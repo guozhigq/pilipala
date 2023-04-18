@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:pilipala/http/init.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Request.setCookie();
   runApp(const MyApp());
 }
 

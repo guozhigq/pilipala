@@ -41,6 +41,10 @@ dependencies:
 
   # 网络
   dio: ^5.1.1
+  cookie_jar: ^3.0.0
+  dio_http2_adapter: ^2.2.0
+  dio_cookie_manager: ^2.1.4
+  connectivity_plus: ^3.0.4
 
   # 图片
   cached_network_image: ^3.2.3
