@@ -12,7 +12,7 @@ class _HotPageState extends State<HotPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('hot'),
+        title: const Text('热门'),
       ),
     );
   }

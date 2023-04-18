@@ -12,7 +12,7 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('mine'),
+        title: const Text('我的'),
       ),
     );
   }
