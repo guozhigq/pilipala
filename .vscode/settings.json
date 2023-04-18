@@ -1,0 +1,6 @@
+{
+    "editor.formatOnSave": true,
+    "[dart]": {
+        "editor.formatOnType": true
+    }
+}
