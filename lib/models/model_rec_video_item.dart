@@ -1,3 +1,5 @@
+import './model_owner.dart';
+
 class RecVideoItemModel {
   RecVideoItemModel({
     this.id,
@@ -23,7 +25,7 @@ class RecVideoItemModel {
   String? title = '';
   int? duration = -1;
   int? pubdate = -1;
-  Onwer? owner;
+  Owner? owner;
   Stat? stat;
   RcmdReason? rcmdReason;
 
@@ -37,29 +39,11 @@ class RecVideoItemModel {
     title = json["title"];
     duration = json["duration"];
     pubdate = json["pubdate"];
-    owner = Onwer.fromJson(json["owner"]);
+    owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);
     rcmdReason = json["rcmd_reason"] != null
         ? RcmdReason.fromJson(json["rcmd_reason"])
         : RcmdReason(content: '');
-  }
-}
-
-class Onwer {
-  Onwer({
-    this.mid,
-    this.name,
-    this.face,
-  });
-
-  int? mid;
-  String? name;
-  String? face;
-
-  Onwer.fromJson(Map<String, dynamic> json) {
-    mid = json["mid"];
-    name = json["name"];
-    face = json['face'];
   }
 }
 

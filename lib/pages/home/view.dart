@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
 import 'package:pilipala/common/widgets/animated_dialog.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
-import 'package:pilipala/models/models_rec_video_item.dart';
 import './controller.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/pages/home/widgets/app_bar.dart';
@@ -114,7 +112,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  OverlayEntry _createPopupDialog(RecVideoItemModel videoItem) {
+  OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
         child: OverlayPop(videoItem: videoItem),

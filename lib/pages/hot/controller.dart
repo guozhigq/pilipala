@@ -3,12 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/model_hot_video_item.dart';
 
 class HotController extends GetxController {
   final ScrollController scrollController = ScrollController();
   final int _count = 20;
   int _currentPage = 1;
-  RxList videoList = [].obs;
+  RxList<HotVideoItemModel> videoList = [HotVideoItemModel()].obs;
   bool isLoadingMore = false;
   bool flag = false;
   OverlayEntry? popupDialog;
@@ -25,13 +26,16 @@ class HotController extends GetxController {
       Api.hotList,
       data: {'pn': _currentPage, 'ps': _count},
     );
-    var data = res.data['data']['list'];
+    List<HotVideoItemModel> list = [];
+    for (var i in res.data['data']['list']) {
+      list.add(HotVideoItemModel.fromJson(i));
+    }
     if (type == 'init') {
-      videoList.value = data;
+      videoList.value = list;
     } else if (type == 'onRefresh') {
-      videoList.insertAll(0, data);
+      videoList.insertAll(0, list);
     } else if (type == 'onLoad') {
-      videoList.addAll(data);
+      videoList.addAll(list);
     }
     _currentPage += 1;
     isLoadingMore = false;
