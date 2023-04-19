@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+// import 'package:pilipala/pages/home/controller.dart';
+import 'package:pilipala/pages/home/index.dart';
 import './controller.dart';
 
 class MainApp extends StatefulWidget {
@@ -11,10 +13,13 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
+  final HomeController _homeController = Get.put(HomeController());
+
   late AnimationController? _animationController;
   late Animation<double>? _fadeAnimation;
   late Animation<double>? _slideAnimation;
   int selectedIndex = 0;
+  int? _lastSelectTime; //上次点击时间
 
   @override
   void initState() {
@@ -29,9 +34,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         Tween<double>(begin: 0.8, end: 1.0).animate(_animationController!);
     _slideAnimation =
         Tween(begin: 0.8, end: 1.0).animate(_animationController!);
+    _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
   }
 
-  void setIndex(int value) {
+  void setIndex(int value) async {
     if (selectedIndex != value) {
       selectedIndex = value;
       _animationController!.reverse().then((_) {
@@ -39,6 +45,23 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         _animationController!.forward();
       });
       setState(() {});
+    }
+
+    var currentPage = _mainController.pages[value];
+    if (currentPage is HomePage) {
+      if (_homeController.flag) {
+        // 单击返回顶部 双击并刷新
+        if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
+          _homeController.onRefresh();
+        } else {
+          await Future.delayed(const Duration(microseconds: 300));
+          _homeController.animateToTop();
+        }
+        _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+      }
+      _homeController.flag = true;
+    } else {
+      _homeController.flag = false;
     }
   }
 

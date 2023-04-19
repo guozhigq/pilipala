@@ -11,6 +11,7 @@ class HomeController extends GetxController {
   int crossAxisCount = 2;
   RxList<RecVideoItemModel> videoList = [RecVideoItemModel()].obs;
   bool isLoadingMore = false;
+  bool flag = false;
 
   @override
   void onInit() {
@@ -48,5 +49,16 @@ class HomeController extends GetxController {
   Future onLoad() async {
     await Future.delayed(const Duration(milliseconds: 500));
     queryRcmdFeed('onLoad');
+  }
+
+  // 返回顶部并刷新
+  void animateToTop() async {
+    if (scrollController.offset >=
+        MediaQuery.of(Get.context!).size.height * 5) {
+      scrollController.jumpTo(0);
+    } else {
+      await scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    }
   }
 }
