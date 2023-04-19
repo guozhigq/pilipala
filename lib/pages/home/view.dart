@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_v.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import './controller.dart';
 import 'package:pilipala/common/constants.dart';
@@ -84,7 +85,7 @@ class _HomePageState extends State<HomePage>
                   (BuildContext context, int index) {
                     return videoList.isNotEmpty
                         ? VideoCardV(videoItem: videoList[index])
-                        : const Text('加载中');
+                        : const VideoCardVSkeleton();
                   },
                   childCount: videoList.isNotEmpty ? videoList.length : 10,
                 ),

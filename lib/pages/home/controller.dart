@@ -26,7 +26,6 @@ class HomeController extends GetxController {
     );
     List<RecVideoItemModel> list = [];
     for (var i in res.data['data']['item']) {
-      print(i);
       list.add(RecVideoItemModel.fromJson(i));
     }
     if (type == 'init') {
