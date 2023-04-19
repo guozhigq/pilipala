@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/video_card_v.dart';
 import './controller.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/pages/home/widgets/app_bar.dart';
@@ -76,15 +77,14 @@ class _HomePageState extends State<HomePage>
                     // 列数
                     crossAxisCount: _homeController.crossAxisCount,
                     mainAxisExtent: MediaQuery.of(context).size.width /
-                            _homeController.crossAxisCount *
-                            (10 / 16) +
+                            _homeController.crossAxisCount /
+                            StyleString.aspectRatio +
                         72),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return Container(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
-                      child: Text(index.toString()),
-                    );
+                    return videoList.isNotEmpty
+                        ? VideoCardV(videoItem: videoList[index])
+                        : const Text('加载中');
                   },
                   childCount: videoList.isNotEmpty ? videoList.length : 10,
                 ),
