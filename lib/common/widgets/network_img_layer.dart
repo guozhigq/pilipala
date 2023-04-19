@@ -10,20 +10,18 @@ class NetworkImgLayer extends StatelessWidget {
   final String? type;
   final Duration? fadeOutDuration;
   final Duration? fadeInDuration;
-  var onTap;
 
-  NetworkImgLayer(
-      {Key? key,
-      this.src,
-      required this.width,
-      required this.height,
-      this.cacheW,
-      this.cacheH,
-      this.type,
-      this.fadeOutDuration,
-      this.fadeInDuration,
-      this.onTap})
-      : super(key: key);
+  const NetworkImgLayer({
+    Key? key,
+    this.src,
+    required this.width,
+    required this.height,
+    this.cacheW,
+    this.cacheH,
+    this.type,
+    this.fadeOutDuration,
+    this.fadeInDuration,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +32,15 @@ class NetworkImgLayer extends StatelessWidget {
               imageUrl: src!,
               width: width ?? double.infinity,
               height: height ?? double.infinity,
-              maxWidthDiskCache: (cacheW ?? width!).toInt(),
-              maxHeightDiskCache: (cacheH ?? height!).toInt(),
-              memCacheWidth: (cacheW ?? width!).toInt(),
-              memCacheHeight: (cacheH ?? height!).toInt(),
-              fit: BoxFit.cover,
+              maxWidthDiskCache:
+                  ((cacheW ?? width!) * MediaQuery.of(context).devicePixelRatio)
+                      .toInt(),
+              // maxHeightDiskCache: (cacheH ?? height!).toInt(),
+              memCacheWidth:
+                  ((cacheW ?? width!) * MediaQuery.of(context).devicePixelRatio)
+                      .toInt(),
+              // memCacheHeight: (cacheH ?? height!).toInt(),
+              fit: BoxFit.fitWidth,
               fadeOutDuration:
                   fadeOutDuration ?? const Duration(milliseconds: 200),
               fadeInDuration:
