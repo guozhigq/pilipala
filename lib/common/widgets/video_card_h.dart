@@ -47,7 +47,7 @@ class VideoCardH extends StatelessWidget {
                               NetworkImgLayer(
                                 // src: videoItem['pic'] +
                                 //     '@${(maxWidth * 2).toInt()}w',
-                                src: videoItem['pic'] + '@.webp',
+                                src: videoItem.pic + '@.webp',
                                 width: maxWidth,
                                 height: maxHeight,
                               ),
@@ -62,7 +62,7 @@ class VideoCardH extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(4),
                                       color: Colors.black54.withOpacity(0.4)),
                                   child: Text(
-                                    Utils.timeFormat(videoItem['duration']!),
+                                    Utils.timeFormat(videoItem.duration!),
                                     style: const TextStyle(
                                         fontSize: 11, color: Colors.white),
                                   ),
@@ -100,7 +100,7 @@ class VideoContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              videoItem['title'],
+              videoItem.title,
               textAlign: TextAlign.start,
               style: TextStyle(
                   fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
@@ -109,8 +109,8 @@ class VideoContent extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            if (videoItem['rcmd_reason'] != '' &&
-                videoItem['rcmd_reason']['content'] != '')
+            if (videoItem.rcmdReason != '' &&
+                videoItem.rcmdReason.content != '')
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
                 decoration: BoxDecoration(
@@ -119,7 +119,7 @@ class VideoContent extends StatelessWidget {
                       color: Theme.of(context).colorScheme.surfaceTint),
                 ),
                 child: Text(
-                  videoItem['rcmd_reason']['content'],
+                  videoItem.rcmdReason.content,
                   style: TextStyle(
                       fontSize: 9,
                       color: Theme.of(context).colorScheme.surfaceTint),
@@ -135,7 +135,7 @@ class VideoContent extends StatelessWidget {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  videoItem['owner']['name'],
+                  videoItem.owner.name,
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                     color: Theme.of(context).colorScheme.outline,
@@ -147,11 +147,11 @@ class VideoContent extends StatelessWidget {
               children: [
                 StatView(
                   theme: 'gray',
-                  view: videoItem['stat']['view'],
+                  view: videoItem.stat.view,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  Utils.dateFormat(videoItem['pubdate']!),
+                  Utils.dateFormat(videoItem.pubdate!),
                   style: TextStyle(
                       fontSize: 11,
                       color: Theme.of(context).colorScheme.outline),

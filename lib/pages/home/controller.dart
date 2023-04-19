@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/models_rec_video_item.dart';
+import 'package:pilipala/models/model_rec_video_item.dart';
 
 class HomeController extends GetxController {
   final ScrollController scrollController = ScrollController();
