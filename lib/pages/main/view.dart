@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:pilipala/pages/home/controller.dart';
 import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/pages/hot/index.dart';
 import './controller.dart';
 
 class MainApp extends StatefulWidget {
@@ -14,6 +14,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
+  final HotController _hotController = Get.put(HotController());
 
   late AnimationController? _animationController;
   late Animation<double>? _fadeAnimation;
@@ -62,6 +63,22 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _homeController.flag = true;
     } else {
       _homeController.flag = false;
+    }
+
+    if (currentPage is HotPage) {
+      if (_hotController.flag) {
+        // 单击返回顶部 双击并刷新
+        if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
+          _hotController.onRefresh();
+        } else {
+          await Future.delayed(const Duration(microseconds: 300));
+          _hotController.animateToTop();
+        }
+        _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+      }
+      _hotController.flag = true;
+    } else {
+      _hotController.flag = false;
     }
   }
 
