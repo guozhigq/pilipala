@@ -10,8 +10,15 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
   var videoItem;
+  Function()? longPress;
+  Function()? longPressEnd;
 
-  VideoCardV({Key? key, required this.videoItem}) : super(key: key);
+  VideoCardV({
+    Key? key,
+    required this.videoItem,
+    this.longPress,
+    this.longPressEnd,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,58 +29,63 @@ class VideoCardV extends StatelessWidget {
         borderRadius: StyleString.mdRadius,
       ),
       margin: EdgeInsets.zero,
-      child: InkWell(
-        onTap: () async {
-          await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?aid=${videoItem.id}',
-              arguments: {'videoItem': videoItem});
-        },
+      child: GestureDetector(
         onLongPress: () {
-          print('长按');
+          longPress!();
         },
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: StyleString.imgRadius,
-                topRight: StyleString.imgRadius,
-              ),
-              child: AspectRatio(
-                aspectRatio: StyleString.aspectRatio,
-                child: LayoutBuilder(builder: (context, boxConstraints) {
-                  double maxWidth = boxConstraints.maxWidth;
-                  double maxHeight = boxConstraints.maxHeight;
-                  double PR = MediaQuery.of(context).devicePixelRatio;
-                  return Stack(
-                    children: [
-                      NetworkImgLayer(
-                        // 指定图片尺寸
-                        // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
-                        src: videoItem.pic + '@.webp',
-                        width: maxWidth,
-                        height: maxHeight,
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: AnimatedOpacity(
-                          opacity: 1,
-                          duration: const Duration(milliseconds: 200),
-                          child: VideoStat(
-                            view: videoItem.stat.view,
-                            danmaku: videoItem.stat.danmaku,
-                            duration: videoItem.duration,
-                          ),
+        onLongPressEnd: (details) {
+          longPressEnd!();
+        },
+        child: InkWell(
+          onTap: () async {
+            await Future.delayed(const Duration(milliseconds: 200));
+            Get.toNamed('/video?aid=${videoItem.id}',
+                arguments: {'videoItem': videoItem});
+          },
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: StyleString.imgRadius,
+                  topRight: StyleString.imgRadius,
+                ),
+                child: AspectRatio(
+                  aspectRatio: StyleString.aspectRatio,
+                  child: LayoutBuilder(builder: (context, boxConstraints) {
+                    double maxWidth = boxConstraints.maxWidth;
+                    double maxHeight = boxConstraints.maxHeight;
+                    double PR = MediaQuery.of(context).devicePixelRatio;
+                    return Stack(
+                      children: [
+                        NetworkImgLayer(
+                          // 指定图片尺寸
+                          // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
+                          src: videoItem.pic + '@.webp',
+                          width: maxWidth,
+                          height: maxHeight,
                         ),
-                      )
-                    ],
-                  );
-                }),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: VideoStat(
+                              view: videoItem.stat.view,
+                              danmaku: videoItem.stat.danmaku,
+                              duration: videoItem.duration,
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }),
+                ),
               ),
-            ),
-            VideoContent(videoItem: videoItem)
-          ],
+              VideoContent(videoItem: videoItem)
+            ],
+          ),
         ),
       ),
     );

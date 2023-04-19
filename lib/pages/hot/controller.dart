@@ -11,6 +11,7 @@ class HotController extends GetxController {
   RxList videoList = [].obs;
   bool isLoadingMore = false;
   bool flag = false;
+  OverlayEntry? popupDialog;
 
   @override
   void onInit() {
