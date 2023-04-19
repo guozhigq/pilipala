@@ -26,7 +26,7 @@ class VideoCardH extends StatelessWidget {
                 StyleString.cardSpace, 5, StyleString.cardSpace, 5),
             child: LayoutBuilder(builder: (context, boxConstraints) {
               double width =
-                  (boxConstraints.maxWidth - StyleString.cardSpace * 3) / 2;
+                  (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
               return SizedBox(
                 height: width / StyleString.aspectRatio,
                 child: Row(

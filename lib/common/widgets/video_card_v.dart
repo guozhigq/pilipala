@@ -48,7 +48,7 @@ class VideoCardV extends StatelessWidget {
                     children: [
                       NetworkImgLayer(
                         // 指定图片尺寸
-                        // src: videoItem['pic'] + '@${(maxWidth * 2).toInt() }w',
+                        // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
                         src: videoItem.pic + '@.webp',
                         width: maxWidth,
                         height: maxHeight,

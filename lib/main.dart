@@ -18,6 +18,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: ((lightDynamic, darkDynamic) {
+        // 图片缓存
+        // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
           title: 'PiLiPaLa',
           theme: ThemeData(

@@ -25,6 +25,8 @@ class NetworkImgLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double pr = MediaQuery.of(context).devicePixelRatio;
+    // double pr = 2;
     return src != ''
         ? ClipRRect(
             borderRadius: BorderRadius.circular(type == 'avatar' ? 50 : 4),
@@ -32,20 +34,16 @@ class NetworkImgLayer extends StatelessWidget {
               imageUrl: src!,
               width: width ?? double.infinity,
               height: height ?? double.infinity,
-              maxWidthDiskCache:
-                  ((cacheW ?? width!) * MediaQuery.of(context).devicePixelRatio)
-                      .toInt(),
+              maxWidthDiskCache: ((cacheW ?? width!) * pr).toInt(),
               // maxHeightDiskCache: (cacheH ?? height!).toInt(),
-              memCacheWidth:
-                  ((cacheW ?? width!) * MediaQuery.of(context).devicePixelRatio)
-                      .toInt(),
+              memCacheWidth: ((cacheW ?? width!) * pr).toInt(),
               // memCacheHeight: (cacheH ?? height!).toInt(),
-              fit: BoxFit.fitWidth,
+              fit: BoxFit.cover,
               fadeOutDuration:
                   fadeOutDuration ?? const Duration(milliseconds: 200),
               fadeInDuration:
                   fadeInDuration ?? const Duration(milliseconds: 200),
-              filterQuality: FilterQuality.high,
+              // filterQuality: FilterQuality.high,
               errorWidget: (context, url, error) => placeholder(context),
               placeholder: (context, url) => placeholder(context),
             ),
