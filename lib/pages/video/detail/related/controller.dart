@@ -7,5 +7,5 @@ class ReleatedController extends GetxController {
   // 推荐视频列表
   List relatedVideoList = [];
 
-  Future<dynamic> queryRelatedVideo() => VideoHttp.relatedVideoList(aid);
+  Future<dynamic> queryRelatedVideo() => VideoHttp.relatedVideoList(aid: aid);
 }

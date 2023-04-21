@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 class VideoDetailController extends GetxController {
+  int tabInitialIndex = 0;
   // tabs
   RxList<String> tabs = <String>['简介', '评论'].obs;
 

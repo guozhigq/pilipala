@@ -19,10 +19,10 @@ class HotController extends GetxController {
 
   // 获取推荐
   Future queryHotFeed(type) async {
-    var res = await VideoHttp.hotVideoList({
-      'pn': _currentPage,
-      'ps': _count,
-    });
+    var res = await VideoHttp.hotVideoList(
+      pn: _currentPage,
+      ps: _count,
+    );
     if (res['status']) {
       if (type == 'init') {
         videoList.value = res['data'];

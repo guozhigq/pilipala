@@ -44,7 +44,7 @@ class VideoIntroController extends GetxController {
 
   // 获取视频简介
   Future queryVideoIntro() async {
-    var result = await VideoHttp.videoIntro(aid);
+    var result = await VideoHttp.videoIntro(aid: aid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       Get.find<VideoDetailController>().tabs.value = [
@@ -61,7 +61,7 @@ class VideoIntroController extends GetxController {
 
   // 获取up主粉丝数
   Future queryUserStat() async {
-    var result = await UserHttp.userStat(videoDetail.value.owner!.mid);
+    var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
       userStat = result['data'];
     }

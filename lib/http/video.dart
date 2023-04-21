@@ -10,13 +10,13 @@ import 'package:pilipala/models/video_detail_res.dart';
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
   // 首页推荐视频
-  static Future rcmdVideoList(data) async {
+  static Future rcmdVideoList({required int ps, required int freshIdx}) async {
     var res = await Request().get(
       Api.recommendList,
       data: {
         'feed_version': 'V3',
-        'ps': data['ps'],
-        'fresh_idx': data['fresh_idx']
+        'ps': ps,
+        'fresh_idx': freshIdx,
       },
     );
     if (res.data['code'] == 0) {
@@ -31,13 +31,10 @@ class VideoHttp {
   }
 
   // 最热视频
-  static Future hotVideoList(data) async {
+  static Future hotVideoList({required int pn, required int ps}) async {
     var res = await Request().get(
       Api.hotList,
-      data: {
-        'pn': data['pn'],
-        'ps': data['ps'],
-      },
+      data: {'pn': pn, 'ps': ps},
     );
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
@@ -51,7 +48,7 @@ class VideoHttp {
   }
 
   // 视频信息 标题、简介
-  static Future videoIntro(aid) async {
+  static Future videoIntro({required String aid}) async {
     var res = await Request().get(Api.videoIntro, data: {'aid': aid});
     VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
     if (result.code == 0) {
@@ -67,13 +64,13 @@ class VideoHttp {
       return {
         'status': false,
         'data': null,
-        'msg': errMap[result.code] ?? '请求异常'
+        'msg': errMap[result.code] ?? '请求异常',
       };
     }
   }
 
   // 相关视频
-  static Future relatedVideoList(aid) async {
+  static Future relatedVideoList({required String aid}) async {
     var res = await Request().get(Api.relatedList, data: {'aid': aid});
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];

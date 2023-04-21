@@ -13,4 +13,7 @@ class Api {
   // 用户(被)关注数、投稿数
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';
+
+  // 评论列表
+  static const String replyList = '/x/v2/reply';
 }

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
@@ -19,6 +20,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      initialIndex: videoDetailController.tabInitialIndex,
       length: videoDetailController.tabs.length, // tab的数量.
       child: SafeArea(
         top: false,
@@ -137,9 +139,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                             context),
                       ),
-                      const SliverToBoxAdapter(
-                        child: Text('评论'),
-                      )
+                      const VideoReplyPanel()
                     ],
                   );
                 })

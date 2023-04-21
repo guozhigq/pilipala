@@ -20,10 +20,10 @@ class HomeController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    var res = await VideoHttp.rcmdVideoList({
-      'ps': count,
-      'fresh_idx': _currentPage,
-    });
+    var res = await VideoHttp.rcmdVideoList(
+      ps: count,
+      freshIdx: _currentPage,
+    );
     if (res['status']) {
       if (type == 'init') {
         videoList.value = res['data'];
