@@ -20,7 +20,7 @@ class VideoIntroPanel extends StatefulWidget {
 class _VideoIntroPanelState extends State<VideoIntroPanel>
     with AutomaticKeepAliveClientMixin {
   final VideoIntroController videoIntroController =
-      Get.put(VideoIntroController());
+      Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
   VideoDetailData? videoDetail;
 
   // 添加页面缓存

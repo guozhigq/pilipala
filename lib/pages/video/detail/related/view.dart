@@ -11,7 +11,8 @@ class RelatedVideoPanel extends StatefulWidget {
 }
 
 class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
-  final ReleatedController _releatedController = Get.put(ReleatedController());
+  final ReleatedController _releatedController =
+      Get.put(ReleatedController(), tag: Get.arguments['heroTag']);
 
   @override
   Widget build(BuildContext context) {

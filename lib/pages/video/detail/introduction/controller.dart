@@ -47,10 +47,9 @@ class VideoIntroController extends GetxController {
     var result = await VideoHttp.videoIntro(aid: aid);
     if (result['status']) {
       videoDetail.value = result['data']!;
-      Get.find<VideoDetailController>().tabs.value = [
-        '简介',
-        '评论 ${result['data']!.stat!.reply}'
-      ];
+      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+          .tabs
+          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
     } else {
       responseMsg = result['msg'];
     }

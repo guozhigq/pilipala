@@ -15,7 +15,7 @@ class VideoDetailPage extends StatefulWidget {
 
 class _VideoDetailPageState extends State<VideoDetailPage> {
   final VideoDetailController videoDetailController =
-      Get.put(VideoDetailController());
+      Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
 
   @override
   Widget build(BuildContext context) {
