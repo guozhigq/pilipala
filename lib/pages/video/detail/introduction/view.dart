@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/video/detail/widgets/expandable_section.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -43,27 +44,29 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: videoIntroController.queryVideoDetail(),
+      future: videoIntroController.queryVideoIntro(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.data) {
+          if (snapshot.data['status']) {
             // 请求成功
             // return _buildView(context, false, videoDetail);
-            return VideoInfo(loadingStatus: false, videoDetail: videoDetail);
+            return VideoInfo(
+                loadingStatus: false,
+                videoDetail: videoDetail,
+                videoIntroController: videoIntroController);
           } else {
             // 请求错误
-            return Center(
-              child: IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  setState(() {});
-                },
-              ),
+            return HttpError(
+              errMsg: snapshot.data['msg'],
+              fn: () => setState(() {}),
             );
           }
         } else {
           // return _buildView(context, true, videoDetail);
-          return VideoInfo(loadingStatus: true, videoDetail: videoDetail);
+          return VideoInfo(
+              loadingStatus: true,
+              videoDetail: videoDetail,
+              videoIntroController: videoIntroController);
         }
       },
     );
@@ -90,8 +93,13 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 class VideoInfo extends StatefulWidget {
   bool loadingStatus = false;
   VideoDetailData? videoDetail;
+  VideoIntroController? videoIntroController;
 
-  VideoInfo({Key? key, required this.loadingStatus, this.videoDetail})
+  VideoInfo(
+      {Key? key,
+      required this.loadingStatus,
+      this.videoDetail,
+      this.videoIntroController})
       : super(key: key);
 
   @override
@@ -150,19 +158,17 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                 ? widget.videoDetail!.owner!.name
                                 : videoItem['owner'].name),
                             const SizedBox(height: 2),
-                            // Text.rich(
-                            //   TextSpan(
-                            //       style: TextStyle(
-                            //           color: Theme.of(context)
-                            //               .colorScheme
-                            //               .outline,
-                            //           fontSize: 11),
-                            //       children: const [
-                            //         TextSpan(text: '2.6万粉丝'),
-                            //         TextSpan(text: '  '),
-                            //         TextSpan(text: '2.6万粉丝'),
-                            //       ]),
-                            // ),
+                            Text(
+                              widget.loadingStatus
+                                  ? '- 粉丝'
+                                  : '${Utils.numFormat(widget.videoIntroController!.userStat['follower'])}粉丝',
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize,
+                                  color: Theme.of(context).colorScheme.outline),
+                            )
                           ]),
                       const Spacer(),
                       AnimatedOpacity(

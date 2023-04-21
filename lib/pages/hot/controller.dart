@@ -1,8 +1,6 @@
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
+import 'package:flutter/material.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 
 class HotController extends GetxController {
@@ -21,22 +19,20 @@ class HotController extends GetxController {
 
   // 获取推荐
   Future queryHotFeed(type) async {
-    var res = await Request().get(
-      Api.hotList,
-      data: {'pn': _currentPage, 'ps': _count},
-    );
-    List<HotVideoItemModel> list = [];
-    for (var i in res.data['data']['list']) {
-      list.add(HotVideoItemModel.fromJson(i));
+    var res = await VideoHttp.hotVideoList({
+      'pn': _currentPage,
+      'ps': _count,
+    });
+    if (res['status']) {
+      if (type == 'init') {
+        videoList.value = res['data'];
+      } else if (type == 'onRefresh') {
+        videoList.insertAll(0, res['data']);
+      } else if (type == 'onLoad') {
+        videoList.addAll(res['data']);
+      }
+      _currentPage += 1;
     }
-    if (type == 'init') {
-      videoList.value = list;
-    } else if (type == 'onRefresh') {
-      videoList.insertAll(0, list);
-    } else if (type == 'onLoad') {
-      videoList.addAll(list);
-    }
-    _currentPage += 1;
     isLoadingMore = false;
   }
 

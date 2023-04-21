@@ -16,22 +16,22 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _releatedController.queryVideoRecommend(),
+      future: _releatedController.queryRelatedVideo(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.data!.isNotEmpty) {
+          if (snapshot.data!['status']) {
             // 请求成功
-            List videoList = _releatedController.relatedVideoList;
+            // List videoList = _releatedController.relatedVideoList;
             return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-              if (index == videoList.length) {
+              if (index == snapshot.data['data'].length) {
                 return SizedBox(height: MediaQuery.of(context).padding.bottom);
               } else {
                 return VideoCardH(
-                  videoItem: videoList[index],
+                  videoItem: snapshot.data['data'][index],
                 );
               }
-            }, childCount: videoList.length + 1));
+            }, childCount: snapshot.data['data'].length + 1));
           } else {
             // 请求错误
             return const Center(

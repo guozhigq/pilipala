@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 
 class HomeController extends GetxController {
@@ -21,22 +20,20 @@ class HomeController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    var res = await Request().get(
-      Api.recommendList,
-      data: {'feed_version': "V3", 'ps': count, 'fresh_idx': _currentPage},
-    );
-    List<RecVideoItemModel> list = [];
-    for (var i in res.data['data']['item']) {
-      list.add(RecVideoItemModel.fromJson(i));
+    var res = await VideoHttp.rcmdVideoList({
+      'ps': count,
+      'fresh_idx': _currentPage,
+    });
+    if (res['status']) {
+      if (type == 'init') {
+        videoList.value = res['data'];
+      } else if (type == 'onRefresh') {
+        videoList.insertAll(0, res['data']);
+      } else if (type == 'onLoad') {
+        videoList.addAll(res['data']);
+      }
+      _currentPage += 1;
     }
-    if (type == 'init') {
-      videoList.value = list;
-    } else if (type == 'onRefresh') {
-      videoList.insertAll(0, list);
-    } else if (type == 'onLoad') {
-      videoList.addAll(list);
-    }
-    _currentPage += 1;
     isLoadingMore = false;
   }
 

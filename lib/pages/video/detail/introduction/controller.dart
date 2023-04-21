@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
+import 'package:pilipala/http/user.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 
@@ -20,6 +20,12 @@ class VideoIntroController extends GetxController {
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
 
+  // 请求返回的信息
+  String responseMsg = '请求异常';
+
+  // up主粉丝数
+  Map userStat = {'follower': '-'};
+
   @override
   void onInit() {
     super.onInit();
@@ -36,17 +42,28 @@ class VideoIntroController extends GetxController {
     }
   }
 
-  Future queryVideoDetail() async {
-    var res = await Request().get(Api.videoDetail, data: {
-      'aid': aid,
-    });
-    VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
-    videoDetail.value = result.data!;
-    Get.find<VideoDetailController>().tabs.value = [
-      '简介',
-      '评论 ${result.data!.stat!.reply}'
-    ];
-    // await Future.delayed(const Duration(seconds: 3));
-    return true;
+  // 获取视频简介
+  Future queryVideoIntro() async {
+    var result = await VideoHttp.videoIntro(aid);
+    if (result['status']) {
+      videoDetail.value = result['data']!;
+      Get.find<VideoDetailController>().tabs.value = [
+        '简介',
+        '评论 ${result['data']!.stat!.reply}'
+      ];
+    } else {
+      responseMsg = result['msg'];
+    }
+    // 获取到粉丝数再返回
+    await queryUserStat();
+    return result;
+  }
+
+  // 获取up主粉丝数
+  Future queryUserStat() async {
+    var result = await UserHttp.userStat(videoDetail.value.owner!.mid);
+    if (result['status']) {
+      userStat = result['data'];
+    }
   }
 }
