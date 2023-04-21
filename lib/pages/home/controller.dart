@@ -47,7 +47,6 @@ class HomeController extends GetxController {
 
   // 上拉加载
   Future onLoad() async {
-    await Future.delayed(const Duration(milliseconds: 500));
     queryRcmdFeed('onLoad');
   }
 

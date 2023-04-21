@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/pages/video/detail/introduction/index.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -52,10 +53,13 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                             double maxWidth = boxConstraints.maxWidth;
                             double maxHeight = boxConstraints.maxHeight;
                             double PR = MediaQuery.of(context).devicePixelRatio;
-                            return NetworkImgLayer(
-                              src: videoDetailController.videoItem['pic'],
-                              width: maxWidth,
-                              height: maxHeight,
+                            return Hero(
+                              tag: videoDetailController.heroTag,
+                              child: NetworkImgLayer(
+                                src: videoDetailController.videoItem['pic'],
+                                width: maxWidth,
+                                height: maxHeight,
+                              ),
                             );
                           },
                         ),
@@ -112,10 +116,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                             context),
                       ),
-                      // const VideoIntroPanel(),
-                      const SliverToBoxAdapter(
-                        child: Text('简介'),
-                      )
+                      const VideoIntroPanel(),
                     ],
                   );
                 }),

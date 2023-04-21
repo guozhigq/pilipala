@@ -13,6 +13,7 @@ class VideoDetailController extends GetxController {
   // 请求状态
   RxBool isLoading = false.obs;
 
+  String heroTag = '';
   @override
   void onInit() {
     super.onInit();
@@ -24,6 +25,7 @@ class VideoDetailController extends GetxController {
           videoItem['pic'] = args.pic;
         }
       }
+      heroTag = Get.arguments['heroTag'];
     }
   }
 }

@@ -1,5 +1,6 @@
 // 工具函数
 import 'dart:io';
+import 'dart:math';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -129,5 +130,9 @@ class Utils {
       return date.split(' ')[0];
     }
     return date;
+  }
+
+  static String makeHeroTag(v) {
+    return v.toString() + Random().nextInt(9999).toString();
   }
 }

@@ -15,6 +15,7 @@ class VideoCardV extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
       elevation: 0.8,
       clipBehavior: Clip.hardEdge,
@@ -26,7 +27,7 @@ class VideoCardV extends StatelessWidget {
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
           Get.toNamed('/video?aid=${videoItem.id}',
-              arguments: {'videoItem': videoItem});
+              arguments: {'videoItem': videoItem, 'heroTag': heroTag});
         },
         onLongPress: () {
           print('长按');
@@ -46,12 +47,15 @@ class VideoCardV extends StatelessWidget {
                   double PR = MediaQuery.of(context).devicePixelRatio;
                   return Stack(
                     children: [
-                      NetworkImgLayer(
-                        // 指定图片尺寸
-                        // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
-                        src: videoItem.pic + '@.webp',
-                        width: maxWidth,
-                        height: maxHeight,
+                      Hero(
+                        tag: heroTag,
+                        child: NetworkImgLayer(
+                          // 指定图片尺寸
+                          // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
+                          src: videoItem.pic + '@.webp',
+                          width: maxWidth,
+                          height: maxHeight,
+                        ),
                       ),
                       Positioned(
                         left: 0,
