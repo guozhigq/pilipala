@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage>
                     mainAxisExtent: MediaQuery.of(context).size.width /
                             _homeController.crossAxisCount /
                             StyleString.aspectRatio +
-                        72),
+                        70),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return videoList.isNotEmpty

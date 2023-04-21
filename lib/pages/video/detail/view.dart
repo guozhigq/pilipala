@@ -120,13 +120,16 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                             context),
                       ),
                       const VideoIntroPanel(),
-                      SliverToBoxAdapter(
-                        child: Divider(
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.1),
+                      SliverPadding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 5),
+                        sliver: SliverToBoxAdapter(
+                          child: Divider(
+                            height: 1,
+                            color:
+                                Theme.of(context).dividerColor.withOpacity(0.1),
+                          ),
                         ),
                       ),
-                      const SliverPadding(padding: EdgeInsets.only(bottom: 5)),
                       const RelatedVideoPanel(),
                     ],
                   );

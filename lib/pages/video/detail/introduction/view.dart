@@ -62,7 +62,6 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             );
           }
         } else {
-          // return _buildView(context, true, videoDetail);
           return VideoInfo(
               loadingStatus: true,
               videoDetail: videoDetail,
@@ -70,23 +69,6 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
         }
       },
     );
-  }
-
-  Widget _buildView(context, loadingStatus, videoDetail) {
-    // return CustomScrollView(
-    //   key: const PageStorageKey<String>('简介'),
-    //   slivers: <Widget>[
-    //     SliverOverlapInjector(
-    //         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
-    //     VideoInfo(loadingStatus: loadingStatus, videoDetail: videoDetail),
-    //     SliverToBoxAdapter(
-    //       child:
-    //           Divider(color: Theme.of(context).dividerColor.withOpacity(0.1)),
-    //     ),
-    //     const RecommendList()
-    //   ],
-    // );
-    return VideoInfo(loadingStatus: loadingStatus, videoDetail: videoDetail);
   }
 }
 
@@ -183,7 +165,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       const SizedBox(width: 4),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 13),
                   // 标题 超过两行收起
                   // Container(
                   //   color: Colors.blue[50],
@@ -231,73 +213,81 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   //     ),
                   //   ],
                   // ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      !widget.loadingStatus
-                          ? widget.videoDetail!.title
-                          : videoItem['title'],
-                      // style: Theme.of(context).textTheme.titleMedium,
-                      // maxLines: 2,
-                    ),
+
+                  Text(
+                    !widget.loadingStatus
+                        ? widget.videoDetail!.title
+                        : videoItem['title'],
                   ),
                   // const SizedBox(height: 5),
                   // 播放量、评论、日期
-                  Row(
-                    children: [
-                      const SizedBox(width: 2),
-                      StatView(
-                        theme: 'gray',
-                        view: !widget.loadingStatus
-                            ? widget.videoDetail!.stat!.view
-                            : videoItem['stat'].view,
-                        size: 'medium',
-                      ),
-                      const SizedBox(width: 10),
-                      StatDanMu(
-                        theme: 'gray',
-                        danmu: !widget.loadingStatus
-                            ? widget.videoDetail!.stat!.danmaku
-                            : videoItem['stat'].danmaku,
-                        size: 'medium',
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        Utils.dateFormat(
-                            !widget.loadingStatus
-                                ? widget.videoDetail!.pubdate
-                                : videoItem['pubdate'],
-                            formatType: 'detail'),
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.outline),
-                      ),
-                      const Spacer(),
-                      RotationTransition(
-                        turns: _manualAnimation!,
-                        child: IconButton(
-                          onPressed: () {
-                            /// 获取动画当前的值
-                            var value = _manualController!.value;
 
-                            /// 0.5代表 180弧度
-                            if (value == 0) {
-                              _manualController!.animateTo(0.5);
-                            } else {
-                              _manualController!.animateTo(0);
-                            }
-                            setState(() {
-                              isExpand = !isExpand;
-                            });
-                          },
-                          icon: Icon(
-                            Icons.expand_less,
-                            color: Theme.of(context).colorScheme.outline,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    onTap: () {
+                      _manualController!.animateTo(isExpand ? 0 : 0.5);
+                      setState(() {
+                        isExpand = !isExpand;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 2),
+                        StatView(
+                          theme: 'gray',
+                          view: !widget.loadingStatus
+                              ? widget.videoDetail!.stat!.view
+                              : videoItem['stat'].view,
+                          size: 'medium',
+                        ),
+                        const SizedBox(width: 10),
+                        StatDanMu(
+                          theme: 'gray',
+                          danmu: !widget.loadingStatus
+                              ? widget.videoDetail!.stat!.danmaku
+                              : videoItem['stat'].danmaku,
+                          size: 'medium',
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          Utils.dateFormat(
+                              !widget.loadingStatus
+                                  ? widget.videoDetail!.pubdate
+                                  : videoItem['pubdate'],
+                              formatType: 'detail'),
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
+                        const Spacer(),
+                        RotationTransition(
+                          turns: _manualAnimation!,
+                          child: SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: IconButton(
+                              padding: const EdgeInsets.all(2.0),
+                              onPressed: () {
+                                /// 0.5代表 180弧度
+                                _manualController!
+                                    .animateTo(isExpand ? 0 : 0.5);
+                                setState(() {
+                                  isExpand = !isExpand;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.expand_less,
+                                size: 22,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 10),
+                      ],
+                    ),
                   ),
+
                   // const SizedBox(height: 5),
                   // 简介 默认收起
                   if (!widget.loadingStatus)
@@ -342,8 +332,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   // 喜欢 投币 分享
   Widget _actionGrid(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      return Container(
-        color: Colors.black12,
+      return SizedBox(
         height: constraints.maxWidth / 5,
         child: GridView.count(
           primary: false,
@@ -442,41 +431,5 @@ class ActionItem extends StatelessWidget {
         ),
       ),
     ));
-  }
-}
-
-class RecommendList extends StatelessWidget {
-  const RecommendList({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        return Material(
-          child: InkWell(
-            onTap: () {},
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-              child: Text(
-                '$index」 求推荐一些高质量的系统地介绍 ChatGPT 及相关技术的视频、文章或者书',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall!
-                    .copyWith(height: 1.6),
-              ),
-            ),
-          ),
-        );
-      }, childCount: 50),
-    );
-  }
-}
-
-class ActionGrid extends StatelessWidget {
-  const ActionGrid({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
