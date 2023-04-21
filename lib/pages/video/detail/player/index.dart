@@ -1,4 +1,4 @@
-library video_intro_panel;
+library video_player;
 
 export './controller.dart';
 export './view.dart';

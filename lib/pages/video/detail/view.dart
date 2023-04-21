@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
+import 'package:pilipala/pages/video/detail/related/index.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -15,12 +16,10 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
   final VideoDetailController videoDetailController =
       Get.put(VideoDetailController());
 
-  final _tabs = <String>['简介', '评论'];
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: _tabs.length, // tab的数量.
+      length: videoDetailController.tabs.length, // tab的数量.
       child: SafeArea(
         top: false,
         bottom: false,
@@ -80,14 +79,16 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Container(
-                              width: 180,
+                              width: 280,
                               margin: const EdgeInsets.only(left: 20),
-                              child: TabBar(
-                                splashBorderRadius: BorderRadius.circular(6),
-                                dividerColor: Colors.transparent,
-                                tabs: _tabs
-                                    .map((String name) => Tab(text: name))
-                                    .toList(),
+                              child: Obx(
+                                () => TabBar(
+                                  splashBorderRadius: BorderRadius.circular(6),
+                                  dividerColor: Colors.transparent,
+                                  tabs: videoDetailController.tabs
+                                      .map((String name) => Tab(text: name))
+                                      .toList(),
+                                ),
                               ),
                             ),
                             // 弹幕开关
@@ -117,6 +118,14 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                             context),
                       ),
                       const VideoIntroPanel(),
+                      SliverToBoxAdapter(
+                        child: Divider(
+                          color:
+                              Theme.of(context).dividerColor.withOpacity(0.1),
+                        ),
+                      ),
+                      const SliverPadding(padding: EdgeInsets.only(bottom: 5)),
+                      const RelatedVideoPanel(),
                     ],
                   );
                 }),

@@ -13,13 +13,15 @@ class VideoCardH extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int aid = videoItem.aid;
+    String heroTag = Utils.makeHeroTag(aid);
     return Material(
       child: Ink(
         child: InkWell(
           onTap: () async {
             await Future.delayed(const Duration(milliseconds: 200));
-            int aid = videoItem['id'] ?? videoItem['aid'];
-            Get.toNamed('/video?aid=$aid', arguments: {'videoItem': videoItem});
+            Get.toNamed('/video?aid=$aid',
+                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
           },
           child: Container(
             padding: const EdgeInsets.fromLTRB(
@@ -44,12 +46,15 @@ class VideoCardH extends StatelessWidget {
                           double PR = MediaQuery.of(context).devicePixelRatio;
                           return Stack(
                             children: [
-                              NetworkImgLayer(
-                                // src: videoItem['pic'] +
-                                //     '@${(maxWidth * 2).toInt()}w',
-                                src: videoItem.pic + '@.webp',
-                                width: maxWidth,
-                                height: maxHeight,
+                              Hero(
+                                tag: heroTag,
+                                child: NetworkImgLayer(
+                                  // src: videoItem['pic'] +
+                                  //     '@${(maxWidth * 2).toInt()}w',
+                                  src: videoItem.pic + '@.webp',
+                                  width: maxWidth,
+                                  height: maxHeight,
+                                ),
                               ),
                               // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
                               Positioned(
@@ -109,7 +114,7 @@ class VideoContent extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            if (videoItem.rcmdReason != '' &&
+            if (videoItem.rcmdReason != null &&
                 videoItem.rcmdReason.content != '')
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),

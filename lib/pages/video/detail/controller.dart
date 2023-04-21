@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 
 class VideoDetailController extends GetxController {
+  // tabs
+  RxList<String> tabs = <String>['简介', '评论'].obs;
+
   // 视频aid
   String aid = Get.parameters['aid']!;
 
@@ -14,6 +17,7 @@ class VideoDetailController extends GetxController {
   RxBool isLoading = false.obs;
 
   String heroTag = '';
+
   @override
   void onInit() {
     super.onInit();

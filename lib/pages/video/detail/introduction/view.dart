@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
@@ -17,10 +16,15 @@ class VideoIntroPanel extends StatefulWidget {
   State<VideoIntroPanel> createState() => _VideoIntroPanelState();
 }
 
-class _VideoIntroPanelState extends State<VideoIntroPanel> {
+class _VideoIntroPanelState extends State<VideoIntroPanel>
+    with AutomaticKeepAliveClientMixin {
   final VideoIntroController videoIntroController =
       Get.put(VideoIntroController());
   VideoDetailData? videoDetail;
+
+  // 添加页面缓存
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -42,10 +46,10 @@ class _VideoIntroPanelState extends State<VideoIntroPanel> {
       future: videoIntroController.queryVideoDetail(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          print(snapshot.data);
           if (snapshot.data) {
             // 请求成功
-            return _buildView(context, false, videoDetail);
+            // return _buildView(context, false, videoDetail);
+            return VideoInfo(loadingStatus: false, videoDetail: videoDetail);
           } else {
             // 请求错误
             return Center(
@@ -58,7 +62,8 @@ class _VideoIntroPanelState extends State<VideoIntroPanel> {
             );
           }
         } else {
-          return _buildView(context, true, videoDetail);
+          // return _buildView(context, true, videoDetail);
+          return VideoInfo(loadingStatus: true, videoDetail: videoDetail);
         }
       },
     );
@@ -320,7 +325,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ),
                     ),
                   _actionGrid(context),
-                  const SizedBox(height: 5),
+                  // const SizedBox(height: 5),
                 ],
               )
             : const Center(child: CircularProgressIndicator()),

@@ -25,8 +25,8 @@ class VideoHttp {
     }
   }
 
-  // static Future videoRecommend(data) async {
-  //   var res = await Request().get(Api.videoRecommend, data: data);
-  //   return res;
-  // }
+  static Future videoRecommend(data) async {
+    var res = await Request().get(Api.relatedList, data: data);
+    return res;
+  }
 }

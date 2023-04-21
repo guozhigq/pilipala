@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/controller.dart';
 
 class VideoIntroController extends GetxController {
   // 视频aid
@@ -41,6 +42,10 @@ class VideoIntroController extends GetxController {
     });
     VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
     videoDetail.value = result.data!;
+    Get.find<VideoDetailController>().tabs.value = [
+      '简介',
+      '评论 ${result.data!.stat!.reply}'
+    ];
     // await Future.delayed(const Duration(seconds: 3));
     return true;
   }
