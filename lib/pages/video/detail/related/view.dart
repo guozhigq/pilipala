@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import './controller.dart';
 
@@ -22,7 +23,6 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data!['status']) {
             // 请求成功
-            // List videoList = _releatedController.relatedVideoList;
             return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
               if (index == snapshot.data['data'].length) {
@@ -40,8 +40,11 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
             );
           }
         } else {
-          return const SliverToBoxAdapter(
-            child: Text('请求中'),
+          // 骨架屏
+          return SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return const VideoCardHSkeleton();
+            }, childCount: 5),
           );
         }
       },
