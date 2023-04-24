@@ -12,9 +12,14 @@ class VideoReplyPanel extends StatefulWidget {
   State<VideoReplyPanel> createState() => _VideoReplyPanelState();
 }
 
-class _VideoReplyPanelState extends State<VideoReplyPanel> {
+class _VideoReplyPanelState extends State<VideoReplyPanel>
+    with AutomaticKeepAliveClientMixin {
   final VideoReplyController _videoReplyController =
       Get.put(VideoReplyController(), tag: Get.arguments['heroTag']);
+
+  // 添加页面缓存
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {

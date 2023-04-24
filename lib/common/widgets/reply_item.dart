@@ -1,27 +1,13 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/utils.dart';
 
-class ReplyItem extends StatefulWidget {
-  ReplyItem({super.key, this.replyItem, this.isUp});
-  ReplyItemModel? replyItem;
-  bool? isUp;
-
-  @override
-  State<ReplyItem> createState() => _ReplyItemState();
-}
-
-class _ReplyItemState extends State<ReplyItem> {
+class ReplyItem extends StatelessWidget {
+  ReplyItem({super.key, this.replyItem, required this.isUp});
   ReplyItemModel? replyItem;
   bool isUp = false;
-
-  @override
-  void initState() {
-    super.initState();
-    replyItem = widget.replyItem;
-    isUp = widget.isUp!;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +16,7 @@ class _ReplyItemState extends State<ReplyItem> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 8, 4),
+            padding: const EdgeInsets.fromLTRB(12, 8, 8, 14),
             child: content(context),
           ),
           Divider(
@@ -42,7 +28,7 @@ class _ReplyItemState extends State<ReplyItem> {
     );
   }
 
-  Widget lfAvtar() {
+  Widget lfAvtar(context) {
     return Container(
       margin: const EdgeInsets.only(top: 5),
       clipBehavior: Clip.hardEdge,
@@ -78,7 +64,7 @@ class _ReplyItemState extends State<ReplyItem> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  lfAvtar(),
+                  lfAvtar(context),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +79,7 @@ class _ReplyItemState extends State<ReplyItem> {
                                 .textTheme
                                 .titleSmall!
                                 .copyWith(
-                                  color: isUp
+                                  color: isUp!
                                       ? Theme.of(context).colorScheme.primary
                                       : null,
                                 ),
@@ -136,18 +122,24 @@ class _ReplyItemState extends State<ReplyItem> {
             ),
           ),
         ),
-        bottonAction(),
+        bottonAction(context),
+        // Text(replyItem!.replies!.length.toString()),
+        if (replyItem!.replies!.isNotEmpty)
+          ReplyItemRow(
+            replies: replyItem!.replies,
+            replyControl: replyItem!.replyControl,
+          )
       ],
     );
   }
 
   // 感谢、回复、复制
-  Widget bottonAction() {
+  Widget bottonAction(context) {
     var color = Theme.of(context).colorScheme.outline;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        // const SizedBox(width: 42),
+        const SizedBox(width: 42),
         SizedBox(
           height: 35,
           child: TextButton(
@@ -173,6 +165,91 @@ class _ReplyItemState extends State<ReplyItem> {
         ),
         const SizedBox(width: 5)
       ],
+    );
+  }
+}
+
+class ReplyItemRow extends StatelessWidget {
+  ReplyItemRow({super.key, this.replies, this.replyControl});
+  List? replies;
+  var replyControl;
+
+  @override
+  Widget build(BuildContext context) {
+    bool isShow = replyControl.isShow;
+    int extraRow = replyControl != null && isShow ? 1 : 0;
+    return Container(
+      margin: const EdgeInsets.only(left: 45, right: 10),
+      padding: const EdgeInsets.only(top: 4, bottom: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Material(
+        color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(6),
+        clipBehavior: Clip.hardEdge,
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: replies!.length + extraRow,
+          itemBuilder: (context, index) {
+            if (extraRow == 1 && index == replies!.length) {
+              return ListTile(
+                onTap: () {},
+                dense: true,
+                contentPadding: const EdgeInsets.only(left: 10, right: 6),
+                title: Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize:
+                          Theme.of(context).textTheme.titleSmall!.fontSize,
+                    ),
+                    children: [
+                      if (replyControl.upReply) const TextSpan(text: 'up回复了'),
+                      if (replyControl.isUpTop) const TextSpan(text: 'up点赞了'),
+                      TextSpan(text: replyControl.entryText)
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return ListTile(
+                onTap: () {},
+                dense: true,
+                contentPadding: const EdgeInsets.only(left: 10, right: 6),
+                title: Text.rich(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                          text: replies![index].member.uname + '：',
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .fontSize,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => {print('跳转至用户主页')}),
+                      TextSpan(
+                        text: replies![index].content.message,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.titleSmall!.fontSize,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 }

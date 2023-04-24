@@ -77,11 +77,15 @@ class ReplyItemModel {
     action = json['action'];
     member = ReplyMember.fromJson(json['member']);
     content = ReplyContent.fromJson(json['content']);
-    replies = json['replies'];
+    replies = json['replies'] != null
+        ? json['replies'].map((item) => ReplyItemModel.fromJson(item)).toList()
+        : [];
     assist = json['assist'];
     upAction = UpAction.fromJson(json['up_action']);
     invisible = json['invisible'];
-    replyControl = ReplyControl.fromJson(json['reply_control']);
+    replyControl = json['reply_control'] == null
+        ? null
+        : ReplyControl.fromJson(json['reply_control']);
   }
 }
 
@@ -101,6 +105,8 @@ class ReplyControl {
   ReplyControl({
     this.upReply,
     this.isUpTop,
+    this.upLike,
+    this.isShow,
     this.entryText,
     this.titleText,
     this.time,
@@ -109,14 +115,28 @@ class ReplyControl {
 
   bool? upReply;
   bool? isUpTop;
+  bool? upLike;
+  bool? isShow;
   String? entryText;
   String? titleText;
   String? time;
   String? location;
 
   ReplyControl.fromJson(Map<String, dynamic> json) {
-    upReply = json['up_reply'];
-    isUpTop = json['is_up_top'];
+    upReply = json['up_reply'] ?? false;
+    isUpTop = json['is_up_top'] ?? false;
+    upLike = json['up_like'] ?? false;
+    if (json['sub_reply_entry_text'] == null) {
+      final RegExp regex = RegExp(r"\d+");
+      final RegExpMatch match = regex.firstMatch(
+          json['sub_reply_entry_text'] == null
+              ? ''
+              : json['sub_reply_entry_text']!)!;
+      isShow = int.parse(match.group(0)!) >= 3;
+    } else {
+      isShow = false;
+    }
+
     entryText = json['sub_reply_entry_text'];
     titleText = json['sub_reply_title_text'];
     time = json['time_desc'];
