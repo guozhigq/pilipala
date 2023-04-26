@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/reply_item.dart';
+import 'package:pilipala/models/video/reply/item.dart';
 import 'controller.dart';
+import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
   const VideoReplyPanel({super.key});
@@ -28,8 +29,24 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data['status']) {
-            List<dynamic> replies = snapshot.data['data'].replies;
-            replies.addAll(snapshot.data['data'].topReplies);
+            List<ReplyItemModel> replies = snapshot.data['data'].replies;
+            // 添加置顶回复
+            if (snapshot.data['data'].upper.top != null) {
+              bool flag = false;
+              for (var i = 0;
+                  i < snapshot.data['data'].topReplies.length;
+                  i++) {
+                if (snapshot.data['data'].topReplies[i].rpid ==
+                    snapshot.data['data'].upper.top.rpid) {
+                  flag = true;
+                }
+              }
+              if (!flag) {
+                replies.insert(0, snapshot.data['data'].upper.top);
+              }
+            }
+
+            replies.insertAll(0, snapshot.data['data'].topReplies);
             // 请求成功
             return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {

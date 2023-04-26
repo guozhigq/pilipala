@@ -28,6 +28,8 @@ class ReplyItemModel {
     this.upAction,
     this.invisible,
     this.replyControl,
+    this.isUp,
+    this.isTop,
   });
 
   int? rpid;
@@ -55,8 +57,11 @@ class ReplyItemModel {
   UpAction? upAction;
   bool? invisible;
   ReplyControl? replyControl;
+  bool? isUp;
+  bool? isTop = false;
 
-  ReplyItemModel.fromJson(Map<String, dynamic> json) {
+  ReplyItemModel.fromJson(Map<String, dynamic> json, upperMid,
+      {isTopStatus = false}) {
     rpid = json['rpid'];
     oid = json['oid'];
     type = json['type'];
@@ -78,7 +83,9 @@ class ReplyItemModel {
     member = ReplyMember.fromJson(json['member']);
     content = ReplyContent.fromJson(json['content']);
     replies = json['replies'] != null
-        ? json['replies'].map((item) => ReplyItemModel.fromJson(item)).toList()
+        ? json['replies']
+            .map((item) => ReplyItemModel.fromJson(item, upperMid))
+            .toList()
         : [];
     assist = json['assist'];
     upAction = UpAction.fromJson(json['up_action']);
@@ -86,6 +93,8 @@ class ReplyItemModel {
     replyControl = json['reply_control'] == null
         ? null
         : ReplyControl.fromJson(json['reply_control']);
+    isUp = upperMid.toString() == json['member']['mid'];
+    isTop = isTopStatus;
   }
 }
 
@@ -126,7 +135,7 @@ class ReplyControl {
     upReply = json['up_reply'] ?? false;
     isUpTop = json['is_up_top'] ?? false;
     upLike = json['up_like'] ?? false;
-    if (json['sub_reply_entry_text'] == null) {
+    if (json['sub_reply_entry_text'] != null) {
       final RegExp regex = RegExp(r"\d+");
       final RegExpMatch match = regex.firstMatch(
           json['sub_reply_entry_text'] == null

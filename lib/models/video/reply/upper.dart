@@ -12,7 +12,7 @@ class ReplyUpper {
   ReplyUpper.fromJson(Map<String, dynamic> json) {
     mid = json['mid'];
     top = json['top'] != null
-        ? ReplyItemModel.fromJson(json['top'])
+        ? ReplyItemModel.fromJson(json['top'], json['mid'])
         : ReplyItemModel();
   }
 }

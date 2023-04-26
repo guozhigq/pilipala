@@ -15,18 +15,22 @@ class ReplyData {
 
   ReplyPage? page;
   ReplyConfig? config;
-  late List? replies;
-  late List? topReplies;
+  late List<ReplyItemModel>? replies;
+  late List<ReplyItemModel>? topReplies;
   ReplyUpper? upper;
 
   ReplyData.fromJson(Map<String, dynamic> json) {
     page = ReplyPage.fromJson(json['page']);
     config = ReplyConfig.fromJson(json['config']);
-    replies =
-        json['replies'].map((item) => ReplyItemModel.fromJson(item)).toList();
+    replies = json['replies']
+        .map<ReplyItemModel>(
+            (item) => ReplyItemModel.fromJson(item, json['upper']['mid']))
+        .toList();
     topReplies = json['top_replies'] != null
         ? json['top_replies']
-            .map((item) => ReplyItemModel.fromJson(item))
+            .map<ReplyItemModel>((item) => ReplyItemModel.fromJson(
+                item, json['upper']['mid'],
+                isTopStatus: true))
             .toList()
         : [];
     upper = ReplyUpper.fromJson(json['upper']);
