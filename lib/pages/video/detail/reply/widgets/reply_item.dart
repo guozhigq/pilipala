@@ -16,7 +16,7 @@ class ReplyItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 8, 0),
+            padding: const EdgeInsets.fromLTRB(12, 6, 8, 0),
             child: content(context),
           ),
           Divider(
@@ -31,11 +31,6 @@ class ReplyItem extends StatelessWidget {
   Widget lfAvtar(context) {
     return Container(
       margin: const EdgeInsets.only(top: 5),
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.03)),
-      ),
       child: NetworkImgLayer(
         src: replyItem!.member!.avatar,
         width: 30,
@@ -104,7 +99,7 @@ class ReplyItem extends StatelessWidget {
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
-              style: const TextStyle(height: 1.6),
+              style: const TextStyle(height: 1.65),
               TextSpan(
                 children: [
                   buildContent(context, replyItem!.content!),
@@ -301,65 +296,8 @@ InlineSpan buildContent(BuildContext context, content) {
     return TextSpan(text: content.message);
   }
   List<InlineSpan> spanChilds = [];
-  // if (content.atNameToMid.isNotEmpty) {
-  //   print(content.message);
-  //   content.atNameToMid.forEach((key, value) {
-  //     key = '@' + key;
-  //     int lastIndex = content.message.indexOf(key);
-  //     int endIndex = (lastIndex + key.length).toInt();
-  //     if (lastIndex >= 0) {
-  //       spanChilds.add(TextSpan(
-  //           text: '@' + key,
-  //           style: TextStyle(color: Theme.of(context).colorScheme.primary)));
-  //       content.message = content.message.replaceRange(lastIndex, endIndex, '');
-  //       spanChilds.add(TextSpan(text: content.message));
-  //     }
-  //     spanChilds.add(TextSpan(text: content.message.substring(lastIndex)));
-  //   });
-  //   // return TextSpan(children: spanChilds);
-  // }
-  // if (content.emote.isNotEmpty) {
-  //   content.emote.forEach((key, value) {
-  //     int lastIndex = content.message.indexOf(key);
-  //     int endIndex = content.message.indexOf(key) + key.length;
-  //     if (lastIndex >= 0) {
-  //       content.message = content.message.replaceRange(lastIndex, endIndex, '');
-  //       spanChilds.add(TextSpan(text: content.message.substring(0, lastIndex)));
-  //     }
-  //     spanChilds.add(WidgetSpan(
-  //         child: NetworkImgLayer(
-  //       src: value["url"],
-  //       width: 20,
-  //       height: 20,
-  //     )));
-  //   });
-  //   // return TextSpan(children: spanChilds);
-  // }
-  // if (content.pictures.isNotEmpty) {
-  //   spanChilds.add(TextSpan(text: content.message));
-  //   spanChilds.add(const WidgetSpan(
-  //       child: SizedBox(
-  //     height: 4,
-  //   )));
-  //   for (var i = 0; i < content.pictures.length; i++) {
-  //     spanChilds.add(
-  //       WidgetSpan(
-  //         child: SizedBox(
-  //           height: 180,
-  //           child: NetworkImgLayer(
-  //             src: content.pictures[i]['img_src'],
-  //             width: 200,
-  //             height: 200 *
-  //                 content.pictures[i]['img_height'] /
-  //                 content.pictures[i]['img_width'],
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //   }
-  //   return TextSpan(children: spanChilds);
-  // }
-  content.message.splitMapJoin(
+  // 匹配表情
+  String matchEmote = content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
     onMatch: (Match match) {
       String matchStr = match[0]!;
@@ -379,54 +317,86 @@ InlineSpan buildContent(BuildContext context, content) {
           return matchStr;
         }
       }
-      return matchStr;
+      return '';
     },
     onNonMatch: (String str) {
-      try {
-        if (content.atNameToMid.isNotEmpty) {
-          return str.splitMapJoin(
-            RegExp(r"@.*:"),
-            onMatch: (Match match) {
-              if (match[0] != null) {
-                content.atNameToMid.forEach((key, value) {
-                  spanChilds.add(
-                    TextSpan(
-                      text: '@$key ',
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.titleSmall!.fontSize,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => {
-                              print('跳转至用户主页'),
-                            },
+      // 匹配@用户
+      String matchMember = str;
+      if (content.atNameToMid.isNotEmpty) {
+        matchMember = str.splitMapJoin(
+          RegExp(r"@.*:"),
+          onMatch: (Match match) {
+            if (match[0] != null) {
+              content.atNameToMid.forEach((key, value) {
+                spanChilds.add(
+                  TextSpan(
+                    text: '@$key ',
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.titleSmall!.fontSize,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                  );
-                });
-              }
-              return match[0]!;
-            },
-            onNonMatch: (String str) {
-              spanChilds.add(TextSpan(text: str));
-              return str;
-            },
-          );
-        } else {
-          spanChilds.add(TextSpan(text: str));
-          return str;
-        }
-      } catch (e) {
-        spanChilds.add(TextSpan(text: str));
-        return str;
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => {
+                            print('跳转至用户主页'),
+                          },
+                  ),
+                );
+              });
+            }
+            return '';
+          },
+          onNonMatch: (String str) {
+            spanChilds.add(TextSpan(text: str));
+            return str;
+          },
+        );
+      } else {
+        matchMember = str;
       }
+
+      // 匹配 jumpUrl
+      String matchUrl = matchMember;
+      if (content.jumpUrl.isNotEmpty) {
+        List urlKeys = content.jumpUrl.keys.toList();
+        matchUrl = matchMember.splitMapJoin(
+          RegExp("(?:${urlKeys.join("|")})"),
+          onMatch: (Match match) {
+            String matchStr = match[0]!;
+            // spanChilds.add(TextSpan(text: matchStr));
+            spanChilds.add(
+              TextSpan(
+                text: content.jumpUrl[matchStr]['title'],
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => {
+                        print('Url 点击'),
+                      },
+              ),
+            );
+            return '';
+          },
+          onNonMatch: (String str) {
+            spanChilds.add(TextSpan(text: str));
+            return str;
+          },
+        );
+      }
+
+      if (content.atNameToMid.isEmpty && content.jumpUrl.isEmpty) {
+        spanChilds.add(TextSpan(text: str));
+      }
+      return str;
     },
   );
+
+  // 图片渲染
   if (content.pictures.isNotEmpty) {
-    spanChilds.add(const WidgetSpan(
-        child: SizedBox(
-      height: 4,
-    )));
+    spanChilds.add(
+      const TextSpan(text: '\n'),
+    );
     for (var i = 0; i < content.pictures.length; i++) {
       spanChilds.add(
         WidgetSpan(
@@ -444,5 +414,6 @@ InlineSpan buildContent(BuildContext context, content) {
       );
     }
   }
+  // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);
 }

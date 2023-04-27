@@ -13,6 +13,6 @@ class ReplyUpper {
     mid = json['mid'];
     top = json['top'] != null
         ? ReplyItemModel.fromJson(json['top'], json['mid'])
-        : ReplyItemModel();
+        : null;
   }
 }

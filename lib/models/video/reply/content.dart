@@ -20,7 +20,7 @@ class ReplyContent {
     atNameToMid = json['at_name_to_mid'] ?? {};
     memebers = json['memebers'] ?? [];
     emote = json['emote'] ?? {};
-    jumpUrl = json['jumpUrl'] ?? {};
+    jumpUrl = json['jump_url'] ?? {};
     pictures = json['pictures'] ?? [];
   }
 }
