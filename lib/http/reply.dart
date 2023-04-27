@@ -14,8 +14,11 @@ class ReplyHttp {
       'type': type,
       'sort': 1,
     });
-    print(res);
     if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
     } else {
       Map errMap = {
         -400: '请求错误',

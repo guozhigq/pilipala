@@ -36,6 +36,7 @@ class NetworkImgLayer extends StatelessWidget {
               imageUrl: src!,
               width: width ?? double.infinity,
               height: height ?? double.infinity,
+              alignment: Alignment.center,
               maxWidthDiskCache: ((cacheW ?? width!) * pr).toInt(),
               // maxHeightDiskCache: (cacheH ?? height!).toInt(),
               memCacheWidth: ((cacheW ?? width!) * pr).toInt(),
