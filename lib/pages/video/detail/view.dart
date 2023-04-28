@@ -1,3 +1,4 @@
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -19,6 +20,10 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final double pinnedHeaderHeight = statusBarHeight +
+        kToolbarHeight +
+        MediaQuery.of(context).size.width * 9 / 16;
     return DefaultTabController(
       initialIndex: videoDetailController.tabInitialIndex,
       length: videoDetailController.tabs.length, // tab的数量.
@@ -26,126 +31,115 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
         top: false,
         bottom: false,
         child: Scaffold(
-          body: NestedScrollView(
+          body: ExtendedNestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
-                SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverAppBar(
-                    title: const Text("视频详情"),
-                    // floating: true,
-                    // snap: true,
-                    pinned: true,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    forceElevated: innerBoxIsScrolled,
-                    expandedHeight: MediaQuery.of(context).size.width * 9 / 16,
-                    collapsedHeight: MediaQuery.of(context).size.width * 9 / 16,
-                    toolbarHeight: kToolbarHeight,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Padding(
-                        padding: EdgeInsets.only(
-                            bottom: 50,
-                            top: MediaQuery.of(context).padding.top),
-                        child: LayoutBuilder(
-                          builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            double PR = MediaQuery.of(context).devicePixelRatio;
-                            return Hero(
-                              tag: videoDetailController.heroTag,
-                              child: NetworkImgLayer(
-                                src: videoDetailController.videoItem['pic'],
-                                width: maxWidth,
-                                height: maxHeight,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(50.0),
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Theme.of(context)
-                                        .dividerColor
-                                        .withOpacity(0.1)))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              width: 280,
-                              margin: const EdgeInsets.only(left: 20),
-                              child: Obx(
-                                () => TabBar(
-                                  splashBorderRadius: BorderRadius.circular(6),
-                                  dividerColor: Colors.transparent,
-                                  tabs: videoDetailController.tabs
-                                      .map((String name) => Tab(text: name))
-                                      .toList(),
-                                ),
-                              ),
+                SliverAppBar(
+                  title: const Text("视频详情"),
+                  pinned: true,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  forceElevated: innerBoxIsScrolled,
+                  expandedHeight: MediaQuery.of(context).size.width * 9 / 16,
+                  collapsedHeight: MediaQuery.of(context).size.width * 9 / 16,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).padding.top),
+                      child: LayoutBuilder(
+                        builder: (context, boxConstraints) {
+                          double maxWidth = boxConstraints.maxWidth;
+                          double maxHeight = boxConstraints.maxHeight;
+                          double PR = MediaQuery.of(context).devicePixelRatio;
+                          return Hero(
+                            tag: videoDetailController.heroTag,
+                            child: NetworkImgLayer(
+                              src: videoDetailController.videoItem['pic'],
+                              width: maxWidth,
+                              height: maxHeight,
                             ),
-                            // 弹幕开关
-                            // const Spacer(),
-                            // Flexible(
-                            //   flex: 2,
-                            //   child: Container(
-                            //     height: 50,
-                            //   ),
-                            // ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
                   ),
                 ),
               ];
             },
-            body: TabBarView(
+            pinnedHeaderSliverHeightBuilder: () {
+              return pinnedHeaderHeight;
+            },
+            onlyOneScrollInBody: true,
+            body: Column(
               children: [
-                Builder(builder: (context) {
-                  return CustomScrollView(
-                    key: const PageStorageKey<String>('简介'),
-                    slivers: <Widget>[
-                      SliverOverlapInjector(
-                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                            context),
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
                       ),
-                      const VideoIntroPanel(),
-                      SliverPadding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 5),
-                        sliver: SliverToBoxAdapter(
-                          child: Divider(
-                            height: 1,
-                            color:
-                                Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        width: 280,
+                        margin: const EdgeInsets.only(left: 20),
+                        child: Obx(
+                          () => TabBar(
+                            splashBorderRadius: BorderRadius.circular(6),
+                            dividerColor: Colors.transparent,
+                            tabs: videoDetailController.tabs
+                                .map((String name) => Tab(text: name))
+                                .toList(),
                           ),
                         ),
                       ),
-                      const RelatedVideoPanel(),
+                      // 弹幕开关
+                      // const Spacer(),
+                      // Flexible(
+                      //   flex: 2,
+                      //   child: Container(
+                      //     height: 50,
+                      //   ),
+                      // ),
                     ],
-                  );
-                }),
-                Builder(builder: (context) {
-                  return CustomScrollView(
-                    key: const PageStorageKey<String>('评论'),
-                    slivers: <Widget>[
-                      SliverOverlapInjector(
-                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                            context),
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          return CustomScrollView(
+                            key: const PageStorageKey<String>('简介'),
+                            slivers: <Widget>[
+                              const VideoIntroPanel(),
+                              SliverPadding(
+                                padding:
+                                    const EdgeInsets.only(top: 8, bottom: 5),
+                                sliver: SliverToBoxAdapter(
+                                  child: Divider(
+                                    height: 1,
+                                    color: Theme.of(context)
+                                        .dividerColor
+                                        .withOpacity(0.1),
+                                  ),
+                                ),
+                              ),
+                              const RelatedVideoPanel(),
+                            ],
+                          );
+                        },
                       ),
                       const VideoReplyPanel()
                     ],
-                  );
-                })
+                  ),
+                ),
               ],
             ),
           ),

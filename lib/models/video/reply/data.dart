@@ -22,10 +22,12 @@ class ReplyData {
   ReplyData.fromJson(Map<String, dynamic> json) {
     page = ReplyPage.fromJson(json['page']);
     config = ReplyConfig.fromJson(json['config']);
-    replies = json['replies']
-        .map<ReplyItemModel>(
-            (item) => ReplyItemModel.fromJson(item, json['upper']['mid']))
-        .toList();
+    replies = json['replies'] != null
+        ? json['replies']
+            .map<ReplyItemModel>(
+                (item) => ReplyItemModel.fromJson(item, json['upper']['mid']))
+            .toList()
+        : [];
     topReplies = json['top_replies'] != null
         ? json['top_replies']
             .map<ReplyItemModel>((item) => ReplyItemModel.fromJson(

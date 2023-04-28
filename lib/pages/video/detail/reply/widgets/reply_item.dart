@@ -5,9 +5,8 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
-  ReplyItem({super.key, this.replyItem, required this.isUp});
+  ReplyItem({super.key, this.replyItem});
   ReplyItemModel? replyItem;
-  bool isUp = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,51 +44,46 @@ class ReplyItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // 头像、昵称
-        Row(
-          // 两端对齐
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            GestureDetector(
-              // onTap: () =>
-              //     Get.toNamed('/member/${reply.userName}', parameters: {
-              //   'memberAvatar': reply.avatar,
-              //   'heroTag': reply.userName + heroTag,
-              // }),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  lfAvtar(context),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        GestureDetector(
+          // onTap: () =>
+          //     Get.toNamed('/member/${reply.userName}', parameters: {
+          //   'memberAvatar': reply.avatar,
+          //   'heroTag': reply.userName + heroTag,
+          // }),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              lfAvtar(context),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            replyItem!.member!.uname!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(
-                                  color: replyItem!.isUp!
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.outline,
-                                ),
-                          ),
-                          const SizedBox(width: 6),
-                          Image.asset(
-                            'assets/images/lv/lv${replyItem!.member!.level}.png',
-                            height: 13,
-                          ),
-                        ],
+                      Text(
+                        replyItem!.member!.uname!,
+                        style: TextStyle(
+                          color: replyItem!.isUp!
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outline,
+                          fontSize:
+                              Theme.of(context).textTheme.titleSmall!.fontSize,
+                        ),
                       ),
+                      const SizedBox(width: 6),
+                      Image.asset(
+                        'assets/images/lv/lv${replyItem!.member!.level}.png',
+                        height: 11,
+                      ),
+                      const SizedBox(width: 6),
+                      if (replyItem!.isUp!) UpTag()
                     ],
-                  )
+                  ),
                 ],
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
         // title
         Container(
@@ -102,6 +96,8 @@ class ReplyItem extends StatelessWidget {
               style: const TextStyle(height: 1.65),
               TextSpan(
                 children: [
+                  if (replyItem!.isTop!)
+                    WidgetSpan(child: UpTag(tagText: '置顶')),
                   buildContent(context, replyItem!.content!),
                 ],
               ),
@@ -136,26 +132,9 @@ class ReplyItem extends StatelessWidget {
               .labelMedium!
               .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
-        if (replyItem!.isTop!) ...[
-          Text(
-            ' • 置顶',
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ],
-        if (replyControl!.isUpTop!) ...[
-          Text(
-            ' • 超赞',
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          // const SizedBox(width: 4),
-        ],
         const Spacer(),
+        if (replyControl!.isUpTop!)
+          Icon(Icons.favorite, color: Colors.red[400], size: 18),
         SizedBox(
           height: 35,
           child: TextButton(
@@ -202,7 +181,7 @@ class ReplyItemRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
-        color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.7),
+        color: Theme.of(context).colorScheme.onInverseSurface,
         borderRadius: BorderRadius.circular(6),
         clipBehavior: Clip.hardEdge,
         animationDuration: Duration.zero,
@@ -245,21 +224,15 @@ class ReplyItemRow extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(8, index == 0 ? 8 : 4, 8, 4),
                     child: Text.rich(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+                      overflow: extraRow == 1
+                          ? TextOverflow.ellipsis
+                          : TextOverflow.visible,
+                      maxLines: extraRow == 1 ? 2 : null,
                       TextSpan(
                         children: [
                           if (replies![index].isUp)
-                            TextSpan(
-                              text: 'UP • ',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium!
-                                    .fontSize,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                            WidgetSpan(
+                              child: UpTag(),
                             ),
                           TextSpan(
                             text: replies![index].member.uname + ' ',
@@ -416,4 +389,32 @@ InlineSpan buildContent(BuildContext context, content) {
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);
+}
+
+class UpTag extends StatelessWidget {
+  String? tagText;
+  UpTag({super.key, this.tagText = 'UP'});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: tagText == 'UP' ? 28 : 38,
+      height: tagText == 'UP' ? 17 : 19,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(3),
+          // color: Theme.of(context).colorScheme.primary,
+          border: Border.all(color: Theme.of(context).colorScheme.primary)),
+      margin: const EdgeInsets.only(right: 4),
+      // padding: const EdgeInsets.symmetric(vertical: 0.5, horizontal: 4),
+      child: Center(
+        child: Text(
+          tagText!,
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -52,6 +52,8 @@ dependencies:
   # 存储
   path_provider: ^2.0.14
 
+  extended_nested_scroll_view: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
