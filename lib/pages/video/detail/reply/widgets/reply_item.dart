@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -367,25 +368,66 @@ InlineSpan buildContent(BuildContext context, content) {
 
   // 图片渲染
   if (content.pictures.isNotEmpty) {
-    spanChilds.add(
-      const TextSpan(text: '\n'),
-    );
-    for (var i = 0; i < content.pictures.length; i++) {
-      spanChilds.add(
-        WidgetSpan(
-          child: SizedBox(
-            height: 180,
-            child: NetworkImgLayer(
-              src: content.pictures[i]['img_src'],
-              width: 200,
-              height: 200 *
-                  content.pictures[i]['img_height'] /
-                  content.pictures[i]['img_width'],
-            ),
-          ),
+    List<Widget> list = [];
+    List picList = [];
+    int len = content.pictures.length;
+    for (var i = 0; i < len; i++) {
+      picList.add(content.pictures[i]['img_src']);
+      list.add(
+        LayoutBuilder(
+          builder: (context, BoxConstraints box) {
+            return GestureDetector(
+              onTap: () {
+                Get.toNamed('/preview',
+                    arguments: {'initialPage': i, 'imgList': picList});
+              },
+              child: NetworkImgLayer(
+                src: content.pictures[i]['img_src'],
+                width: box.maxWidth,
+                height: box.maxWidth,
+              ),
+            );
+          },
         ),
       );
     }
+    spanChilds.add(
+      WidgetSpan(
+        child: LayoutBuilder(
+          builder: (context, BoxConstraints box) {
+            double maxWidth = box.maxWidth;
+            double crossCount = len < 3 ? 2 : 3;
+            double height = maxWidth /
+                    crossCount *
+                    (len % crossCount == 0
+                        ? len ~/ crossCount
+                        : len ~/ crossCount + 1) +
+                6;
+            return Container(
+              padding: const EdgeInsets.only(top: 6),
+              height: height,
+              child: GridView(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                // 子Item排列规则
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  //横轴元素个数
+                  crossAxisCount: crossCount.toInt(),
+                  //纵轴间距
+                  mainAxisSpacing: 4.0,
+                  //横轴间距
+                  crossAxisSpacing: 4.0,
+                  //子组件宽高长度比例
+                  // childAspectRatio: 1,
+                ),
+                //GridView中使用的子Widegt
+                children: list,
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);

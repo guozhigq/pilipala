@@ -48,9 +48,21 @@ dependencies:
 
   # 图片
   cached_network_image: ^3.2.3
-
+  extended_image: ^7.0.2
+  image_gallery_saver: ^1.7.1
+  
   # 存储
   path_provider: ^2.0.14
+
+  # 设备信息
+  device_info_plus: ^8.2.0
+  # 权限
+  permission_handler: ^10.2.0
+  # 分享
+  share_plus: ^6.3.1
+  # webView
+  url_launcher: ^6.1.9
+  flutter_inappwebview: 5.4.4
 
   extended_nested_scroll_view: ^6.0.0
 
