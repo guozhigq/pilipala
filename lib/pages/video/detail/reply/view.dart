@@ -7,7 +7,15 @@ import 'controller.dart';
 import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
-  const VideoReplyPanel({super.key});
+  int oid;
+  int rpid;
+  String level;
+  VideoReplyPanel({
+    this.oid = 0,
+    this.rpid = 0,
+    this.level = '',
+    super.key,
+  });
 
   @override
   State<VideoReplyPanel> createState() => _VideoReplyPanelState();
@@ -15,8 +23,8 @@ class VideoReplyPanel extends StatefulWidget {
 
 class _VideoReplyPanelState extends State<VideoReplyPanel>
     with AutomaticKeepAliveClientMixin {
-  final VideoReplyController _videoReplyController =
-      Get.put(VideoReplyController(), tag: Get.arguments['heroTag']);
+  late VideoReplyController _videoReplyController;
+
   // List<ReplyItemModel>? replyList;
   Future? _futureBuilderFuture;
   // 添加页面缓存
@@ -26,6 +34,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   @override
   void initState() {
     super.initState();
+    if (widget.level == '2') {
+      _videoReplyController = Get.put(
+          VideoReplyController(
+              widget.oid.toString(), widget.rpid.toString(), '2'),
+          tag: widget.rpid.toString());
+    } else {
+      _videoReplyController = Get.put(
+          VideoReplyController(Get.parameters['aid']!, '', '1'),
+          tag: Get.arguments['heroTag']);
+    }
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
     _videoReplyController.scrollController.addListener(

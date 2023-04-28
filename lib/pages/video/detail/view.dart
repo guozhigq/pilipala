@@ -136,7 +136,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                           );
                         },
                       ),
-                      const VideoReplyPanel()
+                      VideoReplyPanel()
                     ],
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
@@ -16,11 +17,13 @@ class ReplyItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 6, 8, 0),
+            padding: const EdgeInsets.fromLTRB(12, 8, 8, 2),
             child: content(context),
           ),
           Divider(
             height: 1,
+            indent: 52,
+            endIndent: 10,
             color: Theme.of(context).dividerColor.withOpacity(0.08),
           )
         ],
@@ -113,6 +116,7 @@ class ReplyItem extends StatelessWidget {
             child: ReplyItemRow(
               replies: replyItem!.replies,
               replyControl: replyItem!.replyControl,
+              f_rpid: replyItem!.rpid,
             ),
           ),
         ],
@@ -171,9 +175,11 @@ class ReplyItemRow extends StatelessWidget {
     super.key,
     this.replies,
     this.replyControl,
+    this.f_rpid,
   });
   List? replies;
   ReplyControl? replyControl;
+  int? f_rpid;
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +201,7 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1 && index == replies!.length) {
               // 有楼中楼回复，在最后显示
               return InkWell(
-                onTap: () {},
+                onTap: () => replyReply(context),
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -223,7 +229,13 @@ class ReplyItemRow extends StatelessWidget {
               return InkWell(
                   onTap: () {},
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(8, index == 0 ? 8 : 4, 8, 4),
+                    padding: EdgeInsets.fromLTRB(
+                        8,
+                        index == 0 && (extraRow == 1 || replies!.length > 1)
+                            ? 8
+                            : 5,
+                        8,
+                        5),
                     child: Text.rich(
                       overflow: extraRow == 1
                           ? TextOverflow.ellipsis
@@ -258,6 +270,48 @@ class ReplyItemRow extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  void replyReply(context) {
+    Get.bottomSheet(
+      barrierColor: Colors.transparent,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      Container(
+        height: Get.size.height - Get.size.width * 9 / 16 - 50,
+        color: Theme.of(context).colorScheme.background,
+        child: Column(
+          children: [
+            AppBar(
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              title: Text(
+                '评论详情',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () async {
+                    await Future.delayed(const Duration(milliseconds: 200));
+                    Get.back();
+                  },
+                )
+              ],
+            ),
+            Expanded(
+              child: VideoReplyPanel(
+                oid: replies!.first.oid,
+                rpid: f_rpid!,
+                level: '2',
+              ),
+            )
+          ],
+        ),
+      ),
+      persistent: false,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
     );
   }
 }

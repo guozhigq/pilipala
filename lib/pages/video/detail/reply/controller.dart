@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
@@ -5,9 +7,18 @@ import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyController extends GetxController {
+  VideoReplyController(
+    this.aid,
+    this.rpid,
+    this.level,
+  );
   final ScrollController scrollController = ScrollController();
-  // 视频aid
-  String aid = Get.parameters['aid']!;
+  // 视频aid 请求时使用的oid
+  String? aid;
+  // 层级 2为楼中楼
+  String? level;
+  // rpid 请求楼中楼回复
+  String? rpid;
   RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
   // 当前页
   int currentPage = 0;
@@ -16,8 +27,11 @@ class VideoReplyController extends GetxController {
 
   Future queryReplyList({type = 'init'}) async {
     isLoadingMore = true;
-    var res =
-        await ReplyHttp.replyList(oid: aid, pageNum: currentPage + 1, type: 1);
+    var res = level == '1'
+        ? await ReplyHttp.replyList(
+            oid: aid!, pageNum: currentPage + 1, type: 1)
+        : await ReplyHttp.replyReplyList(
+            oid: aid!, root: rpid!, pageNum: currentPage + 1, type: 1);
     if (res['status']) {
       res['data'] = ReplyData.fromJson(res['data']);
       if (res['data'].replies.isNotEmpty) {
@@ -27,6 +41,7 @@ class VideoReplyController extends GetxController {
         if (currentPage == 0) {
         } else {
           noMore = true;
+          return;
         }
       }
       if (type == 'init') {
