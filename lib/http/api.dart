@@ -16,4 +16,7 @@ class Api {
 
   // 评论列表
   static const String replyList = '/x/v2/reply';
+
+  // 楼中楼
+  static const String replyReplyList = '/x/v2/reply/reply';
 }

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 
 class Routes {
@@ -11,5 +12,7 @@ class Routes {
     GetPage(name: '/hot', page: () => const HotPage()),
     // 视频详情
     GetPage(name: '/video', page: () => const VideoDetailPage()),
+    // 图片预览
+    GetPage(name: '/preview', page: () => const ImagePreview())
   ];
 }
