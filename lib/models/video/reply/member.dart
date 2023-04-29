@@ -1,4 +1,4 @@
-import 'dart:convert' as convert;
+import 'package:get/get.dart';
 
 class ReplyMember {
   ReplyMember({
@@ -22,6 +22,7 @@ class ReplyMember {
   Map? officialVerify;
   Map? vip;
   Map? fansDetail;
+  UserSailing? userSailing;
 
   ReplyMember.fromJson(Map<String, dynamic> json) {
     mid = json['mid'];
@@ -30,9 +31,12 @@ class ReplyMember {
     avatar = json['avatar'];
     level = json['level_info']['current_level'];
     pendant = Pendant.fromJson(json['pendant']);
-    officialVerify = json['officia_vVerify'];
+    officialVerify = json['officia_verify'];
     vip = json['vip'];
     fansDetail = json['fans_detail'];
+    userSailing = json['user_sailing'] != null
+        ? UserSailing.fromJson(json['user_sailing'])
+        : UserSailing();
   }
 }
 
@@ -51,5 +55,17 @@ class Pendant {
     pid = json['pid'];
     name = json['name'];
     image = json['image'];
+  }
+}
+
+class UserSailing {
+  UserSailing({this.pendant, this.cardbg});
+
+  Map? pendant;
+  Map? cardbg;
+
+  UserSailing.fromJson(Map<String, dynamic> json) {
+    pendant = json['pendant'];
+    cardbg = json['cardbg'];
   }
 }

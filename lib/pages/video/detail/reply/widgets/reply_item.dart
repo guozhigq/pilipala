@@ -33,14 +33,42 @@ class ReplyItem extends StatelessWidget {
 
   Widget lfAvtar(context) {
     return Container(
-      margin: const EdgeInsets.only(top: 5),
-      child: NetworkImgLayer(
-        src: replyItem!.member!.avatar,
-        width: 30,
-        height: 30,
-        type: 'avatar',
-      ),
-    );
+        margin: const EdgeInsets.only(top: 5),
+        child: Stack(
+          children: [
+            NetworkImgLayer(
+              src: replyItem!.member!.avatar,
+              width: 34,
+              height: 34,
+              type: 'avatar',
+            ),
+            if (replyItem!.member!.officialVerify != null &&
+                replyItem!.member!.officialVerify!['type'] == 0)
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  child: Icon(
+                    Icons.offline_bolt,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 16,
+                  ),
+                ),
+              ),
+          ],
+        )
+        // child:
+        // NetworkImgLayer(
+        //   src: replyItem!.member!.avatar,
+        //   width: 30,
+        //   height: 30,
+        //   type: 'avatar',
+        // ),
+        );
   }
 
   Widget content(context) {
@@ -54,39 +82,73 @@ class ReplyItem extends StatelessWidget {
           //   'memberAvatar': reply.avatar,
           //   'heroTag': reply.userName + heroTag,
           // }),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              lfAvtar(context),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        replyItem!.member!.uname!,
-                        style: TextStyle(
-                          color: replyItem!.isUp!
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.outline,
-                          fontSize:
-                              Theme.of(context).textTheme.titleSmall!.fontSize,
-                        ),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: replyItem!.member!.userSailing!.cardbg != null
+                  ? DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                        replyItem!.member!.userSailing!.cardbg!['image'],
                       ),
-                      const SizedBox(width: 6),
-                      Image.asset(
-                        'assets/images/lv/lv${replyItem!.member!.level}.png',
-                        height: 11,
+                    )
+                  : null,
+            ),
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    lfAvtar(context),
+                    const SizedBox(width: 12),
+                    Text(
+                      replyItem!.member!.uname!,
+                      style: TextStyle(
+                        color: replyItem!.isUp! ||
+                                replyItem!.member!.vip!['vipType'] > 0
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outline,
+                        fontSize:
+                            Theme.of(context).textTheme.titleSmall!.fontSize,
                       ),
-                      const SizedBox(width: 6),
-                      if (replyItem!.isUp!) UpTag()
-                    ],
+                    ),
+                    const SizedBox(width: 6),
+                    Image.asset(
+                      'assets/images/lv/lv${replyItem!.member!.level}.png',
+                      height: 11,
+                    ),
+                    const SizedBox(width: 6),
+                    if (replyItem!.isUp!) UpTag(),
+                  ],
+                ),
+                if (replyItem!.member!.userSailing!.cardbg != null &&
+                    replyItem!.member!.userSailing!.cardbg!['fan']['number'] >
+                        0)
+                  Positioned(
+                    top: 8,
+                    left: Get.size.width / 7 * 5.6,
+                    child: DefaultTextStyle(
+                      style: TextStyle(
+                        fontFamily: 'fansCard',
+                        fontSize: 9,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('NO.'),
+                          Text(
+                            replyItem!.member!.userSailing!.cardbg!['fan']
+                                ['num_desc'],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              )
-            ],
+              ],
+            ),
           ),
         ),
         // title
@@ -329,14 +391,16 @@ InlineSpan buildContent(BuildContext context, content) {
     RegExp(r"\[.*?\]"),
     onMatch: (Match match) {
       String matchStr = match[0]!;
+      int size = content.emote[matchStr]['meta']['size'];
       if (content.emote.isNotEmpty) {
         if (content.emote.keys.contains(matchStr)) {
           spanChilds.add(
             WidgetSpan(
               child: NetworkImgLayer(
                 src: content.emote[matchStr]['url'],
-                width: 20,
-                height: 20,
+                type: 'emote',
+                width: size * 20,
+                height: size * 20,
               ),
             ),
           );

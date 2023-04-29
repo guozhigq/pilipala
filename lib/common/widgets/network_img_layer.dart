@@ -30,8 +30,11 @@ class NetworkImgLayer extends StatelessWidget {
     // double pr = 2;
     return src != ''
         ? ClipRRect(
-            borderRadius: BorderRadius.circular(
-                type == 'avatar' ? 50 : StyleString.imgRadius.x),
+            borderRadius: BorderRadius.circular(type == 'avatar'
+                ? 50
+                : type == 'emote'
+                    ? 0
+                    : StyleString.imgRadius.x),
             child: CachedNetworkImage(
               imageUrl: src!,
               width: width ?? double.infinity,

@@ -23,7 +23,7 @@ class VideoReplyController extends GetxController {
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
-  bool noMore = false;
+  RxBool noMore = false.obs;
 
   Future queryReplyList({type = 'init'}) async {
     isLoadingMore = true;
@@ -36,13 +36,16 @@ class VideoReplyController extends GetxController {
       res['data'] = ReplyData.fromJson(res['data']);
       if (res['data'].replies.isNotEmpty) {
         currentPage = currentPage + 1;
-        noMore = false;
+        noMore.value = false;
       } else {
         if (currentPage == 0) {
         } else {
-          noMore = true;
+          noMore.value = true;
           return;
         }
+      }
+      if (res['data'].replies.length >= res['data'].page.count) {
+        noMore.value = true;
       }
       if (type == 'init') {
         List<ReplyItemModel> replies = res['data'].replies;

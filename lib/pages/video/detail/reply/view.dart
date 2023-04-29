@@ -90,9 +90,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                               height:
                                   MediaQuery.of(context).padding.bottom + 60,
                               child: Center(
-                                child: Text(_videoReplyController.noMore
-                                    ? '没有更多了'
-                                    : '加载中'),
+                                child: Obx(() => Text(
+                                    _videoReplyController.noMore.value
+                                        ? '没有更多了'
+                                        : '加载中')),
                               ),
                             );
                           } else {
