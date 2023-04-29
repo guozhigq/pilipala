@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
+import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'controller.dart';
@@ -117,7 +118,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 // 骨架屏
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    return const VideoCardHSkeleton();
+                    return const VideoReplySkeleton();
                   }, childCount: 5),
                 );
               }
