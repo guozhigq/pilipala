@@ -25,12 +25,6 @@ class VideoCardVSkeleton extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.background,
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .outline
-                            .withOpacity(0.1),
-                      ),
                     ),
                   );
                 },

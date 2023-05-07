@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
+import 'package:pilipala/common/widgets/video_card_v.dart';
 import './controller.dart';
 
 class RelatedVideoPanel extends StatefulWidget {

@@ -27,7 +27,11 @@ class MyApp extends StatelessWidget {
                   ColorScheme.fromSeed(
                       seedColor: Colors.green, brightness: Brightness.light),
               useMaterial3: true),
-          darkTheme: ThemeData(colorScheme: darkDynamic, useMaterial3: true),
+          darkTheme: ThemeData(
+              colorScheme: darkDynamic ??
+                  ColorScheme.fromSeed(
+                      seedColor: Colors.green, brightness: Brightness.dark),
+              useMaterial3: true),
           getPages: Routes.getPages,
           home: const MainApp(),
           // home: const Scaffold(),

@@ -59,7 +59,7 @@ class _VideoCardHSkeletonState extends State<VideoCardHSkeleton> {
                                   .colorScheme
                                   .onInverseSurface,
                               width: 200,
-                              height: 13,
+                              height: 11,
                               margin: const EdgeInsets.only(bottom: 5),
                             ),
                             Container(

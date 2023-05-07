@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
@@ -114,116 +115,29 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 25),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 20),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      NetworkImgLayer(
-                        type: 'avatar',
-                        src: !widget.loadingStatus
-                            ? widget.videoDetail!.owner!.face
-                            : videoItem['owner'].face,
-                        width: 38,
-                        height: 38,
-                        fadeInDuration: Duration.zero,
-                        fadeOutDuration: Duration.zero,
-                      ),
-                      const SizedBox(width: 14),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(!widget.loadingStatus
-                                ? widget.videoDetail!.owner!.name
-                                : videoItem['owner'].name),
-                            const SizedBox(height: 2),
-                            Text(
-                              widget.loadingStatus
-                                  ? '- 粉丝'
-                                  : '${Utils.numFormat(widget.videoIntroController!.userStat['follower'])}粉丝',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline),
-                            )
-                          ]),
-                      const Spacer(),
-                      AnimatedOpacity(
-                        opacity: widget.loadingStatus ? 0 : 1,
-                        duration: const Duration(milliseconds: 150),
-                        child: SizedBox(
-                          height: 35,
-                          child: ElevatedButton(
-                              onPressed: () {}, child: const Text('+ 关注')),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                    ],
+                  SelectableRegion(
+                    magnifierConfiguration: const TextMagnifierConfiguration(),
+                    focusNode: FocusNode(),
+                    selectionControls: MaterialTextSelectionControls(),
+                    child: Text(
+                      !widget.loadingStatus
+                          ? widget.videoDetail!.title
+                          : videoItem['title'],
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            letterSpacing: 0.5,
+                          ),
+                    ),
                   ),
-                  const SizedBox(height: 13),
-                  // 标题 超过两行收起
-                  // Container(
-                  //   color: Colors.blue[50],
-                  //   child: SizedOverflowBox(
-                  //     size: const Size(50.0, 50.0),
-                  //     alignment: AlignmentDirectional.bottomStart,
-                  //     child: Container(height: 150.0, width: 150.0, color: Colors.blue,),
-                  //   ),
-                  // ),
-                  // Row(
-                  //   children: [
-                  //     Expanded(
-                  //       child: ExpandedSection(
-                  //         expand: false,
-                  //         begin: 1,
-                  //         end: 1,
-                  //         child: Text(
-                  //           !widget.loadingStatus
-                  //               ? widget.videoDetail!.title
-                  //               : videoItem['title'],
-                  //           overflow: TextOverflow.ellipsis,
-                  //           maxLines: 1,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     const SizedBox(width: 10),
-                  //     RotationTransition(
-                  //       turns: _manualAnimation!,
-                  //       child: IconButton(
-                  //           onPressed: () {
-                  //             /// 获取动画当前的值
-                  //             var value = _manualController!.value;
-
-                  //             /// 0.5代表 180弧度
-                  //             if (value == 0) {
-                  //               _manualController!.animateTo(0.5);
-                  //             } else {
-                  //               _manualController!.animateTo(0);
-                  //             }
-                  //             setState(() {
-                  //               isExpand = !isExpand;
-                  //             });
-                  //           },
-                  //           icon: const Icon(Icons.expand_less)),
-                  //     ),
-                  //   ],
-                  // ),
-
-                  Text(
-                    !widget.loadingStatus
-                        ? widget.videoDetail!.title
-                        : videoItem['title'],
-                  ),
-                  // const SizedBox(height: 5),
-                  // 播放量、评论、日期
-
                   InkWell(
                     splashColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                     onTap: () {
                       _manualController!.animateTo(isExpand ? 0 : 0.5);
                       setState(() {
@@ -276,8 +190,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                 });
                               },
                               icon: Icon(
-                                Icons.expand_less,
-                                size: 22,
+                                FontAwesomeIcons.angleUp,
+                                size: 15,
                                 color: Theme.of(context).colorScheme.outline,
                               ),
                             ),
@@ -287,8 +201,65 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-
-                  // const SizedBox(height: 5),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      NetworkImgLayer(
+                        type: 'avatar',
+                        src: !widget.loadingStatus
+                            ? widget.videoDetail!.owner!.face
+                            : videoItem['owner'].face,
+                        width: 38,
+                        height: 38,
+                        fadeInDuration: Duration.zero,
+                        fadeOutDuration: Duration.zero,
+                      ),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(!widget.loadingStatus
+                              ? widget.videoDetail!.owner!.name
+                              : videoItem['owner'].name),
+                          // const SizedBox(width: 10),
+                          Text(
+                            widget.loadingStatus
+                                ? '- 粉丝'
+                                : '${Utils.numFormat(widget.videoIntroController!.userStat['follower'])}粉丝',
+                            style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .fontSize,
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        opacity: widget.loadingStatus ? 0 : 1,
+                        duration: const Duration(milliseconds: 150),
+                        child: SizedBox(
+                          height: 36,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Row(
+                              children: const [
+                                Icon(
+                                  FontAwesomeIcons.lemon,
+                                  size: 17,
+                                ),
+                                SizedBox(width: 4),
+                                Text('关注'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   // 简介 默认收起
                   if (!widget.loadingStatus)
                     ExpandedSection(
@@ -320,8 +291,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
+                  const SizedBox(height: 5),
                   _actionGrid(context),
-                  // const SizedBox(height: 5),
                 ],
               )
             : const Center(child: CircularProgressIndicator()),
@@ -333,14 +304,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget _actionGrid(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return SizedBox(
-        height: constraints.maxWidth / 5,
+        height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
           primary: false,
           padding: const EdgeInsets.all(0),
           crossAxisCount: 5,
+          childAspectRatio: 1.25,
           children: <Widget>[
             ActionItem(
-                icon: const Icon(Icons.thumb_up),
+                icon: const Icon(FontAwesomeIcons.thumbsUp),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
@@ -348,13 +320,13 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? widget.videoDetail!.stat!.like!.toString()
                     : '-'),
             ActionItem(
-                icon: const Icon(Icons.thumb_down),
+                icon: const Icon(FontAwesomeIcons.thumbsDown),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
                 text: '不喜欢'),
             ActionItem(
-                icon: const Icon(Icons.generating_tokens),
+                icon: const Icon(FontAwesomeIcons.b),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
@@ -362,7 +334,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? widget.videoDetail!.stat!.coin!.toString()
                     : '-'),
             ActionItem(
-                icon: const Icon(Icons.star),
+                icon: const Icon(
+                  FontAwesomeIcons.heart,
+                  size: 17,
+                ),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
@@ -370,7 +345,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? widget.videoDetail!.stat!.favorite!.toString()
                     : '-'),
             ActionItem(
-                icon: const Icon(Icons.share),
+                icon: const Icon(FontAwesomeIcons.shareFromSquare),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
@@ -403,33 +378,35 @@ class ActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: Ink(
-      child: InkWell(
-        onTap: () {},
-        borderRadius: StyleString.mdRadius,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon!.icon!,
-                color: selectStatus
-                    ? Theme.of(context).primaryColor
-                    : Theme.of(context).colorScheme.outline),
-            const SizedBox(height: 2),
-            AnimatedOpacity(
-              opacity: loadingStatus! ? 0 : 1,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                text!,
-                style: TextStyle(
-                    color: selectStatus
-                        ? Theme.of(context).primaryColor
-                        : Theme.of(context).colorScheme.outline,
-                    fontSize: Theme.of(context).textTheme.labelSmall?.fontSize),
+      child: Ink(
+        child: InkWell(
+          onTap: () {},
+          borderRadius: StyleString.mdRadius,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon!.icon!,
+                  color: selectStatus
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).colorScheme.outline),
+              const SizedBox(height: 2),
+              AnimatedOpacity(
+                opacity: loadingStatus! ? 0 : 1,
+                duration: const Duration(milliseconds: 200),
+                child: Text(
+                  text!,
+                  style: TextStyle(
+                      color: selectStatus
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.outline,
+                      fontSize:
+                          Theme.of(context).textTheme.labelSmall?.fontSize),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

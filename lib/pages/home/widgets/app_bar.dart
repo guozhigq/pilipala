@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -29,19 +30,26 @@ class HomeAppBar extends StatelessWidget {
                   title: const Text(
                     'PiLiPaLa',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 19,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1,
+                      fontFamily: 'ArchivoNarrow',
                     ),
                   ),
                   actions: [
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.notifications_none_rounded),
+                      icon: const FaIcon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        size: 18,
+                      ),
                     ),
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.search_rounded),
+                      icon: const FaIcon(
+                        FontAwesomeIcons.envelope,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 10)
                   ],

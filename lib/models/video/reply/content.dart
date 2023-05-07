@@ -6,6 +6,7 @@ class ReplyContent {
     this.emote, // 表情包 如果有的话 null
     this.jumpUrl, // {}
     this.pictures, // {}
+    this.vote,
   });
 
   String? message;
@@ -14,6 +15,7 @@ class ReplyContent {
   Map? emote;
   Map? jumpUrl;
   List? pictures;
+  Map? vote;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -22,5 +24,6 @@ class ReplyContent {
     emote = json['emote'] ?? {};
     jumpUrl = json['jump_url'] ?? {};
     pictures = json['pictures'] ?? [];
+    vote = json['vote'] ?? {};
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -289,45 +290,46 @@ class ReplyItemRow extends StatelessWidget {
               );
             } else {
               return InkWell(
-                  onTap: () {},
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        8,
-                        index == 0 && (extraRow == 1 || replies!.length > 1)
-                            ? 8
-                            : 5,
-                        8,
-                        5),
-                    child: Text.rich(
-                      overflow: extraRow == 1
-                          ? TextOverflow.ellipsis
-                          : TextOverflow.visible,
-                      maxLines: extraRow == 1 ? 2 : null,
-                      TextSpan(
-                        children: [
-                          if (replies![index].isUp)
-                            WidgetSpan(
-                              child: UpTag(),
-                            ),
-                          TextSpan(
-                            text: replies![index].member.uname + ' ',
-                            style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall!
-                                  .fontSize,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => {
-                                    print('跳转至用户主页'),
-                                  },
+                onTap: () {},
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      8,
+                      index == 0 && (extraRow == 1 || replies!.length > 1)
+                          ? 8
+                          : 5,
+                      8,
+                      5),
+                  child: Text.rich(
+                    overflow: extraRow == 1
+                        ? TextOverflow.ellipsis
+                        : TextOverflow.visible,
+                    maxLines: extraRow == 1 ? 2 : null,
+                    TextSpan(
+                      children: [
+                        if (replies![index].isUp)
+                          WidgetSpan(
+                            child: UpTag(),
                           ),
-                          buildContent(context, replies![index].content),
-                        ],
-                      ),
+                        TextSpan(
+                          text: replies![index].member.uname + ' ',
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .fontSize,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => {
+                                  print('跳转至用户主页'),
+                                },
+                        ),
+                        buildContent(context, replies![index].content),
+                      ],
                     ),
-                  ));
+                  ),
+                ),
+              );
             }
           },
         ),
@@ -382,6 +384,7 @@ InlineSpan buildContent(BuildContext context, content) {
   if (content.emote.isEmpty &&
       content.atNameToMid.isEmpty &&
       content.jumpUrl.isEmpty &&
+      content.vote.isEmpty &&
       content.pictures.isEmpty) {
     return TextSpan(text: content.message);
   }
@@ -416,7 +419,7 @@ InlineSpan buildContent(BuildContext context, content) {
       String matchMember = str;
       if (content.atNameToMid.isNotEmpty) {
         matchMember = str.splitMapJoin(
-          RegExp(r"@.*:"),
+          RegExp(r"@.*( |:)"),
           onMatch: (Match match) {
             if (match[0] != null) {
               content.atNameToMid.forEach((key, value) {
@@ -455,7 +458,6 @@ InlineSpan buildContent(BuildContext context, content) {
           RegExp("(?:${urlKeys.join("|")})"),
           onMatch: (Match match) {
             String matchStr = match[0]!;
-            // spanChilds.add(TextSpan(text: matchStr));
             spanChilds.add(
               TextSpan(
                 text: content.jumpUrl[matchStr]['title'],
@@ -468,6 +470,16 @@ InlineSpan buildContent(BuildContext context, content) {
                       },
               ),
             );
+            spanChilds.add(
+              WidgetSpan(
+                child: Icon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  size: 9,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                alignment: PlaceholderAlignment.top,
+              ),
+            );
             return '';
           },
           onNonMatch: (String str) {
@@ -476,6 +488,29 @@ InlineSpan buildContent(BuildContext context, content) {
           },
         );
       }
+
+      str = matchUrl.splitMapJoin(
+        RegExp(r"\d{1,2}:\d{1,2}"),
+        onMatch: (Match match) {
+          String matchStr = match[0]!;
+          spanChilds.add(
+            TextSpan(
+              text: ' $matchStr ',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => {
+                      print('time 点击'),
+                    },
+            ),
+          );
+          return '';
+        },
+        onNonMatch: (str) {
+          return str;
+        },
+      );
 
       if (content.atNameToMid.isEmpty && content.jumpUrl.isEmpty) {
         spanChilds.add(TextSpan(text: str));
@@ -486,66 +521,98 @@ InlineSpan buildContent(BuildContext context, content) {
 
   // 图片渲染
   if (content.pictures.isNotEmpty) {
-    List<Widget> list = [];
     List picList = [];
     int len = content.pictures.length;
-    for (var i = 0; i < len; i++) {
-      picList.add(content.pictures[i]['img_src']);
-      list.add(
-        LayoutBuilder(
-          builder: (context, BoxConstraints box) {
-            return GestureDetector(
-              onTap: () {
-                Get.toNamed('/preview',
-                    arguments: {'initialPage': i, 'imgList': picList});
-              },
-              child: NetworkImgLayer(
-                src: content.pictures[i]['img_src'],
-                width: box.maxWidth,
-                height: box.maxWidth,
-              ),
-            );
-          },
+    if (len == 1) {
+      Map pictureItem = content.pictures.first;
+      picList.add(pictureItem['img_src']);
+      spanChilds.add(const TextSpan(text: '\n'));
+      spanChilds.add(
+        WidgetSpan(
+          child: LayoutBuilder(
+            builder: (context, BoxConstraints box) {
+              return GestureDetector(
+                onTap: () {
+                  Get.toNamed('/preview',
+                      arguments: {'initialPage': 0, 'imgList': picList});
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: NetworkImgLayer(
+                    src: pictureItem['img_src'],
+                    width: box.maxWidth / 2,
+                    height: box.maxWidth *
+                        0.5 *
+                        pictureItem['img_height'] /
+                        pictureItem['img_width'],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       );
     }
-    spanChilds.add(
-      WidgetSpan(
-        child: LayoutBuilder(
-          builder: (context, BoxConstraints box) {
-            double maxWidth = box.maxWidth;
-            double crossCount = len < 3 ? 2 : 3;
-            double height = maxWidth /
-                    crossCount *
-                    (len % crossCount == 0
-                        ? len ~/ crossCount
-                        : len ~/ crossCount + 1) +
-                6;
-            return Container(
-              padding: const EdgeInsets.only(top: 6),
-              height: height,
-              child: GridView(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                // 子Item排列规则
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //横轴元素个数
-                  crossAxisCount: crossCount.toInt(),
-                  //纵轴间距
-                  mainAxisSpacing: 4.0,
-                  //横轴间距
-                  crossAxisSpacing: 4.0,
-                  //子组件宽高长度比例
-                  // childAspectRatio: 1,
+    if (len > 1) {
+      List<Widget> list = [];
+      for (var i = 0; i < len; i++) {
+        picList.add(content.pictures[i]['img_src']);
+        list.add(
+          LayoutBuilder(
+            builder: (context, BoxConstraints box) {
+              return GestureDetector(
+                onTap: () {
+                  Get.toNamed('/preview',
+                      arguments: {'initialPage': i, 'imgList': picList});
+                },
+                child: NetworkImgLayer(
+                  src: content.pictures[i]['img_src'],
+                  width: box.maxWidth,
+                  height: box.maxWidth,
                 ),
-                //GridView中使用的子Widegt
-                children: list,
-              ),
-            );
-          },
+              );
+            },
+          ),
+        );
+      }
+      spanChilds.add(
+        WidgetSpan(
+          child: LayoutBuilder(
+            builder: (context, BoxConstraints box) {
+              double maxWidth = box.maxWidth;
+              double crossCount = len < 3 ? 2 : 3;
+              double height = maxWidth /
+                      crossCount *
+                      (len % crossCount == 0
+                          ? len ~/ crossCount
+                          : len ~/ crossCount + 1) +
+                  6;
+              return Container(
+                padding: const EdgeInsets.only(top: 6),
+                height: height,
+                child: GridView(
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  // 子Item排列规则
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //横轴元素个数
+                    crossAxisCount: crossCount.toInt(),
+                    //纵轴间距
+                    mainAxisSpacing: 4.0,
+                    //横轴间距
+                    crossAxisSpacing: 4.0,
+                    //子组件宽高长度比例
+                    // childAspectRatio: 1,
+                  ),
+                  //GridView中使用的子Widegt
+                  children: list,
+                ),
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);
@@ -554,24 +621,25 @@ InlineSpan buildContent(BuildContext context, content) {
 class UpTag extends StatelessWidget {
   String? tagText;
   UpTag({super.key, this.tagText = 'UP'});
-
   @override
   Widget build(BuildContext context) {
+    Color primary = Theme.of(context).colorScheme.primary;
     return Container(
-      width: tagText == 'UP' ? 28 : 38,
-      height: tagText == 'UP' ? 17 : 19,
+      width: tagText == 'UP' ? 25 : 32,
+      height: tagText == 'UP' ? 16 : 18,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(3),
-          // color: Theme.of(context).colorScheme.primary,
-          border: Border.all(color: Theme.of(context).colorScheme.primary)),
+          color: tagText == 'UP' ? primary : null,
+          border: Border.all(color: primary)),
       margin: const EdgeInsets.only(right: 4),
-      // padding: const EdgeInsets.symmetric(vertical: 0.5, horizontal: 4),
       child: Center(
         child: Text(
           tagText!,
           style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: Theme.of(context).colorScheme.primary,
+            fontSize: 10,
+            color: tagText == 'UP'
+                ? Theme.of(context).colorScheme.onPrimary
+                : primary,
           ),
         ),
       ),

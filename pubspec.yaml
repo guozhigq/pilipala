@@ -65,6 +65,7 @@ dependencies:
   flutter_inappwebview: 5.4.4
 
   extended_nested_scroll_view: ^6.0.0
+  font_awesome_flutter: ^10.4.0
 
 dev_dependencies:
   flutter_test:
@@ -106,6 +107,9 @@ flutter:
     - family: fansCard
       fonts:
         - asset: assets/fonts/fansCard.ttf
+    - family: ArchivoNarrow
+      fonts:
+        - asset: assets/fonts/ArchivoNarrow-BoldItalic.ttf
        
   
   # For details regarding fonts from package dependencies,
