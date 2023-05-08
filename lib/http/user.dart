@@ -10,4 +10,13 @@ class UserHttp {
       return {'status': false};
     }
   }
+
+  static Future<dynamic> userInfo() async {
+    var res = await Request().get(Api.userInfo);
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false};
+    }
+  }
 }

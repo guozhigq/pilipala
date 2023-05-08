@@ -5,18 +5,22 @@ class Api {
   static const String hotList = '/x/web-interface/popular';
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
+  // https://api.bilibili.com/x/web-interface/view/detail  获取视频超详细信息(web端)
   static const String videoIntro = '/x/web-interface/view';
 
   // 视频详情页 相关视频
   static const String relatedList = '/x/web-interface/archive/related';
-
-  // 用户(被)关注数、投稿数
-  // https://api.bilibili.com/x/relation/stat?vmid=697166795
-  static const String userStat = '/x/relation/stat';
 
   // 评论列表
   static const String replyList = '/x/v2/reply';
 
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
+
+  // 用户(被)关注数、投稿数
+  // https://api.bilibili.com/x/relation/stat?vmid=697166795
+  static const String userStat = '/x/relation/stat';
+
+  // 获取用户信息
+  static const String userInfo = '/x/web-interface/nav';
 }

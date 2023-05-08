@@ -63,9 +63,13 @@ dependencies:
   # webView
   url_launcher: ^6.1.9
   flutter_inappwebview: 5.4.4
+  webview_cookie_manager: ^2.0.6
+  webview_flutter: ^4.2.0
 
   extended_nested_scroll_view: ^6.0.0
   font_awesome_flutter: ^10.4.0
+  # toast
+  flutter_smart_dialog: ^4.9.0+6
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +81,21 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  # flutter_launcher_icons:
+  #   git:
+  #     url: https://github.com/nvi9/flutter_launcher_icons.git
+  #     ref: e045d40
+
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: false
+  image_path: assets/images/logo/logo_android.png
+  image_path_android: assets/images/logo/logo_android.png
+  image_path_ios: assets/images/logo/logo_ios.png
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: assets/images/logo/logo_android.png
+  adaptive_icon_monochrome: assets/images/logo/logo_android.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

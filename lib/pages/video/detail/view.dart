@@ -74,7 +74,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
             body: Column(
               children: [
                 Container(
-                  height: 50,
+                  height: 45,
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
@@ -91,7 +91,6 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                         margin: const EdgeInsets.only(left: 20),
                         child: Obx(
                           () => TabBar(
-                            splashBorderRadius: BorderRadius.circular(6),
                             dividerColor: Colors.transparent,
                             tabs: videoDetailController.tabs
                                 .map((String name) => Tab(text: name))

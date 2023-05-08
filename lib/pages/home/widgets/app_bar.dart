@@ -30,7 +30,7 @@ class HomeAppBar extends StatelessWidget {
                   title: const Text(
                     'PiLiPaLa',
                     style: TextStyle(
-                      fontSize: 19,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1,
                       fontFamily: 'ArchivoNarrow',

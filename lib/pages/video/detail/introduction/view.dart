@@ -247,7 +247,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               children: const [
                                 Icon(
                                   FontAwesomeIcons.lemon,
-                                  size: 17,
+                                  size: 15,
                                 ),
                                 SizedBox(width: 4),
                                 Text('关注'),
@@ -334,10 +334,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? widget.videoDetail!.stat!.coin!.toString()
                     : '-'),
             ActionItem(
-                icon: const Icon(
-                  FontAwesomeIcons.heart,
-                  size: 17,
-                ),
+                icon: const Icon(FontAwesomeIcons.star),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
@@ -386,10 +383,11 @@ class ActionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon!.icon!,
+                  size: 20,
                   color: selectStatus
                       ? Theme.of(context).primaryColor
                       : Theme.of(context).colorScheme.outline),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               AnimatedOpacity(
                 opacity: loadingStatus! ? 0 : 1,
                 duration: const Duration(milliseconds: 200),

@@ -3,6 +3,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/webview/index.dart';
 
 class Routes {
   static final List<GetPage> getPages = [
@@ -13,6 +14,8 @@ class Routes {
     // 视频详情
     GetPage(name: '/video', page: () => const VideoDetailPage()),
     // 图片预览
-    GetPage(name: '/preview', page: () => const ImagePreview())
+    GetPage(name: '/preview', page: () => const ImagePreview()),
+    //
+    GetPage(name: '/webview', page: () => const WebviewPage())
   ];
 }

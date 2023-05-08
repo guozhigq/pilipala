@@ -164,7 +164,7 @@ class ReplyItem extends StatelessWidget {
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
-                    WidgetSpan(child: UpTag(tagText: '置顶')),
+                    WidgetSpan(child: UpTag(tagText: 'TOP')),
                   buildContent(context, replyItem!.content!),
                 ],
               ),
@@ -200,6 +200,15 @@ class ReplyItem extends StatelessWidget {
               .labelMedium!
               .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
+        if (replyItem!.replyControl != null &&
+            replyItem!.replyControl!.location != null)
+          Text(
+            ' • ${replyItem!.replyControl!.location!}',
+            style: Theme.of(context)
+                .textTheme
+                .labelMedium!
+                .copyWith(color: Theme.of(context).colorScheme.outline),
+          ),
         const Spacer(),
         if (replyControl!.isUpTop!)
           Icon(Icons.favorite, color: Colors.red[400], size: 18),
@@ -209,7 +218,7 @@ class ReplyItem extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.thumb_up_alt_outlined,
+                  FontAwesomeIcons.thumbsUp,
                   size: 16,
                   color: color,
                 ),

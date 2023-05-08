@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -23,18 +24,24 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           title: 'PiLiPaLa',
           theme: ThemeData(
-              colorScheme: lightDynamic ??
-                  ColorScheme.fromSeed(
-                      seedColor: Colors.green, brightness: Brightness.light),
-              useMaterial3: true),
+            colorScheme: lightDynamic ??
+                ColorScheme.fromSeed(
+                  seedColor: Colors.green,
+                  brightness: Brightness.light,
+                ),
+            useMaterial3: true,
+          ),
           darkTheme: ThemeData(
-              colorScheme: darkDynamic ??
-                  ColorScheme.fromSeed(
-                      seedColor: Colors.green, brightness: Brightness.dark),
-              useMaterial3: true),
+            colorScheme: darkDynamic ??
+                ColorScheme.fromSeed(
+                  seedColor: Colors.green,
+                  brightness: Brightness.dark,
+                ),
+            useMaterial3: true,
+          ),
           getPages: Routes.getPages,
           home: const MainApp(),
-          // home: const Scaffold(),
+          builder: FlutterSmartDialog.init(),
         );
       }),
     );
