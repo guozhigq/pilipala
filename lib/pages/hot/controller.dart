@@ -11,12 +11,6 @@ class HotController extends GetxController {
   bool isLoadingMore = false;
   bool flag = false;
 
-  @override
-  void onInit() {
-    super.onInit();
-    queryHotFeed('init');
-  }
-
   // 获取推荐
   Future queryHotFeed(type) async {
     var res = await VideoHttp.hotVideoList(
@@ -34,6 +28,7 @@ class HotController extends GetxController {
       _currentPage += 1;
     }
     isLoadingMore = false;
+    return res;
   }
 
   // 下拉刷新

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/pages/hot/controller.dart';
 import 'package:pilipala/pages/home/widgets/app_bar.dart';
@@ -14,6 +16,7 @@ class HotPage extends StatefulWidget {
 class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   final HotController _hotController = Get.put(HotController());
   List videoList = [];
+  Future? _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -21,11 +24,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    _hotController.videoList.listen((value) {
-      videoList = value;
-      setState(() {});
-    });
-
+    _futureBuilderFuture = _hotController!.queryHotFeed('init');
     _hotController.scrollController.addListener(
       () {
         if (_hotController.scrollController.position.pixels >=
@@ -52,12 +51,37 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
           controller: _hotController.scrollController,
           slivers: [
             const HomeAppBar(),
-            SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-              return VideoCardH(
-                videoItem: videoList[index],
-              );
-            }, childCount: videoList.length)),
+            FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data as Map;
+                  if (data['status']) {
+                    return Obx(
+                      () => SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          return VideoCardH(
+                            videoItem: _hotController.videoList[index],
+                          );
+                        }, childCount: _hotController.videoList.length),
+                      ),
+                    );
+                  } else {
+                    return HttpError(
+                      errMsg: data['msg'],
+                      fn: () => setState(() {}),
+                    );
+                  }
+                } else {
+                  // 骨架屏
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return const VideoCardHSkeleton();
+                    }, childCount: 5),
+                  );
+                }
+              },
+            ),
             SliverToBoxAdapter(
               child: SizedBox(
                 height: MediaQuery.of(context).padding.bottom + 10,

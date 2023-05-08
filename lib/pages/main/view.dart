@@ -15,11 +15,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
   final HotController _hotController = Get.put(HotController());
+  PageController? _pageController;
 
   late AnimationController? _animationController;
   late Animation<double>? _fadeAnimation;
   late Animation<double>? _slideAnimation;
-  int selectedIndex = 2;
+  int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
 
   @override
@@ -36,6 +37,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _slideAnimation =
         Tween(begin: 0.8, end: 1.0).animate(_animationController!);
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+    _pageController = PageController(initialPage: selectedIndex);
   }
 
   void setIndex(int value) async {
@@ -47,7 +49,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       });
       setState(() {});
     }
-
+    _pageController!.jumpToPage(value);
     var currentPage = _mainController.pages[value];
     if (currentPage is HomePage) {
       if (_homeController.flag) {
@@ -98,8 +100,13 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               reverseCurve: Curves.linear,
             ),
           ),
-          child: IndexedStack(
-            index: selectedIndex,
+          child: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (index) {
+              selectedIndex = index;
+              setState(() {});
+            },
             children: _mainController.pages,
           ),
         ),
