@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/stat/up.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -137,11 +138,12 @@ class VideoContent extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                Image.asset(
-                  'assets/images/up_gray.png',
-                  width: 14,
-                  height: 12,
-                ),
+                // Image.asset(
+                //   'assets/images/up_gray.png',
+                //   width: 14,
+                //   height: 12,
+                // ),
+                const UpTag(),
                 const SizedBox(width: 2),
                 Text(
                   videoItem.owner.name,

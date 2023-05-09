@@ -111,7 +111,7 @@ class Request {
       return response;
     } on DioError catch (e) {
       print('get error: $e');
-      return Future.error(ApiInterceptor.dioError(e));
+      return Future.error(await ApiInterceptor.dioError(e));
     }
   }
 
@@ -132,7 +132,7 @@ class Request {
       return response;
     } on DioError catch (e) {
       print('post error: $e');
-      return Future.error(ApiInterceptor.dioError(e));
+      return Future.error(await ApiInterceptor.dioError(e));
     }
   }
 

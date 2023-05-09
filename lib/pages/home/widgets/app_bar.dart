@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -10,11 +11,7 @@ class HomeAppBar extends StatelessWidget {
     return SliverAppBar(
       // forceElevated: true,
       scrolledUnderElevation: 0,
-      toolbarHeight: Platform.isAndroid
-          ? (MediaQuery.of(context).padding.top + 6)
-          : Platform.isIOS
-              ? MediaQuery.of(context).padding.top - 2
-              : kToolbarHeight,
+      toolbarHeight: MediaQuery.of(context).padding.top,
       expandedHeight: kToolbarHeight + MediaQuery.of(context).padding.top,
       automaticallyImplyLeading: false,
       pinned: true,
@@ -39,18 +36,12 @@ class HomeAppBar extends StatelessWidget {
                   actions: [
                     IconButton(
                       onPressed: () {},
-                      icon: const FaIcon(
-                        FontAwesomeIcons.magnifyingGlass,
-                        size: 18,
-                      ),
+                      icon: const Icon(CupertinoIcons.search, size: 22),
                     ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const FaIcon(
-                        FontAwesomeIcons.envelope,
-                        size: 20,
-                      ),
-                    ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   icon: const Icon(CupertinoIcons.bell, size: 22),
+                    // ),
                     const SizedBox(width: 10)
                   ],
                   elevation: 0,

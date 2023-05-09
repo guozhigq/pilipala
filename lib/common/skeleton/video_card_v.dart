@@ -23,7 +23,6 @@ class VideoCardVSkeleton extends StatelessWidget {
                   return Container(
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
                       borderRadius: BorderRadius.circular(6),
                     ),
                   );

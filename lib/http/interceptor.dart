@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart' hide Response;
 
 class ApiInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // print("请求之前");
+    print("请求之前");
     // 在请求之前添加头部或认证信息
     // options.headers['Authorization'] = 'Bearer token';
     // options.headers['Content-Type'] = 'application/json';
@@ -13,15 +15,14 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    // print("响应之前");
     handler.next(response);
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioError err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
-
-    handler.next(err);
+    // handler.next(err);
+    SmartDialog.showToast(await dioError(err));
     super.onError(err, handler);
   }
 
@@ -43,7 +44,7 @@ class ApiInterceptor extends Interceptor {
         return "发送请求超时，请检查网络设置";
       case DioErrorType.unknown:
         var res = await checkConect();
-        return "$res 网络异常，请稍后重试！";
+        return res + " \n 网络异常，请稍后重试！";
       default:
         return "Dio异常";
     }

@@ -69,9 +69,4 @@ class PreviewController extends GetxController {
     File(path).writeAsBytesSync(response.data);
     Share.shareXFiles([XFile(path)], subject: imgList[initialPage.value]);
   }
-
-  // 浏览器中查看
-  void onBrowserImg() async {
-    Utils.openURL(imgList[initialPage.value]);
-  }
 }

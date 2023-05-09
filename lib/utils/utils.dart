@@ -1,13 +1,10 @@
 // 工具函数
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
-  final ChromeSafariBrowser browser = ChromeSafariBrowser();
-
   static Future<String> getCookiePath() async {
     Directory tempDir = await getApplicationSupportDirectory();
     String tempPath = "${tempDir.path}/.plpl/";
@@ -137,23 +134,5 @@ class Utils {
 
   static String makeHeroTag(v) {
     return v.toString() + Random().nextInt(9999).toString();
-  }
-
-  static openURL(aUrl) async {
-    try {
-      await Utils().browser.open(
-            url: Uri.parse(aUrl),
-            options: ChromeSafariBrowserClassOptions(
-              android: AndroidChromeCustomTabsOptions(
-                shareState: CustomTabsShareState.SHARE_STATE_OFF,
-                isSingleInstance: false,
-                isTrustedWebActivity: false,
-                keepAliveEnabled: true,
-              ),
-            ),
-          );
-    } catch (err) {
-      await InAppBrowser.openWithSystemBrowser(url: Uri.parse(aUrl));
-    }
   }
 }

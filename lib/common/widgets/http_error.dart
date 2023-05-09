@@ -17,6 +17,7 @@ class HttpError extends StatelessWidget {
           children: [
             Text(
               errMsg,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),

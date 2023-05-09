@@ -71,12 +71,6 @@ class VideoReplySkeleton extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 52,
-            endIndent: 10,
-            color: Theme.of(context).dividerColor.withOpacity(0.08),
-          )
         ],
       ),
     );

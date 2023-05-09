@@ -74,11 +74,6 @@ class _ImagePreviewState extends State<ImagePreview>
                   onTap: _previewController.onSaveImg,
                   child: const Text('保存'),
                 ),
-                PopupMenuItem(
-                  value: 'browser',
-                  onTap: _previewController.onBrowserImg,
-                  child: const Text('浏览器中查看'),
-                ),
               ],
             ),
           ],

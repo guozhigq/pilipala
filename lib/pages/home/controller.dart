@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    queryRcmdFeed('init');
+    // queryRcmdFeed('init');
   }
 
   // 获取推荐
@@ -35,6 +35,7 @@ class HomeController extends GetxController {
       _currentPage += 1;
     }
     isLoadingMore = false;
+    return res;
   }
 
   // 下拉刷新

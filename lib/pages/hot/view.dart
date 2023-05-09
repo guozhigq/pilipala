@@ -24,7 +24,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _hotController!.queryHotFeed('init');
+    _futureBuilderFuture = _hotController.queryHotFeed('init');
     _hotController.scrollController.addListener(
       () {
         if (_hotController.scrollController.position.pixels >=

@@ -18,15 +18,15 @@ class ReplyItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 8, 2),
+            padding: const EdgeInsets.fromLTRB(12, 6, 8, 0),
             child: content(context),
           ),
-          Divider(
-            height: 1,
-            indent: 52,
-            endIndent: 10,
-            color: Theme.of(context).dividerColor.withOpacity(0.08),
-          )
+          // Divider(
+          //   height: 1,
+          //   indent: 52,
+          //   endIndent: 10,
+          //   color: Theme.of(context).dividerColor.withOpacity(0.08),
+          // )
         ],
       ),
     );
@@ -154,7 +154,7 @@ class ReplyItem extends StatelessWidget {
         ),
         // title
         Container(
-          margin: const EdgeInsets.only(top: 0, left: 45, right: 6),
+          margin: const EdgeInsets.only(top: 0, left: 45, right: 6, bottom: 6),
           child: SelectableRegion(
             magnifierConfiguration: const TextMagnifierConfiguration(),
             focusNode: FocusNode(),
@@ -201,7 +201,7 @@ class ReplyItem extends StatelessWidget {
               .copyWith(color: Theme.of(context).colorScheme.outline),
         ),
         if (replyItem!.replyControl != null &&
-            replyItem!.replyControl!.location != null)
+            replyItem!.replyControl!.location != '')
           Text(
             ' • ${replyItem!.replyControl!.location!}',
             style: Theme.of(context)
@@ -315,10 +315,6 @@ class ReplyItemRow extends StatelessWidget {
                     maxLines: extraRow == 1 ? 2 : null,
                     TextSpan(
                       children: [
-                        if (replies![index].isUp)
-                          WidgetSpan(
-                            child: UpTag(),
-                          ),
                         TextSpan(
                           text: replies![index].member.uname + ' ',
                           style: TextStyle(
@@ -333,6 +329,10 @@ class ReplyItemRow extends StatelessWidget {
                                   print('跳转至用户主页'),
                                 },
                         ),
+                        if (replies![index].isUp)
+                          WidgetSpan(
+                            child: UpTag(),
+                          ),
                         buildContent(context, replies![index].content),
                       ],
                     ),
@@ -352,13 +352,14 @@ class ReplyItemRow extends StatelessWidget {
       useRootNavigator: true,
       isScrollControlled: true,
       Container(
-        height: Get.size.height - Get.size.width * 9 / 16 - 50,
+        height: Get.size.height - Get.size.width * 9 / 16 - 45,
         color: Theme.of(context).colorScheme.background,
         child: Column(
           children: [
             AppBar(
               automaticallyImplyLeading: false,
               centerTitle: false,
+              elevation: 1,
               title: Text(
                 '评论详情',
                 style: Theme.of(context).textTheme.titleMedium,
@@ -367,7 +368,6 @@ class ReplyItemRow extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () async {
-                    await Future.delayed(const Duration(milliseconds: 200));
                     Get.back();
                   },
                 )
@@ -546,7 +546,7 @@ InlineSpan buildContent(BuildContext context, content) {
                       arguments: {'initialPage': 0, 'imgList': picList});
                 },
                 child: Padding(
-                  padding: EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.only(top: 4),
                   child: NetworkImgLayer(
                     src: pictureItem['img_src'],
                     width: box.maxWidth / 2,
@@ -634,8 +634,8 @@ class UpTag extends StatelessWidget {
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).colorScheme.primary;
     return Container(
-      width: tagText == 'UP' ? 25 : 32,
-      height: tagText == 'UP' ? 16 : 18,
+      width: 24,
+      height: 15,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(3),
           color: tagText == 'UP' ? primary : null,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -246,8 +247,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             child: Row(
                               children: const [
                                 Icon(
-                                  FontAwesomeIcons.lemon,
-                                  size: 15,
+                                  CupertinoIcons.plus,
+                                  size: 16,
                                 ),
                                 SizedBox(width: 4),
                                 Text('关注'),
@@ -383,7 +384,7 @@ class ActionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon!.icon!,
-                  size: 20,
+                  size: 21,
                   color: selectStatus
                       ? Theme.of(context).primaryColor
                       : Theme.of(context).colorScheme.outline),

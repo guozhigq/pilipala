@@ -62,7 +62,6 @@ dependencies:
   share_plus: ^6.3.1
   # webView
   url_launcher: ^6.1.9
-  flutter_inappwebview: 5.4.4
   webview_cookie_manager: ^2.0.6
   webview_flutter: ^4.2.0
 

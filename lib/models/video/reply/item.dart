@@ -149,6 +149,6 @@ class ReplyControl {
     entryText = json['sub_reply_entry_text'];
     titleText = json['sub_reply_title_text'];
     time = json['time_desc'];
-    location = json['location'] ?? '';
+    location = json['location'] != null ? json['location'].split('：')[1] : '';
   }
 }

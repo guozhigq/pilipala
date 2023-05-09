@@ -2,6 +2,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -45,10 +46,10 @@ class WebviewController extends GetxController {
                 await SetCookie.onSet(cookies, HttpString.baseUrl);
                 await SetCookie.onSet(apiCookies, HttpString.baseApiUrl);
                 var result = await UserHttp.userInfo();
-                bool isLogin = result['data']['isLogin'];
-                if (isLogin) {
+                if (result['status'] && result['data'].isLogin) {
                   SmartDialog.showToast('登录成功');
-                  Get.back();
+                  Get.find<MineController>().userInfo = result['data'];
+                  // Get.back();
                 }
               } catch (e) {
                 print(e);
