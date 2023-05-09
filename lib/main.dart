@@ -5,9 +5,11 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
+import 'package:pilipala/utils/storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GStrorage.init();
   await Request.setCookie();
   runApp(const MyApp());
 }

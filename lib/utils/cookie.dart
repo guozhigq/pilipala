@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/utils/utils.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class SetCookie {
   static onSet(List cookiesList, String url) async {

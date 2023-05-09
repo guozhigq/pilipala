@@ -12,6 +12,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class Request {
   static final Request _instance = Request._internal();
+  static late CookieManager cookieManager;
 
   factory Request() => _instance;
 
@@ -31,11 +32,9 @@ class Request {
       ignoreExpires: true,
       storage: FileStorage(cookiePath),
     );
-
-    dio.interceptors.add(CookieManager(cookieJar));
-
-    var cookie = await CookieManager(cookieJar)
-        .cookieJar
+    cookieManager = CookieManager(cookieJar);
+    dio.interceptors.add(cookieManager);
+    var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
     if (cookie.isEmpty) {
       try {
@@ -44,6 +43,16 @@ class Request {
         log("setCookie, ${e.toString()}");
       }
     }
+  }
+
+  // 移除cookie
+  static removeCookie() async {
+    await cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseUrl), []);
+    await cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), []);
+    cookieManager.cookieJar.deleteAll();
+    dio.interceptors.add(cookieManager);
   }
 
   /*

@@ -29,7 +29,7 @@ class UserInfoData {
   bool? isLogin;
   int? emailVerified;
   String? face;
-  Map? levelInfo;
+  LevelInfo? levelInfo;
   int? mid;
   int? mobileVerified;
   int? money;
@@ -55,7 +55,9 @@ class UserInfoData {
     isLogin = json['isLogin'] ?? false;
     emailVerified = json['email_verified'];
     face = json['face'];
-    levelInfo = json['level_info'];
+    levelInfo = json['level_info'] != null
+        ? LevelInfo.fromJson(json['level_info'])
+        : LevelInfo();
     mid = json['mid'];
     mobileVerified = json['mobile_verified'];
     money = json['money'];
@@ -76,5 +78,26 @@ class UserInfoData {
     wallet = json['wallet'];
     hasShop = json['has_shop'];
     shopUrl = json['shop_url'];
+  }
+}
+
+class LevelInfo {
+  LevelInfo({
+    this.currentLevel,
+    this.currentMin,
+    this.currentExp,
+    this.nextExp,
+  });
+
+  int? currentLevel;
+  int? currentMin;
+  int? currentExp;
+  int? nextExp;
+
+  LevelInfo.fromJson(Map<String, dynamic> json) {
+    currentLevel = json['current_level'];
+    currentMin = json['current_min'];
+    currentExp = json['current_exp'];
+    nextExp = json['next_exp'];
   }
 }

@@ -4,6 +4,7 @@ import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
+import 'package:pilipala/pages/setting/index.dart';
 
 class Routes {
   static final List<GetPage> getPages = [
@@ -16,6 +17,8 @@ class Routes {
     // 图片预览
     GetPage(name: '/preview', page: () => const ImagePreview()),
     //
-    GetPage(name: '/webview', page: () => const WebviewPage())
+    GetPage(name: '/webview', page: () => const WebviewPage()),
+    // 设置
+    GetPage(name: '/setting', page: () => const SettingPage()),
   ];
 }

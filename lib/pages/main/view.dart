@@ -20,7 +20,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   late AnimationController? _animationController;
   late Animation<double>? _fadeAnimation;
   late Animation<double>? _slideAnimation;
-  int selectedIndex = 0;
+  int selectedIndex = 2;
   int? _lastSelectTime; //上次点击时间
 
   @override
@@ -111,17 +111,19 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        elevation: 1,
-        destinations: _mainController.navigationBars.map((e) {
-          return NavigationDestination(
-            icon: e['icon'],
-            selectedIcon: e['selectedIcon'],
-            label: e['label'],
-          );
-        }).toList(),
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (value) => setIndex(value),
+      bottomNavigationBar: Obx(
+        () => NavigationBar(
+          elevation: 1,
+          destinations: _mainController.navigationBars.map((e) {
+            return NavigationDestination(
+              icon: e['icon'],
+              selectedIcon: e['selectedIcon'],
+              label: e['label'],
+            );
+          }).toList(),
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) => setIndex(value),
+        ),
       ),
     );
   }

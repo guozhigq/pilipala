@@ -1,6 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/cookie.dart';
@@ -21,6 +22,12 @@ class WebviewController extends GetxController {
     pageTitle = Get.parameters['pageTitle']!;
 
     webviewInit();
+    if (type == 'login') {
+      controller.clearCache();
+      controller.clearLocalStorage();
+      WebViewCookieManager().clearCookies();
+      controller.setUserAgent(Request().headerUa('mob'));
+    }
   }
 
   webviewInit() {
@@ -49,7 +56,7 @@ class WebviewController extends GetxController {
                 if (result['status'] && result['data'].isLogin) {
                   SmartDialog.showToast('登录成功');
                   Get.find<MineController>().userInfo = result['data'];
-                  // Get.back();
+                  Get.back();
                 }
               } catch (e) {
                 print(e);

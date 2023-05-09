@@ -53,6 +53,8 @@ dependencies:
   
   # 存储
   path_provider: ^2.0.14
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
   # 设备信息
   device_info_plus: ^8.2.0
@@ -84,6 +86,7 @@ dev_dependencies:
   #   git:
   #     url: https://github.com/nvi9/flutter_launcher_icons.git
   #     ref: e045d40
+  hive_generator: ^2.0.0
 
 flutter_icons:
   android: true

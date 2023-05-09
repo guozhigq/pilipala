@@ -23,4 +23,7 @@ class Api {
 
   // 获取用户信息
   static const String userInfo = '/x/web-interface/nav';
+
+  // 获取当前用户状态
+  static const String userStatOwner = '/x/web-interface/nav/stat';
 }
