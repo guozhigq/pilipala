@@ -19,6 +19,11 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        toolbarHeight: kTextTabBarHeight + 20,
+        backgroundColor: Colors.transparent,
         title: null,
         actions: [
           IconButton(
@@ -54,6 +59,7 @@ class _MinePageState extends State<MinePage> {
                 height: constraint.maxHeight,
                 child: Column(
                   children: [
+                    const SizedBox(height: 10),
                     FutureBuilder(
                       future: _mineController.queryUserInfo(),
                       builder: (context, snapshot) {
@@ -69,45 +75,6 @@ class _MinePageState extends State<MinePage> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 12),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return SizedBox(
-                            height: constraints.maxWidth / 4 * 0.8,
-                            child: GridView.count(
-                              primary: false,
-                              padding: const EdgeInsets.all(0),
-                              crossAxisCount: 4,
-                              childAspectRatio: 1.25,
-                              children: <Widget>[
-                                ActionItem(
-                                  icon:
-                                      const Icon(CupertinoIcons.cloud_download),
-                                  onTap: () => {},
-                                  text: '离线缓存',
-                                ),
-                                ActionItem(
-                                  icon: const Icon(CupertinoIcons.time),
-                                  onTap: () => {},
-                                  text: '历史记录',
-                                ),
-                                ActionItem(
-                                  icon: const Icon(CupertinoIcons.star),
-                                  onTap: () => {},
-                                  text: '我的收藏',
-                                ),
-                                ActionItem(
-                                  icon: const Icon(CupertinoIcons.film),
-                                  onTap: () => {},
-                                  text: '稍后再看',
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
                   ],
                 ),
               ),

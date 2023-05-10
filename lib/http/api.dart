@@ -26,4 +26,8 @@ class Api {
 
   // 获取当前用户状态
   static const String userStatOwner = '/x/web-interface/nav/stat';
+
+  // 收藏夹
+  // https://api.bilibili.com/x/v3/fav/folder/created/list?pn=1&ps=10&up_mid=17340771
+  static const String userFavFolder = '/x/v3/fav/folder/created/list';
 }

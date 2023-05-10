@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:pilipala/pages/mine/view.dart';
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -42,6 +44,12 @@ class HomeAppBar extends StatelessWidget {
                     //   onPressed: () {},
                     //   icon: const Icon(CupertinoIcons.bell, size: 22),
                     // ),
+                    IconButton(
+                      onPressed: () {
+                        Get.bottomSheet(const MinePage());
+                      },
+                      icon: const Icon(CupertinoIcons.person, size: 22),
+                    ),
                     const SizedBox(width: 10)
                   ],
                   elevation: 0,

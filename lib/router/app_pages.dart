@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
+import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
+import 'package:pilipala/pages/media/index.dart';
 
 class Routes {
   static final List<GetPage> getPages = [
@@ -20,5 +22,9 @@ class Routes {
     GetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
     GetPage(name: '/setting', page: () => const SettingPage()),
+    //
+    GetPage(name: '/media', page: () => const MediaPage()),
+    //
+    GetPage(name: '/fav', page: () => const FavPage()),
   ];
 }

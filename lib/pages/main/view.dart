@@ -20,7 +20,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   late AnimationController? _animationController;
   late Animation<double>? _fadeAnimation;
   late Animation<double>? _slideAnimation;
-  int selectedIndex = 2;
+  int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
 
   @override

@@ -36,7 +36,7 @@ class MineController extends GetxController {
         user.put(UserBoxKey.userMid, res['data'].mid);
         user.put(UserBoxKey.userLogin, true);
         userLogin.value = true;
-        Get.find<MainController>().readuUserFace();
+        // Get.find<MainController>().readuUserFace();
       } else {
         resetUserInfo();
       }
@@ -64,6 +64,6 @@ class MineController extends GetxController {
     await user.delete(UserBoxKey.userMid);
     await user.delete(UserBoxKey.userLogin);
     userLogin.value = false;
-    Get.find<MainController>().resetLast();
+    // Get.find<MainController>().resetLast();
   }
 }
