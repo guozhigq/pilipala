@@ -35,7 +35,9 @@ class VideoIntroController extends GetxController {
         var args = Get.arguments['videoItem'];
         videoItem!['pic'] = args.pic;
         videoItem!['title'] = args.title;
-        videoItem!['stat'] = args.stat;
+        if (args.stat != null) {
+          videoItem!['stat'] = args.stat;
+        }
         videoItem!['pubdate'] = args.pubdate;
         videoItem!['owner'] = args.owner;
       }

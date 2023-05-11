@@ -40,6 +40,7 @@ class _MediaPageState extends State<MediaPage>
                 '媒体库',
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -47,6 +48,7 @@ class _MediaPageState extends State<MediaPage>
           for (var i in _mediaController.list) ...[
             ListTile(
               onTap: () => i['onTap'](),
+              dense: true,
               leading: Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Icon(
@@ -84,9 +86,9 @@ class _MediaPageState extends State<MediaPage>
                     TextSpan(
                       text: '收藏夹 ',
                       style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.titleMedium!.fontSize,
-                      ),
+                          fontSize:
+                              Theme.of(context).textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold),
                     ),
                     if (_mediaController.favFolderData.value.count != null)
                       TextSpan(
@@ -165,50 +167,56 @@ class FavFolderItem extends StatelessWidget {
   FavFolderItemData? item;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        Container(
-          width: 110 * 16 / 9,
-          height: 110,
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: Theme.of(context).colorScheme.onInverseSurface,
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.onInverseSurface,
-                offset: const Offset(4, -12), // 阴影与容器的距离
-                blurRadius: 0.0, // 高斯的标准偏差与盒子的形状卷积。
-                spreadRadius: 0.0, // 在应用模糊之前，框应该膨胀的量。
-              ),
-            ],
+    return GestureDetector(
+      onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
+        'mediaId': item!.id.toString(),
+      }),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 180,
+            height: 110,
+            margin: const EdgeInsets.only(bottom: 8),
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Theme.of(context).colorScheme.onInverseSurface,
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  offset: const Offset(4, -12), // 阴影与容器的距离
+                  blurRadius: 0.0, // 高斯的标准偏差与盒子的形状卷积。
+                  spreadRadius: 0.0, // 在应用模糊之前，框应该膨胀的量。
+                ),
+              ],
+            ),
+            child: LayoutBuilder(
+              builder: (context, BoxConstraints box) {
+                return NetworkImgLayer(
+                  src: item!.cover,
+                  width: box.maxWidth,
+                  height: box.maxHeight,
+                );
+              },
+            ),
           ),
-          child: LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              return NetworkImgLayer(
-                src: item!.cover,
-                width: box.maxWidth,
-                height: box.maxHeight,
-              );
-            },
+          Text(
+            ' ${item!.title}',
+            overflow: TextOverflow.fade,
+            maxLines: 1,
           ),
-        ),
-        Text(
-          ' ${item!.title}',
-          overflow: TextOverflow.fade,
-          maxLines: 1,
-        ),
-        Text(
-          ' 共${item!.mediaCount}条视频',
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall!
-              .copyWith(color: Theme.of(context).colorScheme.outline),
-        )
-      ],
+          Text(
+            ' 共${item!.mediaCount}条视频',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: Theme.of(context).colorScheme.outline),
+          )
+        ],
+      ),
     );
   }
 }

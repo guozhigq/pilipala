@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
@@ -26,5 +27,7 @@ class Routes {
     GetPage(name: '/media', page: () => const MediaPage()),
     //
     GetPage(name: '/fav', page: () => const FavPage()),
+    //
+    GetPage(name: '/favDetail', page: () => const FavDetailPage()),
   ];
 }
