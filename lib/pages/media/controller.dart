@@ -10,12 +10,12 @@ class MediaController extends GetxController {
     {
       'icon': Icons.file_download_outlined,
       'title': '离线缓存',
-      'onTap': () => Get.toNamed('/fav'),
+      'onTap': () {},
     },
     {
       'icon': Icons.history,
       'title': '观看记录',
-      'onTap': () => Get.toNamed('/fav'),
+      'onTap': () {},
     },
     {
       'icon': Icons.star_border,
@@ -24,8 +24,8 @@ class MediaController extends GetxController {
     },
     {
       'icon': Icons.watch_later_outlined,
-      'title': '稍后再看',
-      'onTap': () => Get.toNamed('/fav'),
+      'title': '稍候再看',
+      'onTap': () => {},
     },
   ];
 

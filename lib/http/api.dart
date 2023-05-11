@@ -1,12 +1,72 @@
 class Api {
   // 推荐视频
-  static const String recommendList = '/x/web-interface/index/top/feed/rcmd';
+  static const String recommendList = '/x/web-interface/index/top/rcmd';
+
   // 热门视频
   static const String hotList = '/x/web-interface/popular';
+
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
   // https://api.bilibili.com/x/web-interface/view/detail  获取视频超详细信息(web端)
   static const String videoIntro = '/x/web-interface/view';
+  // 视频详情 超详细
+  // https://api.bilibili.com/x/web-interface/view/detail?aid=527403921
+
+  /// https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/action.md
+  // 点赞 Post
+  /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  /// bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  /// like	num	操作方式	必要	1：点赞 2：取消赞
+  // csrf	str	CSRF Token（位于cookie）	必要
+  // https://api.bilibili.com/x/web-interface/archive/like
+  static const String likeVideo = '/x/web-interface/archive/like';
+
+  //判断视频是否被点赞（双端）Get
+  // access_key	str	APP登录Token	APP方式必要
+  /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  /// bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  // https://api.bilibili.com/x/web-interface/archive/has/like
+  static const String hasLikeVideo = '/x/web-interface/archive/has/like';
+
+  // 视频点踩 web端不支持
+
+  // 投币视频（web端）POST
+  /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  /// bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  /// multiply	num	投币数量	必要	上限为2
+  /// select_like	num	是否附加点赞	非必要	0：不点赞 1：同时点赞 默认为0
+  // csrf	str	CSRF Token（位于cookie）	必要
+  // https://api.bilibili.com/x/web-interface/coin/add
+  static const String coinVideo = '/x/web-interface/coin/add';
+
+  // 判断视频是否被投币（双端）GET
+  // access_key	str	APP登录Token	APP方式必要
+  /// aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  /// bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  /// https://api.bilibili.com/x/web-interface/archive/coins
+  static const String hasCoinVideo = '/x/web-interface/archive/coins';
+
+  // 收藏视频（双端）POST
+  // access_key	str	APP登录Token	APP方式必要
+  /// rid	num	稿件avid	必要
+  /// type	num	必须为2	必要
+  /// add_media_ids	nums	需要加入的收藏夹mlid	非必要	同时添加多个，用,（%2C）分隔
+  /// del_media_ids	nums	需要取消的收藏夹mlid	非必要	同时取消多个，用,（%2C）分隔
+  // csrf	str	CSRF Token（位于cookie）	Cookie方式必要
+  // https://api.bilibili.com/medialist/gateway/coll/resource/deal
+  // https://api.bilibili.com/x/v3/fav/resource/deal
+  static const String favVideo = '/medialist/gateway/coll/resource/deal';
+
+  // 判断视频是否被收藏（双端）GET
+  /// aid
+  // https://api.bilibili.com/x/v2/fav/video/favoured
+  static const String hasFavVideo = '/x/v2/fav/video/favoured';
+
+  // 分享视频 （Web端） POST
+  // https://api.bilibili.com/x/web-interface/share/add
+  // aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  // bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  // csrf	str	CSRF Token（位于cookie）	必要
 
   // 视频详情页 相关视频
   static const String relatedList = '/x/web-interface/archive/related';
@@ -40,4 +100,7 @@ class Api {
   /// tid int 分区id
   // https://api.bilibili.com/x/v3/fav/resource/list?media_id=76614671&pn=1&ps=20&keyword=&order=mtime&type=0&tid=0
   static const String userFavFolderDetail = '/x/v3/fav/resource/list';
+
+  // 正在直播的up & 关注的up
+  // https://api.bilibili.com/x/polymer/web-dynamic/v1/portal
 }

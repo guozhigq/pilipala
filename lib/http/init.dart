@@ -55,6 +55,17 @@ class Request {
     dio.interceptors.add(cookieManager);
   }
 
+  // 从cookie中获取 csrf token
+  static Future<String> getCsrf() async {
+    var cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.baseApiUrl));
+    // for (var i in cookies) {
+    //   print(i);
+    // }
+    var token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+    return token;
+  }
+
   /*
    * config it and create
    */

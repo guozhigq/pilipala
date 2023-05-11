@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/video/detail/widgets/expandable_section.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -100,6 +102,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   /// 手动控制
   late Animation<double>? _manualAnimation;
 
+  final FavController _favController = Get.put(FavController());
+
   @override
   void initState() {
     super.initState();
@@ -111,6 +115,102 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     );
     _manualAnimation =
         Tween<double>(begin: 0.5, end: 1.5).animate(_manualController!);
+  }
+
+  showFavBottomSheet() {
+    Get.bottomSheet(
+      useRootNavigator: true,
+      isScrollControlled: true,
+      Container(
+        height: 450,
+        color: Theme.of(context).colorScheme.background,
+        child: Column(
+          children: [
+            AppBar(
+              toolbarHeight: 50,
+              automaticallyImplyLeading: false,
+              centerTitle: false,
+              elevation: 1,
+              title: Text(
+                '选择文件夹',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text('完成'),
+                ),
+                const SizedBox(width: 6),
+              ],
+            ),
+            Expanded(
+              child: Material(
+                child: FutureBuilder(
+                  future: _favController.queryFavFolder(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      Map data = snapshot.data as Map;
+                      if (data['status']) {
+                        return Obx(
+                          () => ListView.builder(
+                            itemCount: _favController
+                                    .favFolderData.value.list!.length +
+                                1,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return const SizedBox(height: 15);
+                              } else {
+                                return ListTile(
+                                  onTap: () {},
+                                  dense: true,
+                                  leading:
+                                      const Icon(Icons.folder_special_outlined),
+                                  minLeadingWidth: 0,
+                                  title: Text(_favController.favFolderData.value
+                                      .list![index - 1].title!),
+                                  subtitle: Text(
+                                    '${_favController.favFolderData.value.list![index - 1].mediaCount}个内容',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall!
+                                            .fontSize),
+                                  ),
+                                  trailing: Transform.scale(
+                                    scale: 0.9,
+                                    child: Checkbox(
+                                      value: false,
+                                      onChanged: (bool? checkValue) {},
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        );
+                      } else {
+                        return HttpError(
+                          errMsg: data['msg'],
+                          fn: () => setState(() {}),
+                        );
+                      }
+                    } else {
+                      // 骨架屏
+                      return Text('请求中');
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      persistent: false,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
+    );
   }
 
   @override
@@ -293,7 +393,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ),
                     ),
                   const SizedBox(height: 5),
-                  _actionGrid(context),
+                  _actionGrid(context, widget.videoIntroController),
                 ],
               )
             : const Center(child: CircularProgressIndicator()),
@@ -302,7 +402,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   // 喜欢 投币 分享
-  Widget _actionGrid(BuildContext context) {
+  Widget _actionGrid(BuildContext context, videoIntroController) {
     return LayoutBuilder(builder: (context, constraints) {
       return SizedBox(
         height: constraints.maxWidth / 5 * 0.8,
@@ -312,39 +412,50 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           crossAxisCount: 5,
           childAspectRatio: 1.25,
           children: <Widget>[
-            ActionItem(
-                icon: const Icon(FontAwesomeIcons.thumbsUp),
-                onTap: () => {},
-                selectStatus: false,
-                loadingStatus: widget.loadingStatus,
-                text: !widget.loadingStatus
-                    ? widget.videoDetail!.stat!.like!.toString()
-                    : '-'),
+            Obx(
+              () => ActionItem(
+                  icon: const Icon(FontAwesomeIcons.thumbsUp),
+                  selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+                  onTap: () => videoIntroController.actionLikeVideo(),
+                  selectStatus: videoIntroController.hasLike.value,
+                  loadingStatus: widget.loadingStatus,
+                  text: !widget.loadingStatus
+                      ? widget.videoDetail!.stat!.like!.toString()
+                      : '-'),
+            ),
             ActionItem(
                 icon: const Icon(FontAwesomeIcons.thumbsDown),
+                selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
                 onTap: () => {},
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
                 text: '不喜欢'),
-            ActionItem(
-                icon: const Icon(FontAwesomeIcons.b),
-                onTap: () => {},
-                selectStatus: false,
-                loadingStatus: widget.loadingStatus,
-                text: !widget.loadingStatus
-                    ? widget.videoDetail!.stat!.coin!.toString()
-                    : '-'),
-            ActionItem(
-                icon: const Icon(FontAwesomeIcons.star),
-                onTap: () => {},
-                selectStatus: false,
-                loadingStatus: widget.loadingStatus,
-                text: !widget.loadingStatus
-                    ? widget.videoDetail!.stat!.favorite!.toString()
-                    : '-'),
+            Obx(
+              () => ActionItem(
+                  icon: const Icon(FontAwesomeIcons.b),
+                  selectIcon: const Icon(FontAwesomeIcons.b),
+                  onTap: () => videoIntroController.actionCoinVideo(),
+                  selectStatus: videoIntroController.hasCoin.value,
+                  loadingStatus: widget.loadingStatus,
+                  text: !widget.loadingStatus
+                      ? widget.videoDetail!.stat!.coin!.toString()
+                      : '-'),
+            ),
+            Obx(
+              () => ActionItem(
+                  icon: const Icon(FontAwesomeIcons.star),
+                  selectIcon: const Icon(FontAwesomeIcons.star),
+                  // onTap: () => videoIntroController.actionFavVideo(),
+                  onTap: () => showFavBottomSheet(),
+                  selectStatus: videoIntroController.hasFav.value,
+                  loadingStatus: widget.loadingStatus,
+                  text: !widget.loadingStatus
+                      ? widget.videoDetail!.stat!.favorite!.toString()
+                      : '-'),
+            ),
             ActionItem(
                 icon: const Icon(FontAwesomeIcons.shareFromSquare),
-                onTap: () => {},
+                onTap: () => videoIntroController.actionShareVideo(),
                 selectStatus: false,
                 loadingStatus: widget.loadingStatus,
                 text: !widget.loadingStatus
@@ -359,6 +470,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
 class ActionItem extends StatelessWidget {
   Icon? icon;
+  Icon? selectIcon;
   Function? onTap;
   bool? loadingStatus;
   String? text;
@@ -367,6 +479,7 @@ class ActionItem extends StatelessWidget {
   ActionItem({
     Key? key,
     this.icon,
+    this.selectIcon,
     this.onTap,
     this.loadingStatus,
     this.text,
@@ -378,16 +491,17 @@ class ActionItem extends StatelessWidget {
     return Material(
       child: Ink(
         child: InkWell(
-          onTap: () {},
+          onTap: () => onTap!(),
           borderRadius: StyleString.mdRadius,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon!.icon!,
-                  size: 21,
-                  color: selectStatus
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).colorScheme.outline),
+              const SizedBox(height: 4),
+              selectStatus
+                  ? Icon(selectIcon!.icon!,
+                      size: 21, color: Theme.of(context).primaryColor)
+                  : Icon(icon!.icon!,
+                      size: 21, color: Theme.of(context).colorScheme.outline),
               const SizedBox(height: 4),
               AnimatedOpacity(
                 opacity: loadingStatus! ? 0 : 1,

@@ -56,8 +56,13 @@ class _MediaPageState extends State<MediaPage>
                   color: primary,
                 ),
               ),
+              contentPadding:
+                  const EdgeInsets.only(left: 15, top: 2, bottom: 2),
               minLeadingWidth: 0,
-              title: Text(i['title']),
+              title: Text(
+                i['title'],
+                style: const TextStyle(fontSize: 15),
+              ),
             ),
           ],
           favFolder()
@@ -105,13 +110,11 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ),
-          trailing: Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Text(
-              '查看全部',
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                  color: Theme.of(context).colorScheme.outline),
+          trailing: IconButton(
+            onPressed: () => _mediaController.queryFavFolder(),
+            icon: const Icon(
+              Icons.refresh,
+              size: 20,
             ),
           ),
         ),

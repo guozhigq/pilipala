@@ -56,12 +56,12 @@ class MainController extends GetxController {
       // 'icon': const Icon(Icons.person_outline),
       // 'selectedIcon': const Icon(Icons.person),
       'icon': const Icon(
-        CupertinoIcons.tray_full,
-        size: 21,
+        CupertinoIcons.folder,
+        size: 20,
       ),
       'selectedIcon': const Icon(
-        CupertinoIcons.tray_full_fill,
-        size: 21,
+        CupertinoIcons.folder_fill,
+        size: 20,
       ),
       'label': "媒体库",
     }

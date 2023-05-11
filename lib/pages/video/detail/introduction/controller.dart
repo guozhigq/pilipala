@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
@@ -25,6 +27,13 @@ class VideoIntroController extends GetxController {
 
   // up主粉丝数
   Map userStat = {'follower': '-'};
+
+  // 是否点赞
+  RxBool hasLike = false.obs;
+  // 是否投币
+  RxBool hasCoin = false.obs;
+  // 是否收藏
+  RxBool hasFav = false.obs;
 
   @override
   void onInit() {
@@ -57,6 +66,13 @@ class VideoIntroController extends GetxController {
     }
     // 获取到粉丝数再返回
     await queryUserStat();
+    // 获取点赞状态
+    queryHasLikeVideo();
+    // 获取投币状态
+    queryHasCoinVideo();
+    // 获取收藏状态
+    queryHasFavVideo();
+
     return result;
   }
 
@@ -66,5 +82,52 @@ class VideoIntroController extends GetxController {
     if (result['status']) {
       userStat = result['data'];
     }
+  }
+
+  // 获取点赞状态
+  Future queryHasLikeVideo() async {
+    var result = await VideoHttp.hasLikeVideo(aid: aid);
+    // data	num	被点赞标志	0：未点赞  1：已点赞
+    hasLike.value = result["data"] == 1 ? true : false;
+  }
+
+  // 获取投币状态
+  Future queryHasCoinVideo() async {
+    var result = await VideoHttp.hasCoinVideo(aid: aid);
+    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+  }
+
+  // 获取收藏状态
+  Future queryHasFavVideo() async {
+    var result = await VideoHttp.hasFavVideo(aid: aid);
+    hasFav.value = result["data"]['favoured'];
+  }
+
+  // 一键三连
+
+  // （取消）点赞
+  Future actionLikeVideo() async {
+    var result = await VideoHttp.likeVideo(aid: aid, type: !hasLike.value);
+    if (result['status']) {
+      hasLike.value = result["data"] == 1 ? true : false;
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
+  // 投币
+  Future actionCoinVideo() async {
+    print('投币');
+  }
+
+  // （取消）收藏
+  Future actionFavVideo() async {
+    print('（取消）收藏');
+    // var result = await VideoHttp.favVideo(aid: aid, type: true, ids: '');
+  }
+
+  // 分享视频
+  Future actionShareVideo() async {
+    print('分享视频');
   }
 }

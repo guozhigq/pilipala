@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
@@ -87,7 +91,74 @@ class VideoHttp {
       }
       return {'status': true, 'data': list};
     } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 获取点赞状态
+  static Future hasLikeVideo({required String aid}) async {
+    var res = await Request().get(Api.hasLikeVideo, data: {'aid': aid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 获取投币状态
+  static Future hasCoinVideo({required String aid}) async {
+    var res = await Request().get(Api.hasCoinVideo, data: {'aid': aid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
       return {'status': true, 'data': []};
+    }
+  }
+
+  // 获取收藏状态
+  static Future hasFavVideo({required String aid}) async {
+    var res = await Request().get(Api.hasFavVideo, data: {'aid': aid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 一键三连
+  // （取消）点赞
+  static Future likeVideo({required String aid, required bool type}) async {
+    var res = await Request().post(
+      Api.likeVideo,
+      data: {
+        'aid': aid,
+        'like': type ? 1 : 2,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // （取消）收藏
+  static Future favVideo(
+      {required String aid, required bool type, required String ids}) async {
+    Map data = {'rid': aid, 'type': 2};
+    // type true 添加收藏 false 取消收藏
+    if (type) {
+      data['add_media_ids'] = ids;
+    } else {
+      data['del_media_ids'] = ids;
+    }
+    var res = await Request()
+        .post(Api.favVideo, data: {'aid': aid, 'like': type ? 1 : 2});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
     }
   }
 }
