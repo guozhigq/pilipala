@@ -13,6 +13,7 @@ class RecVideoItemModel {
     this.pubdate,
     this.owner,
     this.stat,
+    this.isFollowed,
     this.rcmdReason,
   });
 
@@ -27,6 +28,7 @@ class RecVideoItemModel {
   int? pubdate = -1;
   Owner? owner;
   Stat? stat;
+  int? isFollowed;
   RcmdReason? rcmdReason;
 
   RecVideoItemModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class RecVideoItemModel {
     pubdate = json["pubdate"];
     owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);
+    isFollowed = json["is_followed"] ?? 0;
     rcmdReason = json["rcmd_reason"] != null
         ? RcmdReason.fromJson(json["rcmd_reason"])
         : RcmdReason(content: '');

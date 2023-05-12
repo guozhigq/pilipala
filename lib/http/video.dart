@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
@@ -19,7 +15,7 @@ class VideoHttp {
       var res = await Request().get(
         Api.recommendList,
         data: {
-          'feed_version': 'V3',
+          'feed_version': 'V4',
           'ps': ps,
           'fresh_idx': freshIdx,
         },
@@ -31,10 +27,10 @@ class VideoHttp {
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': []};
+        return {'status': false, 'data': [], 'msg': ''};
       }
     } catch (err) {
-      return {'status': false, 'data': [], 'msg': err};
+      return {'status': false, 'data': [], 'msg': err.toString()};
     }
   }
 

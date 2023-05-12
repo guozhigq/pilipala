@@ -25,6 +25,7 @@ class HomeController extends GetxController {
       freshIdx: _currentPage,
     );
     if (res['status']) {
+      print('type: $type');
       if (type == 'init') {
         videoList.value = res['data'];
       } else if (type == 'onRefresh') {
