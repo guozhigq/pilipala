@@ -186,7 +186,6 @@ class VideoIntroController extends GetxController {
     } catch (e) {}
     var result = await VideoHttp.favVideo(
         aid: aid,
-        type: true,
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
     if (result['status']) {

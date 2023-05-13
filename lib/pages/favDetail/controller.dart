@@ -1,5 +1,7 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 
@@ -25,5 +27,24 @@ class FavDetailController extends GetxController {
     );
     favDetailData.value = res['data'];
     return res;
+  }
+
+  onCancelFav(int id) async {
+    var result = await VideoHttp.favVideo(
+        aid: id.toString(), addIds: '', delIds: mediaId.toString());
+    if (result['status']) {
+      if (result['data']['prompt']) {
+        List<FavDetailItemData> dataList = favDetailData.value.medias!;
+        for (var i in dataList) {
+          if (i.id == id) {
+            dataList.remove(i);
+            break;
+          }
+        }
+        favDetailData.value.medias = dataList;
+        favDetailData.refresh();
+        SmartDialog.showToast('取消收藏');
+      }
+    }
   }
 }

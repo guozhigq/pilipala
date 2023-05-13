@@ -152,12 +152,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
-              child: Text(
-                '共${_favDetailController.item!.mediaCount}条视频',
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    color: Theme.of(context).colorScheme.outline,
-                    letterSpacing: 1),
+              child: Obx(
+                () => Text(
+                  '共${_favDetailController.favDetailData.value.medias != null ? _favDetailController.favDetailData.value.medias!.length : '-'}条视频',
+                  style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                      letterSpacing: 1),
+                ),
               ),
             ),
           ),
