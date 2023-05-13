@@ -167,18 +167,27 @@ class _FavDetailPageState extends State<FavDetailPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 Map data = snapshot.data;
                 if (data['status']) {
-                  return Obx(
-                    () => SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return FavVideoCardH(
-                          videoItem: _favDetailController
-                              .favDetailData.value.medias![index],
-                        );
-                      },
-                          childCount: _favDetailController
-                              .favDetailData.value.medias!.length),
-                    ),
-                  );
+                  if (_favDetailController.item!.mediaCount == 0) {
+                    return const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 300,
+                        child: Center(child: Text('没有内容')),
+                      ),
+                    );
+                  } else {
+                    return Obx(
+                      () => SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          return FavVideoCardH(
+                            videoItem: _favDetailController
+                                .favDetailData.value.medias![index],
+                          );
+                        },
+                            childCount: _favDetailController
+                                .favDetailData.value.medias!.length),
+                      ),
+                    );
+                  }
                 } else {
                   return HttpError(
                     errMsg: data['msg'],
@@ -187,8 +196,9 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 }
               } else {
                 return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('加载中'),
+                  child: SizedBox(
+                    height: 300,
+                    child: Center(child: Text('加载中')),
                   ),
                 );
               }

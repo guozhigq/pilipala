@@ -72,7 +72,7 @@ class FavFolderItemData {
     attr = json['attr'];
     title = json['title'];
     cover = json['cover'];
-    upper = Upper.fromJson(json['upper']);
+    upper = json['upper'] != null ? Upper.fromJson(json['upper']) : Upper();
     coverType = json['cover_type'];
     intro = json['intro'];
     ctime = json['ctime'];

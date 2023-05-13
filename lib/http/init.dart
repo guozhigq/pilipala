@@ -138,13 +138,14 @@ class Request {
   /*
    * post请求
    */
-  post(url, {data, options, cancelToken, extra}) async {
+  post(url, {data, queryParameters, options, cancelToken, extra}) async {
     print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
         url,
         data: data,
+        queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
       );

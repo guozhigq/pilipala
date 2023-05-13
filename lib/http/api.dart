@@ -55,7 +55,7 @@ class Api {
   // csrf	str	CSRF Token（位于cookie）	Cookie方式必要
   // https://api.bilibili.com/medialist/gateway/coll/resource/deal
   // https://api.bilibili.com/x/v3/fav/resource/deal
-  static const String favVideo = '/medialist/gateway/coll/resource/deal';
+  static const String favVideo = '/x/v3/fav/resource/deal';
 
   // 判断视频是否被收藏（双端）GET
   /// aid
@@ -67,6 +67,20 @@ class Api {
   // aid	num	稿件avid	必要（可选）	avid与bvid任选一个
   // bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
   // csrf	str	CSRF Token（位于cookie）	必要
+
+  // 一键三连
+  // https://api.bilibili.com/x/web-interface/archive/like/triple
+  // aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  // bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  // csrf	str	CSRF Token（位于cookie）	必要
+  static const String oneThree = '/x/web-interface/archive/like/triple';
+
+  // 获取指定用户创建的所有收藏夹信息
+  // 该接口也能查询目标内容id存在于那些收藏夹中
+  // up_mid	num	目标用户mid	必要
+  // type	num	目标内容属性	非必要	默认为全部 0：全部 2：视频稿件
+  // rid	num	目标 视频稿件avid
+  static const String videoInFolder = '/x/v3/fav/folder/created/list-all';
 
   // 视频详情页 相关视频
   static const String relatedList = '/x/web-interface/archive/related';

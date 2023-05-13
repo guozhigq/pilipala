@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class VideoIntroController extends GetxController {
   // 视频aid
@@ -34,6 +37,11 @@ class VideoIntroController extends GetxController {
   RxBool hasCoin = false.obs;
   // 是否收藏
   RxBool hasFav = false.obs;
+  Box user = GStrorage.user;
+  bool userLogin = false;
+  Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  List addMediaIdsNew = [];
+  List delMediaIdsNew = [];
 
   @override
   void onInit() {
@@ -51,6 +59,7 @@ class VideoIntroController extends GetxController {
         videoItem!['owner'] = args.owner;
       }
     }
+    userLogin = user.get(UserBoxKey.userLogin) != null;
   }
 
   // 获取视频简介
@@ -66,12 +75,14 @@ class VideoIntroController extends GetxController {
     }
     // 获取到粉丝数再返回
     await queryUserStat();
-    // 获取点赞状态
-    queryHasLikeVideo();
-    // 获取投币状态
-    queryHasCoinVideo();
-    // 获取收藏状态
-    queryHasFavVideo();
+    if (userLogin) {
+      // 获取点赞状态
+      queryHasLikeVideo();
+      // 获取投币状态
+      queryHasCoinVideo();
+      // 获取收藏状态
+      queryHasFavVideo();
+    }
 
     return result;
   }
@@ -104,12 +115,54 @@ class VideoIntroController extends GetxController {
   }
 
   // 一键三连
+  Future actionOneThree() async {
+    if (hasLike.value && hasCoin.value && hasFav.value) {
+      // 已点赞、投币、收藏
+      SmartDialog.showToast('🙏 UP已经收到了～');
+      return false;
+    }
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('一键三连 给UP送温暖'),
+          actions: [
+            TextButton(
+                onPressed: () => SmartDialog.dismiss(),
+                child: const Text('点错了')),
+            TextButton(
+              onPressed: () async {
+                var result = await VideoHttp.oneThree(aid: aid);
+                if (result['status']) {
+                  hasLike.value = result["data"]["like"];
+                  hasCoin.value = result["data"]["coin"];
+                  hasFav.value = result["data"]["fav"];
+                  SmartDialog.showToast('三连成功 🎉');
+                } else {
+                  SmartDialog.showToast(result['msg']);
+                }
+                SmartDialog.dismiss();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
 
   // （取消）点赞
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(aid: aid, type: !hasLike.value);
     if (result['status']) {
       hasLike.value = result["data"] == 1 ? true : false;
+      if (hasLike.value) {
+        SmartDialog.showToast('已点赞 👍');
+      } else {
+        SmartDialog.showToast('取消赞');
+      }
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -122,12 +175,58 @@ class VideoIntroController extends GetxController {
 
   // （取消）收藏
   Future actionFavVideo() async {
-    print('（取消）收藏');
-    // var result = await VideoHttp.favVideo(aid: aid, type: true, ids: '');
+    try {
+      for (var i in favFolderData.value.list!.toList()) {
+        if (i.favState == 1) {
+          addMediaIdsNew.add(i.id);
+        } else {
+          delMediaIdsNew.add(i.id);
+        }
+      }
+    } catch (e) {}
+    var result = await VideoHttp.favVideo(
+        aid: aid,
+        type: true,
+        addIds: addMediaIdsNew.join(','),
+        delIds: delMediaIdsNew.join(','));
+    if (result['status']) {
+      if (result['data']['prompt']) {
+        addMediaIdsNew = [];
+        delMediaIdsNew = [];
+        Get.back();
+        // 重新获取收藏状态
+        queryHasFavVideo();
+        SmartDialog.showToast('✅ 操作成功');
+      }
+    }
   }
 
   // 分享视频
   Future actionShareVideo() async {
     print('分享视频');
+  }
+
+  Future queryVideoInFolder() async {
+    var result = await VideoHttp.videoInFolder(
+        mid: user.get(UserBoxKey.userMid), rid: aid);
+    if (result['status']) {
+      favFolderData.value = result['data'];
+    }
+    return result;
+  }
+
+  // 选择文件夹
+  onChoose(bool checkValue, int index) {
+    List<FavFolderItemData> datalist = favFolderData.value.list!;
+    for (var i = 0; i < datalist.length; i++) {
+      if (i == index) {
+        datalist[i].favState = checkValue == true ? 1 : 0;
+        datalist[i].mediaCount = checkValue == true
+            ? datalist[i].mediaCount! + 1
+            : datalist[i].mediaCount! - 1;
+      }
+    }
+    favFolderData.value.list = datalist;
+    favFolderData.refresh();
   }
 }

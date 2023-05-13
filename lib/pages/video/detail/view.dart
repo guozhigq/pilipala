@@ -114,23 +114,11 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                     children: [
                       Builder(
                         builder: (context) {
-                          return CustomScrollView(
-                            key: const PageStorageKey<String>('简介'),
+                          return const CustomScrollView(
+                            key: PageStorageKey<String>('简介'),
                             slivers: <Widget>[
-                              const VideoIntroPanel(),
-                              SliverPadding(
-                                padding:
-                                    const EdgeInsets.only(top: 8, bottom: 5),
-                                sliver: SliverToBoxAdapter(
-                                  child: Divider(
-                                    height: 1,
-                                    color: Theme.of(context)
-                                        .dividerColor
-                                        .withOpacity(0.1),
-                                  ),
-                                ),
-                              ),
-                              const RelatedVideoPanel(),
+                              VideoIntroPanel(),
+                              RelatedVideoPanel(),
                             ],
                           );
                         },

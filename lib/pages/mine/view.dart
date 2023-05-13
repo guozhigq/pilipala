@@ -64,6 +64,7 @@ class _MinePageState extends State<MinePage> {
                       future: _mineController.queryUserInfo(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
+                          print(snapshot.data);
                           if (snapshot.data['status']) {
                             return Obx(() => userInfoBuild());
                           } else {

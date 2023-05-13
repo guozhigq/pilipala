@@ -2,6 +2,7 @@ import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
+import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
@@ -122,11 +123,26 @@ class VideoHttp {
   }
 
   // 一键三连
+  static Future oneThree({required String aid}) async {
+    var res = await Request().post(
+      Api.oneThree,
+      queryParameters: {
+        'aid': aid,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
   // （取消）点赞
   static Future likeVideo({required String aid, required bool type}) async {
     var res = await Request().post(
       Api.likeVideo,
-      data: {
+      queryParameters: {
         'aid': aid,
         'like': type ? 1 : 2,
         'csrf': await Request.getCsrf(),
@@ -141,18 +157,31 @@ class VideoHttp {
 
   // （取消）收藏
   static Future favVideo(
-      {required String aid, required bool type, required String ids}) async {
-    Map data = {'rid': aid, 'type': 2};
-    // type true 添加收藏 false 取消收藏
-    if (type) {
-      data['add_media_ids'] = ids;
-    } else {
-      data['del_media_ids'] = ids;
-    }
-    var res = await Request()
-        .post(Api.favVideo, data: {'aid': aid, 'like': type ? 1 : 2});
+      {required String aid,
+      required bool type,
+      required String addIds,
+      required String delIds}) async {
+    var res = await Request().post(Api.favVideo, queryParameters: {
+      'rid': aid,
+      'type': 2,
+      'add_media_ids': addIds,
+      'del_media_ids': delIds,
+      'csrf': await Request.getCsrf(),
+    });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 查看视频被收藏在哪个文件夹
+  static Future videoInFolder({required int mid, required String rid}) async {
+    var res = await Request()
+        .get(Api.videoInFolder, data: {'up_mid': mid, 'rid': rid});
+    if (res.data['code'] == 0) {
+      FavFolderData data = FavFolderData.fromJson(res.data['data']);
+      return {'status': true, 'data': data};
     } else {
       return {'status': false, 'data': []};
     }

@@ -27,6 +27,9 @@ class MineController extends GetxController {
   }
 
   Future queryUserInfo() async {
+    if (user.get(UserBoxKey.userLogin) == null) {
+      return {'status': false};
+    }
     var res = await UserHttp.userInfo();
     if (res['status']) {
       if (res['data'].isLogin) {
