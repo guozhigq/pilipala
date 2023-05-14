@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
@@ -179,6 +182,44 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       FavFolderData data = FavFolderData.fromJson(res.data['data']);
       return {'status': true, 'data': data};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 发表评论 replyAdd
+
+  // type	num	评论区类型代码	必要	类型代码见表
+  // oid	num	目标评论区id	必要
+  // root	num	根评论rpid	非必要	二级评论以上使用
+  // parent	num	父评论rpid	非必要	二级评论同根评论id 大于二级评论为要回复的评论id
+  // message	str	发送评论内容	必要	最大1000字符
+  // plat	num	发送平台标识	非必要	1：web端 2：安卓客户端  3：ios客户端  4：wp客户端
+  static Future replyAdd({
+    required ReplyType type,
+    required int oid,
+    required String message,
+    int? root,
+    int? parent,
+  }) async {
+    if(message == ''){
+      return {'status': false, 'data': [], 'msg': '请输入评论内容'};
+    }
+    print('root:$root');
+    print('parent: $parent');
+
+    var res = await Request()
+        .post(Api.replyAdd, queryParameters: {
+          'type': type.index,
+          'oid': oid,
+          'root': root ?? '',
+          'parent': parent == null || parent == 0 ? '' : parent,
+          'message': message,
+          'csrf': await Request.getCsrf(),
+        });
+    log(res.toString());
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': []};
     }

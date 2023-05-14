@@ -8,8 +8,10 @@ import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
-  ReplyItem({super.key, this.replyItem});
+  ReplyItem({super.key, this.replyItem, this.weakUpReply, this.replyLevel});
   ReplyItemModel? replyItem;
+  Function? weakUpReply;
+  String? replyLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +175,7 @@ class ReplyItem extends StatelessWidget {
         ),
         // 操作区域
         bottonAction(context, replyItem!.replyControl),
+        const SizedBox(height: 3),
         if (replyItem!.replies!.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.only(top: 2, bottom: 12),
@@ -193,6 +196,15 @@ class ReplyItem extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 48),
+        if (replyItem!.cardLabel!.isNotEmpty &&
+            replyItem!.cardLabel!.contains('热评'))
+          Text(
+            '热评 • ',
+            style: Theme.of(context)
+                .textTheme
+                .labelMedium!
+                .copyWith(color: Theme.of(context).colorScheme.primary),
+          ),
         Text(
           Utils.dateFormat(replyItem!.ctime),
           style: Theme.of(context)
@@ -210,10 +222,22 @@ class ReplyItem extends StatelessWidget {
                 .copyWith(color: Theme.of(context).colorScheme.outline),
           ),
         const Spacer(),
-        if (replyControl!.isUpTop!)
+        if (replyItem!.upAction!.like!)
           Icon(Icons.favorite, color: Colors.red[400], size: 18),
         SizedBox(
-          height: 35,
+            height: 28,
+            width: 42,
+            child: TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(EdgeInsets.zero),
+              ),
+              child: Text('回复', style: Theme.of(context)
+                  .textTheme
+                  .labelMedium),
+              onPressed: () => weakUpReply!(replyItem, replyLevel),
+            )),
+        SizedBox(
+          height: 32,
           child: TextButton(
             child: Row(
               children: [
@@ -314,6 +338,10 @@ class ReplyItemRow extends StatelessWidget {
                         : TextOverflow.visible,
                     maxLines: extraRow == 1 ? 2 : null,
                     TextSpan(
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = ()  {
+                         replyReply(context);
+                        },
                       children: [
                         TextSpan(
                           text: replies![index].member.uname + ' ',
@@ -395,7 +423,11 @@ InlineSpan buildContent(BuildContext context, content) {
       content.jumpUrl.isEmpty &&
       content.vote.isEmpty &&
       content.pictures.isEmpty) {
-    return TextSpan(text: content.message);
+    return TextSpan(text: content.message,
+      recognizer: TapGestureRecognizer()
+      ..onTap = ()=> {
+        print('点击')
+      },);
   }
   List<InlineSpan> spanChilds = [];
   // 匹配表情
@@ -635,7 +667,7 @@ class UpTag extends StatelessWidget {
     Color primary = Theme.of(context).colorScheme.primary;
     return Container(
       width: 24,
-      height: 15,
+      height: 14,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(3),
           color: tagText == 'UP' ? primary : null,
@@ -645,7 +677,7 @@ class UpTag extends StatelessWidget {
         child: Text(
           tagText!,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 9,
             color: tagText == 'UP'
                 ? Theme.of(context).colorScheme.onPrimary
                 : primary,

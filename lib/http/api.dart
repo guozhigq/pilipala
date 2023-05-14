@@ -91,6 +91,10 @@ class Api {
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
 
+  // 发表评论
+  // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
+  static const String replyAdd = '/x/v2/reply/add';
+
   // 用户(被)关注数、投稿数
   // https://api.bilibili.com/x/relation/stat?vmid=697166795
   static const String userStat = '/x/relation/stat';
