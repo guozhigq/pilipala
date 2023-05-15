@@ -11,6 +11,7 @@ class HomeController extends GetxController {
   RxList<RecVideoItemModel> videoList = [RecVideoItemModel()].obs;
   bool isLoadingMore = false;
   bool flag = false;
+  OverlayEntry? popupDialog;
 
   @override
   void onInit() {

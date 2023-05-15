@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
+import 'package:pilipala/common/widgets/animated_dialog.dart';
+import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import './controller.dart';
@@ -101,6 +103,13 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  OverlayEntry _createPopupDialog(videoItem) {
+    return OverlayEntry(
+        builder: (context) => AnimatedDialog(
+              child: OverlayPop(videoItem: videoItem),
+            ));
+  }
+
   Widget contentGrid(ctr, videoList) {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -118,7 +127,19 @@ class _HomePageState extends State<HomePage>
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return videoList!.isNotEmpty
-              ? VideoCardV(videoItem: videoList![index])
+              ?
+              // VideoCardV(videoItem: videoList![index])
+              VideoCardV(
+                  videoItem: videoList[index],
+                  longPress: () {
+                    _homeController.popupDialog =
+                        _createPopupDialog(videoList[index]);
+                    Overlay.of(context).insert(_homeController.popupDialog!);
+                  },
+                  longPressEnd: () {
+                    _homeController.popupDialog?.remove();
+                  },
+                )
               : const VideoCardVSkeleton();
         },
         childCount: videoList!.isNotEmpty ? videoList!.length : 10,

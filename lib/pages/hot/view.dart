@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/animated_dialog.dart';
+import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
@@ -62,6 +64,15 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _hotController.videoList[index],
+                            longPress: () {
+                              _hotController.popupDialog = _createPopupDialog(
+                                  _hotController.videoList[index]);
+                              Overlay.of(context)
+                                  .insert(_hotController.popupDialog!);
+                            },
+                            longPressEnd: () {
+                              _hotController.popupDialog?.remove();
+                            },
                           );
                         }, childCount: _hotController.videoList.length),
                       ),
@@ -89,6 +100,14 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  OverlayEntry _createPopupDialog(videoItem) {
+    return OverlayEntry(
+      builder: (context) => AnimatedDialog(
+        child: OverlayPop(videoItem: videoItem),
       ),
     );
   }
