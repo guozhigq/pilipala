@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -11,21 +12,21 @@ class StatDanMu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color color =
+        theme == 'white' ? Colors.white : Theme.of(context).colorScheme.outline;
     return Row(
       children: [
-        Image.asset(
-          'assets/images/dm_$theme.png',
-          width: size == 'medium' ? 16 : 14,
-          height: size == 'medium' ? 16 : 14,
+        Icon(
+          CupertinoIcons.ellipses_bubble,
+          size: 14,
+          color: color,
         ),
-        const SizedBox(width: 2),
+        const SizedBox(width: 3),
         Text(
           Utils.numFormat(danmu!),
           style: TextStyle(
             fontSize: size == 'medium' ? 12 : 11,
-            color: theme == 'white'
-                ? Colors.white
-                : Theme.of(context).colorScheme.outline,
+            color: color,
           ),
         )
       ],

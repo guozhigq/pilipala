@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/http/user.dart';
+import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/utils/storage.dart';
+
+class VideoIntroController extends GetxController {
+  // 视频aid
+  String aid = Get.parameters['aid']!;
+
+  // 是否预渲染 骨架屏
+  bool preRender = false;
+
+  // 视频详情 上个页面传入
+  Map? videoItem = {};
+
+  // 请求状态
+  RxBool isLoading = false.obs;
+
+  // 视频详情 请求返回
+  Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
+
+  // 请求返回的信息
+  String responseMsg = '请求异常';
+
+  // up主粉丝数
+  Map userStat = {'follower': '-'};
+
+  // 是否点赞
+  RxBool hasLike = false.obs;
+  // 是否投币
+  RxBool hasCoin = false.obs;
+  // 是否收藏
+  RxBool hasFav = false.obs;
+  Box user = GStrorage.user;
+  bool userLogin = false;
+  Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  List addMediaIdsNew = [];
+  List delMediaIdsNew = [];
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (Get.arguments.isNotEmpty) {
+      if (Get.arguments.containsKey('videoItem')) {
+        preRender = true;
+        var args = Get.arguments['videoItem'];
+        videoItem!['pic'] = args.pic;
+        videoItem!['title'] = args.title;
+        if (args.stat != null) {
+          videoItem!['stat'] = args.stat;
+        }
+        videoItem!['pubdate'] = args.pubdate;
+        videoItem!['owner'] = args.owner;
+      }
+    }
+    userLogin = user.get(UserBoxKey.userLogin) != null;
+  }
+
+  // 获取视频简介
+  Future queryVideoIntro() async {
+    var result = await VideoHttp.videoIntro(aid: aid);
+    if (result['status']) {
+      videoDetail.value = result['data']!;
+      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+          .tabs
+          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
+    } else {
+      responseMsg = result['msg'];
+    }
+    // 获取到粉丝数再返回
+    await queryUserStat();
+    if (userLogin) {
+      // 获取点赞状态
+      queryHasLikeVideo();
+      // 获取投币状态
+      queryHasCoinVideo();
+      // 获取收藏状态
+      queryHasFavVideo();
+    }
+
+    return result;
+  }
+
+  // 获取up主粉丝数
+  Future queryUserStat() async {
+    var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
+    if (result['status']) {
+      userStat = result['data'];
+    }
+  }
+
+  // 获取点赞状态
+  Future queryHasLikeVideo() async {
+    var result = await VideoHttp.hasLikeVideo(aid: aid);
+    // data	num	被点赞标志	0：未点赞  1：已点赞
+    hasLike.value = result["data"] == 1 ? true : false;
+  }
+
+  // 获取投币状态
+  Future queryHasCoinVideo() async {
+    var result = await VideoHttp.hasCoinVideo(aid: aid);
+    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+  }
+
+  // 获取收藏状态
+  Future queryHasFavVideo() async {
+    var result = await VideoHttp.hasFavVideo(aid: aid);
+    hasFav.value = result["data"]['favoured'];
+  }
+
+  // 一键三连
+  Future actionOneThree() async {
+    if (hasLike.value && hasCoin.value && hasFav.value) {
+      // 已点赞、投币、收藏
+      SmartDialog.showToast('🙏 UP已经收到了～');
+      return false;
+    }
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('一键三连 给UP送温暖'),
+          actions: [
+            TextButton(
+                onPressed: () => SmartDialog.dismiss(),
+                child: const Text('点错了')),
+            TextButton(
+              onPressed: () async {
+                var result = await VideoHttp.oneThree(aid: aid);
+                if (result['status']) {
+                  hasLike.value = result["data"]["like"];
+                  hasCoin.value = result["data"]["coin"];
+                  hasFav.value = result["data"]["fav"];
+                  SmartDialog.showToast('三连成功 🎉');
+                } else {
+                  SmartDialog.showToast(result['msg']);
+                }
+                SmartDialog.dismiss();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  // （取消）点赞
+  Future actionLikeVideo() async {
+    var result = await VideoHttp.likeVideo(aid: aid, type: !hasLike.value);
+    if (result['status']) {
+      hasLike.value = result["data"] == 1 ? true : false;
+      if (hasLike.value) {
+        SmartDialog.showToast('已点赞 👍');
+      } else {
+        SmartDialog.showToast('取消赞');
+      }
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
+  // 投币
+  Future actionCoinVideo() async {
+    print('投币');
+  }
+
+  // （取消）收藏
+  Future actionFavVideo() async {
+    try {
+      for (var i in favFolderData.value.list!.toList()) {
+        if (i.favState == 1) {
+          addMediaIdsNew.add(i.id);
+        } else {
+          delMediaIdsNew.add(i.id);
+        }
+      }
+    } catch (e) {}
+    var result = await VideoHttp.favVideo(
+        aid: aid,
+        addIds: addMediaIdsNew.join(','),
+        delIds: delMediaIdsNew.join(','));
+    if (result['status']) {
+      if (result['data']['prompt']) {
+        addMediaIdsNew = [];
+        delMediaIdsNew = [];
+        Get.back();
+        // 重新获取收藏状态
+        queryHasFavVideo();
+        SmartDialog.showToast('✅ 操作成功');
+      }
+    }
+  }
+
+  // 分享视频
+  Future actionShareVideo() async {
+    print('分享视频');
+  }
+
+  Future queryVideoInFolder() async {
+    var result = await VideoHttp.videoInFolder(
+        mid: user.get(UserBoxKey.userMid), rid: aid);
+    if (result['status']) {
+      favFolderData.value = result['data'];
+    }
+    return result;
+  }
+
+  // 选择文件夹
+  onChoose(bool checkValue, int index) {
+    List<FavFolderItemData> datalist = favFolderData.value.list!;
+    for (var i = 0; i < datalist.length; i++) {
+      if (i == index) {
+        datalist[i].favState = checkValue == true ? 1 : 0;
+        datalist[i].mediaCount = checkValue == true
+            ? datalist[i].mediaCount! + 1
+            : datalist[i].mediaCount! - 1;
+      }
+    }
+    favFolderData.value.list = datalist;
+    favFolderData.refresh();
+  }
+}

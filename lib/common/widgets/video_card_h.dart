@@ -7,6 +7,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 水平布局
 class VideoCardH extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   var videoItem;
   Function()? longPress;
   Function()? longPressEnd;
@@ -20,84 +21,94 @@ class VideoCardH extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Ink(
-        child: GestureDetector(
-          onLongPress: () {
-            longPress!();
-          },
-          onLongPressEnd: (details) {
-            longPressEnd!();
-          },
-          child: InkWell(
-            onTap: () async {
-              await Future.delayed(const Duration(milliseconds: 200));
-              int aid = videoItem.aid ?? videoItem.id;
-              Get.toNamed('/video?aid=$aid',
-                  arguments: {'videoItem': videoItem});
-            },
-            child: Container(
+    int aid = videoItem.aid;
+    String heroTag = Utils.makeHeroTag(aid);
+    return GestureDetector(
+      onLongPress: () {
+        longPress!();
+      },
+      onLongPressEnd: (details) {
+        longPressEnd!();
+      },
+      child: InkWell(
+        onTap: () async {
+          await Future.delayed(const Duration(milliseconds: 200));
+          Get.toNamed('/video?aid=$aid',
+              arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+        },
+        child: Column(
+          children: [
+            Padding(
               padding: const EdgeInsets.fromLTRB(
-                  StyleString.cardSpace, 5, StyleString.cardSpace, 5),
-              child: LayoutBuilder(builder: (context, boxConstraints) {
-                double width =
-                    (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
-                return SizedBox(
-                  height: width / StyleString.aspectRatio,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: StyleString.aspectRatio,
-                        // child: ClipRRect(
-                        //   borderRadius: StyleString.mdRadius,
-                        child: LayoutBuilder(
-                          builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            double PR = MediaQuery.of(context).devicePixelRatio;
-                            return Stack(
-                              children: [
-                                NetworkImgLayer(
-                                  // src: videoItem['pic'] +
-                                  //     '@${(maxWidth * 2).toInt()}w',
-                                  src: videoItem.pic + '@.webp',
-                                  width: maxWidth,
-                                  height: maxHeight,
-                                ),
-                                // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
-                                Positioned(
-                                  right: 4,
-                                  bottom: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 1, horizontal: 6),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: Colors.black54.withOpacity(0.4)),
-                                    child: Text(
-                                      Utils.timeFormat(videoItem.duration!),
-                                      style: const TextStyle(
-                                          fontSize: 11, color: Colors.white),
+                  StyleString.cardSpace, 7, StyleString.cardSpace, 7),
+              child: LayoutBuilder(
+                builder: (context, boxConstraints) {
+                  double width =
+                      (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+                  return SizedBox(
+                    height: width / StyleString.aspectRatio,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: StyleString.aspectRatio,
+                          child: LayoutBuilder(
+                            builder: (context, boxConstraints) {
+                              double maxWidth = boxConstraints.maxWidth;
+                              double maxHeight = boxConstraints.maxHeight;
+                              double PR =
+                                  MediaQuery.of(context).devicePixelRatio;
+                              return Stack(
+                                children: [
+                                  Hero(
+                                    tag: heroTag,
+                                    child: NetworkImgLayer(
+                                      // src: videoItem['pic'] +
+                                      //     '@${(maxWidth * 2).toInt()}w',
+                                      src: videoItem.pic + '@.webp',
+                                      width: maxWidth,
+                                      height: maxHeight,
                                     ),
                                   ),
                                   // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
-                                )
-                              ],
-                            );
-                          },
+                                  Positioned(
+                                    right: 4,
+                                    bottom: 4,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 1, horizontal: 6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color:
+                                              Colors.black54.withOpacity(0.4)),
+                                      child: Text(
+                                        Utils.timeFormat(videoItem.duration!),
+                                        style: const TextStyle(
+                                            fontSize: 11, color: Colors.white),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                        // ),
-                      ),
-                      VideoContent(videoItem: videoItem)
-                    ],
-                  ),
-                );
-              }),
-              // height: 124,
+                        VideoContent(videoItem: videoItem)
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
+            Divider(
+              height: 1,
+              indent: 8,
+              endIndent: 12,
+              color: Theme.of(context).dividerColor.withOpacity(0.08),
+            )
+          ],
         ),
       ),
     );
@@ -126,7 +137,7 @@ class VideoContent extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            if (videoItem.rcmdReason != '' &&
+            if (videoItem.rcmdReason != null &&
                 videoItem.rcmdReason.content != '')
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
@@ -145,12 +156,6 @@ class VideoContent extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                Image.asset(
-                  'assets/images/up_gray.png',
-                  width: 14,
-                  height: 12,
-                ),
-                const SizedBox(width: 2),
                 Text(
                   videoItem.owner.name,
                   style: TextStyle(

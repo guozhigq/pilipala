@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pilipala/common/constants.dart';
 
 class NetworkImgLayer extends StatelessWidget {
   final String? src;
@@ -29,11 +30,16 @@ class NetworkImgLayer extends StatelessWidget {
     // double pr = 2;
     return src != ''
         ? ClipRRect(
-            borderRadius: BorderRadius.circular(type == 'avatar' ? 50 : 4),
+            borderRadius: BorderRadius.circular(type == 'avatar'
+                ? 50
+                : type == 'emote'
+                    ? 0
+                    : StyleString.imgRadius.x),
             child: CachedNetworkImage(
               imageUrl: src!,
               width: width ?? double.infinity,
               height: height ?? double.infinity,
+              alignment: Alignment.center,
               maxWidthDiskCache: ((cacheW ?? width!) * pr).toInt(),
               // maxHeightDiskCache: (cacheH ?? height!).toInt(),
               memCacheWidth: ((cacheW ?? width!) * pr).toInt(),

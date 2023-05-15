@@ -12,6 +12,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class Request {
   static final Request _instance = Request._internal();
+  static late CookieManager cookieManager;
 
   factory Request() => _instance;
 
@@ -31,11 +32,9 @@ class Request {
       ignoreExpires: true,
       storage: FileStorage(cookiePath),
     );
-
-    dio.interceptors.add(CookieManager(cookieJar));
-
-    var cookie = await CookieManager(cookieJar)
-        .cookieJar
+    cookieManager = CookieManager(cookieJar);
+    dio.interceptors.add(cookieManager);
+    var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
     if (cookie.isEmpty) {
       try {
@@ -44,6 +43,27 @@ class Request {
         log("setCookie, ${e.toString()}");
       }
     }
+  }
+
+  // 移除cookie
+  static removeCookie() async {
+    await cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseUrl), []);
+    await cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), []);
+    cookieManager.cookieJar.deleteAll();
+    dio.interceptors.add(cookieManager);
+  }
+
+  // 从cookie中获取 csrf token
+  static Future<String> getCsrf() async {
+    var cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.baseApiUrl));
+    // for (var i in cookies) {
+    //   print(i);
+    // }
+    var token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+    return token;
   }
 
   /*
@@ -111,20 +131,21 @@ class Request {
       return response;
     } on DioError catch (e) {
       print('get error: $e');
-      return Future.error(ApiInterceptor.dioError(e));
+      return Future.error(await ApiInterceptor.dioError(e));
     }
   }
 
   /*
    * post请求
    */
-  post(url, {data, options, cancelToken, extra}) async {
+  post(url, {data, queryParameters, options, cancelToken, extra}) async {
     print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
         url,
         data: data,
+        queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
       );
@@ -132,7 +153,7 @@ class Request {
       return response;
     } on DioError catch (e) {
       print('post error: $e');
-      return Future.error(ApiInterceptor.dioError(e));
+      return Future.error(await ApiInterceptor.dioError(e));
     }
   }
 

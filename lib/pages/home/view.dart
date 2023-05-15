@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
 import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import './controller.dart';
 import 'package:pilipala/common/constants.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   final HomeController _homeController = Get.put(HomeController());
+  Future? _futureBuilderFuture;
   List videoList = [];
 
   @override
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _homeController.queryRcmdFeed('init');
     _homeController.videoList.listen((value) {
       videoList = value;
       setState(() {});
@@ -71,37 +74,25 @@ class _HomePageState extends State<HomePage>
                   ? EdgeInsets.zero
                   : const EdgeInsets.fromLTRB(
                       StyleString.cardSpace, 0, StyleString.cardSpace, 8),
-              sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    // 行间距
-                    mainAxisSpacing: StyleString.cardSpace,
-                    // 列间距
-                    crossAxisSpacing: StyleString.cardSpace,
-                    // 列数
-                    crossAxisCount: _homeController.crossAxisCount,
-                    mainAxisExtent: MediaQuery.of(context).size.width /
-                            _homeController.crossAxisCount /
-                            StyleString.aspectRatio +
-                        72),
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return videoList.isNotEmpty
-                        ? VideoCardV(
-                            videoItem: videoList[index],
-                            longPress: () {
-                              _homeController.popupDialog =
-                                  _createPopupDialog(videoList[index]);
-                              Overlay.of(context)
-                                  .insert(_homeController.popupDialog!);
-                            },
-                            longPressEnd: () {
-                              _homeController.popupDialog?.remove();
-                            },
-                          )
-                        : const VideoCardVSkeleton();
-                  },
-                  childCount: videoList.isNotEmpty ? videoList.length : 10,
-                ),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(() => contentGrid(
+                          _homeController, _homeController.videoList));
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => setState(() {}),
+                      );
+                    }
+                  } else {
+                    // 骨架屏
+                    return contentGrid(_homeController, []);
+                  }
+                },
               ),
             ),
             const LoadingMore()
@@ -114,8 +105,44 @@ class _HomePageState extends State<HomePage>
 
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        child: OverlayPop(videoItem: videoItem),
+        builder: (context) => AnimatedDialog(
+              child: OverlayPop(videoItem: videoItem),
+            ));
+  }
+
+  Widget contentGrid(ctr, videoList) {
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        // 行间距
+        mainAxisSpacing: StyleString.cardSpace,
+        // 列间距
+        crossAxisSpacing: StyleString.cardSpace,
+        // 列数
+        crossAxisCount: ctr.crossAxisCount,
+        mainAxisExtent: MediaQuery.of(context).size.width /
+                ctr.crossAxisCount /
+                StyleString.aspectRatio +
+            70,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          return videoList!.isNotEmpty
+              ?
+              // VideoCardV(videoItem: videoList![index])
+              VideoCardV(
+                  videoItem: videoList[index],
+                  longPress: () {
+                    _homeController.popupDialog =
+                        _createPopupDialog(videoList[index]);
+                    Overlay.of(context).insert(_homeController.popupDialog!);
+                  },
+                  longPressEnd: () {
+                    _homeController.popupDialog?.remove();
+                  },
+                )
+              : const VideoCardVSkeleton();
+        },
+        childCount: videoList!.isNotEmpty ? videoList!.length : 10,
       ),
     );
   }

@@ -48,9 +48,29 @@ dependencies:
 
   # 图片
   cached_network_image: ^3.2.3
-
+  extended_image: ^7.0.2
+  image_gallery_saver: ^1.7.1
+  
   # 存储
   path_provider: ^2.0.14
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # 设备信息
+  device_info_plus: ^8.2.0
+  # 权限
+  permission_handler: ^10.2.0
+  # 分享
+  share_plus: ^6.3.1
+  # webView
+  url_launcher: ^6.1.9
+  webview_cookie_manager: ^2.0.6
+  webview_flutter: ^4.2.0
+
+  extended_nested_scroll_view: ^6.0.0
+  font_awesome_flutter: ^10.4.0
+  # toast
+  flutter_smart_dialog: ^4.9.0+6
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +82,22 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  # flutter_launcher_icons:
+  #   git:
+  #     url: https://github.com/nvi9/flutter_launcher_icons.git
+  #     ref: e045d40
+  hive_generator: ^2.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: false
+  image_path: assets/images/logo/logo_android.png
+  image_path_android: assets/images/logo/logo_android.png
+  image_path_ios: assets/images/logo/logo_ios.png
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: assets/images/logo/logo_android.png
+  adaptive_icon_monochrome: assets/images/logo/logo_android.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -76,6 +112,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/images/lv/
+    - assets/images/logo/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
@@ -87,17 +125,14 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
+  fonts:
+    - family: fansCard
+      fonts:
+        - asset: assets/fonts/fansCard.ttf
+    - family: ArchivoNarrow
+      fonts:
+        - asset: assets/fonts/ArchivoNarrow-BoldItalic.ttf
+       
+  
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

@@ -22,6 +22,7 @@ class VideoCardV extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
       elevation: 0.8,
       clipBehavior: Clip.hardEdge,
@@ -40,7 +41,7 @@ class VideoCardV extends StatelessWidget {
           onTap: () async {
             await Future.delayed(const Duration(milliseconds: 200));
             Get.toNamed('/video?aid=${videoItem.id}',
-                arguments: {'videoItem': videoItem});
+                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
           },
           child: Column(
             children: [
@@ -57,12 +58,15 @@ class VideoCardV extends StatelessWidget {
                     double PR = MediaQuery.of(context).devicePixelRatio;
                     return Stack(
                       children: [
-                        NetworkImgLayer(
-                          // 指定图片尺寸
-                          // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
-                          src: videoItem.pic + '@.webp',
-                          width: maxWidth,
-                          height: maxHeight,
+                        Hero(
+                          tag: heroTag,
+                          child: NetworkImgLayer(
+                            // 指定图片尺寸
+                            // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
+                            src: videoItem.pic + '@.webp',
+                            width: maxWidth,
+                            height: maxHeight,
+                          ),
                         ),
                         Positioned(
                           left: 0,
@@ -77,7 +81,7 @@ class VideoCardV extends StatelessWidget {
                               duration: videoItem.duration,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     );
                   }),
@@ -133,6 +137,25 @@ class VideoContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(3)),
                       child: Text(
                         videoItem.rcmdReason.content,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelSmall!.fontSize,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4)
+                  ] else if (videoItem.isFollowed == 1) ...[
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(3)),
+                      child: Text(
+                        '已关注',
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.labelSmall!.fontSize,
