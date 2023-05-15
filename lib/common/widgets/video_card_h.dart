@@ -25,10 +25,14 @@ class VideoCardH extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return GestureDetector(
       onLongPress: () {
-        longPress!();
+        if (longPress != null) {
+          longPress!();
+        }
       },
       onLongPressEnd: (details) {
-        longPressEnd!();
+        if (longPressEnd != null) {
+          longPressEnd!();
+        }
       },
       child: InkWell(
         onTap: () async {

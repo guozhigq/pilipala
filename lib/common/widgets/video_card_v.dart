@@ -32,10 +32,14 @@ class VideoCardV extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
-          longPress!();
+          if (longPress != null) {
+            longPress!();
+          }
         },
         onLongPressEnd: (details) {
-          longPressEnd!();
+          if (longPressEnd != null) {
+            longPressEnd!();
+          }
         },
         child: InkWell(
           onTap: () async {
