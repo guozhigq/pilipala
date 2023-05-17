@@ -19,8 +19,7 @@ class VideoHttp {
       var res = await Request().get(
         Api.recommendList,
         data: {
-          'user-agent': Request().headerUa('mob'),
-          'feed_version': 'V4',
+          'feed_version': 'V3',
           'ps': ps,
           'fresh_idx': freshIdx,
         },
@@ -203,21 +202,20 @@ class VideoHttp {
     int? root,
     int? parent,
   }) async {
-    if(message == ''){
+    if (message == '') {
       return {'status': false, 'data': [], 'msg': '请输入评论内容'};
     }
     print('root:$root');
     print('parent: $parent');
 
-    var res = await Request()
-        .post(Api.replyAdd, queryParameters: {
-          'type': type.index,
-          'oid': oid,
-          'root': root ?? '',
-          'parent': parent == null || parent == 0 ? '' : parent,
-          'message': message,
-          'csrf': await Request.getCsrf(),
-        });
+    var res = await Request().post(Api.replyAdd, queryParameters: {
+      'type': type.index,
+      'oid': oid,
+      'root': root ?? '',
+      'parent': parent == null || parent == 0 ? '' : parent,
+      'message': message,
+      'csrf': await Request.getCsrf(),
+    });
     log(res.toString());
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};

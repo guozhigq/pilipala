@@ -1,10 +1,8 @@
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
-import 'package:pilipala/pages/main/controller.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class MineController extends GetxController {
@@ -14,6 +12,17 @@ class MineController extends GetxController {
   Rx<UserStat> userStat = UserStat().obs;
   Box user = GStrorage.user;
   RxBool userLogin = false.obs;
+  Box userInfoCache = GStrorage.userInfo;
+
+  @override
+  onInit() {
+    super.onInit();
+
+    if (userInfoCache.get('userInfoCache') != null) {
+      print(userInfoCache.get('userInfoCache'));
+      userInfo.value = userInfoCache.get('userInfoCache');
+    }
+  }
 
   onLogin() {
     Get.toNamed(
@@ -34,6 +43,7 @@ class MineController extends GetxController {
     if (res['status']) {
       if (res['data'].isLogin) {
         userInfo.value = res['data'];
+        userInfoCache.put('userInfoCache', res['data']);
         user.put(UserBoxKey.userName, res['data'].uname);
         user.put(UserBoxKey.userFace, res['data'].face);
         user.put(UserBoxKey.userMid, res['data'].mid);

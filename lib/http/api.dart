@@ -1,6 +1,6 @@
 class Api {
   // 推荐视频
-  static const String recommendList = '/x/web-interface/index/top/rcmd';
+  static const String recommendList = '/x/web-interface/index/top/feed/rcmd';
 
   // 热门视频
   static const String hotList = '/x/web-interface/popular';
