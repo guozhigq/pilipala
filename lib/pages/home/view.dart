@@ -89,8 +89,15 @@ class _HomePageState extends State<HomePage>
                       );
                     }
                   } else {
+                    // 缓存数据
+                    if(_homeController.videoList.isNotEmpty) {
+                      return contentGrid(
+                          _homeController, _homeController.videoList);
+                    }
                     // 骨架屏
-                    return contentGrid(_homeController, []);
+                    else{
+                      return contentGrid(_homeController, []);
+                    }
                   }
                 },
               ),

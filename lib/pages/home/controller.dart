@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class HomeController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -12,11 +14,18 @@ class HomeController extends GetxController {
   bool isLoadingMore = false;
   bool flag = false;
   OverlayEntry? popupDialog;
+  Box recVideo = GStrorage.recVideo;
 
   @override
   void onInit() {
     super.onInit();
-    // queryRcmdFeed('init');
+    if(recVideo.get('cacheList') != null && recVideo.get('cacheList').isNotEmpty){
+      List<RecVideoItemModel> list = [];
+      for(var i in recVideo.get('cacheList')){
+        list.add(i);
+      }
+      videoList.value = list;
+    }
   }
 
   // 获取推荐
@@ -33,6 +42,7 @@ class HomeController extends GetxController {
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
       }
+      recVideo.put('cacheList', res['data']);
       _currentPage += 1;
     }
     isLoadingMore = false;

@@ -19,6 +19,7 @@ class VideoHttp {
       var res = await Request().get(
         Api.recommendList,
         data: {
+          'user-agent': Request().headerUa('mob'),
           'feed_version': 'V4',
           'ps': ps,
           'fresh_idx': freshIdx,

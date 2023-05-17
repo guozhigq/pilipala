@@ -6,6 +6,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/hot/view.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class MainController extends GetxController {

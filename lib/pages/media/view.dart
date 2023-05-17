@@ -17,7 +17,7 @@ class _MediaPageState extends State<MediaPage>
   Future? _futureBuilderFuture;
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 
   @override
   void initState() {
@@ -65,7 +65,9 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ],
-          favFolder()
+          Obx(() => _mediaController.userLogin.value == true
+              ? favFolder()
+              : const SizedBox())
         ],
       ),
     );

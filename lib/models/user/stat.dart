@@ -1,3 +1,8 @@
+import 'package:hive/hive.dart';
+
+part 'stat.g.dart';
+
+@HiveType(typeId: 1)
 class UserStat {
   UserStat({
     this.following,
@@ -5,8 +10,11 @@ class UserStat {
     this.dynamicCount,
   });
 
+  @HiveField(0)
   int? following;
+  @HiveField(1)
   int? follower;
+  @HiveField(2)
   int? dynamicCount;
 
   UserStat.fromJson(Map<String, dynamic> json) {

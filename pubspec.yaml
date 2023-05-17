@@ -87,6 +87,7 @@ dev_dependencies:
   #     url: https://github.com/nvi9/flutter_launcher_icons.git
   #     ref: e045d40
   hive_generator: ^2.0.0
+  build_runner: ^2.3.3
 
 flutter_icons:
   android: true

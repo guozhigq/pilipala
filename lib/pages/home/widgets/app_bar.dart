@@ -46,7 +46,13 @@ class HomeAppBar extends StatelessWidget {
                     // ),
                     IconButton(
                       onPressed: () {
-                        Get.bottomSheet(const MinePage());
+                        Get.bottomSheet(
+                            const SizedBox(
+                              height: 450,
+                              child: MinePage(),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            isScrollControlled: true);
                       },
                       icon: const Icon(CupertinoIcons.person, size: 22),
                     ),
