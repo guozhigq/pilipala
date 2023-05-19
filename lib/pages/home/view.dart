@@ -90,12 +90,12 @@ class _HomePageState extends State<HomePage>
                     }
                   } else {
                     // 缓存数据
-                    if(_homeController.videoList.isNotEmpty) {
+                    if (_homeController.videoList.length > 1) {
                       return contentGrid(
                           _homeController, _homeController.videoList);
                     }
                     // 骨架屏
-                    else{
+                    else {
                       return contentGrid(_homeController, []);
                     }
                   }

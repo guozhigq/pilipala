@@ -14,20 +14,22 @@ class GStrorage {
     final dir = await getApplicationDocumentsDirectory();
     final path = dir.path;
     await Hive.initFlutter('$path/hive');
-    // 首页推荐视频
-    Hive.registerAdapter(RecVideoItemModelAdapter());
-    Hive.registerAdapter(RcmdReasonAdapter());
-    Hive.registerAdapter(StatAdapter());
-    Hive.registerAdapter(OwnerAdapter());
-    Hive.registerAdapter(UserInfoDataAdapter());
-    Hive.registerAdapter(LevelInfoAdapter());
-
+    regAdapter();
     // 用户信息
     user = await Hive.openBox('user');
     // 首页推荐视频
     recVideo = await Hive.openBox('recVideo');
     // 登录用户信息
     userInfo = await Hive.openBox('userInfo');
+  }
+
+  static regAdapter() {
+    Hive.registerAdapter(RecVideoItemModelAdapter());
+    Hive.registerAdapter(RcmdReasonAdapter());
+    Hive.registerAdapter(StatAdapter());
+    Hive.registerAdapter(OwnerAdapter());
+    Hive.registerAdapter(UserInfoDataAdapter());
+    Hive.registerAdapter(LevelInfoAdapter());
   }
 }
 
@@ -40,4 +42,8 @@ class UserBoxKey {
   static const String userMid = 'userMid';
   // 登录状态
   static const String userLogin = 'userLogin';
+}
+
+class SettingBoxKey {
+  static const String themeMode = 'themeMode';
 }

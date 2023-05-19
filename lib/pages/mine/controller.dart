@@ -25,14 +25,16 @@ class MineController extends GetxController {
   }
 
   onLogin() {
-    Get.toNamed(
-      '/webview',
-      parameters: {
-        'url': 'https://passport.bilibili.com/h5-app/passport/login',
-        'type': 'login',
-        'pageTitle': '登录bilibili',
-      },
-    );
+    if (!userLogin.value) {
+      Get.toNamed(
+        '/webview',
+        parameters: {
+          'url': 'https://passport.bilibili.com/h5-app/passport/login',
+          'type': 'login',
+          'pageTitle': '登录bilibili',
+        },
+      );
+    }
   }
 
   Future queryUserInfo() async {

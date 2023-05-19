@@ -19,9 +19,10 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if(recVideo.get('cacheList') != null && recVideo.get('cacheList').isNotEmpty){
+    if (recVideo.get('cacheList') != null &&
+        recVideo.get('cacheList').isNotEmpty) {
       List<RecVideoItemModel> list = [];
-      for(var i in recVideo.get('cacheList')){
+      for (var i in recVideo.get('cacheList')) {
         list.add(i);
       }
       videoList.value = list;
@@ -36,7 +37,11 @@ class HomeController extends GetxController {
     );
     if (res['status']) {
       if (type == 'init') {
-        videoList.value = res['data'];
+        if (videoList.length > 1) {
+          videoList.addAll(res['data']);
+        } else {
+          videoList.value = res['data'];
+        }
       } else if (type == 'onRefresh') {
         videoList.insertAll(0, res['data']);
       } else if (type == 'onLoad') {
