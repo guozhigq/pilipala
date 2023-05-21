@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'controller.dart';
 import 'widgets/reply_item.dart';
 
@@ -14,6 +14,7 @@ class VideoReplyPanel extends StatefulWidget {
   int oid;
   int rpid;
   String? level;
+  Key? key;
   VideoReplyPanel({
     this.oid = 0,
     this.rpid = 0,
@@ -29,7 +30,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   late VideoReplyController _videoReplyController;
   late AnimationController fabAnimationCtr;
-  late AnimationController replyAnimationCtl;
 
   // List<ReplyItemModel>? replyList;
   Future? _futureBuilderFuture;
@@ -55,16 +55,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
           VideoReplyController(Get.parameters['aid']!, '', '1'),
           tag: Get.arguments['heroTag']);
     }
-    // if(replyLevel != ''){
-    //   _videoReplyController.replyLevel = replyLevel;
-    // }
-    print(
-        '_videoReplyController.replyLevel: ${_videoReplyController.replyLevel}');
 
     fabAnimationCtr = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
-    replyAnimationCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
     _videoReplyController.scrollController.addListener(
@@ -86,6 +79,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         }
       },
     );
+    fabAnimationCtr.forward();
   }
 
   void _showFab() {
@@ -112,14 +106,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       _videoReplyController.replyLevel = '0';
     }
 
-    replyAnimationCtl.forward();
     await Future.delayed(const Duration(microseconds: 100));
     _videoReplyController.wakeUpReply();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     fabAnimationCtr.dispose();
     _videoReplyController.scrollController.dispose();
@@ -164,9 +156,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             60,
                                     child: Center(
                                       child: Obx(() => Text(
-                                          _videoReplyController.noMore.value
-                                              ? '没有更多了'
-                                              : '加载中')),
+                                          _videoReplyController.noMore.value)),
                                     ),
                                   );
                                 } else {
@@ -211,9 +201,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               right: 14,
               child: SlideTransition(
                 position: Tween<Offset>(
-                  // begin: const Offset(0, 2),
+                  begin: const Offset(0, 2),
                   // 评论内容为空/不足一屏
-                  begin: const Offset(0, 0),
+                  // begin: const Offset(0, 0),
                   end: const Offset(0, 0),
                 ).animate(CurvedAnimation(
                   parent: fabAnimationCtr,
@@ -221,54 +211,22 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 )),
                 child: FloatingActionButton(
                   heroTag: null,
-                  onPressed: () => _showReply('main'),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (builder) {
+                        return VideoReplyNewDialog(
+                          replyLevel: '0',
+                          oid: int.parse(Get.parameters['aid']!),
+                          root: 0,
+                          parent: 0,
+                        );
+                      },
+                    ).then((value) => {print('close ModalBottomSheet')});
+                  },
                   tooltip: '发表评论',
                   child: const Icon(Icons.reply),
-                ),
-              ),
-            ),
-            Obx(
-              () => Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 2),
-                    end: const Offset(0, 0),
-                  ).animate(CurvedAnimation(
-                    parent: replyAnimationCtl,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: Container(
-                    height: 100 + MediaQuery.of(context).padding.bottom,
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom),
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 14, right: 14),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Visibility(
-                            visible: _videoReplyController.autoFocus.value,
-                            child: const TextField(
-                              autofocus: true,
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                  hintText: "友善评论", border: InputBorder.none),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () =>
-                                _videoReplyController.submitReplyAdd(),
-                            child: const Text('发送'),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ),

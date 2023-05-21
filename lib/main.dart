@@ -1,3 +1,4 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,14 @@ class MyApp extends StatelessWidget {
                 ),
             useMaterial3: true,
           ),
+          localizationsDelegates: const [
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          locale: const Locale("zh", "CN"),
+          supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
+          fallbackLocale: const Locale("zh", "CN"),
           getPages: Routes.getPages,
           home: const MainApp(),
           builder: FlutterSmartDialog.init(),

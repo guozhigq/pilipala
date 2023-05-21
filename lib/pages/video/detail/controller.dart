@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoDetailController extends GetxController {
   int tabInitialIndex = 0;
@@ -18,6 +19,12 @@ class VideoDetailController extends GetxController {
   RxBool isLoading = false.obs;
 
   String heroTag = '';
+
+  RxInt oid = 0.obs;
+  // 评论id 请求楼中楼评论使用
+  RxInt fRpid = 0.obs;
+
+  ReplyItemModel? firstFloor;
 
   @override
   void onInit() {

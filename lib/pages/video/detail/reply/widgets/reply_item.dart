@@ -4,7 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
+import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
@@ -176,13 +178,14 @@ class ReplyItem extends StatelessWidget {
         // 操作区域
         bottonAction(context, replyItem!.replyControl),
         const SizedBox(height: 3),
-        if (replyItem!.replies!.isNotEmpty) ...[
+        if (replyItem!.replies!.isNotEmpty && replyLevel != '2') ...[
           Padding(
             padding: const EdgeInsets.only(top: 2, bottom: 12),
             child: ReplyItemRow(
               replies: replyItem!.replies,
               replyControl: replyItem!.replyControl,
               f_rpid: replyItem!.rpid,
+              replyItem: replyItem,
             ),
           ),
         ],
@@ -225,17 +228,32 @@ class ReplyItem extends StatelessWidget {
         if (replyItem!.upAction!.like!)
           Icon(Icons.favorite, color: Colors.red[400], size: 18),
         SizedBox(
-            height: 28,
-            width: 42,
-            child: TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(EdgeInsets.zero),
-              ),
-              child: Text('回复', style: Theme.of(context)
-                  .textTheme
-                  .labelMedium),
-              onPressed: () => weakUpReply!(replyItem, replyLevel),
-            )),
+          height: 28,
+          width: 42,
+          child: TextButton(
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+            ),
+            child: Text('回复', style: Theme.of(context).textTheme.labelMedium),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (builder) {
+                  print('🌹： ${replyItem!.rpid}');
+                  return VideoReplyNewDialog(
+                    replyLevel: replyLevel,
+                    oid: replyItem!.oid,
+                    root: replyItem!.rpid,
+                    parent: replyItem!.rpid,
+                  );
+                },
+              ).then((value) => {
+                print('showModalBottomSheet')
+              });
+            },
+          ),
+        ),
         SizedBox(
           height: 32,
           child: TextButton(
@@ -272,10 +290,12 @@ class ReplyItemRow extends StatelessWidget {
     this.replies,
     this.replyControl,
     this.f_rpid,
+    this.replyItem
   });
   List? replies;
   ReplyControl? replyControl;
   int? f_rpid;
+  ReplyItemModel? replyItem;
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +317,7 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1 && index == replies!.length) {
               // 有楼中楼回复，在最后显示
               return InkWell(
-                onTap: () => replyReply(context),
+                onTap: () => replyReply(replyItem),
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -323,7 +343,7 @@ class ReplyItemRow extends StatelessWidget {
               );
             } else {
               return InkWell(
-                onTap: () {},
+                onTap: () => replyReply(replyItem),
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
                       8,
@@ -338,10 +358,6 @@ class ReplyItemRow extends StatelessWidget {
                         : TextOverflow.visible,
                     maxLines: extraRow == 1 ? 2 : null,
                     TextSpan(
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = ()  {
-                         replyReply(context);
-                        },
                       children: [
                         TextSpan(
                           text: replies![index].member.uname + ' ',
@@ -374,46 +390,15 @@ class ReplyItemRow extends StatelessWidget {
     );
   }
 
-  void replyReply(context) {
-    Get.bottomSheet(
-      barrierColor: Colors.transparent,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      Container(
-        height: Get.size.height - Get.size.width * 9 / 16 - 45,
-        color: Theme.of(context).colorScheme.background,
-        child: Column(
-          children: [
-            AppBar(
-              automaticallyImplyLeading: false,
-              centerTitle: false,
-              elevation: 1,
-              title: Text(
-                '评论详情',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () async {
-                    Get.back();
-                  },
-                )
-              ],
-            ),
-            Expanded(
-              child: VideoReplyPanel(
-                oid: replies!.first.oid,
-                rpid: f_rpid!,
-                level: '2',
-              ),
-            )
-          ],
-        ),
-      ),
-      persistent: false,
-      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
-    );
+  void replyReply(replyItem) {
+    // replyItem 楼主评论
+    Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+        .oid
+        .value = replies!.first.oid;
+    Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+        .fRpid
+        .value = f_rpid!;
+    Get.find<VideoDetailController>(tag: Get.arguments['heroTag']).firstFloor = replyItem;
   }
 }
 
@@ -423,11 +408,10 @@ InlineSpan buildContent(BuildContext context, content) {
       content.jumpUrl.isEmpty &&
       content.vote.isEmpty &&
       content.pictures.isEmpty) {
-    return TextSpan(text: content.message,
-      recognizer: TapGestureRecognizer()
-      ..onTap = ()=> {
-        print('点击')
-      },);
+    return TextSpan(
+      text: content.message,
+      // recognizer: TapGestureRecognizer()..onTap = () => {print('点击')},
+    );
   }
   List<InlineSpan> spanChilds = [];
   // 匹配表情
@@ -505,10 +489,10 @@ InlineSpan buildContent(BuildContext context, content) {
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () => {
-                        print('Url 点击'),
-                      },
+                // recognizer: TapGestureRecognizer()
+                //   ..onTap = () => {
+                //         print('Url 点击'),
+                //       },
               ),
             );
             spanChilds.add(
@@ -540,10 +524,10 @@ InlineSpan buildContent(BuildContext context, content) {
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () => {
-                      print('time 点击'),
-                    },
+              // recognizer: TapGestureRecognizer()
+              //   ..onTap = () => {
+              //         print('time 点击'),
+              //       },
             ),
           );
           return '';

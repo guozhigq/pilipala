@@ -1,5 +1,6 @@
 class Api {
   // 推荐视频
+  // http://app.bilibili.com/x/v2/feed/index
   static const String recommendList = '/x/web-interface/index/top/feed/rcmd';
 
   // 热门视频
@@ -84,6 +85,12 @@ class Api {
 
   // 视频详情页 相关视频
   static const String relatedList = '/x/web-interface/archive/related';
+
+  // 查询用户与自己关系_仅查关注
+  static const String hasFollow = '/x/relation';
+
+  // 操作用户关系
+  static const String relationMod = '/x/relation/modify';
 
   // 评论列表
   static const String replyList = '/x/v2/reply';

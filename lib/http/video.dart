@@ -205,13 +205,10 @@ class VideoHttp {
     if (message == '') {
       return {'status': false, 'data': [], 'msg': '请输入评论内容'};
     }
-    print('root:$root');
-    print('parent: $parent');
-
     var res = await Request().post(Api.replyAdd, queryParameters: {
       'type': type.index,
       'oid': oid,
-      'root': root ?? '',
+      'root': root == null || root == 0 ? '' : root,
       'parent': parent == null || parent == 0 ? '' : parent,
       'message': message,
       'csrf': await Request.getCsrf(),
@@ -221,6 +218,32 @@ class VideoHttp {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': []};
+    }
+  }
+
+  // 查询是否关注up
+  static Future hasFollow({required int mid}) async {
+    var res = await Request().get(Api.hasFollow, data: {'fid': mid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': true, 'data': []};
+    }
+  }
+
+  // 操作用户关系
+  static Future relationMod(
+      {required int mid, required int act, required int reSrc}) async {
+    var res = await Request().post(Api.relationMod, queryParameters: {
+      'fid': mid,
+      'act': act,
+      're_src': reSrc,
+      'csrf': await Request.getCsrf(),
+    });
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': true, 'data': []};
     }
   }
 }

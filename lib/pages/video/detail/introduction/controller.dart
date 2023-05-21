@@ -42,6 +42,8 @@ class VideoIntroController extends GetxController {
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
   List delMediaIdsNew = [];
+  // 关注状态 默认未关注
+  RxMap followStatus = {}.obs;
 
   @override
   void onInit() {
@@ -82,6 +84,8 @@ class VideoIntroController extends GetxController {
       queryHasCoinVideo();
       // 获取收藏状态
       queryHasFavVideo();
+      //
+      queryFollowStatus();
     }
 
     return result;
@@ -227,5 +231,74 @@ class VideoIntroController extends GetxController {
     }
     favFolderData.value.list = datalist;
     favFolderData.refresh();
+  }
+
+  // 查询关注状态
+  Future queryFollowStatus() async {
+    var result = await VideoHttp.hasFollow(mid: videoDetail.value.owner!.mid!);
+    if (result['status']) {
+      followStatus.value = result['data'];
+    }
+    return result;
+  }
+
+  // 关注/取关up
+  Future actionRelationMod() async{
+    int currentStatus = followStatus['attribute'];
+    print(currentStatus);
+    int actionStatus = 0;
+    switch(currentStatus) {
+      case 0:
+        actionStatus = 1;
+        break;
+      case 2:
+        actionStatus = 2;
+        break;
+      default:
+        actionStatus = 0;
+        break;
+    }
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
+          actions: [
+            TextButton(
+                onPressed: () => SmartDialog.dismiss(),
+                child: const Text('点错了')),
+            TextButton(
+              onPressed: () async {
+                var result = await VideoHttp.relationMod(
+                  mid: videoDetail.value.owner!.mid!,
+                  act: actionStatus,
+                  reSrc: 14,
+                );
+                if (result['status']) {
+                  switch(currentStatus) {
+                    case 0:
+                      actionStatus = 2;
+                      break;
+                    case 2:
+                      actionStatus = 0;
+                      break;
+                    default:
+                      actionStatus = 0;
+                      break;
+                  }
+                  followStatus['attribute'] = actionStatus;
+                  followStatus.refresh();
+                }
+                SmartDialog.dismiss();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+
   }
 }

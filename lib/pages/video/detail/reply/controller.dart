@@ -10,11 +10,7 @@ import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyController extends GetxController {
-  VideoReplyController(
-    this.aid,
-    this.rpid,
-    this.level
-  );
+  VideoReplyController(this.aid, this.rpid, this.level);
   final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
   String? aid;
@@ -26,7 +22,7 @@ class VideoReplyController extends GetxController {
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
-  RxBool noMore = false.obs;
+  RxString noMore = ''.obs;
   RxBool autoFocus = false.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
@@ -48,16 +44,17 @@ class VideoReplyController extends GetxController {
       res['data'] = ReplyData.fromJson(res['data']);
       if (res['data'].replies.isNotEmpty) {
         currentPage = currentPage + 1;
-        noMore.value = false;
+        noMore.value = '加载中';
+        if(res['data'].page.count == res['data'].page.acount){
+          noMore.value = '没有更多了';
+        }
       } else {
         if (currentPage == 0) {
+          noMore.value = '还没有评论';
         } else {
-          noMore.value = true;
+          noMore.value = '没有更多了';
           return;
         }
-      }
-      if (res['data'].replies.length >= res['data'].page.count) {
-        noMore.value = true;
       }
       if (type == 'init') {
         List<ReplyItemModel> replies = res['data'].replies;
@@ -96,21 +93,26 @@ class VideoReplyController extends GetxController {
 
   // 发表评论
   Future submitReplyAdd() async {
-    print('replyLevel: $replyLevel');
-    // print('rpid: $rpid');
-    // print('currentReplyItem!.rpid: ${currentReplyItem!.rpid}');
-
-
     var result = await VideoHttp.replyAdd(
       type: ReplyType.video,
       oid: int.parse(aid!),
-      root: replyLevel == '0' ? 0 : replyLevel == '1' ? currentReplyItem!.rpid : rPid,
-      parent:  replyLevel == '0' ? 0 : replyLevel == '1' ? currentReplyItem!.rpid : currentReplyItem!.rpid,
-      message: replyLevel == '2' ?  ' 回复 @${currentReplyItem!.member!.uname!} : 2楼31' : '2楼31',
+      root: replyLevel == '0'
+          ? 0
+          : replyLevel == '1'
+              ? currentReplyItem!.rpid
+              : rPid,
+      parent: replyLevel == '0'
+          ? 0
+          : replyLevel == '1'
+              ? currentReplyItem!.rpid
+              : currentReplyItem!.rpid,
+      message: replyLevel == '2'
+          ? ' 回复 @${currentReplyItem!.member!.uname!} : 2楼31'
+          : '2楼31',
     );
-    if(result['status']){
+    if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
-    }else{
+    } else {
       SmartDialog.showToast(result['message']);
     }
   }

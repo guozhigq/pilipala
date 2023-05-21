@@ -25,11 +25,12 @@ class ReplyHttp {
         -404: '无此项',
         12002: '评论区已关闭',
         12009: '评论主体的type不合法',
+        12061: 'UP主已关闭评论区',
       };
       return {
         'status': false,
         'date': [],
-        'msg': errMap[res.data['code']] ?? '请求异常',
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
