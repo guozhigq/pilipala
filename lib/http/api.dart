@@ -128,4 +128,12 @@ class Api {
 
   // 正在直播的up & 关注的up
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/portal
+
+  // 关注的up动态
+
+  // 获取稍后再看
+  static const String seeYouLater = '/x/v2/history/toview';
+
+  // 获取历史记录
+  static const String historyList = '/x/web-interface/history/cursor';
 }

@@ -27,8 +27,8 @@ class MediaController extends GetxController {
     },
     {
       'icon': Icons.watch_later_outlined,
-      'title': '稍候再看',
-      'onTap': () => {},
+      'title': '稍后再看',
+      'onTap': () => Get.toNamed('/later'),
     },
   ];
 

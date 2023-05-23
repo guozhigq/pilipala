@@ -1,5 +1,6 @@
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/user/info.dart';
@@ -72,6 +73,23 @@ class UserHttp {
     if (res.data['code'] == 0) {
       FavDetailData data = FavDetailData.fromJson(res.data['data']);
       return {'status': true, 'data': data};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 稍后再看
+  static Future<dynamic> seeYouLater() async {
+    var res = await Request().get(Api.seeYouLater);
+    if (res.data['code'] == 0) {
+      List<HotVideoItemModel> list = [];
+      for (var i in res.data['data']['list']) {
+        list.add(HotVideoItemModel.fromJson(i));
+      }
+      return {
+        'status': true,
+        'data': {'list': list, 'count': res.data['data']['count']}
+      };
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
     }

@@ -3,6 +3,7 @@ import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
@@ -29,5 +30,7 @@ class Routes {
     GetPage(name: '/fav', page: () => const FavPage()),
     //
     GetPage(name: '/favDetail', page: () => const FavDetailPage()),
+    // 稍后再看
+    GetPage(name: '/later', page: () => const LaterPage()),
   ];
 }

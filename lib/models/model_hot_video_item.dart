@@ -80,7 +80,7 @@ class HotVideoItemModel {
     pubLocation = json["pub_location"];
     seasontype = json["seasontype"];
     isOgv = json["isOgv"];
-    rcmdReason = json['rcmd_reason'] != ''
+    rcmdReason = json['rcmd_reason'] != '' && json['rcmd_reason'] != null
         ? RcmdReason.fromJson(json['rcmd_reason'])
         : null;
   }
