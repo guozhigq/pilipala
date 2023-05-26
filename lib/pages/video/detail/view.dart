@@ -40,6 +40,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         child: Stack(
           children: [
             Scaffold(
+              resizeToAvoidBottomInset: false,
               key: videoDetailController.scaffoldKey,
               body: ExtendedNestedScrollView(
                 headerSliverBuilder:
@@ -55,6 +56,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           MediaQuery.of(context).size.width * 9 / 16,
                       collapsedHeight:
                           MediaQuery.of(context).size.width * 9 / 16,
+                      backgroundColor: Colors.black,
                       flexibleSpace: FlexibleSpaceBar(
                         background: Padding(
                           padding: EdgeInsets.only(
@@ -68,6 +70,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               return Hero(
                                 tag: videoDetailController.heroTag,
                                 child: NetworkImgLayer(
+                                  type: 'emote',
                                   src: videoDetailController.videoItem['pic'],
                                   width: maxWidth,
                                   height: maxHeight,

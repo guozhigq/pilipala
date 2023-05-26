@@ -69,8 +69,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
-    } else {
-    }
+    } else {}
   }
 
   @override
@@ -95,45 +94,24 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height - MediaQuery.of(context).size.width * 9 / 16 - 48,
+      height: MediaQuery.of(context).size.height -
+          MediaQuery.of(context).size.width * 9 / 16 -
+          45,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-          color: Theme.of(context).colorScheme.background),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        color: Theme.of(context).colorScheme.background,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            height: 55,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(width: 20),
-                Text('发表评论', style: Theme.of(context).textTheme.titleMedium),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
-                ),
-                const SizedBox(width: 12),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
           Expanded(
             child: Container(
               padding: const EdgeInsets.only(
-                  top: 12, right: 15, left: 15, bottom: 10),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: BorderRadius.circular(16),
-              ),
+                  top: 6, right: 15, left: 15, bottom: 10),
               child: Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -182,13 +160,14 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                       )),
                 ),
                 const Spacer(),
-                TextButton(onPressed: () => submitReplyAdd(), child: const Text('发送'))
+                TextButton(
+                    onPressed: () => submitReplyAdd(), child: const Text('发送'))
               ],
             ),
           ),
           AnimatedSize(
             curve: Curves.easeInOut,
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 300),
             child: SizedBox(
               width: double.infinity,
               height: _keyboardHeight,

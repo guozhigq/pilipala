@@ -23,7 +23,7 @@ class ReplyItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 6, 8, 0),
+            padding: const EdgeInsets.fromLTRB(12, 2, 8, 0),
             child: content(context),
           ),
           // Divider(

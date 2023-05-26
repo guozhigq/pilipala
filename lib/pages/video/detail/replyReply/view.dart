@@ -60,7 +60,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.size.height - Get.size.width * 9 / 16 - 48,
+      height: Get.size.height - Get.size.width * 9 / 16 - 45,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [
@@ -101,6 +101,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                 controller: _videoReplyReplyController.scrollController,
                 slivers: <Widget>[
                   if (widget.firstFloor != null) ...[
+                    const SliverToBoxAdapter(child: SizedBox(height: 10)),
                     SliverToBoxAdapter(
                       child: ReplyItem(
                         replyItem: widget.firstFloor,
@@ -109,7 +110,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     ),
                     SliverToBoxAdapter(
                       child: Divider(
-                        height: 30,
+                        height: 20,
                         color: Theme.of(context).dividerColor.withOpacity(0.1),
                         thickness: 6,
                       ),
@@ -137,19 +138,22 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                       height: MediaQuery.of(context)
                                               .padding
                                               .bottom +
-                                          60,
+                                          100,
                                       child: Center(
-                                        child: Obx(() => Text(
-                                            _videoReplyReplyController
-                                                    .noMore.value
-                                                ? '没有更多了'
-                                                : '加载中')),
+                                        child: Obx(
+                                          () => Text(_videoReplyReplyController
+                                                  .noMore.value
+                                              ? '没有更多了'
+                                              : '加载中'),
+                                        ),
                                       ),
                                     );
                                   } else {
-                                    return ReplyItem(
-                                      replyItem: _videoReplyReplyController
-                                          .replyList[index],
+                                    return Material(
+                                      child: ReplyItem(
+                                        replyItem: _videoReplyReplyController
+                                            .replyList[index],
+                                      ),
                                     );
                                   }
                                 },
