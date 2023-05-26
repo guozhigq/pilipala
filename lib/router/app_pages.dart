@@ -19,7 +19,13 @@ class Routes {
     // 视频详情
     GetPage(name: '/video', page: () => const VideoDetailPage()),
     // 图片预览
-    GetPage(name: '/preview', page: () => const ImagePreview()),
+    GetPage(
+      name: '/preview',
+      page: () => const ImagePreview(),
+      transition: Transition.fade,
+      transitionDuration: const Duration(milliseconds: 300),
+      showCupertinoParallax: false,
+    ),
     //
     GetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置

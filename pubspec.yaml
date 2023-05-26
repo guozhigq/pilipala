@@ -72,6 +72,7 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   # toast
   flutter_smart_dialog: ^4.9.0+6
+  dismissible_page: ^1.0.2
 
 dev_dependencies:
   flutter_test:
