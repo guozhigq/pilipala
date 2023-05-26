@@ -7,6 +7,7 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
@@ -248,9 +249,7 @@ class ReplyItem extends StatelessWidget {
                     parent: replyItem!.rpid,
                   );
                 },
-              ).then((value) => {
-                print('showModalBottomSheet')
-              });
+              ).then((value) => {print('showModalBottomSheet')});
             },
           ),
         ),
@@ -285,13 +284,12 @@ class ReplyItem extends StatelessWidget {
 
 // ignore: must_be_immutable
 class ReplyItemRow extends StatelessWidget {
-  ReplyItemRow({
-    super.key,
-    this.replies,
-    this.replyControl,
-    this.f_rpid,
-    this.replyItem
-  });
+  ReplyItemRow(
+      {super.key,
+      this.replies,
+      this.replyControl,
+      this.f_rpid,
+      this.replyItem});
   List? replies;
   ReplyControl? replyControl;
   int? f_rpid;
@@ -392,13 +390,12 @@ class ReplyItemRow extends StatelessWidget {
 
   void replyReply(replyItem) {
     // replyItem 楼主评论
-    Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-        .oid
-        .value = replies!.first.oid;
-    Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-        .fRpid
-        .value = f_rpid!;
-    Get.find<VideoDetailController>(tag: Get.arguments['heroTag']).firstFloor = replyItem;
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    videoDetailCtr.oid = replies!.first.oid;
+    videoDetailCtr.fRpid = f_rpid!;
+    videoDetailCtr.firstFloor = replyItem;
+    videoDetailCtr.showReplyReplyPanel();
   }
 }
 

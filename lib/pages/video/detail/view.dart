@@ -19,29 +19,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     with TickerProviderStateMixin {
   final VideoDetailController videoDetailController =
       Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
-  late AnimationController replyAnimationCtl;
 
   @override
   void initState() {
     super.initState();
-    replyAnimationCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-
-    videoDetailController.fRpid.listen((p0) {
-      if (p0 != 0) {
-        showReplyReplyPanel();
-      }
-    });
-  }
-
-  showReplyReplyPanel() {
-    replyAnimationCtl.forward();
-  }
-
-  hiddenReplyReplyPanel() {
-    replyAnimationCtl.reverse().then((value) {
-      videoDetailController.fRpid.value = 0;
-    });
   }
 
   @override
@@ -59,6 +40,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         child: Stack(
           children: [
             Scaffold(
+              key: videoDetailController.scaffoldKey,
               body: ExtendedNestedScrollView(
                 headerSliverBuilder:
                     (BuildContext context, bool innerBoxIsScrolled) {
@@ -160,30 +142,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 2),
-                  end: const Offset(0, 0),
-                ).animate(CurvedAnimation(
-                  parent: replyAnimationCtl,
-                  curve: Curves.easeInOut,
-                )),
-                child: Obx(
-                  () => videoDetailController.fRpid.value != 0
-                      ? VideoReplyReplyPanel(
-                          oid: videoDetailController.oid.value,
-                          rpid: videoDetailController.fRpid.value,
-                          closePanel: hiddenReplyReplyPanel,
-                          firstFloor: videoDetailController.firstFloor,
-                  )
-                      : const SizedBox(),
                 ),
               ),
             ),

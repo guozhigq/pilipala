@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 
 class VideoDetailController extends GetxController {
   int tabInitialIndex = 0;
@@ -20,11 +22,13 @@ class VideoDetailController extends GetxController {
 
   String heroTag = '';
 
-  RxInt oid = 0.obs;
+  int oid = 0;
   // 评论id 请求楼中楼评论使用
-  RxInt fRpid = 0.obs;
+  int fRpid = 0;
 
   ReplyItemModel? firstFloor;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void onInit() {
@@ -39,5 +43,22 @@ class VideoDetailController extends GetxController {
       }
       heroTag = Get.arguments['heroTag'];
     }
+  }
+
+  showReplyReplyPanel() {
+    PersistentBottomSheetController<void>? ctr = scaffoldKey.currentState?.showBottomSheet<void>((BuildContext context) {
+      return
+      VideoReplyReplyPanel(
+        oid: oid,
+        rpid: fRpid,
+        closePanel: ()=> {
+          fRpid = 0,
+      },
+        firstFloor: firstFloor,
+      );
+    });
+    ctr?.closed.then((value) {
+      fRpid = 0;
+    });
   }
 }

@@ -80,6 +80,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     _videoReplyReplyController.currentPage = 0;
                     _videoReplyReplyController.rPid = 0;
                     widget.closePanel!();
+                    Navigator.pop(context);
                   },
                 ),
               ],

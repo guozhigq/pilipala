@@ -35,6 +35,9 @@ class VideoReplyReplyController extends GetxController {
   }
 
   Future queryReplyList({type = 'init'}) async {
+    if(type == 'init'){
+      currentPage = 0;
+    }
     isLoadingMore = true;
     var res = await ReplyHttp.replyReplyList(
         oid: aid!, root: rpid!, pageNum: currentPage + 1, type: 1);
