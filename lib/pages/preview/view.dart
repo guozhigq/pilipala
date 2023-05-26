@@ -168,7 +168,7 @@ class _ImagePreviewState extends State<ImagePreview>
           bottom: 0,
           child: Container(
             // height: 45,
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10, top: 20),
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, top: 20),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -199,10 +199,10 @@ class _ImagePreviewState extends State<ImagePreview>
                       ]),
                     ),
                   ),
-                  FloatingActionButton(
-                    onPressed: () => _previewController.onSaveImg(),
-                    child: const Icon(Icons.save_alt_rounded),
-                  ),
+                  const Spacer(),
+                  ElevatedButton(onPressed: () => _previewController.onShareImg(), child: Text('分享')),
+                  const SizedBox(width: 10),
+                  ElevatedButton(onPressed: () => _previewController.onSaveImg(), child: Text('保存'))
                 ],
               ),
             ),

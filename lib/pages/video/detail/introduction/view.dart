@@ -467,8 +467,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             Obx(
               () => ActionItem(
-                  icon: const Icon(FontAwesomeIcons.star),
-                  selectIcon: const Icon(FontAwesomeIcons.star),
+                  icon: const Icon(FontAwesomeIcons.heart),
+                  selectIcon: const Icon(FontAwesomeIcons.heartCircleCheck),
                   onTap: () => showFavBottomSheet(),
                   selectStatus: videoIntroController.hasFav.value,
                   loadingStatus: widget.loadingStatus,

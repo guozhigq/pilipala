@@ -64,7 +64,7 @@ class PreviewController extends GetxController {
         options: Options(responseType: ResponseType.bytes));
     final temp = await getTemporaryDirectory();
     String imgName =
-        "pic_vvex${DateTime.now().toString().split('-').join()}.jpg";
+        "pic_plpl${DateTime.now().toString().split('-').join()}.jpg";
     var path = '${temp.path}/$imgName';
     File(path).writeAsBytesSync(response.data);
     Share.shareXFiles([XFile(path)], subject: imgList[initialPage.value]);

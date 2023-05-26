@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:share_plus/share_plus.dart';
 
 class VideoIntroController extends GetxController {
   // 视频aid
@@ -161,12 +163,15 @@ class VideoIntroController extends GetxController {
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(aid: aid, type: !hasLike.value);
     if (result['status']) {
-      hasLike.value = result["data"] == 1 ? true : false;
-      if (hasLike.value) {
-        SmartDialog.showToast('已点赞 👍');
-      } else {
+      // hasLike.value = result["data"] == 1 ? true : false;
+      if (!hasLike.value) {
+        SmartDialog.showToast('点赞成功 👍');
+        hasLike.value = true;
+      } else if(hasLike.value){
         SmartDialog.showToast('取消赞');
+        hasLike.value = false;
       }
+      hasLike.refresh();
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -206,7 +211,12 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    print('分享视频');
+    var result = await Share.share(
+        '${HttpString.baseUrl}/video/$aid'
+    ).whenComplete(() {
+      print("share completion block ");
+    });
+    return result;
   }
 
   Future queryVideoInFolder() async {
