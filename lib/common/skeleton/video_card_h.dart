@@ -2,14 +2,9 @@ import 'package:pilipala/common/constants.dart';
 import 'package:flutter/material.dart';
 import 'skeleton.dart';
 
-class VideoCardHSkeleton extends StatefulWidget {
+class VideoCardHSkeleton extends StatelessWidget {
   const VideoCardHSkeleton({super.key});
 
-  @override
-  State<VideoCardHSkeleton> createState() => _VideoCardHSkeletonState();
-}
-
-class _VideoCardHSkeletonState extends State<VideoCardHSkeleton> {
   @override
   Widget build(BuildContext context) {
     return Skeleton(

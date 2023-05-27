@@ -4,29 +4,12 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
 
-class MediaPage extends StatefulWidget {
+class MediaPage extends StatelessWidget {
   const MediaPage({super.key});
 
   @override
-  State<MediaPage> createState() => _MediaPageState();
-}
-
-class _MediaPageState extends State<MediaPage>
-    with AutomaticKeepAliveClientMixin {
-  final MediaController _mediaController = Get.put(MediaController());
-  Future? _futureBuilderFuture;
-
-  @override
-  bool get wantKeepAlive => false;
-
-  @override
-  void initState() {
-    super.initState();
-    _futureBuilderFuture = _mediaController.queryFavFolder();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final MediaController mediaController = Get.put(MediaController());
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(toolbarHeight: 30),
@@ -45,7 +28,7 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ),
-          for (var i in _mediaController.list) ...[
+          for (var i in mediaController.list) ...[
             ListTile(
               onTap: () => i['onTap'](),
               dense: true,
@@ -65,15 +48,15 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ],
-          Obx(() => _mediaController.userLogin.value == true
-              ? favFolder()
+          Obx(() => mediaController.userLogin.value == true
+              ? favFolder(mediaController, context)
               : const SizedBox())
         ],
       ),
     );
   }
 
-  Widget favFolder() {
+  Widget favFolder(mediaController, context) {
     return Column(
       children: [
         Divider(
@@ -97,9 +80,9 @@ class _MediaPageState extends State<MediaPage>
                               Theme.of(context).textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.bold),
                     ),
-                    if (_mediaController.favFolderData.value.count != null)
+                    if (mediaController.favFolderData.value.count != null)
                       TextSpan(
-                        text: _mediaController.favFolderData.value.count
+                        text: mediaController.favFolderData.value.count
                             .toString(),
                         style: TextStyle(
                           fontSize:
@@ -113,7 +96,7 @@ class _MediaPageState extends State<MediaPage>
             ),
           ),
           trailing: IconButton(
-            onPressed: () => _mediaController.queryFavFolder(),
+            onPressed: () => mediaController.queryFavFolder(),
             icon: const Icon(
               Icons.refresh,
               size: 20,
@@ -125,18 +108,18 @@ class _MediaPageState extends State<MediaPage>
           width: double.infinity,
           height: 170,
           child: FutureBuilder(
-              future: _futureBuilderFuture,
+              future: mediaController.queryFavFolder(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data;
+                  Map data = snapshot.data as Map;
                   if (data['status']) {
                     List favFolderList =
-                        _mediaController.favFolderData.value.list!;
+                        mediaController.favFolderData.value.list!;
                     int favFolderCount =
-                        _mediaController.favFolderData.value.count!;
+                        mediaController.favFolderData.value.count!;
                     bool flag = favFolderCount > favFolderList.length;
                     return Obx(() => ListView.builder(
-                          itemCount: _mediaController
+                          itemCount: mediaController
                                   .favFolderData.value.list!.length +
                               (flag ? 1 : 0),
                           itemBuilder: (context, index) {
@@ -156,7 +139,7 @@ class _MediaPageState extends State<MediaPage>
                                   ));
                             } else {
                               return FavFolderItem(
-                                  item: _mediaController
+                                  item: mediaController
                                       .favFolderData.value.list![index],
                                   index: index);
                             }

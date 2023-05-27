@@ -5,18 +5,13 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'controller.dart';
 
-class MinePage extends StatefulWidget {
+class MinePage extends StatelessWidget {
   const MinePage({super.key});
 
   @override
-  State<MinePage> createState() => _MinePageState();
-}
-
-class _MinePageState extends State<MinePage> {
-  final MineController _mineController = Get.put(MineController());
-
-  @override
   Widget build(BuildContext context) {
+    final MineController mineController = Get.put(MineController());
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -46,45 +41,39 @@ class _MinePageState extends State<MinePage> {
           const SizedBox(width: 10),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _mineController.queryUserInfo();
-          await _mineController.queryUserStatOwner();
-        },
-        child: LayoutBuilder(
-          builder: (context, constraint) {
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: SizedBox(
-                height: constraint.maxHeight,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    FutureBuilder(
-                      future: _mineController.queryUserInfo(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          if (snapshot.data['status']) {
-                            return Obx(() => userInfoBuild());
-                          } else {
-                            return userInfoBuild();
-                          }
+      body: LayoutBuilder(
+        builder: (context, constraint) {
+          return SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: SizedBox(
+              height: constraint.maxHeight,
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  FutureBuilder(
+                    future: mineController.queryUserInfo(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data['status']) {
+                          return Obx(() => userInfoBuild(mineController, context));
                         } else {
-                          return userInfoBuild();
+                          return userInfoBuild(mineController, context);
                         }
-                      },
-                    ),
-                  ],
-                ),
+                      } else {
+                        return userInfoBuild(mineController, context);
+                      }
+                    },
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget userInfoBuild() {
+  Widget userInfoBuild(_mineController, context) {
     return Column(
       children: [
         const SizedBox(height: 5),

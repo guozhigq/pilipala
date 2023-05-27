@@ -13,6 +13,7 @@ class SettingController extends GetxController {
   void onInit() {
     super.onInit();
     userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+    print(userLogin.value);
   }
 
   loginOut() async {
