@@ -243,7 +243,9 @@ class ReplyItem extends StatelessWidget {
             style: ButtonStyle(
               padding: MaterialStateProperty.all(EdgeInsets.zero),
             ),
-            child: Text('回复', style: Theme.of(context).textTheme.labelMedium),
+            child: Text('回复', style: Theme.of(context).textTheme.labelMedium!.copyWith(
+              color: Theme.of(context).colorScheme.outline
+            )),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -260,7 +262,6 @@ class ReplyItem extends StatelessWidget {
                     // 完成评论，数据添加
                     if (value['data'] != null)
                       {
-                        print('🌹： ${value['data'].content.message}'),
                         addReply!(value['data'])
                         // replyControl.replies.add(value['data']),
                       }
@@ -426,6 +427,7 @@ InlineSpan buildContent(BuildContext context, content) {
     );
   }
   List<InlineSpan> spanChilds = [];
+  bool hasMatchMember = true;
   // 匹配表情
   String matchEmote = content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
@@ -459,6 +461,7 @@ InlineSpan buildContent(BuildContext context, content) {
           RegExp(r"@.*( |:)"),
           onMatch: (Match match) {
             if (match[0] != null) {
+              hasMatchMember = false;
               content.atNameToMid.forEach((key, value) {
                 spanChilds.add(
                   TextSpan(
@@ -489,7 +492,7 @@ InlineSpan buildContent(BuildContext context, content) {
 
       // 匹配 jumpUrl
       String matchUrl = matchMember;
-      if (content.jumpUrl.isNotEmpty) {
+      if (content.jumpUrl.isNotEmpty && hasMatchMember) {
         List urlKeys = content.jumpUrl.keys.toList();
         matchUrl = matchMember.splitMapJoin(
           RegExp("(?:${urlKeys.join("|")})"),
@@ -525,7 +528,6 @@ InlineSpan buildContent(BuildContext context, content) {
           },
         );
       }
-
       str = matchUrl.splitMapJoin(
         RegExp(r"\d{1,2}:\d{1,2}"),
         onMatch: (Match match) {
@@ -650,6 +652,29 @@ InlineSpan buildContent(BuildContext context, content) {
         ),
       );
     }
+  }
+
+  // 笔记链接
+  if (content.richText.isNotEmpty) {
+    spanChilds.add(
+      TextSpan(
+        text: ' 笔记',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => {
+                Get.toNamed(
+                  '/webview',
+                  parameters: {
+                    'url': content.richText['note']['click_url'],
+                    'type': 'note',
+                    'pageTitle': '笔记预览'
+                  },
+                )
+              },
+      ),
+    );
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);

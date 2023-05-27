@@ -45,9 +45,9 @@ class WebviewController extends GetxController {
           onPageStarted: (String url) {},
           // 加载完成
           onPageFinished: (String url) async {
-            if (url.startsWith(
+            if (type == 'login' && (url.startsWith(
                     'https://passport.bilibili.com/web/sso/exchange_cookie') ||
-                url.startsWith('https://m.bilibili.com/')) {
+                url.startsWith('https://m.bilibili.com/'))) {
               try {
                 var cookies =
                     await WebviewCookieManager().getCookies(HttpString.baseUrl);

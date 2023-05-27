@@ -7,6 +7,7 @@ class ReplyContent {
     this.jumpUrl, // {}
     this.pictures, // {}
     this.vote,
+    this.richText
   });
 
   String? message;
@@ -16,6 +17,7 @@ class ReplyContent {
   Map? jumpUrl;
   List? pictures;
   Map? vote;
+  Map? richText;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -25,5 +27,6 @@ class ReplyContent {
     jumpUrl = json['jump_url'] ?? {};
     pictures = json['pictures'] ?? [];
     vote = json['vote'] ?? {};
+    richText = json['rich_text'] ?? {};
   }
 }
