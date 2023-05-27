@@ -163,12 +163,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                   return ReplyItem(
                                       replyItem: _videoReplyController
                                           .replyList[index],
-                                      weakUpReply: (replyItem, replyLevel) =>
-                                          _showReply(
-                                            'floor',
-                                            replyItem: replyItem,
-                                            replyLevel: replyLevel,
-                                          ),
+                                      showReplyRow: true,
                                       replyLevel: replyLevel);
                                 }
                               },
@@ -223,7 +218,11 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                           parent: 0,
                         );
                       },
-                    ).then((value) => {print('close ModalBottomSheet')});
+                    ).then((value) => {
+                      // 完成评论，数据添加
+                      _videoReplyController
+                          .replyList.add(value['data'])
+                    });
                   },
                   tooltip: '发表评论',
                   child: const Icon(Icons.reply),

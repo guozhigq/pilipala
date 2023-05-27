@@ -104,9 +104,13 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     const SliverToBoxAdapter(child: SizedBox(height: 10)),
                     SliverToBoxAdapter(
                       child: ReplyItem(
-                        replyItem: widget.firstFloor,
-                        replyLevel: '2',
-                      ),
+                          replyItem: widget.firstFloor,
+                          replyLevel: '1',
+                          showReplyRow: false,
+                          addReply: (replyItem) {
+                                _videoReplyReplyController.replyList
+                                    .add(replyItem);
+                              }),
                     ),
                     SliverToBoxAdapter(
                       child: Divider(
@@ -151,9 +155,15 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                   } else {
                                     return Material(
                                       child: ReplyItem(
-                                        replyItem: _videoReplyReplyController
-                                            .replyList[index],
-                                      ),
+                                          replyItem: _videoReplyReplyController
+                                              .replyList[index],
+                                          replyLevel: '2',
+                                          showReplyRow: false,
+                                          addReply: (replyItem) {
+                                            _videoReplyReplyController
+                                                    .replyList
+                                                    .add(replyItem);
+                                              }),
                                     );
                                   }
                                 },

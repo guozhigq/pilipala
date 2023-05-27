@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
   int? oid;
@@ -59,7 +61,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   Future submitReplyAdd() async {
     String message = _replyContentController.text;
-    print(widget.oid);
     var result = await VideoHttp.replyAdd(
       type: ReplyType.video,
       oid: widget.oid!,
@@ -69,6 +70,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
+      Get.back(result: {
+        'data': ReplyItemModel.fromJson(result['data']['reply'], ''),
+      });
     } else {}
   }
 

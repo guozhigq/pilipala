@@ -102,7 +102,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
           child: PageView(
             controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
+            // physics: const NeverScrollableScrollPhysics(),
             onPageChanged: (index) {
               selectedIndex = index;
               setState(() {});
@@ -111,19 +111,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: Obx(
-        () => NavigationBar(
-          elevation: 1,
-          destinations: _mainController.navigationBars.map((e) {
-            return NavigationDestination(
-              icon: e['icon'],
-              selectedIcon: e['selectedIcon'],
-              label: e['label'],
-            );
-          }).toList(),
-          selectedIndex: selectedIndex,
-          onDestinationSelected: (value) => setIndex(value),
-        ),
+      bottomNavigationBar: NavigationBar(
+        elevation: 1,
+        destinations: _mainController.navigationBars.map((e) {
+          return NavigationDestination(
+            icon: e['icon'],
+            selectedIcon: e['selectedIcon'],
+            label: e['label'],
+          );
+        }).toList(),
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (value) => setIndex(value),
       ),
     );
   }

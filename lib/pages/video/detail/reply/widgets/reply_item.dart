@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,10 +13,16 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
-  ReplyItem({super.key, this.replyItem, this.weakUpReply, this.replyLevel});
+  ReplyItem(
+      {super.key,
+      this.replyItem,
+      this.addReply,
+      this.replyLevel,
+      this.showReplyRow});
   ReplyItemModel? replyItem;
-  Function? weakUpReply;
+  Function? addReply;
   String? replyLevel;
+  bool? showReplyRow = true;
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +187,7 @@ class ReplyItem extends StatelessWidget {
         // 操作区域
         bottonAction(context, replyItem!.replyControl),
         const SizedBox(height: 3),
-        if (replyItem!.replies!.isNotEmpty && replyLevel != '2') ...[
+        if (replyItem!.replies!.isNotEmpty && showReplyRow!) ...[
           Padding(
             padding: const EdgeInsets.only(top: 2, bottom: 12),
             child: ReplyItemRow(
@@ -241,7 +249,6 @@ class ReplyItem extends StatelessWidget {
                 context: context,
                 isScrollControlled: true,
                 builder: (builder) {
-                  print('🌹： ${replyItem!.rpid}');
                   return VideoReplyNewDialog(
                     replyLevel: replyLevel,
                     oid: replyItem!.oid,
@@ -249,7 +256,15 @@ class ReplyItem extends StatelessWidget {
                     parent: replyItem!.rpid,
                   );
                 },
-              ).then((value) => {print('showModalBottomSheet')});
+              ).then((value) => {
+                    // 完成评论，数据添加
+                    if (value['data'] != null)
+                      {
+                        print('🌹： ${value['data'].content.message}'),
+                        addReply!(value['data'])
+                        // replyControl.replies.add(value['data']),
+                      }
+                  });
             },
           ),
         ),
