@@ -73,6 +73,12 @@ dependencies:
   # toast
   flutter_smart_dialog: ^4.9.0+6
   dismissible_page: ^1.0.2
+  flutter_meedu_media_kit:
+#    path: /Users/rr/Desktop/code/flutter_meedu_media_kit/package
+     git:
+       url: https://github.com/guozhigq/flutter_meedu_media_kit.git
+       ref: feature-custom
+       path: package
 
 dev_dependencies:
   flutter_test:

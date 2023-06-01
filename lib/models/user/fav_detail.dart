@@ -43,6 +43,7 @@ class FavDetailItemData {
     // this.season,
     // this.ogv,
     this.stat,
+    this.cid,
   });
 
   int? id;
@@ -62,6 +63,7 @@ class FavDetailItemData {
   String? bvId;
   String? bvid;
   Stat? stat;
+  int? cid;
 
   FavDetailItemData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -81,6 +83,7 @@ class FavDetailItemData {
     bvId = json['bv_id'];
     bvid = json['bvid'];
     stat = Stat.fromJson(json['cnt_info']);
+    cid = json['ugc']['first_cid'];
   }
 }
 

@@ -6,6 +6,10 @@ class Api {
   // 热门视频
   static const String hotList = '/x/web-interface/popular';
 
+  // 视频流
+  // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
+  static const String videoUrl = '/x/player/playurl';
+
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
   // https://api.bilibili.com/x/web-interface/view/detail  获取视频超详细信息(web端)

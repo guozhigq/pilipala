@@ -1,15 +1,18 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
 import 'package:pilipala/utils/storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   await GStrorage.init();
   await Request.setCookie();
   runApp(const MyApp());
@@ -53,6 +56,7 @@ class MyApp extends StatelessWidget {
           getPages: Routes.getPages,
           home: const MainApp(),
           builder: FlutterSmartDialog.init(),
+          navigatorObservers: [VideoDetailPage.routeObserver],
         );
       }),
     );

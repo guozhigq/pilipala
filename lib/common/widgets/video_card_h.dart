@@ -37,7 +37,7 @@ class VideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?aid=$aid',
+          Get.toNamed('/video?aid=$aid&cid=${videoItem.cid}',
               arguments: {'videoItem': videoItem, 'heroTag': heroTag});
         },
         child: Column(

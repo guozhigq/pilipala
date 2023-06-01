@@ -59,6 +59,40 @@ class VideoHttp {
     }
   }
 
+  // 视频流
+  static Future videoUrl(
+      {int? avid, int? bvid, required int cid, int? qn}) async {
+    Map<String, dynamic> data = {
+      'avid': avid,
+      // 'bvid': bvid,
+      'cid': cid,
+      'qn': qn ?? 64,
+      // 'fnval': 16,
+      // 'fnver': '',
+      'fourk': 1,
+      // 'session': '',
+      // 'otype': '',
+      // 'type': '',
+      // 'platform': '',
+      // 'high_quality': ''
+    };
+    try {
+      var res = await Request().get(Api.videoUrl, data: data);
+      if (res.data['code'] == 0) {
+        // List<HotVideoItemModel> list = [];
+        // for (var i in res.data['data']['list']) {
+        //   list.add(HotVideoItemModel.fromJson(i));
+        // }
+        return {'status': true, 'data': res.data['data']};
+      } else {
+        return {'status': false, 'data': []};
+      }
+    } catch (err) {
+      print('🐯：$err');
+      return {'status': false, 'data': [], 'msg': err};
+    }
+  }
+
   // 视频信息 标题、简介
   static Future videoIntro({required String aid}) async {
     var res = await Request().get(Api.videoIntro, data: {'aid': aid});

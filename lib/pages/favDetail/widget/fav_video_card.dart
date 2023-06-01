@@ -43,7 +43,7 @@ class FavVideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?aid=$id',
+          Get.toNamed('/video?aid=$id&cid=${videoItem.cid}',
               arguments: {'videoItem': videoItem, 'heroTag': heroTag});
         },
         child: Column(
