@@ -149,6 +149,24 @@ class VideoHttp {
     }
   }
 
+  // 投币
+  static Future coinVideo({required String aid, required int multiply}) async {
+    var res = await Request().post(
+      Api.coinVideo,
+      queryParameters: {
+        'aid': aid,
+        'multiply': multiply,
+        'select_like': 0,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': true, 'data': [], 'msg': ''};
+    }
+  }
+
   // 获取收藏状态
   static Future hasFavVideo({required String aid}) async {
     var res = await Request().get(Api.hasFavVideo, data: {'aid': aid});

@@ -46,6 +46,7 @@ class VideoIntroController extends GetxController {
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
+  int _tempThemeValue = -1;
 
   @override
   void onInit() {
@@ -167,7 +168,7 @@ class VideoIntroController extends GetxController {
       if (!hasLike.value) {
         SmartDialog.showToast('点赞成功 👍');
         hasLike.value = true;
-      } else if(hasLike.value){
+      } else if (hasLike.value) {
         SmartDialog.showToast('取消赞');
         hasLike.value = false;
       }
@@ -179,7 +180,56 @@ class VideoIntroController extends GetxController {
 
   // 投币
   Future actionCoinVideo() async {
-    print('投币');
+    showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('选择投币个数'),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            content: StatefulBuilder(builder: (context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile(
+                    value: 1,
+                    title: const Text('1枚'),
+                    groupValue: _tempThemeValue,
+                    onChanged: (value) {
+                      _tempThemeValue = value!;
+                      Get.appUpdate();
+                    },
+                  ),
+                  RadioListTile(
+                    value: 2,
+                    title: const Text('2枚'),
+                    groupValue: _tempThemeValue,
+                    onChanged: (value) {
+                      _tempThemeValue = value!;
+                      Get.appUpdate();
+                    },
+                  ),
+                ],
+              );
+            }),
+            actions: [
+              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
+              TextButton(
+                  onPressed: () async {
+                    var res = await VideoHttp.coinVideo(
+                        aid: aid, multiply: _tempThemeValue);
+                    print(res);
+                    if (res['status']) {
+                      SmartDialog.showToast('投币成功');
+                    } else {
+                      SmartDialog.showToast(res['msg']);
+                    }
+                    Get.back();
+                    queryHasCoinVideo();
+                  },
+                  child: const Text('确定'))
+            ],
+          );
+        });
   }
 
   // （取消）收藏
@@ -211,9 +261,8 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result = await Share.share(
-        '${HttpString.baseUrl}/video/$aid'
-    ).whenComplete(() {
+    var result =
+        await Share.share('${HttpString.baseUrl}/video/$aid').whenComplete(() {
       print("share completion block ");
     });
     return result;
@@ -253,11 +302,11 @@ class VideoIntroController extends GetxController {
   }
 
   // 关注/取关up
-  Future actionRelationMod() async{
+  Future actionRelationMod() async {
     int currentStatus = followStatus['attribute'];
     print(currentStatus);
     int actionStatus = 0;
-    switch(currentStatus) {
+    switch (currentStatus) {
       case 0:
         actionStatus = 1;
         break;
@@ -287,7 +336,7 @@ class VideoIntroController extends GetxController {
                   reSrc: 14,
                 );
                 if (result['status']) {
-                  switch(currentStatus) {
+                  switch (currentStatus) {
                     case 0:
                       actionStatus = 2;
                       break;
@@ -309,6 +358,5 @@ class VideoIntroController extends GetxController {
         );
       },
     );
-
   }
 }
