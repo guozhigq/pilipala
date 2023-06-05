@@ -54,6 +54,9 @@ class VideoDetailController extends GetxController {
           videoItem['pic'] = args.pic;
         }
       }
+      if (Get.arguments.containsKey('pic')) {
+        videoItem['pic'] = Get.arguments['pic'];
+      }
       heroTag = Get.arguments['heroTag'];
     }
     queryVideoUrl();

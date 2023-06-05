@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/user/history.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
 
@@ -90,6 +93,21 @@ class UserHttp {
         'status': true,
         'data': {'list': list, 'count': res.data['data']['count']}
       };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 观看历史
+  static Future historyList(int? max, int? viewAt) async {
+    var res = await Request().get(Api.historyList, data: {
+      'type': 'all',
+      'ps': 20,
+      'max': max ?? 0,
+      'view_at': viewAt ?? 0,
+    });
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
     }
