@@ -41,18 +41,22 @@ class VideoDetailController extends GetxController {
           videoItem['pic'] = args.pic;
         }
       }
+      if (Get.arguments.containsKey('pic')) {
+        videoItem['pic'] = Get.arguments['pic'];
+      }
       heroTag = Get.arguments['heroTag'];
     }
   }
 
   showReplyReplyPanel() {
-    PersistentBottomSheetController<void>? ctr = scaffoldKey.currentState?.showBottomSheet<void>((BuildContext context) {
+    PersistentBottomSheetController<void>? ctr =
+        scaffoldKey.currentState?.showBottomSheet<void>((BuildContext context) {
       return VideoReplyReplyPanel(
         oid: oid,
         rpid: fRpid,
-        closePanel: ()=> {
+        closePanel: () => {
           fRpid = 0,
-      },
+        },
         firstFloor: firstFloor,
       );
     });

@@ -18,7 +18,7 @@ class MediaController extends GetxController {
     {
       'icon': Icons.history,
       'title': '观看记录',
-      'onTap': () {},
+      'onTap': () => Get.toNamed('/history'),
     },
     {
       'icon': Icons.star_border,
