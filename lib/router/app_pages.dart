@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
+import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/later/index.dart';
@@ -38,5 +39,7 @@ class Routes {
     GetPage(name: '/favDetail', page: () => const FavDetailPage()),
     // 稍后再看
     GetPage(name: '/later', page: () => const LaterPage()),
+    // 历史记录
+    GetPage(name: '/history', page: () => const HistoryPage()),
   ];
 }
