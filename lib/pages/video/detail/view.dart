@@ -98,7 +98,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if(!_meeduPlayerController!.pipEnabled){
+    if (!_meeduPlayerController!.pipEnabled) {
       _meeduPlayerController!.pause();
     }
     super.didPushNext();
@@ -162,53 +162,53 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               double maxHeight = boxConstraints.maxHeight;
                               // double PR =
                               // MediaQuery.of(context).devicePixelRatio;
-                              return Stack(
-                                children: [
-                                  AspectRatio(
-                                    aspectRatio: 16 / 9,
-                                    child: MeeduVideoPlayer(
-                                      controller: _meeduPlayerController!,
-                                      header: (BuildContext context,
-                                          MeeduPlayerController
-                                              _meeduPlayerController,
-                                          Responsive) {
-                                        return AppBar(
-                                          toolbarHeight: 40,
-                                          backgroundColor: Colors.transparent,
-                                          primary: false,
-                                          elevation: 0,
-                                          scrolledUnderElevation: 0,
-                                          foregroundColor: Colors.white,
-                                          leading: IconButton(
-                                            onPressed: () {
-                                              Get.back();
-                                            },
-                                            icon: const Icon(
-                                              Icons.arrow_back_ios,
-                                              size: 19,
+                              return Hero(
+                                tag: videoDetailController.heroTag,
+                                child: Stack(
+                                  children: [
+                                    AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: MeeduVideoPlayer(
+                                        controller: _meeduPlayerController!,
+                                        header: (BuildContext context,
+                                            MeeduPlayerController
+                                                _meeduPlayerController,
+                                            Responsive) {
+                                          return AppBar(
+                                            toolbarHeight: 40,
+                                            backgroundColor: Colors.transparent,
+                                            primary: false,
+                                            elevation: 0,
+                                            scrolledUnderElevation: 0,
+                                            foregroundColor: Colors.white,
+                                            leading: IconButton(
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                              icon: const Icon(
+                                                Icons.arrow_back_ios,
+                                                size: 19,
+                                              ),
                                             ),
-                                          ),
-                                          title: Text(
-                                            '视频详情',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: Theme.of(context)
-                                                    .textTheme
-                                                    .titleSmall!
-                                                    .fontSize),
-                                          ),
-                                        );
-                                      },
+                                            title: Text(
+                                              '视频详情',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: Theme.of(context)
+                                                      .textTheme
+                                                      .titleSmall!
+                                                      .fontSize),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: isShowCover,
-                                    child: Positioned(
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: Hero(
-                                        tag: videoDetailController.heroTag,
+                                    Visibility(
+                                      visible: isShowCover,
+                                      child: Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
                                         child: NetworkImgLayer(
                                           type: 'emote',
                                           src: videoDetailController
@@ -218,8 +218,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               );
                             },
                           ),
