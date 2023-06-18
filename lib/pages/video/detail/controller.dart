@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 
@@ -79,11 +81,12 @@ class VideoDetailController extends GetxController {
     });
   }
 
-  playerInit(url) {
+  playerInit(source, audioSource, {Duration defaultST = Duration.zero}) {
     meeduPlayerController.setDataSource(
       DataSource(
         type: DataSourceType.network,
-        source: url,
+        source: source,
+        audioSource: audioSource,
         httpHeaders: {
           'user-agent':
               'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15',
@@ -91,7 +94,8 @@ class VideoDetailController extends GetxController {
         },
       ),
       autoplay: true,
-      looping: false
+      looping: false,
+      seekTo: defaultST,
     );
   }
 
@@ -108,7 +112,16 @@ class VideoDetailController extends GetxController {
   // 视频链接
   queryVideoUrl() async {
     var result = await VideoHttp.videoUrl(cid: cid, avid: aid);
-    var url = result['data']['durl'].first['url'];
-    playerInit(url);
+    // log('result: ${result.toString()}');
+    if (result['status']) {
+      PlayUrlModel data = result['data'];
+      print(data.dash);
+
+      // 指定质量的视频 -> 最高质量的视频
+      String videoUrl = data.dash!.video!.first.baseUrl!;
+      String audioUrl = data.dash!.audio!.first.baseUrl!;
+      playerInit(videoUrl, audioUrl,
+          defaultST: Duration(milliseconds: data.lastPlayTime!));
+    }
   }
 }

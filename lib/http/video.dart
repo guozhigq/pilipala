@@ -6,6 +6,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
@@ -66,8 +67,9 @@ class VideoHttp {
       'avid': avid,
       // 'bvid': bvid,
       'cid': cid,
-      'qn': qn ?? 64,
-      // 'fnval': 16,
+      // 'qn': qn ?? 80,
+      // 获取所有格式的视频
+      'fnval': 4048,
       // 'fnver': '',
       'fourk': 1,
       // 'session': '',
@@ -83,7 +85,10 @@ class VideoHttp {
         // for (var i in res.data['data']['list']) {
         //   list.add(HotVideoItemModel.fromJson(i));
         // }
-        return {'status': true, 'data': res.data['data']};
+        return {
+          'status': true,
+          'data': PlayUrlModel.fromJson(res.data['data'])
+        };
       } else {
         return {'status': false, 'data': []};
       }
