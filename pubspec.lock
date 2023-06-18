@@ -400,10 +400,10 @@ packages:
     description:
       path: package
       ref: feature-custom
-      resolved-ref: b3dfea3ccf98cc08fc7d2de438eab0d7959c3c02
+      resolved-ref: b8a145a796c537e312fd8e5e1ba299020f8032db
       url: "https://github.com/guozhigq/flutter_meedu_media_kit.git"
     source: git
-    version: "4.2.10+1"
+    version: "4.2.12"
   flutter_smart_dialog:
     dependency: "direct main"
     description:
@@ -618,18 +618,18 @@ packages:
     dependency: transitive
     description:
       name: media_kit
-      sha256: "67cb78a254a2559f2d4d4a71748817967e3d8a5512071f4e6f63a1a8b8a50ca7"
+      sha256: "080cfb5af8d04f8cc454cb4c5ea34b19de5b8e1a1b3af62a34e766364b5244ad"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9+1"
+    version: "0.0.11"
   media_kit_libs_android_video:
     dependency: transitive
     description:
       name: media_kit_libs_android_video
-      sha256: df98da77eb6ec3473cf627abc68702f9be5a47fd788de7fb4c70863ee82789c5
+      sha256: daeaeb254aee1089fa77f11cbeb0864a1238cbd0cb2a1c5ab9b2a2e66cc5ff42
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   media_kit_libs_ios_video:
     dependency: transitive
     description:
@@ -738,10 +738,10 @@ packages:
     dependency: "direct main"
     description:
       name: path_provider
-      sha256: c7edf82217d4b2952b2129a61d3ad60f1075b9299e629e149a8d2e39c2e6aad4
+      sha256: "3087813781ab814e4157b172f1a11c46be20179fcc9bea043e0fba36bc0acaa2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.14"
+    version: "2.0.15"
   path_provider_android:
     dependency: transitive
     description:
