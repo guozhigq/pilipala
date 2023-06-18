@@ -36,7 +36,10 @@ class Utils {
         return '$minute:00';
       }
     } else {
-      return '';
+      int hour = time ~/ 3600;
+      String hourStr = hour < 10 ? '0$hour' : hour.toString();
+      var a = timeFormat(time - hour * 3600);
+      return '$hourStr:$a';
     }
   }
 
