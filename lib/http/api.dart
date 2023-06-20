@@ -140,4 +140,8 @@ class Api {
 
   // 获取历史记录
   static const String historyList = '/x/web-interface/history/cursor';
+
+  // 热搜
+  static const String hotSearchList =
+      'https://s.search.bilibili.com/main/hotword';
 }

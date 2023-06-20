@@ -6,6 +6,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
+import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
@@ -41,5 +42,7 @@ class Routes {
     GetPage(name: '/later', page: () => const LaterPage()),
     // 历史记录
     GetPage(name: '/history', page: () => const HistoryPage()),
+    // 搜索页面
+    GetPage(name: '/search', page: () => const SearchPage())
   ];
 }

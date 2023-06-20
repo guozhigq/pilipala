@@ -243,9 +243,11 @@ class ReplyItem extends StatelessWidget {
             style: ButtonStyle(
               padding: MaterialStateProperty.all(EdgeInsets.zero),
             ),
-            child: Text('回复', style: Theme.of(context).textTheme.labelMedium!.copyWith(
-              color: Theme.of(context).colorScheme.outline
-            )),
+            child: Text('回复',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.outline)),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -504,10 +506,12 @@ InlineSpan buildContent(BuildContext context, content) {
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                // recognizer: TapGestureRecognizer()
-                //   ..onTap = () => {
-                //         print('Url 点击'),
-                //       },
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => {
+                        Get.toNamed('/search', parameters: {
+                          'keyword': content.jumpUrl[matchStr]['title']
+                        })
+                      },
               ),
             );
             spanChilds.add(
