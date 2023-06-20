@@ -1,15 +1,10 @@
 import 'package:get/get.dart';
+import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/pages/searchPanel/index.dart';
 
 class SearchResultController extends GetxController {
   String? keyword;
-  List tabs = [
-    {'label': '综合', 'id': ''},
-    {'label': '视频', 'id': ''},
-    {'label': '番剧', 'id': ''},
-    {'label': '直播', 'id': ''},
-    {'label': '专栏', 'id': ''},
-    {'label': '用户', 'id': ''}
-  ];
+  int tabIndex = 0;
 
   @override
   void onInit() {

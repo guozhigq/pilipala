@@ -36,7 +36,7 @@ class NetworkImgLayer extends StatelessWidget {
                     ? 0
                     : StyleString.imgRadius.x),
             child: CachedNetworkImage(
-              imageUrl: src!,
+              imageUrl: src!.startsWith('//') ? 'https:${src!}' : src!,
               width: width ?? double.infinity,
               height: height ?? double.infinity,
               alignment: Alignment.center,

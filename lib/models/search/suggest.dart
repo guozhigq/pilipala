@@ -34,7 +34,6 @@ class SearchSuggestItem {
     String reg = '<em class=\"suggest_high_light\">$inputTerm</em>';
     try {
       if (json['name'].indexOf(inputTerm) != -1) {
-        print(json['name']);
         String str = json['name'].replaceAll(reg, '^');
         List arr = str.split('^');
         arr.insert(arr.length - 1, inputTerm);

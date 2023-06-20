@@ -147,4 +147,7 @@ class Api {
   // 搜索关键词
   static const String serachSuggest =
       'https://s.search.bilibili.com/main/suggest';
+
+  // 分类搜索
+  static const String searchByType = '/x/web-interface/search/type';
 }

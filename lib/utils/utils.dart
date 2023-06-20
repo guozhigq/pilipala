@@ -26,8 +26,11 @@ class Utils {
     }
   }
 
-  static String timeFormat(int time) {
+  static String timeFormat(dynamic time) {
     // 1小时内
+    if (time is String && time.contains(':')) {
+      return time;
+    }
     if (time < 3600) {
       int minute = time ~/ 60;
       double res = time / 60;
