@@ -1,5 +1,7 @@
 // ignore: file_names
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 class HotKeyword extends StatelessWidget {
   final double? width;
@@ -44,10 +46,8 @@ class HotKeyword extends StatelessWidget {
                     if (i.icon != null && i.icon != '')
                       SizedBox(
                         width: 40,
-                        child: Image.network(
-                          i.icon!,
-                          height: 15,
-                        ),
+                        child:
+                            CachedNetworkImage(imageUrl: i.icon!, height: 15.0),
                       ),
                   ],
                 ),

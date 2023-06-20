@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/pages/search/index.dart';
-
+import 'controller.dart';
 import 'widgets/hotKeyword.dart';
 
 class SearchPage extends StatefulWidget {
@@ -18,6 +18,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         shape: Border(
           bottom: BorderSide(
@@ -26,6 +27,14 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         titleSpacing: 0,
+        actions: [
+          Hero(
+            tag: 'searchTag',
+            child: IconButton(
+                onPressed: () => _searchController.submit(),
+                icon: const Icon(CupertinoIcons.search, size: 22)),
+          )
+        ],
         title: Obx(
           () => TextField(
             autofocus: true,
@@ -40,78 +49,78 @@ class _SearchPageState extends State<SearchPage> {
                   ? IconButton(
                       icon: Icon(
                         Icons.clear,
+                        size: 22,
                         color: Theme.of(context).colorScheme.outline,
                       ),
                       onPressed: () => _searchController.onClear())
                   : null,
             ),
-            onSubmitted: (String value) => _searchController.submit(value),
+            onSubmitted: (String value) => _searchController.submit(),
           ),
         ),
       ),
-      // body: Column(
-      //   children: [hotSearch()],
-      // ),
-      body: hotSearch(),
-      // body: DefaultTabController(
-      //   length: _searchController.tabs.length,
-      //   child: Column(
-      //     children: [
-      //       const SizedBox(height: 4),
-      //       Theme(
-      //         data: ThemeData(
-      //           splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
-      //           highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
-      //         ),
-      //         child: TabBar(
-      //           tabs: _searchController.tabs
-      //               .map((e) => Tab(text: e['label']))
-      //               .toList(),
-      //           isScrollable: true,
-      //           indicatorWeight: 0,
-      //           indicatorPadding:
-      //               const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-      //           indicator: BoxDecoration(
-      //             color: Theme.of(context).colorScheme.secondaryContainer,
-      //             borderRadius: const BorderRadius.all(
-      //               Radius.circular(16),
-      //             ),
-      //           ),
-      //           indicatorSize: TabBarIndicatorSize.tab,
-      //           labelColor: Theme.of(context).colorScheme.onSecondaryContainer,
-      //           labelStyle: const TextStyle(fontSize: 13),
-      //           dividerColor: Colors.transparent,
-      //           unselectedLabelColor: Theme.of(context).colorScheme.outline,
-      //           onTap: (index) {
-      //             print(index);
-      //           },
-      //         ),
-      //       ),
-      //       Expanded(
-      //         child: TabBarView(
-      //           children: [
-      //             Container(
-      //               width: 200,
-      //               height: 200,
-      //               color: Colors.amber,
-      //             ),
-      //             Text('1'),
-      //             Text('1'),
-      //             Text('1'),
-      //             Text('1'),
-      //             Text('1'),
-      //           ],
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+      body: Column(
+        children: [
+          const SizedBox(height: 12),
+          // 搜索建议
+          _searchSuggest(),
+          // 热搜
+          hotSearch(),
+        ],
+      ),
+    );
+  }
+
+  Widget _searchSuggest() {
+    return Obx(
+      () => _searchController.searchSuggestList.isNotEmpty &&
+              _searchController.searchSuggestList.first.term != null
+          ? ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: _searchController.searchSuggestList.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  customBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  onTap: () => _searchController.onClickKeyword(
+                      _searchController.searchSuggestList[index].term!),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 9, bottom: 9),
+                    // child: Text(
+                    //   _searchController.searchSuggestList[index].term!,
+                    // ),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                              text: _searchController
+                                  .searchSuggestList[index].name![0]),
+                          TextSpan(
+                            text: _searchController
+                                .searchSuggestList[index].name![1],
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(
+                              text: _searchController
+                                  .searchSuggestList[index].name![2]),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
+          : const SizedBox(),
     );
   }
 
   Widget hotSearch() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 25, 4, 0),
+      padding: const EdgeInsets.fromLTRB(10, 14, 4, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

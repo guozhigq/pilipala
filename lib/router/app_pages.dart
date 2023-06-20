@@ -12,6 +12,8 @@ import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
 import 'package:pilipala/pages/media/index.dart';
 
+import '../pages/searchResult/index.dart';
+
 class Routes {
   static final List<GetPage> getPages = [
     // 首页(推荐)
@@ -43,6 +45,8 @@ class Routes {
     // 历史记录
     GetPage(name: '/history', page: () => const HistoryPage()),
     // 搜索页面
-    GetPage(name: '/search', page: () => const SearchPage())
+    GetPage(name: '/search', page: () => const SearchPage()),
+    // 搜索结果
+    GetPage(name: '/searchResult', page: () => const SearchResultPage())
   ];
 }

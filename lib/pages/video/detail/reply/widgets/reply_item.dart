@@ -508,7 +508,7 @@ InlineSpan buildContent(BuildContext context, content) {
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () => {
-                        Get.toNamed('/search', parameters: {
+                        Get.toNamed('/searchResult', parameters: {
                           'keyword': content.jumpUrl[matchStr]['title']
                         })
                       },

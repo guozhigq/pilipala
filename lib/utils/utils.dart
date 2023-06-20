@@ -1,4 +1,5 @@
 // 工具函数
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:get/get_utils/get_utils.dart';

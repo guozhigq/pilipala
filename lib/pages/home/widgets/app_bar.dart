@@ -36,11 +36,14 @@ class HomeAppBar extends StatelessWidget {
                     ),
                   ),
                   actions: [
-                    IconButton(
-                      onPressed: () {
-                        Get.toNamed('/search');
-                      },
-                      icon: const Icon(CupertinoIcons.search, size: 22),
+                    Hero(
+                      tag: 'searchTag',
+                      child: IconButton(
+                        onPressed: () {
+                          Get.toNamed('/search');
+                        },
+                        icon: const Icon(CupertinoIcons.search, size: 22),
+                      ),
                     ),
                     // IconButton(
                     //   onPressed: () {},
