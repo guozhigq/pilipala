@@ -85,7 +85,7 @@ class HisListItem {
   String? longTitle;
   String? cover;
   String? pic;
-  String? covers;
+  List? covers;
   String? uri;
   History? history;
   int? videos;
@@ -111,7 +111,7 @@ class HisListItem {
     longTitle = json['long_title'];
     cover = json['cover'];
     pic = json['cover'] ?? '';
-    covers = json['covers'] ?? '';
+    covers = json['covers'] ?? [];
     uri = json['uri'];
     history = History.fromJson(json['history']);
     videos = json['videos'];

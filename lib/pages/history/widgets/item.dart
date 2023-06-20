@@ -15,7 +15,7 @@ class HistoryItem extends StatelessWidget {
     return InkWell(
       onTap: () async {
         await Future.delayed(const Duration(milliseconds: 200));
-        Get.toNamed('/video?aid=$aid',
+        Get.toNamed('/video?aid=$aid&cid=${videoItem.history.cid}',
             arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
       },
       child: Column(
