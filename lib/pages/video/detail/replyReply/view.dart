@@ -108,9 +108,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                           replyLevel: '1',
                           showReplyRow: false,
                           addReply: (replyItem) {
-                                _videoReplyReplyController.replyList
-                                    .add(replyItem);
-                              }),
+                            _videoReplyReplyController.replyList.add(replyItem);
+                          }),
                     ),
                     SliverToBoxAdapter(
                       child: Divider(
@@ -160,10 +159,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                           replyLevel: '2',
                                           showReplyRow: false,
                                           addReply: (replyItem) {
-                                            _videoReplyReplyController
-                                                    .replyList
-                                                    .add(replyItem);
-                                              }),
+                                            _videoReplyReplyController.replyList
+                                                .add(replyItem);
+                                          }),
                                     );
                                   }
                                 },

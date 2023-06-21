@@ -153,7 +153,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .bottom),
                                     height:
                                         MediaQuery.of(context).padding.bottom +
-                                            60,
+                                            100,
                                     child: Center(
                                       child: Obx(() => Text(
                                           _videoReplyController.noMore.value)),
@@ -219,10 +219,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                         );
                       },
                     ).then((value) => {
-                      // 完成评论，数据添加
-                      _videoReplyController
-                          .replyList.add(value['data'])
-                    });
+                          // 完成评论，数据添加
+                          _videoReplyController.replyList.add(value['data'])
+                        });
                   },
                   tooltip: '发表评论',
                   child: const Icon(Icons.reply),

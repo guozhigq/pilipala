@@ -45,7 +45,7 @@ class VideoReplyController extends GetxController {
       if (res['data'].replies.isNotEmpty) {
         currentPage = currentPage + 1;
         noMore.value = '加载中';
-        if (res['data'].page.count == res['data'].page.acount) {
+        if (replyList.length == res['data'].page.acount) {
           noMore.value = '没有更多了';
         }
       } else {

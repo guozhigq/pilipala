@@ -31,7 +31,7 @@ class ReplyItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 2, 8, 0),
+            padding: const EdgeInsets.fromLTRB(12, 4, 8, 2),
             child: content(context),
           ),
           // Divider(
@@ -96,18 +96,8 @@ class ReplyItem extends StatelessWidget {
           //   'memberAvatar': reply.avatar,
           //   'heroTag': reply.userName + heroTag,
           // }),
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
-            decoration: BoxDecoration(
-              image: replyItem!.member!.userSailing!.cardbg != null
-                  ? DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(
-                        replyItem!.member!.userSailing!.cardbg!['image'],
-                      ),
-                    )
-                  : null,
-            ),
             child: Stack(
               children: [
                 Row(
@@ -136,12 +126,33 @@ class ReplyItem extends StatelessWidget {
                     if (replyItem!.isUp!) UpTag(),
                   ],
                 ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    width: double.infinity,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      image: replyItem!.member!.userSailing!.cardbg != null
+                          ? DecorationImage(
+                              alignment: Alignment.centerRight,
+                              fit: BoxFit.fitHeight,
+                              image: NetworkImage(
+                                replyItem!
+                                    .member!.userSailing!.cardbg!['image'],
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
                 if (replyItem!.member!.userSailing!.cardbg != null &&
                     replyItem!.member!.userSailing!.cardbg!['fan']['number'] >
                         0)
                   Positioned(
-                    top: 8,
-                    left: Get.size.width / 7 * 5.6,
+                    top: 10,
+                    left: Get.size.width / 7 * 5.8,
                     child: DefaultTextStyle(
                       style: TextStyle(
                         fontFamily: 'fansCard',
@@ -324,19 +335,57 @@ class ReplyItemRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         clipBehavior: Clip.hardEdge,
         animationDuration: Duration.zero,
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: replies!.length + extraRow,
-          itemBuilder: (context, index) {
-            if (extraRow == 1 && index == replies!.length) {
-              // 有楼中楼回复，在最后显示
-              return InkWell(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < replies!.length; i++) ...[
+              InkWell(
                 onTap: () => replyReply(replyItem),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                      8,
+                      i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
+                      8,
+                      5),
+                  child: Text.rich(
+                    overflow: extraRow == 1
+                        ? TextOverflow.ellipsis
+                        : TextOverflow.visible,
+                    maxLines: extraRow == 1 ? 2 : null,
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: replies![i].member.uname + ' ',
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .fontSize,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => {
+                                  print('跳转至用户主页'),
+                                },
+                        ),
+                        if (replies![i].isUp)
+                          WidgetSpan(
+                            child: UpTag(),
+                          ),
+                        buildContent(context, replies![i].content),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+            if (extraRow == 1)
+              InkWell(
+                onTap: () => replyReply(replyItem),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
                   child: Text.rich(
                     TextSpan(
                       style: TextStyle(
@@ -356,51 +405,8 @@ class ReplyItemRow extends StatelessWidget {
                     ),
                   ),
                 ),
-              );
-            } else {
-              return InkWell(
-                onTap: () => replyReply(replyItem),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      8,
-                      index == 0 && (extraRow == 1 || replies!.length > 1)
-                          ? 8
-                          : 5,
-                      8,
-                      5),
-                  child: Text.rich(
-                    overflow: extraRow == 1
-                        ? TextOverflow.ellipsis
-                        : TextOverflow.visible,
-                    maxLines: extraRow == 1 ? 2 : null,
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: replies![index].member.uname + ' ',
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .fontSize,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () => {
-                                  print('跳转至用户主页'),
-                                },
-                        ),
-                        if (replies![index].isUp)
-                          WidgetSpan(
-                            child: UpTag(),
-                          ),
-                        buildContent(context, replies![index].content),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-          },
+              )
+          ],
         ),
       ),
     );
@@ -435,7 +441,7 @@ InlineSpan buildContent(BuildContext context, content) {
   if (content.vote.isNotEmpty) {
     content.message.splitMapJoin(RegExp(r"\{vote:.*?\}"),
         onMatch: (Match match) {
-      String matchStr = match[0]!;
+      // String matchStr = match[0]!;
       spanChilds.add(
         TextSpan(
           text: '投票: ${content.vote['title']}',
@@ -462,7 +468,7 @@ InlineSpan buildContent(BuildContext context, content) {
   }
   // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
   // 匹配表情
-  String matchEmote = content.message.splitMapJoin(
+  content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
     onMatch: (Match match) {
       String matchStr = match[0]!;
@@ -669,21 +675,13 @@ InlineSpan buildContent(BuildContext context, content) {
               return Container(
                 padding: const EdgeInsets.only(top: 6),
                 height: height,
-                child: GridView(
+                child: GridView.count(
                   padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
-                  // 子Item排列规则
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //横轴元素个数
-                    crossAxisCount: crossCount.toInt(),
-                    //纵轴间距
-                    mainAxisSpacing: 4.0,
-                    //横轴间距
-                    crossAxisSpacing: 4.0,
-                    //子组件宽高长度比例
-                    // childAspectRatio: 1,
-                  ),
-                  //GridView中使用的子Widegt
+                  crossAxisCount: crossCount.toInt(),
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                  childAspectRatio: 1,
                   children: list,
                 ),
               );
