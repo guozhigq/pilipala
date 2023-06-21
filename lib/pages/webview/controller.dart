@@ -16,6 +16,8 @@ class WebviewController extends GetxController {
   String type = '';
   String pageTitle = '';
   final WebViewController controller = WebViewController();
+  RxInt loadProgress = 0.obs;
+  RxBool loadShow = true.obs;
 
   @override
   void onInit() {
@@ -41,13 +43,16 @@ class WebviewController extends GetxController {
           // 页面加载
           onProgress: (int progress) {
             // Update loading bar.
+            loadProgress.value = progress;
           },
           onPageStarted: (String url) {},
           // 加载完成
           onPageFinished: (String url) async {
-            if (type == 'login' && (url.startsWith(
-                    'https://passport.bilibili.com/web/sso/exchange_cookie') ||
-                url.startsWith('https://m.bilibili.com/'))) {
+            loadShow.value = false;
+            if (type == 'login' &&
+                (url.startsWith(
+                        'https://passport.bilibili.com/web/sso/exchange_cookie') ||
+                    url.startsWith('https://m.bilibili.com/'))) {
               try {
                 var cookies =
                     await WebviewCookieManager().getCookies(HttpString.baseUrl);
@@ -73,7 +78,7 @@ class WebviewController extends GetxController {
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
+            if (request.url.startsWith('bilibili//')) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;

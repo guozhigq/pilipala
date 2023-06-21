@@ -16,14 +16,42 @@ class _WebviewPageState extends State<WebviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text(
-          _webviewController.pageTitle,
-          style: Theme.of(context).textTheme.titleMedium,
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text(
+            _webviewController.pageTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _webviewController.controller.reload();
+              },
+              icon: const Icon(
+                Icons.refresh,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 10)
+          ],
         ),
-      ),
-      body: WebViewWidget(controller: _webviewController.controller),
-    );
+        body: Column(
+          children: [
+            Obx(
+              () => AnimatedContainer(
+                curve: Curves.easeInOut,
+                duration: const Duration(milliseconds: 350),
+                height: _webviewController.loadShow.value ? 4 : 0,
+                child: LinearProgressIndicator(
+                  key: ValueKey(_webviewController.loadProgress),
+                  value: _webviewController.loadProgress / 100,
+                ),
+              ),
+            ),
+            Expanded(
+              child: WebViewWidget(controller: _webviewController.controller),
+            ),
+          ],
+        ));
   }
 }
