@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
@@ -15,8 +16,22 @@ class HistoryItem extends StatelessWidget {
     return InkWell(
       onTap: () async {
         await Future.delayed(const Duration(milliseconds: 200));
-        Get.toNamed('/video?aid=$aid&cid=${videoItem.history.cid}',
-            arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
+        if (videoItem.history.business.contains('article')) {
+          String cid = videoItem.history.cid != 0
+              ? videoItem.history.cid.toString()
+              : videoItem.history.oid.toString();
+          Get.toNamed(
+            '/webview',
+            parameters: {
+              'url': 'https://www.bilibili.com/read/cv$cid',
+              'type': 'note',
+              'pageTitle': videoItem.title
+            },
+          );
+        } else {
+          Get.toNamed('/video?aid=$aid&cid=${videoItem.history.cid}',
+              arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
+        }
       },
       child: Column(
         children: [
@@ -47,27 +62,82 @@ class HistoryItem extends StatelessWidget {
                                   child: NetworkImgLayer(
                                     // src: videoItem['pic'] +
                                     //     '@${(maxWidth * 2).toInt()}w',
-                                    src: videoItem.cover + '@.webp',
+                                    src: (videoItem.cover != ''
+                                            ? videoItem.cover
+                                            : videoItem.covers.first) +
+                                        '@.webp',
                                     width: maxWidth,
                                     height: maxHeight,
                                   ),
                                 ),
-                                Positioned(
-                                  right: 4,
-                                  bottom: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 1, horizontal: 6),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: Colors.black54.withOpacity(0.4)),
-                                    child: Text(
-                                      Utils.timeFormat(videoItem.duration!),
-                                      style: const TextStyle(
-                                          fontSize: 11, color: Colors.white),
+                                if (!BusinessType
+                                    .hiddenDurationType.hiddenDurationType
+                                    .contains(videoItem.history.business))
+                                  Positioned(
+                                    right: 4,
+                                    bottom: 4,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 1, horizontal: 6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color:
+                                              Colors.black54.withOpacity(0.4)),
+                                      child: Text(
+                                        videoItem.progress == -1
+                                            ? '已看完'
+                                            : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
+                                        style: const TextStyle(
+                                            fontSize: 11, color: Colors.white),
+                                      ),
                                     ),
                                   ),
-                                )
+                                // 右上角
+                                if (BusinessType.showBadge.showBadge
+                                    .contains(videoItem.history.business))
+                                  Positioned(
+                                    right: 4,
+                                    top: 4,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 1, horizontal: 6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer),
+                                      child: Text(
+                                        videoItem.badge,
+                                        style: TextStyle(
+                                            fontSize: 11,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                      ),
+                                    ),
+                                  ),
+                                if (videoItem.history.business ==
+                                    BusinessType.live.type)
+                                  Positioned(
+                                    right: 4,
+                                    top: 4,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 1, horizontal: 6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color:
+                                              Colors.black54.withOpacity(0.4)),
+                                      child: Text(
+                                        videoItem.badge,
+                                        style: const TextStyle(
+                                            fontSize: 11, color: Colors.white),
+                                      ),
+                                    ),
+                                  )
                               ],
                             );
                           },

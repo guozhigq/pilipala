@@ -33,7 +33,8 @@ class _SearchPageState extends State<SearchPage> {
             child: IconButton(
                 onPressed: () => _searchController.submit(),
                 icon: const Icon(CupertinoIcons.search, size: 22)),
-          )
+          ),
+          const SizedBox(width: 10)
         ],
         title: Obx(
           () => TextField(

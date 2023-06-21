@@ -10,7 +10,6 @@ class HistoryController extends GetxController {
 
   @override
   void onInit() {
-    queryHistoryList();
     super.onInit();
   }
 

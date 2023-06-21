@@ -303,4 +303,21 @@ class VideoHttp {
       return {'status': true, 'data': []};
     }
   }
+
+  // 视频播放进度
+  static Future heartBeat({aid, progress, realtime}) async {
+    var res = await Request().post(Api.heartBeat, queryParameters: {
+      'aid': aid,
+      // 'bvid': '',
+      // 'cid': '',
+      // 'epid': '',
+      // 'sid': '',
+      // 'mid': '',
+      'played_time': progress,
+      // 'realtime': realtime,
+      // 'type': '',
+      // 'sub_type': '',
+      'csrf': await Request.getCsrf(),
+    });
+  }
 }

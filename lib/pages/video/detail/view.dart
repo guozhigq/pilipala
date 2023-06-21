@@ -27,7 +27,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final VideoDetailController videoDetailController =
       Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
   MeeduPlayerController? _meeduPlayerController;
-  ScrollController _extendNestCtr = ScrollController();
+  final ScrollController _extendNestCtr = ScrollController();
   late AnimationController animationController;
 
   // final _meeduPlayerController = MeeduPlayerController(
@@ -46,13 +46,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _meeduPlayerController = videoDetailController.meeduPlayerController;
     _playerEventSubs = _meeduPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) {
+        videoDetailController.markHeartBeat();
         if (status == PlayerStatus.playing) {
           Wakelock.enable();
-          print('开始播放了');
           isPlay = false;
           isShowCover = false;
           setState(() {});
+          videoDetailController.loopHeartBeat();
         } else {
+          videoDetailController.timer!.cancel();
           isPlay = true;
           setState(() {});
           Wakelock.disable();
@@ -92,6 +94,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   void dispose() {
     videoDetailController.meeduPlayerController.dispose();
+    videoDetailController.timer!.cancel();
     super.dispose();
   }
 
@@ -100,6 +103,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPushNext() async {
     if (!_meeduPlayerController!.pipEnabled) {
       _meeduPlayerController!.pause();
+    }
+    if (videoDetailController.timer!.isActive) {
+      videoDetailController.timer!.cancel();
     }
     super.didPushNext();
   }
@@ -110,6 +116,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       _meeduPlayerController!.play();
+    }
+    if (!videoDetailController.timer!.isActive) {
+      videoDetailController.loopHeartBeat();
     }
     super.didPopNext();
   }

@@ -150,4 +150,8 @@ class Api {
 
   // 分类搜索
   static const String searchByType = '/x/web-interface/search/type';
+
+  // 记录视频播放进度
+  // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
+  static const String heartBeat = '/x/click-interface/web/heartbeat';
 }

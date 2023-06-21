@@ -45,6 +45,8 @@ class VideoDetailController extends GetxController {
     enabledButtons: const EnabledButtons(pip: true),
   );
 
+  Timer? timer;
+
   @override
   void onInit() {
     super.onInit();
@@ -115,13 +117,31 @@ class VideoDetailController extends GetxController {
     // log('result: ${result.toString()}');
     if (result['status']) {
       PlayUrlModel data = result['data'];
-      print(data.dash);
-
       // 指定质量的视频 -> 最高质量的视频
       String videoUrl = data.dash!.video!.first.baseUrl!;
       String audioUrl = data.dash!.audio!.first.baseUrl!;
       playerInit(videoUrl, audioUrl,
           defaultST: Duration(milliseconds: data.lastPlayTime!));
     }
+  }
+
+  void loopHeartBeat() {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      markHeartBeat();
+    });
+  }
+
+  void markHeartBeat() async {
+    Duration progress = meeduPlayerController.position.value;
+    await VideoHttp.heartBeat(aid: aid, progress: progress.inSeconds);
+  }
+
+  @override
+  void onClose() {
+    markHeartBeat();
+    if (timer!.isActive) {
+      timer!.cancel();
+    }
+    super.onClose();
   }
 }

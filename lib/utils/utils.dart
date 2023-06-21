@@ -35,7 +35,7 @@ class Utils {
       int minute = time ~/ 60;
       double res = time / 60;
       if (minute != res) {
-        return '${minute < 10 ? '0$minute' : minute} :${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
+        return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
       } else {
         return '$minute:00';
       }
