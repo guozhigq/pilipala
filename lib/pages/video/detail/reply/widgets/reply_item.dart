@@ -430,13 +430,46 @@ InlineSpan buildContent(BuildContext context, content) {
   }
   List<InlineSpan> spanChilds = [];
   bool hasMatchMember = true;
+
+  // 投票
+  if (content.vote.isNotEmpty) {
+    content.message.splitMapJoin(RegExp(r"\{vote:.*?\}"),
+        onMatch: (Match match) {
+      String matchStr = match[0]!;
+      spanChilds.add(
+        TextSpan(
+          text: '投票: ${content.vote['title']}',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () => {
+                  Get.toNamed(
+                    '/webview',
+                    parameters: {
+                      'url': content.vote['url'],
+                      'type': 'vote',
+                      'pageTitle': content.vote['title'],
+                    },
+                  )
+                },
+        ),
+      );
+      return '';
+    }, onNonMatch: (String str) {
+      return str;
+    });
+  }
+  // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
   // 匹配表情
   String matchEmote = content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
     onMatch: (Match match) {
       String matchStr = match[0]!;
-      int size = content.emote[matchStr]['meta']['size'];
-      if (content.emote.isNotEmpty) {
+      if (content.emote.isNotEmpty &&
+          matchStr.indexOf('[') == matchStr.lastIndexOf('[') &&
+          matchStr.indexOf(']') == matchStr.lastIndexOf(']')) {
+        int size = content.emote[matchStr]['meta']['size'];
         if (content.emote.keys.contains(matchStr)) {
           spanChilds.add(
             WidgetSpan(
@@ -452,6 +485,9 @@ InlineSpan buildContent(BuildContext context, content) {
           spanChilds.add(TextSpan(text: matchStr));
           return matchStr;
         }
+      } else {
+        spanChilds.add(TextSpan(text: matchStr));
+        return matchStr;
       }
       return '';
     },
