@@ -160,7 +160,7 @@ class History {
     epid = json['epid'];
     bvid = json['bvid'];
     page = json['page'];
-    cid = json['cid'];
+    cid = json['cid'] == 0 ? null : json['cid'];
     part = json['part'];
     business = json['business'];
     dt = json['dt'];

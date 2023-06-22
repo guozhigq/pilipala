@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -17,11 +18,10 @@ class HistoryItem extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
+        int cid = videoItem.history.cid ??
+            await SearchHttp.ab2c(aid: aid, bvid: bvid);
         await Future.delayed(const Duration(milliseconds: 200));
         if (videoItem.history.business.contains('article')) {
-          String cid = videoItem.history.cid != 0
-              ? videoItem.history.cid.toString()
-              : videoItem.history.oid.toString();
           Get.toNamed(
             '/webview',
             parameters: {
@@ -31,7 +31,7 @@ class HistoryItem extends StatelessWidget {
             },
           );
         } else {
-          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.history.cid}',
+          Get.toNamed('/video?bvid=$bvid&cid=$cid',
               arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
         }
       },
