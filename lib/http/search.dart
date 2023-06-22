@@ -17,7 +17,7 @@ class SearchHttp {
     } else {
       return {
         'status': false,
-        'date': [],
+        'data': [],
         'msg': '请求错误 🙅',
       };
     }
@@ -36,7 +36,7 @@ class SearchHttp {
     } else {
       return {
         'status': false,
-        'date': [],
+        'data': [],
         'msg': '请求错误 🙅',
       };
     }
@@ -55,9 +55,8 @@ class SearchHttp {
       'user_type': 0,
       'page': page
     });
-    if (res.data['code'] == 0) {
+    if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
       var data;
-      // log(res.data.toString());
       switch (searchType) {
         case SearchType.video:
           data = SearchVideoModel.fromJson(res.data['data']);
@@ -69,7 +68,6 @@ class SearchHttp {
           data = SearchUserModel.fromJson(res.data['data']);
           break;
       }
-
       return {
         'status': true,
         'data': data,
@@ -77,8 +75,8 @@ class SearchHttp {
     } else {
       return {
         'status': false,
-        'date': [],
-        'msg': '请求错误 🙅',
+        'data': [],
+        'msg': res.data['data']['numPages'] == 0 ? '没有相关数据' : '请求错误 🙅',
       };
     }
   }

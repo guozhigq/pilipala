@@ -11,19 +11,14 @@ class SearchPanelController extends GetxController {
   RxInt page = 1.obs;
   RxList resultList = [].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
   Future onSearch({type = 'init'}) async {
     var result = await SearchHttp.searchByType(
         searchType: searchType!, keyword: keyword!, page: page.value);
     if (result['status']) {
-      if (type == 'init') {
+      if (type == 'init' || type == 'onLoad') {
         page.value++;
         resultList.addAll(result['data'].list);
-      } else {
+      } else if (type == 'onRefresh') {
         resultList.value = result['data'].list;
       }
     }
@@ -32,7 +27,7 @@ class SearchPanelController extends GetxController {
 
   Future onRefresh() async {
     page.value = 1;
-    onSearch(type: 'refresh');
+    onSearch(type: 'onRefresh');
   }
 
   // 返回顶部并刷新

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'controller.dart';
@@ -10,10 +11,26 @@ class SearchPage extends StatefulWidget {
 
   @override
   State<SearchPage> createState() => _SearchPageState();
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage> with RouteAware {
   final SearchController _searchController = Get.put(SearchController());
+
+  @override
+  // 返回当前页面时
+  void didPopNext() async {
+    _searchController.searchFocusNode.requestFocus();
+    super.didPopNext();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    SearchPage.routeObserver
+        .subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,8 +165,12 @@ class _SearchPageState extends State<SearchPage> {
                       return HotKeyword(
                         width: width,
                         hotSearchList: _searchController.hotSearchList,
-                        onClick: (keyword) =>
-                            _searchController.onClickKeyword(keyword),
+                        onClick: (keyword) async {
+                          _searchController.searchFocusNode.unfocus();
+                          await Future.delayed(
+                              const Duration(milliseconds: 150));
+                          _searchController.onClickKeyword(keyword);
+                        },
                       );
                     } else {
                       return HttpError(

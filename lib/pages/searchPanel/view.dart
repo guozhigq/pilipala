@@ -23,6 +23,8 @@ class _SearchPanelState extends State<SearchPanel>
     with AutomaticKeepAliveClientMixin {
   late SearchPanelController? _searchPanelController;
 
+  bool _isLoadingMore = false;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -30,11 +32,24 @@ class _SearchPanelState extends State<SearchPanel>
   void initState() {
     super.initState();
     _searchPanelController = Get.put(
-        SearchPanelController(
-          keyword: widget.keyword,
-          searchType: widget.searchType,
-        ),
-        tag: widget.searchType!.type);
+      SearchPanelController(
+        keyword: widget.keyword,
+        searchType: widget.searchType,
+      ),
+      tag: widget.searchType!.type,
+    );
+    ScrollController scrollController =
+        _searchPanelController!.scrollController;
+    scrollController.addListener(() async {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 100) {
+        if (!_isLoadingMore) {
+          _isLoadingMore = true;
+          await _searchPanelController!.onSearch(type: 'onLoad');
+          _isLoadingMore = false;
+        }
+      }
+    });
   }
 
   @override
@@ -71,9 +86,14 @@ class _SearchPanelState extends State<SearchPanel>
                 ),
               );
             } else {
-              return HttpError(
-                errMsg: data['msg'],
-                fn: () => setState(() {}),
+              return CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: [
+                  HttpError(
+                    errMsg: data['msg'],
+                    fn: () => setState(() {}),
+                  ),
+                ],
               );
             }
           } else {
