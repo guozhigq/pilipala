@@ -4,6 +4,7 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/utils/id_utils.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
@@ -20,6 +21,7 @@ class FavDetailController extends GetxController {
   }
 
   Future<dynamic> queryUserFavFolderDetail() async {
+    print('🐯🐯虎');
     var res = await await UserHttp.userFavFolderDetail(
       pn: 1,
       ps: 15,
@@ -31,7 +33,7 @@ class FavDetailController extends GetxController {
 
   onCancelFav(int id) async {
     var result = await VideoHttp.favVideo(
-        aid: id.toString(), addIds: '', delIds: mediaId.toString());
+        aid: id, addIds: '', delIds: mediaId.toString());
     if (result['status']) {
       if (result['data']['prompt']) {
         List<FavDetailItemData> dataList = favDetailData.value.medias!;

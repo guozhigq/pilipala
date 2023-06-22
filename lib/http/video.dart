@@ -62,10 +62,10 @@ class VideoHttp {
 
   // 视频流
   static Future videoUrl(
-      {int? avid, int? bvid, required int cid, int? qn}) async {
+      {int? avid, String? bvid, required int cid, int? qn}) async {
     Map<String, dynamic> data = {
-      'avid': avid,
-      // 'bvid': bvid,
+      // 'avid': avid,
+      'bvid': bvid,
       'cid': cid,
       // 'qn': qn ?? 80,
       // 获取所有格式的视频
@@ -99,8 +99,8 @@ class VideoHttp {
   }
 
   // 视频信息 标题、简介
-  static Future videoIntro({required String aid}) async {
-    var res = await Request().get(Api.videoIntro, data: {'aid': aid});
+  static Future videoIntro({required String bvid}) async {
+    var res = await Request().get(Api.videoIntro, data: {'bvid': bvid});
     VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
     if (result.code == 0) {
       return {'status': true, 'data': result.data!};
@@ -121,8 +121,8 @@ class VideoHttp {
   }
 
   // 相关视频
-  static Future relatedVideoList({required String aid}) async {
-    var res = await Request().get(Api.relatedList, data: {'aid': aid});
+  static Future relatedVideoList({required String bvid}) async {
+    var res = await Request().get(Api.relatedList, data: {'bvid': bvid});
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']) {
@@ -135,8 +135,8 @@ class VideoHttp {
   }
 
   // 获取点赞状态
-  static Future hasLikeVideo({required String aid}) async {
-    var res = await Request().get(Api.hasLikeVideo, data: {'aid': aid});
+  static Future hasLikeVideo({required String bvid}) async {
+    var res = await Request().get(Api.hasLikeVideo, data: {'bvid': bvid});
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
@@ -145,8 +145,8 @@ class VideoHttp {
   }
 
   // 获取投币状态
-  static Future hasCoinVideo({required String aid}) async {
-    var res = await Request().get(Api.hasCoinVideo, data: {'aid': aid});
+  static Future hasCoinVideo({required String bvid}) async {
+    var res = await Request().get(Api.hasCoinVideo, data: {'bvid': bvid});
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
@@ -155,11 +155,11 @@ class VideoHttp {
   }
 
   // 投币
-  static Future coinVideo({required String aid, required int multiply}) async {
+  static Future coinVideo({required String bvid, required int multiply}) async {
     var res = await Request().post(
       Api.coinVideo,
       queryParameters: {
-        'aid': aid,
+        'bvid': bvid,
         'multiply': multiply,
         'select_like': 0,
         'csrf': await Request.getCsrf(),
@@ -173,7 +173,7 @@ class VideoHttp {
   }
 
   // 获取收藏状态
-  static Future hasFavVideo({required String aid}) async {
+  static Future hasFavVideo({required int aid}) async {
     var res = await Request().get(Api.hasFavVideo, data: {'aid': aid});
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
@@ -183,11 +183,11 @@ class VideoHttp {
   }
 
   // 一键三连
-  static Future oneThree({required String aid}) async {
+  static Future oneThree({required String bvid}) async {
     var res = await Request().post(
       Api.oneThree,
       queryParameters: {
-        'aid': aid,
+        'bvid': bvid,
         'csrf': await Request.getCsrf(),
       },
     );
@@ -199,11 +199,11 @@ class VideoHttp {
   }
 
   // （取消）点赞
-  static Future likeVideo({required String aid, required bool type}) async {
+  static Future likeVideo({required String bvid, required bool type}) async {
     var res = await Request().post(
       Api.likeVideo,
       queryParameters: {
-        'aid': aid,
+        'bvid': bvid,
         'like': type ? 1 : 2,
         'csrf': await Request.getCsrf(),
       },
@@ -217,7 +217,7 @@ class VideoHttp {
 
   // （取消）收藏
   static Future favVideo(
-      {required String aid, String? addIds, String? delIds}) async {
+      {required int aid, String? addIds, String? delIds}) async {
     var res = await Request().post(Api.favVideo, queryParameters: {
       'rid': aid,
       'type': 2,
@@ -233,7 +233,7 @@ class VideoHttp {
   }
 
   // 查看视频被收藏在哪个文件夹
-  static Future videoInFolder({required int mid, required String rid}) async {
+  static Future videoInFolder({required int mid, required int rid}) async {
     var res = await Request()
         .get(Api.videoInFolder, data: {'up_mid': mid, 'rid': rid});
     if (res.data['code'] == 0) {
@@ -305,10 +305,10 @@ class VideoHttp {
   }
 
   // 视频播放进度
-  static Future heartBeat({aid, progress, realtime}) async {
+  static Future heartBeat({bvid, progress, realtime}) async {
     var res = await Request().post(Api.heartBeat, queryParameters: {
-      'aid': aid,
-      // 'bvid': '',
+      // 'aid': aid,
+      'bvid': bvid,
       // 'cid': '',
       // 'epid': '',
       // 'sid': '',

@@ -76,6 +76,7 @@ class SearchVideoItemModel {
     cid = json['id'];
     arcurl = json['arcurl'];
     aid = json['aid'];
+    bvid = json['bvid'];
     title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     description = json['description'];
     pic = 'https:${json['pic']}';

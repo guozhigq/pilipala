@@ -10,10 +10,14 @@ import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyController extends GetxController {
-  VideoReplyController(this.aid, this.rpid, this.level);
+  VideoReplyController(
+    this.aid,
+    this.rpid,
+    this.level,
+  );
   final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
-  String? aid;
+  int? aid;
   // 层级 2为楼中楼
   String? level;
   // rpid 请求楼中楼回复
@@ -95,7 +99,7 @@ class VideoReplyController extends GetxController {
   Future submitReplyAdd() async {
     var result = await VideoHttp.replyAdd(
       type: ReplyType.video,
-      oid: int.parse(aid!),
+      oid: aid!,
       root: replyLevel == '0'
           ? 0
           : replyLevel == '1'

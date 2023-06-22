@@ -46,15 +46,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _meeduPlayerController = videoDetailController.meeduPlayerController;
     _playerEventSubs = _meeduPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) {
-        videoDetailController.markHeartBeat();
+        // videoDetailController.markHeartBeat();
         if (status == PlayerStatus.playing) {
           Wakelock.enable();
           isPlay = false;
           isShowCover = false;
           setState(() {});
-          videoDetailController.loopHeartBeat();
+          // videoDetailController.loopHeartBeat();
         } else {
-          videoDetailController.timer!.cancel();
+          // videoDetailController.timer!.cancel();
           isPlay = true;
           setState(() {});
           Wakelock.disable();

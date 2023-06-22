@@ -16,7 +16,7 @@ class VideoDetailController extends GetxController {
   RxList<String> tabs = <String>['简介', '评论'].obs;
 
   // 视频aid
-  int aid = int.parse(Get.parameters['aid']!);
+  String bvid = Get.parameters['bvid']!;
   int cid = int.parse(Get.parameters['cid']!);
 
   // 是否预渲染 骨架屏
@@ -113,7 +113,8 @@ class VideoDetailController extends GetxController {
 
   // 视频链接
   queryVideoUrl() async {
-    var result = await VideoHttp.videoUrl(cid: cid, avid: aid);
+    print('🐶🐶🐶');
+    var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
     // log('result: ${result.toString()}');
     if (result['status']) {
       PlayUrlModel data = result['data'];
@@ -133,7 +134,7 @@ class VideoDetailController extends GetxController {
 
   void markHeartBeat() async {
     Duration progress = meeduPlayerController.position.value;
-    await VideoHttp.heartBeat(aid: aid, progress: progress.inSeconds);
+    await VideoHttp.heartBeat(bvid: bvid, progress: progress.inSeconds);
   }
 
   @override

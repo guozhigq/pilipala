@@ -8,12 +8,13 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
 class VideoIntroController extends GetxController {
-  // 视频aid
-  String aid = Get.parameters['aid']!;
+  // 视频bvid
+  String bvid = Get.parameters['bvid']!;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -69,7 +70,7 @@ class VideoIntroController extends GetxController {
 
   // 获取视频简介
   Future queryVideoIntro() async {
-    var result = await VideoHttp.videoIntro(aid: aid);
+    var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
@@ -104,21 +105,25 @@ class VideoIntroController extends GetxController {
 
   // 获取点赞状态
   Future queryHasLikeVideo() async {
-    var result = await VideoHttp.hasLikeVideo(aid: aid);
+    var result = await VideoHttp.hasLikeVideo(bvid: bvid);
     // data	num	被点赞标志	0：未点赞  1：已点赞
     hasLike.value = result["data"] == 1 ? true : false;
   }
 
   // 获取投币状态
   Future queryHasCoinVideo() async {
-    var result = await VideoHttp.hasCoinVideo(aid: aid);
+    var result = await VideoHttp.hasCoinVideo(bvid: bvid);
     hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
   }
 
   // 获取收藏状态
   Future queryHasFavVideo() async {
-    var result = await VideoHttp.hasFavVideo(aid: aid);
-    hasFav.value = result["data"]['favoured'];
+    var result = await VideoHttp.hasFavVideo(aid: IdUtils.bv2av(bvid));
+    if (result['status']) {
+      hasFav.value = result["data"]['favoured'];
+    } else {
+      hasFav.value = false;
+    }
   }
 
   // 一键三连
@@ -141,7 +146,7 @@ class VideoIntroController extends GetxController {
                 child: const Text('点错了')),
             TextButton(
               onPressed: () async {
-                var result = await VideoHttp.oneThree(aid: aid);
+                var result = await VideoHttp.oneThree(bvid: bvid);
                 if (result['status']) {
                   hasLike.value = result["data"]["like"];
                   hasCoin.value = result["data"]["coin"];
@@ -162,7 +167,7 @@ class VideoIntroController extends GetxController {
 
   // （取消）点赞
   Future actionLikeVideo() async {
-    var result = await VideoHttp.likeVideo(aid: aid, type: !hasLike.value);
+    var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
       if (!hasLike.value) {
@@ -216,7 +221,7 @@ class VideoIntroController extends GetxController {
               TextButton(
                   onPressed: () async {
                     var res = await VideoHttp.coinVideo(
-                        aid: aid, multiply: _tempThemeValue);
+                        bvid: bvid, multiply: _tempThemeValue);
                     print(res);
                     if (res['status']) {
                       SmartDialog.showToast('投币成功');
@@ -244,7 +249,7 @@ class VideoIntroController extends GetxController {
       }
     } catch (e) {}
     var result = await VideoHttp.favVideo(
-        aid: aid,
+        aid: IdUtils.bv2av(bvid),
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
     if (result['status']) {
@@ -262,7 +267,7 @@ class VideoIntroController extends GetxController {
   // 分享视频
   Future actionShareVideo() async {
     var result =
-        await Share.share('${HttpString.baseUrl}/video/$aid').whenComplete(() {
+        await Share.share('${HttpString.baseUrl}/video/$bvid').whenComplete(() {
       print("share completion block ");
     });
     return result;
@@ -270,7 +275,7 @@ class VideoIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: user.get(UserBoxKey.userMid), rid: aid);
+        mid: user.get(UserBoxKey.userMid), rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }

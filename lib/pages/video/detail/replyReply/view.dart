@@ -31,8 +31,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   void initState() {
     _videoReplyReplyController = Get.put(
-        VideoReplyReplyController(
-            widget.oid.toString(), widget.rpid.toString()),
+        VideoReplyReplyController(widget.oid, widget.rpid.toString()),
         tag: widget.rpid.toString());
     super.initState();
 

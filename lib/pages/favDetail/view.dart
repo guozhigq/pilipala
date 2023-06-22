@@ -20,10 +20,12 @@ class _FavDetailPageState extends State<FavDetailPage> {
   final FavDetailController _favDetailController =
       Get.put(FavDetailController());
   late StreamController<bool> titleStreamC; // a
+  Future? _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
     titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
@@ -165,7 +167,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
           ),
           FutureBuilder(
-            future: _favDetailController.queryUserFavFolderDetail(),
+            future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 Map data = snapshot.data;

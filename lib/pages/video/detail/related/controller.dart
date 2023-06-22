@@ -4,11 +4,11 @@ import 'package:pilipala/http/video.dart';
 
 class ReleatedController extends GetxController {
   // 视频aid
-  String aid = Get.parameters['aid']!;
+  String bvid = Get.parameters['bvid']!;
   // 推荐视频列表
   List relatedVideoList = [];
 
   OverlayEntry? popupDialog;
 
-  Future<dynamic> queryRelatedVideo() => VideoHttp.relatedVideoList(aid: aid);
+  Future<dynamic> queryRelatedVideo() => VideoHttp.relatedVideoList(bvid: bvid);
 }

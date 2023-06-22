@@ -8,7 +8,7 @@ class VideoReplyReplyController extends GetxController {
   VideoReplyReplyController(this.aid, this.rpid);
   final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
-  String? aid;
+  int? aid;
   // rpid 请求楼中楼回复
   String? rpid;
   RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
@@ -29,13 +29,14 @@ class VideoReplyReplyController extends GetxController {
     super.onInit();
     currentPage = 0;
   }
+
   // 上拉加载
   Future onLoad() async {
     queryReplyList(type: 'onLoad');
   }
 
   Future queryReplyList({type = 'init'}) async {
-    if(type == 'init'){
+    if (type == 'init') {
       currentPage = 0;
     }
     isLoadingMore = true;

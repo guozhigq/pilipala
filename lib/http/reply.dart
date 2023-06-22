@@ -3,7 +3,7 @@ import 'package:pilipala/http/init.dart';
 
 class ReplyHttp {
   static Future replyList({
-    required String oid,
+    required int oid,
     required int pageNum,
     required int type,
     int sort = 1,
@@ -36,7 +36,7 @@ class ReplyHttp {
   }
 
   static Future replyReplyList({
-    required String oid,
+    required int oid,
     required String root,
     required int pageNum,
     required int type,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -19,6 +20,7 @@ class FavVideoCardH extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int id = videoItem.id;
+    String bvid = IdUtils.av2bv(id);
     String heroTag = Utils.makeHeroTag(id);
     return Dismissible(
       movementDuration: const Duration(milliseconds: 300),
@@ -43,7 +45,7 @@ class FavVideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?aid=$id&cid=${videoItem.cid}',
+          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
               arguments: {'videoItem': videoItem, 'heroTag': heroTag});
         },
         child: Column(

@@ -7,16 +7,17 @@ import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'controller.dart';
 import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
-  int oid;
+  String? bvid;
   int rpid;
   String? level;
   Key? key;
   VideoReplyPanel({
-    this.oid = 0,
+    this.bvid,
     this.rpid = 0,
     this.level,
     super.key,
@@ -42,17 +43,19 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   void initState() {
+    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     super.initState();
     replyLevel = widget.level ?? '1';
     if (widget.level != null && widget.level == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(
-              widget.oid.toString(), widget.rpid.toString(), '2'),
+          VideoReplyController(oid, widget.rpid.toString(), '2'),
           tag: widget.rpid.toString());
       _videoReplyController.rPid = widget.rpid;
     } else {
-      _videoReplyController = Get.put(
-          VideoReplyController(Get.parameters['aid']!, '', '1'),
+      int oid = Get.parameters['bvid'] != null
+          ? IdUtils.bv2av(Get.parameters['bvid']!)
+          : 0;
+      _videoReplyController = Get.put(VideoReplyController(oid, '', '1'),
           tag: Get.arguments['heroTag']);
     }
 
@@ -213,15 +216,18 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                       builder: (builder) {
                         return VideoReplyNewDialog(
                           replyLevel: '0',
-                          oid: int.parse(Get.parameters['aid']!),
+                          oid: IdUtils.bv2av(Get.parameters['bvid']!),
                           root: 0,
                           parent: 0,
                         );
                       },
-                    ).then((value) => {
-                          // 完成评论，数据添加
-                          _videoReplyController.replyList.add(value['data'])
-                        });
+                    ).then(
+                      (value) => {
+                        // 完成评论，数据添加
+                        if (value != null && value['data'])
+                          {_videoReplyController.replyList.add(value['data'])}
+                      },
+                    );
                   },
                   tooltip: '发表评论',
                   child: const Icon(Icons.reply),

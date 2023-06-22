@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/business_type.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
@@ -12,6 +13,7 @@ class HistoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int aid = videoItem.history.oid;
+    String bvid = videoItem.history.bvid;
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
@@ -29,7 +31,7 @@ class HistoryItem extends StatelessWidget {
             },
           );
         } else {
-          Get.toNamed('/video?aid=$aid&cid=${videoItem.history.cid}',
+          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.history.cid}',
               arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
         }
       },

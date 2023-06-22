@@ -22,6 +22,7 @@ class VideoCardH extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int aid = videoItem.aid;
+    String bvid = videoItem.bvid;
     String heroTag = Utils.makeHeroTag(aid);
     return GestureDetector(
       onLongPress: () {
@@ -37,7 +38,7 @@ class VideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?aid=$aid&cid=${videoItem.cid}',
+          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
               arguments: {'videoItem': videoItem, 'heroTag': heroTag});
         },
         child: Column(
