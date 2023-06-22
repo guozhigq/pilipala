@@ -62,7 +62,10 @@ class Request {
     // for (var i in cookies) {
     //   print(i);
     // }
-    var token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+    String token = '';
+    if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
+      token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+    }
     return token;
   }
 
@@ -91,8 +94,8 @@ class Request {
       ..add(ApiInterceptor())
       // 日志拦截器 输出请求、响应内容
       ..add(LogInterceptor(
-        request: true,
-        requestHeader: true,
+        request: false,
+        requestHeader: false,
         responseHeader: false,
       ));
     dio.transformer = BackgroundTransformer();

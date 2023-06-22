@@ -128,6 +128,10 @@ class VideoIntroController extends GetxController {
 
   // 一键三连
   Future actionOneThree() async {
+    if (user.get(UserBoxKey.userMid) == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     if (hasLike.value && hasCoin.value && hasFav.value) {
       // 已点赞、投币、收藏
       SmartDialog.showToast('🙏 UP已经收到了～');
@@ -185,6 +189,10 @@ class VideoIntroController extends GetxController {
 
   // 投币
   Future actionCoinVideo() async {
+    if (user.get(UserBoxKey.userMid) == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     showDialog(
         context: Get.context!,
         builder: (context) {

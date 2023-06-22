@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class VideoIntroPanel extends StatefulWidget {
@@ -109,6 +111,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   showFavBottomSheet() {
+    if (videoIntroController.user.get(UserBoxKey.userMid) == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     Get.bottomSheet(
       useRootNavigator: true,
       isScrollControlled: true,

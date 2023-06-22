@@ -67,7 +67,10 @@ class WebviewController extends GetxController {
                   SmartDialog.showToast('登录成功');
                   Box user = GStrorage.user;
                   user.put(UserBoxKey.userLogin, true);
+                  Box userInfoCache = GStrorage.userInfo;
+                  userInfoCache.put('userInfoCache', result['data']);
                   Get.find<MineController>().userInfo.value = result['data'];
+                  Get.find<MineController>().onInit();
                   Get.find<HomeController>().queryRcmdFeed('onRefresh');
                   Get.back();
                 }

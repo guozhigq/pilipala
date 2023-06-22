@@ -19,13 +19,15 @@ class MineController extends GetxController {
     super.onInit();
 
     if (userInfoCache.get('userInfoCache') != null) {
-      print(userInfoCache.get('userInfoCache'));
       userInfo.value = userInfoCache.get('userInfoCache');
     }
   }
 
-  onLogin() {
+  onLogin() async {
     if (!userLogin.value) {
+      /// TODO
+      Get.back();
+      await Future.delayed(const Duration(milliseconds: 150));
       Get.toNamed(
         '/webview',
         parameters: {
