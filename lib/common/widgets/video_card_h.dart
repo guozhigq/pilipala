@@ -1,7 +1,9 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -37,9 +39,14 @@ class VideoCardH extends StatelessWidget {
       },
       child: InkWell(
         onTap: () async {
-          await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
-              arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+          try {
+            int cid =
+                videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
+            Get.toNamed('/video?bvid=$bvid&cid=$cid',
+                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+          } catch (err) {
+            SmartDialog.showToast(err.toString());
+          }
         },
         child: Column(
           children: [

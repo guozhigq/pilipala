@@ -154,4 +154,7 @@ class Api {
   // 记录视频播放进度
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
   static const String heartBeat = '/x/click-interface/web/heartbeat';
+
+  // 查询视频分P列表 (avid/bvid转cid)
+  static const String ab2c = '/x/player/pagelist';
 }

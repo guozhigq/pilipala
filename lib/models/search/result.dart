@@ -73,7 +73,6 @@ class SearchVideoItemModel {
   SearchVideoItemModel.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     id = json['id'];
-    cid = json['id'];
     arcurl = json['arcurl'];
     aid = json['aid'];
     bvid = json['bvid'];
@@ -83,14 +82,13 @@ class SearchVideoItemModel {
     videoReview = json['video_review'];
     pubdate = json['pubdate'];
     senddate = json['senddate'];
-    duration = test(json['duration']);
-    // duration = json['duration'];
+    duration = _dutation(json['duration']);
     owner = Owner.fromJson(json);
     stat = Stat.fromJson(json);
   }
 }
 
-test(String duration) {
+_dutation(String duration) {
   List timeList = duration.split(':');
   int len = timeList.length;
   if (len == 2) {
