@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'controller.dart';
 import 'widgets/hotKeyword.dart';
+import 'widgets/search_text.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -63,28 +64,31 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             decoration: InputDecoration(
               hintText: '搜索',
               border: InputBorder.none,
-              suffixIcon: _searchController.searchKeyWord.value.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.clear,
-                        size: 22,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      onPressed: () => _searchController.onClear())
-                  : null,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  size: 22,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                onPressed: () => _searchController.onClear(),
+              ),
             ),
             onSubmitted: (String value) => _searchController.submit(),
           ),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 12),
-          // 搜索建议
-          _searchSuggest(),
-          // 热搜
-          hotSearch(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            // 搜索建议
+            _searchSuggest(),
+            // 热搜
+            hotSearch(),
+            // 搜索历史
+            _history()
+          ],
+        ),
       ),
     );
   }
@@ -143,7 +147,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(6, 0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(6, 0, 0, 6),
             child: Text(
               '大家都在搜',
               style: Theme.of(context)
@@ -152,7 +156,6 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   .copyWith(fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 6),
           LayoutBuilder(
             builder: (context, boxConstraints) {
               final double width = boxConstraints.maxWidth;
@@ -194,6 +197,55 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _history() {
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(10, 25, 4, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_searchController.historyList.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(6, 0, 1, 2),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '搜索历史',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextButton(
+                      onPressed: () => _searchController.onClearHis(),
+                      child: const Text('清空'),
+                    )
+                  ],
+                ),
+              ),
+            // if (_searchController.historyList.isNotEmpty)
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              direction: Axis.horizontal,
+              textDirection: TextDirection.ltr,
+              children: [
+                for (int i = 0; i < _searchController.historyList.length; i++)
+                  SearchText(
+                    searchText: _searchController.historyList[i],
+                    searchTextIdx: i,
+                    onSelect: (value) => _searchController.onSelect(value),
+                  )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

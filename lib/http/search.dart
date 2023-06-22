@@ -51,8 +51,8 @@ class SearchHttp {
     var res = await Request().get(Api.searchByType, data: {
       'search_type': searchType.type,
       'keyword': keyword,
-      'order_sort': 0,
-      'user_type': 0,
+      // 'order_sort': 0,
+      // 'user_type': 0,
       'page': page
     });
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {

@@ -91,8 +91,8 @@ class Request {
       ..add(ApiInterceptor())
       // 日志拦截器 输出请求、响应内容
       ..add(LogInterceptor(
-        request: false,
-        requestHeader: false,
+        request: true,
+        requestHeader: true,
         responseHeader: false,
       ));
     dio.transformer = BackgroundTransformer();
