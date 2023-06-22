@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
-import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class SearchController extends GetxController {
@@ -14,6 +13,9 @@ class SearchController extends GetxController {
   Rx<TextEditingController> controller = TextEditingController().obs;
   List<HotSearchItem> hotSearchList = [];
   Box hotKeyword = GStrorage.hotKeyword;
+  Box histiryWord = GStrorage.historyword;
+  List historyCacheList = [];
+  RxList historyList = [].obs;
   RxList<SearchSuggestItem> searchSuggestList = [SearchSuggestItem()].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
@@ -33,6 +35,8 @@ class SearchController extends GetxController {
     if (Get.parameters.keys.isNotEmpty) {
       onClickKeyword(Get.parameters['keyword']!);
     }
+    historyCacheList = histiryWord.get('cacheList') ?? [];
+    historyList.value = historyCacheList;
   }
 
   void onChange(value) {
@@ -45,9 +49,13 @@ class SearchController extends GetxController {
   }
 
   void onClear() {
-    controller.value.clear();
-    searchKeyWord.value = '';
-    searchSuggestList.value = [];
+    if (searchKeyWord.value.isNotEmpty) {
+      controller.value.clear();
+      searchKeyWord.value = '';
+      searchSuggestList.value = [];
+    } else {
+      Get.back();
+    }
   }
 
   // 搜索
@@ -56,6 +64,14 @@ class SearchController extends GetxController {
     if (searchKeyWord == '') {
       return;
     }
+    List arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
+    arr.insert(0, searchKeyWord.value);
+    historyCacheList = arr;
+
+    historyList.value = historyCacheList;
+    // 手动刷新
+    historyList.refresh();
+    histiryWord.put('cacheList', historyCacheList);
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
 
@@ -83,5 +99,18 @@ class SearchController extends GetxController {
     if (result['status']) {
       searchSuggestList.value = result['data'].tag;
     }
+  }
+
+  onSelect(word) {
+    searchKeyWord.value = word;
+    controller.value.text = word;
+    submit();
+  }
+
+  onClearHis() {
+    historyList.value = [];
+    historyCacheList = [];
+    historyList.refresh();
+    histiryWord.put('cacheList', []);
   }
 }
