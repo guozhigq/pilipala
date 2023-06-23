@@ -59,14 +59,19 @@ class _FavPageState extends State<FavPage> {
                 ),
               );
             } else {
-              return HttpError(
-                errMsg: data['msg'],
-                fn: () => setState(() {}),
+              return CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: [
+                  HttpError(
+                    errMsg: data['msg'],
+                    fn: () => setState(() {}),
+                  ),
+                ],
               );
             }
           } else {
             // 骨架屏
-            return Text('请求中');
+            return const Text('请求中');
           }
         },
       ),

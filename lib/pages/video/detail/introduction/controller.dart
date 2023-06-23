@@ -57,7 +57,15 @@ class VideoIntroController extends GetxController {
         preRender = true;
         var args = Get.arguments['videoItem'];
         videoItem!['pic'] = args.pic;
-        videoItem!['title'] = args.title;
+        if (args.title is String) {
+          videoItem!['title'] = args.title;
+        } else {
+          String str = '';
+          for (Map map in args.title) {
+            str += map['text'];
+          }
+          videoItem!['title'] = str;
+        }
         if (args.stat != null) {
           videoItem!['stat'] = args.stat;
         }

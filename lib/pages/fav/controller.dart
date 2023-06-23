@@ -10,9 +10,11 @@ class FavController extends GetxController {
     var res = await await UserHttp.userfavFolder(
       pn: 1,
       ps: 10,
-      mid: GStrorage.user.get(UserBoxKey.userMid),
+      mid: GStrorage.user.get(UserBoxKey.userMid) ?? 0,
     );
-    favFolderData.value = res['data'];
+    if (res['status']) {
+      favFolderData.value = res['data'];
+    }
     return res;
   }
 }

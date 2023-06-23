@@ -53,6 +53,7 @@ class SearchVideoItemModel {
   int? aid;
   String? bvid;
   List? title;
+  // List? titleList;
   String? description;
   String? pic;
   // String? play;
@@ -78,6 +79,7 @@ class SearchVideoItemModel {
     arcurl = json['arcurl'];
     aid = json['aid'];
     bvid = json['bvid'];
+    // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     title = Em.regTitle(json['title']);
     description = json['description'];
     pic = 'https:${json['pic']}';

@@ -151,6 +151,7 @@ class VideoContent extends StatelessWidget {
               ),
             ] else ...[
               RichText(
+                maxLines: 2,
                 text: TextSpan(
                   children: [
                     for (var i in videoItem.title) ...[

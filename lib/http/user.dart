@@ -54,7 +54,7 @@ class UserHttp {
       FavFolderData data = FavFolderData.fromJson(res.data['data']);
       return {'status': true, 'data': data};
     } else {
-      return {'status': false, 'data': [], 'msg': res.data['message']};
+      return {'status': false, 'data': [], 'msg': '账号未登录'};
     }
   }
 

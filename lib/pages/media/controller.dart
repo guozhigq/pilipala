@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
@@ -13,7 +14,9 @@ class MediaController extends GetxController {
     {
       'icon': Icons.file_download_outlined,
       'title': '离线缓存',
-      'onTap': () {},
+      'onTap': () {
+        SmartDialog.showToast('功能开发中');
+      },
     },
     {
       'icon': Icons.history,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/utils.dart';
 
 Widget searchMbangumiPanel(BuildContext context, ctr, list) {
   return ListView.builder(
@@ -26,6 +27,7 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 4),
                     RichText(
                       text: TextSpan(
                         style: TextStyle(
@@ -53,8 +55,15 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                     const SizedBox(height: 12),
                     Text('评分:${i.mediaScore['score'].toString()}'),
                     const SizedBox(height: 2),
-                    // Text(Utils.dateFormat(i.pubtime).toString()),
-                    // const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(i.areas),
+                        const SizedBox(width: 3),
+                        const Text('·'),
+                        const SizedBox(width: 3),
+                        Text(Utils.dateFormat(i.pubtime).toString()),
+                      ],
+                    ),
                     Row(
                       children: [
                         Text(i.styles),
@@ -66,7 +75,7 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                       ],
                     ),
                     // Text('声优：${i.cv}'),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 6),
                     Text(i.desc, overflow: TextOverflow.ellipsis, maxLines: 2),
                   ],
                 ),
