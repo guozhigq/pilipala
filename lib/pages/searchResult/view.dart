@@ -52,6 +52,7 @@ class _SearchResultPageState extends State<SearchResultPage>
       ),
       body: Column(
         children: [
+          const SizedBox(height: 4),
           Theme(
             data: ThemeData(
               splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
@@ -68,9 +69,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                   const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
               indicator: BoxDecoration(
                 color: Theme.of(context).colorScheme.secondaryContainer,
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(16),
-                ),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               labelColor: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -87,7 +86,6 @@ class _SearchResultPageState extends State<SearchResultPage>
               },
             ),
           ),
-          const SizedBox(height: 4),
           Expanded(
             child: TabBarView(
               controller: _tabController,

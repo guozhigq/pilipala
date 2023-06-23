@@ -139,15 +139,36 @@ class VideoContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              videoItem.title,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                  fontWeight: FontWeight.w500),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            if (videoItem.title is String) ...[
+              Text(
+                videoItem.title,
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                    fontWeight: FontWeight.w500),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ] else ...[
+              RichText(
+                text: TextSpan(
+                  children: [
+                    for (var i in videoItem.title) ...[
+                      TextSpan(
+                        text: i['text'],
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: i['type'] == 'em'
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+            ],
             const Spacer(),
             if (videoItem.rcmdReason != null &&
                 videoItem.rcmdReason.content != '')

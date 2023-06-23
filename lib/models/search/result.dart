@@ -1,3 +1,5 @@
+import 'package:pilipala/utils/em.dart';
+
 class SearchVideoModel {
   SearchVideoModel({this.list});
   List<SearchVideoItemModel>? list;
@@ -50,7 +52,7 @@ class SearchVideoItemModel {
   String? arcurl;
   int? aid;
   String? bvid;
-  String? title;
+  List? title;
   String? description;
   String? pic;
   // String? play;
@@ -76,7 +78,7 @@ class SearchVideoItemModel {
     arcurl = json['arcurl'];
     aid = json['aid'];
     bvid = json['bvid'];
-    title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
+    title = Em.regTitle(json['title']);
     description = json['description'];
     pic = 'https:${json['pic']}';
     videoReview = json['video_review'];
@@ -241,6 +243,7 @@ class SearchLiveItemModel {
     this.rankScore,
     this.roomid,
     this.attentions,
+    this.cateName,
   });
 
   int? rankOffset;
@@ -251,13 +254,14 @@ class SearchLiveItemModel {
   String? uface;
   String? userCover;
   String? type;
-  String? title;
+  List? title;
   String? cover;
   int? online;
   int? rankIndex;
   int? rankScore;
   int? roomid;
   int? attentions;
+  String? cateName;
 
   SearchLiveItemModel.fromJson(Map<String, dynamic> json) {
     rankOffset = json['rank_offset'];
@@ -268,12 +272,13 @@ class SearchLiveItemModel {
     uface = json['uface'];
     userCover = json['user_cover'];
     type = json['type'];
-    title = json['title'];
+    title = Em.regTitle(json['title']);
     cover = json['cover'];
     online = json['online'];
     rankIndex = json['rank_index'];
     rankScore = json['rank_score'];
     roomid = json['roomid'];
     attentions = json['attentions'];
+    cateName = Em.regCate(json['cate_name']) ?? '';
   }
 }

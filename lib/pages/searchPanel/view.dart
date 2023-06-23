@@ -7,6 +7,9 @@ import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/common/search_type.dart';
 
 import 'controller.dart';
+import 'widgets/live_panerl.dart';
+import 'widgets/user_panel.dart';
+import 'widgets/video_panel.dart';
 import 'widgets/userPanel.dart';
 
 class SearchPanel extends StatefulWidget {
@@ -63,28 +66,21 @@ class _SearchPanelState extends State<SearchPanel>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data;
+            var ctr = _searchPanelController;
+            List list = ctr!.resultList;
             if (data['status']) {
-              return Obx(
-                () => ListView.builder(
-                  controller: _searchPanelController!.scrollController,
-                  addAutomaticKeepAlives: false,
-                  addRepaintBoundaries: false,
-                  itemCount: _searchPanelController!.resultList.length,
-                  itemBuilder: (context, index) {
-                    var i = _searchPanelController!.resultList[index];
-                    switch (widget.searchType) {
-                      case SearchType.video:
-                        return VideoCardH(videoItem: i);
-                      case SearchType.bili_user:
-                        return UserPanel(userItem: i);
-                      case SearchType.live_room:
-                        return LiveCard(liveItem: i);
-                      default:
-                        return const SizedBox();
-                    }
-                  },
-                ),
-              );
+              return Obx(() {
+                switch (widget.searchType) {
+                  case SearchType.video:
+                    return searchVideoPanel(context, ctr, list);
+                  case SearchType.bili_user:
+                    return searchUserPanel(context, ctr, list);
+                  case SearchType.live_room:
+                    return searchLivePanel(context, ctr, list);
+                  default:
+                    return const SizedBox();
+                }
+              });
             } else {
               return CustomScrollView(
                 physics: const NeverScrollableScrollPhysics(),
