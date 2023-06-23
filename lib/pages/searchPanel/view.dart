@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/live_card.dart';
-import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/common/search_type.dart';
 
 import 'controller.dart';
-import 'widgets/live_panerl.dart';
+import 'widgets/live_panel.dart';
+import 'widgets/media_bangumi_panel.dart';
 import 'widgets/user_panel.dart';
 import 'widgets/video_panel.dart';
-import 'widgets/userPanel.dart';
 
 class SearchPanel extends StatefulWidget {
   String? keyword;
@@ -73,6 +71,8 @@ class _SearchPanelState extends State<SearchPanel>
                 switch (widget.searchType) {
                   case SearchType.video:
                     return searchVideoPanel(context, ctr, list);
+                  case SearchType.media_bangumi:
+                    return searchMbangumiPanel(context, ctr, list);
                   case SearchType.bili_user:
                     return searchUserPanel(context, ctr, list);
                   case SearchType.live_room:

@@ -67,6 +67,9 @@ class SearchHttp {
         case SearchType.bili_user:
           data = SearchUserModel.fromJson(res.data['data']);
           break;
+        case SearchType.media_bangumi:
+          data = SearchMBangumiModel.fromJson(res.data['data']);
+          break;
       }
       return {
         'status': true,
