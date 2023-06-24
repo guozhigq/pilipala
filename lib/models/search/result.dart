@@ -1,4 +1,5 @@
 import 'package:pilipala/utils/em.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class SearchVideoModel {
   SearchVideoModel({this.list});
@@ -86,22 +87,9 @@ class SearchVideoItemModel {
     videoReview = json['video_review'];
     pubdate = json['pubdate'];
     senddate = json['senddate'];
-    duration = _dutation(json['duration']);
+    duration = Utils.duration(json['duration']);
     owner = Owner.fromJson(json);
     stat = Stat.fromJson(json);
-  }
-}
-
-_dutation(String duration) {
-  List timeList = duration.split(':');
-  int len = timeList.length;
-  if (len == 2) {
-    return int.parse(timeList[0]) * 60 + int.parse(timeList[1]);
-  }
-  if (len == 3) {
-    return int.parse(timeList[0]) * 3600 +
-        int.parse(timeList[1]) * 60 +
-        timeList[2];
   }
 }
 

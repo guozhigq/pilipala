@@ -42,7 +42,7 @@ class MediaController extends GetxController {
   }
 
   Future<dynamic> queryFavFolder() async {
-    if (!userLogin.value) {
+    if (!userLogin.value || GStrorage.user.get(UserBoxKey.userMid) == null) {
       return {'status': false, 'data': [], 'msg': '未登录'};
     }
     var res = await await UserHttp.userfavFolder(

@@ -119,9 +119,9 @@ class MediaPage extends StatelessWidget {
                         mediaController.favFolderData.value.count!;
                     bool flag = favFolderCount > favFolderList.length;
                     return Obx(() => ListView.builder(
-                          itemCount: mediaController
-                                  .favFolderData.value.list!.length +
-                              (flag ? 1 : 0),
+                          itemCount:
+                              mediaController.favFolderData.value.list!.length +
+                                  (flag ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (flag && index == favFolderList.length) {
                               return Padding(

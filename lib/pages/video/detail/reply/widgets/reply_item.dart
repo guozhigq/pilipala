@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -467,6 +468,9 @@ InlineSpan buildContent(BuildContext context, content) {
     });
   }
   // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
+  if (content.message.contains('&amp;')) {
+    content.message = content.message.replaceAll('&amp;', '&');
+  }
   // 匹配表情
   content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
@@ -584,10 +588,14 @@ InlineSpan buildContent(BuildContext context, content) {
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),
-              // recognizer: TapGestureRecognizer()
-              //   ..onTap = () => {
-              //         print('time 点击'),
-              //       },
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+                      .meeduPlayerController
+                      .seekTo(
+                        Duration(seconds: Utils.duration(matchStr)),
+                      );
+                },
             ),
           );
           return '';

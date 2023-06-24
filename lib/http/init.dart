@@ -82,9 +82,14 @@ class Request {
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
       receiveTimeout: const Duration(milliseconds: 12000),
       //Http请求头.
-      // headers: {
-      //   'cookie': '',
-      // },
+      headers: {
+        // 'cookie': '',
+        "env": 'prod',
+        "app-key": 'android',
+        "x-bili-aurora-eid": 'UlMFQVcABlAH',
+        "x-bili-aurora-zone": 'sh001',
+        // "x-bili-mid": ''
+      },
     );
 
     dio.options = options;

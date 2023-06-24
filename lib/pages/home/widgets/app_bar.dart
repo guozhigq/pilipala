@@ -73,6 +73,7 @@ class HomeAppBar extends StatelessWidget {
                           src: userInfoCache.get('userInfoCache').face,
                         ),
                       ),
+                      const SizedBox(width: 10),
                     ] else ...[
                       IconButton(
                         onPressed: () => showModalBottomSheet(
