@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pilipala/pages/dynamics/view.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/history/index.dart';
@@ -47,6 +48,8 @@ class Routes {
     // 搜索页面
     GetPage(name: '/search', page: () => const SearchPage()),
     // 搜索结果
-    GetPage(name: '/searchResult', page: () => const SearchResultPage())
+    GetPage(name: '/searchResult', page: () => const SearchResultPage()),
+    //
+    GetPage(name: '/dynamics', page: () => const DynamicsPage())
   ];
 }

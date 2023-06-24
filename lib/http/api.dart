@@ -135,6 +135,8 @@ class Api {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/portal
 
   // 关注的up动态
+  // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all
+  static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
 
   // 获取稍后再看
   static const String seeYouLater = '/x/v2/history/toview';
