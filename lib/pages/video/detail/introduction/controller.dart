@@ -76,7 +76,7 @@ class VideoIntroController extends GetxController {
     userLogin = user.get(UserBoxKey.userLogin) != null;
   }
 
-  // 获取视频简介
+  // 获取视频简介&分p
   Future queryVideoIntro() async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {

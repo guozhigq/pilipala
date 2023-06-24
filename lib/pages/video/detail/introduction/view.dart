@@ -16,6 +16,8 @@ import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'widgets/season.dart';
+
 class VideoIntroPanel extends StatefulWidget {
   const VideoIntroPanel({Key? key}) : super(key: key);
 
@@ -342,7 +344,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ),
                     ),
                   const SizedBox(height: 8),
+                  // 点赞收藏转发
                   _actionGrid(context, videoIntroController),
+                  // 合集
+                  if (!widget.loadingStatus &&
+                      widget.videoDetail!.ugcSeason != null) ...[
+                    seasonPanel(widget.videoDetail!.ugcSeason!,
+                        widget.videoDetail!.pages!.first.cid)
+                  ],
                   Divider(
                     height: 26,
                     color: Theme.of(context).dividerColor.withOpacity(0.1),

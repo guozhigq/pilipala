@@ -113,7 +113,6 @@ class VideoDetailController extends GetxController {
 
   // 视频链接
   queryVideoUrl() async {
-    print('🐶🐶🐶');
     var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
     // log('result: ${result.toString()}');
     if (result['status']) {

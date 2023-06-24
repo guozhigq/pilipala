@@ -60,6 +60,7 @@ class VideoDetailData {
   List<Page>? pages;
   Subtitle? subtitle;
   // Label? label;
+  UgcSeason? ugcSeason;
   bool? isSeasonDisplay;
   UserGarb? userGarb;
   HonorReply? honorReply;
@@ -94,6 +95,7 @@ class VideoDetailData {
     this.noCache,
     this.pages,
     this.subtitle,
+    this.ugcSeason,
     this.isSeasonDisplay,
     this.userGarb,
     this.honorReply,
@@ -137,6 +139,9 @@ class VideoDetailData {
         : List<Page>.from(json["pages"]!.map((e) => Page.fromJson(e)));
     subtitle =
         json["subtitle"] == null ? null : Subtitle.fromJson(json["subtitle"]);
+    ugcSeason = json["ugc_season"] != null
+        ? UgcSeason.fromJson(json["ugc_season"])
+        : null;
     isSeasonDisplay = json["is_season_display"];
     userGarb =
         json["user_garb"] == null ? null : UserGarb.fromJson(json["user_garb"]);
@@ -522,3 +527,111 @@ class UserGarb {
 }
 
 class Label {}
+
+class UgcSeason {
+  UgcSeason({
+    this.id,
+    this.title,
+    this.cover,
+    this.mid,
+    this.intro,
+    this.signState,
+    this.attribute,
+    this.sections,
+    this.stat,
+    this.epCount,
+    this.seasonType,
+    this.isPaySeason,
+  });
+
+  int? id;
+  String? title;
+  String? cover;
+  int? mid;
+  String? intro;
+  int? signState;
+  int? attribute;
+  List<SectionItem>? sections;
+  Stat? stat;
+  int? epCount;
+  int? seasonType;
+  bool? isPaySeason;
+
+  UgcSeason.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    title = json['title'];
+    cover = json['cover'];
+    mid = json['mid'];
+    intro = json['intro'];
+    signState = json['sign_state'];
+    attribute = json['attribute'];
+    sections = json['sections']
+        .map<SectionItem>((e) => SectionItem.fromJson(e))
+        .toList();
+    stat = Stat.fromJson(json['stat']);
+    epCount = json['ep_count'];
+    seasonType = json['season_type'];
+    isPaySeason = json['is_pay_count'];
+  }
+}
+
+class SectionItem {
+  SectionItem({
+    this.seasonId,
+    this.id,
+    this.title,
+    this.type,
+    this.episodes,
+  });
+
+  int? seasonId;
+  int? id;
+  String? title;
+  int? type;
+  List<EpisodeItem>? episodes;
+
+  SectionItem.fromJson(Map<String, dynamic> json) {
+    seasonId = json['season_id'];
+    id = json['id'];
+    title = json['title'];
+    type = json['type'];
+    episodes = json['episodes']
+        .map<EpisodeItem>((e) => EpisodeItem.fromJson(e))
+        .toList();
+  }
+}
+
+class EpisodeItem {
+  EpisodeItem({
+    this.seasonId,
+    this.sectionId,
+    this.id,
+    this.aid,
+    this.cid,
+    this.title,
+    this.attribute,
+    this.page,
+    this.bvid,
+  });
+  int? seasonId;
+  int? sectionId;
+  int? id;
+  int? aid;
+  int? cid;
+  String? title;
+  int? attribute;
+  Page? page;
+  String? bvid;
+
+  EpisodeItem.fromJson(Map<String, dynamic> json) {
+    seasonId = json['season_id'];
+    sectionId = json['sectionId'];
+    id = json['id'];
+    aid = json['aid'];
+    cid = json['cid'];
+    title = json['title'];
+    attribute = json['attribute'];
+    page = Page.fromJson(json['page']);
+    bvid = json['bvid'];
+  }
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -11,7 +12,10 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
     itemBuilder: (context, index) {
       var i = list![index];
       return InkWell(
-        onTap: () {},
+        onTap: () {
+          Get.toNamed('/video?bvid=${i.bvid}&cid=${i.cid}',
+              arguments: {'videoItem': i, 'heroTag': Utils.makeHeroTag(i.id)});
+        },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(

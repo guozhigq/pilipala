@@ -59,6 +59,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           setState(() {});
           Wakelock.disable();
         }
+        // 播放完成停止 or 切换下一个
+        if (status == PlayerStatus.completed) {
+          _meeduPlayerController!.pause();
+        }
       },
     );
 
@@ -67,8 +71,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     _extendNestCtr.addListener(
       () {
-        print(_extendNestCtr.position.pixels);
-
         double offset = _extendNestCtr.position.pixels;
         if (offset > doubleOffset) {
           animationController.forward();
