@@ -198,11 +198,13 @@ class DynamicMajorModel {
   DynamicMajorModel({
     this.archive,
     this.draw,
+    this.ugcSeason,
     this.type,
   });
 
   DynamicArchiveModel? archive;
   DynamicDrawModel? draw;
+  DynamicArchiveModel? ugcSeason;
   DynamicOpusModel? opus;
   // MAJOR_TYPE_DRAW 图片
   // MAJOR_TYPE_ARCHIVE 视频
@@ -215,6 +217,9 @@ class DynamicMajorModel {
         : null;
     draw =
         json['draw'] != null ? DynamicDrawModel.fromJson(json['draw']) : null;
+    ugcSeason = json['ugc_season'] != null
+        ? DynamicArchiveModel.fromJson(json['ugc_season'])
+        : null;
     opus =
         json['opus'] != null ? DynamicOpusModel.fromJson(json['opus']) : null;
     type = json['type'];
@@ -236,7 +241,7 @@ class DynamicArchiveModel {
     this.type,
   });
 
-  String? aid;
+  int? aid;
   Map? badge;
   String? bvid;
   String? cover;
@@ -249,14 +254,14 @@ class DynamicArchiveModel {
   int? type;
 
   DynamicArchiveModel.fromJson(Map<String, dynamic> json) {
-    aid = json['aid'];
+    aid = json['aid'] is String ? int.parse(json['aid']) : json['aid'];
     badge = json['badge'];
     bvid = json['bvid'];
     cover = json['cover'];
     disablePreview = json['disable_preview'];
     durationText = json['duration_text'];
     jumpUrl = json['jump_url'];
-    stat = Stat.fromJson(json['stat']);
+    stat = json['stat'] != null ? Stat.fromJson(json['stat']) : null;
     title = json['title'];
     type = json['type'];
   }
@@ -265,17 +270,17 @@ class DynamicArchiveModel {
 class DynamicDrawModel {
   DynamicDrawModel({
     this.id,
-    this.item,
+    this.items,
   });
 
   int? id;
-  List<DynamicDrawItemModel>? item;
+  List<DynamicDrawItemModel>? items;
 
   DynamicDrawModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     // ignore: prefer_null_aware_operators
-    item = json['item'] != null
-        ? json['item']
+    items = json['items'] != null
+        ? json['items']
             .map<DynamicDrawItemModel>((e) => DynamicDrawItemModel.fromJson(e))
             .toList()
         : null;
@@ -332,7 +337,7 @@ class DynamicDrawItemModel {
     this.width,
   });
   int? height;
-  int? size;
+  double? size;
   String? src;
   List? tags;
   int? width;
