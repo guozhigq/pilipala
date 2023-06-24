@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:pilipala/http/index.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/result.dart';
@@ -93,5 +94,27 @@ class SearchHttp {
     }
     var res = await Request().get(Api.ab2c, data: {...data});
     return res.data['data'].first['cid'];
+  }
+
+  static Future bangumiInfo({int? seasonId, int? epId}) async {
+    Map<String, dynamic> data = {};
+    if (seasonId != null) {
+      data['season_id'] = seasonId;
+    } else if (epId != null) {
+      data['ep_id'] = epId;
+    }
+    var res = await Request().get(Api.bangumiInfo, data: {...data});
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': BangumiInfoModel.fromJson(res.data['result']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': '请求错误 🙅',
+      };
+    }
   }
 }

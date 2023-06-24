@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/search.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/utils/utils.dart';
 
 Widget searchMbangumiPanel(BuildContext context, ctr, list) {
+  TextStyle style =
+      TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize);
   return ListView.builder(
     controller: ctr!.scrollController,
     addAutomaticKeepAlives: false,
@@ -21,10 +26,15 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              NetworkImgLayer(
-                width: 111,
-                height: 148,
-                src: i.cover,
+              Stack(
+                children: [
+                  NetworkImgLayer(
+                    width: 111,
+                    height: 148,
+                    src: i.cover,
+                  ),
+                  Positioned(top: 6, right: 4, child: UpTag(type: i.mediaType))
+                ],
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -33,11 +43,12 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                   children: [
                     const SizedBox(height: 4),
                     RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       text: TextSpan(
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface),
                         children: [
-                          WidgetSpan(child: UpTag(type: i.mediaType)),
                           for (var i in i.title) ...[
                             TextSpan(
                               text: i['text'],
@@ -57,30 +68,54 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text('评分:${i.mediaScore['score'].toString()}'),
-                    const SizedBox(height: 2),
+                    Text('评分:${i.mediaScore['score'].toString()}',
+                        style: style),
                     Row(
                       children: [
-                        Text(i.areas),
+                        Text(i.areas, style: style),
                         const SizedBox(width: 3),
                         const Text('·'),
                         const SizedBox(width: 3),
-                        Text(Utils.dateFormat(i.pubtime).toString()),
+                        Text(Utils.dateFormat(i.pubtime).toString(),
+                            style: style),
                       ],
                     ),
                     Row(
                       children: [
-                        Text(i.styles),
+                        Text(i.styles, style: style),
                         const SizedBox(width: 3),
                         const Text('·'),
                         const SizedBox(width: 3),
-                        Text(i.indexShow),
-                        const SizedBox(width: 3),
+                        Text(i.indexShow, style: style),
                       ],
                     ),
-                    // Text('声优：${i.cv}'),
-                    const SizedBox(height: 6),
-                    Text(i.desc, overflow: TextOverflow.ellipsis, maxLines: 2),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      height: 32,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          SmartDialog.showLoading(msg: '获取中...');
+                          var res = await SearchHttp.bangumiInfo(
+                              seasonId: i.seasonId);
+                          SmartDialog.dismiss();
+                          if (res['status']) {
+                            EpisodeItem episode = res['data'].episodes.first;
+                            String bvid = episode.bvid!;
+                            int cid = episode.cid!;
+                            String pic = episode.cover!;
+                            String heroTag = Utils.makeHeroTag(cid);
+                            Get.toNamed(
+                              '/video?bvid=$bvid&cid=$cid',
+                              arguments: {
+                                'pic': pic,
+                                'heroTag': heroTag,
+                              },
+                            );
+                          }
+                        },
+                        child: const Text('观看'),
+                      ),
+                    )
                   ],
                 ),
               ),

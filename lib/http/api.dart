@@ -157,4 +157,7 @@ class Api {
 
   // 查询视频分P列表 (avid/bvid转cid)
   static const String ab2c = '/x/player/pagelist';
+
+  // 番剧/剧集明细
+  static const String bangumiInfo = '/pgc/view/web/season';
 }
