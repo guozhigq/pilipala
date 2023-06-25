@@ -146,24 +146,29 @@ class ModuleAuthorModel {
 // 单个动态详情 - 动态信息
 class ModuleDynamicModel {
   ModuleDynamicModel({
-    // this.additional,
+    this.additional,
     this.desc,
     this.major,
     this.topic,
   });
 
-  String? additional;
+  DynamicAddModel? additional;
   DynamicDescModel? desc;
   DynamicMajorModel? major;
-  Map? topic;
+  DynamicTopicModel? topic;
 
   ModuleDynamicModel.fromJson(Map<String, dynamic> json) {
+    additional = json['additional'] != null
+        ? DynamicAddModel.fromJson(json['additional'])
+        : null;
     desc =
         json['desc'] != null ? DynamicDescModel.fromJson(json['desc']) : null;
     if (json['major'] != null) {
       major = DynamicMajorModel.fromJson(json['major']);
     }
-    topic = json['topic'];
+    topic = json['topic'] != null
+        ? DynamicTopicModel.fromJson(json['topic'])
+        : null;
   }
 }
 
@@ -177,18 +182,71 @@ class ModuleDynamicModel {
 
 //   }
 // }
+class DynamicAddModel {
+  DynamicAddModel({
+    this.type,
+    this.vote,
+  });
+
+  String? type;
+  Vote? vote;
+  DynamicAddModel.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    vote = json['vote'] != null ? Vote.fromJson(json['vote']) : null;
+  }
+}
+
+class Vote {
+  Vote({
+    this.choiceCnt,
+    this.defaultShare,
+    this.share,
+    this.endTime,
+    this.joinNum,
+    this.status,
+    this.type,
+    this.uid,
+    this.voteId,
+  });
+
+  int? choiceCnt;
+  String? share;
+  int? defaultShare;
+  int? endTime;
+  int? joinNum;
+  String? status;
+  String? type;
+  int? uid;
+  int? voteId;
+
+  Vote.fromJson(Map<String, dynamic> json) {
+    choiceCnt = json['choice_cnt'];
+    share = json['share'];
+    defaultShare = json['default_share'];
+    endTime = json['end_time'];
+    joinNum = json['join_num'];
+    status = json['status'];
+    type = json['type'];
+    uid = json['uid'];
+    voteId = json['vote_id'];
+  }
+}
 
 class DynamicDescModel {
   DynamicDescModel({
-    this.richTextNode,
+    this.richTextNodes,
     this.text,
   });
 
-  List? richTextNode;
+  List<RichTextNodeItem>? richTextNodes;
   String? text;
 
   DynamicDescModel.fromJson(Map<String, dynamic> json) {
-    richTextNode = json['rich_text_nodes'];
+    richTextNodes = json['rich_text_nodes'] != null
+        ? json['rich_text_nodes']
+            .map<RichTextNodeItem>((e) => RichTextNodeItem.fromJson(e))
+            .toList()
+        : [];
     text = json['text'];
   }
 }
@@ -199,6 +257,8 @@ class DynamicMajorModel {
     this.archive,
     this.draw,
     this.ugcSeason,
+    this.opus,
+    this.none,
     this.type,
   });
 
@@ -206,6 +266,7 @@ class DynamicMajorModel {
   DynamicDrawModel? draw;
   DynamicArchiveModel? ugcSeason;
   DynamicOpusModel? opus;
+  DynamicNoneModel? none;
   // MAJOR_TYPE_DRAW 图片
   // MAJOR_TYPE_ARCHIVE 视频
   // MAJOR_TYPE_OPUS 图文/文章
@@ -222,7 +283,27 @@ class DynamicMajorModel {
         : null;
     opus =
         json['opus'] != null ? DynamicOpusModel.fromJson(json['opus']) : null;
+    none =
+        json['none'] != null ? DynamicNoneModel.fromJson(json['none']) : null;
     type = json['type'];
+  }
+}
+
+class DynamicTopicModel {
+  DynamicTopicModel({
+    this.id,
+    this.jumpUrl,
+    this.name,
+  });
+
+  int? id;
+  String? jumpUrl;
+  String? name;
+
+  DynamicTopicModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    jumpUrl = json['jump_url'];
+    name = json['name'];
   }
 }
 
@@ -296,14 +377,86 @@ class DynamicOpusModel {
   });
 
   String? jumpUrl;
-  List? pics;
-  Map? summary;
+  List<OpusPicsModel>? pics;
+  SummaryModel? summary;
   String? title;
   DynamicOpusModel.fromJson(Map<String, dynamic> json) {
     jumpUrl = json['jump_url'];
-    pics = json['pics'];
-    summary = json['summary'];
+    pics = json['pics'] != null
+        ? json['pics']
+            .map<OpusPicsModel>((e) => OpusPicsModel.fromJson(e))
+            .toList()
+        : [];
+    summary =
+        json['summary'] != null ? SummaryModel.fromJson(json['summary']) : null;
     title = json['title'];
+  }
+}
+
+class SummaryModel {
+  SummaryModel({
+    this.richTextNodes,
+    this.text,
+  });
+
+  List<RichTextNodeItem>? richTextNodes;
+  String? text;
+
+  SummaryModel.fromJson(Map<String, dynamic> json) {
+    richTextNodes = json['rich_text_nodes']
+        .map<RichTextNodeItem>((e) => RichTextNodeItem.fromJson(e))
+        .toList();
+    text = json['text'];
+  }
+}
+
+class RichTextNodeItem {
+  RichTextNodeItem({
+    this.emoji,
+    this.origText,
+    this.text,
+    this.type,
+  });
+  Emoji? emoji;
+  String? origText;
+  String? text;
+  String? type;
+
+  RichTextNodeItem.fromJson(Map<String, dynamic> json) {
+    emoji = json['emoji'] != null ? Emoji.fromJson(json['emoji']) : null;
+    origText = json['orig_text'];
+    text = json['text'];
+    type = json['type'];
+  }
+}
+
+class Emoji {
+  Emoji({
+    this.iconUrl,
+    this.size,
+    this.text,
+    this.type,
+  });
+
+  String? iconUrl;
+  double? size;
+  String? text;
+  int? type;
+  Emoji.fromJson(Map<String, dynamic> json) {
+    iconUrl = json['icon_url'];
+    size = json['size'].toDouble();
+    text = json['text'];
+    type = json['type'];
+  }
+}
+
+class DynamicNoneModel {
+  DynamicNoneModel({
+    this.tips,
+  });
+  String? tips;
+  DynamicNoneModel.fromJson(Map<String, dynamic> json) {
+    tips = json['tips'];
   }
 }
 
@@ -313,18 +466,21 @@ class OpusPicsModel {
     this.height,
     this.size,
     this.src,
+    this.url,
   });
 
   int? width;
   int? height;
   int? size;
   String? src;
+  String? url;
 
   OpusPicsModel.fromJson(Map<String, dynamic> json) {
     width = json['width'];
     height = json['height'];
-    size = json['size'];
+    size = json['size'].toInt();
     src = json['src'];
+    url = json['url'];
   }
 }
 
@@ -337,13 +493,13 @@ class DynamicDrawItemModel {
     this.width,
   });
   int? height;
-  double? size;
+  int? size;
   String? src;
   List? tags;
   int? width;
   DynamicDrawItemModel.fromJson(Map<String, dynamic> json) {
     height = json['height'];
-    size = json['size'];
+    size = json['size'].toInt();
     src = json['src'];
     tags = json['tags'];
     width = json['width'];
@@ -359,12 +515,12 @@ class ModuleStatModel {
   });
 
   Comment? comment;
-  Map? forward;
+  ForWard? forward;
   Like? like;
 
   ModuleStatModel.fromJson(Map<String, dynamic> json) {
     comment = Comment.fromJson(json['comment']);
-    forward = json['forward'];
+    forward = ForWard.fromJson(json['forward']);
     like = Like.fromJson(json['like']);
   }
 }
@@ -380,7 +536,18 @@ class Comment {
   bool? forbidden;
 
   Comment.fromJson(Map<String, dynamic> json) {
-    count = json['count'].toString();
+    count = json['count'] == 0 ? null : json['count'].toString();
+    forbidden = json['forbidden'];
+  }
+}
+
+class ForWard {
+  ForWard({this.count, this.forbidden});
+  String? count;
+  bool? forbidden;
+
+  ForWard.fromJson(Map<String, dynamic> json) {
+    count = json['count'] == 0 ? null : json['count'].toString();
     forbidden = json['forbidden'];
   }
 }
@@ -398,7 +565,7 @@ class Like {
   bool? status;
 
   Like.fromJson(Map<String, dynamic> json) {
-    count = json['count'].toString();
+    count = json['count'] == 0 ? null : json['count'].toString();
     forbidden = json['forbidden'];
     status = json['status'];
   }

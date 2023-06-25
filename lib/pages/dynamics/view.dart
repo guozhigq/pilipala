@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 
@@ -15,9 +13,13 @@ class DynamicsPage extends StatefulWidget {
   State<DynamicsPage> createState() => _DynamicsPageState();
 }
 
-class _DynamicsPageState extends State<DynamicsPage> {
+class _DynamicsPageState extends State<DynamicsPage>
+    with AutomaticKeepAliveClientMixin {
   DynamicsController _dynamicsController = Get.put(DynamicsController());
   Future? _futureBuilderFuture;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
