@@ -99,7 +99,11 @@ class DynamicPanel extends StatelessWidget {
                 ),
               ),
             ],
-            Text.rich(richNode(item, context)),
+            Text.rich(
+              richNode(item, context),
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ));
   }
@@ -135,7 +139,25 @@ class DynamicPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Text(item.modules.moduleDynamic.desc.text),
+              if (item.modules.moduleDynamic.topic != null) ...[
+                Padding(
+                  padding: floor == 2
+                      ? EdgeInsets.zero
+                      : const EdgeInsets.only(left: 12, right: 12),
+                  child: GestureDetector(
+                    child: Text(
+                      '#${item.modules.moduleDynamic.topic.name}',
+                      style: authorStyle,
+                    ),
+                  ),
+                ),
+              ],
+              Text.rich(
+                richNode(item, context),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+              // Text(item.modules.moduleDynamic.desc.text),
               const SizedBox(height: 4),
             ],
             Padding(
@@ -188,60 +210,203 @@ class DynamicPanel extends StatelessWidget {
                     .copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 2),
-              Text(item.modules.moduleDynamic.major.opus.summary.richTextNodes
-                  .first.text),
+              if (item.modules.moduleDynamic.major.opus.summary.text !=
+                  'undefined')
+                Text(
+                  item.modules.moduleDynamic.major.opus.summary.richTextNodes
+                      .first.text,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                ),
               picWidget(item, context)
             ],
           ),
         );
       // 转发
       case 'DYNAMIC_TYPE_FORWARD':
-        switch (item.orig.type) {
-          // 递归
-          case 'DYNAMIC_TYPE_AV':
-            return Container(
-              padding: const EdgeInsets.only(
-                  left: 15, top: 10, right: 15, bottom: 10),
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-              child: forWard(item.orig, context, floor: 2),
-            );
-          case 'DYNAMIC_TYPE_DRAW':
-            return Container(
-              padding: const EdgeInsets.only(
-                  left: 15, top: 10, right: 15, bottom: 10),
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-              child: forWard(item.orig, context, floor: 2),
-            );
-          case 'DYNAMIC_TYPE_WORD':
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(
-                  left: 15, top: 10, right: 15, bottom: 10),
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-              child: forWard(item.orig, context, floor: 2),
-            );
-          case 'DYNAMIC_TYPE_NONE':
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(
-                  left: 15, top: 10, right: 15, bottom: 10),
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-              child: forWard(item.orig, context, floor: 2),
-            );
-          case 'DYNAMIC_TYPE_ARTICLE':
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(
-                  left: 15, top: 10, right: 15, bottom: 10),
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-              child: forWard(item.orig, context, floor: 2),
-            );
-          default:
-            return const Text('渲染出错了1');
-        }
+        return Container(
+          padding:
+              const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 10),
+          color: Theme.of(context).dividerColor.withOpacity(0.08),
+          child: forWard(item.orig, context, floor: 2),
+        );
+      // switch (item.orig.type) {
+      //   // 递归
+      //   case 'DYNAMIC_TYPE_AV':
+      //     return Container(
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_DRAW':
+      //     return Container(
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_WORD':
+      //     return Container(
+      //       width: double.infinity,
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_NONE':
+      //     return Container(
+      //       width: double.infinity,
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_ARTICLE':
+      //     return Container(
+      //       width: double.infinity,
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_PGC':
+      //     return Container(
+      //       width: double.infinity,
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   case 'DYNAMIC_TYPE_LIVE_RCMD':
+      //     return Container(
+      //       width: double.infinity,
+      //       padding: const EdgeInsets.only(
+      //           left: 15, top: 10, right: 15, bottom: 10),
+      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
+      //       child: forWard(item.orig, context, floor: 2),
+      //     );
+      //   default:
+      //     return const Text('渲染出错了1');
+      // }
       // 直播
       case 'DYNAMIC_TYPE_LIVE_RCMD':
-        return const Text('DYNAMIC_TYPE_LIVE_RCMD');
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (floor == 2) ...[
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                      '@${item.modules.moduleAuthor.name}',
+                      style: authorStyle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    Utils.dateFormat(item.modules.moduleAuthor.pubTs),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize:
+                            Theme.of(context).textTheme.labelSmall!.fontSize),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 4),
+            if (item.modules.moduleDynamic.topic != null) ...[
+              Padding(
+                padding: floor == 2
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.only(left: 12, right: 12),
+                child: GestureDetector(
+                  child: Text(
+                    '#${item.modules.moduleDynamic.topic.name}',
+                    style: authorStyle,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+            if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
+              Text.rich(richNode(item, context)),
+              const SizedBox(height: 6),
+            ],
+            GestureDetector(
+              onTap: () {},
+              child: LayoutBuilder(builder: (context, box) {
+                double width = box.maxWidth;
+                return Stack(
+                  children: [
+                    NetworkImgLayer(
+                      type: floor == 1 ? 'emote' : null,
+                      width: width,
+                      height: width / StyleString.aspectRatio,
+                      src: item.modules.moduleDynamic.major.liveRcmd.cover,
+                    ),
+                    Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          height: 80,
+                          padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: <Color>[
+                                  Colors.transparent,
+                                  Colors.black87,
+                                ],
+                              ),
+                              borderRadius: floor == 1
+                                  ? null
+                                  : const BorderRadius.all(Radius.circular(6))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              DefaultTextStyle.merge(
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize,
+                                    color: Colors.white),
+                                child: Row(
+                                  children: [
+                                    Text(item.modules.moduleDynamic.major
+                                            .liveRcmd.areaName ??
+                                        ''),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ],
+                );
+              }),
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: floor == 1
+                  ? const EdgeInsets.only(left: 12, right: 12)
+                  : EdgeInsets.zero,
+              child: Text(
+                item.modules.moduleDynamic.major.liveRcmd.title,
+                maxLines: 1,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 2),
+          ],
+        );
       // 合集
       case 'DYNAMIC_TYPE_UGC_SEASON':
         return videoSeasonWidget(item, context, 'ugcSeason');
@@ -276,7 +441,8 @@ class DynamicPanel extends StatelessWidget {
                 ],
               )
             : const SizedBox(height: 0);
-
+      case 'DYNAMIC_TYPE_PGC':
+        return videoSeasonWidget(item, context, 'pgc', floor: floor);
       case 'DYNAMIC_TYPE_NONE':
         return Row(
           children: [
@@ -371,7 +537,7 @@ class DynamicPanel extends StatelessWidget {
                     : len ~/ crossCount + 1) +
             6;
         return Container(
-          padding: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: 4),
           height: height,
           child: GridView.count(
             padding: EdgeInsets.zero,
@@ -401,6 +567,7 @@ class DynamicPanel extends StatelessWidget {
     Map<dynamic, dynamic> dynamicProperty = {
       'ugcSeason': item.modules.moduleDynamic.major.ugcSeason,
       'archive': item.modules.moduleDynamic.major.archive,
+      'pgc': item.modules.moduleDynamic.major.pgc
     };
     dynamic content = dynamicProperty[type];
 
@@ -427,8 +594,8 @@ class DynamicPanel extends StatelessWidget {
             ],
           ),
         ],
+        const SizedBox(height: 4),
         if (item.modules.moduleDynamic.topic != null) ...[
-          const SizedBox(height: 4),
           Padding(
             padding: floor == 2
                 ? EdgeInsets.zero
@@ -440,8 +607,12 @@ class DynamicPanel extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 6),
         ],
-        const SizedBox(height: 6),
+        if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
+          Text.rich(richNode(item, context)),
+          const SizedBox(height: 6),
+        ],
         GestureDetector(
           onTap: () {},
           child: LayoutBuilder(builder: (context, box) {
@@ -487,8 +658,9 @@ class DynamicPanel extends StatelessWidget {
                                 color: Colors.white),
                             child: Row(
                               children: [
-                                Text(content.durationText),
-                                const SizedBox(width: 10),
+                                Text(content.durationText ?? ''),
+                                if (content.durationText != null)
+                                  const SizedBox(width: 10),
                                 Text(content.stat.play + '次围观'),
                                 const SizedBox(width: 10),
                                 Text(content.stat.danmaku + '条弹幕')
@@ -526,12 +698,13 @@ class DynamicPanel extends StatelessWidget {
 
   InlineSpan richNode(item, context) {
     TextStyle authorStyle =
-        TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 13);
+        TextStyle(color: Theme.of(context).colorScheme.primary);
     List<InlineSpan> spanChilds = [];
     for (var i in item.modules.moduleDynamic.desc.richTextNodes) {
       if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
         spanChilds.add(TextSpan(text: i.origText));
       }
+      // @用户
       if (i.type == 'RICH_TEXT_NODE_TYPE_AT') {
         spanChilds.add(
           WidgetSpan(
@@ -542,7 +715,7 @@ class DynamicPanel extends StatelessWidget {
                 GestureDetector(
                   onTap: () {},
                   child: Text(
-                    '@${item.modules.moduleAuthor.name}',
+                    '${i.text}',
                     style: authorStyle,
                   ),
                 ),
@@ -551,6 +724,7 @@ class DynamicPanel extends StatelessWidget {
           ),
         );
       }
+      // 话题
       if (i.type == 'RICH_TEXT_NODE_TYPE_TOPIC') {
         spanChilds.add(
           WidgetSpan(
@@ -564,6 +738,7 @@ class DynamicPanel extends StatelessWidget {
           ),
         );
       }
+      // 网页链接
       if (i.type == 'RICH_TEXT_NODE_TYPE_WEB') {
         spanChilds.add(
           WidgetSpan(
@@ -577,6 +752,7 @@ class DynamicPanel extends StatelessWidget {
           ),
         );
       }
+      // 投票
       if (i.type == 'RICH_TEXT_NODE_TYPE_VOTE') {
         spanChilds.add(
           WidgetSpan(
@@ -590,6 +766,7 @@ class DynamicPanel extends StatelessWidget {
           ),
         );
       }
+      // 表情
       if (i.type == 'RICH_TEXT_NODE_TYPE_EMOJI') {
         spanChilds.add(
           WidgetSpan(
@@ -602,7 +779,38 @@ class DynamicPanel extends StatelessWidget {
           ),
         );
       }
+      // 抽奖
+      if (i.type == 'RICH_TEXT_NODE_TYPE_LOTTERY') {
+        spanChilds.add(
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () {},
+              child: Text(
+                ' ${i.origText} ',
+                style: authorStyle,
+              ),
+            ),
+          ),
+        );
+      }
+
+      /// TODO 商品
+      if (i.type == 'RICH_TEXT_NODE_TYPE_GOODS') {
+        spanChilds.add(
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () {},
+              child: Text(
+                ' ${i.text} ',
+                style: authorStyle,
+              ),
+            ),
+          ),
+        );
+      }
     }
-    return TextSpan(children: spanChilds);
+    return TextSpan(
+      children: spanChilds,
+    );
   }
 }

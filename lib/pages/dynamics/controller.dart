@@ -4,14 +4,15 @@ import 'package:pilipala/models/dynamics/result.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
-  String reqType = 'all';
-  String? offset;
+  String? offset = '';
   RxList<DynamicItemModel>? dynamicsList = [DynamicItemModel()].obs;
+  RxString dynamicsType = 'all'.obs;
+  RxString dynamicsTypeLabel = '全部'.obs;
 
   Future queryFollowDynamic({type = 'init'}) async {
     var res = await DynamicsHttp.followDynamic(
-      page: page,
-      type: reqType,
+      page: type == 'init' ? 1 : page,
+      type: dynamicsType.value,
       offset: offset,
     );
     if (res['status']) {
@@ -21,7 +22,14 @@ class DynamicsController extends GetxController {
         dynamicsList!.addAll(res['data'].items);
       }
       offset = res['data'].offset;
+      page++;
     }
     return res;
+  }
+
+  onSelectType(value, label) {
+    dynamicsType.value = value;
+    dynamicsTypeLabel.value = label;
+    queryFollowDynamic();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class DynamicsDataModel {
   DynamicsDataModel({
     this.hasMore,
@@ -186,13 +188,17 @@ class DynamicAddModel {
   DynamicAddModel({
     this.type,
     this.vote,
+    this.ugc,
   });
 
   String? type;
   Vote? vote;
+  Ugc? ugc;
+
   DynamicAddModel.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     vote = json['vote'] != null ? Vote.fromJson(json['vote']) : null;
+    ugc = json['ugc'] != null ? Ugc.fromJson(json['ugc']) : null;
   }
 }
 
@@ -214,7 +220,7 @@ class Vote {
   int? defaultShare;
   int? endTime;
   int? joinNum;
-  String? status;
+  int? status;
   String? type;
   int? uid;
   int? voteId;
@@ -229,6 +235,39 @@ class Vote {
     type = json['type'];
     uid = json['uid'];
     voteId = json['vote_id'];
+  }
+}
+
+class Ugc {
+  Ugc({
+    this.cover,
+    this.descSecond,
+    this.duration,
+    this.headText,
+    this.idStr,
+    this.jumpUrl,
+    this.multiLine,
+    this.title,
+  });
+
+  String? cover;
+  String? descSecond;
+  String? duration;
+  String? headText;
+  String? idStr;
+  String? jumpUrl;
+  String? multiLine;
+  String? title;
+
+  Ugc.fromJson(Map<String, dynamic> json) {
+    cover = json['cover'];
+    descSecond = json['desc_second'];
+    duration = json['duration'];
+    headText = json['head_text'];
+    idStr = json['id_str'];
+    jumpUrl = json['jump_url'];
+    multiLine = json['multi_line'];
+    title = json['title'];
   }
 }
 
@@ -258,6 +297,8 @@ class DynamicMajorModel {
     this.draw,
     this.ugcSeason,
     this.opus,
+    this.pgc,
+    this.liveRcmd,
     this.none,
     this.type,
   });
@@ -266,6 +307,8 @@ class DynamicMajorModel {
   DynamicDrawModel? draw;
   DynamicArchiveModel? ugcSeason;
   DynamicOpusModel? opus;
+  DynamicArchiveModel? pgc;
+  DynamicLiveModel? liveRcmd;
   DynamicNoneModel? none;
   // MAJOR_TYPE_DRAW 图片
   // MAJOR_TYPE_ARCHIVE 视频
@@ -283,6 +326,11 @@ class DynamicMajorModel {
         : null;
     opus =
         json['opus'] != null ? DynamicOpusModel.fromJson(json['opus']) : null;
+    pgc =
+        json['pgc'] != null ? DynamicArchiveModel.fromJson(json['pgc']) : null;
+    liveRcmd = json['live_rcmd'] != null
+        ? DynamicLiveModel.fromJson(json['live_rcmd'])
+        : null;
     none =
         json['none'] != null ? DynamicNoneModel.fromJson(json['none']) : null;
     type = json['type'];
@@ -503,6 +551,46 @@ class DynamicDrawItemModel {
     src = json['src'];
     tags = json['tags'];
     width = json['width'];
+  }
+}
+
+class DynamicLiveModel {
+  DynamicLiveModel({
+    this.content,
+  });
+
+  String? content;
+  int? type;
+  Map? livePlayInfo;
+  int? uid;
+  String? parentAreaName;
+  int? roomId;
+  String? liveId;
+  int? liveStatus;
+  String? cover;
+  int? online;
+  String? areaName;
+  String? title;
+  int? liveStartTime;
+
+  DynamicLiveModel.fromJson(Map<String, dynamic> json) {
+    content = json['content'];
+    if (json['content'] != null) {
+      Map<String, dynamic> data = jsonDecode(json['content']);
+
+      type = data['type'];
+      Map livePlayInfo = data['live_play_info'];
+      uid = livePlayInfo['uid'];
+      parentAreaName = livePlayInfo['parent_area_name'];
+      roomId = livePlayInfo['room_id'];
+      liveId = livePlayInfo['live_id'];
+      liveStatus = livePlayInfo['live_status'];
+      cover = livePlayInfo['cover'];
+      online = livePlayInfo['online'];
+      areaName = livePlayInfo['area_name'];
+      title = livePlayInfo['title'];
+      liveStartTime = livePlayInfo['live_start_time'];
+    }
   }
 }
 

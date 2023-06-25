@@ -136,6 +136,8 @@ class Api {
 
   // 关注的up动态
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all
+  // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?timezone_offset=-480&type=video&page=1&features=itemOpusStyle
+  // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?host_mid=548196587&offset=&page=1&features=itemOpusStyle
   static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
 
   // 获取稍后再看
