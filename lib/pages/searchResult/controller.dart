@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/pages/searchPanel/index.dart';
 
 class SearchResultController extends GetxController {
   String? keyword;

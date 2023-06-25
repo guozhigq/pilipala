@@ -13,7 +13,9 @@ import 'widgets/video_panel.dart';
 class SearchPanel extends StatefulWidget {
   String? keyword;
   SearchType? searchType;
-  SearchPanel({required this.keyword, required this.searchType, Key? key})
+  String? tag;
+  SearchPanel(
+      {required this.keyword, required this.searchType, this.tag, Key? key})
       : super(key: key);
 
   @override
@@ -37,7 +39,7 @@ class _SearchPanelState extends State<SearchPanel>
         keyword: widget.keyword,
         searchType: widget.searchType,
       ),
-      tag: widget.searchType!.type,
+      tag: widget.searchType!.type + widget.tag!,
     );
     ScrollController scrollController =
         _searchPanelController!.scrollController;

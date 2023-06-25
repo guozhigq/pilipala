@@ -13,17 +13,19 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage>
     with TickerProviderStateMixin {
-  final SearchResultController _searchResultController =
-      Get.put(SearchResultController());
+  late SearchResultController? _searchResultController;
   late TabController? _tabController;
 
   @override
   void initState() {
     super.initState();
+    _searchResultController = Get.put(SearchResultController(),
+        tag: DateTime.now().millisecondsSinceEpoch.toString());
+
     _tabController = TabController(
       vsync: this,
       length: SearchType.values.length,
-      initialIndex: _searchResultController.tabIndex,
+      initialIndex: _searchResultController!.tabIndex,
     );
   }
 
@@ -44,7 +46,7 @@ class _SearchResultPageState extends State<SearchResultPage>
           child: SizedBox(
             width: double.infinity,
             child: Text(
-              '${_searchResultController.keyword}',
+              '${_searchResultController!.keyword}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -77,12 +79,12 @@ class _SearchResultPageState extends State<SearchResultPage>
               dividerColor: Colors.transparent,
               unselectedLabelColor: Theme.of(context).colorScheme.outline,
               onTap: (index) {
-                if (index == _searchResultController.tabIndex) {
+                if (index == _searchResultController!.tabIndex) {
                   Get.find<SearchPanelController>(
                           tag: SearchType.values[index].type)
                       .animateToTop();
                 }
-                _searchResultController.tabIndex = index;
+                _searchResultController!.tabIndex = index;
               },
             ),
           ),
@@ -92,8 +94,9 @@ class _SearchResultPageState extends State<SearchResultPage>
               children: [
                 for (var i in SearchType.values) ...{
                   SearchPanel(
-                    keyword: _searchResultController.keyword,
+                    keyword: _searchResultController!.keyword,
                     searchType: i,
+                    tag: DateTime.now().millisecondsSinceEpoch.toString(),
                   )
                 }
               ],
