@@ -248,8 +248,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 body: Column(
                   children: [
                     Container(
+                      width: double.infinity,
                       height: 45,
                       decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.background,
                         border: Border(
                           bottom: BorderSide(
                             color:

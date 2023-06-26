@@ -54,6 +54,8 @@ class HomeAppBar extends StatelessWidget {
                     //   onPressed: () {},
                     //   icon: const Icon(CupertinoIcons.bell, size: 22),
                     // ),
+                    const SizedBox(width: 6),
+
                     /// TODO
                     if (userInfoCache.get('userInfoCache') != null) ...[
                       GestureDetector(

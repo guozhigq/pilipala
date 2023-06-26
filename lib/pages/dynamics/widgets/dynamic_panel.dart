@@ -6,6 +6,13 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'action_panel.dart';
+import 'article_panel.dart';
+import 'content_panel.dart';
+import 'live_rcmd_panel.dart';
+import 'pic_panel.dart';
+import 'rich_node_panel.dart';
+
 class DynamicPanel extends StatelessWidget {
   DynamicItemModel? item;
   DynamicPanel({this.item, Key? key});
@@ -50,7 +57,7 @@ class DynamicPanel extends StatelessWidget {
 
   Widget author(item, context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       child: Row(
         children: [
           NetworkImgLayer(
@@ -64,14 +71,19 @@ class DynamicPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(item.modules.moduleAuthor.name),
-              Text(
-                item.modules.moduleAuthor.pubTime +
-                    (item.modules.moduleAuthor.pubAction != ''
-                        ? '  ${item.modules.moduleAuthor.pubAction}'
-                        : ''),
+              DefaultTextStyle.merge(
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.outline,
                   fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                ),
+                child: Row(
+                  children: [
+                    Text(item.modules.moduleAuthor.pubTime),
+                    if (item.modules.moduleAuthor.pubTime != '' &&
+                        item.modules.moduleAuthor.pubAction != '')
+                      const Text(' '),
+                    Text(item.modules.moduleAuthor.pubAction),
+                  ],
                 ),
               )
             ],
@@ -79,33 +91,6 @@ class DynamicPanel extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  // 内容
-  Widget content(item, context) {
-    TextStyle authorStyle =
-        TextStyle(color: Theme.of(context).colorScheme.primary);
-    return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (item.modules.moduleDynamic.topic != null) ...[
-              GestureDetector(
-                child: Text(
-                  '#${item.modules.moduleDynamic.topic.name}',
-                  style: authorStyle,
-                ),
-              ),
-            ],
-            Text.rich(
-              richNode(item, context),
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ));
   }
 
   // 转发
@@ -157,7 +142,6 @@ class DynamicPanel extends StatelessWidget {
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
               ),
-              // Text(item.modules.moduleDynamic.desc.text),
               const SizedBox(height: 4),
             ],
             Padding(
@@ -173,240 +157,18 @@ class DynamicPanel extends StatelessWidget {
         return videoSeasonWidget(item, context, 'archive', floor: floor);
       // 文章
       case 'DYNAMIC_TYPE_ARTICLE':
-        return Padding(
-          padding: floor == 2
-              ? EdgeInsets.zero
-              : const EdgeInsets.only(left: 12, right: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (floor == 2) ...[
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        '@${item.modules.moduleAuthor.name}',
-                        style: authorStyle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      Utils.dateFormat(item.modules.moduleAuthor.pubTs),
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline,
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
-              Text(
-                item.modules.moduleDynamic.major.opus.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 2),
-              if (item.modules.moduleDynamic.major.opus.summary.text !=
-                  'undefined')
-                Text(
-                  item.modules.moduleDynamic.major.opus.summary.richTextNodes
-                      .first.text,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              picWidget(item, context)
-            ],
-          ),
-        );
+        return articlePanel(item, context, floor: floor);
       // 转发
       case 'DYNAMIC_TYPE_FORWARD':
         return Container(
           padding:
-              const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 10),
+              const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 8),
           color: Theme.of(context).dividerColor.withOpacity(0.08),
           child: forWard(item.orig, context, floor: 2),
         );
-      // switch (item.orig.type) {
-      //   // 递归
-      //   case 'DYNAMIC_TYPE_AV':
-      //     return Container(
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_DRAW':
-      //     return Container(
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_WORD':
-      //     return Container(
-      //       width: double.infinity,
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_NONE':
-      //     return Container(
-      //       width: double.infinity,
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_ARTICLE':
-      //     return Container(
-      //       width: double.infinity,
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_PGC':
-      //     return Container(
-      //       width: double.infinity,
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   case 'DYNAMIC_TYPE_LIVE_RCMD':
-      //     return Container(
-      //       width: double.infinity,
-      //       padding: const EdgeInsets.only(
-      //           left: 15, top: 10, right: 15, bottom: 10),
-      //       color: Theme.of(context).dividerColor.withOpacity(0.08),
-      //       child: forWard(item.orig, context, floor: 2),
-      //     );
-      //   default:
-      //     return const Text('渲染出错了1');
-      // }
       // 直播
       case 'DYNAMIC_TYPE_LIVE_RCMD':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (floor == 2) ...[
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      '@${item.modules.moduleAuthor.name}',
-                      style: authorStyle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    Utils.dateFormat(item.modules.moduleAuthor.pubTs),
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 4),
-            if (item.modules.moduleDynamic.topic != null) ...[
-              Padding(
-                padding: floor == 2
-                    ? EdgeInsets.zero
-                    : const EdgeInsets.only(left: 12, right: 12),
-                child: GestureDetector(
-                  child: Text(
-                    '#${item.modules.moduleDynamic.topic.name}',
-                    style: authorStyle,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-            ],
-            if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
-              Text.rich(richNode(item, context)),
-              const SizedBox(height: 6),
-            ],
-            GestureDetector(
-              onTap: () {},
-              child: LayoutBuilder(builder: (context, box) {
-                double width = box.maxWidth;
-                return Stack(
-                  children: [
-                    NetworkImgLayer(
-                      type: floor == 1 ? 'emote' : null,
-                      width: width,
-                      height: width / StyleString.aspectRatio,
-                      src: item.modules.moduleDynamic.major.liveRcmd.cover,
-                    ),
-                    Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          height: 80,
-                          padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: <Color>[
-                                  Colors.transparent,
-                                  Colors.black87,
-                                ],
-                              ),
-                              borderRadius: floor == 1
-                                  ? null
-                                  : const BorderRadius.all(Radius.circular(6))),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              DefaultTextStyle.merge(
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize,
-                                    color: Colors.white),
-                                child: Row(
-                                  children: [
-                                    Text(item.modules.moduleDynamic.major
-                                            .liveRcmd.areaName ??
-                                        ''),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
-                  ],
-                );
-              }),
-            ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: floor == 1
-                  ? const EdgeInsets.only(left: 12, right: 12)
-                  : EdgeInsets.zero,
-              child: Text(
-                item.modules.moduleDynamic.major.liveRcmd.title,
-                maxLines: 1,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(height: 2),
-          ],
-        );
+        return liveRcmdPanel(item, context, floor: floor);
       // 合集
       case 'DYNAMIC_TYPE_UGC_SEASON':
         return videoSeasonWidget(item, context, 'ugcSeason');
@@ -459,100 +221,6 @@ class DynamicPanel extends StatelessWidget {
     }
   }
 
-  // 操作栏
-  Widget action(item, context) {
-    ModuleStatModel stat = item.modules.moduleStat;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            FontAwesomeIcons.shareFromSquare,
-            size: 16,
-          ),
-          label: Text(stat.forward!.count ?? '转发'),
-        ),
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            FontAwesomeIcons.comment,
-            size: 16,
-          ),
-          label: Text(stat.comment!.count ?? '评论'),
-        ),
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            FontAwesomeIcons.thumbsUp,
-            size: 16,
-          ),
-          label: Text(stat.like!.count ?? '点赞'),
-        )
-      ],
-    );
-  }
-
-  Widget picWidget(item, context) {
-    String type = item.modules.moduleDynamic.major.type;
-    List pictures = [];
-    if (type == 'MAJOR_TYPE_OPUS') {
-      pictures = item.modules.moduleDynamic.major.opus.pics;
-    }
-    if (type == 'MAJOR_TYPE_DRAW') {
-      pictures = item.modules.moduleDynamic.major.draw.items;
-    }
-    int len = pictures.length;
-    List picList = [];
-
-    List<Widget> list = [];
-    for (var i = 0; i < len; i++) {
-      picList.add(pictures[i].src ?? pictures[i].url);
-      list.add(
-        LayoutBuilder(
-          builder: (context, BoxConstraints box) {
-            return GestureDetector(
-              onTap: () {
-                Get.toNamed('/preview',
-                    arguments: {'initialPage': i, 'imgList': picList});
-              },
-              child: NetworkImgLayer(
-                src: pictures[i].src ?? pictures[i].url,
-                width: box.maxWidth,
-                height: box.maxWidth,
-              ),
-            );
-          },
-        ),
-      );
-    }
-    return LayoutBuilder(
-      builder: (context, BoxConstraints box) {
-        double maxWidth = box.maxWidth;
-        double crossCount = len < 3 ? 2 : 3;
-        double height = maxWidth /
-                crossCount *
-                (len % crossCount == 0
-                    ? len ~/ crossCount
-                    : len ~/ crossCount + 1) +
-            6;
-        return Container(
-          padding: const EdgeInsets.only(top: 4),
-          height: height,
-          child: GridView.count(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: crossCount.toInt(),
-            mainAxisSpacing: 4.0,
-            crossAxisSpacing: 4.0,
-            childAspectRatio: 1,
-            children: list,
-          ),
-        );
-      },
-    );
-  }
-
   // 视频or合集
   Widget videoSeasonWidget(item, context, type, {floor = 1}) {
     TextStyle authorStyle =
@@ -573,6 +241,7 @@ class DynamicPanel extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         if (floor == 2) ...[
           Row(
@@ -593,8 +262,9 @@ class DynamicPanel extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 6),
         ],
-        const SizedBox(height: 4),
+        // const SizedBox(height: 4),
         if (item.modules.moduleDynamic.topic != null) ...[
           Padding(
             padding: floor == 2
@@ -626,55 +296,56 @@ class DynamicPanel extends StatelessWidget {
                   src: content.cover,
                 ),
                 Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      height: 80,
-                      padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: <Color>[
-                              Colors.transparent,
-                              Colors.black87,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 80,
+                    padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: <Color>[
+                            Colors.transparent,
+                            Colors.black54,
+                          ],
+                        ),
+                        borderRadius: floor == 1
+                            ? null
+                            : const BorderRadius.all(Radius.circular(6))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        DefaultTextStyle.merge(
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize,
+                              color: Colors.white),
+                          child: Row(
+                            children: [
+                              Text(content.durationText ?? ''),
+                              if (content.durationText != null)
+                                const SizedBox(width: 10),
+                              Text(content.stat.play + '次围观'),
+                              const SizedBox(width: 10),
+                              Text(content.stat.danmaku + '条弹幕')
                             ],
                           ),
-                          borderRadius: floor == 1
-                              ? null
-                              : const BorderRadius.all(Radius.circular(6))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          DefaultTextStyle.merge(
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium!
-                                    .fontSize,
-                                color: Colors.white),
-                            child: Row(
-                              children: [
-                                Text(content.durationText ?? ''),
-                                if (content.durationText != null)
-                                  const SizedBox(width: 10),
-                                Text(content.stat.play + '次围观'),
-                                const SizedBox(width: 10),
-                                Text(content.stat.danmaku + '条弹幕')
-                              ],
-                            ),
-                          ),
-                          Image.asset(
-                            'assets/images/play.png',
-                            width: 70,
-                            height: 70,
-                          ),
-                        ],
-                      ),
-                    )),
+                        ),
+                        Image.asset(
+                          'assets/images/play.png',
+                          width: 60,
+                          height: 60,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             );
           }),
@@ -691,126 +362,7 @@ class DynamicPanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 2),
       ],
-    );
-  }
-
-  InlineSpan richNode(item, context) {
-    TextStyle authorStyle =
-        TextStyle(color: Theme.of(context).colorScheme.primary);
-    List<InlineSpan> spanChilds = [];
-    for (var i in item.modules.moduleDynamic.desc.richTextNodes) {
-      if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
-        spanChilds.add(TextSpan(text: i.origText));
-      }
-      // @用户
-      if (i.type == 'RICH_TEXT_NODE_TYPE_AT') {
-        spanChilds.add(
-          WidgetSpan(
-            baseline: TextBaseline.ideographic,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    '${i.text}',
-                    style: authorStyle,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-      // 话题
-      if (i.type == 'RICH_TEXT_NODE_TYPE_TOPIC') {
-        spanChilds.add(
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                ' ${i.origText} ',
-                style: authorStyle,
-              ),
-            ),
-          ),
-        );
-      }
-      // 网页链接
-      if (i.type == 'RICH_TEXT_NODE_TYPE_WEB') {
-        spanChilds.add(
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                i.text,
-                style: authorStyle,
-              ),
-            ),
-          ),
-        );
-      }
-      // 投票
-      if (i.type == 'RICH_TEXT_NODE_TYPE_VOTE') {
-        spanChilds.add(
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                i.text,
-                style: authorStyle,
-              ),
-            ),
-          ),
-        );
-      }
-      // 表情
-      if (i.type == 'RICH_TEXT_NODE_TYPE_EMOJI') {
-        spanChilds.add(
-          WidgetSpan(
-            child: NetworkImgLayer(
-              src: i.emoji.iconUrl,
-              type: 'emote',
-              width: i.emoji.size * 20,
-              height: i.emoji.size * 20,
-            ),
-          ),
-        );
-      }
-      // 抽奖
-      if (i.type == 'RICH_TEXT_NODE_TYPE_LOTTERY') {
-        spanChilds.add(
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                ' ${i.origText} ',
-                style: authorStyle,
-              ),
-            ),
-          ),
-        );
-      }
-
-      /// TODO 商品
-      if (i.type == 'RICH_TEXT_NODE_TYPE_GOODS') {
-        spanChilds.add(
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                ' ${i.text} ',
-                style: authorStyle,
-              ),
-            ),
-          ),
-        );
-      }
-    }
-    return TextSpan(
-      children: spanChilds,
     );
   }
 }

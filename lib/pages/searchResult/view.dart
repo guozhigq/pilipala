@@ -55,37 +55,42 @@ class _SearchResultPageState extends State<SearchResultPage>
       body: Column(
         children: [
           const SizedBox(height: 4),
-          Theme(
-            data: ThemeData(
-              splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
-              highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
-            ),
-            child: TabBar(
-              controller: _tabController,
-              tabs: [
-                for (var i in SearchType.values) Tab(text: i.label),
-              ],
-              isScrollable: true,
-              indicatorWeight: 0,
-              indicatorPadding:
-                  const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-              indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(left: 8),
+            color: Theme.of(context).colorScheme.surface,
+            child: Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
+                highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
               ),
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Theme.of(context).colorScheme.onSecondaryContainer,
-              labelStyle: const TextStyle(fontSize: 13),
-              dividerColor: Colors.transparent,
-              unselectedLabelColor: Theme.of(context).colorScheme.outline,
-              onTap: (index) {
-                if (index == _searchResultController!.tabIndex) {
-                  Get.find<SearchPanelController>(
-                          tag: SearchType.values[index].type)
-                      .animateToTop();
-                }
-                _searchResultController!.tabIndex = index;
-              },
+              child: TabBar(
+                controller: _tabController,
+                tabs: [
+                  for (var i in SearchType.values) Tab(text: i.label),
+                ],
+                isScrollable: true,
+                indicatorWeight: 0,
+                indicatorPadding:
+                    const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+                indicator: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                labelStyle: const TextStyle(fontSize: 13),
+                dividerColor: Colors.transparent,
+                unselectedLabelColor: Theme.of(context).colorScheme.outline,
+                onTap: (index) {
+                  if (index == _searchResultController!.tabIndex) {
+                    Get.find<SearchPanelController>(
+                            tag: SearchType.values[index].type)
+                        .animateToTop();
+                  }
+                  _searchResultController!.tabIndex = index;
+                },
+              ),
             ),
           ),
           Expanded(

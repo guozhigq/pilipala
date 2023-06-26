@@ -120,10 +120,9 @@ class VideoContent extends StatelessWidget {
               videoItem.title,
               textAlign: TextAlign.start,
               style: const TextStyle(
-                  // fontSize:
-                  //     Theme.of(context).textTheme.titleSmall!.fontSize,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500),
+                // fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                fontSize: 13,
+              ),
               maxLines: Get.find<HomeController>().crossAxisCount,
               overflow: TextOverflow.ellipsis,
             ),

@@ -231,10 +231,10 @@ class ReplyItem extends StatelessWidget {
           ),
         Text(
           Utils.dateFormat(replyItem!.ctime),
-          style: Theme.of(context)
-              .textTheme
-              .labelMedium!
-              .copyWith(color: Theme.of(context).colorScheme.outline),
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         if (replyItem!.replyControl != null &&
             replyItem!.replyControl!.location != '')

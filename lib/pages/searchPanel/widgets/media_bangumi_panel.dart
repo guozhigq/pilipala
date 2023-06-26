@@ -115,7 +115,7 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                         },
                         child: const Text('观看'),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

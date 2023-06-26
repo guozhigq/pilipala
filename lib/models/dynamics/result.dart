@@ -256,7 +256,7 @@ class Ugc {
   String? headText;
   String? idStr;
   String? jumpUrl;
-  String? multiLine;
+  bool? multiLine;
   String? title;
 
   Ugc.fromJson(Map<String, dynamic> json) {
