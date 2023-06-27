@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
@@ -16,9 +17,9 @@ class DynamicsPage extends StatefulWidget {
 
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
-  DynamicsController _dynamicsController = Get.put(DynamicsController());
+  final DynamicsController _dynamicsController = Get.put(DynamicsController());
   Future? _futureBuilderFuture;
-  final ScrollController scrollController = ScrollController();
+  // final ScrollController scrollController = ScrollController();
   bool _isLoadingMore = false;
   @override
   bool get wantKeepAlive => true;
@@ -28,10 +29,11 @@ class _DynamicsPageState extends State<DynamicsPage>
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
 
-    scrollController.addListener(
+    _dynamicsController.scrollController.addListener(
       () async {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
+        if (_dynamicsController.scrollController.position.pixels >=
+            _dynamicsController.scrollController.position.maxScrollExtent -
+                200) {
           if (!_isLoadingMore) {
             _isLoadingMore = true;
             await _dynamicsController.queryFollowDynamic(type: 'onLoad');
@@ -92,7 +94,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 List<DynamicItemModel> list = _dynamicsController.dynamicsList!;
                 return Obx(
                   () => ListView.builder(
-                    controller: scrollController,
+                    controller: _dynamicsController.scrollController,
                     shrinkWrap: true,
                     itemCount: list.length,
                     itemBuilder: (BuildContext context, index) {
@@ -105,19 +107,18 @@ class _DynamicsPageState extends State<DynamicsPage>
                   slivers: [
                     HttpError(
                       errMsg: data['msg'],
-                      fn: () => setState(() {}),
+                      fn: () => _dynamicsController.queryFollowDynamic(),
                     )
                   ],
                 );
               }
             } else {
               // 骨架屏
-              // return SliverList(
-              //   delegate: SliverChildBuilderDelegate((context, index) {
-              //     return const VideoCardHSkeleton();
-              //   }, childCount: 10),
-              // );
-              return Text('加载中');
+              return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 5,
+                itemBuilder: ((context, index) => const DynamicCardSkeleton()),
+              );
             }
           },
         ),

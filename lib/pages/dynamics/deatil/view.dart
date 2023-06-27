@@ -24,6 +24,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   late StreamController<bool> titleStreamC; // appBar title
   final ScrollController scrollController = ScrollController();
   bool _visibleTitle = false;
+  String? action;
 
   @override
   void initState() {
@@ -37,11 +38,16 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
       oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
       type = 11;
     }
-
+    action =
+        Get.arguments.containsKey('action') ? Get.arguments['action'] : null;
     _dynamicDetailController = Get.put(DynamicDetailController(oid, type));
     _futureBuilderFuture = _dynamicDetailController!.queryReplyList();
     titleStreamC = StreamController<bool>();
     scrollController.addListener(_listen);
+    if (action == 'comment') {
+      _visibleTitle = true;
+      titleStreamC.add(true);
+    }
   }
 
   void _listen() async {
@@ -90,12 +96,13 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
         child: CustomScrollView(
           controller: scrollController,
           slivers: [
-            SliverToBoxAdapter(
-              child: DynamicPanel(
-                item: _dynamicDetailController!.item,
-                source: 'detail',
+            if (action != 'comment')
+              SliverToBoxAdapter(
+                child: DynamicPanel(
+                  item: _dynamicDetailController!.item,
+                  source: 'detail',
+                ),
               ),
-            ),
             SliverPersistentHeader(
               delegate: _MySliverPersistentHeaderDelegate(
                 child: Container(

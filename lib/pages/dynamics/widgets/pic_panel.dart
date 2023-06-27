@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 Widget picWidget(item, context) {
@@ -14,7 +15,6 @@ Widget picWidget(item, context) {
   }
   int len = pictures.length;
   List picList = [];
-
   List<Widget> list = [];
   for (var i = 0; i < len; i++) {
     picList.add(pictures[i].src ?? pictures[i].url);
@@ -42,7 +42,8 @@ Widget picWidget(item, context) {
   return LayoutBuilder(
     builder: (context, BoxConstraints box) {
       double maxWidth = box.maxWidth;
-      double aspectRatio = 1.1;
+      double aspectRatio = 1.0;
+      double origAspectRatio = 0.0;
       double crossCount = len == 1
           ? 1
           : len < 3
@@ -51,20 +52,19 @@ Widget picWidget(item, context) {
 
       double height = 0.0;
       if (len == 1) {
-        aspectRatio = pictures.first.width / pictures.first.height;
+        origAspectRatio =
+            aspectRatio = pictures.first.width / pictures.first.height;
+        if (aspectRatio < 0.4) {
+          aspectRatio = 0.4;
+        }
         height = pictures.first.height * maxWidth / pictures.first.width;
-        if (pictures.first.width != 1920) {
+        if (origAspectRatio < 0.5 || pictures.first.width < 1920) {
           crossCount = 2;
           height = maxWidth / 2 / aspectRatio;
         }
       } else {
         aspectRatio = 1;
-        height = maxWidth /
-                crossCount *
-                (len % crossCount == 0
-                    ? len ~/ crossCount
-                    : len ~/ crossCount + 1) +
-            6;
+        height = maxWidth / crossCount * ((len / crossCount).ceil()) + 6;
       }
       return Container(
         padding: const EdgeInsets.only(top: 4),
@@ -73,14 +73,20 @@ Widget picWidget(item, context) {
         ),
         clipBehavior: Clip.hardEdge,
         height: height,
-        child: GridView.count(
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: crossCount.toInt(),
-          mainAxisSpacing: 4.0,
-          crossAxisSpacing: 4.0,
-          childAspectRatio: aspectRatio,
-          children: list,
+        child: Stack(
+          children: [
+            GridView.count(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: crossCount.toInt(),
+              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 4.0,
+              childAspectRatio: aspectRatio,
+              children: list,
+            ),
+            if (len == 1 && origAspectRatio < 0.4)
+              pBadge('长图', context, null, null, 6.0, 6.0, type: 'gray')
+          ],
         ),
       );
     },

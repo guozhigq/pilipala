@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/dynamics.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -8,6 +12,7 @@ class DynamicsController extends GetxController {
   RxList<DynamicItemModel>? dynamicsList = [DynamicItemModel()].obs;
   RxString dynamicsType = 'all'.obs;
   RxString dynamicsTypeLabel = '全部'.obs;
+  final ScrollController scrollController = ScrollController();
 
   Future queryFollowDynamic({type = 'init'}) async {
     var res = await DynamicsHttp.followDynamic(
@@ -27,16 +32,22 @@ class DynamicsController extends GetxController {
     return res;
   }
 
-  onSelectType(value, label) {
+  onSelectType(value, label) async {
     dynamicsType.value = value;
     dynamicsTypeLabel.value = label;
-    queryFollowDynamic();
+    await queryFollowDynamic();
+    scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
-  pushDetail(item, floor) {
+  pushDetail(item, floor, {action = 'all'}) async {
+    if (action == 'comment') {
+      Get.toNamed('/dynamicDetail',
+          arguments: {'item': item, 'floor': floor, 'action': action});
+      return false;
+    }
     switch (item!.type) {
       case 'DYNAMIC_TYPE_FORWARD':
-        print('转发的动态');
         Get.toNamed('/dynamicDetail',
             arguments: {'item': item, 'floor': floor});
         break;
@@ -45,10 +56,25 @@ class DynamicsController extends GetxController {
             arguments: {'item': item, 'floor': floor});
         break;
       case 'DYNAMIC_TYPE_AV':
-        print('视频');
+        String bvid = item.modules.moduleDynamic.major.archive.bvid;
+        int aid = item.modules.moduleDynamic.major.archive.aid;
+        String cover = item.modules.moduleDynamic.major.archive.cover;
+        String heroTag = Utils.makeHeroTag(aid);
+        try {
+          int cid = await SearchHttp.ab2c(bvid: bvid);
+          Get.toNamed('/video?bvid=$bvid&cid=$cid',
+              arguments: {'pic': cover, 'heroTag': heroTag});
+        } catch (err) {
+          SmartDialog.showToast(err.toString());
+        }
         break;
       case 'DYNAMIC_TYPE_ARTICLE':
-        print('文章/专栏');
+        String title = item.modules.moduleDynamic.major.opus.title;
+        String url = item.modules.moduleDynamic.major.opus.jumpUrl;
+        Get.toNamed(
+          '/webview',
+          parameters: {'url': 'https:$url', 'type': 'note', 'pageTitle': title},
+        );
         break;
       case 'DYNAMIC_TYPE_PGC':
         print('番剧');

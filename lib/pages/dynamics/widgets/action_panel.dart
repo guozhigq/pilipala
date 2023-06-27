@@ -26,7 +26,8 @@ Widget action(item, context) {
         label: Text(stat.forward!.count ?? '转发'),
       ),
       TextButton.icon(
-        onPressed: () => _dynamicsController.pushDetail(item, 1),
+        onPressed: () =>
+            _dynamicsController.pushDetail(item, 1, action: 'comment'),
         icon: const Icon(
           FontAwesomeIcons.comment,
           size: 16,
