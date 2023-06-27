@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'rich_node_panel.dart';
 
-Widget content(item, context) {
+Widget content(item, context, source) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
   return Container(
@@ -22,7 +22,7 @@ Widget content(item, context) {
           ],
           Text.rich(
             richNode(item, context),
-            maxLines: 3,
+            maxLines: source == 'detail' ? 999 : 3,
             overflow: TextOverflow.ellipsis,
           ),
         ],

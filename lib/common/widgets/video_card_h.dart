@@ -2,6 +2,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -84,24 +85,13 @@ class VideoCardH extends StatelessWidget {
                                     ),
                                   ),
                                   // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
-                                  Positioned(
-                                    right: 4,
-                                    bottom: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 1, horizontal: 6),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color:
-                                              Colors.black54.withOpacity(0.4)),
-                                      child: Text(
-                                        Utils.timeFormat(videoItem.duration!),
-                                        style: const TextStyle(
-                                            fontSize: 11, color: Colors.white),
-                                      ),
-                                    ),
-                                  )
+                                  pBadge(Utils.timeFormat(videoItem.duration!),
+                                      context, null, 6.0, 6.0, null,
+                                      type: 'gray'),
+                                  if (videoItem.rcmdReason != null &&
+                                      videoItem.rcmdReason.content != '')
+                                    pBadge(videoItem.rcmdReason.content,
+                                        context, 6.0, 6.0, null, null),
                                 ],
                               );
                             },
@@ -171,22 +161,22 @@ class VideoContent extends StatelessWidget {
               ),
             ],
             const Spacer(),
-            if (videoItem.rcmdReason != null &&
-                videoItem.rcmdReason.content != '')
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.surfaceTint),
-                ),
-                child: Text(
-                  videoItem.rcmdReason.content,
-                  style: TextStyle(
-                      fontSize: 9,
-                      color: Theme.of(context).colorScheme.surfaceTint),
-                ),
-              ),
+            // if (videoItem.rcmdReason != null &&
+            //     videoItem.rcmdReason.content != '')
+            //   Container(
+            //     padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+            //     decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.circular(4),
+            //       border: Border.all(
+            //           color: Theme.of(context).colorScheme.surfaceTint),
+            //     ),
+            //     child: Text(
+            //       videoItem.rcmdReason.content,
+            //       style: TextStyle(
+            //           fontSize: 9,
+            //           color: Theme.of(context).colorScheme.surfaceTint),
+            //     ),
+            //   ),
             const SizedBox(height: 4),
             Row(
               children: [

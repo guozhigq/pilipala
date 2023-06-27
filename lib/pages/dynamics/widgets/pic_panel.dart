@@ -26,14 +26,14 @@ Widget picWidget(item, context) {
               Get.toNamed('/preview',
                   arguments: {'initialPage': i, 'imgList': picList});
             },
-            child: Hero(
-              tag: pictures[i].src,
-              child: NetworkImgLayer(
-                src: pictures[i].src ?? pictures[i].url,
-                width: box.maxWidth,
-                height: box.maxWidth,
-              ),
+            // child: Hero(
+            //   tag: pictures[i].src ?? pictures[i].url,
+            child: NetworkImgLayer(
+              src: pictures[i].src ?? pictures[i].url,
+              width: box.maxWidth,
+              height: box.maxWidth,
             ),
+            // ),
           );
         },
       ),
@@ -53,6 +53,10 @@ Widget picWidget(item, context) {
       if (len == 1) {
         aspectRatio = pictures.first.width / pictures.first.height;
         height = pictures.first.height * maxWidth / pictures.first.width;
+        if (pictures.first.width != 1920) {
+          crossCount = 2;
+          height = maxWidth / 2 / aspectRatio;
+        }
       } else {
         aspectRatio = 1;
         height = maxWidth /
@@ -62,7 +66,6 @@ Widget picWidget(item, context) {
                     : len ~/ crossCount + 1) +
             6;
       }
-
       return Container(
         padding: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(

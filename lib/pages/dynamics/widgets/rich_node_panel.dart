@@ -8,7 +8,8 @@ InlineSpan richNode(item, context) {
   List<InlineSpan> spanChilds = [];
   for (var i in item.modules.moduleDynamic.desc.richTextNodes) {
     if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
-      spanChilds.add(TextSpan(text: i.origText));
+      spanChilds.add(
+          TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
     }
     // @用户
     if (i.type == 'RICH_TEXT_NODE_TYPE_AT') {
@@ -103,6 +104,16 @@ InlineSpan richNode(item, context) {
       spanChilds.add(
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
+          child: Icon(
+            Icons.redeem_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      );
+      spanChilds.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
           child: GestureDetector(
             onTap: () {},
             child: Text(
@@ -116,6 +127,16 @@ InlineSpan richNode(item, context) {
 
     /// TODO 商品
     if (i.type == 'RICH_TEXT_NODE_TYPE_GOODS') {
+      spanChilds.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Icon(
+            Icons.shopping_bag_outlined,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      );
       spanChilds.add(
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,

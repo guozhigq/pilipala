@@ -22,7 +22,7 @@ class DynamicsDataModel {
 // 单个动态
 class DynamicItemModel {
   DynamicItemModel({
-    // this.basic,
+    this.basic,
     this.idStr,
     this.modules,
     this.orig,
@@ -30,7 +30,7 @@ class DynamicItemModel {
     this.visible,
   });
 
-  // Map? basic;
+  Map? basic;
   String? idStr;
   ItemModulesModel? modules;
   ItemOrigModel? orig;
@@ -38,7 +38,7 @@ class DynamicItemModel {
   bool? visible;
 
   DynamicItemModel.fromJson(Map<String, dynamic> json) {
-    // basic = json['basic'];
+    basic = json['basic'];
     idStr = json['id_str'];
     modules = ItemModulesModel.fromJson(json['modules']);
     orig = json['orig'] != null ? ItemOrigModel.fromJson(json['orig']) : null;
@@ -140,7 +140,7 @@ class ModuleAuthorModel {
     name = json['name'];
     pubAction = json['pub_action'];
     pubTime = json['pub_time'];
-    pubTs = json['pub_ts'];
+    pubTs = json['pub_ts'] == 0 ? null : json['pub_ts'];
     type = json['type'];
   }
 }

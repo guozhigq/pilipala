@@ -32,4 +32,32 @@ class DynamicsController extends GetxController {
     dynamicsTypeLabel.value = label;
     queryFollowDynamic();
   }
+
+  pushDetail(item, floor) {
+    switch (item!.type) {
+      case 'DYNAMIC_TYPE_FORWARD':
+        print('转发的动态');
+        Get.toNamed('/dynamicDetail',
+            arguments: {'item': item, 'floor': floor});
+        break;
+      case 'DYNAMIC_TYPE_DRAW':
+        Get.toNamed('/dynamicDetail',
+            arguments: {'item': item, 'floor': floor});
+        break;
+      case 'DYNAMIC_TYPE_AV':
+        print('视频');
+        break;
+      case 'DYNAMIC_TYPE_ARTICLE':
+        print('文章/专栏');
+        break;
+      case 'DYNAMIC_TYPE_PGC':
+        print('番剧');
+        break;
+      case 'DYNAMIC_TYPE_WORD':
+        print('纯文本');
+        Get.toNamed('/dynamicDetail',
+            arguments: {'item': item, 'floor': floor});
+        break;
+    }
+  }
 }

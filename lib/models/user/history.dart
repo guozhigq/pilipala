@@ -158,7 +158,7 @@ class History {
   History.fromJson(Map<String, dynamic> json) {
     oid = json['oid'];
     epid = json['epid'];
-    bvid = json['bvid'];
+    bvid = json['bvid'] == '' ? null : json['bvid'];
     page = json['page'];
     cid = json['cid'] == 0 ? null : json['cid'];
     part = json['part'];

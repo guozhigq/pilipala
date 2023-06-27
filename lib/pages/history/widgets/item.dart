@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/business_type.dart';
@@ -14,13 +15,15 @@ class HistoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int aid = videoItem.history.oid;
-    String bvid = videoItem.history.bvid;
+    String bvid = videoItem.history.bvid ?? IdUtils.av2bv(aid);
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
         int cid = videoItem.history.cid ??
+            videoItem.history.oid ??
             await SearchHttp.ab2c(aid: aid, bvid: bvid);
         await Future.delayed(const Duration(milliseconds: 200));
+        print(videoItem.history.business);
         if (videoItem.history.business.contains('article')) {
           Get.toNamed(
             '/webview',
@@ -75,71 +78,23 @@ class HistoryItem extends StatelessWidget {
                                 if (!BusinessType
                                     .hiddenDurationType.hiddenDurationType
                                     .contains(videoItem.history.business))
-                                  Positioned(
-                                    right: 4,
-                                    bottom: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 1, horizontal: 6),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color:
-                                              Colors.black54.withOpacity(0.4)),
-                                      child: Text(
-                                        videoItem.progress == -1
-                                            ? '已看完'
-                                            : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
-                                        style: const TextStyle(
-                                            fontSize: 11, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
+                                  pBadge(
+                                      videoItem.progress == -1
+                                          ? '已看完'
+                                          : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
+                                      context,
+                                      null,
+                                      6.0,
+                                      6.0,
+                                      null,
+                                      type: 'gray'),
                                 // 右上角
                                 if (BusinessType.showBadge.showBadge
-                                    .contains(videoItem.history.business))
-                                  Positioned(
-                                    right: 4,
-                                    top: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 1, horizontal: 6),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primaryContainer),
-                                      child: Text(
-                                        videoItem.badge,
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary),
-                                      ),
-                                    ),
-                                  ),
-                                if (videoItem.history.business ==
-                                    BusinessType.live.type)
-                                  Positioned(
-                                    right: 4,
-                                    top: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 1, horizontal: 6),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color:
-                                              Colors.black54.withOpacity(0.4)),
-                                      child: Text(
-                                        videoItem.badge,
-                                        style: const TextStyle(
-                                            fontSize: 11, color: Colors.white),
-                                      ),
-                                    ),
-                                  )
+                                        .contains(videoItem.history.business) ||
+                                    videoItem.history.business ==
+                                        BusinessType.live.type)
+                                  pBadge(videoItem.badge, context, 6.0, 6.0,
+                                      null, null),
                               ],
                             );
                           },

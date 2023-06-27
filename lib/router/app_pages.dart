@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
-import 'package:pilipala/pages/dynamics/view.dart';
+import 'package:pilipala/pages/dynamics/deatil/index.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/history/index.dart';
@@ -8,12 +9,11 @@ import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
+import 'package:pilipala/pages/searchResult/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
 import 'package:pilipala/pages/media/index.dart';
-
-import '../pages/searchResult/index.dart';
 
 class Routes {
   static final List<GetPage> getPages = [
@@ -49,7 +49,9 @@ class Routes {
     GetPage(name: '/search', page: () => const SearchPage()),
     // 搜索结果
     GetPage(name: '/searchResult', page: () => const SearchResultPage()),
-    //
-    GetPage(name: '/dynamics', page: () => const DynamicsPage())
+    // 动态
+    GetPage(name: '/dynamics', page: () => const DynamicsPage()),
+    // 动态详情
+    GetPage(name: '/dynamicDetail', page: () => const DynamicDetailPage())
   ];
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/bangumi/info.dart';
@@ -33,7 +34,8 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                     height: 148,
                     src: i.cover,
                   ),
-                  Positioned(top: 6, right: 4, child: UpTag(type: i.mediaType))
+                  pBadge(i.mediaType == 1 ? '番剧' : '国创', context, 6.0, 4.0,
+                      null, null)
                 ],
               ),
               const SizedBox(width: 10),
@@ -125,29 +127,4 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
       );
     },
   );
-}
-
-class UpTag extends StatelessWidget {
-  int? type;
-  UpTag({super.key, this.type = 4});
-  @override
-  Widget build(BuildContext context) {
-    Color primary = Theme.of(context).colorScheme.primary;
-    return Container(
-      width: 24,
-      height: 16,
-      decoration:
-          BoxDecoration(borderRadius: BorderRadius.circular(3), color: primary),
-      margin: const EdgeInsets.only(right: 4),
-      child: Center(
-        child: Text(
-          type == 1 ? '番剧' : '国创',
-          style: TextStyle(
-            fontSize: 9,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-      ),
-    );
-  }
 }
