@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import './controller.dart';
 
 class MainApp extends StatefulWidget {
@@ -111,17 +112,16 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        elevation: 1,
-        destinations: _mainController.navigationBars.map((e) {
-          return NavigationDestination(
+      bottomNavigationBar: SalomonBottomBar(
+        currentIndex: selectedIndex,
+        onTap: (value) => setIndex(value),
+        items: _mainController.navigationBars.map((e) {
+          return SalomonBottomBarItem(
             icon: e['icon'],
-            selectedIcon: e['selectedIcon'],
-            label: e['label'],
+            title: Text(e['label']),
+            selectedColor: Theme.of(context).colorScheme.primary,
           );
         }).toList(),
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (value) => setIndex(value),
       ),
     );
   }

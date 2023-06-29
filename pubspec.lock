@@ -902,6 +902,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  salomon_bottom_bar:
+    dependency: "direct main"
+    description:
+      name: salomon_bottom_bar
+      sha256: e20abf2e449749432223a8b4e6647c212eef6c2b638e0ed8cc92eff9529c2b48
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.2"
   screen_brightness:
     dependency: transitive
     description:
