@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -7,6 +8,7 @@ import 'package:pilipala/models/dynamics/result.dart';
 
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
+import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
   const DynamicsPage({super.key});
@@ -19,7 +21,6 @@ class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   Future? _futureBuilderFuture;
-  // final ScrollController scrollController = ScrollController();
   bool _isLoadingMore = false;
   @override
   bool get wantKeepAlive => true;
@@ -48,81 +49,140 @@ class _DynamicsPageState extends State<DynamicsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        title: const Text('动态'),
-        actions: [
-          Obx(
-            () => PopupMenuButton(
-              initialValue: _dynamicsController.dynamicsType.value,
-              position: PopupMenuPosition.under,
-              itemBuilder: (context) => [
-                for (var i in DynamicsType.values) ...[
-                  PopupMenuItem(
-                    value: i.values,
-                    onTap: () =>
-                        _dynamicsController.onSelectType(i.values, i.labels),
-                    child: Text(i.labels),
-                  )
-                ],
-              ],
-              child: Row(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        titleSpacing: 0,
+        title: SizedBox(
+          height: 36,
+          child: Stack(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    _dynamicsController.dynamicsTypeLabel.value,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                  Obx(
+                    () => SegmentedButton<DynamicsType>(
+                      showSelectedIcon: false,
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10)),
+                        side: MaterialStateProperty.all(
+                          BorderSide(
+                              color: Theme.of(context).hintColor, width: 0.5),
+                        ),
+                      ),
+                      segments: <ButtonSegment<DynamicsType>>[
+                        for (var i in _dynamicsController.filterTypeList) ...[
+                          ButtonSegment<DynamicsType>(
+                            value: i['value'],
+                            label: Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Text(i['label']),
+                            ),
+                            enabled: i['enabled'],
+                          ),
+                        ]
+                      ],
+                      selected: <DynamicsType>{
+                        _dynamicsController.dynamicsType.value
+                      },
+                      onSelectionChanged: (Set<DynamicsType> newSelection) {
+                        _dynamicsController.dynamicsType.value =
+                            newSelection.first;
+                        _dynamicsController.onSelectType(newSelection.first);
+                      },
                     ),
                   ),
-                  const SizedBox(width: 10)
                 ],
               ),
-            ),
+              Positioned(
+                right: 10,
+                top: 0,
+                bottom: 0,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    _dynamicsController.mid = -1;
+                    _dynamicsController.dynamicsType.value =
+                        DynamicsType.values[0];
+                    SmartDialog.showToast('还原默认加载',
+                        alignment: Alignment.topCenter);
+                    _dynamicsController.queryFollowDynamic();
+                  },
+                  icon: const Icon(Icons.history),
+                ),
+              )
+            ],
           ),
-          const SizedBox(width: 4)
-        ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          _dynamicsController.page = 1;
+          _dynamicsController.queryFollowUp();
           await _dynamicsController.queryFollowDynamic();
         },
-        child: FutureBuilder(
-          future: _futureBuilderFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              Map data = snapshot.data;
-              if (data['status']) {
-                List<DynamicItemModel> list = _dynamicsController.dynamicsList!;
-                return Obx(
-                  () => ListView.builder(
-                    controller: _dynamicsController.scrollController,
-                    shrinkWrap: true,
-                    itemCount: list.length,
-                    itemBuilder: (BuildContext context, index) {
-                      return DynamicPanel(item: list[index]);
-                    },
-                  ),
-                );
-              } else {
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
+        child: CustomScrollView(
+          controller: _dynamicsController.scrollController,
+          slivers: [
+            FutureBuilder(
+              future: _dynamicsController.queryFollowUp(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data;
+                  if (data['status']) {
+                    return Obx(() => UpPanel(_dynamicsController.upData.value));
+                  } else {
+                    return const SliverToBoxAdapter(
+                        child: SizedBox(height: 80));
+                  }
+                } else {
+                  return const SliverToBoxAdapter(
+                      child: SizedBox(
+                    height: 115,
+                    child: UpPanelSkeleton(),
+                  ));
+                }
+              },
+            ),
+            FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data;
+                  if (data['status']) {
+                    List<DynamicItemModel> list =
+                        _dynamicsController.dynamicsList!;
+                    return Obx(
+                      () => SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          return DynamicPanel(item: list[index]);
+                        }, childCount: list.length),
+                      ),
+                    );
+                  } else {
+                    return HttpError(
                       errMsg: data['msg'],
                       fn: () => _dynamicsController.queryFollowDynamic(),
-                    )
-                  ],
-                );
-              }
-            } else {
-              // 骨架屏
-              return ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 5,
-                itemBuilder: ((context, index) => const DynamicCardSkeleton()),
-              );
-            }
-          },
+                    );
+                  }
+                } else {
+                  // 骨架屏
+                  return skeleton();
+                }
+              },
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget skeleton() {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return const DynamicCardSkeleton();
+      }, childCount: 5),
     );
   }
 }

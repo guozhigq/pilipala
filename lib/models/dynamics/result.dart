@@ -526,7 +526,7 @@ class OpusPicsModel {
   OpusPicsModel.fromJson(Map<String, dynamic> json) {
     width = json['width'];
     height = json['height'];
-    size = json['size'].toInt();
+    size = json['size'] != null ? json['size'].toInt() : 0;
     src = json['src'];
     url = json['url'];
   }

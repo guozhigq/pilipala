@@ -73,6 +73,9 @@ class DynamicDetailController extends GetxController {
       } else {
         replyList.addAll(replies);
       }
+      if (replyList.length == acount.value) {
+        noMore.value = '没有更多了';
+      }
     }
     isLoadingMore = false;
     return res;

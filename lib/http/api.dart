@@ -134,6 +134,7 @@ class Api {
 
   // 正在直播的up & 关注的up
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/portal
+  static const String followUp = '/x/polymer/web-dynamic/v1/portal';
 
   // 关注的up动态
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all
