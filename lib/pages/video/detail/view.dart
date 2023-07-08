@@ -37,6 +37,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // );
   StreamSubscription? _playerEventSubs;
   bool isPlay = false;
+  PlayerStatus playerStatus = PlayerStatus.paused;
   bool isShowCover = true;
   double doubleOffset = 0;
 
@@ -47,6 +48,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _playerEventSubs = _meeduPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) {
         videoDetailController.markHeartBeat();
+        playerStatus = status;
         if (status == PlayerStatus.playing) {
           Wakelock.enable();
           isPlay = false;
@@ -58,10 +60,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           isPlay = true;
           setState(() {});
           Wakelock.disable();
-        }
-        // 播放完成停止 or 切换下一个
-        if (status == PlayerStatus.completed) {
-          _meeduPlayerController!.pause();
+          // 播放完成停止 or 切换下一个
+          if (status == PlayerStatus.completed) {}
         }
       },
     );
@@ -91,6 +91,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       // The next line disables the wakelock again.
       await Wakelock.disable();
     }
+  }
+
+  void continuePlay() async {
+    await _extendNestCtr.animateTo(0,
+        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    _meeduPlayerController!.play();
   }
 
   @override
@@ -240,7 +246,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   ];
                 },
                 pinnedHeaderSliverHeightBuilder: () {
-                  return isPlay
+                  return playerStatus != PlayerStatus.playing
                       ? MediaQuery.of(context).padding.top + 50
                       : pinnedHeaderHeight;
                 },
@@ -327,16 +333,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     centerTitle: true,
                     title: TextButton(
-                      onPressed: () {
-                        _extendNestCtr.animateTo(0,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut);
-                      },
+                      onPressed: () => continuePlay(),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.play_arrow_rounded),
-                          Text('继续播放')
+                        children: [
+                          const Icon(Icons.play_arrow_rounded),
+                          Text(
+                            playerStatus == PlayerStatus.paused
+                                ? '继续播放'
+                                : playerStatus == PlayerStatus.completed
+                                    ? '重新播放'
+                                    : '播放中',
+                          )
                         ],
                       ),
                     ),

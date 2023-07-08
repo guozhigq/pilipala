@@ -96,7 +96,6 @@ class VideoDetailController extends GetxController {
         },
       ),
       autoplay: true,
-      looping: false,
       seekTo: defaultST,
     );
   }
