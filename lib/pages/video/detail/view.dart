@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
@@ -144,120 +145,139 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight;
-    return DefaultTabController(
-      initialIndex: videoDetailController.tabInitialIndex,
-      length: videoDetailController.tabs.length, // tab的数量.
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: Stack(
-          children: [
-            Scaffold(
-              resizeToAvoidBottomInset: false,
-              key: videoDetailController.scaffoldKey,
-              body: ExtendedNestedScrollView(
-                controller: _extendNestCtr,
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                      automaticallyImplyLeading: false,
-                      pinned: false,
-                      elevation: 0,
-                      scrolledUnderElevation: 0,
-                      forceElevated: innerBoxIsScrolled,
-                      expandedHeight: videoHeight,
-                      // collapsedHeight: videoHeight,
-                      backgroundColor: Theme.of(context).colorScheme.background,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Padding(
-                          padding: EdgeInsets.only(
-                              top: MediaQuery.of(context).padding.top),
-                          child: LayoutBuilder(
-                            builder: (context, boxConstraints) {
-                              double maxWidth = boxConstraints.maxWidth;
-                              double maxHeight = boxConstraints.maxHeight;
-                              // double PR =
-                              // MediaQuery.of(context).devicePixelRatio;
-                              return Hero(
-                                tag: videoDetailController.heroTag,
-                                child: Stack(
-                                  children: [
-                                    AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: MeeduVideoPlayer(
-                                        controller: _meeduPlayerController!,
-                                        header: (BuildContext context,
-                                            MeeduPlayerController
-                                                _meeduPlayerController,
-                                            Responsive) {
-                                          return AppBar(
-                                            toolbarHeight: 40,
-                                            backgroundColor: Colors.transparent,
-                                            primary: false,
-                                            elevation: 0,
-                                            scrolledUnderElevation: 0,
-                                            foregroundColor: Colors.white,
-                                            leading: IconButton(
-                                              onPressed: () {
-                                                Get.back();
-                                              },
-                                              icon: const Icon(
-                                                Icons.arrow_back_ios,
-                                                size: 19,
-                                              ),
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: NetworkImgLayer(
+              type: 'emote',
+              src: videoDetailController.videoItem['pic'],
+              width: Get.size.width,
+              height: videoHeight + 100,
+            ),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100), //可以看源码
+              child: Container(
+                decoration: BoxDecoration(
+                  color:
+                      Theme.of(context).colorScheme.background.withOpacity(0.1),
+                ),
+              ),
+            ),
+          ),
+          Scaffold(
+            resizeToAvoidBottomInset: false,
+            key: videoDetailController.scaffoldKey,
+            backgroundColor: Colors.transparent,
+            body: ExtendedNestedScrollView(
+              controller: _extendNestCtr,
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverAppBar(
+                    automaticallyImplyLeading: false,
+                    pinned: false,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    forceElevated: innerBoxIsScrolled,
+                    expandedHeight: videoHeight,
+                    backgroundColor: Colors.transparent,
+                    // backgroundColor: Theme.of(context).colorScheme.background,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Padding(
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top),
+                        child: LayoutBuilder(
+                          builder: (context, boxConstraints) {
+                            double maxWidth = boxConstraints.maxWidth;
+                            double maxHeight = boxConstraints.maxHeight;
+                            return Hero(
+                              tag: videoDetailController.heroTag,
+                              child: Stack(
+                                children: [
+                                  AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: MeeduVideoPlayer(
+                                      controller: _meeduPlayerController!,
+                                      header: (BuildContext context,
+                                          MeeduPlayerController
+                                              _meeduPlayerController,
+                                          Responsive) {
+                                        return AppBar(
+                                          toolbarHeight: 40,
+                                          backgroundColor: Colors.transparent,
+                                          primary: false,
+                                          elevation: 0,
+                                          scrolledUnderElevation: 0,
+                                          foregroundColor: Colors.white,
+                                          leading: IconButton(
+                                            onPressed: () {
+                                              Get.back();
+                                            },
+                                            icon: const Icon(
+                                              Icons.arrow_back_ios,
+                                              size: 19,
                                             ),
-                                            title: Text(
-                                              '视频详情',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: Theme.of(context)
-                                                      .textTheme
-                                                      .titleSmall!
-                                                      .fontSize),
-                                            ),
-                                          );
-                                        },
+                                          ),
+                                          title: Text(
+                                            '视频详情',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .titleSmall!
+                                                    .fontSize),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: isShowCover,
+                                    child: Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: NetworkImgLayer(
+                                        type: 'emote',
+                                        src: videoDetailController
+                                            .videoItem['pic'],
+                                        width: maxWidth,
+                                        height: maxHeight,
                                       ),
                                     ),
-                                    Visibility(
-                                      visible: isShowCover,
-                                      child: Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: NetworkImgLayer(
-                                          type: 'emote',
-                                          src: videoDetailController
-                                              .videoItem['pic'],
-                                          width: maxWidth,
-                                          height: maxHeight,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                  ];
-                },
-                pinnedHeaderSliverHeightBuilder: () {
-                  return playerStatus != PlayerStatus.playing
-                      ? MediaQuery.of(context).padding.top + 50
-                      : pinnedHeaderHeight;
-                },
-                onlyOneScrollInBody: true,
-                body: Column(
+                  ),
+                ];
+              },
+              pinnedHeaderSliverHeightBuilder: () {
+                return playerStatus != PlayerStatus.playing
+                    ? statusBarHeight + kToolbarHeight
+                    : pinnedHeaderHeight;
+              },
+              onlyOneScrollInBody: true,
+              body: Container(
+                color: Theme.of(context).colorScheme.background,
+                child: Column(
                   children: [
                     Container(
                       width: double.infinity,
-                      height: 45,
+                      height: 0,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.background,
                         border: Border(
                           bottom: BorderSide(
                             color:
@@ -274,7 +294,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             margin: const EdgeInsets.only(left: 20),
                             child: Obx(
                               () => TabBar(
+                                controller: videoDetailController.tabCtr,
                                 dividerColor: Colors.transparent,
+                                indicatorColor:
+                                    Theme.of(context).colorScheme.background,
                                 tabs: videoDetailController.tabs
                                     .map((String name) => Tab(text: name))
                                     .toList(),
@@ -294,6 +317,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     ),
                     Expanded(
                       child: TabBarView(
+                        controller: videoDetailController.tabCtr,
                         children: [
                           Builder(
                             builder: (context) {
@@ -314,55 +338,55 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 ),
               ),
             ),
-            // 播放完成/暂停播放
-            Positioned(
-              top: -MediaQuery.of(context).padding.top +
-                  (doubleOffset / videoHeight) * 50,
-              left: 0,
-              right: 0,
-              child: Opacity(
-                opacity: doubleOffset / videoHeight,
-                child: Container(
-                  height: 50 + MediaQuery.of(context).padding.top,
-                  color: Theme.of(context).colorScheme.background,
-                  padding:
-                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                  child: AppBar(
-                    primary: false,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    centerTitle: true,
-                    title: TextButton(
-                      onPressed: () => continuePlay(),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.play_arrow_rounded),
-                          Text(
-                            playerStatus == PlayerStatus.paused
-                                ? '继续播放'
-                                : playerStatus == PlayerStatus.completed
-                                    ? '重新播放'
-                                    : '播放中',
-                          )
-                        ],
-                      ),
+          ),
+          // 播放完成/暂停播放
+          Positioned(
+            top: -statusBarHeight +
+                (doubleOffset / (videoHeight - kToolbarHeight)) *
+                    (kToolbarHeight - 9),
+            left: 0,
+            right: 0,
+            child: Opacity(
+              opacity: doubleOffset / (videoHeight - kToolbarHeight),
+              child: Container(
+                height: statusBarHeight + kToolbarHeight,
+                color: Theme.of(context).colorScheme.background,
+                padding: EdgeInsets.only(top: statusBarHeight),
+                child: AppBar(
+                  primary: false,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  centerTitle: true,
+                  title: TextButton(
+                    onPressed: () => continuePlay(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.play_arrow_rounded),
+                        Text(
+                          playerStatus == PlayerStatus.paused
+                              ? '继续播放'
+                              : playerStatus == PlayerStatus.completed
+                                  ? '重新播放'
+                                  : '播放中',
+                        )
+                      ],
                     ),
-                    actions: [
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.share,
-                            size: 20,
-                          )),
-                      const SizedBox(width: 12)
-                    ],
                   ),
+                  actions: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.share,
+                          size: 20,
+                        )),
+                    const SizedBox(width: 12)
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -136,6 +136,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               controller: _videoReplyController.scrollController,
               key: const PageStorageKey<String>('评论'),
               slivers: <Widget>[
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
                 FutureBuilder(
                   future: _futureBuilderFuture,
                   builder: (context, snapshot) {

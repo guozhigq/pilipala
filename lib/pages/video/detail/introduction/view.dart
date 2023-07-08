@@ -7,6 +7,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/widgets/expandable_section.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -99,6 +100,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   final FavController _favController = Get.put(FavController());
 
+  late VideoDetailController? videoDetailCtr;
   @override
   void initState() {
     super.initState();
@@ -110,6 +112,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     );
     _manualAnimation =
         Tween<double>(begin: 0.5, end: 1.5).animate(_manualController!);
+    videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
   }
 
   showFavBottomSheet() {
@@ -345,7 +349,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ),
                   const SizedBox(height: 8),
                   // 点赞收藏转发
-                  _actionGrid(context, videoIntroController),
+                  _actionGrid(context, videoIntroController, videoDetailCtr),
                   // 合集
                   if (!widget.loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
@@ -425,88 +429,90 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   // 喜欢 投币 分享
-  Widget _actionGrid(BuildContext context, videoIntroController) {
+  Widget _actionGrid(
+      BuildContext context, videoIntroController, videoDetailCtr) {
     return LayoutBuilder(builder: (context, constraints) {
       return SizedBox(
         height: constraints.maxWidth / 5 * 0.8,
-        child: GridView.count(
-          primary: false,
-          padding: const EdgeInsets.all(0),
-          crossAxisCount: 5,
-          childAspectRatio: 1.25,
-          children: <Widget>[
-            // ActionItem(
-            //   icon: const Icon(FontAwesomeIcons.s),
-            //   selectIcon: const Icon(FontAwesomeIcons.s),
-            //   onTap: () => {},
-            //   selectStatus: true,
-            //   loadingStatus: false,
-            //   text: '三连',
-            // ),
-            // Column(
-            //   children: [],
-            // ),
-            InkWell(
-              onTap: () => videoIntroController.actionOneThree(),
-              borderRadius: StyleString.mdRadius,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Image.asset(
-                  'assets/images/logo/logo_big.png',
-                  width: 10,
-                  height: 10,
-                ),
+        child: Material(
+          child: GridView.count(
+            primary: false,
+            padding: const EdgeInsets.all(0),
+            crossAxisCount: 5,
+            childAspectRatio: 1.25,
+            children: <Widget>[
+              // InkWell(
+              //   onTap: () => videoIntroController.actionOneThree(),
+              //   borderRadius: StyleString.mdRadius,
+              //   child: Padding(
+              //     padding: const EdgeInsets.all(12),
+              //     child: Image.asset(
+              //       'assets/images/logo/logo_big.png',
+              //       width: 10,
+              //       height: 10,
+              //     ),
+              //   ),
+              // ),
+              Obx(
+                () => ActionItem(
+                    icon: const Icon(FontAwesomeIcons.thumbsUp),
+                    selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+                    onTap: () => videoIntroController.actionLikeVideo(),
+                    selectStatus: videoIntroController.hasLike.value,
+                    loadingStatus: widget.loadingStatus,
+                    text: !widget.loadingStatus
+                        ? widget.videoDetail!.stat!.like!.toString()
+                        : '-'),
               ),
-            ),
-            Obx(
-              () => ActionItem(
-                  icon: const Icon(FontAwesomeIcons.thumbsUp),
-                  selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
-                  onTap: () => videoIntroController.actionLikeVideo(),
-                  selectStatus: videoIntroController.hasLike.value,
+              // ActionItem(
+              //     icon: const Icon(FontAwesomeIcons.thumbsDown),
+              //     selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
+              //     onTap: () => {},
+              //     selectStatus: false,
+              //     loadingStatus: widget.loadingStatus,
+              //     text: '不喜欢'),
+              Obx(
+                () => ActionItem(
+                    icon: const Icon(FontAwesomeIcons.b),
+                    selectIcon: const Icon(FontAwesomeIcons.b),
+                    onTap: () => videoIntroController.actionCoinVideo(),
+                    selectStatus: videoIntroController.hasCoin.value,
+                    loadingStatus: widget.loadingStatus,
+                    text: !widget.loadingStatus
+                        ? widget.videoDetail!.stat!.coin!.toString()
+                        : '-'),
+              ),
+              Obx(
+                () => ActionItem(
+                    icon: const Icon(FontAwesomeIcons.heart),
+                    selectIcon: const Icon(FontAwesomeIcons.heartCircleCheck),
+                    onTap: () => showFavBottomSheet(),
+                    selectStatus: videoIntroController.hasFav.value,
+                    loadingStatus: widget.loadingStatus,
+                    text: !widget.loadingStatus
+                        ? widget.videoDetail!.stat!.favorite!.toString()
+                        : '-'),
+              ),
+              ActionItem(
+                  icon: const Icon(FontAwesomeIcons.shareFromSquare),
+                  onTap: () => videoIntroController.actionShareVideo(),
+                  selectStatus: false,
                   loadingStatus: widget.loadingStatus,
                   text: !widget.loadingStatus
-                      ? widget.videoDetail!.stat!.like!.toString()
+                      ? widget.videoDetail!.stat!.share!.toString()
                       : '-'),
-            ),
-            // ActionItem(
-            //     icon: const Icon(FontAwesomeIcons.thumbsDown),
-            //     selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
-            //     onTap: () => {},
-            //     selectStatus: false,
-            //     loadingStatus: widget.loadingStatus,
-            //     text: '不喜欢'),
-            Obx(
-              () => ActionItem(
-                  icon: const Icon(FontAwesomeIcons.b),
-                  selectIcon: const Icon(FontAwesomeIcons.b),
-                  onTap: () => videoIntroController.actionCoinVideo(),
-                  selectStatus: videoIntroController.hasCoin.value,
+              ActionItem(
+                  icon: const Icon(FontAwesomeIcons.comments),
+                  onTap: () {
+                    videoDetailCtr.tabCtr.animateTo(1);
+                  },
+                  selectStatus: false,
                   loadingStatus: widget.loadingStatus,
                   text: !widget.loadingStatus
-                      ? widget.videoDetail!.stat!.coin!.toString()
+                      ? widget.videoDetail!.stat!.reply!.toString()
                       : '-'),
-            ),
-            Obx(
-              () => ActionItem(
-                  icon: const Icon(FontAwesomeIcons.heart),
-                  selectIcon: const Icon(FontAwesomeIcons.heartCircleCheck),
-                  onTap: () => showFavBottomSheet(),
-                  selectStatus: videoIntroController.hasFav.value,
-                  loadingStatus: widget.loadingStatus,
-                  text: !widget.loadingStatus
-                      ? widget.videoDetail!.stat!.favorite!.toString()
-                      : '-'),
-            ),
-            ActionItem(
-                icon: const Icon(FontAwesomeIcons.shareFromSquare),
-                onTap: () => videoIntroController.actionShareVideo(),
-                selectStatus: false,
-                loadingStatus: widget.loadingStatus,
-                text: !widget.loadingStatus
-                    ? widget.videoDetail!.stat!.share!.toString()
-                    : '-'),
-          ],
+            ],
+          ),
         ),
       );
     });

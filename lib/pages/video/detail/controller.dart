@@ -10,8 +10,10 @@ import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 
-class VideoDetailController extends GetxController {
+class VideoDetailController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   int tabInitialIndex = 0;
+  TabController? tabCtr;
   // tabs
   RxList<String> tabs = <String>['简介', '评论'].obs;
 
@@ -63,6 +65,7 @@ class VideoDetailController extends GetxController {
       }
       heroTag = Get.arguments['heroTag'];
     }
+    tabCtr = TabController(length: 2, vsync: this);
     queryVideoUrl();
   }
 
