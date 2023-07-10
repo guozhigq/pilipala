@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
 
@@ -29,7 +26,12 @@ class _UpPanelState extends State<UpPanel> {
     super.initState();
     upList = widget.upData!.upList!;
     liveList = widget.upData!.liveUsers!.items!;
-    upList.insert(0, UpItem(face: '', uname: '全部动态', mid: -1));
+    upList.insert(
+        0,
+        UpItem(
+            face: 'https://files.catbox.moe/8uc48f.png',
+            uname: '全部动态',
+            mid: -1));
   }
 
   @override
@@ -103,7 +105,8 @@ class _UpPanelState extends State<UpPanel> {
       onTap: () {
         if (data.type == 'up') {
           currentMid = data.mid;
-          Get.find<DynamicsController>().mid = data.mid;
+          Get.find<DynamicsController>().mid.value = data.mid;
+          Get.find<DynamicsController>().upInfo.value = data;
           Get.find<DynamicsController>().onSelectUp(data.mid);
           int liveLen = liveList.length;
           int upLen = upList.length;

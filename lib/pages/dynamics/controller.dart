@@ -17,7 +17,8 @@ class DynamicsController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<FollowUpModel> upData = FollowUpModel().obs;
   // 默认获取全部动态
-  int mid = -1;
+  RxInt mid = (-1).obs;
+  Rx<UpItem> upInfo = UpItem().obs;
   List filterTypeList = [
     {
       'label': DynamicsType.all.labels,
@@ -41,6 +42,7 @@ class DynamicsController extends GetxController {
     },
   ];
   bool flag = false;
+  RxInt initialValue = 1.obs;
 
   Future queryFollowDynamic({type = 'init'}) async {
     // if (type == 'init') {
@@ -50,7 +52,7 @@ class DynamicsController extends GetxController {
       page: type == 'init' ? 1 : page,
       type: dynamicsType.value.values,
       offset: offset,
-      mid: mid,
+      mid: mid.value,
     );
     if (res['status']) {
       if (type == 'init') {
@@ -65,7 +67,10 @@ class DynamicsController extends GetxController {
   }
 
   onSelectType(value) async {
-    dynamicsType.value = value;
+    dynamicsType.value = filterTypeList[value - 1]['value'];
+    dynamicsList!.value = [DynamicItemModel()];
+    page = 1;
+    initialValue.value = value;
     await queryFollowDynamic();
     scrollController.jumpTo(0);
   }
@@ -127,7 +132,8 @@ class DynamicsController extends GetxController {
 
   onSelectUp(mid) async {
     dynamicsType.value = DynamicsType.values[0];
-
+    dynamicsList!.value = [DynamicItemModel()];
+    page = 1;
     queryFollowDynamic();
   }
 

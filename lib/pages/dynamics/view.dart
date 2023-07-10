@@ -1,3 +1,5 @@
+import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -59,40 +61,94 @@ class _DynamicsPageState extends State<DynamicsPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Obx(
-                    () => SegmentedButton<DynamicsType>(
-                      showSelectedIcon: false,
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(
-                            const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 10)),
-                        side: MaterialStateProperty.all(
-                          BorderSide(
-                              color: Theme.of(context).hintColor, width: 0.5),
+                  Obx(() {
+                    if (_dynamicsController.mid.value != -1 &&
+                        _dynamicsController.upInfo.value.uname != null) {
+                      return SizedBox(
+                        height: 36,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                              '${_dynamicsController.upInfo.value.uname!}的动态',
+                              key: ValueKey<String>(
+                                  _dynamicsController.upInfo.value.uname!),
+                              style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .fontSize,
+                              )),
                         ),
-                      ),
-                      segments: <ButtonSegment<DynamicsType>>[
-                        for (var i in _dynamicsController.filterTypeList) ...[
-                          ButtonSegment<DynamicsType>(
-                            value: i['value'],
-                            label: Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Text(i['label']),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  }),
+                  Obx(() => Visibility(
+                        visible: _dynamicsController.mid.value == -1,
+                        child: CustomSlidingSegmentedControl<int>(
+                          initialValue: _dynamicsController.initialValue.value,
+                          children: {
+                            1: Text(
+                              '全部',
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .fontSize),
                             ),
-                            enabled: i['enabled'],
+                            2: Text('投稿',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize)),
+                            3: Text('番剧',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize)),
+                            // 4: Text(
+                            //   '专栏',
+                            //   style: TextStyle(
+                            //       fontSize: Theme.of(context)
+                            //           .textTheme
+                            //           .labelMedium!
+                            //           .fontSize),
+                            // ),
+                          },
+                          padding: 16.0,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceVariant
+                                .withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        ]
-                      ],
-                      selected: <DynamicsType>{
-                        _dynamicsController.dynamicsType.value
-                      },
-                      onSelectionChanged: (Set<DynamicsType> newSelection) {
-                        _dynamicsController.dynamicsType.value =
-                            newSelection.first;
-                        _dynamicsController.onSelectType(newSelection.first);
-                      },
-                    ),
-                  ),
+                          thumbDecoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.background,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              width: 1.2,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceVariant
+                                  .withOpacity(0.7),
+                            ),
+                          ),
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          onValueChanged: (v) {
+                            _dynamicsController.onSelectType(v);
+                          },
+                        ),
+                      ))
                 ],
               ),
               Positioned(
@@ -102,7 +158,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
-                    _dynamicsController.mid = -1;
+                    _dynamicsController.mid.value = -1;
                     _dynamicsController.dynamicsType.value =
                         DynamicsType.values[0];
                     SmartDialog.showToast('还原默认加载',
@@ -150,11 +206,14 @@ class _DynamicsPageState extends State<DynamicsPage>
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList!;
                     return Obx(
-                      () => SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return DynamicPanel(item: list[index]);
-                        }, childCount: list.length),
-                      ),
+                      () => list.length == 1
+                          ? skeleton()
+                          : SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                return DynamicPanel(item: list[index]);
+                              }, childCount: list.length),
+                            ),
                     );
                   } else {
                     return HttpError(
