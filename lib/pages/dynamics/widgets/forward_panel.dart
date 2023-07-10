@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'additional_panel.dart';
 import 'article_panel.dart';
+import 'live_panel.dart';
 import 'live_rcmd_panel.dart';
 import 'pic_panel.dart';
 import 'rich_node_panel.dart';
@@ -88,6 +90,8 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     // 直播
     case 'DYNAMIC_TYPE_LIVE_RCMD':
       return liveRcmdPanel(item, context, floor: floor);
+    case 'DYNAMIC_TYPE_LIVE':
+      return livePanel(item, context, floor: floor);
     // 合集
     case 'DYNAMIC_TYPE_UGC_SEASON':
       return videoSeasonWidget(item, context, 'ugcSeason');
@@ -119,8 +123,17 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 Text(item.modules.moduleDynamic.desc.text)
               ],
             )
-          : const SizedBox(height: 0);
+          : item.modules.moduleDynamic.additional != null
+              ? addWidget(
+                  item,
+                  context,
+                  item.modules.moduleDynamic.additional.type,
+                  floor: floor,
+                )
+              : const SizedBox(height: 0);
     case 'DYNAMIC_TYPE_PGC':
+      return videoSeasonWidget(item, context, 'pgc', floor: floor);
+    case 'DYNAMIC_TYPE_PGC_UNION':
       return videoSeasonWidget(item, context, 'pgc', floor: floor);
     case 'DYNAMIC_TYPE_NONE':
       return Row(

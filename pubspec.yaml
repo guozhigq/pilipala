@@ -65,21 +65,25 @@ dependencies:
   share_plus: ^6.3.1
   # webView
   url_launcher: ^6.1.9
+  # cookie 管理
   webview_cookie_manager: ^2.0.6
+  # 浏览器
   webview_flutter: ^4.2.0
-
+  # 解决sliver滑动不同步
   extended_nested_scroll_view: ^6.0.0
+  # 图标
   font_awesome_flutter: ^10.4.0
   # toast
   flutter_smart_dialog: ^4.9.0+6
+  # 下滑关闭
   dismissible_page: ^1.0.2
+  # 媒体播放
   flutter_meedu_media_kit:
     # path: /Users/rr/Desktop/code/flutter_meedu_media_kit/package
     git:
       url: https://github.com/guozhigq/flutter_meedu_media_kit.git
       ref: feature-custom
       path: package
-  screenshot: ^1.3.0
 
 dev_dependencies:
   flutter_test:

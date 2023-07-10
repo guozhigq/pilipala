@@ -299,6 +299,7 @@ class DynamicMajorModel {
     this.opus,
     this.pgc,
     this.liveRcmd,
+    this.live,
     this.none,
     this.type,
   });
@@ -309,6 +310,7 @@ class DynamicMajorModel {
   DynamicOpusModel? opus;
   DynamicArchiveModel? pgc;
   DynamicLiveModel? liveRcmd;
+  DynamicLive2Model? live;
   DynamicNoneModel? none;
   // MAJOR_TYPE_DRAW 图片
   // MAJOR_TYPE_ARCHIVE 视频
@@ -331,6 +333,8 @@ class DynamicMajorModel {
     liveRcmd = json['live_rcmd'] != null
         ? DynamicLiveModel.fromJson(json['live_rcmd'])
         : null;
+    live =
+        json['live'] != null ? DynamicLive2Model.fromJson(json['live']) : null;
     none =
         json['none'] != null ? DynamicNoneModel.fromJson(json['none']) : null;
     type = json['type'];
@@ -591,6 +595,42 @@ class DynamicLiveModel {
       title = livePlayInfo['title'];
       liveStartTime = livePlayInfo['live_start_time'];
     }
+  }
+}
+
+class DynamicLive2Model {
+  DynamicLive2Model({
+    this.badge,
+    this.cover,
+    this.descFirst,
+    this.descSecond,
+    this.id,
+    this.jumpUrl,
+    this.liveState,
+    this.reserveType,
+    this.title,
+  });
+
+  Map? badge;
+  String? cover;
+  String? descFirst;
+  String? descSecond;
+  int? id;
+  String? jumpUrl;
+  int? liveState;
+  int? reserveType;
+  String? title;
+
+  DynamicLive2Model.fromJson(Map<String, dynamic> json) {
+    badge = json['badge'];
+    cover = json['cover'];
+    descFirst = json['desc_first'];
+    descSecond = json['desc_second'];
+    id = json['id'];
+    jumpUrl = json['jump_url'];
+    liveState = json['liv_state'];
+    reserveType = json['reserve_type'];
+    title = json['title'];
   }
 }
 
