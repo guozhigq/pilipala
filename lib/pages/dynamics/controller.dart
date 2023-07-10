@@ -40,6 +40,7 @@ class DynamicsController extends GetxController {
       'enabled': true
     },
   ];
+  bool flag = false;
 
   Future queryFollowDynamic({type = 'init'}) async {
     // if (type == 'init') {
@@ -128,5 +129,22 @@ class DynamicsController extends GetxController {
     dynamicsType.value = DynamicsType.values[0];
 
     queryFollowDynamic();
+  }
+
+  onRefresh() async {
+    page = 1;
+    queryFollowUp();
+    await queryFollowDynamic();
+  }
+
+  // 返回顶部并刷新
+  void animateToTop() async {
+    if (scrollController.offset >=
+        MediaQuery.of(Get.context!).size.height * 5) {
+      scrollController.jumpTo(0);
+    } else {
+      await scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    }
   }
 }

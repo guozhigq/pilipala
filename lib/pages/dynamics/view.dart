@@ -117,11 +117,7 @@ class _DynamicsPageState extends State<DynamicsPage>
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          _dynamicsController.page = 1;
-          _dynamicsController.queryFollowUp();
-          await _dynamicsController.queryFollowDynamic();
-        },
+        onRefresh: () => _dynamicsController.onRefresh(),
         child: CustomScrollView(
           controller: _dynamicsController.scrollController,
           slivers: [

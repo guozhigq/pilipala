@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import './controller.dart';
@@ -15,6 +16,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
   final HotController _hotController = Get.put(HotController());
+  final DynamicsController _dynamicController = Get.put(DynamicsController());
+
   PageController? _pageController;
 
   late AnimationController? _animationController;
@@ -81,6 +84,22 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _hotController.flag = true;
     } else {
       _hotController.flag = false;
+    }
+
+    if (currentPage is DynamicsPage) {
+      if (_dynamicController.flag) {
+        // 单击返回顶部 双击并刷新
+        if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
+          _dynamicController.onRefresh();
+        } else {
+          await Future.delayed(const Duration(microseconds: 300));
+          _dynamicController.animateToTop();
+        }
+        _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+      }
+      _dynamicController.flag = true;
+    } else {
+      _dynamicController.flag = false;
     }
   }
 
