@@ -49,6 +49,8 @@ class VideoDetailController extends GetxController
 
   Timer? timer;
 
+  RxString bgCover = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -58,10 +60,12 @@ class VideoDetailController extends GetxController
         var args = Get.arguments['videoItem'];
         if (args.pic != null && args.pic != '') {
           videoItem['pic'] = args.pic;
+          bgCover.value = args.pic;
         }
       }
       if (Get.arguments.containsKey('pic')) {
         videoItem['pic'] = Get.arguments['pic'];
+        bgCover.value = Get.arguments['pic'];
       }
       heroTag = Get.arguments['heroTag'];
     }
@@ -135,7 +139,11 @@ class VideoDetailController extends GetxController
 
   void markHeartBeat() async {
     Duration progress = meeduPlayerController.position.value;
-    await VideoHttp.heartBeat(bvid: bvid, progress: progress.inSeconds);
+    await VideoHttp.heartBeat(
+      bvid: bvid,
+      cid: cid,
+      progress: progress.inSeconds,
+    );
   }
 
   @override

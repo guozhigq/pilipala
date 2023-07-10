@@ -345,10 +345,11 @@ class ReplyItemRow extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
-                      8,
-                      i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
-                      8,
-                      5),
+                    8,
+                    i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
+                    8,
+                    i == 0 && (extraRow == 1 || replies!.length > 1) ? 5 : 6,
+                  ),
                   child: Text.rich(
                     overflow: extraRow == 1
                         ? TextOverflow.ellipsis

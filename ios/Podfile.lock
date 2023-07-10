@@ -119,7 +119,7 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
   media_kit_libs_ios_video: 96259eccffaa309b63a7ee610c2c7786a3b335e5
-  media_kit_native_event_loop: 9f9eb778d0d806ab9486eff7513f7f90f07d50f8
+  media_kit_native_event_loop: 1eac6db2378101404392c80606103b42f7c2c491
   media_kit_video: c6ae801433b484912087b519b45f1beac97b960b
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce

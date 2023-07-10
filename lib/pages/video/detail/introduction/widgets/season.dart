@@ -78,8 +78,13 @@ Widget seasonPanel(UgcSeason ugcSeason, cid) {
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
             child: Row(
               children: [
-                Text('合集：${ugcSeason.title!}'),
-                const Spacer(),
+                Expanded(
+                  child: Text(
+                    '合集：${ugcSeason.title!}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 15),
                 Text(
                   '${currentIndex + 1} / ${ugcSeason.epCount}',
                   style: Theme.of(context).textTheme.labelSmall,

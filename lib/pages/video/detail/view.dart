@@ -31,11 +31,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final ScrollController _extendNestCtr = ScrollController();
   late AnimationController animationController;
 
-  // final _meeduPlayerController = MeeduPlayerController(
-  //   pipEnabled: true,
-  //   controlsStyle: ControlsStyle.secondary,
-  //   enabledButtons: const EnabledButtons(pip: true),
-  // );
   StreamSubscription? _playerEventSubs;
   bool isPlay = false;
   PlayerStatus playerStatus = PlayerStatus.paused;
@@ -154,11 +149,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             top: 0,
             left: 0,
             right: 0,
-            child: NetworkImgLayer(
-              type: 'emote',
-              src: videoDetailController.videoItem['pic'],
-              width: Get.size.width,
-              height: videoHeight + 100,
+            child: Obx(
+              () => NetworkImgLayer(
+                type: 'emote',
+                src: videoDetailController.bgCover.value,
+                width: Get.size.width,
+                height: videoHeight,
+              ),
             ),
           ),
           Positioned.fill(
@@ -225,15 +222,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                               Icons.arrow_back_ios,
                                               size: 19,
                                             ),
-                                          ),
-                                          title: Text(
-                                            '视频详情',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: Theme.of(context)
-                                                    .textTheme
-                                                    .titleSmall!
-                                                    .fontSize),
                                           ),
                                         );
                                       },
@@ -304,14 +292,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               ),
                             ),
                           ),
-                          // 弹幕开关
-                          // const Spacer(),
-                          // Flexible(
-                          //   flex: 2,
-                          //   child: Container(
-                          //     height: 50,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),

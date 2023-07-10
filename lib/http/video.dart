@@ -305,11 +305,11 @@ class VideoHttp {
   }
 
   // 视频播放进度
-  static Future heartBeat({bvid, progress, realtime}) async {
+  static Future heartBeat({bvid, cid, progress, realtime}) async {
     var res = await Request().post(Api.heartBeat, queryParameters: {
       // 'aid': aid,
       'bvid': bvid,
-      // 'cid': '',
+      'cid': cid,
       // 'epid': '',
       // 'sid': '',
       // 'mid': '',

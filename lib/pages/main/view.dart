@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import './controller.dart';
 
 class MainApp extends StatefulWidget {
@@ -103,7 +102,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
           child: PageView(
             controller: _pageController,
-            // physics: const NeverScrollableScrollPhysics(),
             onPageChanged: (index) {
               selectedIndex = index;
               setState(() {});
@@ -112,16 +110,21 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: SalomonBottomBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
+        type: BottomNavigationBarType.shifting,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        selectedFontSize: 12.4,
         onTap: (value) => setIndex(value),
-        items: _mainController.navigationBars.map((e) {
-          return SalomonBottomBarItem(
-            icon: e['icon'],
-            title: Text(e['label']),
-            selectedColor: Theme.of(context).colorScheme.primary,
-          );
-        }).toList(),
+        items: [
+          ..._mainController.navigationBars.map((e) {
+            return BottomNavigationBarItem(
+              icon: e['icon'],
+              label: e['label'],
+            );
+          }).toList(),
+        ],
       ),
     );
   }

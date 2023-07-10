@@ -20,10 +20,9 @@ class HistoryItem extends StatelessWidget {
     return InkWell(
       onTap: () async {
         int cid = videoItem.history.cid ??
-            videoItem.history.oid ??
+            // videoItem.history.oid ??
             await SearchHttp.ab2c(aid: aid, bvid: bvid);
         await Future.delayed(const Duration(milliseconds: 200));
-        print(videoItem.history.business);
         if (videoItem.history.business.contains('article')) {
           Get.toNamed(
             '/webview',

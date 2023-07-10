@@ -79,7 +79,7 @@ dependencies:
       url: https://github.com/guozhigq/flutter_meedu_media_kit.git
       ref: feature-custom
       path: package
-  salomon_bottom_bar: ^3.3.2
+  screenshot: ^1.3.0
 
 dev_dependencies:
   flutter_test:
