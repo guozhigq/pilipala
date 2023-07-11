@@ -3,10 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
@@ -24,6 +28,8 @@ class _DynamicsPageState extends State<DynamicsPage>
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   Future? _futureBuilderFuture;
   bool _isLoadingMore = false;
+  Box userInfoCache = GStrorage.userInfo;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -55,7 +61,7 @@ class _DynamicsPageState extends State<DynamicsPage>
         scrolledUnderElevation: 0,
         titleSpacing: 0,
         title: SizedBox(
-          height: 36,
+          height: 34,
           child: Stack(
             children: [
               Row(
@@ -123,7 +129,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                             //           .fontSize),
                             // ),
                           },
-                          padding: 16.0,
+                          padding: 13.0,
                           decoration: BoxDecoration(
                             color: Theme.of(context)
                                 .colorScheme
@@ -135,7 +141,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                             color: Theme.of(context).colorScheme.background,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              width: 1.2,
+                              width: 1,
                               color: Theme.of(context)
                                   .colorScheme
                                   .surfaceVariant
@@ -152,22 +158,53 @@ class _DynamicsPageState extends State<DynamicsPage>
                 ],
               ),
               Positioned(
-                right: 10,
+                right: 4,
                 top: 0,
                 bottom: 0,
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () {
-                    _dynamicsController.mid.value = -1;
-                    _dynamicsController.dynamicsType.value =
-                        DynamicsType.values[0];
-                    SmartDialog.showToast('还原默认加载',
-                        alignment: Alignment.topCenter);
-                    _dynamicsController.queryFollowDynamic();
-                  },
-                  icon: const Icon(Icons.history),
+                  onPressed: () => _dynamicsController.resetSearch(),
+                  icon: const Icon(Icons.history, size: 21),
                 ),
-              )
+              ),
+              Positioned(
+                left: 10,
+                top: 0,
+                bottom: 0,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: userInfoCache.get('userInfoCache') != null
+                      ? GestureDetector(
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            builder: (_) => const SizedBox(
+                              height: 450,
+                              child: MinePage(),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            isScrollControlled: true,
+                          ),
+                          child: NetworkImgLayer(
+                            type: 'avatar',
+                            width: 30,
+                            height: 30,
+                            src: userInfoCache.get('userInfoCache').face,
+                          ),
+                        )
+                      : IconButton(
+                          onPressed: () => showModalBottomSheet(
+                            context: context,
+                            builder: (_) => const SizedBox(
+                              height: 450,
+                              child: MinePage(),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            isScrollControlled: true,
+                          ),
+                          icon: const Icon(CupertinoIcons.person, size: 22),
+                        ),
+                ),
+              ),
             ],
           ),
         ),

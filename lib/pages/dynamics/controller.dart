@@ -11,7 +11,7 @@ import 'package:pilipala/utils/utils.dart';
 class DynamicsController extends GetxController {
   int page = 1;
   String? offset = '';
-  RxList<DynamicItemModel>? dynamicsList = [DynamicItemModel()].obs;
+  RxList<DynamicItemModel> dynamicsList = [DynamicItemModel()].obs;
   Rx<DynamicsType> dynamicsType = DynamicsType.values[0].obs;
   RxString dynamicsTypeLabel = '全部'.obs;
   final ScrollController scrollController = ScrollController();
@@ -152,5 +152,15 @@ class DynamicsController extends GetxController {
       await scrollController.animateTo(0,
           duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
+  }
+
+  // 重置搜索
+  void resetSearch() {
+    mid.value = -1;
+    dynamicsType.value = DynamicsType.values[0];
+    initialValue.value = 1;
+    SmartDialog.showToast('还原默认加载', alignment: Alignment.topCenter);
+    dynamicsList.value = [DynamicItemModel()];
+    queryFollowDynamic();
   }
 }
