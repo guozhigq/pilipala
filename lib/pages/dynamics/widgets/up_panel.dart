@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class UpPanel extends StatefulWidget {
   FollowUpModel? upData;
@@ -20,6 +22,7 @@ class _UpPanelState extends State<UpPanel> {
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
   static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
+  Box user = GStrorage.user;
 
   @override
   void initState() {
@@ -27,11 +30,18 @@ class _UpPanelState extends State<UpPanel> {
     upList = widget.upData!.upList!;
     liveList = widget.upData!.liveUsers!.items!;
     upList.insert(
-        0,
-        UpItem(
-            face: 'https://files.catbox.moe/8uc48f.png',
-            uname: '全部动态',
-            mid: -1));
+      0,
+      UpItem(
+          face: 'https://files.catbox.moe/8uc48f.png', uname: '全部动态', mid: -1),
+    );
+    upList.insert(
+      1,
+      UpItem(
+        face: user.get(UserBoxKey.userFace),
+        uname: '我的',
+        mid: user.get(UserBoxKey.userMid),
+      ),
+    );
   }
 
   @override
