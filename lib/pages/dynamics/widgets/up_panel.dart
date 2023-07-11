@@ -62,11 +62,22 @@ class _UpPanelState extends State<UpPanel> {
                     top: 5, left: 12, right: 12, bottom: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       '最常访问',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
+                    SizedBox(
+                      height: 26,
+                      child: TextButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
+                        onPressed: () => Get.toNamed('/follow'),
+                        child:
+                            const Text('查看全部', style: TextStyle(fontSize: 12)),
+                      ),
+                    )
                   ],
                 ),
               ),

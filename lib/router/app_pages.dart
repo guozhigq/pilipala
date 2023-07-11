@@ -3,6 +3,7 @@ import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
+import 'package:pilipala/pages/follow/index.dart';
 import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
@@ -52,6 +53,8 @@ class Routes {
     // 动态
     GetPage(name: '/dynamics', page: () => const DynamicsPage()),
     // 动态详情
-    GetPage(name: '/dynamicDetail', page: () => const DynamicDetailPage())
+    GetPage(name: '/dynamicDetail', page: () => const DynamicDetailPage()),
+    // 关注
+    GetPage(name: '/follow', page: () => const FollowPage()),
   ];
 }

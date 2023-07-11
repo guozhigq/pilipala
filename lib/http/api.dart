@@ -167,4 +167,17 @@ class Api {
 
   // 番剧/剧集明细
   static const String bangumiInfo = '/pgc/view/web/season';
+
+  // 全部关注的up
+  // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
+  // order_type 排序规则 最近访问传空，最常访问传 attention
+  static const String followings = '/x/relation/followings';
+
+  // 指定分类的关注
+  // https://api.bilibili.com/x/relation/tag?mid=17340771&tagid=-10&pn=1&ps=20
+  static const String tagFollowings = '/x/relation/tag';
+
+  // 关注分类
+  // https://api.bilibili.com/x/relation/tags
+  static const String followingsClass = '/x/relation/tags';
 }
