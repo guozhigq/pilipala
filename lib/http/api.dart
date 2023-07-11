@@ -185,4 +185,9 @@ class Api {
   // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
   // order_type 排序规则 最近访问传空，最常访问传 attention
   static const String fans = 'https://api.bilibili.com/x/relation/fans';
+
+  // 直播
+  // ?page=1&page_size=30&platform=web
+  static const String liveList =
+      'https://api.live.bilibili.com/xlive/web-interface/v1/second/getUserRecommend';
 }

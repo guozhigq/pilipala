@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:pilipala/pages/live/index.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
 import './controller.dart';
 
@@ -20,16 +21,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    // _tabController = TabController(
-    //   initialIndex: _homeController.initialIndex,
-    //   length: _homeController.tabs.length,
-    //   vsync: this,
-    // );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +97,7 @@ class _HomePageState extends State<HomePage>
       body: TabBarView(
         controller: _homeController.tabController,
         children: const [
-          SizedBox(),
+          LivePage(),
           RcmdPage(),
           HotPage(),
         ],
