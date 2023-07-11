@@ -190,4 +190,10 @@ class Api {
   // ?page=1&page_size=30&platform=web
   static const String liveList =
       'https://api.live.bilibili.com/xlive/web-interface/v1/second/getUserRecommend';
+
+  // 直播间详情
+  // cid roomId
+  // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
+  static const String liveRoomInfo =
+      'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo';
 }

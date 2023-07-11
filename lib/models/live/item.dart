@@ -50,7 +50,7 @@ class LiveItemModel {
   Map? watchedShow;
 
   LiveItemModel.fromJson(Map<String, dynamic> json) {
-    roomId = json['room_id'];
+    roomId = json['roomid'];
     uid = json['uid'];
     title = json['title'];
     uname = json['uname'];

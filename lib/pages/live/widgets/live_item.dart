@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
@@ -22,7 +23,7 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: 0,
+      elevation: 0.8,
       clipBehavior: Clip.hardEdge,
       shape: RoundedRectangleBorder(
         borderRadius: StyleString.mdRadius,
@@ -42,13 +43,16 @@ class LiveCardV extends StatelessWidget {
         child: InkWell(
           onTap: () async {
             await Future.delayed(const Duration(milliseconds: 200));
-            // Get.toNamed('/video?bvid=${liveItem.bvid}&cid=${liveItem.cid}',
-            //     arguments: {'videoItem': liveItem, 'heroTag': heroTag});
+            Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
+                arguments: {'liveItem': liveItem, 'heroTag': heroTag});
           },
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.all(StyleString.imgRadius),
+                borderRadius: const BorderRadius.only(
+                  topLeft: StyleString.imgRadius,
+                  topRight: StyleString.imgRadius,
+                ),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
                   child: LayoutBuilder(builder: (context, boxConstraints) {
@@ -86,7 +90,7 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 8, 6, 7),
+        padding: const EdgeInsets.fromLTRB(8, 8, 6, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -99,7 +103,7 @@ class LiveContent extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             Row(
               children: [
                 UpTag(),
@@ -116,6 +120,7 @@ class LiveContent extends StatelessWidget {
                 )
               ],
             ),
+            const SizedBox(height: 2),
             Row(
               children: [
                 Text(
