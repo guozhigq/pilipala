@@ -85,6 +85,7 @@ dependencies:
       ref: feature-custom
       path: package
   custom_sliding_segmented_control: ^1.7.5
+  loading_more_list: ^5.0.3
   
 dev_dependencies:
   flutter_test:
@@ -144,9 +145,12 @@ flutter:
     - family: fansCard
       fonts:
         - asset: assets/fonts/fansCard.ttf
-    - family: ArchivoNarrow
+    - family: Jura-Bold
       fonts:
-        - asset: assets/fonts/ArchivoNarrow-BoldItalic.ttf
+        - asset: assets/fonts/Jura-Bold.ttf
+    - family: HarmonyOS
+      fonts:
+        - asset: assets/fonts/HarmonyOS_Sans_SC_Regular.ttf
        
   
   # For details regarding fonts from package dependencies,

@@ -13,7 +13,7 @@ import 'package:pilipala/utils/storage.dart';
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
     const HomePage(),
-    const HotPage(),
+    // const HotPage(),
     const DynamicsPage(),
     const MediaPage(),
   ];
@@ -25,13 +25,13 @@ class MainController extends GetxController {
       ),
       'label': "推荐",
     },
-    {
-      'icon': const Icon(
-        Icons.eco,
-        size: 20,
-      ),
-      'label': "热门",
-    },
+    // {
+    //   'icon': const Icon(
+    //     Icons.eco,
+    //     size: 20,
+    //   ),
+    //   'label': "热门",
+    // },
     {
       'icon': const Icon(
         Icons.bolt,

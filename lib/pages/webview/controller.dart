@@ -6,6 +6,7 @@ import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -71,7 +72,7 @@ class WebviewController extends GetxController {
                   userInfoCache.put('userInfoCache', result['data']);
                   Get.find<MineController>().userInfo.value = result['data'];
                   Get.find<MineController>().onInit();
-                  Get.find<HomeController>().queryRcmdFeed('onRefresh');
+                  Get.find<RcmdController>().queryRcmdFeed('onRefresh');
                   Get.back();
                 }
               } catch (e) {

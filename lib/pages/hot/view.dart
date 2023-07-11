@@ -6,7 +6,6 @@ import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/pages/hot/controller.dart';
-import 'package:pilipala/pages/home/widgets/app_bar.dart';
 
 class HotPage extends StatefulWidget {
   const HotPage({Key? key}) : super(key: key);
@@ -52,7 +51,6 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
         child: CustomScrollView(
           controller: _hotController.scrollController,
           slivers: [
-            const HomeAppBar(),
             FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
