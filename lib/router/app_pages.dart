@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
+import 'package:pilipala/pages/fan/index.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/follow/index.dart';
@@ -56,5 +57,7 @@ class Routes {
     GetPage(name: '/dynamicDetail', page: () => const DynamicDetailPage()),
     // 关注
     GetPage(name: '/follow', page: () => const FollowPage()),
+    // 粉丝
+    GetPage(name: '/fan', page: () => const FansPage()),
   ];
 }

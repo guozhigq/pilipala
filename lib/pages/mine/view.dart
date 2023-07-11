@@ -55,7 +55,8 @@ class MinePage extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (snapshot.data['status']) {
-                          return Obx(() => userInfoBuild(mineController, context));
+                          return Obx(
+                              () => userInfoBuild(mineController, context));
                         } else {
                           return userInfoBuild(mineController, context);
                         }
@@ -250,7 +251,7 @@ class MinePage extends StatelessWidget {
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () => Get.toNamed('/follow'),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -280,7 +281,7 @@ class MinePage extends StatelessWidget {
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () => Get.toNamed('/fan'),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

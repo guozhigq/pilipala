@@ -44,7 +44,7 @@ class _FollowPageState extends State<FollowPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: const Text('关注的用户'),
+        title: const Text('我的关注'),
       ),
       body: RefreshIndicator(
           onRefresh: () async =>

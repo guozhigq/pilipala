@@ -180,4 +180,9 @@ class Api {
   // 关注分类
   // https://api.bilibili.com/x/relation/tags
   static const String followingsClass = '/x/relation/tags';
+
+  // 粉丝
+  // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
+  // order_type 排序规则 最近访问传空，最常访问传 attention
+  static const String fans = 'https://api.bilibili.com/x/relation/fans';
 }
