@@ -13,8 +13,9 @@ final DynamicsController _dynamicsController = Get.put(DynamicsController());
 Widget liveRcmdPanel(item, context, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
-  int liveStatus = item.modules.moduleDynamic.major.liveRcmd.liveStatus;
   DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;
+  int liveStatus = liveRcmd.liveStatus!;
+  Map watchedShow = liveRcmd.watchedShow!;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -74,6 +75,8 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
                   src: item.modules.moduleDynamic.major.liveRcmd.cover,
                 ),
               ),
+              pBadge(watchedShow['text_large'], context, 6, 56, null, null,
+                  type: 'gray'),
               pBadge(
                   liveStatus == 1 ? '直播中' : '直播结束', context, 6, 6, null, null),
               Positioned(

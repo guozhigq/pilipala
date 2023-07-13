@@ -576,6 +576,7 @@ class DynamicLiveModel {
   String? areaName;
   String? title;
   int? liveStartTime;
+  Map? watchedShow;
 
   DynamicLiveModel.fromJson(Map<String, dynamic> json) {
     content = json['content'];
@@ -594,6 +595,7 @@ class DynamicLiveModel {
       areaName = livePlayInfo['area_name'];
       title = livePlayInfo['title'];
       liveStartTime = livePlayInfo['live_start_time'];
+      watchedShow = livePlayInfo['watched_show'];
     }
   }
 }

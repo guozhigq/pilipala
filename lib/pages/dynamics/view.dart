@@ -140,13 +140,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                           thumbDecoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.background,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              width: 1,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceVariant
-                                  .withOpacity(0.7),
-                            ),
                           ),
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,

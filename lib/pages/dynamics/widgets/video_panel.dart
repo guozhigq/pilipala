@@ -94,7 +94,7 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
                 clipBehavior: Clip.hardEdge,
                 decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
+                      begin: Alignment.center,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
                         Colors.transparent,
@@ -115,7 +115,9 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
                           color: Colors.white),
                       child: Row(
                         children: [
-                          Text(content.durationText ?? ''),
+                          pBadge(content.durationText ?? '', context, null,
+                              null, 0, 0,
+                              type: 'gray'),
                           if (content.durationText != null)
                             const SizedBox(width: 10),
                           Text(content.stat.play + '次围观'),

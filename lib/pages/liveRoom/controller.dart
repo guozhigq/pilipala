@@ -9,6 +9,7 @@ class LiveRoomController extends GetxController {
   String cover = '';
   late int roomId;
   var liveItem;
+  late String heroTag;
 
   MeeduPlayerController meeduPlayerController = MeeduPlayerController(
     colorTheme: Theme.of(Get.context!).colorScheme.primary,
@@ -22,6 +23,7 @@ class LiveRoomController extends GetxController {
     super.onInit();
     if (Get.arguments != null) {
       var args = Get.arguments['liveItem'];
+      heroTag = Get.arguments['heroTag'];
       liveItem = args;
       roomId = liveItem.roomId!;
       if (args.pic != null && args.pic != '') {
