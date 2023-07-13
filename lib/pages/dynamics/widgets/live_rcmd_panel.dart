@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'rich_node_panel.dart';
 
+final DynamicsController _dynamicsController = Get.put(DynamicsController());
 Widget liveRcmdPanel(item, context, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
+  int liveStatus = item.modules.moduleDynamic.major.liveRcmd.liveStatus;
+  DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -51,59 +58,67 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
         const SizedBox(height: 6),
       ],
       GestureDetector(
-        onTap: () {},
+        onTap: () {
+          _dynamicsController.pushDetail(item, floor);
+        },
         child: LayoutBuilder(builder: (context, box) {
           double width = box.maxWidth;
           return Stack(
             children: [
-              NetworkImgLayer(
-                type: floor == 1 ? 'emote' : null,
-                width: width,
-                height: width / StyleString.aspectRatio,
-                src: item.modules.moduleDynamic.major.liveRcmd.cover,
+              Hero(
+                tag: liveRcmd.roomId.toString(),
+                child: NetworkImgLayer(
+                  type: floor == 1 ? 'emote' : null,
+                  width: width,
+                  height: width / StyleString.aspectRatio,
+                  src: item.modules.moduleDynamic.major.liveRcmd.cover,
+                ),
               ),
+              pBadge(
+                  liveStatus == 1 ? '直播中' : '直播结束', context, 6, 6, null, null),
               Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    height: 80,
-                    padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: <Color>[
-                            Colors.transparent,
-                            Colors.black45,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: 80,
+                  padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: <Color>[
+                          Colors.transparent,
+                          Colors.black45,
+                        ],
+                      ),
+                      borderRadius: floor == 1
+                          ? null
+                          : const BorderRadius.all(Radius.circular(6))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      DefaultTextStyle.merge(
+                        style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .fontSize,
+                            color: Colors.white),
+                        child: Row(
+                          children: [
+                            Text(item.modules.moduleDynamic.major.liveRcmd
+                                    .areaName ??
+                                ''),
                           ],
                         ),
-                        borderRadius: floor == 1
-                            ? null
-                            : const BorderRadius.all(Radius.circular(6))),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        DefaultTextStyle.merge(
-                          style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium!
-                                  .fontSize,
-                              color: Colors.white),
-                          child: Row(
-                            children: [
-                              Text(item.modules.moduleDynamic.major.liveRcmd
-                                      .areaName ??
-                                  ''),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           );
         }),

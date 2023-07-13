@@ -91,15 +91,16 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                     controller: _meeduPlayerController!,
                   ),
                 ),
-                Container(
-                  color: Theme.of(context).colorScheme.background,
-                  height: 45,
-                  padding: const EdgeInsets.only(left: 12, right: 12),
-                  child: Row(children: [
-                    Text(
-                        _liveRoomController.liveItem.watchedShow['text_large']),
-                  ]),
-                ),
+                if (_liveRoomController.liveItem.watchedShow != null)
+                  Container(
+                    color: Theme.of(context).colorScheme.background,
+                    height: 45,
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: Row(children: [
+                      Text(_liveRoomController
+                          .liveItem.watchedShow['text_large']),
+                    ]),
+                  ),
               ],
             ),
           )

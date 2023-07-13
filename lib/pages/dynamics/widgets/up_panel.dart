@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
+import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -148,7 +149,16 @@ class _UpPanelState extends State<UpPanel> {
 
           setState(() {});
         } else if (data.type == 'live') {
-          SmartDialog.showToast('直播功能暂未开发');
+          LiveItemModel liveItem = LiveItemModel.fromJson({
+            'title': data.title,
+            'uname': data.uname,
+            'face': data.face,
+            'roomid': data.roomId,
+          });
+          Get.toNamed(
+            '/liveRoom?rooid=${data.roomId}',
+            arguments: {'liveItem': liveItem},
+          );
         }
       },
       child: Padding(

@@ -6,6 +6,7 @@ import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
+import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
@@ -118,6 +119,22 @@ class DynamicsController extends GetxController {
         print('纯文本');
         Get.toNamed('/dynamicDetail',
             arguments: {'item': item, 'floor': floor});
+        break;
+      case 'DYNAMIC_TYPE_LIVE_RCMD':
+        DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;
+        ModuleAuthorModel author = item.modules.moduleAuthor;
+        LiveItemModel liveItem = LiveItemModel.fromJson({
+          'title': liveRcmd.title,
+          'uname': author.name,
+          'cover': liveRcmd.cover,
+          'mid': author.mid,
+          'face': author.face,
+          'roomid': liveRcmd.roomId,
+        });
+        Get.toNamed('/liveRoom?roomid=${liveItem.roomId}', arguments: {
+          'liveItem': liveItem,
+          'heroTag': liveItem.roomId.toString()
+        });
         break;
     }
   }

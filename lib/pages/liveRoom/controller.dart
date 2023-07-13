@@ -20,12 +20,13 @@ class LiveRoomController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    var args = Get.arguments['liveItem'];
-    liveItem = args;
-    print(liveItem.roomId);
-    roomId = liveItem.roomId!;
-    if (args.pic != null && args.pic != '') {
-      cover = args.cover;
+    if (Get.arguments != null) {
+      var args = Get.arguments['liveItem'];
+      liveItem = args;
+      roomId = liveItem.roomId!;
+      if (args.pic != null && args.pic != '') {
+        cover = args.cover;
+      }
     }
     queryLiveInfo();
   }
