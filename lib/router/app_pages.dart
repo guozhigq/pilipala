@@ -10,6 +10,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
+import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
@@ -62,5 +63,7 @@ class Routes {
     GetPage(name: '/fan', page: () => const FansPage()),
     // 直播详情
     GetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
+    // 用户中心
+    GetPage(name: '/member', page: () => const MemberPage()),
   ];
 }

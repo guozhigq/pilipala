@@ -196,4 +196,9 @@ class Api {
   // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
   static const String liveRoomInfo =
       'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo';
+
+  // 用户信息 需要Wbi签名
+  // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
+  static const String memberInfo =
+      'https://api.bilibili.com/x/space/wbi/acc/info';
 }

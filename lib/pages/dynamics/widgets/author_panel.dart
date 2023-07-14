@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 Widget author(item, context) {
@@ -7,9 +8,8 @@ Widget author(item, context) {
     child: Row(
       children: [
         GestureDetector(
-          onTap: () {
-            print('个人主页');
-          },
+          onTap: () =>
+              Get.toNamed('/member?mid=${item.modules.moduleAuthor.mid}'),
           child: NetworkImgLayer(
             width: 40,
             height: 40,
