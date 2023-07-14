@@ -5,6 +5,7 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/business_type.dart';
+import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -19,11 +20,11 @@ class HistoryItem extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
-        int cid = videoItem.history.cid ??
-            // videoItem.history.oid ??
-            await SearchHttp.ab2c(aid: aid, bvid: bvid);
         await Future.delayed(const Duration(milliseconds: 200));
         if (videoItem.history.business.contains('article')) {
+          int cid = videoItem.history.cid ??
+              // videoItem.history.oid ??
+              await SearchHttp.ab2c(aid: aid, bvid: bvid);
           Get.toNamed(
             '/webview',
             parameters: {
@@ -32,7 +33,24 @@ class HistoryItem extends StatelessWidget {
               'pageTitle': videoItem.title
             },
           );
+        } else if (videoItem.history.business == 'live' &&
+            videoItem.liveStatus == 1) {
+          LiveItemModel liveItem = LiveItemModel.fromJson({
+            'face': videoItem.authorFace,
+            'roomid': videoItem.history.oid,
+            'pic': videoItem.cover,
+            'title': videoItem.title,
+            'uname': videoItem.authorName,
+            'cover': videoItem.cover,
+          });
+          Get.toNamed(
+            '/liveRoom?roomId=${videoItem.history.oid}',
+            arguments: {'liveItem': liveItem},
+          );
         } else {
+          int cid = videoItem.history.cid ??
+              // videoItem.history.oid ??
+              await SearchHttp.ab2c(aid: aid, bvid: bvid);
           Get.toNamed('/video?bvid=$bvid&cid=$cid',
               arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
         }

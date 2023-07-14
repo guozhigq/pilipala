@@ -21,13 +21,12 @@ class LiveRoomController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    roomId = int.parse(Get.parameters['roomId']!);
     if (Get.arguments != null) {
-      var args = Get.arguments['liveItem'];
+      liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
-      liveItem = args;
-      roomId = liveItem.roomId!;
-      if (args.pic != null && args.pic != '') {
-        cover = args.cover;
+      if (liveItem.pic != null && liveItem.pic != '') {
+        cover = liveItem.cover;
       }
     }
     queryLiveInfo();
