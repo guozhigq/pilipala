@@ -170,6 +170,10 @@ class _MemberPageState extends State<MemberPage>
                                                         1
                                                     ? '个人认证：'
                                                     : '企业认证：',
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                ),
                                               ),
                                               Text(
                                                 _memberController.memberInfo

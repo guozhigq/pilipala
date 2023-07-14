@@ -375,18 +375,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     },
                     child: Row(
                       children: [
-                        Hero(
-                          tag: videoItem['owner'].mid + 99,
-                          child: NetworkImgLayer(
-                            type: 'avatar',
-                            src: !widget.loadingStatus
-                                ? widget.videoDetail!.owner!.face
-                                : videoItem['owner'].face,
-                            width: 38,
-                            height: 38,
-                            fadeInDuration: Duration.zero,
-                            fadeOutDuration: Duration.zero,
-                          ),
+                        NetworkImgLayer(
+                          type: 'avatar',
+                          src: !widget.loadingStatus
+                              ? widget.videoDetail!.owner!.face
+                              : videoItem['owner'].face,
+                          width: 38,
+                          height: 38,
+                          fadeInDuration: Duration.zero,
+                          fadeOutDuration: Duration.zero,
                         ),
                         const SizedBox(width: 14),
                         Column(

@@ -51,72 +51,56 @@ class _UpPanelState extends State<UpPanel> {
       floating: true,
       pinned: false,
       delegate: _SliverHeaderDelegate(
-        height: 115,
+        height: 90,
         child: Container(
-          height: 115,
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).dividerColor.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-            color: Theme.of(context).colorScheme.surface,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 5, left: 12, right: 12, bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '最常访问',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 26,
-                      child: TextButton(
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.zero),
-                        ),
-                        onPressed: () => Get.toNamed('/follow'),
-                        child:
-                            const Text('查看全部', style: TextStyle(fontSize: 12)),
+            height: 90,
+            color: Theme.of(context).colorScheme.background,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    controller: scrollController,
+                    children: [
+                      const SizedBox(width: 10),
+                      for (int i = 0; i < liveList.length; i++) ...[
+                        upItemBuild(liveList[i], i)
+                      ],
+                      VerticalDivider(
+                        indent: 20,
+                        endIndent: 40,
+                        width: 26,
+                        color: Theme.of(context).primaryColor.withOpacity(0.5),
                       ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  controller: scrollController,
-                  children: [
-                    const SizedBox(width: 10),
-                    for (int i = 0; i < liveList.length; i++) ...[
-                      upItemBuild(liveList[i], i)
+                      for (int i = 0; i < upList.length; i++) ...[
+                        upItemBuild(upList[i], i)
+                      ],
+                      const SizedBox(width: 10),
                     ],
-                    VerticalDivider(
-                      indent: 15,
-                      endIndent: 35,
-                      width: 26,
-                      color: Theme.of(context).primaryColor.withOpacity(0.5),
+                  ),
+                ),
+                Material(
+                  child: InkWell(
+                    onTap: () => Get.toNamed('/follow'),
+                    child: Container(
+                      height: 100,
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondaryContainer
+                          .withOpacity(0.3),
+                      child: Center(
+                        child: Text(
+                          '全部',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
                     ),
-                    for (int i = 0; i < upList.length; i++) ...[
-                      upItemBuild(upList[i], i)
-                    ],
-                    const SizedBox(width: 10),
-                  ],
+                  ),
                 ),
-              )
-            ],
-          ),
-        ),
+              ],
+            )),
       ),
     );
   }
@@ -141,6 +125,7 @@ class _UpPanelState extends State<UpPanel> {
           } else {
             moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
           }
+          data.hasUpdate = false;
           scrollController.animateTo(
             moveDistance,
             duration: const Duration(milliseconds: 500),
@@ -194,7 +179,7 @@ class _UpPanelState extends State<UpPanel> {
                   width: contentWidth,
                   child: Text(
                     data.uname,
-                    overflow: TextOverflow.fade,
+                    overflow: TextOverflow.ellipsis,
                     softWrap: false,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -242,57 +227,37 @@ class UpPanelSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-              const EdgeInsets.only(top: 5, left: 12, right: 12, bottom: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                '最常访问',
-                style: TextStyle(fontWeight: FontWeight.bold),
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 10,
+      itemBuilder: ((context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 49,
+                height: 49,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(24),
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 6),
+                width: 45,
+                height: 12,
+                color: Theme.of(context).colorScheme.onInverseSurface,
               ),
             ],
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 10,
-            itemBuilder: ((context, index) => Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 49,
-                        height: 49,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.onInverseSurface,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(24),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        width: 45,
-                        height: 12,
-                        color: Theme.of(context).colorScheme.onInverseSurface,
-                      ),
-                    ],
-                  ),
-                )),
-          ),
-        )
-      ],
+        );
+      }),
     );
   }
 }

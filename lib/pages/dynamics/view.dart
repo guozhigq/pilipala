@@ -221,7 +221,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 } else {
                   return const SliverToBoxAdapter(
                       child: SizedBox(
-                    height: 115,
+                    height: 90,
                     child: UpPanelSkeleton(),
                   ));
                 }
