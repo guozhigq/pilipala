@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/utils.dart';
 
 Widget author(item, context) {
+  String heroTag = Utils.makeHeroTag(item.modules.moduleAuthor.mid);
   return Container(
     padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
     child: Row(
       children: [
         GestureDetector(
-          onTap: () =>
-              Get.toNamed('/member?mid=${item.modules.moduleAuthor.mid}'),
-          child: NetworkImgLayer(
-            width: 40,
-            height: 40,
-            type: 'avatar',
-            src: item.modules.moduleAuthor.face,
+          onTap: () => Get.toNamed(
+              '/member?mid=${item.modules.moduleAuthor.mid}',
+              arguments: {
+                'face': item.modules.moduleAuthor.face,
+                'heroTag': heroTag
+              }),
+          child: Hero(
+            tag: heroTag,
+            child: NetworkImgLayer(
+              width: 40,
+              height: 40,
+              type: 'avatar',
+              src: item.modules.moduleAuthor.face,
+            ),
           ),
         ),
         const SizedBox(width: 10),

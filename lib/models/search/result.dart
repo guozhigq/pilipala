@@ -193,7 +193,7 @@ class SearchUserItemModel {
     usign = json['usign'];
     fans = json['fans'];
     videos = json['videos'];
-    upic = json['upic'];
+    upic = 'https:' + json['upic'];
     faceNft = json['face_nft'];
     faceNftType = json['face_nft_type'];
     verifyInfo = json['verify_info'];

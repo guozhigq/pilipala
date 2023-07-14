@@ -46,16 +46,19 @@ class ReplyItem extends StatelessWidget {
     );
   }
 
-  Widget lfAvtar(context) {
+  Widget lfAvtar(context, heroTag) {
     return Container(
         margin: const EdgeInsets.only(top: 5),
         child: Stack(
           children: [
-            NetworkImgLayer(
-              src: replyItem!.member!.avatar,
-              width: 34,
-              height: 34,
-              type: 'avatar',
+            Hero(
+              tag: heroTag,
+              child: NetworkImgLayer(
+                src: replyItem!.member!.avatar,
+                width: 34,
+                height: 34,
+                type: 'avatar',
+              ),
             ),
             if (replyItem!.member!.officialVerify != null &&
                 replyItem!.member!.officialVerify!['type'] == 0)
@@ -87,16 +90,18 @@ class ReplyItem extends StatelessWidget {
   }
 
   Widget content(context) {
+    String heroTag = Utils.makeHeroTag(replyItem!.mid);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // 头像、昵称
         GestureDetector(
-          // onTap: () =>
-          //     Get.toNamed('/member/${reply.userName}', parameters: {
-          //   'memberAvatar': reply.avatar,
-          //   'heroTag': reply.userName + heroTag,
-          // }),
+          onTap: () {
+            Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
+              'face': replyItem!.member!.avatar!,
+              'heroTag': heroTag
+            });
+          },
           child: SizedBox(
             width: double.infinity,
             child: Stack(
@@ -105,7 +110,7 @@ class ReplyItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    lfAvtar(context),
+                    lfAvtar(context, heroTag),
                     const SizedBox(width: 12),
                     Text(
                       replyItem!.member!.uname!,
@@ -367,9 +372,16 @@ class ReplyItemRow extends StatelessWidget {
                             color: Theme.of(context).colorScheme.primary,
                           ),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () => {
-                                  print('跳转至用户主页'),
-                                },
+                            ..onTap = () {
+                              String heroTag =
+                                  Utils.makeHeroTag(replies![i].member.mid);
+                              Get.toNamed(
+                                  '/member?mid=${replies![i].member.mid}',
+                                  arguments: {
+                                    'face': replies![i].member.avatar,
+                                    'heroTag': heroTag
+                                  });
+                            },
                         ),
                         if (replies![i].isUp)
                           WidgetSpan(
@@ -521,9 +533,13 @@ InlineSpan buildContent(BuildContext context, content) {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => {
-                            print('跳转至用户主页'),
-                          },
+                      ..onTap = () {
+                        String heroTag = Utils.makeHeroTag(value);
+                        Get.toNamed(
+                          '/member?mid=$value',
+                          arguments: {'face': '', 'heroTag': heroTag},
+                        );
+                      },
                   ),
                 );
               });

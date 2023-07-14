@@ -128,115 +128,112 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         _videoReplyController.currentPage = 0;
         return await _videoReplyController.queryReplyList();
       },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            CustomScrollView(
-              controller: _videoReplyController.scrollController,
-              key: const PageStorageKey<String>('评论'),
-              slivers: <Widget>[
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map data = snapshot.data as Map;
-                      if (data['status']) {
-                        // 请求成功
-                        return Obx(
-                          () => SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                if (index ==
-                                    _videoReplyController.replyList.length) {
-                                  return Container(
-                                    padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                            .padding
-                                            .bottom),
-                                    height:
-                                        MediaQuery.of(context).padding.bottom +
-                                            100,
-                                    child: Center(
-                                      child: Obx(() => Text(
-                                          _videoReplyController.noMore.value)),
-                                    ),
-                                  );
-                                } else {
-                                  return ReplyItem(
-                                      replyItem: _videoReplyController
-                                          .replyList[index],
-                                      showReplyRow: true,
-                                      replyLevel: replyLevel);
-                                }
-                              },
-                              childCount:
-                                  _videoReplyController.replyList.length + 1,
-                            ),
+      child: Stack(
+        children: [
+          CustomScrollView(
+            controller: _videoReplyController.scrollController,
+            key: const PageStorageKey<String>('评论'),
+            slivers: <Widget>[
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      // 请求成功
+                      return Obx(
+                        () => SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              if (index ==
+                                  _videoReplyController.replyList.length) {
+                                return Container(
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .padding
+                                          .bottom),
+                                  height:
+                                      MediaQuery.of(context).padding.bottom +
+                                          100,
+                                  child: Center(
+                                    child: Obx(() => Text(
+                                        _videoReplyController.noMore.value)),
+                                  ),
+                                );
+                              } else {
+                                return ReplyItem(
+                                    replyItem:
+                                        _videoReplyController.replyList[index],
+                                    showReplyRow: true,
+                                    replyLevel: replyLevel);
+                              }
+                            },
+                            childCount:
+                                _videoReplyController.replyList.length + 1,
                           ),
-                        );
-                      } else {
-                        // 请求错误
-                        return HttpError(
-                          errMsg: data['msg'],
-                          fn: () => setState(() {}),
-                        );
-                      }
+                        ),
+                      );
                     } else {
-                      // 骨架屏
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return const VideoReplySkeleton();
-                        }, childCount: 5),
+                      // 请求错误
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => setState(() {}),
                       );
                     }
-                  },
-                )
-              ],
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 14,
-              right: 14,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 2),
-                  // 评论内容为空/不足一屏
-                  // begin: const Offset(0, 0),
-                  end: const Offset(0, 0),
-                ).animate(CurvedAnimation(
-                  parent: fabAnimationCtr,
-                  curve: Curves.easeInOut,
-                )),
-                child: FloatingActionButton(
-                  heroTag: null,
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (builder) {
-                        return VideoReplyNewDialog(
-                          replyLevel: '0',
-                          oid: IdUtils.bv2av(Get.parameters['bvid']!),
-                          root: 0,
-                          parent: 0,
-                        );
-                      },
-                    ).then(
-                      (value) => {
-                        // 完成评论，数据添加
-                        if (value != null && value['data'])
-                          {_videoReplyController.replyList.add(value['data'])}
-                      },
+                  } else {
+                    // 骨架屏
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return const VideoReplySkeleton();
+                      }, childCount: 5),
                     );
-                  },
-                  tooltip: '发表评论',
-                  child: const Icon(Icons.reply),
-                ),
+                  }
+                },
+              )
+            ],
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).padding.bottom + 14,
+            right: 14,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 2),
+                // 评论内容为空/不足一屏
+                // begin: const Offset(0, 0),
+                end: const Offset(0, 0),
+              ).animate(CurvedAnimation(
+                parent: fabAnimationCtr,
+                curve: Curves.easeInOut,
+              )),
+              child: FloatingActionButton(
+                heroTag: null,
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (builder) {
+                      return VideoReplyNewDialog(
+                        replyLevel: '0',
+                        oid: IdUtils.bv2av(Get.parameters['bvid']!),
+                        root: 0,
+                        parent: 0,
+                      );
+                    },
+                  ).then(
+                    (value) => {
+                      // 完成评论，数据添加
+                      if (value != null && value['data'])
+                        {_videoReplyController.replyList.add(value['data'])}
+                    },
+                  );
+                },
+                tooltip: '发表评论',
+                child: const Icon(Icons.reply),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

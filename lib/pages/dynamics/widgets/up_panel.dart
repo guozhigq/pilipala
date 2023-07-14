@@ -174,12 +174,13 @@ class _UpPanelState extends State<UpPanel> {
               Badge(
                 smallSize: 8,
                 label: data.type == 'live' ? const Text('Live') : null,
-                textColor: Theme.of(context).colorScheme.onPrimary,
+                textColor: Theme.of(context).colorScheme.onSecondaryContainer,
                 alignment: AlignmentDirectional.bottomCenter,
-                padding: const EdgeInsets.only(left: 4, right: 4),
+                padding: const EdgeInsets.only(left: 6, right: 6),
                 isLabelVisible: data.type == 'live' ||
                     (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor:
+                    Theme.of(context).colorScheme.secondaryContainer,
                 child: NetworkImgLayer(
                   width: 49,
                   height: 49,

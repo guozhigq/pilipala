@@ -19,10 +19,23 @@ class MemberHttp {
   }
 
   static Future memberStat({int? mid}) async {
-    var res = await Request().get(Api.userStat, data: {mid: mid});
+    var res = await Request().get(Api.userStat, data: {'vmid': mid});
     if (res.data['code'] == 0) {
-      print(res.data['data']);
-      // return {'status': true, 'data': FansDataModel.fromJson(res.data['data'])};
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future memberCardInfo({int? mid}) async {
+    var res = await Request()
+        .get(Api.memberCardInfo, data: {'mid': mid, 'photo': true});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
     } else {
       return {
         'status': false,

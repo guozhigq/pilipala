@@ -89,20 +89,21 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                       controller: _meeduPlayerController!,
                     ),
                   ),
-                  Visibility(
-                    visible: isShowCover,
-                    child: Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: NetworkImgLayer(
-                        type: 'emote',
-                        src: _liveRoomController.liveItem.cover,
-                        width: Get.size.width,
-                        height: videoHeight,
+                  if (_liveRoomController.liveItem.cover != null)
+                    Visibility(
+                      visible: isShowCover,
+                      child: Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: NetworkImgLayer(
+                          type: 'emote',
+                          src: _liveRoomController.liveItem.cover,
+                          width: Get.size.width,
+                          height: videoHeight,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               )),
           if (_liveRoomController.liveItem.watchedShow != null)

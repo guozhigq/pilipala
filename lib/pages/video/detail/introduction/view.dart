@@ -360,62 +360,80 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     height: 26,
                     color: Theme.of(context).dividerColor.withOpacity(0.1),
                   ),
-                  Row(
-                    children: [
-                      NetworkImgLayer(
-                        type: 'avatar',
-                        src: !widget.loadingStatus
-                            ? widget.videoDetail!.owner!.face
-                            : videoItem['owner'].face,
-                        width: 38,
-                        height: 38,
-                        fadeInDuration: Duration.zero,
-                        fadeOutDuration: Duration.zero,
-                      ),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(!widget.loadingStatus
-                              ? widget.videoDetail!.owner!.name
-                              : videoItem['owner'].name),
-                          // const SizedBox(width: 10),
-                          Text(
-                            widget.loadingStatus
-                                ? '- 粉丝'
-                                : '${Utils.numFormat(videoIntroController.userStat['follower'])}粉丝',
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall!
-                                    .fontSize,
-                                color: Theme.of(context).colorScheme.outline),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      AnimatedOpacity(
-                        opacity: widget.loadingStatus ? 0 : 1,
-                        duration: const Duration(milliseconds: 150),
-                        child: SizedBox(
-                          height: 36,
-                          child: Obx(
-                            () => videoIntroController.followStatus.isNotEmpty
-                                ? ElevatedButton(
-                                    onPressed: () => videoIntroController
-                                        .actionRelationMod(),
-                                    child: Text(videoIntroController
-                                                .followStatus['attribute'] ==
-                                            0
-                                        ? '关注'
-                                        : '已关注'),
-                                  )
-                                : const SizedBox(),
+                  GestureDetector(
+                    onTap: () {
+                      int mid = !widget.loadingStatus
+                          ? widget.videoDetail!.owner!.mid
+                          : videoItem['owner'].mid;
+                      String face = !widget.loadingStatus
+                          ? widget.videoDetail!.owner!.face
+                          : videoItem['owner'].face;
+                      Get.toNamed('/member?mid=$mid', arguments: {
+                        'face': face,
+                        'heroTag': (mid + 99).toString()
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Hero(
+                          tag: videoItem['owner'].mid + 99,
+                          child: NetworkImgLayer(
+                            type: 'avatar',
+                            src: !widget.loadingStatus
+                                ? widget.videoDetail!.owner!.face
+                                : videoItem['owner'].face,
+                            width: 38,
+                            height: 38,
+                            fadeInDuration: Duration.zero,
+                            fadeOutDuration: Duration.zero,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 14),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(!widget.loadingStatus
+                                ? widget.videoDetail!.owner!.name
+                                : videoItem['owner'].name),
+                            // const SizedBox(width: 10),
+                            Text(
+                              widget.loadingStatus
+                                  ? '- 粉丝'
+                                  : '${Utils.numFormat(videoIntroController.userStat['follower'])}粉丝',
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize,
+                                  color: Theme.of(context).colorScheme.outline),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        AnimatedOpacity(
+                          opacity: widget.loadingStatus ? 0 : 1,
+                          duration: const Duration(milliseconds: 150),
+                          child: SizedBox(
+                            height: 36,
+                            child: Obx(
+                              () => videoIntroController.followStatus.isNotEmpty
+                                  ? ElevatedButton(
+                                      onPressed: () => videoIntroController
+                                          .actionRelationMod(),
+                                      child: Text(videoIntroController
+                                                  .followStatus['attribute'] ==
+                                              0
+                                          ? '关注'
+                                          : '已关注'),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
                   Divider(
                     height: 26,
                     color: Theme.of(context).dividerColor.withOpacity(0.1),

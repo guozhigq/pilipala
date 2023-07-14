@@ -23,7 +23,7 @@ class LiveRoomController extends GetxController {
     super.onInit();
     if (Get.arguments != null) {
       var args = Get.arguments['liveItem'];
-      heroTag = Get.arguments['heroTag'];
+      heroTag = Get.arguments['heroTag'] ?? '';
       liveItem = args;
       roomId = liveItem.roomId!;
       if (args.pic != null && args.pic != '') {
