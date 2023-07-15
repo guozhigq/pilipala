@@ -10,6 +10,7 @@ class MemberInfoModel {
     this.topPhoto,
     this.official,
     this.vip,
+    this.liveRoom,
   });
 
   int? mid;
@@ -29,13 +30,14 @@ class MemberInfoModel {
     name = json['name'];
     sex = json['sex'];
     face = json['face'];
-    sign = json['sign'] == '' ? '该用户还没有签名' : json['sign'];
+    sign = json['sign'] == '' ? '该用户还没有签名' : json['sign'].replaceAll('\n', '');
     level = json['level'];
     isFollowed = json['is_followed'];
     topPhoto = json['top_photo'];
     official = json['official'];
     vip = Vip.fromJson(json['vip']);
-    liveRoom = LiveRoom.fromJson(json['live_room']);
+    liveRoom =
+        json['live_room'] != null ? LiveRoom.fromJson(json['live_room']) : null;
   }
 }
 
@@ -80,12 +82,12 @@ class LiveRoom {
   int? roundStatus;
 
   LiveRoom.fromJson(Map<String, dynamic> json) {
-    roomStatus = json['room_status'];
-    liveStatus = json['live_status'];
+    roomStatus = json['roomStatus'];
+    liveStatus = json['liveStatus'];
     url = json['url'];
     title = json['title'];
     cover = json['cover'];
-    roomId = json['room_id'];
-    roundStatus = json['round_status'];
+    roomId = json['roomid'];
+    roundStatus = json['roundStatus'];
   }
 }

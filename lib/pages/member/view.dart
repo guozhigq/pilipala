@@ -1,7 +1,10 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/models/user/stat.dart';
 import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -39,7 +42,7 @@ class _MemberPageState extends State<MemberPage>
               elevation: 0,
               scrolledUnderElevation: 0,
               forceElevated: innerBoxIsScrolled,
-              expandedHeight: 300,
+              expandedHeight: 320,
               actions: [
                 IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
                 const SizedBox(width: 4),
@@ -97,8 +100,6 @@ class _MemberPageState extends State<MemberPage>
                                   alignment: AlignmentDirectional.center,
                                   children: [
                                     Column(
-                                      // mainAxisAlignment:
-                                      //     MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -117,7 +118,24 @@ class _MemberPageState extends State<MemberPage>
                                                       fontWeight:
                                                           FontWeight.bold),
                                             ),
-                                            const SizedBox(width: 6),
+                                            const SizedBox(width: 2),
+                                            if (_memberController
+                                                    .memberInfo.value.sex ==
+                                                '女')
+                                              const Icon(
+                                                FontAwesomeIcons.venus,
+                                                size: 14,
+                                                color: Colors.pink,
+                                              ),
+                                            if (_memberController
+                                                    .memberInfo.value.sex ==
+                                                '男')
+                                              const Icon(
+                                                FontAwesomeIcons.mars,
+                                                size: 14,
+                                                color: Colors.blue,
+                                              ),
+                                            const SizedBox(width: 4),
                                             Image.asset(
                                               'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
                                               height: 11,
@@ -159,39 +177,49 @@ class _MemberPageState extends State<MemberPage>
                                                 .official!['title'] !=
                                             '') ...[
                                           const SizedBox(height: 6),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                _memberController
-                                                                .memberInfo
-                                                                .value
-                                                                .official![
-                                                            'role'] ==
-                                                        1
-                                                    ? '个人认证：'
-                                                    : '企业认证：',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
+                                          Text.rich(
+                                            maxLines: 2,
+                                            TextSpan(
+                                              text: _memberController
+                                                          .memberInfo
+                                                          .value
+                                                          .official!['role'] ==
+                                                      1
+                                                  ? '个人认证：'
+                                                  : '企业认证：',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: _memberController
+                                                      .memberInfo
+                                                      .value
+                                                      .official!['title'],
                                                 ),
-                                              ),
-                                              Text(
-                                                _memberController.memberInfo
-                                                    .value.official!['title']!,
-                                              ),
-                                            ],
+                                              ],
+                                            ),
+                                            softWrap: true,
                                           ),
                                         ],
                                         const SizedBox(height: 4),
                                         if (_memberController
                                                 .memberInfo.value.sign !=
                                             '')
-                                          Text(
-                                            _memberController
-                                                .memberInfo.value.sign!,
-                                            textAlign: TextAlign.left,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
+                                          SelectableRegion(
+                                            magnifierConfiguration:
+                                                const TextMagnifierConfiguration(),
+                                            focusNode: FocusNode(),
+                                            selectionControls:
+                                                MaterialTextSelectionControls(),
+                                            child: Text(
+                                              _memberController
+                                                  .memberInfo.value.sign!,
+                                              textAlign: TextAlign.left,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                       ],
                                     ),
@@ -261,33 +289,50 @@ class _MemberPageState extends State<MemberPage>
                         ? memberInfo.face
                         : _memberController.face,
                   ),
-                  Positioned(
-                    bottom: 0,
-                    left: 14,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: Row(children: [
-                        Image.asset(
-                          'assets/images/live.gif',
-                          height: 10,
+                  if (!loadingStatus &&
+                      memberInfo.liveRoom != null &&
+                      memberInfo.liveRoom.liveStatus == 1)
+                    Positioned(
+                      bottom: 0,
+                      left: 14,
+                      child: GestureDetector(
+                        onTap: () {
+                          LiveItemModel liveItem = LiveItemModel.fromJson({
+                            'title': memberInfo.liveRoom.title,
+                            'uname': memberInfo.name,
+                            'face': memberInfo.face,
+                            'roomid': memberInfo.liveRoom.roomId,
+                          });
+                          Get.toNamed(
+                            '/liveRoom?roomid=${memberInfo.liveRoom.roomId}',
+                            arguments: {'liveItem': liveItem},
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Row(children: [
+                            Image.asset(
+                              'assets/images/live.gif',
+                              height: 10,
+                            ),
+                            Text(
+                              ' 直播中',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize),
+                            )
+                          ]),
                         ),
-                        Text(
-                          ' 直播中',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall!
-                                  .fontSize),
-                        )
-                      ]),
-                    ),
-                  )
+                      ),
+                    )
                 ],
               )),
           const SizedBox(width: 12),
@@ -356,35 +401,51 @@ class _MemberPageState extends State<MemberPage>
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.only(left: 42, right: 42),
-                        foregroundColor: !loadingStatus && memberInfo.isFollowed
-                            ? null
-                            : Theme.of(context).colorScheme.onPrimary,
-                        backgroundColor: !loadingStatus && memberInfo.isFollowed
-                            ? Theme.of(context).colorScheme.onInverseSurface
-                            : Theme.of(context).colorScheme.primary, // 设置按钮背景色
+                if (_memberController.ownerMid != _memberController.mid) ...[
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.only(left: 42, right: 42),
+                          foregroundColor:
+                              !loadingStatus && memberInfo.isFollowed
+                                  ? Theme.of(context).colorScheme.outline
+                                  : Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor: !loadingStatus &&
+                                  memberInfo.isFollowed
+                              ? Theme.of(context).colorScheme.onInverseSurface
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .primary, // 设置按钮背景色
+                        ),
+                        child: Text(!loadingStatus && memberInfo.isFollowed
+                            ? '取关'
+                            : '关注'),
                       ),
-                      child: Text(!loadingStatus && memberInfo.isFollowed
-                          ? '取关'
-                          : '关注'),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.only(left: 42, right: 42),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                        child: const Text('发消息'),
+                      )
+                    ],
+                  )
+                ] else ...[
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.only(left: 80, right: 80),
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.only(left: 42, right: 42),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.onInverseSurface,
-                      ),
-                      child: const Text('发消息'),
-                    )
-                  ],
-                )
+                    child: const Text('编辑资料'),
+                  )
+                ]
               ],
             ),
           ),

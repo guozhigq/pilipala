@@ -141,7 +141,7 @@ class _UpPanelState extends State<UpPanel> {
             'roomid': data.roomId,
           });
           Get.toNamed(
-            '/liveRoom?rooid=${data.roomId}',
+            '/liveRoom?roomid=${data.roomId}',
             arguments: {'liveItem': liveItem},
           );
         }
