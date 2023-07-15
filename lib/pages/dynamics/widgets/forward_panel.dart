@@ -68,6 +68,13 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 : const EdgeInsets.only(left: 12, right: 12),
             child: picWidget(item, context),
           ),
+          if (item.modules.moduleDynamic.additional != null)
+            addWidget(
+              item,
+              context,
+              item.modules.moduleDynamic.additional.type,
+              floor: floor,
+            )
         ],
       );
     // 视频

@@ -189,16 +189,29 @@ class DynamicAddModel {
     this.type,
     this.vote,
     this.ugc,
+    this.reserve,
+    this.goods,
   });
 
   String? type;
   Vote? vote;
   Ugc? ugc;
+  Reserve? reserve;
+  Good? goods;
+
+  /// TODO 比赛vs
+  String? match;
+
+  /// TODO 游戏信息
+  String? common;
 
   DynamicAddModel.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     vote = json['vote'] != null ? Vote.fromJson(json['vote']) : null;
     ugc = json['ugc'] != null ? Ugc.fromJson(json['ugc']) : null;
+    reserve =
+        json['reserve'] != null ? Reserve.fromJson(json['reserve']) : null;
+    goods = json['goods'] != null ? Good.fromJson(json['goods']) : null;
   }
 }
 
@@ -268,6 +281,97 @@ class Ugc {
     jumpUrl = json['jump_url'];
     multiLine = json['multi_line'];
     title = json['title'];
+  }
+}
+
+class Reserve {
+  Reserve({
+    this.button,
+    this.desc1,
+    this.desc2,
+    this.jumpUrl,
+    this.reserveTotal,
+    this.rid,
+    this.state,
+    this.stype,
+    this.title,
+    this.upMid,
+  });
+
+  Map? button;
+  Map? desc1;
+  Map? desc2;
+  String? jumpUrl;
+  int? reserveTotal;
+  int? rid;
+  int? state;
+  int? stype;
+  String? title;
+  int? upMid;
+
+  Reserve.fromJson(Map<String, dynamic> json) {
+    button = json['button'];
+    desc1 = json['desc1'];
+    desc2 = json['desc2'];
+    jumpUrl = json['jump_url'];
+    reserveTotal = json['reserve_total'];
+    rid = json['rid'];
+    state = json['state'];
+    state = json['state'];
+    stype = json['stype'];
+    title = json['title'];
+    upMid = json['up_mid'];
+  }
+}
+
+class Good {
+  Good({
+    this.headIcon,
+    this.headText,
+    this.items,
+    this.jumpUrl,
+  });
+
+  String? headIcon;
+  String? headText;
+  List<GoodItem>? items;
+  String? jumpUrl;
+
+  Good.fromJson(Map<String, dynamic> json) {
+    headIcon = json['head_icon'];
+    headText = json['head_text'];
+    items = json['items'].map<GoodItem>((e) => GoodItem.fromJson(e)).toList();
+    jumpUrl = json['jump_url'];
+  }
+}
+
+class GoodItem {
+  GoodItem({
+    this.brief,
+    this.cover,
+    this.id,
+    this.jumpDesc,
+    this.jumpUrl,
+    this.name,
+    this.price,
+  });
+
+  String? brief;
+  String? cover;
+  String? id;
+  String? jumpDesc;
+  String? jumpUrl;
+  String? name;
+  String? price;
+
+  GoodItem.fromJson(Map<String, dynamic> json) {
+    brief = json['brief'];
+    cover = json['cover'];
+    id = json['id'];
+    jumpDesc = json['jump_desc'];
+    jumpUrl = json['jump_url'];
+    name = json['name'];
+    price = json['price'];
   }
 }
 
