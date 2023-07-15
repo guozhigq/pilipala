@@ -8,7 +8,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/view.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box userInfoCache = GStrorage.userInfo;
+Box user = GStrorage.user;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -57,7 +57,7 @@ class HomeAppBar extends StatelessWidget {
                     const SizedBox(width: 6),
 
                     /// TODO
-                    if (userInfoCache.get('userInfoCache') != null) ...[
+                    if (user.get(UserBoxKey.userLogin)) ...[
                       GestureDetector(
                         onTap: () => showModalBottomSheet(
                           context: context,
@@ -72,7 +72,7 @@ class HomeAppBar extends StatelessWidget {
                           type: 'avatar',
                           width: 32,
                           height: 32,
-                          src: userInfoCache.get('userInfoCache').face,
+                          src: user.get(UserBoxKey.userMid),
                         ),
                       ),
                       const SizedBox(width: 10),

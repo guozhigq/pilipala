@@ -28,7 +28,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   Future? _futureBuilderFuture;
   bool _isLoadingMore = false;
-  Box userInfoCache = GStrorage.userInfo;
+  Box user = GStrorage.user;
 
   @override
   bool get wantKeepAlive => true;
@@ -166,7 +166,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 bottom: 0,
                 child: Align(
                   alignment: Alignment.center,
-                  child: userInfoCache.get('userInfoCache') != null
+                  child: user.get(UserBoxKey.userLogin)
                       ? GestureDetector(
                           onTap: () => showModalBottomSheet(
                             context: context,
@@ -181,7 +181,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                             type: 'avatar',
                             width: 30,
                             height: 30,
-                            src: userInfoCache.get('userInfoCache').face,
+                            src: user.get(UserBoxKey.userFace),
                           ),
                         )
                       : IconButton(
@@ -248,7 +248,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
-                      fn: () => _dynamicsController.queryFollowDynamic(),
+                      fn: () => _dynamicsController.onRefresh(),
                     );
                   }
                 } else {

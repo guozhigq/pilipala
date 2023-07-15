@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rcmd/controller.dart';
@@ -68,11 +69,15 @@ class WebviewController extends GetxController {
                   SmartDialog.showToast('登录成功');
                   Box user = GStrorage.user;
                   user.put(UserBoxKey.userLogin, true);
+                  user.put(UserBoxKey.userName, result['data'].uname);
+                  user.put(UserBoxKey.userFace, result['data'].face);
+                  user.put(UserBoxKey.userMid, result['data'].mid);
                   Box userInfoCache = GStrorage.userInfo;
                   userInfoCache.put('userInfoCache', result['data']);
                   Get.find<MineController>().userInfo.value = result['data'];
                   Get.find<MineController>().onInit();
                   Get.find<RcmdController>().queryRcmdFeed('onRefresh');
+                  Get.find<DynamicsController>().queryFollowDynamic();
                   Get.back();
                 }
               } catch (e) {
