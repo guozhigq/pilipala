@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 富文本
@@ -20,9 +21,10 @@ InlineSpan richNode(item, context) {
             mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () => Get.toNamed('/member?mid=${i.rid}',
+                    arguments: {'face': null}),
                 child: Text(
-                  '${i.text}',
+                  ' ${i.text}',
                   style: authorStyle,
                 ),
               ),

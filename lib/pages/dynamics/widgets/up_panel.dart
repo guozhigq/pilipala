@@ -164,8 +164,9 @@ class _UpPanelState extends State<UpPanel> {
                 padding: const EdgeInsets.only(left: 6, right: 6),
                 isLabelVisible: data.type == 'live' ||
                     (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor:
-                    Theme.of(context).colorScheme.secondaryContainer,
+                backgroundColor: data.type == 'live'
+                    ? Theme.of(context).colorScheme.secondaryContainer
+                    : Theme.of(context).colorScheme.primary,
                 child: NetworkImgLayer(
                   width: 49,
                   height: 49,

@@ -93,13 +93,11 @@ class DynamicsController extends GetxController {
         break;
       case 'DYNAMIC_TYPE_AV':
         String bvid = item.modules.moduleDynamic.major.archive.bvid;
-        int aid = item.modules.moduleDynamic.major.archive.aid;
         String cover = item.modules.moduleDynamic.major.archive.cover;
-        String heroTag = Utils.makeHeroTag(aid);
         try {
           int cid = await SearchHttp.ab2c(bvid: bvid);
           Get.toNamed('/video?bvid=$bvid&cid=$cid',
-              arguments: {'pic': cover, 'heroTag': heroTag});
+              arguments: {'pic': cover, 'heroTag': bvid});
         } catch (err) {
           SmartDialog.showToast(err.toString());
         }
@@ -136,6 +134,10 @@ class DynamicsController extends GetxController {
           'heroTag': liveItem.roomId.toString()
         });
         break;
+
+      /// TODO
+      case 'DYNAMIC_TYPE_UGC_SEASON':
+        print('合集');
     }
   }
 

@@ -572,17 +572,20 @@ class RichTextNodeItem {
     this.origText,
     this.text,
     this.type,
+    this.rid,
   });
   Emoji? emoji;
   String? origText;
   String? text;
   String? type;
+  String? rid;
 
   RichTextNodeItem.fromJson(Map<String, dynamic> json) {
     emoji = json['emoji'] != null ? Emoji.fromJson(json['emoji']) : null;
     origText = json['orig_text'];
     text = json['text'];
     type = json['type'];
+    rid = json['rid'];
   }
 }
 

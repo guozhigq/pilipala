@@ -50,33 +50,34 @@ class _MemberPageState extends State<MemberPage>
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   children: [
-                    Positioned.fill(
-                      bottom: 10,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.fitWidth,
-                            image: NetworkImage(_memberController.face!),
-                            alignment: Alignment.topCenter,
-                            isAntiAlias: true,
+                    if (_memberController.face != null)
+                      Positioned.fill(
+                        bottom: 10,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.fitWidth,
+                              image: NetworkImage(_memberController.face!),
+                              alignment: Alignment.topCenter,
+                              isAntiAlias: true,
+                            ),
                           ),
-                        ),
-                        foregroundDecoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context)
-                                  .colorScheme
-                                  .background
-                                  .withOpacity(0.44),
-                              Theme.of(context).colorScheme.background,
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            stops: const [0.0, 0.46],
+                          foregroundDecoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Theme.of(context)
+                                    .colorScheme
+                                    .background
+                                    .withOpacity(0.44),
+                                Theme.of(context).colorScheme.background,
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              stops: const [0.0, 0.46],
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     Positioned(
                       left: 0,
                       right: 0,

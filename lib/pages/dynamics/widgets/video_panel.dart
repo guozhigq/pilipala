@@ -1,5 +1,6 @@
 // 视频or合集
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -32,7 +33,9 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
         Row(
           children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () => Get.toNamed(
+                  '/member?mid=${item.modules.moduleAuthor.mid}',
+                  arguments: {'face': item.modules.moduleAuthor.face}),
               child: Text(
                 item.modules.moduleAuthor.type == null
                     ? '@${item.modules.moduleAuthor.name}'
@@ -76,11 +79,14 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
         double width = box.maxWidth;
         return Stack(
           children: [
-            NetworkImgLayer(
-              type: floor == 1 ? 'emote' : null,
-              width: width,
-              height: width / StyleString.aspectRatio,
-              src: content.cover,
+            Hero(
+              tag: content.bvid,
+              child: NetworkImgLayer(
+                type: floor == 1 ? 'emote' : null,
+                width: width,
+                height: width / StyleString.aspectRatio,
+                src: content.cover,
+              ),
             ),
             if (content.badge != null && type == 'pgc')
               pBadge(content.badge['text'], context, 8.0, 10.0, null, null),
