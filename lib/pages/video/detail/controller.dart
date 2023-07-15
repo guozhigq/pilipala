@@ -73,7 +73,7 @@ class VideoDetailController extends GetxController
     queryVideoUrl();
   }
 
-  showReplyReplyPanel() {
+  showReplyReplyPanel(paddingTop) {
     PersistentBottomSheetController<void>? ctr =
         scaffoldKey.currentState?.showBottomSheet<void>((BuildContext context) {
       return VideoReplyReplyPanel(
@@ -83,6 +83,7 @@ class VideoDetailController extends GetxController
           fRpid = 0,
         },
         firstFloor: firstFloor,
+        paddingTop: paddingTop,
       );
     });
     ctr?.closed.then((value) {

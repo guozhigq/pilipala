@@ -12,12 +12,14 @@ class VideoReplyNewDialog extends StatefulWidget {
   int? root;
   String? replyLevel;
   int? parent;
+  double? paddingTop;
 
   VideoReplyNewDialog({
     this.oid,
     this.root,
     this.replyLevel,
     this.parent,
+    this.paddingTop,
   });
 
   @override
@@ -97,10 +99,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
+    print('1111111');
     return Container(
       height: MediaQuery.of(context).size.height -
           MediaQuery.of(context).size.width * 9 / 16 -
-          45,
+          widget.paddingTop!,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(

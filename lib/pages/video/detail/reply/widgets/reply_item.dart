@@ -222,6 +222,7 @@ class ReplyItem extends StatelessWidget {
   // 感谢、回复、复制
   Widget bottonAction(context, replyControl) {
     var color = Theme.of(context).colorScheme.outline;
+    double paddingTop = MediaQuery.of(context).padding.top;
     return Row(
       children: [
         const SizedBox(width: 48),
@@ -271,11 +272,11 @@ class ReplyItem extends StatelessWidget {
                 isScrollControlled: true,
                 builder: (builder) {
                   return VideoReplyNewDialog(
-                    replyLevel: replyLevel,
-                    oid: replyItem!.oid,
-                    root: replyItem!.rpid,
-                    parent: replyItem!.rpid,
-                  );
+                      replyLevel: replyLevel,
+                      oid: replyItem!.oid,
+                      root: replyItem!.rpid,
+                      parent: replyItem!.rpid,
+                      paddingTop: paddingTop);
                 },
               ).then((value) => {
                     // 完成评论，数据添加
@@ -346,7 +347,8 @@ class ReplyItemRow extends StatelessWidget {
           children: [
             for (var i = 0; i < replies!.length; i++) ...[
               InkWell(
-                onTap: () => replyReply(replyItem),
+                onTap: () =>
+                    replyReply(replyItem, MediaQuery.of(context).padding.top),
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
@@ -396,7 +398,8 @@ class ReplyItemRow extends StatelessWidget {
             ],
             if (extraRow == 1)
               InkWell(
-                onTap: () => replyReply(replyItem),
+                onTap: () =>
+                    replyReply(replyItem, MediaQuery.of(context).padding.top),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
@@ -426,14 +429,14 @@ class ReplyItemRow extends StatelessWidget {
     );
   }
 
-  void replyReply(replyItem) {
+  void replyReply(replyItem, paddingTop) {
     // replyItem 楼主评论
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     videoDetailCtr.oid = replies!.first.oid;
     videoDetailCtr.fRpid = f_rpid!;
     videoDetailCtr.firstFloor = replyItem;
-    videoDetailCtr.showReplyReplyPanel();
+    videoDetailCtr.showReplyReplyPanel(paddingTop);
   }
 }
 

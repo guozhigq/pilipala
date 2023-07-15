@@ -12,11 +12,14 @@ class VideoReplyReplyPanel extends StatefulWidget {
   int? rpid;
   Function? closePanel;
   ReplyItemModel? firstFloor;
+  double? paddingTop;
+
   VideoReplyReplyPanel({
     this.oid,
     this.rpid,
     this.closePanel,
     this.firstFloor,
+    this.paddingTop,
     super.key,
   });
 
@@ -59,7 +62,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.size.height - Get.size.width * 9 / 16 - 45,
+      height: MediaQuery.of(context).size.height -
+          MediaQuery.of(context).size.width * 9 / 16 -
+          widget.paddingTop!,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

@@ -122,6 +122,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   Widget build(BuildContext context) {
+    double paddingTop = MediaQuery.of(context).padding.top;
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {});
@@ -212,12 +213,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    builder: (builder) {
+                    builder: (BuildContext context) {
                       return VideoReplyNewDialog(
                         replyLevel: '0',
                         oid: IdUtils.bv2av(Get.parameters['bvid']!),
                         root: 0,
                         parent: 0,
+                        paddingTop: paddingTop,
                       );
                     },
                   ).then(
