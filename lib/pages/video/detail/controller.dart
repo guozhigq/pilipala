@@ -125,7 +125,8 @@ class VideoDetailController extends GetxController
       PlayUrlModel data = result['data'];
       // 指定质量的视频 -> 最高质量的视频
       String videoUrl = data.dash!.video!.first.baseUrl!;
-      String audioUrl = data.dash!.audio!.first.baseUrl!;
+      String audioUrl =
+          data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first.baseUrl! : '';
       playerInit(videoUrl, audioUrl,
           defaultST: Duration(milliseconds: data.lastPlayTime!));
     }

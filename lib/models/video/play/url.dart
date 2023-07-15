@@ -78,7 +78,9 @@ class Dash {
     duration = json['duration'];
     minBufferTime = json['minBufferTime'];
     video = json['video'].map<VideoItem>((e) => VideoItem.fromJson(e)).toList();
-    audio = json['audio'].map<AudioItem>((e) => AudioItem.fromJson(e)).toList();
+    audio = json['audio'] != null
+        ? json['audio'].map<AudioItem>((e) => AudioItem.fromJson(e)).toList()
+        : [];
     dolby = json['dolby'];
     flac = json['flac'] ?? '';
   }
