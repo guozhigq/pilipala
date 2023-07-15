@@ -21,7 +21,7 @@ class LiveRoomController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    roomId = int.parse(Get.parameters['roomId']!);
+    roomId = int.parse(Get.parameters['roomid']!);
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';

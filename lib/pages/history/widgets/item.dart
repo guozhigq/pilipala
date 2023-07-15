@@ -44,7 +44,7 @@ class HistoryItem extends StatelessWidget {
             'cover': videoItem.cover,
           });
           Get.toNamed(
-            '/liveRoom?roomId=${videoItem.history.oid}',
+            '/liveRoom?roomid=${videoItem.history.oid}',
             arguments: {'liveItem': liveItem},
           );
         } else {
