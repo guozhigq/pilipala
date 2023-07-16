@@ -423,7 +423,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                           ? '关注'
                                           : '已关注'),
                                     )
-                                  : const SizedBox(),
+                                  : ElevatedButton(
+                                      onPressed: () => videoIntroController
+                                          .actionRelationMod(),
+                                      child: const Text('关注'),
+                                    ),
                             ),
                           ),
                         ),

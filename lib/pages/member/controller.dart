@@ -18,7 +18,7 @@ class MemberController extends GetxController {
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
-    ownerMid = user.get(UserBoxKey.userMid);
+    ownerMid = user.get(UserBoxKey.userMid) ?? -1;
     face = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';
   }
