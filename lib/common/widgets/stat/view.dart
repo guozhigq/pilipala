@@ -17,7 +17,8 @@ class StatView extends StatelessWidget {
     return Row(
       children: [
         Icon(
-          CupertinoIcons.play_rectangle,
+          // CupertinoIcons.play_rectangle,
+          Icons.play_circle_outlined,
           size: 13,
           color: color,
         ),

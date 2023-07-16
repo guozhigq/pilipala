@@ -99,7 +99,7 @@ class _LivePageState extends State<LivePage> {
         // 行间距
         mainAxisSpacing: StyleString.cardSpace + 2,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace,
+        crossAxisSpacing: StyleString.cardSpace + 2,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:

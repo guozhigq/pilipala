@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -53,7 +54,7 @@ class VideoCardH extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  StyleString.cardSpace, 7, StyleString.cardSpace, 7),
+                  StyleString.safeSpace, 6, StyleString.safeSpace, 6),
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
                   double width =
@@ -125,7 +126,7 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
+        padding: const EdgeInsets.fromLTRB(10, 4, 6, 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -191,6 +192,7 @@ class VideoContent extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 3),
             Row(
               children: [
                 StatView(
@@ -198,12 +200,16 @@ class VideoContent extends StatelessWidget {
                   view: videoItem.stat.view,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  Utils.dateFormat(videoItem.pubdate!),
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(context).colorScheme.outline),
-                )
+                StatDanMu(
+                  theme: 'gray',
+                  danmu: videoItem.stat.danmaku,
+                ),
+                // Text(
+                //   Utils.dateFormat(videoItem.pubdate!),
+                //   style: TextStyle(
+                //       fontSize: 11,
+                //       color: Theme.of(context).colorScheme.outline),
+                // )
               ],
             ),
           ],

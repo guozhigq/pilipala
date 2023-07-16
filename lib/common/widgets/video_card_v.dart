@@ -27,9 +27,9 @@ class VideoCardV extends StatelessWidget {
     return Card(
       elevation: 0,
       clipBehavior: Clip.hardEdge,
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: StyleString.mdRadius,
-      // ),
+      shape: RoundedRectangleBorder(
+        borderRadius: StyleString.mdRadius,
+      ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -52,6 +52,7 @@ class VideoCardV extends StatelessWidget {
           child: Column(
             children: [
               Container(
+                clipBehavior: Clip.hardEdge,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: StyleString.imgRadius,
@@ -78,20 +79,20 @@ class VideoCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        // Positioned(
-                        //   left: 0,
-                        //   right: 0,
-                        //   bottom: 0,
-                        //   child: AnimatedOpacity(
-                        //     opacity: 1,
-                        //     duration: const Duration(milliseconds: 200),
-                        //     child: VideoStat(
-                        //       view: videoItem.stat.view,
-                        //       danmaku: videoItem.stat.danmaku,
-                        //       duration: videoItem.duration,
-                        //     ),
-                        //   ),
-                        // ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: VideoStat(
+                              view: videoItem.stat.view,
+                              danmaku: videoItem.stat.danmaku,
+                              duration: videoItem.duration,
+                            ),
+                          ),
+                        ),
                       ],
                     );
                   }),
@@ -114,7 +115,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 6, 6, 7),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 8),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -220,7 +221,7 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 45,
-      padding: const EdgeInsets.only(top: 22, left: 8, right: 8),
+      padding: const EdgeInsets.only(top: 22, left: 8, right: 10),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
