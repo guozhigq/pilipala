@@ -25,11 +25,11 @@ class VideoCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
-      elevation: 0.8,
+      elevation: 0,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: StyleString.mdRadius,
+      // ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -51,10 +51,14 @@ class VideoCardV extends StatelessWidget {
           },
           child: Column(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: StyleString.imgRadius,
-                  topRight: StyleString.imgRadius,
+              Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: StyleString.imgRadius,
+                    topRight: StyleString.imgRadius,
+                    bottomLeft: StyleString.imgRadius,
+                    bottomRight: StyleString.imgRadius,
+                  ),
                 ),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
@@ -74,20 +78,20 @@ class VideoCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AnimatedOpacity(
-                            opacity: 1,
-                            duration: const Duration(milliseconds: 200),
-                            child: VideoStat(
-                              view: videoItem.stat.view,
-                              danmaku: videoItem.stat.danmaku,
-                              duration: videoItem.duration,
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   left: 0,
+                        //   right: 0,
+                        //   bottom: 0,
+                        //   child: AnimatedOpacity(
+                        //     opacity: 1,
+                        //     duration: const Duration(milliseconds: 200),
+                        //     child: VideoStat(
+                        //       view: videoItem.stat.view,
+                        //       danmaku: videoItem.stat.danmaku,
+                        //       duration: videoItem.duration,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     );
                   }),
@@ -110,7 +114,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(8, 8, 6, 7),
+        padding: const EdgeInsets.fromLTRB(4, 6, 6, 7),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -120,9 +124,10 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: const TextStyle(
-                // fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
               ),
               maxLines: Get.find<RcmdController>().crossAxisCount,
               overflow: TextOverflow.ellipsis,

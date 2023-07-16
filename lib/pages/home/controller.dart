@@ -6,9 +6,30 @@ import 'package:pilipala/pages/rcmd/index.dart';
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
   List tabs = [
-    {'label': '直播', 'type': 'live'},
-    {'label': '推荐', 'type': 'rcm'},
-    {'label': '热门', 'type': 'hot'},
+    {
+      'icon': const Icon(
+        Icons.live_tv_outlined,
+        size: 15,
+      ),
+      'label': '直播',
+      'type': 'live'
+    },
+    {
+      'icon': const Icon(
+        Icons.thumb_up_off_alt_outlined,
+        size: 15,
+      ),
+      'label': '推荐',
+      'type': 'rcm'
+    },
+    {
+      'icon': const Icon(
+        Icons.whatshot_outlined,
+        size: 15,
+      ),
+      'label': '热门',
+      'type': 'hot'
+    },
   ];
   int initialIndex = 1;
   late TabController tabController;

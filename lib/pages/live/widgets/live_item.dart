@@ -23,11 +23,11 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: 0.8,
+      elevation: 0,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: StyleString.mdRadius,
+      // ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -52,6 +52,8 @@ class LiveCardV extends StatelessWidget {
                 borderRadius: const BorderRadius.only(
                   topLeft: StyleString.imgRadius,
                   topRight: StyleString.imgRadius,
+                  bottomLeft: StyleString.imgRadius,
+                  bottomRight: StyleString.imgRadius,
                 ),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
@@ -90,15 +92,17 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(8, 8, 6, 4),
+        padding: const EdgeInsets.fromLTRB(4, 6, 6, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               liveItem.title,
               textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -111,8 +115,9 @@ class LiveContent extends StatelessWidget {
                   child: Text(
                     liveItem.uname,
                     textAlign: TextAlign.start,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

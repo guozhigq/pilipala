@@ -57,7 +57,7 @@ class VideoCardH extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
                   double width =
-                      (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+                      (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
                   return SizedBox(
                     height: width / StyleString.aspectRatio,
                     child: Row(
@@ -104,12 +104,12 @@ class VideoCardH extends StatelessWidget {
                 },
               ),
             ),
-            Divider(
-              height: 1,
-              indent: 8,
-              endIndent: 12,
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-            )
+            // Divider(
+            //   height: 1,
+            //   indent: 8,
+            //   endIndent: 12,
+            //   color: Theme.of(context).dividerColor.withOpacity(0.08),
+            // )
           ],
         ),
       ),
@@ -134,8 +134,10 @@ class VideoContent extends StatelessWidget {
                 videoItem.title,
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                    fontWeight: FontWeight.w500),
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
