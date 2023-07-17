@@ -19,7 +19,10 @@ class ReplyContent {
   Map? richText;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
-    message = json['message'].replaceAll('&gt;', '>').replaceAll('&#34;', '"');
+    message = json['message']
+        .replaceAll('&gt;', '>')
+        .replaceAll('&#34;', '"')
+        .replaceAll('&#39;', "'");
     atNameToMid = json['at_name_to_mid'] ?? {};
     memebers = json['memebers'] ?? [];
     emote = json['emote'] ?? {};
