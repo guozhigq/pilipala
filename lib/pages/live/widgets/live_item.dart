@@ -24,7 +24,7 @@ class LiveCardV extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
       elevation: 0,
-      clipBehavior: Clip.hardEdge,
+      // clipBehavior: Clip.hardEdge,
       // shape: RoundedRectangleBorder(
       //   borderRadius: StyleString.mdRadius,
       // ),
@@ -70,6 +70,18 @@ class LiveCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: VideoStat(
+                              liveItem: liveItem,
+                            ),
+                          ),
+                        ),
                       ],
                     );
                   }),
@@ -92,9 +104,10 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 4),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               liveItem.title,
@@ -104,7 +117,7 @@ class LiveContent extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.3,
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
@@ -125,22 +138,49 @@ class LiveContent extends StatelessWidget {
                 )
               ],
             ),
-            const SizedBox(height: 2),
-            Row(
-              children: [
-                Text(
-                  '${'[' + liveItem.areaName}]',
-                  style: const TextStyle(fontSize: 11),
-                ),
-                const Text(' • '),
-                Text(
-                  liveItem.watchedShow['text_large'],
-                  style: const TextStyle(fontSize: 11),
-                ),
-              ],
-            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class VideoStat extends StatelessWidget {
+  final LiveItemModel? liveItem;
+
+  const VideoStat({
+    Key? key,
+    required this.liveItem,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 45,
+      padding: const EdgeInsets.only(top: 22, left: 10, right: 10),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            Colors.transparent,
+            Colors.black54,
+          ],
+          tileMode: TileMode.mirror,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            liveItem!.areaName!,
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+          Text(
+            liveItem!.watchedShow!['text_small'],
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+        ],
       ),
     );
   }

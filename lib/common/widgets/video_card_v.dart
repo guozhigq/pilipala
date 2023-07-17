@@ -225,7 +225,7 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 45,
-      padding: const EdgeInsets.only(top: 22, left: 8, right: 10),
+      padding: const EdgeInsets.only(top: 22, left: 6, right: 6),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -246,7 +246,7 @@ class VideoStat extends StatelessWidget {
                 theme: 'white',
                 view: view,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               StatDanMu(
                 theme: 'white',
                 danmu: danmaku,

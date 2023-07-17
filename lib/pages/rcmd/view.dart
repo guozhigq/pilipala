@@ -101,7 +101,7 @@ class _RcmdPageState extends State<RcmdPage>
         // 行间距
         mainAxisSpacing: StyleString.cardSpace + 2,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 2,
+        crossAxisSpacing: StyleString.cardSpace + 3,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:
