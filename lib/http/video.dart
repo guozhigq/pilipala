@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
@@ -20,15 +21,46 @@ class VideoHttp {
       var res = await Request().get(
         Api.recommendList,
         data: {
+          'version': 1,
           'feed_version': 'V3',
           'ps': ps,
           'fresh_idx': freshIdx,
+          'fresh_type': 999999
         },
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
         for (var i in res.data['data']['item']) {
           list.add(RecVideoItemModel.fromJson(i));
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': ''};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err.toString()};
+    }
+  }
+
+  static Future rcmdVideoListApp(
+      {required int ps, required int freshIdx}) async {
+    try {
+      var res = await Request().get(
+        Api.recommendListApp,
+        data: {
+          'idx': freshIdx,
+          'flush': '5',
+          'column': '4',
+          'device': 'pad',
+          'device_type': 0,
+          'device_name': 'vivo',
+          'pull': freshIdx == 0 ? 'true' : 'false',
+        },
+      );
+      if (res.data['code'] == 0) {
+        List<RecVideoItemAppModel> list = [];
+        for (var i in res.data['data']['items']) {
+          list.add(RecVideoItemAppModel.fromJson(i));
         }
         return {'status': true, 'data': list};
       } else {

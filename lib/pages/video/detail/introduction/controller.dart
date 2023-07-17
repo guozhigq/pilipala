@@ -324,8 +324,11 @@ class VideoIntroController extends GetxController {
 
   // 关注/取关up
   Future actionRelationMod() async {
+    if (user.get(UserBoxKey.userMid) == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     int currentStatus = followStatus['attribute'];
-    print(currentStatus);
     int actionStatus = 0;
     switch (currentStatus) {
       case 0:

@@ -4,11 +4,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -50,6 +52,7 @@ class VideoDetailController extends GetxController
   Timer? timer;
 
   RxString bgCover = ''.obs;
+  Box user = GStrorage.user;
 
   @override
   void onInit() {
@@ -140,6 +143,9 @@ class VideoDetailController extends GetxController
   }
 
   void markHeartBeat() async {
+    if (user.get(UserBoxKey.userMid) == null) {
+      return;
+    }
     Duration progress = meeduPlayerController.position.value;
     await VideoHttp.heartBeat(
       bvid: bvid,

@@ -166,7 +166,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 bottom: 0,
                 child: Align(
                   alignment: Alignment.center,
-                  child: user.get(UserBoxKey.userLogin)
+                  child: user.get(UserBoxKey.userLogin) ?? false
                       ? GestureDetector(
                           onTap: () => showModalBottomSheet(
                             context: context,

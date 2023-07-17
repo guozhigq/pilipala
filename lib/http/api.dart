@@ -1,7 +1,7 @@
 class Api {
   // 推荐视频
-  // static const String recommendList =
-  //     'https://app.bilibili.com/x/v2/feed/index?appkey=27eb53fc9058f8c3';
+  static const String recommendListApp =
+      'https://app.bilibili.com/x/v2/feed/index';
   static const String recommendList = '/x/web-interface/index/top/feed/rcmd';
 
   // 热门视频
