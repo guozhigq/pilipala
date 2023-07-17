@@ -4,6 +4,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/pages/home/controller.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -45,8 +46,8 @@ class VideoCardV extends StatelessWidget {
         child: InkWell(
           onTap: () async {
             await Future.delayed(const Duration(milliseconds: 200));
-            print(videoItem.bvid);
-            Get.toNamed('/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}',
+            String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
+            Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
                 arguments: {'videoItem': videoItem, 'heroTag': heroTag});
           },
           child: Column(
@@ -74,20 +75,22 @@ class VideoCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AnimatedOpacity(
-                            opacity: 1,
-                            duration: const Duration(milliseconds: 200),
-                            child: VideoStat(
-                              view: videoItem.stat.view,
-                              danmaku: videoItem.stat.danmaku,
-                              duration: videoItem.duration,
+                        if (videoItem.stat.view is int &&
+                            videoItem.stat.danmaku is int)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: AnimatedOpacity(
+                              opacity: 1,
+                              duration: const Duration(milliseconds: 200),
+                              child: VideoStat(
+                                view: videoItem.stat.view,
+                                danmaku: videoItem.stat.danmaku,
+                                duration: videoItem.duration,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     );
                   }),
@@ -131,7 +134,8 @@ class VideoContent extends StatelessWidget {
               height: 18,
               child: Row(
                 children: [
-                  if (videoItem.rcmdReason.content != '') ...[
+                  if (videoItem.rcmdReason != null &&
+                      videoItem.rcmdReason.content != '') ...[
                     Container(
                       padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
                       decoration: BoxDecoration(

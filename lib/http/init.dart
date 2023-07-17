@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/interceptor.dart';
@@ -88,10 +90,14 @@ class Request {
         "app-key": 'android',
         "x-bili-aurora-eid": 'UlMFQVcABlAH',
         "x-bili-aurora-zone": 'sh001',
-        // "x-bili-mid": ''
+        'referer': 'https://www.bilibili.com/',
       },
     );
 
+    Box user = GStrorage.user;
+    if (user.get(UserBoxKey.userMid) != null) {
+      options.headers['x-bili-mid'] = user.get(UserBoxKey.userMid).toString();
+    }
     dio.options = options;
 
     //添加拦截器
