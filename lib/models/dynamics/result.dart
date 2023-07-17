@@ -493,7 +493,7 @@ class DynamicArchiveModel {
   DynamicArchiveModel.fromJson(Map<String, dynamic> json) {
     aid = json['aid'] is String ? int.parse(json['aid']) : json['aid'];
     badge = json['badge'];
-    bvid = json['bvid'];
+    bvid = json['bvid'] ?? json['epid'].toString() ?? ' ';
     cover = json['cover'];
     disablePreview = json['disable_preview'];
     durationText = json['duration_text'];
