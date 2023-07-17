@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -340,7 +341,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(widget.videoDetail!.bvid!),
-                                Text(widget.videoDetail!.desc!),
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      buildContent(
+                                          context, widget.videoDetail!),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -535,6 +543,42 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         ),
       );
     });
+  }
+
+  InlineSpan buildContent(BuildContext context, content) {
+    String desc = content.desc;
+    List descV2 = content.descV2;
+    // type
+    // 1 普通文本
+    // 2 @用户
+    List<InlineSpan> spanChilds = [];
+    if (descV2.isNotEmpty) {
+      for (var i = 0; i < descV2.length; i++) {
+        if (descV2[i].type == 1) {
+          spanChilds.add(TextSpan(text: descV2[i].rawText));
+        } else if (descV2[i].type == 2) {
+          spanChilds.add(
+            TextSpan(
+              text: '@${descV2[i].rawText}',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  String heroTag = Utils.makeHeroTag(descV2[i].bizId);
+                  Get.toNamed(
+                    '/member?mid=${descV2[i].bizId}',
+                    arguments: {'face': '', 'heroTag': heroTag},
+                  );
+                },
+            ),
+          );
+        }
+      }
+    } else {
+      spanChilds.add(TextSpan(text: desc));
+    }
+    return TextSpan(children: spanChilds);
   }
 }
 
