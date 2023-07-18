@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'controller.dart';
@@ -113,6 +114,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     _videoReplyController.wakeUpReply();
   }
 
+  // 展示二级回复
+  void replyReply(replyItem, paddingTop) {
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    videoDetailCtr.oid = replyItem.replies!.first.oid;
+    videoDetailCtr.fRpid = replyItem.rpid!;
+    videoDetailCtr.firstFloor = replyItem;
+    videoDetailCtr.showReplyReplyPanel(paddingTop);
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -164,10 +175,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                 );
                               } else {
                                 return ReplyItem(
-                                    replyItem:
-                                        _videoReplyController.replyList[index],
-                                    showReplyRow: true,
-                                    replyLevel: replyLevel);
+                                  replyItem:
+                                      _videoReplyController.replyList[index],
+                                  showReplyRow: true,
+                                  replyLevel: replyLevel,
+                                  replyReply: (replyItem, paddingTop) =>
+                                      replyReply(replyItem, paddingTop),
+                                );
                               }
                             },
                             childCount:

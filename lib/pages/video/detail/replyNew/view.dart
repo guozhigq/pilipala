@@ -13,6 +13,7 @@ class VideoReplyNewDialog extends StatefulWidget {
   String? replyLevel;
   int? parent;
   double? paddingTop;
+  ReplyType? replyType;
 
   VideoReplyNewDialog({
     this.oid,
@@ -20,6 +21,7 @@ class VideoReplyNewDialog extends StatefulWidget {
     this.replyLevel,
     this.parent,
     this.paddingTop,
+    this.replyType,
   });
 
   @override
@@ -64,7 +66,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   Future submitReplyAdd() async {
     String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
-      type: ReplyType.video,
+      type: widget.replyType!,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,

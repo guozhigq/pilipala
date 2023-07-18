@@ -4,6 +4,8 @@ enum ReplyType {
   video,
   // 话题
   topic,
+  //
+  unset2,
   // 活动
   activity,
   // 小视频

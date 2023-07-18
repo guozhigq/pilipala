@@ -6,6 +6,7 @@ import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
@@ -14,16 +15,21 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
-  ReplyItem(
-      {super.key,
-      this.replyItem,
-      this.addReply,
-      this.replyLevel,
-      this.showReplyRow});
+  ReplyItem({
+    super.key,
+    this.replyItem,
+    this.addReply,
+    this.replyLevel,
+    this.showReplyRow,
+    this.replyReply,
+    this.replyType,
+  });
   ReplyItemModel? replyItem;
   Function? addReply;
   String? replyLevel;
   bool? showReplyRow = true;
+  Function? replyReply;
+  ReplyType? replyType;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +218,7 @@ class ReplyItem extends StatelessWidget {
               replyControl: replyItem!.replyControl,
               f_rpid: replyItem!.rpid,
               replyItem: replyItem,
+              replyReply: replyReply,
             ),
           ),
         ],
@@ -272,11 +279,13 @@ class ReplyItem extends StatelessWidget {
                 isScrollControlled: true,
                 builder: (builder) {
                   return VideoReplyNewDialog(
-                      replyLevel: replyLevel,
-                      oid: replyItem!.oid,
-                      root: replyItem!.rpid,
-                      parent: replyItem!.rpid,
-                      paddingTop: paddingTop);
+                    replyLevel: replyLevel,
+                    oid: replyItem!.oid,
+                    root: replyItem!.rpid,
+                    parent: replyItem!.rpid,
+                    paddingTop: paddingTop,
+                    replyType: replyType,
+                  );
                 },
               ).then((value) => {
                     // 完成评论，数据添加
@@ -320,21 +329,25 @@ class ReplyItem extends StatelessWidget {
 
 // ignore: must_be_immutable
 class ReplyItemRow extends StatelessWidget {
-  ReplyItemRow(
-      {super.key,
-      this.replies,
-      this.replyControl,
-      this.f_rpid,
-      this.replyItem});
+  ReplyItemRow({
+    super.key,
+    this.replies,
+    this.replyControl,
+    this.f_rpid,
+    this.replyItem,
+    this.replyReply,
+  });
   List? replies;
   ReplyControl? replyControl;
   int? f_rpid;
   ReplyItemModel? replyItem;
+  Function? replyReply;
 
   @override
   Widget build(BuildContext context) {
     bool isShow = replyControl!.isShow!;
     int extraRow = replyControl != null && isShow ? 1 : 0;
+    double paddingTop = MediaQuery.of(context).padding.top;
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
@@ -347,8 +360,7 @@ class ReplyItemRow extends StatelessWidget {
           children: [
             for (var i = 0; i < replies!.length; i++) ...[
               InkWell(
-                onTap: () =>
-                    replyReply(replyItem, MediaQuery.of(context).padding.top),
+                onTap: () => replyReply!(replyItem, paddingTop),
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
@@ -398,8 +410,7 @@ class ReplyItemRow extends StatelessWidget {
             ],
             if (extraRow == 1)
               InkWell(
-                onTap: () =>
-                    replyReply(replyItem, MediaQuery.of(context).padding.top),
+                onTap: () => replyReply!(replyItem, paddingTop),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
@@ -427,16 +438,6 @@ class ReplyItemRow extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void replyReply(replyItem, paddingTop) {
-    // replyItem 楼主评论
-    VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    videoDetailCtr.oid = replies!.first.oid;
-    videoDetailCtr.fRpid = f_rpid!;
-    videoDetailCtr.firstFloor = replyItem;
-    videoDetailCtr.showReplyReplyPanel(paddingTop);
   }
 }
 

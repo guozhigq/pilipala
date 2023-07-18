@@ -15,6 +15,7 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
 import 'package:pilipala/pages/media/index.dart';
@@ -65,5 +66,7 @@ class Routes {
     GetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
     // 用户中心
     GetPage(name: '/member', page: () => const MemberPage()),
+    // 二级回复
+    GetPage(name: '/replyReply', page: () => VideoReplyReplyPanel()),
   ];
 }
