@@ -64,7 +64,12 @@ InlineSpan richNode(item, context) {
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Get.toNamed(
+                '/webview',
+                parameters: {'url': i.origText, 'type': 'url', 'pageTitle': ''},
+              );
+            },
             child: Text(
               i.text,
               style: authorStyle,
@@ -79,7 +84,18 @@ InlineSpan richNode(item, context) {
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              String dynamicId = item.basic['comment_id_str'];
+              Get.toNamed(
+                '/webview',
+                parameters: {
+                  'url':
+                      'https://t.bilibili.com/vote/h5/index/#/result?vote_id=${i.rid}&dynamic_id=${dynamicId}&isWeb=1',
+                  'type': 'vote',
+                  'pageTitle': '投票'
+                },
+              );
+            },
             child: Text(
               '投票：${i.text}',
               style: authorStyle,

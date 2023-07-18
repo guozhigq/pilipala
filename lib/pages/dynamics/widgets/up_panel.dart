@@ -92,8 +92,10 @@ class _UpPanelState extends State<UpPanel> {
                       child: Center(
                         child: Text(
                           '全部',
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer),
                         ),
                       ),
                     ),
