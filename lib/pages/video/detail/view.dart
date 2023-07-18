@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:ui';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
@@ -11,8 +9,9 @@ import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
-import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:wakelock/wakelock.dart';
+
+import 'widgets/app_bar.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -29,7 +28,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
   MeeduPlayerController? _meeduPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
-  late AnimationController animationController;
+  late StreamController<double> appbarStream;
 
   StreamSubscription? _playerEventSubs;
   bool isPlay = false;
@@ -62,19 +61,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       },
     );
 
-    animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+    appbarStream = StreamController<double>();
 
     _extendNestCtr.addListener(
       () {
         double offset = _extendNestCtr.position.pixels;
-        if (offset > doubleOffset) {
-          animationController.forward();
-        } else {
-          animationController.reverse();
-        }
-        doubleOffset = offset;
-        setState(() {});
+        appbarStream.add(offset);
       },
     );
   }
@@ -145,30 +137,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       bottom: false,
       child: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Obx(
-              () => NetworkImgLayer(
-                type: 'emote',
-                src: videoDetailController.bgCover.value,
-                width: Get.size.width,
-                height: videoHeight,
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100), //可以看源码
-              child: Container(
-                decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.background.withOpacity(0.1),
-                ),
-              ),
-            ),
-          ),
           Scaffold(
             resizeToAvoidBottomInset: false,
             key: videoDetailController.scaffoldKey,
@@ -185,8 +153,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
                     expandedHeight: videoHeight,
-                    backgroundColor: Colors.transparent,
-                    // backgroundColor: Theme.of(context).colorScheme.background,
+                    // backgroundColor: Colors.transparent,
+                    backgroundColor: Theme.of(context).colorScheme.background,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
                         padding: EdgeInsets.only(
@@ -320,52 +288,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ),
           ),
           // 播放完成/暂停播放
-          Positioned(
-            top: -statusBarHeight +
-                (doubleOffset / (videoHeight - kToolbarHeight)) *
-                    (kToolbarHeight - 9),
-            left: 0,
-            right: 0,
-            child: Opacity(
-              opacity: doubleOffset / (videoHeight - kToolbarHeight),
-              child: Container(
-                height: statusBarHeight + kToolbarHeight,
-                color: Theme.of(context).colorScheme.background,
-                padding: EdgeInsets.only(top: statusBarHeight),
-                child: AppBar(
-                  primary: false,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  centerTitle: true,
-                  title: TextButton(
-                    onPressed: () => continuePlay(),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.play_arrow_rounded),
-                        Text(
-                          playerStatus == PlayerStatus.paused
-                              ? '继续播放'
-                              : playerStatus == PlayerStatus.completed
-                                  ? '重新播放'
-                                  : '播放中',
-                        )
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.share,
-                          size: 20,
-                        )),
-                    const SizedBox(width: 12)
-                  ],
-                ),
-              ),
-            ),
-          ),
+          StreamBuilder(
+            stream: appbarStream.stream,
+            initialData: 0,
+            builder: ((context, snapshot) {
+              return ScrollAppBar(
+                snapshot.data!.toDouble(),
+                continuePlay,
+                playerStatus,
+              );
+            }),
+          )
         ],
       ),
     );
