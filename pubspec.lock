@@ -424,7 +424,7 @@ packages:
     description:
       path: package
       ref: feature-custom
-      resolved-ref: ea73de29401ab35126ef3eac68270b2e6c3ef4e0
+      resolved-ref: "3b879c2ea736ade61236f82d5009230e054db5dd"
       url: "https://github.com/guozhigq/flutter_meedu_media_kit.git"
     source: git
     version: "4.2.12"

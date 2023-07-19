@@ -90,7 +90,7 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(8, 8, 6, 4),
+        padding: const EdgeInsets.fromLTRB(8, 7, 6, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

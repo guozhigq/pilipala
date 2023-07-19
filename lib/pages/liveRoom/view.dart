@@ -69,13 +69,20 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   _liveRoomController.liveItem.uname,
                   style: const TextStyle(fontSize: 14),
                 ),
-                const SizedBox(height: 3),
-                Text(_liveRoomController.liveItem.title,
+                const SizedBox(height: 1),
+                Text(_liveRoomController.liveItem.watchedShow['text_large'],
                     style: const TextStyle(fontSize: 12)),
               ],
-            )
+            ),
           ],
         ),
+        actions: [
+          SizedBox(
+            height: 34,
+            child: ElevatedButton(onPressed: () {}, child: const Text('关注')),
+          ),
+          const SizedBox(width: 12),
+        ],
       ),
       body: Column(
         children: [
@@ -86,6 +93,36 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   AspectRatio(
                     aspectRatio: 16 / 9,
                     child: MeeduVideoPlayer(
+                      header: (BuildContext context,
+                          MeeduPlayerController _meeduPlayerController,
+                          Responsive) {
+                        return AppBar(
+                          backgroundColor: Colors.transparent,
+                          primary: false,
+                          elevation: 0,
+                          scrolledUnderElevation: 0,
+                          foregroundColor: Colors.white,
+                          automaticallyImplyLeading: false,
+                          centerTitle: false,
+                          title: Text(_liveRoomController.liveItem.title,
+                              style: const TextStyle(fontSize: 12)),
+                          actions: [
+                            SizedBox(
+                              width: 38,
+                              height: 38,
+                              child: IconButton(
+                                onPressed: () =>
+                                    _meeduPlayerController.enterPip(context),
+                                icon: const Icon(
+                                  Icons.branding_watermark_outlined,
+                                  size: 19,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12)
+                          ],
+                        );
+                      },
                       controller: _meeduPlayerController!,
                     ),
                   ),
@@ -110,9 +147,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             Container(
               height: 45,
               padding: const EdgeInsets.only(left: 12, right: 12),
-              child: Row(children: [
-                Text(_liveRoomController.liveItem.watchedShow['text_large']),
-              ]),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.background,
                 border: Border(
@@ -120,6 +154,56 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                       color: Theme.of(context).dividerColor.withOpacity(0.1)),
                 ),
               ),
+              child: Row(children: <Widget>[
+                // SizedBox(
+                //   width: 38,
+                //   height: 38,
+                //   child: IconButton(
+                //     onPressed: () {},
+                //     icon: const Icon(
+                //       Icons.subtitles_outlined,
+                //       size: 21,
+                //     ),
+                //   ),
+                // ),
+                const Spacer(),
+                // SizedBox(
+                //   width: 38,
+                //   height: 38,
+                //   child: IconButton(
+                //     onPressed: () {},
+                //     icon: const Icon(
+                //       Icons.hd_outlined,
+                //       size: 20,
+                //     ),
+                //   ),
+                // ),
+                SizedBox(
+                  width: 38,
+                  height: 38,
+                  child: IconButton(
+                    onPressed: () => _liveRoomController
+                        .setVolumn(_meeduPlayerController!.volume.value),
+                    icon: Obx(() => Icon(
+                          _liveRoomController.volumeOff.value
+                              ? Icons.volume_off_outlined
+                              : Icons.volume_up_outlined,
+                          size: 21,
+                        )),
+                  ),
+                ),
+                SizedBox(
+                  width: 38,
+                  height: 38,
+                  child: IconButton(
+                    onPressed: () =>
+                        _meeduPlayerController!.goToFullscreen(context),
+                    icon: const Icon(
+                      Icons.fullscreen,
+                    ),
+                  ),
+                ),
+              ]),
             ),
         ],
       ),
