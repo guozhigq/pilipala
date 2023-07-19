@@ -70,8 +70,11 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 1),
-                Text(_liveRoomController.liveItem.watchedShow['text_large'],
-                    style: const TextStyle(fontSize: 12)),
+                if (_liveRoomController.liveItem.watchedShow != null)
+                  Text(
+                      _liveRoomController.liveItem.watchedShow['text_large'] ??
+                          '',
+                      style: const TextStyle(fontSize: 12)),
               ],
             ),
           ],

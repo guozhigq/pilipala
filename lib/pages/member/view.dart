@@ -303,6 +303,7 @@ class _MemberPageState extends State<MemberPage>
                             'uname': memberInfo.name,
                             'face': memberInfo.face,
                             'roomid': memberInfo.liveRoom.roomId,
+                            'watched_show': memberInfo.liveRoom.watchedShow,
                           });
                           Get.toNamed(
                             '/liveRoom?roomid=${memberInfo.liveRoom.roomId}',
