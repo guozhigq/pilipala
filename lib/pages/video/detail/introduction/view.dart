@@ -231,7 +231,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 20),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 10),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(

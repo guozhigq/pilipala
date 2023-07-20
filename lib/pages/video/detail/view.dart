@@ -232,7 +232,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   children: [
                     Container(
                       width: double.infinity,
-                      height: 0,
+                      height: 45,
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -252,8 +252,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               () => TabBar(
                                 controller: videoDetailController.tabCtr,
                                 dividerColor: Colors.transparent,
-                                indicatorColor:
-                                    Theme.of(context).colorScheme.background,
+                                // indicatorColor:
+                                //     Theme.of(context).colorScheme.background,
                                 tabs: videoDetailController.tabs
                                     .map((String name) => Tab(text: name))
                                     .toList(),
@@ -278,7 +278,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               );
                             },
                           ),
-                          VideoReplyPanel()
+                          VideoReplyPanel(
+                            bvid: videoDetailController.bvid,
+                          )
                         ],
                       ),
                     ),

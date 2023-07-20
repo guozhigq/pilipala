@@ -53,9 +53,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
           tag: widget.rpid.toString());
       _videoReplyController.rPid = widget.rpid;
     } else {
-      int oid = Get.parameters['bvid'] != null
-          ? IdUtils.bv2av(Get.parameters['bvid']!)
-          : 0;
+      // fix 评论加载不对称
+      // int oid = Get.parameters['bvid'] != null
+      //     ? IdUtils.bv2av(Get.parameters['bvid']!)
+      //     : 0;
       _videoReplyController = Get.put(VideoReplyController(oid, '', '1'),
           tag: Get.arguments['heroTag']);
     }
