@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
+import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/wbi_sign.dart';
@@ -13,6 +14,8 @@ class MemberController extends GetxController {
   String? heroTag;
   Box user = GStrorage.user;
   late int ownerMid;
+  // 投稿列表
+  RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
 
   @override
   void onInit() {
@@ -26,14 +29,7 @@ class MemberController extends GetxController {
   // 获取用户信息
   Future<Map<String, dynamic>> getInfo() async {
     await getMemberStat();
-    String params = await WbiSign().makSign({
-      'mid': mid,
-      'token': '',
-      'platform': 'web',
-      'web_location': 1550101,
-    });
-    params = '?$params';
-    var res = await MemberHttp.memberInfo(params: params);
+    var res = await MemberHttp.memberInfo(mid: mid);
     if (res['status']) {
       memberInfo.value = res['data'];
     }

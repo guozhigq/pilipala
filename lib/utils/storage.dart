@@ -12,6 +12,7 @@ class GStrorage {
   static late final Box userInfo;
   static late final Box hotKeyword;
   static late final Box historyword;
+  static late final Box localCache;
 
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -28,6 +29,8 @@ class GStrorage {
     hotKeyword = await Hive.openBox('hotKeyword');
     // 搜索历史
     historyword = await Hive.openBox('historyWord');
+    // 本地缓存
+    localCache = await Hive.openBox('localCache');
   }
 
   static regAdapter() {

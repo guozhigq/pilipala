@@ -1,11 +1,11 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:loading_more_list/loading_more_list.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/models/user/stat.dart';
+import 'package:pilipala/pages/member/archive/view.dart';
 import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -19,13 +19,15 @@ class MemberPage extends StatefulWidget {
 class _MemberPageState extends State<MemberPage>
     with SingleTickerProviderStateMixin {
   final MemberController _memberController = Get.put(MemberController());
+  Future? _futureBuilderFuture;
   final ScrollController _extendNestCtr = ScrollController();
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
+    _futureBuilderFuture = _memberController.getInfo();
   }
 
   @override
@@ -90,7 +92,7 @@ class _MemberPageState extends State<MemberPage>
                     Padding(
                       padding: const EdgeInsets.only(left: 18, right: 18),
                       child: FutureBuilder(
-                        future: _memberController.getInfo(),
+                        future: _futureBuilderFuture,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
@@ -264,7 +266,7 @@ class _MemberPageState extends State<MemberPage>
               children: [
                 Text('主页'),
                 Text('动态'),
-                Text('投稿'),
+                ArchivePanel(),
               ],
             ))
           ],
