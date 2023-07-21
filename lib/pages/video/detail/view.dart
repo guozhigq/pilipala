@@ -97,7 +97,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if (!_meeduPlayerController!.pipEnabled) {
+    if (!_meeduPlayerController!.pipAvailable.value) {
       _meeduPlayerController!.pause();
     }
     if (videoDetailController.timer!.isActive) {
