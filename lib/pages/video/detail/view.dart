@@ -90,7 +90,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   void dispose() {
     videoDetailController.meeduPlayerController.dispose();
-    videoDetailController.timer!.cancel();
+    if (videoDetailController.timer != null) {
+      videoDetailController.timer!.cancel();
+    }
     super.dispose();
   }
 

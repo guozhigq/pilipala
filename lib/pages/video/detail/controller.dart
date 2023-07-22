@@ -161,7 +161,7 @@ class VideoDetailController extends GetxController
   @override
   void onClose() {
     markHeartBeat();
-    if (timer!.isActive) {
+    if (timer != null && timer!.isActive) {
       timer!.cancel();
     }
     super.onClose();

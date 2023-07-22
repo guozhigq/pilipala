@@ -65,7 +65,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             // 请求错误
             return HttpError(
               errMsg: snapshot.data['msg'],
-              fn: () => setState(() {}),
+              fn: () => Get.back(),
             );
           }
         } else {
