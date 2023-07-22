@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 
-Widget seasonPanel(UgcSeason ugcSeason, cid) {
+Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {
   return Builder(builder: (context) {
     List<EpisodeItem> episodes = ugcSeason.sections!.first.episodes!;
     int currentIndex = episodes.indexWhere((e) => e.cid == cid);
@@ -20,7 +20,7 @@ Widget seasonPanel(UgcSeason ugcSeason, cid) {
           onTap: () => showBottomSheet(
             context: context,
             builder: (_) => Container(
-              height: Get.size.height - Get.size.width * 9 / 16 - 45,
+              height: sheetHeight,
               color: Theme.of(context).colorScheme.background,
               child: Column(
                 children: [
