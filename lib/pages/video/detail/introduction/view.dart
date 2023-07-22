@@ -65,7 +65,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             // 请求错误
             return HttpError(
               errMsg: snapshot.data['msg'],
-              fn: () => setState(() {}),
+              fn: () => Get.back(),
             );
           }
         } else {
@@ -231,7 +231,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 20),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 10),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(
@@ -248,6 +248,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             letterSpacing: 0.5,
                           ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   InkWell(

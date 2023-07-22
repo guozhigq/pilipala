@@ -7,6 +7,7 @@ import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
   FollowUpModel? upData;
@@ -92,8 +93,10 @@ class _UpPanelState extends State<UpPanel> {
                       child: Center(
                         child: Text(
                           '全部',
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer),
                         ),
                       ),
                     ),
@@ -145,6 +148,11 @@ class _UpPanelState extends State<UpPanel> {
             arguments: {'liveItem': liveItem},
           );
         }
+      },
+      onLongPress: () {
+        String heroTag = Utils.makeHeroTag(data.mid);
+        Get.toNamed('/member?mid=${data.mid}',
+            arguments: {'face': data.face, 'heroTag': heroTag});
       },
       child: Padding(
         padding: itemPadding,

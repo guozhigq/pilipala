@@ -2,11 +2,15 @@
 // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/misc/sign/wbi.md
 // import md5 from 'md5'
 // import axios from 'axios'
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
+import 'package:pilipala/utils/storage.dart';
+
 class WbiSign {
+  static Box localCache = GStrorage.user;
   List mixinKeyEncTab = [
     46,
     47,
@@ -83,7 +87,7 @@ class WbiSign {
   }
 
   // 为请求参数进行 wbi 签名
-  String encWbi(params, imgKey, subKey) {
+  Map<String, dynamic> encWbi(params, imgKey, subKey) {
     String mixinKey = getMixinKey(imgKey + subKey);
     DateTime now = DateTime.now();
     int currTime = (now.millisecondsSinceEpoch / 1000).round();
@@ -99,19 +103,25 @@ class WbiSign {
     String queryStr = query.join('&');
     String wbiSign =
         md5.convert(utf8.encode(queryStr + mixinKey)).toString(); // 计算 w_rid
-    print('w_rid: $wbiSign');
-    return '$queryStr&w_rid=$wbiSign';
+    return {'wts': currTime.toString(), 'w_rid': wbiSign};
   }
 
-  // 获取最新的 img_key 和 sub_key
+  // 获取最新的 img_key 和 sub_key 可以从缓存中获取
   static Future<Map<String, dynamic>> getWbiKeys() async {
+    DateTime nowDate = DateTime.now();
+    if (localCache.get('wbiKeys') != null &&
+        DateTime.fromMillisecondsSinceEpoch(localCache.get('timeStamp')).day ==
+            nowDate.day) {
+      Map cacheWbiKeys = localCache.get('wbiKeys');
+      return Map<String, dynamic>.from(cacheWbiKeys);
+    }
     var resp =
         await Request().get('https://api.bilibili.com/x/web-interface/nav');
     var jsonContent = resp.data['data'];
 
     String imgUrl = jsonContent['wbi_img']['img_url'];
     String subUrl = jsonContent['wbi_img']['sub_url'];
-    return {
+    Map<String, dynamic> wbiKeys = {
       'imgKey': imgUrl
           .substring(imgUrl.lastIndexOf('/') + 1, imgUrl.length)
           .split('.')[0],
@@ -119,12 +129,16 @@ class WbiSign {
           .substring(subUrl.lastIndexOf('/') + 1, subUrl.length)
           .split('.')[0]
     };
+    localCache.put('wbiKeys', wbiKeys);
+    localCache.put('timeStamp', nowDate.millisecondsSinceEpoch);
+    return wbiKeys;
   }
 
   makSign(Map<String, dynamic> params) async {
     // params 为需要加密的请求参数
     Map<String, dynamic> wbiKeys = await getWbiKeys();
-    String query = encWbi(params, wbiKeys['imgKey'], wbiKeys['subKey']);
+    Map<String, dynamic> query = params
+      ..addAll(encWbi(params, wbiKeys['imgKey'], wbiKeys['subKey']));
     return query;
   }
 }

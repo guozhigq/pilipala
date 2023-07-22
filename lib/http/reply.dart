@@ -23,7 +23,7 @@ class ReplyHttp {
       Map errMap = {
         -400: '请求错误',
         -404: '无此项',
-        12002: '评论区已关闭',
+        12002: '当前页面评论功能已关闭"',
         12009: '评论主体的type不合法',
         12061: 'UP主已关闭评论区',
       };
@@ -48,6 +48,7 @@ class ReplyHttp {
       'pn': pageNum,
       'type': type,
       'sort': 1,
+      'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
       return {

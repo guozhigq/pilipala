@@ -80,22 +80,22 @@ class VideoCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        if (videoItem.stat.view is int &&
-                            videoItem.stat.danmaku is int)
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: AnimatedOpacity(
-                              opacity: 1,
-                              duration: const Duration(milliseconds: 200),
-                              child: VideoStat(
-                                view: videoItem.stat.view,
-                                danmaku: videoItem.stat.danmaku,
-                                duration: videoItem.duration,
-                              ),
-                            ),
-                          ),
+                        // if (videoItem.stat.view is int &&
+                        //     videoItem.stat.danmaku is int)
+                        //   Positioned(
+                        //     left: 0,
+                        //     right: 0,
+                        //     bottom: 0,
+                        //     child: AnimatedOpacity(
+                        //       opacity: 1,
+                        //       duration: const Duration(milliseconds: 200),
+                        //       child: VideoStat(
+                        //         view: videoItem.stat.view,
+                        //         danmaku: videoItem.stat.danmaku,
+                        //         duration: videoItem.duration,
+                        //       ),
+                        //     ),
+                        //   ),
                       ],
                     );
                   }),
@@ -118,7 +118,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 8),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 12),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -136,71 +136,84 @@ class VideoContent extends StatelessWidget {
               maxLines: Get.find<RcmdController>().crossAxisCount,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(
-              height: 18,
-              child: Row(
-                children: [
-                  if (videoItem.rcmdReason != null &&
-                      videoItem.rcmdReason.content != '') ...[
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Text(
-                        videoItem.rcmdReason.content,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4)
-                  ] else if (videoItem.isFollowed == 1) ...[
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Text(
-                        '已关注',
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4)
-                  ],
-                  Expanded(
-                    child: LayoutBuilder(builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return SizedBox(
-                        width: constraints.maxWidth,
-                        child: Text(
-                          videoItem.owner.name,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .fontSize,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ],
-              ),
+            // SizedBox(
+            //   height: 18,
+            //   child: Row(
+            //     children: [
+            //       if (videoItem.rcmdReason != null &&
+            //           videoItem.rcmdReason.content != '') ...[
+            //         Container(
+            //           padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+            //           decoration: BoxDecoration(
+            //               color: Theme.of(context)
+            //                   .colorScheme
+            //                   .primaryContainer
+            //                   .withOpacity(0.6),
+            //               borderRadius: BorderRadius.circular(3)),
+            //           child: Text(
+            //             videoItem.rcmdReason.content,
+            //             style: TextStyle(
+            //               fontSize:
+            //                   Theme.of(context).textTheme.labelSmall!.fontSize,
+            //               color: Theme.of(context).colorScheme.primary,
+            //             ),
+            //           ),
+            //         ),
+            //         const SizedBox(width: 4)
+            //       ] else if (videoItem.isFollowed == 1) ...[
+            //         Container(
+            //           padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+            //           decoration: BoxDecoration(
+            //               color: Theme.of(context)
+            //                   .colorScheme
+            //                   .primaryContainer
+            //                   .withOpacity(0.6),
+            //               borderRadius: BorderRadius.circular(3)),
+            //           child: Text(
+            //             '已关注',
+            //             style: TextStyle(
+            //               fontSize:
+            //                   Theme.of(context).textTheme.labelSmall!.fontSize,
+            //               color: Theme.of(context).colorScheme.primary,
+            //             ),
+            //           ),
+            //         ),
+            //         const SizedBox(width: 4)
+            //       ],
+            //       Expanded(
+            //         child: LayoutBuilder(builder:
+            //             (BuildContext context, BoxConstraints constraints) {
+            //           return SizedBox(
+            //             width: constraints.maxWidth,
+            //             child: Text(
+            //               videoItem.owner.name,
+            //               maxLines: 1,
+            //               style: TextStyle(
+            //                 fontSize: Theme.of(context)
+            //                     .textTheme
+            //                     .labelMedium!
+            //                     .fontSize,
+            //                 color: Theme.of(context).colorScheme.outline,
+            //               ),
+            //             ),
+            //           );
+            //         }),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            Row(
+              children: [
+                StatView(
+                  theme: 'black',
+                  view: videoItem.stat.view,
+                ),
+                const SizedBox(width: 6),
+                StatDanMu(
+                  theme: 'black',
+                  danmu: videoItem.stat.danmaku,
+                ),
+              ],
             ),
           ],
         ),

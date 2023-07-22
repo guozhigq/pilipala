@@ -234,7 +234,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                   Map data = snapshot.data;
                   if (data['status']) {
                     List<DynamicItemModel> list =
-                        _dynamicsController.dynamicsList!;
+                        _dynamicsController.dynamicsList;
                     return Obx(
                       () => list.length == 1
                           ? skeleton()

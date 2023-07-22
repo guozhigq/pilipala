@@ -84,11 +84,11 @@ class VideoIntroController extends GetxController {
       Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
           .tabs
           .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
+      // 获取到粉丝数再返回
+      await queryUserStat();
     } else {
       responseMsg = result['msg'];
     }
-    // 获取到粉丝数再返回
-    await queryUserStat();
     if (userLogin) {
       // 获取点赞状态
       queryHasLikeVideo();
@@ -99,13 +99,13 @@ class VideoIntroController extends GetxController {
       //
       queryFollowStatus();
     }
-
     return result;
   }
 
   // 获取up主粉丝数
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
+    print('🌹：$result');
     if (result['status']) {
       userStat = result['data'];
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
 
@@ -13,6 +14,8 @@ class VideoReplyReplyPanel extends StatefulWidget {
   Function? closePanel;
   ReplyItemModel? firstFloor;
   double? paddingTop;
+  String? source;
+  ReplyType? replyType;
 
   VideoReplyReplyPanel({
     this.oid,
@@ -20,6 +23,8 @@ class VideoReplyReplyPanel extends StatefulWidget {
     this.closePanel,
     this.firstFloor,
     this.paddingTop,
+    this.source,
+    this.replyType,
     super.key,
   });
 
@@ -34,7 +39,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   void initState() {
     _videoReplyReplyController = Get.put(
-        VideoReplyReplyController(widget.oid, widget.rpid.toString()),
+        VideoReplyReplyController(
+            widget.oid, widget.rpid.toString(), widget.replyType!),
         tag: widget.rpid.toString());
     super.initState();
 
@@ -62,34 +68,37 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).size.width * 9 / 16 -
-          widget.paddingTop!,
+      height: widget.source == 'videoDetail'
+          ? MediaQuery.of(context).size.height -
+              MediaQuery.of(context).size.width * 9 / 16 -
+              widget.paddingTop!
+          : null,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [
-          Container(
-            height: 45,
-            padding: const EdgeInsets.only(left: 14, right: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '评论详情',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    _videoReplyReplyController.currentPage = 0;
-                    _videoReplyReplyController.rPid = 0;
-                    widget.closePanel!();
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
+          if (widget.source == 'videoDetail')
+            Container(
+              height: 45,
+              padding: const EdgeInsets.only(left: 14, right: 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '评论详情',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      _videoReplyReplyController.currentPage = 0;
+                      _videoReplyReplyController.rPid = 0;
+                      widget.closePanel!();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
           Divider(
             height: 1,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
@@ -188,7 +197,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                           delegate:
                               SliverChildBuilderDelegate((context, index) {
                             return const VideoReplySkeleton();
-                          }, childCount: 5),
+                          }, childCount: 8),
                         );
                       }
                     },

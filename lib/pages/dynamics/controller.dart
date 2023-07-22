@@ -57,9 +57,9 @@ class DynamicsController extends GetxController {
     );
     if (res['status']) {
       if (type == 'init') {
-        dynamicsList!.value = res['data'].items;
+        dynamicsList.value = res['data'].items;
       } else {
-        dynamicsList!.addAll(res['data'].items);
+        dynamicsList.addAll(res['data'].items);
       }
       offset = res['data'].offset;
       page++;
@@ -69,7 +69,7 @@ class DynamicsController extends GetxController {
 
   onSelectType(value) async {
     dynamicsType.value = filterTypeList[value - 1]['value'];
-    dynamicsList!.value = [DynamicItemModel()];
+    dynamicsList.value = [DynamicItemModel()];
     page = 1;
     initialValue.value = value;
     await queryFollowDynamic();
@@ -128,6 +128,7 @@ class DynamicsController extends GetxController {
           'mid': author.mid,
           'face': author.face,
           'roomid': liveRcmd.roomId,
+          'watched_show': liveRcmd.watchedShow,
         });
         Get.toNamed('/liveRoom?roomid=${liveItem.roomId}', arguments: {
           'liveItem': liveItem,
@@ -151,7 +152,7 @@ class DynamicsController extends GetxController {
 
   onSelectUp(mid) async {
     dynamicsType.value = DynamicsType.values[0];
-    dynamicsList!.value = [DynamicItemModel()];
+    dynamicsList.value = [DynamicItemModel()];
     page = 1;
     queryFollowDynamic();
   }

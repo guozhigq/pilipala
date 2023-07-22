@@ -90,14 +90,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   void dispose() {
     videoDetailController.meeduPlayerController.dispose();
-    videoDetailController.timer!.cancel();
+    if (videoDetailController.timer != null) {
+      videoDetailController.timer!.cancel();
+    }
     super.dispose();
   }
 
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if (!_meeduPlayerController!.pipEnabled) {
+    if (!_meeduPlayerController!.pipAvailable.value) {
       _meeduPlayerController!.pause();
     }
     if (videoDetailController.timer!.isActive) {
@@ -232,7 +234,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   children: [
                     Container(
                       width: double.infinity,
-                      height: 0,
+                      height: 45,
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -252,8 +254,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               () => TabBar(
                                 controller: videoDetailController.tabCtr,
                                 dividerColor: Colors.transparent,
-                                indicatorColor:
-                                    Theme.of(context).colorScheme.background,
+                                // indicatorColor:
+                                //     Theme.of(context).colorScheme.background,
                                 tabs: videoDetailController.tabs
                                     .map((String name) => Tab(text: name))
                                     .toList(),
@@ -278,7 +280,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               );
                             },
                           ),
-                          VideoReplyPanel()
+                          VideoReplyPanel(
+                            bvid: videoDetailController.bvid,
+                          )
                         ],
                       ),
                     ),

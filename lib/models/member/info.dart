@@ -71,6 +71,7 @@ class LiveRoom {
     this.cover,
     this.roomId,
     this.roundStatus,
+    this.watchedShow,
   });
 
   int? roomStatus;
@@ -80,6 +81,7 @@ class LiveRoom {
   String? cover;
   int? roomId;
   int? roundStatus;
+  Map? watchedShow;
 
   LiveRoom.fromJson(Map<String, dynamic> json) {
     roomStatus = json['roomStatus'];
@@ -89,5 +91,6 @@ class LiveRoom {
     cover = json['cover'];
     roomId = json['roomid'];
     roundStatus = json['roundStatus'];
+    watchedShow = json['watched_show'];
   }
 }

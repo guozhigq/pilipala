@@ -23,7 +23,7 @@ Widget addWidget(item, context, type, {floor = 1}) {
         onTap: () {},
         child: Container(
           padding:
-              const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 8),
+              const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
           color: bgColor,
           child: Row(
             children: [
@@ -60,89 +60,103 @@ Widget addWidget(item, context, type, {floor = 1}) {
         ),
       );
     case 'ADDITIONAL_TYPE_RESERVE':
-      return InkWell(
-        onTap: () {},
-        child: Container(
-          margin: const EdgeInsets.only(top: 8),
-          padding:
-              const EdgeInsets.only(left: 15, top: 12, right: 15, bottom: 10),
-          color: bgColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(dynamicProperty[type].title),
-                  Text.rich(TextSpan(
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline,
-                          fontSize: Theme.of(context)
-                              .textTheme
-                              .labelMedium!
-                              .fontSize),
-                      children: [
-                        TextSpan(text: dynamicProperty[type].desc1['text']),
-                        TextSpan(text: dynamicProperty[type].desc2['text']),
-                      ]))
-                ],
-              ),
-              // TextButton(onPressed: () {}, child: Text('123'))
-            ],
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: InkWell(
+          onTap: () {},
+          child: Container(
+            width: double.infinity,
+            padding:
+                const EdgeInsets.only(left: 12, top: 10, right: 12, bottom: 10),
+            color: bgColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dynamicProperty[type].title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 1),
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize:
+                            Theme.of(context).textTheme.labelMedium!.fontSize),
+                    children: [
+                      TextSpan(text: dynamicProperty[type].desc1['text']),
+                      const TextSpan(text: '  '),
+                      TextSpan(text: dynamicProperty[type].desc2['text']),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            // TextButton(onPressed: () {}, child: Text('123'))
           ),
         ),
       );
     case 'ADDITIONAL_TYPE_GOODS':
-      return Container(
-        margin: const EdgeInsets.only(top: 6),
-        padding: const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 8),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.all(Radius.circular(6)),
-        ),
-        child: Row(
-          children: [
-            NetworkImgLayer(
-              width: 75,
-              height: 75,
-              src: dynamicProperty[type].items.first.cover,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+      return Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: InkWell(
+            onTap: () {},
+            child: Container(
+              padding:
+                  const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    dynamicProperty[type].items.first.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  NetworkImgLayer(
+                    width: 75,
+                    height: 75,
+                    src: dynamicProperty[type].items.first.cover,
                   ),
-                  Text(
-                    dynamicProperty[type].items.first.brief,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.outline,
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    dynamicProperty[type].items.first.price,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          dynamicProperty[type].items.first.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          dynamicProperty[type].items.first.brief,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .fontSize,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          dynamicProperty[type].items.first.price,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      );
+          ));
     case 'ADDITIONAL_TYPE_MATCH':
       return SizedBox();
     case 'ADDITIONAL_TYPE_COMMON':
+      return SizedBox();
+    case 'ADDITIONAL_TYPE_VOTE':
       return SizedBox();
     default:
       return Text('11');

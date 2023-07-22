@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
@@ -87,6 +88,8 @@ class VideoDetailController extends GetxController
         },
         firstFloor: firstFloor,
         paddingTop: paddingTop,
+        replyType: ReplyType.video,
+        source: 'videoDetail',
       );
     });
     ctr?.closed.then((value) {
@@ -95,6 +98,7 @@ class VideoDetailController extends GetxController
   }
 
   playerInit(source, audioSource, {Duration defaultST = Duration.zero}) {
+    meeduPlayerController.onVideoFitChange(BoxFit.cover);
     meeduPlayerController.setDataSource(
       DataSource(
         type: DataSourceType.network,
@@ -157,7 +161,7 @@ class VideoDetailController extends GetxController
   @override
   void onClose() {
     markHeartBeat();
-    if (timer!.isActive) {
+    if (timer != null && timer!.isActive) {
       timer!.cancel();
     }
     super.onClose();

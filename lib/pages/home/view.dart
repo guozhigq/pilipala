@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         titleSpacing: 0,
         title: Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 8),
           child: Stack(
             children: [
               const Align(
@@ -79,13 +79,12 @@ class _HomePageState extends State<HomePage>
                       indicatorPadding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 5),
                       indicator: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(20)),
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,
-                      labelColor:
-                          Theme.of(context).colorScheme.onSecondaryContainer,
+                      labelColor: Theme.of(context).colorScheme.onPrimary,
                       labelStyle: const TextStyle(fontSize: 13),
                       dividerColor: Colors.transparent,
                       unselectedLabelColor:

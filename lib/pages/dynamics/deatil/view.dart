@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/widgets/author_panel.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
+import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 
 import '../widgets/dynamic_panel.dart';
 
@@ -25,19 +27,20 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   final ScrollController scrollController = ScrollController();
   bool _visibleTitle = false;
   String? action;
+  // 回复类型
+  late int type;
 
   @override
   void initState() {
     super.initState();
     int oid = 0;
-    int type = 0;
+    // floor 1原创 2转发
     if (Get.arguments['floor'] == 1) {
       oid = int.parse(Get.arguments['item'].basic!['comment_id_str']);
-      type = Get.arguments['item'].basic!['comment_type'];
     } else {
       oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
-      type = 11;
     }
+    type = Get.arguments['item'].basic!['comment_type'];
     action =
         Get.arguments.containsKey('action') ? Get.arguments['action'] : null;
     _dynamicDetailController = Get.put(DynamicDetailController(oid, type));
@@ -66,6 +69,26 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
       _visibleTitle = false;
       titleStreamC.add(false);
     }
+  }
+
+  void replyReply(replyItem, paddingTop) {
+    int oid = replyItem.replies!.first.oid;
+    int rpid = replyItem.rpid!;
+    Get.to(
+      () => Scaffold(
+        appBar: AppBar(
+          title: const Text('评论详情'),
+          centerTitle: false,
+        ),
+        body: VideoReplyReplyPanel(
+          oid: oid,
+          rpid: rpid,
+          paddingTop: paddingTop,
+          source: 'dynamic',
+          replyType: ReplyType.values[type],
+        ),
+      ),
+    );
   }
 
   @override
@@ -189,10 +212,14 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                               );
                             } else {
                               return ReplyItem(
-                                  replyItem: _dynamicDetailController!
-                                      .replyList[index],
-                                  showReplyRow: true,
-                                  replyLevel: '1');
+                                replyItem:
+                                    _dynamicDetailController!.replyList[index],
+                                showReplyRow: true,
+                                replyLevel: '1',
+                                replyReply: (replyItem, paddingTop) =>
+                                    replyReply(replyItem, paddingTop),
+                                replyType: ReplyType.album,
+                              );
                             }
                           },
                           childCount:
@@ -212,7 +239,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoReplySkeleton();
-                    }, childCount: 5),
+                    }, childCount: 8),
                   );
                 }
               },

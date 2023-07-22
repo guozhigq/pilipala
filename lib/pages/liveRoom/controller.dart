@@ -10,11 +10,14 @@ class LiveRoomController extends GetxController {
   late int roomId;
   var liveItem;
   late String heroTag;
+  double volume = 0.0;
+  // 静音状态
+  RxBool volumeOff = false.obs;
 
   MeeduPlayerController meeduPlayerController = MeeduPlayerController(
     colorTheme: Theme.of(Get.context!).colorScheme.primary,
     pipEnabled: true,
-    controlsStyle: ControlsStyle.youtube,
+    controlsStyle: ControlsStyle.live,
     enabledButtons: const EnabledButtons(pip: true),
   );
 
@@ -45,6 +48,7 @@ class LiveRoomController extends GetxController {
       ),
       autoplay: true,
     );
+    volume = meeduPlayerController.volume.value;
   }
 
   Future queryLiveInfo() async {
@@ -58,5 +62,19 @@ class LiveRoomController extends GetxController {
           item.urlInfo!.first.extra!;
       playerInit(videoUrl);
     }
+  }
+
+  void setVolumn(value) {
+    if (value == 0) {
+      // 设置音量
+      volumeOff.value = false;
+      meeduPlayerController.setVolume(volume);
+    } else {
+      // 取消音量
+      volume = value;
+      volumeOff.value = true;
+      meeduPlayerController.setVolume(0);
+    }
+    print('🌹：${volumeOff.value}');
   }
 }

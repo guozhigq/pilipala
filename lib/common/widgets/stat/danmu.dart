@@ -12,13 +12,17 @@ class StatDanMu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color =
-        theme == 'white' ? Colors.white : Theme.of(context).colorScheme.outline;
+    Map<String, Color> colorObject = {
+      'white': Colors.white,
+      'gray': Theme.of(context).colorScheme.outline,
+      'black': Theme.of(context).colorScheme.onBackground.withOpacity(0.8),
+    };
+    Color color = colorObject[theme]!;
     return Row(
       children: [
         Icon(
           // CupertinoIcons.ellipses_bubble,
-          Icons.subtitles_outlined,
+          Icons.subtitles_sharp,
           size: 14,
           color: color,
         ),
