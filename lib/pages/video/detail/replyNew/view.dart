@@ -3,16 +3,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
   int? oid;
   int? root;
   String? replyLevel;
   int? parent;
-  double? paddingTop;
   ReplyType? replyType;
 
   VideoReplyNewDialog({
@@ -20,7 +21,6 @@ class VideoReplyNewDialog extends StatefulWidget {
     this.root,
     this.replyLevel,
     this.parent,
-    this.paddingTop,
     this.replyType,
   });
 
@@ -38,6 +38,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   bool ableClean = false;
   bool autoFocus = false;
   Timer? timer;
+  Box localCache = GStrorage.localCache;
+  late double sheetHeight;
 
   @override
   void initState() {
@@ -50,6 +52,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     WidgetsBinding.instance.addObserver(this);
     // 自动聚焦
     _autoFocus();
+
+    sheetHeight = localCache.get('sheetHeight');
   }
 
   _autoFocus() async {
@@ -66,7 +70,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   Future submitReplyAdd() async {
     String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
-      type: widget.replyType!,
+      type: widget.replyType ?? ReplyType.video,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,
@@ -101,11 +105,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
-    print('1111111');
     return Container(
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).size.width * 9 / 16 -
-          widget.paddingTop!,
+      height: sheetHeight,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(

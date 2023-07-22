@@ -197,11 +197,14 @@ class ReplyItem extends StatelessWidget {
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
               style: const TextStyle(height: 1.65),
+              maxLines:
+                  replyItem!.content!.isText! && replyLevel == '1' ? 6 : 999,
+              overflow: TextOverflow.ellipsis,
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
                     WidgetSpan(child: UpTag(tagText: 'TOP')),
-                  buildContent(context, replyItem!.content!),
+                  buildContent(context, replyItem!, replyReply),
                 ],
               ),
             ),
@@ -229,7 +232,6 @@ class ReplyItem extends StatelessWidget {
   // 感谢、回复、复制
   Widget bottonAction(context, replyControl) {
     var color = Theme.of(context).colorScheme.outline;
-    double paddingTop = MediaQuery.of(context).padding.top;
     return Row(
       children: [
         const SizedBox(width: 48),
@@ -283,7 +285,6 @@ class ReplyItem extends StatelessWidget {
                     oid: replyItem!.oid,
                     root: replyItem!.rpid,
                     parent: replyItem!.rpid,
-                    paddingTop: paddingTop,
                     replyType: replyType,
                   );
                 },
@@ -347,7 +348,6 @@ class ReplyItemRow extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isShow = replyControl!.isShow!;
     int extraRow = replyControl != null && isShow ? 1 : 0;
-    double paddingTop = MediaQuery.of(context).padding.top;
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
@@ -360,7 +360,7 @@ class ReplyItemRow extends StatelessWidget {
           children: [
             for (var i = 0; i < replies!.length; i++) ...[
               InkWell(
-                onTap: () => replyReply!(replyItem, paddingTop),
+                onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
@@ -401,7 +401,7 @@ class ReplyItemRow extends StatelessWidget {
                           WidgetSpan(
                             child: UpTag(),
                           ),
-                        buildContent(context, replies![i].content),
+                        buildContent(context, replies![i], replyReply),
                       ],
                     ),
                   ),
@@ -410,7 +410,7 @@ class ReplyItemRow extends StatelessWidget {
             ],
             if (extraRow == 1)
               InkWell(
-                onTap: () => replyReply!(replyItem, paddingTop),
+                onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
@@ -441,7 +441,8 @@ class ReplyItemRow extends StatelessWidget {
   }
 }
 
-InlineSpan buildContent(BuildContext context, content) {
+InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
+  var content = replyItem.content;
   if (content.emote.isEmpty &&
       content.atNameToMid.isEmpty &&
       content.jumpUrl.isEmpty &&
@@ -449,7 +450,7 @@ InlineSpan buildContent(BuildContext context, content) {
       content.pictures.isEmpty) {
     return TextSpan(
       text: content.message,
-      // recognizer: TapGestureRecognizer()..onTap = () => {print('点击')},
+      recognizer: TapGestureRecognizer()..onTap = () => replyReply(replyItem),
     );
   }
   List<InlineSpan> spanChilds = [];

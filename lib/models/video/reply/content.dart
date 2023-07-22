@@ -1,13 +1,15 @@
 class ReplyContent {
-  ReplyContent(
-      {this.message,
-      this.atNameToMid, // @的用户的mid null
-      this.memebers, // 被@的用户List 如果有的话 []
-      this.emote, // 表情包 如果有的话 null
-      this.jumpUrl, // {}
-      this.pictures, // {}
-      this.vote,
-      this.richText});
+  ReplyContent({
+    this.message,
+    this.atNameToMid, // @的用户的mid null
+    this.memebers, // 被@的用户List 如果有的话 []
+    this.emote, // 表情包 如果有的话 null
+    this.jumpUrl, // {}
+    this.pictures, // {}
+    this.vote,
+    this.richText,
+    this.isText,
+  });
 
   String? message;
   Map? atNameToMid;
@@ -17,6 +19,7 @@ class ReplyContent {
   List? pictures;
   Map? vote;
   Map? richText;
+  bool? isText;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
     message = json['message']
@@ -30,5 +33,10 @@ class ReplyContent {
     pictures = json['pictures'] ?? [];
     vote = json['vote'] ?? {};
     richText = json['rich_text'] ?? {};
+    isText = emote!.isEmpty &&
+        atNameToMid!.isEmpty &&
+        jumpUrl!.isEmpty &&
+        vote!.isEmpty &&
+        pictures!.isEmpty;
   }
 }

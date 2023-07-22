@@ -71,7 +71,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
     }
   }
 
-  void replyReply(replyItem, paddingTop) {
+  void replyReply(replyItem) {
     int oid = replyItem.replies!.first.oid;
     int rpid = replyItem.rpid!;
     Get.to(
@@ -83,7 +83,6 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
         body: VideoReplyReplyPanel(
           oid: oid,
           rpid: rpid,
-          paddingTop: paddingTop,
           source: 'dynamic',
           replyType: ReplyType.values[type],
         ),
@@ -216,8 +215,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                                     _dynamicDetailController!.replyList[index],
                                 showReplyRow: true,
                                 replyLevel: '1',
-                                replyReply: (replyItem, paddingTop) =>
-                                    replyReply(replyItem, paddingTop),
+                                replyReply: (replyItem) =>
+                                    replyReply(replyItem),
                                 replyType: ReplyType.album,
                               );
                             }
