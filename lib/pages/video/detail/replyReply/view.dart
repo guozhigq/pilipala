@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
+import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
 
@@ -13,7 +15,6 @@ class VideoReplyReplyPanel extends StatefulWidget {
   int? rpid;
   Function? closePanel;
   ReplyItemModel? firstFloor;
-  double? paddingTop;
   String? source;
   ReplyType? replyType;
 
@@ -22,7 +23,6 @@ class VideoReplyReplyPanel extends StatefulWidget {
     this.rpid,
     this.closePanel,
     this.firstFloor,
-    this.paddingTop,
     this.source,
     this.replyType,
     super.key,
@@ -35,6 +35,8 @@ class VideoReplyReplyPanel extends StatefulWidget {
 class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late VideoReplyReplyController _videoReplyReplyController;
   late AnimationController replyAnimationCtl;
+  Box localCache = GStrorage.localCache;
+  late double sheetHeight;
 
   @override
   void initState() {
@@ -57,6 +59,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
         }
       },
     );
+
+    sheetHeight = localCache.get('sheetHeight');
   }
 
   @override
@@ -68,11 +72,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.source == 'videoDetail'
-          ? MediaQuery.of(context).size.height -
-              MediaQuery.of(context).size.width * 9 / 16 -
-              widget.paddingTop!
-          : null,
+      height: widget.source == 'videoDetail' ? sheetHeight : null,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

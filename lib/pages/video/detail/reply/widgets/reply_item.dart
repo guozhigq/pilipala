@@ -229,7 +229,6 @@ class ReplyItem extends StatelessWidget {
   // 感谢、回复、复制
   Widget bottonAction(context, replyControl) {
     var color = Theme.of(context).colorScheme.outline;
-    double paddingTop = MediaQuery.of(context).padding.top;
     return Row(
       children: [
         const SizedBox(width: 48),
@@ -283,7 +282,6 @@ class ReplyItem extends StatelessWidget {
                     oid: replyItem!.oid,
                     root: replyItem!.rpid,
                     parent: replyItem!.rpid,
-                    paddingTop: paddingTop,
                     replyType: replyType,
                   );
                 },
@@ -347,7 +345,6 @@ class ReplyItemRow extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isShow = replyControl!.isShow!;
     int extraRow = replyControl != null && isShow ? 1 : 0;
-    double paddingTop = MediaQuery.of(context).padding.top;
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
@@ -360,7 +357,7 @@ class ReplyItemRow extends StatelessWidget {
           children: [
             for (var i = 0; i < replies!.length; i++) ...[
               InkWell(
-                onTap: () => replyReply!(replyItem, paddingTop),
+                onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
@@ -410,7 +407,7 @@ class ReplyItemRow extends StatelessWidget {
             ],
             if (extraRow == 1)
               InkWell(
-                onTap: () => replyReply!(replyItem, paddingTop),
+                onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),

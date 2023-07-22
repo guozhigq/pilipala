@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
 class MainApp extends StatefulWidget {
@@ -87,6 +89,11 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Box localCache = GStrorage.localCache;
+    double sheetHeight = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.of(context).size.width * 9 / 16;
+    localCache.put('sheetHeight', sheetHeight);
     return Scaffold(
       body: FadeTransition(
         opacity: _fadeAnimation!,

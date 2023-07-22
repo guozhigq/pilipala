@@ -116,13 +116,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem, paddingTop) {
+  void replyReply(replyItem) {
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     videoDetailCtr.oid = replyItem.replies!.first.oid;
     videoDetailCtr.fRpid = replyItem.rpid!;
     videoDetailCtr.firstFloor = replyItem;
-    videoDetailCtr.showReplyReplyPanel(paddingTop);
+    videoDetailCtr.showReplyReplyPanel();
   }
 
   @override
@@ -134,7 +134,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   Widget build(BuildContext context) {
-    double paddingTop = MediaQuery.of(context).padding.top;
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {});
@@ -180,8 +179,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                       _videoReplyController.replyList[index],
                                   showReplyRow: true,
                                   replyLevel: replyLevel,
-                                  replyReply: (replyItem, paddingTop) =>
-                                      replyReply(replyItem, paddingTop),
+                                  replyReply: (replyItem) =>
+                                      replyReply(replyItem),
                                 );
                               }
                             },
@@ -234,7 +233,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                         oid: IdUtils.bv2av(Get.parameters['bvid']!),
                         root: 0,
                         parent: 0,
-                        paddingTop: paddingTop,
                       );
                     },
                   ).then(

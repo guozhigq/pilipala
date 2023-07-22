@@ -10,7 +10,7 @@ import 'dart:convert';
 import 'package:pilipala/utils/storage.dart';
 
 class WbiSign {
-  static Box localCache = GStrorage.user;
+  static Box localCache = GStrorage.localCache;
   List mixinKeyEncTab = [
     46,
     47,
