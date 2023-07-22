@@ -70,7 +70,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   Future submitReplyAdd() async {
     String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
-      type: widget.replyType!,
+      type: widget.replyType ?? ReplyType.video,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,

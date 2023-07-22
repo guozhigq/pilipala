@@ -197,11 +197,14 @@ class ReplyItem extends StatelessWidget {
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
               style: const TextStyle(height: 1.65),
+              maxLines:
+                  replyItem!.content!.isText! && replyLevel == '1' ? 6 : 999,
+              overflow: TextOverflow.ellipsis,
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
                     WidgetSpan(child: UpTag(tagText: 'TOP')),
-                  buildContent(context, replyItem!.content!),
+                  buildContent(context, replyItem!, replyReply),
                 ],
               ),
             ),
@@ -398,7 +401,7 @@ class ReplyItemRow extends StatelessWidget {
                           WidgetSpan(
                             child: UpTag(),
                           ),
-                        buildContent(context, replies![i].content),
+                        buildContent(context, replies![i], replyReply),
                       ],
                     ),
                   ),
@@ -438,7 +441,8 @@ class ReplyItemRow extends StatelessWidget {
   }
 }
 
-InlineSpan buildContent(BuildContext context, content) {
+InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
+  var content = replyItem.content;
   if (content.emote.isEmpty &&
       content.atNameToMid.isEmpty &&
       content.jumpUrl.isEmpty &&
@@ -446,7 +450,7 @@ InlineSpan buildContent(BuildContext context, content) {
       content.pictures.isEmpty) {
     return TextSpan(
       text: content.message,
-      // recognizer: TapGestureRecognizer()..onTap = () => {print('点击')},
+      recognizer: TapGestureRecognizer()..onTap = () => replyReply(replyItem),
     );
   }
   List<InlineSpan> spanChilds = [];

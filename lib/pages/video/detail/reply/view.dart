@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
@@ -181,6 +182,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                   replyLevel: replyLevel,
                                   replyReply: (replyItem) =>
                                       replyReply(replyItem),
+                                  replyType: ReplyType.video,
                                 );
                               }
                             },
@@ -233,12 +235,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                         oid: IdUtils.bv2av(Get.parameters['bvid']!),
                         root: 0,
                         parent: 0,
+                        replyType: ReplyType.video,
                       );
                     },
                   ).then(
                     (value) => {
                       // 完成评论，数据添加
-                      if (value != null && value['data'])
+                      if (value != null && value['data'] != null)
                         {_videoReplyController.replyList.add(value['data'])}
                     },
                   );
