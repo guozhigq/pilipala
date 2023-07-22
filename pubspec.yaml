@@ -34,9 +34,9 @@ dependencies:
     sdk: flutter
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.5
   # 动态取色
-  dynamic_color: ^1.6.2
+  dynamic_color: ^1.6.6
 
   get: ^4.6.5
 
@@ -63,18 +63,20 @@ dependencies:
   permission_handler: ^10.2.0
   # 分享
   share_plus: ^6.3.1
-  # webView
-  url_launcher: ^6.1.9
   # cookie 管理
   webview_cookie_manager: ^2.0.6
   # 浏览器
   webview_flutter: ^4.2.0
   # 解决sliver滑动不同步
   extended_nested_scroll_view: ^6.0.0
+  # 上拉加载
+  loading_more_list: ^5.0.3
+  # 下拉刷新
+  pull_to_refresh_notification: ^3.0.1
   # 图标
   font_awesome_flutter: ^10.4.0
   # toast
-  flutter_smart_dialog: ^4.9.0+6
+  flutter_smart_dialog: ^4.9.3+2
   # 下滑关闭
   dismissible_page: ^1.0.2
   # 媒体播放
@@ -85,9 +87,8 @@ dependencies:
       ref: feature-custom
       path: package
   custom_sliding_segmented_control: ^1.7.5
-  loading_more_list: ^5.0.3
-  crypto: any
-  pull_to_refresh_notification: ^3.0.1
+  # 加密
+  crypto: ^3.0.3
   
 dev_dependencies:
   flutter_test:

@@ -98,6 +98,7 @@ class VideoDetailController extends GetxController
   }
 
   playerInit(source, audioSource, {Duration defaultST = Duration.zero}) {
+    meeduPlayerController.onVideoFitChange(BoxFit.cover);
     meeduPlayerController.setDataSource(
       DataSource(
         type: DataSourceType.network,
