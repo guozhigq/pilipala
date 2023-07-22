@@ -1,15 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/fav/index.dart';
-import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/widgets/expandable_section.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
@@ -18,6 +14,9 @@ import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'widgets/action_row_item.dart';
+import 'widgets/intro_detail.dart';
+import 'widgets/menu_row.dart';
 import 'widgets/season.dart';
 
 class VideoIntroPanel extends StatefulWidget {
@@ -231,135 +230,99 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 10),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 15),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SelectableRegion(
-                    magnifierConfiguration: const TextMagnifierConfiguration(),
-                    focusNode: FocusNode(),
-                    selectionControls: MaterialTextSelectionControls(),
-                    child: Text(
-                      !widget.loadingStatus
-                          ? widget.videoDetail!.title
-                          : videoItem['title'],
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            letterSpacing: 0.5,
-                          ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  InkWell(
-                    splashColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      _manualController!.animateTo(isExpand ? 0 : 0.5);
-                      setState(() {
-                        isExpand = !isExpand;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 2),
-                        StatView(
-                          theme: 'gray',
-                          view: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.view
-                              : videoItem['stat'].view,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        StatDanMu(
-                          theme: 'gray',
-                          danmu: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.danmaku
-                              : videoItem['stat'].danmaku,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          Utils.dateFormat(
-                              !widget.loadingStatus
-                                  ? widget.videoDetail!.pubdate
-                                  : videoItem['pubdate'],
-                              formatType: 'detail'),
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.outline),
-                        ),
-                        const Spacer(),
-                        RotationTransition(
-                          turns: _manualAnimation!,
-                          child: SizedBox(
-                            width: 35,
-                            height: 35,
-                            child: IconButton(
-                              padding: const EdgeInsets.all(2.0),
-                              onPressed: () {
-                                /// 0.5代表 180弧度
-                                _manualController!
-                                    .animateTo(isExpand ? 0 : 0.5);
-                                setState(() {
-                                  isExpand = !isExpand;
-                                });
-                              },
-                              icon: Icon(
-                                FontAwesomeIcons.angleUp,
-                                size: 15,
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-                  ),
-                  // 简介 默认收起
-                  if (!widget.loadingStatus)
-                    ExpandedSection(
-                      expand: isExpand,
-                      begin: 0.0,
-                      end: 1.0,
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline,
-                          height: 1.5,
-                          fontSize:
-                              Theme.of(context).textTheme.labelMedium?.fontSize,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: SelectableRegion(
-                            magnifierConfiguration:
-                                const TextMagnifierConfiguration(),
-                            focusNode: FocusNode(),
-                            selectionControls: MaterialTextSelectionControls(),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(widget.videoDetail!.bvid!),
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      buildContent(
-                                          context, widget.videoDetail!),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          !widget.loadingStatus
+                              ? widget.videoDetail!.title
+                              : videoItem['title'],
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(
+                                  letterSpacing: 0.5,
+                                  fontWeight: FontWeight.bold),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  const SizedBox(height: 8),
+                      const SizedBox(width: 20),
+                      SizedBox(
+                        width: 34,
+                        height: 34,
+                        child: IconButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith((states) {
+                              return Theme.of(context)
+                                  .highlightColor
+                                  .withOpacity(0.2);
+                            }),
+                          ),
+                          onPressed: () {
+                            showBottomSheet(
+                                context: context,
+                                enableDrag: true,
+                                builder: (BuildContext context) {
+                                  return IntroDetail(
+                                      videoDetail: widget.videoDetail!);
+                                });
+                          },
+                          icon: const Icon(Icons.more_horiz),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const SizedBox(width: 2),
+                      StatView(
+                        theme: 'black',
+                        view: !widget.loadingStatus
+                            ? widget.videoDetail!.stat!.view
+                            : videoItem['stat'].view,
+                        size: 'medium',
+                      ),
+                      const SizedBox(width: 10),
+                      StatDanMu(
+                        theme: 'black',
+                        danmu: !widget.loadingStatus
+                            ? widget.videoDetail!.stat!.danmaku
+                            : videoItem['stat'].danmaku,
+                        size: 'medium',
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        Utils.dateFormat(
+                            !widget.loadingStatus
+                                ? widget.videoDetail!.pubdate
+                                : videoItem['pubdate'],
+                            formatType: 'detail'),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
                   // 点赞收藏转发
-                  _actionGrid(context, videoIntroController, videoDetailCtr),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: actionRow(
+                        context,
+                        videoIntroController,
+                        videoDetailCtr,
+                      ),
+                    ),
+                  ),
                   // 合集
                   if (!widget.loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
@@ -390,12 +353,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           src: !widget.loadingStatus
                               ? widget.videoDetail!.owner!.face
                               : videoItem['owner'].face,
-                          width: 38,
-                          height: 38,
+                          width: 34,
+                          height: 34,
                           fadeInDuration: Duration.zero,
                           fadeOutDuration: Duration.zero,
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -421,7 +384,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           opacity: widget.loadingStatus ? 0 : 1,
                           duration: const Duration(milliseconds: 150),
                           child: SizedBox(
-                            height: 36,
+                            height: 34,
                             child: Obx(
                               () => videoIntroController.followStatus.isNotEmpty
                                   ? ElevatedButton(
@@ -444,107 +407,83 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-
+                  const SizedBox(height: 8),
                   Divider(
-                    height: 26,
+                    height: 12,
                     color: Theme.of(context).dividerColor.withOpacity(0.1),
                   ),
-                  // const SizedBox(height: 10),
                 ],
               )
-            : const Center(child: CircularProgressIndicator()),
+            : const SizedBox(
+                height: 100,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
       ),
     );
   }
 
-  // 喜欢 投币 分享
-  Widget _actionGrid(
-      BuildContext context, videoIntroController, videoDetailCtr) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return SizedBox(
-        height: constraints.maxWidth / 5 * 0.8,
-        child: Material(
-          child: GridView.count(
-            primary: false,
-            padding: const EdgeInsets.all(0),
-            crossAxisCount: 5,
-            childAspectRatio: 1.25,
-            children: <Widget>[
-              // InkWell(
-              //   onTap: () => videoIntroController.actionOneThree(),
-              //   borderRadius: StyleString.mdRadius,
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(12),
-              //     child: Image.asset(
-              //       'assets/images/logo/logo_big.png',
-              //       width: 10,
-              //       height: 10,
-              //     ),
-              //   ),
-              // ),
-              Obx(
-                () => ActionItem(
-                    icon: const Icon(FontAwesomeIcons.thumbsUp),
-                    selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
-                    onTap: () => videoIntroController.actionLikeVideo(),
-                    selectStatus: videoIntroController.hasLike.value,
-                    loadingStatus: widget.loadingStatus,
-                    text: !widget.loadingStatus
-                        ? widget.videoDetail!.stat!.like!.toString()
-                        : '-'),
-              ),
-              // ActionItem(
-              //     icon: const Icon(FontAwesomeIcons.thumbsDown),
-              //     selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
-              //     onTap: () => {},
-              //     selectStatus: false,
-              //     loadingStatus: widget.loadingStatus,
-              //     text: '不喜欢'),
-              Obx(
-                () => ActionItem(
-                    icon: const Icon(FontAwesomeIcons.b),
-                    selectIcon: const Icon(FontAwesomeIcons.b),
-                    onTap: () => videoIntroController.actionCoinVideo(),
-                    selectStatus: videoIntroController.hasCoin.value,
-                    loadingStatus: widget.loadingStatus,
-                    text: !widget.loadingStatus
-                        ? widget.videoDetail!.stat!.coin!.toString()
-                        : '-'),
-              ),
-              Obx(
-                () => ActionItem(
-                    icon: const Icon(FontAwesomeIcons.heart),
-                    selectIcon: const Icon(FontAwesomeIcons.heartCircleCheck),
-                    onTap: () => showFavBottomSheet(),
-                    selectStatus: videoIntroController.hasFav.value,
-                    loadingStatus: widget.loadingStatus,
-                    text: !widget.loadingStatus
-                        ? widget.videoDetail!.stat!.favorite!.toString()
-                        : '-'),
-              ),
-              ActionItem(
-                  icon: const Icon(FontAwesomeIcons.shareFromSquare),
-                  onTap: () => videoIntroController.actionShareVideo(),
-                  selectStatus: false,
-                  loadingStatus: widget.loadingStatus,
-                  text: !widget.loadingStatus
-                      ? widget.videoDetail!.stat!.share!.toString()
-                      : '-'),
-              ActionItem(
-                  icon: const Icon(FontAwesomeIcons.comments),
-                  onTap: () {
-                    videoDetailCtr.tabCtr.animateTo(1);
-                  },
-                  selectStatus: false,
-                  loadingStatus: widget.loadingStatus,
-                  text: !widget.loadingStatus
-                      ? widget.videoDetail!.stat!.reply!.toString()
-                      : '-'),
-            ],
-          ),
+  Widget actionRow(BuildContext context, videoIntroController, videoDetailCtr) {
+    return Row(children: [
+      Obx(
+        () => ActionRowItem(
+          icon: const Icon(FontAwesomeIcons.thumbsUp),
+          onTap: () => videoIntroController.actionLikeVideo(),
+          selectStatus: videoIntroController.hasLike.value,
+          loadingStatus: widget.loadingStatus,
+          text: !widget.loadingStatus
+              ? widget.videoDetail!.stat!.like!.toString()
+              : '-',
         ),
-      );
-    });
+      ),
+      const SizedBox(width: 8),
+      Obx(
+        () => ActionRowItem(
+          icon: const Icon(FontAwesomeIcons.b),
+          onTap: () => videoIntroController.actionCoinVideo(),
+          selectStatus: videoIntroController.hasCoin.value,
+          loadingStatus: widget.loadingStatus,
+          text: !widget.loadingStatus
+              ? widget.videoDetail!.stat!.coin!.toString()
+              : '-',
+        ),
+      ),
+      const SizedBox(width: 8),
+      Obx(
+        () => ActionRowItem(
+          icon: const Icon(FontAwesomeIcons.heart),
+          onTap: () => showFavBottomSheet(),
+          selectStatus: videoIntroController.hasFav.value,
+          loadingStatus: widget.loadingStatus,
+          text: !widget.loadingStatus
+              ? widget.videoDetail!.stat!.favorite!.toString()
+              : '-',
+        ),
+      ),
+      const SizedBox(width: 8),
+      ActionRowItem(
+        icon: const Icon(FontAwesomeIcons.comment),
+        onTap: () {
+          videoDetailCtr.tabCtr.animateTo(1);
+        },
+        selectStatus: false,
+        loadingStatus: widget.loadingStatus,
+        text: !widget.loadingStatus
+            ? widget.videoDetail!.stat!.reply!.toString()
+            : '-',
+      ),
+      const SizedBox(width: 8),
+      ActionRowItem(
+        icon: const Icon(FontAwesomeIcons.share),
+        onTap: () => videoIntroController.actionShareVideo(),
+        selectStatus: false,
+        loadingStatus: widget.loadingStatus,
+        text: !widget.loadingStatus
+            ? widget.videoDetail!.stat!.share!.toString()
+            : '-',
+      ),
+    ]);
   }
 
   InlineSpan buildContent(BuildContext context, content) {
@@ -581,56 +520,5 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       spanChilds.add(TextSpan(text: desc));
     }
     return TextSpan(children: spanChilds);
-  }
-}
-
-class ActionItem extends StatelessWidget {
-  Icon? icon;
-  Icon? selectIcon;
-  Function? onTap;
-  bool? loadingStatus;
-  String? text;
-  bool selectStatus = false;
-
-  ActionItem({
-    Key? key,
-    this.icon,
-    this.selectIcon,
-    this.onTap,
-    this.loadingStatus,
-    this.text,
-    required this.selectStatus,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onTap!(),
-      borderRadius: StyleString.mdRadius,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 4),
-          selectStatus
-              ? Icon(selectIcon!.icon!,
-                  size: 21, color: Theme.of(context).primaryColor)
-              : Icon(icon!.icon!,
-                  size: 21, color: Theme.of(context).colorScheme.outline),
-          const SizedBox(height: 4),
-          AnimatedOpacity(
-            opacity: loadingStatus! ? 0 : 1,
-            duration: const Duration(milliseconds: 200),
-            child: Text(
-              text ?? '',
-              style: TextStyle(
-                  color: selectStatus
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).colorScheme.outline,
-                  fontSize: Theme.of(context).textTheme.labelSmall?.fontSize),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

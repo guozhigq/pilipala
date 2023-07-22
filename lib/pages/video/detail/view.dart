@@ -5,6 +5,8 @@ import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/common/widgets/sliver_header.dart';
+import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
@@ -234,7 +236,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   children: [
                     Container(
                       width: double.infinity,
-                      height: 45,
+                      height: 0,
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -254,8 +256,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               () => TabBar(
                                 controller: videoDetailController.tabCtr,
                                 dividerColor: Colors.transparent,
-                                // indicatorColor:
-                                //     Theme.of(context).colorScheme.background,
+                                indicatorColor:
+                                    Theme.of(context).colorScheme.background,
                                 tabs: videoDetailController.tabs
                                     .map((String name) => Tab(text: name))
                                     .toList(),
@@ -271,11 +273,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         children: [
                           Builder(
                             builder: (context) {
-                              return const CustomScrollView(
-                                key: PageStorageKey<String>('简介'),
+                              return CustomScrollView(
+                                key: const PageStorageKey<String>('简介'),
                                 slivers: <Widget>[
-                                  VideoIntroPanel(),
-                                  RelatedVideoPanel(),
+                                  const VideoIntroPanel(),
+                                  SliverPersistentHeader(
+                                    floating: true,
+                                    pinned: true,
+                                    delegate: SliverHeaderDelegate(
+                                      height: 50,
+                                      child: MenuRow(loadingStatus: false),
+                                    ),
+                                  ),
+                                  const RelatedVideoPanel(),
                                 ],
                               );
                             },
