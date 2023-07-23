@@ -120,7 +120,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   void replyReply(replyItem) {
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    videoDetailCtr.oid = replyItem.replies!.first.oid;
+    videoDetailCtr.oid = replyItem.oid;
     videoDetailCtr.fRpid = replyItem.rpid!;
     videoDetailCtr.firstFloor = replyItem;
     videoDetailCtr.showReplyReplyPanel();
