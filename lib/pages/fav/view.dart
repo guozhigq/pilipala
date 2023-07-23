@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/pages/fav/widgets/item.dart';
 
 class FavPage extends StatefulWidget {
   const FavPage({super.key});
@@ -18,7 +19,11 @@ class _FavPageState extends State<FavPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text('我的收藏'),
+        titleSpacing: 0,
+        title: Text(
+          '我的收藏',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: FutureBuilder(
         future: _favController.queryFavFolder(),
@@ -30,31 +35,9 @@ class _FavPageState extends State<FavPage> {
                 () => ListView.builder(
                   itemCount: _favController.favFolderData.value.list!.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () => Get.toNamed(
-                        '/favDetail',
-                        arguments:
-                            _favController.favFolderData.value.list![index],
-                        parameters: {
-                          'mediaId': _favController
-                              .favFolderData.value.list![index].id
-                              .toString(),
-                        },
-                      ),
-                      leading: const Icon(Icons.folder_special_outlined),
-                      minLeadingWidth: 0,
-                      title: Text(_favController
-                          .favFolderData.value.list![index].title!),
-                      subtitle: Text(
-                        '${_favController.favFolderData.value.list![index].mediaCount}个内容',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelSmall!
-                                .fontSize),
-                      ),
-                    );
+                    return FavItem(
+                        favFolderItem:
+                            _favController.favFolderData.value.list![index]);
                   },
                 ),
               );
