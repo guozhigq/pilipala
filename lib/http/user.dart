@@ -112,4 +112,36 @@ class UserHttp {
       return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
+
+  // 暂停观看历史
+  static Future pauseHistory(bool switchStatus) async {
+    // 暂停switchStatus传true 否则false
+    var res = await Request().post(
+      Api.pauseHistory,
+      queryParameters: {
+        'switch': switchStatus,
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    return res;
+  }
+
+  // 观看历史暂停状态
+  static Future historyStatus() async {
+    var res = await Request().get(Api.historyStatus);
+    return res;
+  }
+
+  // 清空历史记录
+  static Future clearHistory() async {
+    var res = await Request().post(
+      Api.clearHistory,
+      queryParameters: {
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    return res;
+  }
 }
