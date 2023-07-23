@@ -1,9 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+
+Box localCache = GStrorage.localCache;
+late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {
   var videoDetail;
@@ -15,10 +20,11 @@ class IntroDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    sheetHeight = localCache.get('sheetHeight');
     return Container(
         color: Theme.of(context).colorScheme.background,
         padding: const EdgeInsets.only(left: 14, right: 14),
-        height: 570,
+        height: sheetHeight,
         child: Column(
           children: [
             Container(
