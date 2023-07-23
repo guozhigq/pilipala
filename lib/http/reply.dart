@@ -12,7 +12,7 @@ class ReplyHttp {
       'oid': oid,
       'pn': pageNum,
       'type': type,
-      'sort': 1,
+      'sort': sort,
     });
     if (res.data['code'] == 0) {
       return {

@@ -103,7 +103,7 @@ class ReplyItem extends StatelessWidget {
                       replyItem!.member!.uname!,
                       style: TextStyle(
                         color: replyItem!.isUp! ||
-                                replyItem!.member!.vip!['vipType'] > 0
+                                replyItem!.member!.vip!['vipStatus'] > 0
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
                         fontSize:
@@ -177,7 +177,7 @@ class ReplyItem extends StatelessWidget {
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
-              style: const TextStyle(height: 1.65),
+              style: const TextStyle(height: 1.75),
               maxLines:
                   replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
               overflow: TextOverflow.ellipsis,
