@@ -28,7 +28,8 @@ enum ReplyType {
   ticket,
   // 音频
   audio,
-
+  // 风纪委员会
+  unset3,
   // 点评
   comment,
   // 动态

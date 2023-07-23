@@ -34,7 +34,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   late VideoReplyController _videoReplyController;
   late AnimationController fabAnimationCtr;
 
-  // List<ReplyItemModel>? replyList;
   Future? _futureBuilderFuture;
   bool _isFabVisible = true;
   String replyLevel = '1';
@@ -112,8 +111,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       _videoReplyController.replyLevel = '0';
     }
 
-    await Future.delayed(const Duration(microseconds: 100));
-    _videoReplyController.wakeUpReply();
+    // await Future.delayed(const Duration(microseconds: 100));
+    // _videoReplyController.wakeUpReply();
   }
 
   // 展示二级回复
@@ -231,7 +230,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                     isScrollControlled: true,
                     builder: (BuildContext context) {
                       return VideoReplyNewDialog(
-                        replyLevel: '0',
                         oid: IdUtils.bv2av(Get.parameters['bvid']!),
                         root: 0,
                         parent: 0,

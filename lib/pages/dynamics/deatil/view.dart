@@ -72,7 +72,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   }
 
   void replyReply(replyItem) {
-    int oid = replyItem.replies!.first.oid;
+    int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
     Get.to(
       () => Scaffold(
@@ -85,6 +85,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
           rpid: rpid,
           source: 'dynamic',
           replyType: ReplyType.values[type],
+          firstFloor: replyItem,
         ),
       ),
     );
@@ -217,7 +218,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                                 replyLevel: '1',
                                 replyReply: (replyItem) =>
                                     replyReply(replyItem),
-                                replyType: ReplyType.album,
+                                replyType: ReplyType.values[type],
                               );
                             }
                           },

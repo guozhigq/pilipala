@@ -27,7 +27,6 @@ class VideoReplyController extends GetxController {
   int currentPage = 0;
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
-  RxBool autoFocus = false.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
   // 回复来源
@@ -89,35 +88,5 @@ class VideoReplyController extends GetxController {
   // 上拉加载
   Future onLoad() async {
     queryReplyList(type: 'onLoad');
-  }
-
-  wakeUpReply() {
-    autoFocus.value = true;
-  }
-
-  // 发表评论
-  Future submitReplyAdd() async {
-    var result = await VideoHttp.replyAdd(
-      type: ReplyType.video,
-      oid: aid!,
-      root: replyLevel == '0'
-          ? 0
-          : replyLevel == '1'
-              ? currentReplyItem!.rpid
-              : rPid,
-      parent: replyLevel == '0'
-          ? 0
-          : replyLevel == '1'
-              ? currentReplyItem!.rpid
-              : currentReplyItem!.rpid,
-      message: replyLevel == '2'
-          ? ' 回复 @${currentReplyItem!.member!.uname!} : 2楼31'
-          : '2楼31',
-    );
-    if (result['status']) {
-      SmartDialog.showToast(result['data']['success_toast']);
-    } else {
-      SmartDialog.showToast(result['message']);
-    }
   }
 }
