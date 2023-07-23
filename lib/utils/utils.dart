@@ -122,9 +122,9 @@ class Utils {
       return timeStr;
     }
 
-    if (formatType == 'list' && int.parse(DD) > DateTime.now().day - 2) {
-      return '昨天';
-    }
+    // if (formatType == 'list' && int.parse(DD) > DateTime.now().day - 2) {
+    //   return '昨天';
+    // }
 
     date = date
         .replaceAll('YY', YY)
@@ -133,8 +133,12 @@ class Utils {
         .replaceAll('hh', hh)
         .replaceAll('mm', mm)
         .replaceAll('ss', ss);
-    if (int.parse(DD) < DateTime.now().day) {
-      return date.split(' ')[0];
+    if (int.parse(YY) == DateTime.now().year &&
+        int.parse(MM) == DateTime.now().month) {
+      // 当天
+      if (int.parse(DD) == DateTime.now().day) {
+        return date.split(' ')[1];
+      }
     }
     return date;
   }

@@ -5,6 +5,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -27,7 +28,6 @@ class VideoReplyController extends GetxController {
   int currentPage = 0;
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
-  RxBool autoFocus = false.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
   // 回复来源
@@ -37,11 +37,19 @@ class VideoReplyController extends GetxController {
   // 默认回复主楼
   String replyLevel = '0';
 
+  ReplySortType sortType = ReplySortType.time;
+  RxString sortTypeTitle = ReplySortType.time.titles.obs;
+  RxString sortTypeLabel = ReplySortType.time.labels.obs;
+
   Future queryReplyList({type = 'init'}) async {
     isLoadingMore = true;
     var res = level == '1'
         ? await ReplyHttp.replyList(
-            oid: aid!, pageNum: currentPage + 1, type: 1)
+            oid: aid!,
+            pageNum: currentPage + 1,
+            type: ReplyType.video.index,
+            sort: sortType.index,
+          )
         : await ReplyHttp.replyReplyList(
             oid: aid!, root: rpid!, pageNum: currentPage + 1, type: 1);
     if (res['status']) {
@@ -91,33 +99,24 @@ class VideoReplyController extends GetxController {
     queryReplyList(type: 'onLoad');
   }
 
-  wakeUpReply() {
-    autoFocus.value = true;
-  }
-
-  // 发表评论
-  Future submitReplyAdd() async {
-    var result = await VideoHttp.replyAdd(
-      type: ReplyType.video,
-      oid: aid!,
-      root: replyLevel == '0'
-          ? 0
-          : replyLevel == '1'
-              ? currentReplyItem!.rpid
-              : rPid,
-      parent: replyLevel == '0'
-          ? 0
-          : replyLevel == '1'
-              ? currentReplyItem!.rpid
-              : currentReplyItem!.rpid,
-      message: replyLevel == '2'
-          ? ' 回复 @${currentReplyItem!.member!.uname!} : 2楼31'
-          : '2楼31',
-    );
-    if (result['status']) {
-      SmartDialog.showToast(result['data']['success_toast']);
-    } else {
-      SmartDialog.showToast(result['message']);
+  // 排序搜索评论
+  queryBySort() {
+    switch (sortType) {
+      case ReplySortType.time:
+        sortType = ReplySortType.like;
+        break;
+      case ReplySortType.like:
+        sortType = ReplySortType.reply;
+        break;
+      case ReplySortType.reply:
+        sortType = ReplySortType.time;
+        break;
+      default:
     }
+    sortTypeTitle.value = sortType.titles;
+    sortTypeLabel.value = sortType.labels;
+    currentPage = 0;
+    replyList.clear();
+    queryReplyList(type: 'init');
   }
 }

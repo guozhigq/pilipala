@@ -33,10 +33,7 @@ class ReplyContent {
     pictures = json['pictures'] ?? [];
     vote = json['vote'] ?? {};
     richText = json['rich_text'] ?? {};
-    isText = emote!.isEmpty &&
-        atNameToMid!.isEmpty &&
-        jumpUrl!.isEmpty &&
-        vote!.isEmpty &&
-        pictures!.isEmpty;
+    // 不包含@ 笔记 图片的时候，文字可折叠
+    isText = atNameToMid!.isEmpty && vote!.isEmpty && pictures!.isEmpty;
   }
 }

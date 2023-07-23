@@ -72,7 +72,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   }
 
   void replyReply(replyItem) {
-    int oid = replyItem.replies!.first.oid;
+    int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
     Get.to(
       () => Scaffold(
@@ -85,6 +85,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
           rpid: rpid,
           source: 'dynamic',
           replyType: ReplyType.values[type],
+          firstFloor: replyItem,
         ),
       ),
     );
@@ -158,27 +159,16 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                       ),
                       const Text('条回复'),
                       const Spacer(),
-                      // TextButton.icon(
-                      //   onPressed: () {},
-                      //   icon: const Icon(
-                      //     Icons.subject_rounded,
-                      //     size: 15,
-                      //   ),
-                      //   style: TextButton.styleFrom(
-                      //     padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                      //     foregroundColor:
-                      //         Theme.of(context).colorScheme.outline,
-                      //   ),
-                      //   label: Text(
-                      //     '按时间',
-                      //     style: TextStyle(
-                      //       fontSize: Theme.of(context)
-                      //           .textTheme
-                      //           .titleSmall!
-                      //           .fontSize,
-                      //     ),
-                      //   ),
-                      // ),
+                      SizedBox(
+                        height: 35,
+                        child: TextButton.icon(
+                          onPressed: () =>
+                              _dynamicDetailController!.queryBySort(),
+                          icon: const Icon(Icons.sort, size: 17),
+                          label: Obx(() => Text(
+                              _dynamicDetailController!.sortTypeLabel.value)),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -193,38 +183,51 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                   if (snapshot.data['status']) {
                     // 请求成功
                     return Obx(
-                      () => SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            if (index ==
-                                _dynamicDetailController!.replyList.length) {
-                              return Container(
-                                padding: EdgeInsets.only(
-                                    bottom:
-                                        MediaQuery.of(context).padding.bottom),
-                                height:
-                                    MediaQuery.of(context).padding.bottom + 100,
-                                child: Center(
-                                  child: Obx(() => Text(
-                                      _dynamicDetailController!.noMore.value)),
-                                ),
-                              );
-                            } else {
-                              return ReplyItem(
-                                replyItem:
-                                    _dynamicDetailController!.replyList[index],
-                                showReplyRow: true,
-                                replyLevel: '1',
-                                replyReply: (replyItem) =>
-                                    replyReply(replyItem),
-                                replyType: ReplyType.album,
-                              );
-                            }
-                          },
-                          childCount:
-                              _dynamicDetailController!.replyList.length + 1,
-                        ),
-                      ),
+                      () => _dynamicDetailController!.replyList.isEmpty
+                          ? SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                return const VideoReplySkeleton();
+                              }, childCount: 8),
+                            )
+                          : SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  if (index ==
+                                      _dynamicDetailController!
+                                          .replyList.length) {
+                                    return Container(
+                                      padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context)
+                                              .padding
+                                              .bottom),
+                                      height: MediaQuery.of(context)
+                                              .padding
+                                              .bottom +
+                                          100,
+                                      child: Center(
+                                        child: Obx(() => Text(
+                                            _dynamicDetailController!
+                                                .noMore.value)),
+                                      ),
+                                    );
+                                  } else {
+                                    return ReplyItem(
+                                      replyItem: _dynamicDetailController!
+                                          .replyList[index],
+                                      showReplyRow: true,
+                                      replyLevel: '1',
+                                      replyReply: (replyItem) =>
+                                          replyReply(replyItem),
+                                      replyType: ReplyType.values[type],
+                                    );
+                                  }
+                                },
+                                childCount:
+                                    _dynamicDetailController!.replyList.length +
+                                        1,
+                              ),
+                            ),
                     );
                   } else {
                     // 请求错误

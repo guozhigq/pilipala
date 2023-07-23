@@ -1,17 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
-import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
-import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ReplyItem extends StatelessWidget {
@@ -33,66 +28,52 @@ class ReplyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 4, 8, 2),
-            child: content(context),
-          ),
-          // Divider(
-          //   height: 1,
-          //   indent: 52,
-          //   endIndent: 10,
-          //   color: Theme.of(context).dividerColor.withOpacity(0.08),
-          // )
-        ],
+    return Material(
+      child: InkWell(
+        // 点击整个评论区 评论详情/回复
+        onTap: () => replyReply!(replyItem),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 8, 2),
+          child: content(context),
+        ),
       ),
     );
   }
 
   Widget lfAvtar(context, heroTag) {
     return Container(
-        margin: const EdgeInsets.only(top: 5),
-        child: Stack(
-          children: [
-            Hero(
-              tag: heroTag,
-              child: NetworkImgLayer(
-                src: replyItem!.member!.avatar,
-                width: 34,
-                height: 34,
-                type: 'avatar',
-              ),
+      margin: const EdgeInsets.only(top: 5),
+      child: Stack(
+        children: [
+          Hero(
+            tag: heroTag,
+            child: NetworkImgLayer(
+              src: replyItem!.member!.avatar,
+              width: 34,
+              height: 34,
+              type: 'avatar',
             ),
-            if (replyItem!.member!.officialVerify != null &&
-                replyItem!.member!.officialVerify!['type'] == 0)
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: Theme.of(context).colorScheme.background,
-                  ),
-                  child: Icon(
-                    Icons.offline_bolt,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 16,
-                  ),
+          ),
+          if (replyItem!.member!.officialVerify != null &&
+              replyItem!.member!.officialVerify!['type'] == 0)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: Theme.of(context).colorScheme.background,
+                ),
+                child: Icon(
+                  Icons.offline_bolt,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 16,
                 ),
               ),
-          ],
-        )
-        // child:
-        // NetworkImgLayer(
-        //   src: replyItem!.member!.avatar,
-        //   width: 30,
-        //   height: 30,
-        //   type: 'avatar',
-        // ),
-        );
+            ),
+        ],
+      ),
+    );
   }
 
   Widget content(context) {
@@ -122,7 +103,7 @@ class ReplyItem extends StatelessWidget {
                       replyItem!.member!.uname!,
                       style: TextStyle(
                         color: replyItem!.isUp! ||
-                                replyItem!.member!.vip!['vipType'] > 0
+                                replyItem!.member!.vip!['vipStatus'] > 0
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
                         fontSize:
@@ -196,15 +177,15 @@ class ReplyItem extends StatelessWidget {
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
-              style: const TextStyle(height: 1.65),
+              style: const TextStyle(height: 1.75),
               maxLines:
-                  replyItem!.content!.isText! && replyLevel == '1' ? 6 : 999,
+                  replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
               overflow: TextOverflow.ellipsis,
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
                     WidgetSpan(child: UpTag(tagText: 'TOP')),
-                  buildContent(context, replyItem!, replyReply),
+                  buildContent(context, replyItem!, replyReply, null),
                 ],
               ),
             ),
@@ -212,10 +193,12 @@ class ReplyItem extends StatelessWidget {
         ),
         // 操作区域
         bottonAction(context, replyItem!.replyControl),
-        const SizedBox(height: 3),
-        if (replyItem!.replies!.isNotEmpty && showReplyRow!) ...[
+        // 一楼的评论
+        if ((replyItem!.replyControl!.isShow! ||
+                replyItem!.replies!.isNotEmpty) &&
+            showReplyRow!) ...[
           Padding(
-            padding: const EdgeInsets.only(top: 2, bottom: 12),
+            padding: const EdgeInsets.only(top: 5, bottom: 12),
             child: ReplyItemRow(
               replies: replyItem!.replies,
               replyControl: replyItem!.replyControl,
@@ -281,16 +264,16 @@ class ReplyItem extends StatelessWidget {
                 isScrollControlled: true,
                 builder: (builder) {
                   return VideoReplyNewDialog(
-                    replyLevel: replyLevel,
                     oid: replyItem!.oid,
                     root: replyItem!.rpid,
                     parent: replyItem!.rpid,
                     replyType: replyType,
+                    replyItem: replyItem,
                   );
                 },
               ).then((value) => {
                     // 完成评论，数据添加
-                    if (value['data'] != null)
+                    if (value != null && value['data'] != null)
                       {
                         addReply!(value['data'])
                         // replyControl.replies.add(value['data']),
@@ -358,58 +341,60 @@ class ReplyItemRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < replies!.length; i++) ...[
-              InkWell(
-                onTap: () => replyReply!(replyItem),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(
-                    8,
-                    i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
-                    8,
-                    i == 0 && (extraRow == 1 || replies!.length > 1) ? 5 : 6,
-                  ),
-                  child: Text.rich(
-                    overflow: extraRow == 1
-                        ? TextOverflow.ellipsis
-                        : TextOverflow.visible,
-                    maxLines: extraRow == 1 ? 2 : null,
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: replies![i].member.uname + ' ',
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .fontSize,
-                            color: Theme.of(context).colorScheme.primary,
+            if (replies!.isNotEmpty)
+              for (var i = 0; i < replies!.length; i++) ...[
+                InkWell(
+                  // 一楼点击评论展开评论详情
+                  onTap: () => replyReply!(replyItem),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.fromLTRB(
+                      8,
+                      i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
+                      8,
+                      i == 0 && (extraRow == 1 || replies!.length > 1) ? 5 : 6,
+                    ),
+                    child: Text.rich(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: replies![i].member.uname + ' ',
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .fontSize,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                String heroTag =
+                                    Utils.makeHeroTag(replies![i].member.mid);
+                                Get.toNamed(
+                                    '/member?mid=${replies![i].member.mid}',
+                                    arguments: {
+                                      'face': replies![i].member.avatar,
+                                      'heroTag': heroTag
+                                    });
+                              },
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              String heroTag =
-                                  Utils.makeHeroTag(replies![i].member.mid);
-                              Get.toNamed(
-                                  '/member?mid=${replies![i].member.mid}',
-                                  arguments: {
-                                    'face': replies![i].member.avatar,
-                                    'heroTag': heroTag
-                                  });
-                            },
-                        ),
-                        if (replies![i].isUp)
-                          WidgetSpan(
-                            child: UpTag(),
-                          ),
-                        buildContent(context, replies![i], replyReply),
-                      ],
+                          if (replies![i].isUp)
+                            WidgetSpan(
+                              child: UpTag(),
+                            ),
+                          buildContent(
+                              context, replies![i], replyReply, replyItem),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
             if (extraRow == 1)
               InkWell(
+                // 一楼点击【共xx条回复】展开评论详情
                 onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
@@ -441,7 +426,11 @@ class ReplyItemRow extends StatelessWidget {
   }
 }
 
-InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
+InlineSpan buildContent(
+    BuildContext context, replyItem, replyReply, fReplyItem) {
+  // replyItem 当前回复内容
+  // replyReply 查看二楼回复（回复详情）回调
+  // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   var content = replyItem.content;
   if (content.emote.isEmpty &&
       content.atNameToMid.isEmpty &&
@@ -450,7 +439,9 @@ InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
       content.pictures.isEmpty) {
     return TextSpan(
       text: content.message,
-      recognizer: TapGestureRecognizer()..onTap = () => replyReply(replyItem),
+      recognizer: TapGestureRecognizer()
+        ..onTap =
+            () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem),
     );
   }
   List<InlineSpan> spanChilds = [];
@@ -510,11 +501,19 @@ InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
             ),
           );
         } else {
-          spanChilds.add(TextSpan(text: matchStr));
+          spanChilds.add(TextSpan(
+              text: matchStr,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () =>
+                    replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
           return matchStr;
         }
       } else {
-        spanChilds.add(TextSpan(text: matchStr));
+        spanChilds.add(TextSpan(
+            text: matchStr,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () =>
+                  replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
         return matchStr;
       }
       return '';
@@ -595,7 +594,11 @@ InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
             return '';
           },
           onNonMatch: (String str) {
-            spanChilds.add(TextSpan(text: str));
+            spanChilds.add(TextSpan(
+                text: str,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => replyReply(
+                      replyItem.root == 0 ? replyItem : fReplyItem)));
             return str;
           },
         );
@@ -628,7 +631,11 @@ InlineSpan buildContent(BuildContext context, replyItem, replyReply) {
       );
 
       if (content.atNameToMid.isEmpty && content.jumpUrl.isEmpty) {
-        spanChilds.add(TextSpan(text: str));
+        spanChilds.add(TextSpan(
+            text: str,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () =>
+                  replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
       }
       return str;
     },

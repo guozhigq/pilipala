@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
-import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
@@ -15,6 +15,10 @@ class DynamicDetailController extends GetxController {
   RxString noMore = ''.obs;
   RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
   RxInt acount = 0.obs;
+
+  ReplySortType sortType = ReplySortType.time;
+  RxString sortTypeTitle = ReplySortType.time.titles.obs;
+  RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
   @override
   void onInit() {
@@ -35,6 +39,7 @@ class DynamicDetailController extends GetxController {
       oid: oid!,
       pageNum: currentPage + 1,
       type: type!,
+      sort: sortType.index,
     );
     if (res['status']) {
       res['data'] = ReplyData.fromJson(res['data']);
@@ -42,7 +47,7 @@ class DynamicDetailController extends GetxController {
       if (res['data'].replies.isNotEmpty) {
         currentPage = currentPage + 1;
         noMore.value = '加载中...';
-        if (replyList.isEmpty) {
+        if (res['data'].replies.isEmpty) {
           noMore.value = '没有更多了';
           return;
         }
@@ -79,5 +84,25 @@ class DynamicDetailController extends GetxController {
     }
     isLoadingMore = false;
     return res;
+  }
+
+  // 排序搜索评论
+  queryBySort() {
+    switch (sortType) {
+      case ReplySortType.time:
+        sortType = ReplySortType.like;
+        break;
+      case ReplySortType.like:
+        sortType = ReplySortType.reply;
+        break;
+      case ReplySortType.reply:
+        sortType = ReplySortType.time;
+        break;
+      default:
+    }
+    sortTypeTitle.value = sortType.titles;
+    sortTypeLabel.value = sortType.labels;
+    replyList.clear();
+    queryReplyList(reqType: 'init');
   }
 }

@@ -12,16 +12,16 @@ import 'package:pilipala/utils/storage.dart';
 class VideoReplyNewDialog extends StatefulWidget {
   int? oid;
   int? root;
-  String? replyLevel;
   int? parent;
   ReplyType? replyType;
+  ReplyItemModel? replyItem;
 
   VideoReplyNewDialog({
     this.oid,
     this.root,
-    this.replyLevel,
     this.parent,
     this.replyType,
+    this.replyItem,
   });
 
   @override
@@ -36,14 +36,12 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   double _keyboardHeight = 0.0; // 键盘高度
   final _debouncer = Debouncer(milliseconds: 100); // 设置延迟时间
   bool ableClean = false;
-  bool autoFocus = false;
   Timer? timer;
   Box localCache = GStrorage.localCache;
   late double sheetHeight;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // 监听输入框聚焦
     // replyContentFocusNode.addListener(_onFocus);
@@ -74,14 +72,18 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,
-      message: message,
+      message: widget.replyItem != null && widget.replyItem!.root != 0
+          ? ' 回复 @${widget.replyItem!.member!.uname!} : $message'
+          : message,
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
       Get.back(result: {
         'data': ReplyItemModel.fromJson(result['data']['reply'], ''),
       });
-    } else {}
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
   }
 
   @override
@@ -101,6 +103,12 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
         }
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _replyContentController.dispose();
+    super.dispose();
   }
 
   @override
