@@ -42,7 +42,6 @@ class DynamicDetailController extends GetxController {
       sort: sortType.index,
     );
     if (res['status']) {
-      res['data'] = ReplyData.fromJson(res['data']);
       acount.value = res['data'].page.acount;
       if (res['data'].replies.isNotEmpty) {
         currentPage = currentPage + 1;

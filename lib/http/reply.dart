@@ -70,4 +70,32 @@ class ReplyHttp {
       };
     }
   }
+
+  // 评论点赞
+  static Future likeReply({
+    required int type,
+    required int oid,
+    required int rpid,
+    required int action,
+  }) async {
+    var res = await Request().post(
+      Api.likeReply,
+      queryParameters: {
+        'type': type,
+        'oid': oid,
+        'rpid': rpid,
+        'action': action,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

@@ -104,6 +104,9 @@ class Api {
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
 
+  // 评论点赞
+  static const String likeReply = '/x/v2/reply/action';
+
   // 发表评论
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
   static const String replyAdd = '/x/v2/reply/add';
@@ -141,6 +144,10 @@ class Api {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?timezone_offset=-480&type=video&page=1&features=itemOpusStyle
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?host_mid=548196587&offset=&page=1&features=itemOpusStyle
   static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
+
+  // 动态点赞
+  static const String likeDynamic =
+      'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/thumb';
 
   // 获取稍后再看
   static const String seeYouLater = '/x/v2/history/toview';

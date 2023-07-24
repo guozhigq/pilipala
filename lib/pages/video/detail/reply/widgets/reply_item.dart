@@ -9,6 +9,8 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'zan.dart';
+
 class ReplyItem extends StatelessWidget {
   ReplyItem({
     super.key,
@@ -282,29 +284,7 @@ class ReplyItem extends StatelessWidget {
             },
           ),
         ),
-        SizedBox(
-          height: 32,
-          child: TextButton(
-            child: Row(
-              children: [
-                Icon(
-                  FontAwesomeIcons.thumbsUp,
-                  size: 16,
-                  color: color,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  replyItem!.like.toString(),
-                  style: TextStyle(
-                      color: color,
-                      fontSize:
-                          Theme.of(context).textTheme.labelSmall!.fontSize),
-                ),
-              ],
-            ),
-            onPressed: () {},
-          ),
-        ),
+        ZanButton(replyItem: replyItem, replyType: replyType),
         const SizedBox(width: 5)
       ],
     );

@@ -236,7 +236,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList;
                     return Obx(
-                      () => list.length == 1
+                      () => list.isEmpty
                           ? skeleton()
                           : SliverList(
                               delegate:
