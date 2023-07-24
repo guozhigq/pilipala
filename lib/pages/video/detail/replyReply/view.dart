@@ -11,14 +11,14 @@ import 'package:pilipala/utils/storage.dart';
 import 'controller.dart';
 
 class VideoReplyReplyPanel extends StatefulWidget {
-  int? oid;
-  int? rpid;
-  Function? closePanel;
-  ReplyItemModel? firstFloor;
-  String? source;
-  ReplyType? replyType;
+  final int? oid;
+  final int? rpid;
+  final Function? closePanel;
+  final ReplyItemModel? firstFloor;
+  final String? source;
+  final ReplyType? replyType;
 
-  VideoReplyReplyPanel({
+  const VideoReplyReplyPanel({
     this.oid,
     this.rpid,
     this.closePanel,
@@ -91,7 +91,6 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     icon: const Icon(Icons.close),
                     onPressed: () {
                       _videoReplyReplyController.currentPage = 0;
-                      _videoReplyReplyController.rPid = 0;
                       widget.closePanel!();
                       Navigator.pop(context);
                     },

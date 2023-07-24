@@ -1,5 +1,6 @@
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/video/reply/data.dart';
 
 class ReplyHttp {
   static Future replyList({
@@ -17,7 +18,7 @@ class ReplyHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': res.data['data'],
+        'data': ReplyData.fromJson(res.data['data']),
       };
     } else {
       Map errMap = {

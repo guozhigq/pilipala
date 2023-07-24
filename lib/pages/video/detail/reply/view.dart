@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
@@ -14,14 +13,14 @@ import 'controller.dart';
 import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
-  String? bvid;
-  int rpid;
-  String? level;
-  Key? key;
-  VideoReplyPanel({
+  final String? bvid;
+  final int rpid;
+  final String? replyLevel;
+
+  const VideoReplyPanel({
     this.bvid,
     this.rpid = 0,
-    this.level,
+    this.replyLevel,
     super.key,
   });
 
@@ -46,18 +45,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   void initState() {
     int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     super.initState();
-    replyLevel = widget.level ?? '1';
-    if (widget.level != null && widget.level == '2') {
+    replyLevel = widget.replyLevel ?? '1';
+    if (replyLevel == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(oid, widget.rpid.toString(), '2'),
+          VideoReplyController(oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
-      _videoReplyController.rPid = widget.rpid;
     } else {
-      // fix 评论加载不对称
-      // int oid = Get.parameters['bvid'] != null
-      //     ? IdUtils.bv2av(Get.parameters['bvid']!)
-      //     : 0;
-      _videoReplyController = Get.put(VideoReplyController(oid, '', '1'),
+      _videoReplyController = Get.put(VideoReplyController(oid, '', replyLevel),
           tag: Get.arguments['heroTag']);
     }
 
@@ -101,20 +95,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     }
   }
 
-  void _showReply(source, {ReplyItemModel? replyItem, replyLevel}) async {
-    // source main 直接回复  floor 楼中楼回复
-    if (source == 'floor') {
-      _videoReplyController.currentReplyItem = replyItem;
-      _videoReplyController.replySource = source;
-      _videoReplyController.replyLevel = replyLevel ?? '1';
-    } else {
-      _videoReplyController.replyLevel = '0';
-    }
-
-    // await Future.delayed(const Duration(microseconds: 100));
-    // _videoReplyController.wakeUpReply();
-  }
-
   // 展示二级回复
   void replyReply(replyItem) {
     VideoDetailController videoDetailCtr =
@@ -136,7 +116,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        setState(() {});
         _videoReplyController.currentPage = 0;
         return await _videoReplyController.queryReplyList();
       },
@@ -204,18 +183,15 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             : SliverList(
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
+                                    double bottom =
+                                        MediaQuery.of(context).padding.bottom;
                                     if (index ==
                                         _videoReplyController
                                             .replyList.length) {
                                       return Container(
-                                        padding: EdgeInsets.only(
-                                            bottom: MediaQuery.of(context)
-                                                .padding
-                                                .bottom),
-                                        height: MediaQuery.of(context)
-                                                .padding
-                                                .bottom +
-                                            100,
+                                        padding:
+                                            EdgeInsets.only(bottom: bottom),
+                                        height: bottom + 100,
                                         child: Center(
                                           child: Obx(() => Text(
                                               _videoReplyController
@@ -265,8 +241,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
             child: SlideTransition(
               position: Tween<Offset>(
                 begin: const Offset(0, 2),
-                // 评论内容为空/不足一屏
-                // begin: const Offset(0, 0),
                 end: const Offset(0, 0),
               ).animate(CurvedAnimation(
                 parent: fabAnimationCtr,
