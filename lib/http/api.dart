@@ -104,6 +104,9 @@ class Api {
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
 
+  // 评论点赞
+  static const String likeReply = '/x/v2/reply/action';
+
   // 发表评论
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/action.md
   static const String replyAdd = '/x/v2/reply/add';
