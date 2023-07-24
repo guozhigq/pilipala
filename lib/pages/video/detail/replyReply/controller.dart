@@ -21,11 +21,6 @@ class VideoReplyReplyController extends GetxController {
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
-  // 根评论 id 回复楼中楼回复使用
-  int? rPid;
-  // 默认回复主楼
-  String replyLevel = '0';
-
   @override
   void onInit() {
     super.onInit();

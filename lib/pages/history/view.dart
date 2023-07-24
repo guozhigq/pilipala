@@ -39,8 +39,43 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('观看记录'),
+        titleSpacing: 0,
         centerTitle: false,
+        title: Text(
+          '观看记录',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String type) {
+              // 处理菜单项选择的逻辑
+              switch (type) {
+                case 'pause':
+                  _historyController.onPauseHistory();
+                  break;
+                case 'clear':
+                  _historyController.onClearHistory();
+                  break;
+                default:
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'pause',
+                child: Obx(
+                  () => Text(!_historyController.pauseStatus.value
+                      ? '暂停观看记录'
+                      : '恢复观看记录'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'clear',
+                child: Text('清空观看记录'),
+              ),
+            ],
+          ),
+          const SizedBox(width: 6),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -57,13 +92,23 @@ class _HistoryPageState extends State<HistoryPage> {
                   Map data = snapshot.data;
                   if (data['status']) {
                     return Obx(
-                      () => SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return HistoryItem(
-                            videoItem: _historyController.historyList[index],
-                          );
-                        }, childCount: _historyController.historyList.length),
-                      ),
+                      () => _historyController.historyList.isEmpty
+                          ? const SliverToBoxAdapter(
+                              child: Center(
+                                child: Text('没数据'),
+                              ),
+                            )
+                          : SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                return HistoryItem(
+                                  videoItem:
+                                      _historyController.historyList[index],
+                                );
+                              },
+                                  childCount:
+                                      _historyController.historyList.length),
+                            ),
                     );
                   } else {
                     return HttpError(

@@ -34,6 +34,14 @@ class _FavDetailPageState extends State<FavDetailPage> {
         } else if (_controller.offset <= 160) {
           titleStreamC.add(false);
         }
+
+        if (_controller.position.pixels >=
+            _controller.position.maxScrollExtent - 200) {
+          if (!_favDetailController.isLoadingMore) {
+            _favDetailController.isLoadingMore = true;
+            _favDetailController.onLoad();
+          }
+        }
       },
     );
   }
@@ -109,9 +117,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     // mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: 180,
-                        height: 110,
+                      Hero(
+                        tag: _favDetailController.heroTag,
                         child: NetworkImgLayer(
                           width: 180,
                           height: 110,
@@ -156,7 +163,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.favDetailData.value.medias != null ? _favDetailController.favDetailData.value.medias!.length : '-'}条视频',
+                  '共${_favDetailController.favInfo['media_count'] ?? '-'}条视频',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -184,12 +191,9 @@ class _FavDetailPageState extends State<FavDetailPage> {
                       () => SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return FavVideoCardH(
-                            videoItem: _favDetailController
-                                .favDetailData.value.medias![index],
+                            videoItem: _favDetailController.favList[index],
                           );
-                        },
-                            childCount: _favDetailController
-                                .favDetailData.value.medias!.length),
+                        }, childCount: _favDetailController.favList.length),
                       ),
                     );
                   }

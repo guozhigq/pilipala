@@ -59,3 +59,8 @@ class UserBoxKey {
 class SettingBoxKey {
   static const String themeMode = 'themeMode';
 }
+
+class LocalCacheKey {
+  // 历史记录暂停状态 默认false
+  static const String historyStatus = 'historyStatus';
+}

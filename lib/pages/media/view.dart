@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatelessWidget {
   const MediaPage({super.key});
@@ -169,12 +170,14 @@ class FavFolderItem extends StatelessWidget {
   int? index;
   @override
   Widget build(BuildContext context) {
+    String heroTag = Utils.makeHeroTag(item!.fid);
+
     return Container(
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
       child: GestureDetector(
-        onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
-          'mediaId': item!.id.toString(),
-        }),
+        onTap: () => Get.toNamed('/favDetail',
+            arguments: item,
+            parameters: {'mediaId': item!.id.toString(), 'heroTag': heroTag}),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,10 +202,13 @@ class FavFolderItem extends StatelessWidget {
               ),
               child: LayoutBuilder(
                 builder: (context, BoxConstraints box) {
-                  return NetworkImgLayer(
-                    src: item!.cover,
-                    width: box.maxWidth,
-                    height: box.maxHeight,
+                  return Hero(
+                    tag: heroTag,
+                    child: NetworkImgLayer(
+                      src: item!.cover,
+                      width: box.maxWidth,
+                      height: box.maxHeight,
+                    ),
                   );
                 },
               ),

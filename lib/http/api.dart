@@ -148,6 +148,15 @@ class Api {
   // 获取历史记录
   static const String historyList = '/x/web-interface/history/cursor';
 
+  // 暂停历史记录
+  static const String pauseHistory = '/x/v2/history/shadow/set';
+
+  // 查询历史记录暂停状态
+  static const String historyStatus = '/x/v2/history/shadow?jsonp=jsonp';
+
+  // 清空历史记录
+  static const String clearHistory = '/x/v2/history/clear';
+
   // 热搜
   static const String hotSearchList =
       'https://s.search.bilibili.com/main/hotword';
