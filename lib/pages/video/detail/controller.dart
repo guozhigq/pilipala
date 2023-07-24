@@ -54,6 +54,7 @@ class VideoDetailController extends GetxController
 
   RxString bgCover = ''.obs;
   Box user = GStrorage.user;
+  Box localCache = GStrorage.localCache;
 
   @override
   void onInit() {
@@ -147,6 +148,9 @@ class VideoDetailController extends GetxController
 
   void markHeartBeat() async {
     if (user.get(UserBoxKey.userMid) == null) {
+      return;
+    }
+    if (localCache.get(LocalCacheKey.historyStatus) == true) {
       return;
     }
     Duration progress = meeduPlayerController.position.value;

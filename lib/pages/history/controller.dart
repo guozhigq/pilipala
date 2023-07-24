@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/user/history.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class HistoryController extends GetxController {
   final ScrollController scrollController = ScrollController();
   RxList<HisListItem> historyList = [HisListItem()].obs;
   bool isLoadingMore = false;
   RxBool pauseStatus = false.obs;
+  Box localCache = GStrorage.localCache;
 
   @override
   void onInit() {
@@ -78,10 +81,11 @@ class HistoryController extends GetxController {
     );
   }
 
-// 观看历史暂停状态
+  // 观看历史暂停状态
   Future historyStatus() async {
     var res = await UserHttp.historyStatus();
     pauseStatus.value = res.data['data'];
+    localCache.put(LocalCacheKey.historyStatus, res.data['data']);
   }
 
   // 清空观看历史

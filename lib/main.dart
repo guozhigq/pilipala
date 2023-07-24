@@ -9,6 +9,7 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
+import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
 
 void main() async {
@@ -16,6 +17,7 @@ void main() async {
   MediaKit.ensureInitialized();
   await GStrorage.init();
   await Request.setCookie();
+  await Data.init();
   runApp(const MyApp());
 }
 
