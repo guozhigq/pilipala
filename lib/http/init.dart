@@ -38,9 +38,18 @@ class Request {
     dio.interceptors.add(cookieManager);
     var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
+    var cookie2 = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.tUrl));
     if (cookie.isEmpty) {
       try {
         await Request().get(HttpString.baseUrl);
+      } catch (e) {
+        log("setCookie, ${e.toString()}");
+      }
+    }
+    if (cookie2.isEmpty) {
+      try {
+        await Request().get(HttpString.tUrl);
       } catch (e) {
         log("setCookie, ${e.toString()}");
       }
@@ -99,7 +108,6 @@ class Request {
       options.headers['x-bili-mid'] = user.get(UserBoxKey.userMid).toString();
     }
     dio.options = options;
-
     //添加拦截器
     dio.interceptors
       ..add(ApiInterceptor())

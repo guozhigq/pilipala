@@ -42,7 +42,7 @@ class DynamicPanel extends StatelessWidget {
                 content(item, context, source),
               forWard(item, context, _dynamicsController, source),
               const SizedBox(height: 2),
-              if (source == null) action(item, context),
+              if (source == null) ActionPanel(item: item),
             ],
           ),
         ),

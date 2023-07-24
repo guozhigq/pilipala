@@ -46,9 +46,9 @@ class DynamicsController extends GetxController {
   RxInt initialValue = 1.obs;
 
   Future queryFollowDynamic({type = 'init'}) async {
-    // if (type == 'init') {
-    //   dynamicsList!.value = [];
-    // }
+    if (type == 'init') {
+      dynamicsList.clear();
+    }
     var res = await DynamicsHttp.followDynamic(
       page: type == 'init' ? 1 : page,
       type: dynamicsType.value.values,

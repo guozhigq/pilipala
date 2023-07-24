@@ -145,6 +145,10 @@ class Api {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?host_mid=548196587&offset=&page=1&features=itemOpusStyle
   static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
 
+  // 动态点赞
+  static const String likeDynamic =
+      'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/thumb';
+
   // 获取稍后再看
   static const String seeYouLater = '/x/v2/history/toview';
 

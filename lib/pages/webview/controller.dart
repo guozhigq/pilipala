@@ -58,10 +58,13 @@ class WebviewController extends GetxController {
               try {
                 var cookies =
                     await WebviewCookieManager().getCookies(HttpString.baseUrl);
-                var apiCookies =
-                    await WebviewCookieManager().getCookies(HttpString.baseUrl);
+                var apiCookies = await WebviewCookieManager()
+                    .getCookies(HttpString.baseApiUrl);
+                var tCookies =
+                    await WebviewCookieManager().getCookies(HttpString.tUrl);
                 await SetCookie.onSet(cookies, HttpString.baseUrl);
                 await SetCookie.onSet(apiCookies, HttpString.baseApiUrl);
+                await SetCookie.onSet(tCookies, HttpString.tUrl);
                 await UserHttp.userInfo();
                 var result = await UserHttp.userInfo();
                 print('网页登录： $result');
