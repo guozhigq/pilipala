@@ -184,9 +184,11 @@ class VideoIntroController extends GetxController {
       if (!hasLike.value) {
         SmartDialog.showToast('点赞成功 👍');
         hasLike.value = true;
+        videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
       } else if (hasLike.value) {
         SmartDialog.showToast('取消赞');
         hasLike.value = false;
+        videoDetail.value.stat!.like = videoDetail.value.stat!.like! - 1;
       }
       hasLike.refresh();
     } else {
@@ -238,12 +240,14 @@ class VideoIntroController extends GetxController {
                     var res = await VideoHttp.coinVideo(
                         bvid: bvid, multiply: _tempThemeValue);
                     if (res['status']) {
-                      SmartDialog.showToast('投币成功');
+                      SmartDialog.showToast('投币成功 👏');
+                      hasCoin.value = true;
+                      videoDetail.value.stat!.coin =
+                          videoDetail.value.stat!.coin! + _tempThemeValue;
                     } else {
                       SmartDialog.showToast(res['msg']);
                     }
                     Get.back();
-                    queryHasCoinVideo();
                   },
                   child: const Text('确定'))
             ],

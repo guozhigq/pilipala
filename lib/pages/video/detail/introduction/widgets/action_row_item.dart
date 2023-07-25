@@ -44,14 +44,22 @@ class ActionRowItem extends StatelessWidget {
               AnimatedOpacity(
                 opacity: loadingStatus! ? 0 : 1,
                 duration: const Duration(milliseconds: 200),
-                child: Text(
-                  text ?? '',
-                  style: TextStyle(
-                      color: selectStatus
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium?.fontSize),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return ScaleTransition(scale: animation, child: child);
+                  },
+                  child: Text(
+                    text ?? '',
+                    key: ValueKey<String>(text ?? ''),
+                    style: TextStyle(
+                        color: selectStatus
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        fontSize:
+                            Theme.of(context).textTheme.labelSmall!.fontSize),
+                  ),
                 ),
               ),
             ],

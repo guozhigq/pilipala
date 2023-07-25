@@ -199,7 +199,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': [], 'msg': ''};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
