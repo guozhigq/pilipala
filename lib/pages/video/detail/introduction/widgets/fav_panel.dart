@@ -15,11 +15,13 @@ class FavPanel extends StatefulWidget {
 class _FavPanelState extends State<FavPanel> {
   Box localCache = GStrorage.localCache;
   late double sheetHeight;
+  late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
     sheetHeight = localCache.get('sheetHeight');
+    _futureBuilderFuture = widget.ctr!.queryVideoInFolder();
   }
 
   @override
@@ -52,7 +54,7 @@ class _FavPanelState extends State<FavPanel> {
           Expanded(
             child: Material(
               child: FutureBuilder(
-                future: widget.ctr!.queryVideoInFolder(),
+                future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
