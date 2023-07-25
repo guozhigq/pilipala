@@ -24,10 +24,10 @@ class LiveCardV extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
       elevation: 0,
-      // clipBehavior: Clip.hardEdge,
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: StyleString.mdRadius,
-      // ),
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(
+        borderRadius: StyleString.mdRadius,
+      ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -114,7 +114,7 @@ class LiveContent extends StatelessWidget {
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
               maxLines: 2,

@@ -157,7 +157,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               .titleMedium!
                               .copyWith(
                                   letterSpacing: 0.5,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.w500),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -238,10 +238,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     seasonPanel(widget.videoDetail!.ugcSeason!,
                         widget.videoDetail!.pages!.first.cid, sheetHeight)
                   ],
-                  Divider(
-                    height: 26,
-                    color: Theme.of(context).dividerColor.withOpacity(0.1),
-                  ),
+                  // Divider(
+                  //   height: 26,
+                  //   color: Theme.of(context).dividerColor.withOpacity(0.1),
+                  // ),
+                  const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
                       int mid = !widget.loadingStatus
@@ -257,6 +258,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     },
                     child: Row(
                       children: [
+                        const SizedBox(width: 5),
                         NetworkImgLayer(
                           type: 'avatar',
                           src: !widget.loadingStatus
@@ -293,17 +295,48 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           opacity: widget.loadingStatus ? 0 : 1,
                           duration: const Duration(milliseconds: 150),
                           child: SizedBox(
-                            height: 34,
+                            height: 32,
                             child: Obx(
                               () => videoIntroController.followStatus.isNotEmpty
-                                  ? ElevatedButton(
+                                  ? TextButton(
                                       onPressed: () => videoIntroController
                                           .actionRelationMod(),
-                                      child: Text(videoIntroController
-                                                  .followStatus['attribute'] ==
-                                              0
-                                          ? '关注'
-                                          : '已关注'),
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, right: 8),
+                                        foregroundColor:
+                                            videoIntroController.followStatus[
+                                                        'attribute'] !=
+                                                    0
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .outline
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                        backgroundColor:
+                                            videoIntroController.followStatus[
+                                                        'attribute'] !=
+                                                    0
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onInverseSurface
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .primary, // 设置按钮背景色
+                                      ),
+                                      child: Text(
+                                        videoIntroController.followStatus[
+                                                    'attribute'] !=
+                                                0
+                                            ? '已关注'
+                                            : '关注',
+                                        style: TextStyle(
+                                            fontSize: Theme.of(context)
+                                                .textTheme
+                                                .labelMedium!
+                                                .fontSize),
+                                      ),
                                     )
                                   : ElevatedButton(
                                       onPressed: () => videoIntroController
@@ -313,14 +346,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 4)
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Divider(
-                    height: 12,
-                    color: Theme.of(context).dividerColor.withOpacity(0.1),
-                  ),
+                  const SizedBox(height: 12),
+                  // Divider(
+                  //   height: 12,
+                  //   color: Theme.of(context).dividerColor.withOpacity(0.1),
+                  // ),
                 ],
               )
             : const SizedBox(

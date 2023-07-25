@@ -118,7 +118,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 12),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 10),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -130,91 +130,91 @@ class VideoContent extends StatelessWidget {
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
               maxLines: Get.find<RcmdController>().crossAxisCount,
               overflow: TextOverflow.ellipsis,
             ),
-            // SizedBox(
-            //   height: 18,
-            //   child: Row(
-            //     children: [
-            //       if (videoItem.rcmdReason != null &&
-            //           videoItem.rcmdReason.content != '') ...[
-            //         Container(
-            //           padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-            //           decoration: BoxDecoration(
-            //               color: Theme.of(context)
-            //                   .colorScheme
-            //                   .primaryContainer
-            //                   .withOpacity(0.6),
-            //               borderRadius: BorderRadius.circular(3)),
-            //           child: Text(
-            //             videoItem.rcmdReason.content,
-            //             style: TextStyle(
-            //               fontSize:
-            //                   Theme.of(context).textTheme.labelSmall!.fontSize,
-            //               color: Theme.of(context).colorScheme.primary,
-            //             ),
-            //           ),
-            //         ),
-            //         const SizedBox(width: 4)
-            //       ] else if (videoItem.isFollowed == 1) ...[
-            //         Container(
-            //           padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-            //           decoration: BoxDecoration(
-            //               color: Theme.of(context)
-            //                   .colorScheme
-            //                   .primaryContainer
-            //                   .withOpacity(0.6),
-            //               borderRadius: BorderRadius.circular(3)),
-            //           child: Text(
-            //             '已关注',
-            //             style: TextStyle(
-            //               fontSize:
-            //                   Theme.of(context).textTheme.labelSmall!.fontSize,
-            //               color: Theme.of(context).colorScheme.primary,
-            //             ),
-            //           ),
-            //         ),
-            //         const SizedBox(width: 4)
-            //       ],
-            //       Expanded(
-            //         child: LayoutBuilder(builder:
-            //             (BuildContext context, BoxConstraints constraints) {
-            //           return SizedBox(
-            //             width: constraints.maxWidth,
-            //             child: Text(
-            //               videoItem.owner.name,
-            //               maxLines: 1,
-            //               style: TextStyle(
-            //                 fontSize: Theme.of(context)
-            //                     .textTheme
-            //                     .labelMedium!
-            //                     .fontSize,
-            //                 color: Theme.of(context).colorScheme.outline,
-            //               ),
-            //             ),
-            //           );
-            //         }),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            Row(
-              children: [
-                StatView(
-                  theme: 'black',
-                  view: videoItem.stat.view,
-                ),
-                const SizedBox(width: 6),
-                StatDanMu(
-                  theme: 'black',
-                  danmu: videoItem.stat.danmaku,
-                ),
-              ],
+            SizedBox(
+              height: 18,
+              child: Row(
+                children: [
+                  if (videoItem.rcmdReason != null &&
+                      videoItem.rcmdReason.content != '') ...[
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(3)),
+                      child: Text(
+                        videoItem.rcmdReason.content,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelSmall!.fontSize,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4)
+                  ] else if (videoItem.isFollowed == 1) ...[
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(3)),
+                      child: Text(
+                        '已关注',
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelSmall!.fontSize,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4)
+                  ],
+                  Expanded(
+                    child: LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return SizedBox(
+                        width: constraints.maxWidth,
+                        child: Text(
+                          videoItem.owner.name,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .fontSize,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
+            // Row(
+            //   children: [
+            //     StatView(
+            //       theme: 'black',
+            //       view: videoItem.stat.view,
+            //     ),
+            //     const SizedBox(width: 6),
+            //     StatDanMu(
+            //       theme: 'black',
+            //       danmu: videoItem.stat.danmaku,
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

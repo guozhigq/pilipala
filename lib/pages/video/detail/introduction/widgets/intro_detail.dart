@@ -28,7 +28,7 @@ class IntroDetail extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 25,
+              height: 40,
               padding: const EdgeInsets.only(bottom: 2),
               child: Center(
                 child: Container(
@@ -51,7 +51,7 @@ class IntroDetail extends StatelessWidget {
                     Text(
                       videoDetail!.title,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          letterSpacing: 0.5, fontWeight: FontWeight.bold),
+                          letterSpacing: 0.5, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 10),
                     Row(
