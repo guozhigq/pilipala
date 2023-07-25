@@ -37,6 +37,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late AnimationController replyAnimationCtl;
   Box localCache = GStrorage.localCache;
   late double sheetHeight;
+  Future? _futureBuilderFuture;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     );
 
     sheetHeight = localCache.get('sheetHeight');
+    _futureBuilderFuture = _videoReplyReplyController.queryReplyList();
   }
 
   @override
@@ -134,7 +136,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     ),
                   ],
                   FutureBuilder(
-                    future: _videoReplyReplyController.queryReplyList(),
+                    future: _futureBuilderFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         Map data = snapshot.data as Map;
