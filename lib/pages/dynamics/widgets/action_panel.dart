@@ -105,7 +105,7 @@ class _ActionPanelState extends State<ActionPanel> {
             },
             child: Text(
               stat.like!.count ?? '点赞',
-              key: ValueKey<String>(stat.like!.count!),
+              key: ValueKey<String>(stat.like!.count ?? '点赞'),
               style: TextStyle(
                 color: stat.like!.status! ? primary : color,
               ),

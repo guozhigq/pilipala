@@ -11,7 +11,6 @@ import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
-import 'package:wakelock/wakelock.dart';
 
 import 'widgets/app_bar.dart';
 
@@ -47,7 +46,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         videoDetailController.markHeartBeat();
         playerStatus = status;
         if (status == PlayerStatus.playing) {
-          Wakelock.enable();
           isPlay = false;
           isShowCover = false;
           setState(() {});
@@ -56,7 +54,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           videoDetailController.timer!.cancel();
           isPlay = true;
           setState(() {});
-          Wakelock.disable();
           // 播放完成停止 or 切换下一个
           if (status == PlayerStatus.completed) {}
         }
@@ -79,7 +76,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       await _meeduPlayerController!.dispose();
       _meeduPlayerController = null;
       // The next line disables the wakelock again.
-      await Wakelock.disable();
     }
   }
 

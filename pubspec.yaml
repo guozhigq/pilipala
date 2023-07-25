@@ -49,8 +49,8 @@ dependencies:
 
   # 图片
   cached_network_image: ^3.2.3
-  extended_image: ^7.0.2
-  image_gallery_saver: ^1.7.1
+  extended_image: ^8.0.2
+  image_gallery_saver: ^2.0.3
   
   # 存储
   path_provider: ^2.0.14
@@ -58,15 +58,15 @@ dependencies:
   hive_flutter: ^1.1.0
 
   # 设备信息
-  device_info_plus: ^8.2.0
+  device_info_plus: ^9.0.2
   # 权限
-  permission_handler: ^10.2.0
+  permission_handler: ^10.4.3
   # 分享
-  share_plus: ^6.3.1
+  share_plus: ^7.0.2
   # cookie 管理
   webview_cookie_manager: ^2.0.6
   # 浏览器
-  webview_flutter: ^4.2.0
+  webview_flutter: ^4.2.2
   # 解决sliver滑动不同步
   extended_nested_scroll_view: ^6.0.0
   # 上拉加载
@@ -81,11 +81,11 @@ dependencies:
   dismissible_page: ^1.0.2
   # 媒体播放
   flutter_meedu_media_kit:
-    # path: /Users/rr/Desktop/code/flutter_meedu_media_kit/package
-    git:
-      url: https://github.com/guozhigq/flutter_meedu_media_kit.git
-      ref: feature-custom
-      path: package
+    path: /Users/rr/Desktop/code/flutter_meedu_media_kit/package
+    # git:
+    #   url: https://github.com/guozhigq/flutter_meedu_media_kit.git
+    #   ref: feature-custom
+    #   path: package
   custom_sliding_segmented_control: ^1.7.5
   # 加密
   crypto: ^3.0.3

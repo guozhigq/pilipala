@@ -25,10 +25,6 @@ class GStrorage {
     recVideo = await Hive.openBox('recVideo');
     // 登录用户信息
     userInfo = await Hive.openBox('userInfo');
-    // 热搜关键词
-    hotKeyword = await Hive.openBox('hotKeyword');
-    // 搜索历史
-    historyword = await Hive.openBox('historyWord');
     // 本地缓存
     localCache = await Hive.openBox('localCache');
   }
@@ -42,6 +38,13 @@ class GStrorage {
     Hive.registerAdapter(LevelInfoAdapter());
     Hive.registerAdapter(HotSearchModelAdapter());
     Hive.registerAdapter(HotSearchItemAdapter());
+  }
+
+  static Future<void> lazyInit() async {
+    // 热搜关键词
+    hotKeyword = await Hive.openBox('hotKeyword');
+    // 搜索历史
+    historyword = await Hive.openBox('historyWord');
   }
 }
 

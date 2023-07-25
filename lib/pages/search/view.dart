@@ -17,7 +17,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> with RouteAware {
-  final SearchController _searchController = Get.put(SearchController());
+  final SSearchController _searchController = Get.put(SSearchController());
 
   @override
   // 返回当前页面时
