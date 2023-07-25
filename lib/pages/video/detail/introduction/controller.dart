@@ -105,7 +105,6 @@ class VideoIntroController extends GetxController {
   // 获取up主粉丝数
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
-    print('🌹：$result');
     if (result['status']) {
       userStat = result['data'];
     }
@@ -238,7 +237,6 @@ class VideoIntroController extends GetxController {
                   onPressed: () async {
                     var res = await VideoHttp.coinVideo(
                         bvid: bvid, multiply: _tempThemeValue);
-                    print(res);
                     if (res['status']) {
                       SmartDialog.showToast('投币成功');
                     } else {
@@ -263,7 +261,10 @@ class VideoIntroController extends GetxController {
           delMediaIdsNew.add(i.id);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
     var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: addMediaIdsNew.join(','),
@@ -282,10 +283,8 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result =
-        await Share.share('${HttpString.baseUrl}/video/$bvid').whenComplete(() {
-      print("share completion block ");
-    });
+    var result = await Share.share('${HttpString.baseUrl}/video/$bvid')
+        .whenComplete(() {});
     return result;
   }
 

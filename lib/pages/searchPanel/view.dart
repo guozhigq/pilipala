@@ -11,10 +11,10 @@ import 'widgets/user_panel.dart';
 import 'widgets/video_panel.dart';
 
 class SearchPanel extends StatefulWidget {
-  String? keyword;
-  SearchType? searchType;
-  String? tag;
-  SearchPanel(
+  final String? keyword;
+  final SearchType? searchType;
+  final String? tag;
+  const SearchPanel(
       {required this.keyword, required this.searchType, this.tag, Key? key})
       : super(key: key);
 
@@ -57,6 +57,7 @@ class _SearchPanelState extends State<SearchPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         await _searchPanelController!.onRefresh();

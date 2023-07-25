@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MenuRow extends StatelessWidget {
-  bool? loadingStatus;
-  MenuRow({
+  final bool? loadingStatus;
+  const MenuRow({
     Key? key,
     this.loadingStatus,
   }) : super(key: key);

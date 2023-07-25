@@ -90,7 +90,7 @@ InlineSpan richNode(item, context) {
                 '/webview',
                 parameters: {
                   'url':
-                      'https://t.bilibili.com/vote/h5/index/#/result?vote_id=${i.rid}&dynamic_id=${dynamicId}&isWeb=1',
+                      'https://t.bilibili.com/vote/h5/index/#/result?vote_id=${i.rid}&dynamic_id=$dynamicId&isWeb=1',
                   'type': 'vote',
                   'pageTitle': '投票'
                 },

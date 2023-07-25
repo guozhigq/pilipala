@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -321,11 +323,11 @@ class MinePage extends StatelessWidget {
 }
 
 class ActionItem extends StatelessWidget {
-  Icon? icon;
-  Function? onTap;
-  String? text;
+  final Icon? icon;
+  final Function? onTap;
+  final String? text;
 
-  ActionItem({
+  const ActionItem({
     Key? key,
     this.icon,
     this.onTap,

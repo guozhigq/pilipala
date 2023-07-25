@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart' hide Response;
+// import 'package:get/get.dart' hide Response;
 
 class ApiInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print("请求之前");
+    // print("请求之前");
     // 在请求之前添加头部或认证信息
     // options.headers['Authorization'] = 'Bearer token';
     // options.headers['Content-Type'] = 'application/json';
@@ -19,30 +19,30 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
     // handler.next(err);
     SmartDialog.showToast(await dioError(err));
     super.onError(err, handler);
   }
 
-  static Future dioError(DioError error) async {
+  static Future dioError(DioException error) async {
     switch (error.type) {
-      case DioErrorType.badCertificate:
+      case DioExceptionType.badCertificate:
         return '证书有误！';
-      case DioErrorType.badResponse:
+      case DioExceptionType.badResponse:
         return '服务器异常，请稍后重试！';
-      case DioErrorType.cancel:
+      case DioExceptionType.cancel:
         return "请求已被取消，请重新请求";
-      case DioErrorType.connectionError:
+      case DioExceptionType.connectionError:
         return '连接错误，请检查网络设置';
-      case DioErrorType.connectionTimeout:
+      case DioExceptionType.connectionTimeout:
         return "网络连接超时，请检查网络设置";
-      case DioErrorType.receiveTimeout:
+      case DioExceptionType.receiveTimeout:
         return "响应超时，请稍后重试！";
-      case DioErrorType.sendTimeout:
+      case DioExceptionType.sendTimeout:
         return "发送请求超时，请检查网络设置";
-      case DioErrorType.unknown:
+      case DioExceptionType.unknown:
         var res = await checkConect();
         return res + " \n 网络异常，请稍后重试！";
       default:

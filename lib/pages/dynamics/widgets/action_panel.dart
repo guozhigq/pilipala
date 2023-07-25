@@ -8,11 +8,12 @@ import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 
 class ActionPanel extends StatefulWidget {
-  ActionPanel({
+  const ActionPanel({
     super.key,
     this.item,
   });
-  var item;
+  // ignore: prefer_typing_uninitialized_variables
+  final item;
 
   @override
   State<ActionPanel> createState() => _ActionPanelState();

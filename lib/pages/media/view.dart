@@ -155,7 +155,7 @@ class MediaPage extends StatelessWidget {
                   }
                 } else {
                   // 骨架屏
-                  return SizedBox();
+                  return const SizedBox();
                 }
               }),
         ),
@@ -165,9 +165,9 @@ class MediaPage extends StatelessWidget {
 }
 
 class FavFolderItem extends StatelessWidget {
-  FavFolderItem({super.key, this.item, this.index});
-  FavFolderItemData? item;
-  int? index;
+  const FavFolderItem({super.key, this.item, this.index});
+  final FavFolderItemData? item;
+  final int? index;
   @override
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(item!.fid);

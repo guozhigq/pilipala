@@ -10,8 +10,8 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
-  var videoItem;
-  HistoryItem({super.key, required this.videoItem});
+  final dynamic videoItem;
+  const HistoryItem({super.key, required this.videoItem});
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +76,11 @@ class HistoryItem extends StatelessWidget {
                           builder: (context, boxConstraints) {
                             double maxWidth = boxConstraints.maxWidth;
                             double maxHeight = boxConstraints.maxHeight;
-                            double PR = MediaQuery.of(context).devicePixelRatio;
                             return Stack(
                               children: [
                                 Hero(
                                   tag: heroTag,
                                   child: NetworkImgLayer(
-                                    // src: videoItem['pic'] +
-                                    //     '@${(maxWidth * 2).toInt()}w',
                                     src: (videoItem.cover != ''
                                             ? videoItem.cover
                                             : videoItem.covers.first) +
@@ -137,7 +134,7 @@ class HistoryItem extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
-  final videoItem;
+  final dynamic videoItem;
   const VideoContent({super.key, required this.videoItem});
 
   @override
@@ -164,7 +161,7 @@ class VideoContent extends StatelessWidget {
                 videoItem.showTitle,
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     fontWeight: FontWeight.w400,
                     color: Theme.of(context).colorScheme.outline),
                 maxLines: 2,
@@ -176,7 +173,7 @@ class VideoContent extends StatelessWidget {
                 Text(
                   videoItem.authorName,
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
@@ -187,7 +184,8 @@ class VideoContent extends StatelessWidget {
                 Text(
                   Utils.dateFormat(videoItem.viewAt!),
                   style: TextStyle(
-                      fontSize: 11,
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline),
                 )
               ],

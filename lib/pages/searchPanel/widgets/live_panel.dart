@@ -37,7 +37,6 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
                   child: LayoutBuilder(builder: (context, boxConstraints) {
                     double maxWidth = boxConstraints.maxWidth;
                     double maxHeight = boxConstraints.maxHeight;
-                    double PR = MediaQuery.of(context).devicePixelRatio;
                     return Stack(
                       children: [
                         Hero(
@@ -79,7 +78,7 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
 }
 
 class LiveContent extends StatelessWidget {
-  final liveItem;
+  final dynamic liveItem;
   const LiveContent({Key? key, required this.liveItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {

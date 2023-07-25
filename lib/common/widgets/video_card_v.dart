@@ -6,16 +6,16 @@ import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/pages/home/controller.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
-  var videoItem;
-  Function()? longPress;
-  Function()? longPressEnd;
+  // ignore: prefer_typing_uninitialized_variables
+  final videoItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
-  VideoCardV({
+  const VideoCardV({
     Key? key,
     required this.videoItem,
     this.longPress,
@@ -67,14 +67,11 @@ class VideoCardV extends StatelessWidget {
                   child: LayoutBuilder(builder: (context, boxConstraints) {
                     double maxWidth = boxConstraints.maxWidth;
                     double maxHeight = boxConstraints.maxHeight;
-                    double PR = MediaQuery.of(context).devicePixelRatio;
                     return Stack(
                       children: [
                         Hero(
                           tag: heroTag,
                           child: NetworkImgLayer(
-                            // 指定图片尺寸
-                            // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
                             src: videoItem.pic + '@.webp',
                             width: maxWidth,
                             height: maxHeight,
@@ -111,6 +108,7 @@ class VideoCardV extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   const VideoContent({Key? key, required this.videoItem}) : super(key: key);
   @override

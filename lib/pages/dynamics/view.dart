@@ -1,13 +1,11 @@
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -55,6 +53,7 @@ class _DynamicsPageState extends State<DynamicsPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

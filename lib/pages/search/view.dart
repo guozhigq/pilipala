@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'controller.dart';
-import 'widgets/hotKeyword.dart';
+import 'widgets/hot_keyword.dart';
 import 'widgets/search_text.dart';
 
 class SearchPage extends StatefulWidget {

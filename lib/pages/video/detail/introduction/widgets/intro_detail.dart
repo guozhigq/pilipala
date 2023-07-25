@@ -11,9 +11,9 @@ Box localCache = GStrorage.localCache;
 late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {
-  var videoDetail;
+  final dynamic videoDetail;
 
-  IntroDetail({
+  const IntroDetail({
     Key? key,
     this.videoDetail,
   }) : super(key: key);
@@ -28,11 +28,11 @@ class IntroDetail extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 40,
+              height: 35,
               padding: const EdgeInsets.only(bottom: 2),
               child: Center(
                 child: Container(
-                  width: 40,
+                  width: 32,
                   height: 3,
                   decoration: BoxDecoration(
                       color: Theme.of(context)

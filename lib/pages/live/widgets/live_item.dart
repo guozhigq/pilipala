@@ -8,11 +8,11 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
-  LiveItemModel liveItem;
-  Function()? longPress;
-  Function()? longPressEnd;
+  final LiveItemModel liveItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
-  LiveCardV({
+  const LiveCardV({
     Key? key,
     required this.liveItem,
     this.longPress,
@@ -97,7 +97,7 @@ class LiveCardV extends StatelessWidget {
 }
 
 class LiveContent extends StatelessWidget {
-  final liveItem;
+  final dynamic liveItem;
   const LiveContent({Key? key, required this.liveItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -123,7 +123,7 @@ class LiveContent extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                UpTag(),
+                const UpTag(),
                 Expanded(
                   child: Text(
                     liveItem.uname,

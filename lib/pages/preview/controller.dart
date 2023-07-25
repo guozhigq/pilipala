@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:pilipala/utils/utils.dart';
 import 'package:share_plus/share_plus.dart';
 
 class PreviewController extends GetxController {
@@ -36,10 +35,8 @@ class PreviewController extends GetxController {
       // Permission.photos
     ].request();
 
-    final info = statuses[Permission.storage].toString();
+    statuses[Permission.storage].toString();
     // final photosInfo = statuses[Permission.photos].toString();
-
-    print('授权状态：$info');
   }
 
   // 图片保存
@@ -52,6 +49,7 @@ class PreviewController extends GetxController {
         name: "pic_vvex${DateTime.now().toString().split('-').join()}");
     if (result != null) {
       if (result['isSuccess']) {
+        // ignore: avoid_print
         print('已保存到相册');
       }
     }

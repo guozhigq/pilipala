@@ -1,14 +1,13 @@
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
-import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class DynamicDetailController extends GetxController {
   DynamicDetailController(this.oid, this.type);
   int? oid;
   int? type;
-  var item;
+  dynamic item;
   int? floor;
   int currentPage = 0;
   bool isLoadingMore = false;

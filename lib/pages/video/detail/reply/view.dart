@@ -114,6 +114,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         _videoReplyController.currentPage = 0;

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 
 Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {

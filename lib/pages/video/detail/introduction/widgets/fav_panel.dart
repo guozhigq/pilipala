@@ -5,8 +5,8 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
-  var ctr;
-  FavPanel({this.ctr});
+  final dynamic ctr;
+  const FavPanel({super.key, this.ctr});
 
   @override
   State<FavPanel> createState() => _FavPanelState();
@@ -112,7 +112,7 @@ class _FavPanelState extends State<FavPanel> {
                     }
                   } else {
                     // 骨架屏
-                    return Text('请求中');
+                    return const Text('请求中');
                   }
                 },
               ),

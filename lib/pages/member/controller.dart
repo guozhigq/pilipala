@@ -7,7 +7,6 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
 
 class MemberController extends GetxController {
   late int mid;
@@ -48,13 +47,13 @@ class MemberController extends GetxController {
     return res;
   }
 
-  Future getMemberCardInfo() async {
-    var res = await MemberHttp.memberCardInfo(mid: mid);
-    if (res['status']) {
-      print(userStat);
-    }
-    return res;
-  }
+  // Future getMemberCardInfo() async {
+  //   var res = await MemberHttp.memberCardInfo(mid: mid);
+  //   if (res['status']) {
+  //     print(userStat);
+  //   }
+  //   return res;
+  // }
 
   // 关注/取关up
   Future actionRelationMod() async {

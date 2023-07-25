@@ -41,6 +41,7 @@ class _RcmdPageState extends State<RcmdPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         return await _rcmdController.onRefresh();

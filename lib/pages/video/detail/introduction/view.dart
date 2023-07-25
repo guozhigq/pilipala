@@ -4,8 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -53,6 +53,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder(
       future: videoIntroController.queryVideoIntro(),
       builder: (context, snapshot) {
@@ -77,10 +78,10 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 }
 
 class VideoInfo extends StatefulWidget {
-  bool loadingStatus = false;
-  VideoDetailData? videoDetail;
+  final bool loadingStatus;
+  final VideoDetailData? videoDetail;
 
-  VideoInfo({Key? key, required this.loadingStatus, this.videoDetail})
+  const VideoInfo({Key? key, this.loadingStatus = false, this.videoDetail})
       : super(key: key);
 
   @override
@@ -93,14 +94,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
   bool isExpand = false;
 
-  /// 手动控制动画的控制器
-  late AnimationController? _manualController;
-
-  /// 手动控制
-  late Animation<double>? _manualAnimation;
-
-  final FavController _favController = Get.put(FavController());
-
   late VideoDetailController? videoDetailCtr;
   Box localCache = GStrorage.localCache;
   late double sheetHeight;
@@ -109,13 +102,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    /// 不设置重复，使用代码控制进度，动画时间1秒
-    _manualController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _manualAnimation =
-        Tween<double>(begin: 0.5, end: 1.5).animate(_manualController!);
     videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     sheetHeight = localCache.get('sheetHeight');
@@ -139,56 +125,70 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 15),
+      padding: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 15),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          !widget.loadingStatus
-                              ? widget.videoDetail!.title
-                              : videoItem['title'],
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(
-                                  letterSpacing: 0.5,
-                                  fontWeight: FontWeight.w500),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      SizedBox(
-                        width: 34,
-                        height: 34,
-                        child: IconButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(EdgeInsets.zero),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith((states) {
-                              return Theme.of(context)
-                                  .highlightColor
-                                  .withOpacity(0.2);
-                            }),
+                  GestureDetector(
+                    onTap: () {
+                      showBottomSheet(
+                        context: context,
+                        enableDrag: true,
+                        builder: (BuildContext context) {
+                          return IntroDetail(videoDetail: widget.videoDetail!);
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            !widget.loadingStatus
+                                ? widget.videoDetail!.title
+                                : videoItem['title'],
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                    letterSpacing: 0.5,
+                                    fontWeight: FontWeight.w500),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          onPressed: () {
-                            showBottomSheet(
+                        ),
+                        const SizedBox(width: 20),
+                        SizedBox(
+                          width: 34,
+                          height: 34,
+                          child: IconButton(
+                            style: ButtonStyle(
+                              padding:
+                                  MaterialStateProperty.all(EdgeInsets.zero),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                return Theme.of(context)
+                                    .highlightColor
+                                    .withOpacity(0.2);
+                              }),
+                            ),
+                            onPressed: () {
+                              showBottomSheet(
                                 context: context,
                                 enableDrag: true,
                                 builder: (BuildContext context) {
                                   return IntroDetail(
                                       videoDetail: widget.videoDetail!);
-                                });
-                          },
-                          icon: const Icon(Icons.more_horiz),
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.more_horiz),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Row(
@@ -222,7 +222,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   ),
                   // 点赞收藏转发
                   Padding(
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.only(top: 15),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: actionRow(
@@ -270,25 +270,24 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           fadeOutDuration: Duration.zero,
                         ),
                         const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(!widget.loadingStatus
-                                ? widget.videoDetail!.owner!.name
-                                : videoItem['owner'].name),
-                            // const SizedBox(width: 10),
-                            Text(
-                              widget.loadingStatus
-                                  ? '- 粉丝'
-                                  : '${Utils.numFormat(videoIntroController.userStat['follower'])}粉丝',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline),
-                            ),
-                          ],
+                        Text(
+                          !widget.loadingStatus
+                              ? widget.videoDetail!.owner!.name
+                              : videoItem['owner'].name,
+                          style: const TextStyle(fontSize: 12.5),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          widget.loadingStatus
+                              ? '- 粉丝'
+                              : Utils.numFormat(
+                                  videoIntroController.userStat['follower']),
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall!
+                                  .fontSize,
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                         const Spacer(),
                         AnimatedOpacity(
@@ -418,14 +417,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       ),
       const SizedBox(width: 8),
       ActionRowItem(
-        icon: const Icon(FontAwesomeIcons.share),
-        onTap: () => videoIntroController.actionShareVideo(),
-        selectStatus: false,
-        loadingStatus: widget.loadingStatus,
-        text: !widget.loadingStatus
-            ? widget.videoDetail!.stat!.share!.toString()
-            : '-',
-      ),
+          icon: const Icon(FontAwesomeIcons.share),
+          onTap: () => videoIntroController.actionShareVideo(),
+          selectStatus: false,
+          loadingStatus: widget.loadingStatus,
+          // text: !widget.loadingStatus
+          //     ? widget.videoDetail!.stat!.share!.toString()
+          //     : '-',
+          text: '转发'),
     ]);
   }
 

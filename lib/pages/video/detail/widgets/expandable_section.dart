@@ -1,16 +1,20 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class ExpandedSection extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
   final bool expand;
-  double begin = 0.0;
-  double end = 1.0;
+  final double begin;
+  final double end;
 
-  ExpandedSection(
-      {this.expand = false,
-      required this.child,
-      required this.begin,
-      required this.end});
+  const ExpandedSection({
+    super.key,
+    this.expand = false,
+    this.child,
+    this.begin = 0.0,
+    this.end = 1.0,
+  });
 
   @override
   _ExpandedSectionState createState() => _ExpandedSectionState();

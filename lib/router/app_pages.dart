@@ -67,6 +67,6 @@ class Routes {
     // 用户中心
     GetPage(name: '/member', page: () => const MemberPage()),
     // 二级回复
-    GetPage(name: '/replyReply', page: () => VideoReplyReplyPanel()),
+    GetPage(name: '/replyReply', page: () => const VideoReplyReplyPanel()),
   ];
 }

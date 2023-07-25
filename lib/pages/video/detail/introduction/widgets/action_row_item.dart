@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
 
 class ActionRowItem extends StatelessWidget {
-  Icon? icon;
-  Icon? selectIcon;
-  Function? onTap;
-  bool? loadingStatus;
-  String? text;
-  bool selectStatus = false;
+  final Icon? icon;
+  final Icon? selectIcon;
+  final Function? onTap;
+  final bool? loadingStatus;
+  final String? text;
+  final bool selectStatus;
 
-  ActionRowItem({
+  const ActionRowItem({
     Key? key,
     this.icon,
     this.selectIcon,
     this.onTap,
     this.loadingStatus,
     this.text,
-    required this.selectStatus,
+    this.selectStatus = false,
   }) : super(key: key);
 
   @override

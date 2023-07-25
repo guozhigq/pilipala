@@ -62,7 +62,7 @@ class _FollowPageState extends State<FollowPage> {
                   List<FollowItemModel> list = _followController.followList;
                   return Obx(
                     () => list.length == 1
-                        ? SizedBox()
+                        ? const SizedBox()
                         : ListView.builder(
                             controller: scrollController,
                             itemCount: list.length,
@@ -79,7 +79,7 @@ class _FollowPageState extends State<FollowPage> {
                 }
               } else {
                 // 骨架屏
-                return SizedBox();
+                return const SizedBox();
               }
             },
           )),

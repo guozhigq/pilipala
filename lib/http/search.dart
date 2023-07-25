@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -57,7 +55,7 @@ class SearchHttp {
       'page': page
     });
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
-      var data;
+      Object data;
       switch (searchType) {
         case SearchType.video:
           data = SearchVideoModel.fromJson(res.data['data']);

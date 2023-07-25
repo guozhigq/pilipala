@@ -5,6 +5,7 @@ import 'package:pilipala/pages/setting/index.dart';
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
 
+  @override
   Widget build(BuildContext context) {
     final SettingController settingController = Get.put(SettingController());
     return Scaffold(

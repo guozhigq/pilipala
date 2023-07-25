@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:math';
 import 'dart:ui' as ui show Image;
 
@@ -15,7 +17,8 @@ class PullToRefreshHeader extends StatelessWidget {
     this.info,
     this.lastRefreshTime, {
     this.color,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final PullToRefreshScrollNotificationInfo? info;
   final DateTime? lastRefreshTime;
@@ -23,21 +26,21 @@ class PullToRefreshHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PullToRefreshScrollNotificationInfo? _info = info;
-    if (_info == null) {
+    final PullToRefreshScrollNotificationInfo? infos = info;
+    if (infos == null) {
       return Container();
     }
     String text = '';
-    if (_info.mode == PullToRefreshIndicatorMode.armed) {
+    if (infos.mode == PullToRefreshIndicatorMode.armed) {
       text = 'Release to refresh';
-    } else if (_info.mode == PullToRefreshIndicatorMode.refresh ||
-        _info.mode == PullToRefreshIndicatorMode.snap) {
+    } else if (infos.mode == PullToRefreshIndicatorMode.refresh ||
+        infos.mode == PullToRefreshIndicatorMode.snap) {
       text = 'Loading...';
-    } else if (_info.mode == PullToRefreshIndicatorMode.done) {
+    } else if (infos.mode == PullToRefreshIndicatorMode.done) {
       text = 'Refresh completed.';
-    } else if (_info.mode == PullToRefreshIndicatorMode.drag) {
+    } else if (infos.mode == PullToRefreshIndicatorMode.drag) {
       text = 'Pull to refresh';
-    } else if (_info.mode == PullToRefreshIndicatorMode.canceled) {
+    } else if (infos.mode == PullToRefreshIndicatorMode.canceled) {
       text = 'Cancel refresh';
     }
 
@@ -67,16 +70,15 @@ class PullToRefreshHeader extends StatelessWidget {
                 Expanded(
                   child: Container(
                     alignment: Alignment.centerRight,
-                    child: RefreshImage(top),
                     margin: const EdgeInsets.only(right: 12.0),
+                    child: RefreshImage(top, null),
                   ),
                 ),
                 Column(
                   children: <Widget>[
                     Text(text, style: ts),
                     Text(
-                      'Last updated:' +
-                          DateFormat('yyyy-MM-dd hh:mm').format(time),
+                      'Last updated:${DateFormat('yyyy-MM-dd hh:mm').format(time)}',
                       style: ts.copyWith(fontSize: 14),
                     )
                   ],
@@ -92,7 +94,7 @@ class PullToRefreshHeader extends StatelessWidget {
 }
 
 class RefreshImage extends StatelessWidget {
-  const RefreshImage(this.top);
+  const RefreshImage(this.top, Key? key) : super(key: key);
 
   final double top;
 

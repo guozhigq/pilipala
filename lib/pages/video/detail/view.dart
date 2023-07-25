@@ -173,8 +173,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       controller: _meeduPlayerController!,
                                       header: (BuildContext context,
                                           MeeduPlayerController
-                                              _meeduPlayerController,
-                                          Responsive) {
+                                              meeduPlayerController,
+                                          Responsive responsive) {
                                         return AppBar(
                                           toolbarHeight: 40,
                                           backgroundColor: Colors.transparent,
@@ -278,7 +278,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     pinned: true,
                                     delegate: SliverHeaderDelegate(
                                       height: 50,
-                                      child: MenuRow(loadingStatus: false),
+                                      child:
+                                          const MenuRow(loadingStatus: false),
                                     ),
                                   ),
                                   const RelatedVideoPanel(),
@@ -306,6 +307,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 snapshot.data!.toDouble(),
                 continuePlay,
                 playerStatus,
+                null,
               );
             }),
           )

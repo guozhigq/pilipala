@@ -1,4 +1,6 @@
 // 工具函数
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -52,7 +54,7 @@ class Utils {
     // 当前时间
     int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     // 对比
-    int _distance = (time - timeStamp).toInt();
+    int distance = (time - timeStamp).toInt();
     // 当前年日期
     String currentYearStr = 'MM月DD日 hh:mm';
     String lastYearStr = 'YY年MM月DD日 hh:mm';
@@ -65,12 +67,12 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
-    if (_distance <= 60) {
+    if (distance <= 60) {
       return '刚刚';
-    } else if (_distance <= 3600) {
-      return '${(_distance / 60).floor()}分钟前';
-    } else if (_distance <= 43200) {
-      return '${(_distance / 60 / 60).floor()}小时前';
+    } else if (distance <= 3600) {
+      return '${(distance / 60).floor()}分钟前';
+    } else if (distance <= 43200) {
+      return '${(distance / 60 / 60).floor()}小时前';
     } else if (DateTime.fromMillisecondsSinceEpoch(time * 1000).year ==
         DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000).year) {
       return CustomStamp_str(

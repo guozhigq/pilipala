@@ -12,11 +12,11 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 水平布局
 class VideoCardH extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
-  var videoItem;
-  Function()? longPress;
-  Function()? longPressEnd;
+  final videoItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
-  VideoCardH({
+  const VideoCardH({
     Key? key,
     required this.videoItem,
     this.longPress,
@@ -71,21 +71,16 @@ class VideoCardH extends StatelessWidget {
                             builder: (context, boxConstraints) {
                               double maxWidth = boxConstraints.maxWidth;
                               double maxHeight = boxConstraints.maxHeight;
-                              double PR =
-                                  MediaQuery.of(context).devicePixelRatio;
                               return Stack(
                                 children: [
                                   Hero(
                                     tag: heroTag,
                                     child: NetworkImgLayer(
-                                      // src: videoItem['pic'] +
-                                      //     '@${(maxWidth * 2).toInt()}w',
                                       src: videoItem.pic + '@.webp',
                                       width: maxWidth,
                                       height: maxHeight,
                                     ),
                                   ),
-                                  // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
                                   pBadge(Utils.timeFormat(videoItem.duration!),
                                       context, null, 6.0, 6.0, null,
                                       type: 'gray'),
@@ -119,6 +114,7 @@ class VideoCardH extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   const VideoContent({super.key, required this.videoItem});
 
@@ -186,7 +182,7 @@ class VideoContent extends StatelessWidget {
                 Text(
                   videoItem.owner.name,
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),

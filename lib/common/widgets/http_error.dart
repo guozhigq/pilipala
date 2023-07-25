@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HttpError extends StatelessWidget {
-  HttpError({required this.errMsg, required this.fn, super.key});
+  const HttpError({required this.errMsg, required this.fn, super.key});
 
-  String errMsg = '';
+  final String? errMsg;
   final Function()? fn;
 
   @override
@@ -16,7 +16,7 @@ class HttpError extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              errMsg,
+              errMsg ?? '请求异常',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),

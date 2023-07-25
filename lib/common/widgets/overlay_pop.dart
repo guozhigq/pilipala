@@ -3,8 +3,8 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 class OverlayPop extends StatelessWidget {
-  var videoItem;
-  OverlayPop({super.key, this.videoItem});
+  final dynamic videoItem;
+  const OverlayPop({super.key, this.videoItem});
 
   @override
   Widget build(BuildContext context) {

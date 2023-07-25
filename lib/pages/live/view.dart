@@ -20,9 +20,6 @@ class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
     _liveController.scrollController.addListener(

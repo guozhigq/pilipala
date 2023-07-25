@@ -71,7 +71,6 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
           ),
         ),
       );
-      ;
     },
   );
 }
