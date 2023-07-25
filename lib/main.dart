@@ -16,9 +16,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await GStrorage.init();
+  runApp(const MyApp());
   await Request.setCookie();
   await Data.init();
-  runApp(const MyApp());
+  await GStrorage.lazyInit();
 }
 
 class MyApp extends StatelessWidget {

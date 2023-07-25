@@ -7,7 +7,7 @@ import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
 import 'package:pilipala/utils/storage.dart';
 
-class SearchController extends GetxController {
+class SSearchController extends GetxController {
   final FocusNode searchFocusNode = FocusNode();
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;

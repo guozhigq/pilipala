@@ -10,7 +10,7 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
-  - image_gallery_saver (1.5.0):
+  - image_gallery_saver (2.0.2):
     - Flutter
   - media_kit_libs_ios_video (1.0.4):
     - Flutter
@@ -18,10 +18,12 @@ PODS:
     - Flutter
   - media_kit_video (0.0.1):
     - Flutter
+  - package_info_plus (0.4.5):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.0.4):
+  - permission_handler_apple (9.1.1):
     - Flutter
   - ReachabilitySwift (5.0.0)
   - screen_brightness_ios (0.1.0):
@@ -31,12 +33,12 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - sqflite (0.0.2):
+  - sqflite (0.0.3):
     - Flutter
     - FMDB (>= 2.7.5)
   - volume_controller (0.0.1):
     - Flutter
-  - wakelock (0.0.1):
+  - wakelock_plus (0.0.1):
     - Flutter
   - webview_cookie_manager (0.0.1):
     - Flutter
@@ -52,14 +54,15 @@ DEPENDENCIES:
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
-  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+  - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
   - webview_cookie_manager (from `.symlinks/plugins/webview_cookie_manager/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
@@ -85,8 +88,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/media_kit_native_event_loop/ios"
   media_kit_video:
     :path: ".symlinks/plugins/media_kit_video/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/ios"
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   screen_brightness_ios:
@@ -94,13 +99,13 @@ EXTERNAL SOURCES:
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/ios"
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   volume_controller:
     :path: ".symlinks/plugins/volume_controller/ios"
-  wakelock:
-    :path: ".symlinks/plugins/wakelock/ios"
+  wakelock_plus:
+    :path: ".symlinks/plugins/wakelock_plus/ios"
   webview_cookie_manager:
     :path: ".symlinks/plugins/webview_cookie_manager/ios"
   webview_flutter_wkwebview:
@@ -108,23 +113,24 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
-  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
+  device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_meedu_media_kit: 5059e8719e3fd4a65fe5312b0febc75491e553f9
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
-  media_kit_libs_ios_video: 96259eccffaa309b63a7ee610c2c7786a3b335e5
+  image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
+  media_kit_libs_ios_video: bcbf9a53dd3b60c0fcf92b0903e4706391ad0b65
   media_kit_native_event_loop: 1eac6db2378101404392c80606103b42f7c2c491
-  media_kit_video: c6ae801433b484912087b519b45f1beac97b960b
-  path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
-  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  media_kit_video: 6c61501e3ab980488d80df6d705905d14b150b63
+  package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
-  share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
-  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
-  sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
+  share_plus: 599aa54e4ea31d4b4c0e9c911bcc26c55e791028
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
-  wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
+  wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
   webview_cookie_manager: eaf920722b493bd0f7611b5484771ca53fed03f7
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 
