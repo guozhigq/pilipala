@@ -108,16 +108,19 @@ class _MemberPageState extends State<MemberPage>
                                         const SizedBox(height: 14),
                                         Row(
                                           children: [
-                                            Text(
+                                            Expanded(
+                                                child: Text(
                                               _memberController
                                                   .memberInfo.value.name!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyLarge!
                                                   .copyWith(
                                                       fontWeight:
                                                           FontWeight.bold),
-                                            ),
+                                            )),
                                             const SizedBox(width: 2),
                                             if (_memberController
                                                     .memberInfo.value.sex ==

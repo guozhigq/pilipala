@@ -19,6 +19,8 @@ Widget followItem({item}) {
     ),
     title: Text(
       item.uname,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: const TextStyle(fontSize: 14),
     ),
     subtitle: Text(
