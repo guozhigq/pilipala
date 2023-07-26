@@ -44,7 +44,6 @@ class _FavPanelState extends State<FavPanel> {
               TextButton(
                 onPressed: () async {
                   await widget.ctr!.actionFavVideo();
-                  Get.back();
                 },
                 child: const Text('完成'),
               ),
