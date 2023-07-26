@@ -31,7 +31,7 @@ class SearchSuggestItem {
   SearchSuggestItem.fromJson(Map<String, dynamic> json, String inputTerm) {
     value = json['value'];
     term = json['term'];
-    String reg = '<em class=\"suggest_high_light\">$inputTerm</em>';
+    String reg = '<em class="suggest_high_light">$inputTerm</em>';
     try {
       if (json['name'].indexOf(inputTerm) != -1) {
         String str = json['name'].replaceAll(reg, '^');

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 
 Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {
@@ -75,21 +74,28 @@ Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     '合集：${ugcSeason.title!}',
+                    style: Theme.of(context).textTheme.labelMedium,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 15),
+                Image.asset(
+                  'assets/images/live.gif',
+                  color: Theme.of(context).colorScheme.primary,
+                  height: 11,
+                ),
+                const SizedBox(width: 4),
                 Text(
                   '${currentIndex + 1} / ${ugcSeason.epCount}',
-                  style: Theme.of(context).textTheme.labelSmall,
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
-                const SizedBox(width: 2),
+                const SizedBox(width: 6),
                 const Icon(
                   Icons.arrow_forward_ios_outlined,
                   size: 13,

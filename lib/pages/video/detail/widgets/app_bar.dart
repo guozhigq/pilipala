@@ -3,14 +3,15 @@ import 'package:flutter_meedu_media_kit/meedu_player.dart';
 
 class ScrollAppBar extends StatelessWidget {
   final double scrollVal;
-  Function callback;
+  final Function callback;
   final PlayerStatus playerStatus;
 
-  ScrollAppBar(
+  const ScrollAppBar(
     this.scrollVal,
     this.callback,
     this.playerStatus,
-  );
+    Key? key,
+  ) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -153,12 +153,12 @@ Widget addWidget(item, context, type, {floor = 1}) {
             ),
           ));
     case 'ADDITIONAL_TYPE_MATCH':
-      return SizedBox();
+      return const SizedBox();
     case 'ADDITIONAL_TYPE_COMMON':
-      return SizedBox();
+      return const SizedBox();
     case 'ADDITIONAL_TYPE_VOTE':
-      return SizedBox();
+      return const SizedBox();
     default:
-      return Text('11');
+      return const Text('11');
   }
 }

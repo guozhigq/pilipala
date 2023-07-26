@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -5,7 +7,6 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
-import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/cookie.dart';

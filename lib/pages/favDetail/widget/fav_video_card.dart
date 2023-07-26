@@ -11,7 +11,7 @@ import '../controller.dart';
 
 // 收藏视频卡片 - 水平布局
 class FavVideoCardH extends StatelessWidget {
-  var videoItem;
+  final dynamic videoItem;
   final FavDetailController _favDetailController =
       Get.put(FavDetailController());
 
@@ -28,9 +28,9 @@ class FavVideoCardH extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.errorContainer,
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(Icons.clear_all_rounded),
               SizedBox(width: 6),
               Text('取消收藏')
@@ -51,7 +51,8 @@ class FavVideoCardH extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
+              padding: const EdgeInsets.fromLTRB(
+                  StyleString.safeSpace, 5, StyleString.safeSpace, 5),
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
                   double width =
@@ -68,21 +69,16 @@ class FavVideoCardH extends StatelessWidget {
                             builder: (context, boxConstraints) {
                               double maxWidth = boxConstraints.maxWidth;
                               double maxHeight = boxConstraints.maxHeight;
-                              double PR =
-                                  MediaQuery.of(context).devicePixelRatio;
                               return Stack(
                                 children: [
                                   Hero(
                                     tag: heroTag,
                                     child: NetworkImgLayer(
-                                      // src: videoItem['pic'] +
-                                      //     '@${(maxWidth * 2).toInt()}w',
                                       src: videoItem.pic + '@.webp',
                                       width: maxWidth,
                                       height: maxHeight,
                                     ),
                                   ),
-                                  // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
                                   Positioned(
                                     right: 4,
                                     bottom: 4,
@@ -121,7 +117,7 @@ class FavVideoCardH extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
-  final videoItem;
+  final dynamic videoItem;
   const VideoContent({super.key, required this.videoItem});
 
   @override
@@ -135,9 +131,11 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                  fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -145,10 +143,11 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.owner.name,
               style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                 color: Theme.of(context).colorScheme.outline,
               ),
             ),
+            const SizedBox(height: 2),
             Row(
               children: [
                 StatView(

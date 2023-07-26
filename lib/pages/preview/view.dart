@@ -1,8 +1,9 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:pilipala/common/widgets/appbar.dart';
 import 'controller.dart';
 
 typedef DoubleClickAnimationListener = void Function();
@@ -145,6 +146,8 @@ class _ImagePreviewState extends State<ImagePreview>
                             ],
                           ),
                         );
+                      } else {
+                        return const SizedBox();
                       }
                     },
                     initGestureConfigHandler: (ExtendedImageState state) {
@@ -168,7 +171,8 @@ class _ImagePreviewState extends State<ImagePreview>
           bottom: 0,
           child: Container(
             // height: 45,
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, top: 20),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom, top: 20),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -186,23 +190,29 @@ class _ImagePreviewState extends State<ImagePreview>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Obx(
-                        () => Text.rich(
+                    () => Text.rich(
                       TextSpan(
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18
-                        ),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18),
                           children: [
-                        TextSpan(text: _previewController.currentPage.toString()),
-                        const TextSpan(text: ' / '),
-                        TextSpan(text: _previewController.imgList.length.toString()),
-                      ]),
+                            TextSpan(
+                                text:
+                                    _previewController.currentPage.toString()),
+                            const TextSpan(text: ' / '),
+                            TextSpan(
+                                text: _previewController.imgList.length
+                                    .toString()),
+                          ]),
                     ),
                   ),
                   const Spacer(),
-                  ElevatedButton(onPressed: () => _previewController.onShareImg(), child: Text('分享')),
+                  ElevatedButton(
+                      onPressed: () => _previewController.onShareImg(),
+                      child: const Text('分享')),
                   const SizedBox(width: 10),
-                  ElevatedButton(onPressed: () => _previewController.onSaveImg(), child: Text('保存'))
+                  ElevatedButton(
+                      onPressed: () => _previewController.onSaveImg(),
+                      child: const Text('保存'))
                 ],
               ),
             ),

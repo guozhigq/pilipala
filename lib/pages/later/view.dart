@@ -26,8 +26,12 @@ class _LaterPageState extends State<LaterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('稍后再看'),
+        titleSpacing: 0,
         centerTitle: false,
+        title: Text(
+          '稍后再看',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: CustomScrollView(
         controller: _laterController.scrollController,

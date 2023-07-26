@@ -86,7 +86,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return const VideoCardHSkeleton();
-                    }, childCount: 5),
+                    }, childCount: 10),
                   );
                 }
               },

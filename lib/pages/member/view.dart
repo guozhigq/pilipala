@@ -2,12 +2,8 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:loading_more_list/loading_more_list.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/member/archive/view.dart';
 import 'package:pilipala/pages/member/index.dart';
-import 'package:pilipala/utils/utils.dart';
 
 import 'widgets/profile.dart';
 
@@ -231,7 +227,7 @@ class _MemberPageState extends State<MemberPage>
                                 ),
                               );
                             } else {
-                              return SizedBox();
+                              return const SizedBox();
                             }
                           } else {
                             // 骨架屏

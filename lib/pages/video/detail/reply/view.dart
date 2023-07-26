@@ -114,6 +114,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         _videoReplyController.currentPage = 0;
@@ -130,8 +131,18 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    color: Theme.of(context).colorScheme.background,
-                    padding: const EdgeInsets.fromLTRB(12, 6, 10, 6),
+                    height: 45,
+                    padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      border: Border(
+                        bottom: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .outline
+                                .withOpacity(0.1)),
+                      ),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -155,9 +166,11 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                           child: TextButton.icon(
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
-                            icon: const Icon(Icons.sort, size: 17),
+                            icon: const Icon(Icons.sort, size: 15),
                             label: Obx(() => Text(
-                                _videoReplyController.sortTypeLabel.value)),
+                                  _videoReplyController.sortTypeLabel.value,
+                                  style: const TextStyle(fontSize: 12),
+                                )),
                           ),
                         )
                       ],

@@ -24,6 +24,7 @@ class _ArchivePanelState extends State<ArchivePanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return PullToRefreshNotification(
       onRefresh: () async {
         await Future.delayed(const Duration(seconds: 1));

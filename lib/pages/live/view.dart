@@ -20,9 +20,6 @@ class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
     _liveController.scrollController.addListener(
@@ -50,7 +47,7 @@ class _LivePageState extends State<LivePage> {
           SliverPadding(
             // 单列布局 EdgeInsets.zero
             padding: const EdgeInsets.fromLTRB(
-                StyleString.cardSpace, 0, StyleString.cardSpace, 8),
+                StyleString.safeSpace, 0, StyleString.safeSpace, 0),
             sliver: FutureBuilder(
               future: _liveController.queryLiveList('init'),
               builder: (context, snapshot) {
@@ -97,13 +94,13 @@ class _LivePageState extends State<LivePage> {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace,
+        mainAxisSpacing: StyleString.cardSpace + 2,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace,
+        crossAxisSpacing: StyleString.cardSpace + 3,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 70,
+            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

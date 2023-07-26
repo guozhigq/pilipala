@@ -13,7 +13,6 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final bool visible;
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => child.preferredSize;
 
   @override

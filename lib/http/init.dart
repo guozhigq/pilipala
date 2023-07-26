@@ -151,7 +151,7 @@ class Request {
         cancelToken: cancelToken,
       );
       return response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       print('get error: $e');
       return Future.error(await ApiInterceptor.dioError(e));
     }
@@ -173,7 +173,7 @@ class Request {
       );
       print('post success: ${response.data}');
       return response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       print('post error: $e');
       return Future.error(await ApiInterceptor.dioError(e));
     }
@@ -193,7 +193,7 @@ class Request {
       print('downloadFile success: ${response.data}');
 
       return response.data;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       print('downloadFile error: $e');
       return Future.error(ApiInterceptor.dioError(e));
     }

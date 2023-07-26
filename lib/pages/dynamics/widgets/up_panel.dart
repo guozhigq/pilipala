@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -10,8 +9,8 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
-  FollowUpModel? upData;
-  UpPanel(this.upData, {Key? key}) : super(key: key);
+  final FollowUpModel? upData;
+  const UpPanel(this.upData, {Key? key}) : super(key: key);
 
   @override
   State<UpPanel> createState() => _UpPanelState();
@@ -168,7 +167,9 @@ class _UpPanelState extends State<UpPanel> {
                 smallSize: 8,
                 label: data.type == 'live' ? const Text('Live') : null,
                 textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                alignment: AlignmentDirectional.bottomCenter,
+                alignment: data.type == 'live'
+                    ? AlignmentDirectional.topCenter
+                    : AlignmentDirectional.topEnd,
                 padding: const EdgeInsets.only(left: 6, right: 6),
                 isLabelVisible: data.type == 'live' ||
                     (data.type == 'up' && (data.hasUpdate ?? false)),

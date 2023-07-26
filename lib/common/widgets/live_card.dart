@@ -6,9 +6,10 @@ import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class LiveCard extends StatelessWidget {
-  var liveItem;
+  // ignore: prefer_typing_uninitialized_variables
+  final liveItem;
 
-  LiveCard({
+  const LiveCard({
     Key? key,
     required this.liveItem,
   }) : super(key: key);
@@ -37,14 +38,11 @@ class LiveCard extends StatelessWidget {
               child: LayoutBuilder(builder: (context, boxConstraints) {
                 double maxWidth = boxConstraints.maxWidth;
                 double maxHeight = boxConstraints.maxHeight;
-                double PR = MediaQuery.of(context).devicePixelRatio;
                 return Stack(
                   children: [
                     Hero(
                       tag: heroTag,
                       child: NetworkImgLayer(
-                        // 指定图片尺寸
-                        // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
                         src: liveItem.cover + '@.webp',
                         type: 'emote',
                         width: maxWidth,
@@ -79,6 +77,7 @@ class LiveCard extends StatelessWidget {
 }
 
 class LiveContent extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final liveItem;
   const LiveContent({Key? key, required this.liveItem}) : super(key: key);
   @override
@@ -140,19 +139,19 @@ class LiveStat extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              // StatView(
-              //   theme: 'white',
-              //   view: view,
-              // ),
-              // const SizedBox(width: 8),
-              // StatDanMu(
-              //   theme: 'white',
-              //   danmu: danmaku,
-              // ),
-            ],
-          ),
+          // Row(
+          // children: [
+          // StatView(
+          //   theme: 'white',
+          //   view: view,
+          // ),
+          // const SizedBox(width: 8),
+          // StatDanMu(
+          //   theme: 'white',
+          //   danmu: danmaku,
+          // ),
+          // ],
+          // ),
           Text(
             online.toString(),
             style: const TextStyle(fontSize: 11, color: Colors.white),

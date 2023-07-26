@@ -6,13 +6,13 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class ZanButton extends StatefulWidget {
-  ZanButton({
+  const ZanButton({
     super.key,
     this.replyItem,
     this.replyType,
   });
 
-  ReplyItemModel? replyItem;
+  final ReplyItemModel? replyItem;
   final ReplyType? replyType;
 
   @override

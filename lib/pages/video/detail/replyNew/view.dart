@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -10,13 +9,14 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
-  int? oid;
-  int? root;
-  int? parent;
-  ReplyType? replyType;
-  ReplyItemModel? replyItem;
+  final int? oid;
+  final int? root;
+  final int? parent;
+  final ReplyType? replyType;
+  final ReplyItemModel? replyItem;
 
-  VideoReplyNewDialog({
+  const VideoReplyNewDialog({
+    super.key,
     this.oid,
     this.root,
     this.parent,
@@ -56,7 +56,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   _autoFocus() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    FocusScope.of(context).requestFocus(replyContentFocusNode);
+    if (context.mounted) {
+      FocusScope.of(context).requestFocus(replyContentFocusNode);
+    }
   }
 
   _printLatestValue() {
@@ -91,9 +93,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     super.didChangeMetrics();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // 键盘高度
-      final viewInsets = EdgeInsets.fromWindowPadding(
-          WidgetsBinding.instance.window.viewInsets,
-          WidgetsBinding.instance.window.devicePixelRatio);
+      final viewInsets = EdgeInsets.fromViewPadding(
+          View.of(context).viewInsets, View.of(context).devicePixelRatio);
       _debouncer.run(() {
         if (mounted) {
           setState(() {
@@ -197,7 +198,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   }
 }
 
-typedef void DebounceCallback();
+typedef DebounceCallback = void Function();
 
 class Debouncer {
   DebounceCallback? callback;

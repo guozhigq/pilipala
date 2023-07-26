@@ -1,7 +1,6 @@
 // ignore: file_names
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 class HotKeyword extends StatelessWidget {
   final double? width;

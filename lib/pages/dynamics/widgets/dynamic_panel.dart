@@ -7,8 +7,8 @@ import 'content_panel.dart';
 import 'forward_panel.dart';
 
 class DynamicPanel extends StatelessWidget {
-  var item;
-  String? source;
+  final dynamic item;
+  final String? source;
   DynamicPanel({this.item, this.source, Key? key}) : super(key: key);
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
 

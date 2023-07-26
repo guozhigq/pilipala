@@ -53,7 +53,7 @@ class VideoCardVSkeleton extends StatelessWidget {
                   ),
                   Container(
                     width: 80,
-                    height: 13,
+                    height: 12,
                     color: Theme.of(context).colorScheme.background,
                   ),
                 ],

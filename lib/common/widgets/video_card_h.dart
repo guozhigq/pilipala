@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -11,11 +12,11 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 水平布局
 class VideoCardH extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
-  var videoItem;
-  Function()? longPress;
-  Function()? longPressEnd;
+  final videoItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
-  VideoCardH({
+  const VideoCardH({
     Key? key,
     required this.videoItem,
     this.longPress,
@@ -53,11 +54,11 @@ class VideoCardH extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  StyleString.cardSpace, 7, StyleString.cardSpace, 7),
+                  StyleString.safeSpace, 6, StyleString.safeSpace, 6),
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
                   double width =
-                      (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+                      (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
                   return SizedBox(
                     height: width / StyleString.aspectRatio,
                     child: Row(
@@ -70,21 +71,16 @@ class VideoCardH extends StatelessWidget {
                             builder: (context, boxConstraints) {
                               double maxWidth = boxConstraints.maxWidth;
                               double maxHeight = boxConstraints.maxHeight;
-                              double PR =
-                                  MediaQuery.of(context).devicePixelRatio;
                               return Stack(
                                 children: [
                                   Hero(
                                     tag: heroTag,
                                     child: NetworkImgLayer(
-                                      // src: videoItem['pic'] +
-                                      //     '@${(maxWidth * 2).toInt()}w',
                                       src: videoItem.pic + '@.webp',
                                       width: maxWidth,
                                       height: maxHeight,
                                     ),
                                   ),
-                                  // Image.network( videoItem['pic'], width: double.infinity, height: double.infinity,),
                                   pBadge(Utils.timeFormat(videoItem.duration!),
                                       context, null, 6.0, 6.0, null,
                                       type: 'gray'),
@@ -104,12 +100,12 @@ class VideoCardH extends StatelessWidget {
                 },
               ),
             ),
-            Divider(
-              height: 1,
-              indent: 8,
-              endIndent: 12,
-              color: Theme.of(context).dividerColor.withOpacity(0.08),
-            )
+            // Divider(
+            //   height: 1,
+            //   indent: 8,
+            //   endIndent: 12,
+            //   color: Theme.of(context).dividerColor.withOpacity(0.08),
+            // )
           ],
         ),
       ),
@@ -118,6 +114,7 @@ class VideoCardH extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   const VideoContent({super.key, required this.videoItem});
 
@@ -133,9 +130,11 @@ class VideoContent extends StatelessWidget {
               Text(
                 videoItem.title,
                 textAlign: TextAlign.start,
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                    fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -150,6 +149,7 @@ class VideoContent extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
+                          letterSpacing: 0.3,
                           color: i['type'] == 'em'
                               ? Theme.of(context).colorScheme.primary
                               : Theme.of(context).colorScheme.onSurface,
@@ -183,12 +183,13 @@ class VideoContent extends StatelessWidget {
                 Text(
                   videoItem.owner.name,
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 3),
             Row(
               children: [
                 StatView(
@@ -196,12 +197,16 @@ class VideoContent extends StatelessWidget {
                   view: videoItem.stat.view,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  Utils.dateFormat(videoItem.pubdate!),
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(context).colorScheme.outline),
-                )
+                StatDanMu(
+                  theme: 'gray',
+                  danmu: videoItem.stat.danmaku,
+                ),
+                // Text(
+                //   Utils.dateFormat(videoItem.pubdate!),
+                //   style: TextStyle(
+                //       fontSize: 11,
+                //       color: Theme.of(context).colorScheme.outline),
+                // )
               ],
             ),
           ],

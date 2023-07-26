@@ -77,8 +77,12 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
     Get.to(
       () => Scaffold(
         appBar: AppBar(
-          title: const Text('评论详情'),
+          titleSpacing: 0,
           centerTitle: false,
+          title: Text(
+            '评论详情',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
         body: VideoReplyReplyPanel(
           oid: oid,

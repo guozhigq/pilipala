@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SearchText extends StatelessWidget {
-  String? searchText;
-  Function? onSelect;
-  int? searchTextIdx;
-  SearchText({super.key, this.searchText, this.onSelect, this.searchTextIdx});
+  final String? searchText;
+  final Function? onSelect;
+  final int? searchTextIdx;
+  const SearchText(
+      {super.key, this.searchText, this.onSelect, this.searchTextIdx});
 
   @override
   Widget build(BuildContext context) {

@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         titleSpacing: 0,
         title: Padding(
-          padding: const EdgeInsets.only(left: 4, right: 4),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 0),
           child: Stack(
             children: [
               const Align(
@@ -55,26 +55,45 @@ class _HomePageState extends State<HomePage>
                     splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
                     highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
                   ),
-                  child: TabBar(
-                    controller: _homeController.tabController,
-                    tabs: [
-                      for (var i in _homeController.tabs) Tab(text: i['label']),
-                    ],
-                    isScrollable: true,
-                    indicatorWeight: 0,
-                    indicatorPadding:
-                        const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-                    indicator: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: TabBar(
+                      controller: _homeController.tabController,
+                      tabs: [
+                        for (var i in _homeController.tabs)
+                          // Tab(text: i['label'])
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 11),
+                            child: Row(
+                              children: [
+                                i['icon'],
+                                const SizedBox(width: 4),
+                                Text(i['label'])
+                              ],
+                            ),
+                          ),
+                      ],
+                      isScrollable: true,
+                      indicatorWeight: 0,
+                      indicatorPadding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 5),
+                      indicator: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primaryContainer
+                            .withOpacity(0.8),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                      ),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelColor: Theme.of(context).colorScheme.primary,
+                      labelStyle: const TextStyle(fontSize: 13),
+                      dividerColor: Colors.transparent,
+                      unselectedLabelColor:
+                          Theme.of(context).colorScheme.outline,
+                      onTap: (value) => {_homeController.initialIndex = value},
                     ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelColor:
-                        Theme.of(context).colorScheme.onSecondaryContainer,
-                    labelStyle: const TextStyle(fontSize: 13),
-                    dividerColor: Colors.transparent,
-                    unselectedLabelColor: Theme.of(context).colorScheme.outline,
-                    onTap: (value) => {_homeController.initialIndex = value},
                   ),
                 ),
               ),

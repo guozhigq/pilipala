@@ -11,13 +11,16 @@ Widget followItem({item}) {
     leading: Hero(
       tag: heroTag,
       child: NetworkImgLayer(
-        width: 38,
-        height: 38,
+        width: 45,
+        height: 45,
         type: 'avatar',
         src: item.face,
       ),
     ),
-    title: Text(item.uname),
+    title: Text(
+      item.uname,
+      style: const TextStyle(fontSize: 14),
+    ),
     subtitle: Text(
       item.sign,
       maxLines: 1,

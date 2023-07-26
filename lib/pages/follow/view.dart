@@ -43,8 +43,12 @@ class _FollowPageState extends State<FollowPage> {
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
+        titleSpacing: 0,
         centerTitle: false,
-        title: const Text('我的关注'),
+        title: Text(
+          '我的关注',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: RefreshIndicator(
           onRefresh: () async =>
@@ -58,7 +62,7 @@ class _FollowPageState extends State<FollowPage> {
                   List<FollowItemModel> list = _followController.followList;
                   return Obx(
                     () => list.length == 1
-                        ? SizedBox()
+                        ? const SizedBox()
                         : ListView.builder(
                             controller: scrollController,
                             itemCount: list.length,
@@ -75,7 +79,7 @@ class _FollowPageState extends State<FollowPage> {
                 }
               } else {
                 // 骨架屏
-                return SizedBox();
+                return const SizedBox();
               }
             },
           )),

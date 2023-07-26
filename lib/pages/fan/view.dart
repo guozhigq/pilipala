@@ -44,7 +44,11 @@ class _FansPageState extends State<FansPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: const Text('我的粉丝'),
+        titleSpacing: 0,
+        title: Text(
+          '我的粉丝',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async => await _fansController.queryFans('init'),
@@ -57,7 +61,7 @@ class _FansPageState extends State<FansPage> {
                 List<FansItemModel> list = _fansController.fansList;
                 return Obx(
                   () => list.length == 1
-                      ? SizedBox()
+                      ? const SizedBox()
                       : ListView.builder(
                           controller: scrollController,
                           itemCount: list.length,
@@ -74,7 +78,7 @@ class _FansPageState extends State<FansPage> {
               }
             } else {
               // 骨架屏
-              return SizedBox();
+              return const SizedBox();
             }
           },
         ),

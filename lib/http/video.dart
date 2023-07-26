@@ -125,7 +125,6 @@ class VideoHttp {
         return {'status': false, 'data': []};
       }
     } catch (err) {
-      print('🐯：$err');
       return {'status': false, 'data': [], 'msg': err};
     }
   }
@@ -200,7 +199,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': [], 'msg': ''};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -338,7 +337,7 @@ class VideoHttp {
 
   // 视频播放进度
   static Future heartBeat({bvid, cid, progress, realtime}) async {
-    var res = await Request().post(Api.heartBeat, queryParameters: {
+    await Request().post(Api.heartBeat, queryParameters: {
       // 'aid': aid,
       'bvid': bvid,
       'cid': cid,

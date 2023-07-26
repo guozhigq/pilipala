@@ -105,7 +105,6 @@ class VideoIntroController extends GetxController {
   // 获取up主粉丝数
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
-    print('🌹：$result');
     if (result['status']) {
       userStat = result['data'];
     }
@@ -185,9 +184,11 @@ class VideoIntroController extends GetxController {
       if (!hasLike.value) {
         SmartDialog.showToast('点赞成功 👍');
         hasLike.value = true;
+        videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
       } else if (hasLike.value) {
         SmartDialog.showToast('取消赞');
         hasLike.value = false;
+        videoDetail.value.stat!.like = videoDetail.value.stat!.like! - 1;
       }
       hasLike.refresh();
     } else {
@@ -238,14 +239,15 @@ class VideoIntroController extends GetxController {
                   onPressed: () async {
                     var res = await VideoHttp.coinVideo(
                         bvid: bvid, multiply: _tempThemeValue);
-                    print(res);
                     if (res['status']) {
-                      SmartDialog.showToast('投币成功');
+                      SmartDialog.showToast('投币成功 👏');
+                      hasCoin.value = true;
+                      videoDetail.value.stat!.coin =
+                          videoDetail.value.stat!.coin! + _tempThemeValue;
                     } else {
                       SmartDialog.showToast(res['msg']);
                     }
                     Get.back();
-                    queryHasCoinVideo();
                   },
                   child: const Text('确定'))
             ],
@@ -263,7 +265,10 @@ class VideoIntroController extends GetxController {
           delMediaIdsNew.add(i.id);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
     var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: addMediaIdsNew.join(','),
@@ -282,10 +287,8 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result =
-        await Share.share('${HttpString.baseUrl}/video/$bvid').whenComplete(() {
-      print("share completion block ");
-    });
+    var result = await Share.share('${HttpString.baseUrl}/video/$bvid')
+        .whenComplete(() {});
     return result;
   }
 

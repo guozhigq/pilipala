@@ -12,21 +12,21 @@ import 'package:pilipala/utils/utils.dart';
 import 'zan.dart';
 
 class ReplyItem extends StatelessWidget {
-  ReplyItem({
-    super.key,
+  const ReplyItem({
     this.replyItem,
     this.addReply,
     this.replyLevel,
-    this.showReplyRow,
+    this.showReplyRow = true,
     this.replyReply,
     this.replyType,
-  });
-  ReplyItemModel? replyItem;
-  Function? addReply;
-  String? replyLevel;
-  bool? showReplyRow = true;
-  Function? replyReply;
-  ReplyType? replyType;
+    Key? key,
+  }) : super(key: key);
+  final ReplyItemModel? replyItem;
+  final Function? addReply;
+  final String? replyLevel;
+  final bool? showReplyRow;
+  final Function? replyReply;
+  final ReplyType? replyType;
 
   @override
   Widget build(BuildContext context) {
@@ -108,8 +108,7 @@ class ReplyItem extends StatelessWidget {
                                 replyItem!.member!.vip!['vipStatus'] > 0
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.titleSmall!.fontSize,
+                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -118,7 +117,7 @@ class ReplyItem extends StatelessWidget {
                       height: 11,
                     ),
                     const SizedBox(width: 6),
-                    if (replyItem!.isUp!) UpTag(),
+                    if (replyItem!.isUp!) const UpTag(),
                   ],
                 ),
                 Positioned(
@@ -186,7 +185,7 @@ class ReplyItem extends StatelessWidget {
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
-                    WidgetSpan(child: UpTag(tagText: 'TOP')),
+                    const WidgetSpan(child: UpTag(tagText: 'TOP')),
                   buildContent(context, replyItem!, replyReply, null),
                 ],
               ),
@@ -204,7 +203,7 @@ class ReplyItem extends StatelessWidget {
             child: ReplyItemRow(
               replies: replyItem!.replies,
               replyControl: replyItem!.replyControl,
-              f_rpid: replyItem!.rpid,
+              // f_rpid: replyItem!.rpid,
               replyItem: replyItem,
               replyReply: replyReply,
             ),
@@ -216,7 +215,6 @@ class ReplyItem extends StatelessWidget {
 
   // 感谢、回复、复制
   Widget bottonAction(context, replyControl) {
-    var color = Theme.of(context).colorScheme.outline;
     return Row(
       children: [
         const SizedBox(width: 48),
@@ -297,13 +295,13 @@ class ReplyItemRow extends StatelessWidget {
     super.key,
     this.replies,
     this.replyControl,
-    this.f_rpid,
+    // this.f_rpid,
     this.replyItem,
     this.replyReply,
   });
   List? replies;
   ReplyControl? replyControl;
-  int? f_rpid;
+  // int? f_rpid;
   ReplyItemModel? replyItem;
   Function? replyReply;
 
@@ -361,7 +359,7 @@ class ReplyItemRow extends StatelessWidget {
                               },
                           ),
                           if (replies![i].isUp)
-                            WidgetSpan(
+                            const WidgetSpan(
                               child: UpTag(),
                             ),
                           buildContent(
@@ -439,16 +437,14 @@ InlineSpan buildContent(
             color: Theme.of(context).colorScheme.primary,
           ),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => {
-                  Get.toNamed(
-                    '/webview',
-                    parameters: {
-                      'url': content.vote['url'],
-                      'type': 'vote',
-                      'pageTitle': content.vote['title'],
-                    },
-                  )
-                },
+            ..onTap = () => Get.toNamed(
+                  '/webview',
+                  parameters: {
+                    'url': content.vote['url'],
+                    'type': 'vote',
+                    'pageTitle': content.vote['title'],
+                  },
+                ),
         ),
       );
       return '';
@@ -554,11 +550,9 @@ InlineSpan buildContent(
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 recognizer: TapGestureRecognizer()
-                  ..onTap = () => {
-                        Get.toNamed('/searchResult', parameters: {
-                          'keyword': content.jumpUrl[matchStr]['title']
-                        })
-                      },
+                  ..onTap = () => Get.toNamed('/searchResult', parameters: {
+                        'keyword': content.jumpUrl[matchStr]['title']
+                      }),
               ),
             );
             spanChilds.add(
@@ -718,16 +712,14 @@ InlineSpan buildContent(
           color: Theme.of(context).colorScheme.primary,
         ),
         recognizer: TapGestureRecognizer()
-          ..onTap = () => {
-                Get.toNamed(
-                  '/webview',
-                  parameters: {
-                    'url': content.richText['note']['click_url'],
-                    'type': 'note',
-                    'pageTitle': '笔记预览'
-                  },
-                )
-              },
+          ..onTap = () => Get.toNamed(
+                '/webview',
+                parameters: {
+                  'url': content.richText['note']['click_url'],
+                  'type': 'note',
+                  'pageTitle': '笔记预览'
+                },
+              ),
       ),
     );
   }
@@ -736,8 +728,8 @@ InlineSpan buildContent(
 }
 
 class UpTag extends StatelessWidget {
-  String? tagText;
-  UpTag({super.key, this.tagText = 'UP'});
+  final String? tagText;
+  const UpTag({super.key, this.tagText = 'UP'});
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).colorScheme.primary;

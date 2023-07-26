@@ -41,6 +41,7 @@ class _RcmdPageState extends State<RcmdPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         return await _rcmdController.onRefresh();
@@ -53,7 +54,7 @@ class _RcmdPageState extends State<RcmdPage>
             padding: _rcmdController.crossAxisCount == 1
                 ? EdgeInsets.zero
                 : const EdgeInsets.fromLTRB(
-                    StyleString.cardSpace, 0, StyleString.cardSpace, 8),
+                    StyleString.safeSpace, 0, StyleString.safeSpace, 0),
             sliver: FutureBuilder(
               future: _rcmdController.queryRcmdFeed('init'),
               builder: (context, snapshot) {
@@ -99,13 +100,13 @@ class _RcmdPageState extends State<RcmdPage>
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace,
+        mainAxisSpacing: StyleString.cardSpace + 2,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace,
+        crossAxisSpacing: StyleString.cardSpace + 3,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 70,
+            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

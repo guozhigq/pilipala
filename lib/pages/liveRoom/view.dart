@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
-import 'dart:ui';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 import 'controller.dart';
@@ -18,7 +15,6 @@ class LiveRoomPage extends StatefulWidget {
 class _LiveRoomPageState extends State<LiveRoomPage> {
   final LiveRoomController _liveRoomController = Get.put(LiveRoomController());
   MeeduPlayerController? _meeduPlayerController;
-  StreamSubscription? _playerEventSubs;
 
   bool isShowCover = true;
   bool isPlay = true;
@@ -27,7 +23,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   void initState() {
     super.initState();
     _meeduPlayerController = _liveRoomController.meeduPlayerController;
-    _playerEventSubs = _meeduPlayerController!.onPlayerStatusChanged.listen(
+    _meeduPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) {
         if (status == PlayerStatus.playing) {
           isShowCover = false;
@@ -45,7 +41,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double statusBarHeight = MediaQuery.of(context).padding.top;
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
 
     return Scaffold(
@@ -97,8 +92,8 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                     aspectRatio: 16 / 9,
                     child: MeeduVideoPlayer(
                       header: (BuildContext context,
-                          MeeduPlayerController _meeduPlayerController,
-                          Responsive) {
+                          MeeduPlayerController meeduPlayerController,
+                          Responsive responsive) {
                         return AppBar(
                           backgroundColor: Colors.transparent,
                           primary: false,
@@ -115,7 +110,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                               height: 38,
                               child: IconButton(
                                 onPressed: () =>
-                                    _meeduPlayerController.enterPip(context),
+                                    meeduPlayerController.enterPip(context),
                                 icon: const Icon(
                                   Icons.branding_watermark_outlined,
                                   size: 19,

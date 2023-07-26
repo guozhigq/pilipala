@@ -81,7 +81,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
           if (widget.source == 'videoDetail')
             Container(
               height: 45,
-              padding: const EdgeInsets.only(left: 14, right: 14),
+              padding: const EdgeInsets.only(left: 12, right: 2),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

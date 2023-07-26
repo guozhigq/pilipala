@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';

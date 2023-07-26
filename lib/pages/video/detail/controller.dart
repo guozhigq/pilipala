@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';

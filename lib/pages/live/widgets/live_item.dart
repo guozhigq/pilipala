@@ -8,11 +8,11 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
-  LiveItemModel liveItem;
-  Function()? longPress;
-  Function()? longPressEnd;
+  final LiveItemModel liveItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
-  LiveCardV({
+  const LiveCardV({
     Key? key,
     required this.liveItem,
     this.longPress,
@@ -23,7 +23,7 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: 0.8,
+      elevation: 0,
       clipBehavior: Clip.hardEdge,
       shape: RoundedRectangleBorder(
         borderRadius: StyleString.mdRadius,
@@ -52,6 +52,8 @@ class LiveCardV extends StatelessWidget {
                 borderRadius: const BorderRadius.only(
                   topLeft: StyleString.imgRadius,
                   topRight: StyleString.imgRadius,
+                  bottomLeft: StyleString.imgRadius,
+                  bottomRight: StyleString.imgRadius,
                 ),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
@@ -66,6 +68,18 @@ class LiveCardV extends StatelessWidget {
                             src: '${liveItem.cover!}@.webp',
                             width: maxWidth,
                             height: maxHeight,
+                          ),
+                        ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AnimatedOpacity(
+                            opacity: 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: VideoStat(
+                              liveItem: liveItem,
+                            ),
                           ),
                         ),
                       ],
@@ -83,36 +97,39 @@ class LiveCardV extends StatelessWidget {
 }
 
 class LiveContent extends StatelessWidget {
-  final liveItem;
+  final dynamic liveItem;
   const LiveContent({Key? key, required this.liveItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(8, 7, 6, 4),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               liveItem.title,
               textAlign: TextAlign.start,
               style: const TextStyle(
                 fontSize: 13,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
             Row(
               children: [
-                UpTag(),
+                const UpTag(),
                 Expanded(
                   child: Text(
                     liveItem.uname,
                     textAlign: TextAlign.start,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -120,22 +137,49 @@ class LiveContent extends StatelessWidget {
                 )
               ],
             ),
-            const SizedBox(height: 2),
-            Row(
-              children: [
-                Text(
-                  '${'[' + liveItem.areaName}]',
-                  style: const TextStyle(fontSize: 11),
-                ),
-                const Text(' • '),
-                Text(
-                  liveItem.watchedShow['text_large'],
-                  style: const TextStyle(fontSize: 11),
-                ),
-              ],
-            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class VideoStat extends StatelessWidget {
+  final LiveItemModel? liveItem;
+
+  const VideoStat({
+    Key? key,
+    required this.liveItem,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 45,
+      padding: const EdgeInsets.only(top: 22, left: 10, right: 10),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            Colors.transparent,
+            Colors.black54,
+          ],
+          tileMode: TileMode.mirror,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            liveItem!.areaName!,
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+          Text(
+            liveItem!.watchedShow!['text_small'],
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+        ],
       ),
     );
   }

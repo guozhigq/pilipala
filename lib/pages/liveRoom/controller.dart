@@ -8,7 +8,7 @@ import 'package:pilipala/models/live/room_info.dart';
 class LiveRoomController extends GetxController {
   String cover = '';
   late int roomId;
-  var liveItem;
+  dynamic liveItem;
   late String heroTag;
   double volume = 0.0;
   // 静音状态
@@ -75,6 +75,5 @@ class LiveRoomController extends GetxController {
       volumeOff.value = true;
       meeduPlayerController.setVolume(0);
     }
-    print('🌹：${volumeOff.value}');
   }
 }

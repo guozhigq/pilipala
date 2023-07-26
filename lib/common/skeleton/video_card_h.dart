@@ -27,9 +27,6 @@ class VideoCardHSkeleton extends StatelessWidget {
                         aspectRatio: StyleString.aspectRatio,
                         child: LayoutBuilder(
                           builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            double PR = MediaQuery.of(context).devicePixelRatio;
                             return Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context)
