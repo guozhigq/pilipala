@@ -24,7 +24,7 @@ class StatDanMu extends StatelessWidget {
           size: 14,
           color: color,
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 2),
         Text(
           Utils.numFormat(danmu!),
           style: TextStyle(
