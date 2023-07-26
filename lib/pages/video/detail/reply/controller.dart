@@ -4,6 +4,7 @@ import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class VideoReplyController extends GetxController {
   VideoReplyController(
@@ -83,6 +84,7 @@ class VideoReplyController extends GetxController {
 
   // 排序搜索评论
   queryBySort() {
+    feedBack();
     switch (sortType) {
       case ReplySortType.time:
         sortType = ReplySortType.like;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
 Widget author(item, context) {
@@ -10,12 +11,16 @@ Widget author(item, context) {
     child: Row(
       children: [
         GestureDetector(
-          onTap: () => Get.toNamed(
+          onTap: () {
+            feedBack();
+            Get.toNamed(
               '/member?mid=${item.modules.moduleAuthor.mid}',
               arguments: {
                 'face': item.modules.moduleAuthor.face,
                 'heroTag': heroTag
-              }),
+              },
+            );
+          },
           child: Hero(
             tag: heroTag,
             child: NetworkImgLayer(

@@ -4,6 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:pilipala/common/widgets/custom_toast.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
@@ -61,7 +62,9 @@ class MyApp extends StatelessWidget {
           fallbackLocale: const Locale("zh", "CN"),
           getPages: Routes.getPages,
           home: const MainApp(),
-          builder: FlutterSmartDialog.init(),
+          builder: FlutterSmartDialog.init(
+            toastBuilder: (String msg) => CustomToast(msg: msg),
+          ),
           navigatorObservers: [
             VideoDetailPage.routeObserver,
             SearchPage.routeObserver

@@ -7,6 +7,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'zan.dart';
@@ -86,6 +87,7 @@ class ReplyItem extends StatelessWidget {
         // 头像、昵称
         GestureDetector(
           onTap: () {
+            feedBack();
             Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
               'face': replyItem!.member!.avatar!,
               'heroTag': heroTag
@@ -259,6 +261,7 @@ class ReplyItem extends StatelessWidget {
                     .labelMedium!
                     .copyWith(color: Theme.of(context).colorScheme.outline)),
             onPressed: () {
+              feedBack();
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
@@ -348,6 +351,7 @@ class ReplyItemRow extends StatelessWidget {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
+                                feedBack();
                                 String heroTag =
                                     Utils.makeHeroTag(replies![i].member.mid);
                                 Get.toNamed(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/live/index.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -92,7 +93,8 @@ class _HomePageState extends State<HomePage>
                       dividerColor: Colors.transparent,
                       unselectedLabelColor:
                           Theme.of(context).colorScheme.outline,
-                      onTap: (value) => {_homeController.initialIndex = value},
+                      onTap: (value) =>
+                          {feedBack(), _homeController.initialIndex = value},
                     ),
                   ),
                 ),
@@ -103,6 +105,7 @@ class _HomePageState extends State<HomePage>
                   tag: 'searchTag',
                   child: IconButton(
                     onPressed: () {
+                      feedBack();
                       Get.toNamed('/search');
                     },
                     icon: const Icon(CupertinoIcons.search, size: 21),

@@ -5,6 +5,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -81,7 +82,7 @@ class _UpPanelState extends State<UpPanel> {
                 ),
                 Material(
                   child: InkWell(
-                    onTap: () => Get.toNamed('/follow'),
+                    onTap: () => {feedBack(), Get.toNamed('/follow')},
                     child: Container(
                       height: 100,
                       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -111,6 +112,7 @@ class _UpPanelState extends State<UpPanel> {
     bool isCurrent = currentMid == data.mid || currentMid == -1;
     return InkWell(
       onTap: () {
+        feedBack();
         if (data.type == 'up') {
           currentMid = data.mid;
           Get.find<DynamicsController>().mid.value = data.mid;
@@ -149,6 +151,7 @@ class _UpPanelState extends State<UpPanel> {
         }
       },
       onLongPress: () {
+        feedBack();
         String heroTag = Utils.makeHeroTag(data.mid);
         Get.toNamed('/member?mid=${data.mid}',
             arguments: {'face': data.face, 'heroTag': heroTag});

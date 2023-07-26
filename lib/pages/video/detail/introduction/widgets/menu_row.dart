@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class MenuRow extends StatelessWidget {
   final bool? loadingStatus;
@@ -62,7 +63,10 @@ class MenuRow extends StatelessWidget {
       borderRadius: const BorderRadius.all(Radius.circular(30)),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
-        onTap: () => onTap!(),
+        onTap: () => {
+          feedBack(),
+          onTap!(),
+        },
         child: Container(
           padding: const EdgeInsets.fromLTRB(13, 5.5, 13, 5.5),
           decoration: BoxDecoration(

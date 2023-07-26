@@ -24,7 +24,7 @@ class StatView extends StatelessWidget {
           size: 13,
           color: color,
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 2),
         Text(
           Utils.numFormat(view!),
           style: TextStyle(

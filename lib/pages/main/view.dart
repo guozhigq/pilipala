@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
@@ -44,6 +45,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   }
 
   void setIndex(int value) async {
+    feedBack();
     if (selectedIndex != value) {
       selectedIndex = value;
       _animationController!.reverse().then((_) {

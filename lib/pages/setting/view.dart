@@ -7,6 +7,10 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle subTitleStyle = Theme.of(context)
+        .textTheme
+        .labelMedium!
+        .copyWith(color: Theme.of(context).colorScheme.outline);
     final SettingController settingController = Get.put(SettingController());
     return Scaffold(
       appBar: AppBar(
@@ -14,6 +18,28 @@ class SettingPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          Obx(
+            () => ListTile(
+              enableFeedback: true,
+              onTap: () => settingController.onOpenFeedBack(),
+              title: const Text('震动反馈'),
+              subtitle: Text('请确定手机设置中已开启震动反馈', style: subTitleStyle),
+              trailing: Transform.scale(
+                scale: 0.8,
+                child: Switch(
+                    thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                        (Set<MaterialState> states) {
+                      if (states.isNotEmpty &&
+                          states.first == MaterialState.selected) {
+                        return const Icon(Icons.done);
+                      }
+                      return null; // All other states will use the default thumbIcon.
+                    }),
+                    value: settingController.feedBackEnable.value,
+                    onChanged: (value) => settingController.onOpenFeedBack()),
+              ),
+            ),
+          ),
           Obx(
             () => Visibility(
               visible: settingController.userLogin.value,
