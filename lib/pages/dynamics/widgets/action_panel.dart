@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class ActionPanel extends StatefulWidget {
   const ActionPanel({
@@ -31,6 +32,7 @@ class _ActionPanelState extends State<ActionPanel> {
 
   // 动态点赞
   onLikeDynamic() async {
+    feedBack();
     var item = widget.item!;
     String dynamicId = item.idStr!;
     // 1 已点赞 2 不喜欢 0 未操作

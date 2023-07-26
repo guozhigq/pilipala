@@ -12,6 +12,7 @@ import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -125,6 +126,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   // 视频介绍
   showIntroDetail() {
+    feedBack();
     showBottomSheet(
       context: context,
       enableDrag: true,
@@ -245,6 +247,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   ],
                   GestureDetector(
                       onTap: () {
+                        feedBack();
                         int mid = !widget.loadingStatus
                             ? widget.videoDetail!.owner!.mid
                             : videoItem['owner'].mid;

@@ -9,6 +9,7 @@ import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -78,6 +79,7 @@ class DynamicsController extends GetxController {
   }
 
   pushDetail(item, floor, {action = 'all'}) async {
+    feedBack();
     if (action == 'comment') {
       Get.toNamed('/dynamicDetail',
           arguments: {'item': item, 'floor': floor, 'action': action});

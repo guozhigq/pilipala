@@ -8,6 +8,7 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
@@ -143,6 +144,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           onValueChanged: (v) {
+                            feedBack();
                             _dynamicsController.onSelectType(v);
                           },
                         ),
@@ -155,7 +157,8 @@ class _DynamicsPageState extends State<DynamicsPage>
                 bottom: 0,
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => _dynamicsController.resetSearch(),
+                  onPressed: () =>
+                      {feedBack(), _dynamicsController.resetSearch()},
                   icon: const Icon(Icons.history, size: 21),
                 ),
               ),
@@ -167,15 +170,18 @@ class _DynamicsPageState extends State<DynamicsPage>
                   alignment: Alignment.center,
                   child: user.get(UserBoxKey.userLogin) ?? false
                       ? GestureDetector(
-                          onTap: () => showModalBottomSheet(
-                            context: context,
-                            builder: (_) => const SizedBox(
-                              height: 450,
-                              child: MinePage(),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                            isScrollControlled: true,
-                          ),
+                          onTap: () {
+                            feedBack();
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (_) => const SizedBox(
+                                height: 450,
+                                child: MinePage(),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              isScrollControlled: true,
+                            );
+                          },
                           child: NetworkImgLayer(
                             type: 'avatar',
                             width: 30,
@@ -184,15 +190,18 @@ class _DynamicsPageState extends State<DynamicsPage>
                           ),
                         )
                       : IconButton(
-                          onPressed: () => showModalBottomSheet(
-                            context: context,
-                            builder: (_) => const SizedBox(
-                              height: 450,
-                              child: MinePage(),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                            isScrollControlled: true,
-                          ),
+                          onPressed: () {
+                            feedBack();
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (_) => const SizedBox(
+                                height: 450,
+                                child: MinePage(),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              isScrollControlled: true,
+                            );
+                          },
                           icon: const Icon(CupertinoIcons.person, size: 22),
                         ),
                 ),

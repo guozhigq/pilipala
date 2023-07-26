@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class ActionRowItem extends StatelessWidget {
   final Icon? icon;
@@ -27,7 +28,10 @@ class ActionRowItem extends StatelessWidget {
       borderRadius: const BorderRadius.all(Radius.circular(30)),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
-        onTap: () => onTap!(),
+        onTap: () => {
+          feedBack(),
+          onTap!(),
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(13, 6.5, 15, 6.3),
           child: Row(

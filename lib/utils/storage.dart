@@ -13,6 +13,7 @@ class GStrorage {
   static late final Box hotKeyword;
   static late final Box historyword;
   static late final Box localCache;
+  static late final Box setting;
 
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -27,6 +28,8 @@ class GStrorage {
     userInfo = await Hive.openBox('userInfo');
     // 本地缓存
     localCache = await Hive.openBox('localCache');
+    // 设置
+    setting = await Hive.openBox('setting');
   }
 
   static regAdapter() {
@@ -61,6 +64,7 @@ class UserBoxKey {
 
 class SettingBoxKey {
   static const String themeMode = 'themeMode';
+  static const String feedBackEnable = 'feedBackEnable';
 }
 
 class LocalCacheKey {

@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
@@ -68,6 +69,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   }
 
   Future submitReplyAdd() async {
+    feedBack();
     String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
       type: widget.replyType ?? ReplyType.video,

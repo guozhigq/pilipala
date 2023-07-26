@@ -8,6 +8,7 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
@@ -303,6 +304,7 @@ class VideoIntroController extends GetxController {
 
   // 选择文件夹
   onChoose(bool checkValue, int index) {
+    feedBack();
     List<FavFolderItemData> datalist = favFolderData.value.list!;
     for (var i = 0; i < datalist.length; i++) {
       if (i == index) {
@@ -327,6 +329,7 @@ class VideoIntroController extends GetxController {
 
   // 关注/取关up
   Future actionRelationMod() async {
+    feedBack();
     if (user.get(UserBoxKey.userMid) == null) {
       SmartDialog.showToast('账号未登录');
       return;

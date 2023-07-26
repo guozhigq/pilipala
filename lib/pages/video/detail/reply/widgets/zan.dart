@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class ZanButton extends StatefulWidget {
   const ZanButton({
@@ -22,6 +23,7 @@ class ZanButton extends StatefulWidget {
 class _ZanButtonState extends State<ZanButton> {
   // 评论点赞
   onLikeReply() async {
+    feedBack();
     SmartDialog.showLoading(msg: 'pilipala ...');
     ReplyItemModel replyItem = widget.replyItem!;
     int oid = replyItem.oid!;

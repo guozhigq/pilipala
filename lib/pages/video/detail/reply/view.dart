@@ -8,6 +8,7 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'controller.dart';
 import 'widgets/reply_item.dart';
@@ -262,6 +263,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               child: FloatingActionButton(
                 heroTag: null,
                 onPressed: () {
+                  feedBack();
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
