@@ -430,9 +430,11 @@ packages:
   flutter_meedu_media_kit:
     dependency: "direct main"
     description:
-      path: "/Users/rr/Desktop/code/flutter_meedu_media_kit/package"
-      relative: false
-    source: path
+      path: package
+      ref: feature-custom
+      resolved-ref: d1d6d62f0059ec3501e21c9a94e72dae827162e9
+      url: "https://github.com/guozhigq/flutter_meedu_media_kit.git"
+    source: git
     version: "4.2.12"
   flutter_smart_dialog:
     dependency: "direct main"

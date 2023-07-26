@@ -143,7 +143,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                     ),
                   ),
                   height: 45,
-                  padding: const EdgeInsets.only(left: 15, right: 12),
+                  padding: const EdgeInsets.only(left: 12, right: 6),
                   child: Row(
                     children: [
                       Obx(
@@ -168,9 +168,11 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                         child: TextButton.icon(
                           onPressed: () =>
                               _dynamicDetailController!.queryBySort(),
-                          icon: const Icon(Icons.sort, size: 17),
+                          icon: const Icon(Icons.sort, size: 16),
                           label: Obx(() => Text(
-                              _dynamicDetailController!.sortTypeLabel.value)),
+                                _dynamicDetailController!.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              )),
                         ),
                       )
                     ],
@@ -187,7 +189,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                   if (snapshot.data['status']) {
                     // 请求成功
                     return Obx(
-                      () => _dynamicDetailController!.replyList.isEmpty
+                      () => _dynamicDetailController!.replyList.isEmpty &&
+                              _dynamicDetailController!.isLoadingMore
                           ? SliverList(
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
@@ -210,9 +213,18 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                                               .bottom +
                                           100,
                                       child: Center(
-                                        child: Obx(() => Text(
+                                        child: Obx(
+                                          () => Text(
                                             _dynamicDetailController!
-                                                .noMore.value)),
+                                                .noMore.value,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     );
                                   } else {

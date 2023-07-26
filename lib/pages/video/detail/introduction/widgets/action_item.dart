@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class ActionItem extends StatelessWidget {
   final Icon? icon;
@@ -22,7 +23,10 @@ class ActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onTap!(),
+      onTap: () => {
+        feedBack(),
+        onTap!(),
+      },
       borderRadius: StyleString.mdRadius,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -30,20 +34,27 @@ class ActionItem extends StatelessWidget {
           const SizedBox(height: 4),
           selectStatus
               ? Icon(selectIcon!.icon!,
-                  size: 21, color: Theme.of(context).primaryColor)
+                  size: 18, color: Theme.of(context).colorScheme.primary)
               : Icon(icon!.icon!,
-                  size: 21, color: Theme.of(context).colorScheme.outline),
-          const SizedBox(height: 4),
+                  size: 18, color: Theme.of(context).colorScheme.outline),
+          const SizedBox(height: 6),
           AnimatedOpacity(
             opacity: loadingStatus! ? 0 : 1,
             duration: const Duration(milliseconds: 200),
-            child: Text(
-              text ?? '',
-              style: TextStyle(
-                  color: selectStatus
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).colorScheme.outline,
-                  fontSize: Theme.of(context).textTheme.labelSmall?.fontSize),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: Text(
+                text ?? '',
+                key: ValueKey<String>(text ?? ''),
+                style: TextStyle(
+                    color: selectStatus
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline,
+                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize),
+              ),
             ),
           ),
         ],

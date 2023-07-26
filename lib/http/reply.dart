@@ -54,7 +54,7 @@ class ReplyHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': res.data['data'],
+        'data': ReplyData.fromJson(res.data['data']),
       };
     } else {
       Map errMap = {

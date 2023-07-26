@@ -33,23 +33,17 @@ class VideoReplyController extends GetxController {
 
   Future queryReplyList({type = 'init'}) async {
     isLoadingMore = true;
-    var res = replyLevel == '1'
-        ? await ReplyHttp.replyList(
-            oid: aid!,
-            pageNum: ++currentPage,
-            type: ReplyType.video.index,
-            sort: sortType.index,
-          )
-        : await ReplyHttp.replyReplyList(
-            oid: aid!,
-            root: rpid!,
-            pageNum: ++currentPage,
-            type: ReplyType.video.index,
-          );
+    var res = await ReplyHttp.replyList(
+      oid: aid!,
+      pageNum: currentPage + 1,
+      type: ReplyType.video.index,
+      sort: sortType.index,
+    );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
-        noMore.value = '加载中';
+        currentPage++;
+        noMore.value = '加载中...';
         if (replyList.length == res['data'].page.acount) {
           noMore.value = '没有更多了';
         }

@@ -63,7 +63,9 @@ class NetworkImgLayer extends StatelessWidget {
       height: height ?? double.infinity,
       child: Center(
           child: Image.asset(
-        'assets/images/loading.png',
+        type == 'avatar'
+            ? 'assets/images/noface.jpeg'
+            : 'assets/images/loading.png',
         width: 300,
         height: 300,
       )),

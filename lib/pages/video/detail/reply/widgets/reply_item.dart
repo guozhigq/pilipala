@@ -187,7 +187,9 @@ class ReplyItem extends StatelessWidget {
               TextSpan(
                 children: [
                   if (replyItem!.isTop!)
-                    const WidgetSpan(child: UpTag(tagText: 'TOP')),
+                    const WidgetSpan(
+                        alignment: PlaceholderAlignment.top,
+                        child: UpTag(tagText: 'TOP')),
                   buildContent(context, replyItem!, replyReply, null),
                 ],
               ),

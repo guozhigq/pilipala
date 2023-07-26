@@ -167,10 +167,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                           child: TextButton.icon(
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
-                            icon: const Icon(Icons.sort, size: 15),
+                            icon: const Icon(Icons.sort, size: 16),
                             label: Obx(() => Text(
                                   _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 13),
                                 )),
                           ),
                         )
@@ -207,9 +207,18 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             EdgeInsets.only(bottom: bottom),
                                         height: bottom + 100,
                                         child: Center(
-                                          child: Obx(() => Text(
+                                          child: Obx(
+                                            () => Text(
                                               _videoReplyController
-                                                  .noMore.value)),
+                                                  .noMore.value,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       );
                                     } else {

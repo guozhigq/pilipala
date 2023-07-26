@@ -68,7 +68,7 @@ class MenuRow extends StatelessWidget {
           onTap!(),
         },
         child: Container(
-          padding: const EdgeInsets.fromLTRB(13, 5.5, 13, 5.5),
+          padding: const EdgeInsets.fromLTRB(13, 5.5, 13, 4.5),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(30)),
             border: Border.all(
@@ -85,7 +85,11 @@ class MenuRow extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 child: Text(
                   text!,
-                  style: const TextStyle(fontSize: 13),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: selectStatus
+                          ? Theme.of(context).colorScheme.onBackground
+                          : Theme.of(context).colorScheme.outline),
                 ),
               ),
             ],

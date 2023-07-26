@@ -7,9 +7,10 @@ Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {
     int currentIndex = episodes.indexWhere((e) => e.cid == cid);
     return Container(
       margin: const EdgeInsets.only(
-        top: 15,
+        top: 8,
         left: 2,
         right: 2,
+        bottom: 2,
       ),
       child: Material(
         color: Theme.of(context).colorScheme.onInverseSurface,
@@ -88,11 +89,11 @@ Widget seasonPanel(UgcSeason ugcSeason, cid, sheetHeight) {
                 Image.asset(
                   'assets/images/live.gif',
                   color: Theme.of(context).colorScheme.primary,
-                  height: 11,
+                  height: 12,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 10),
                 Text(
-                  '${currentIndex + 1} / ${ugcSeason.epCount}',
+                  '${currentIndex + 1}/${ugcSeason.epCount}',
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
                 const SizedBox(width: 6),

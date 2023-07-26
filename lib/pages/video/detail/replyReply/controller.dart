@@ -17,7 +17,7 @@ class VideoReplyReplyController extends GetxController {
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
-  RxBool noMore = false.obs;
+  RxString noMore = ''.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
@@ -38,27 +38,25 @@ class VideoReplyReplyController extends GetxController {
     }
     isLoadingMore = true;
     var res = await ReplyHttp.replyReplyList(
-        oid: aid!,
-        root: rpid!,
-        pageNum: currentPage + 1,
-        type: replyType.index);
+      oid: aid!,
+      root: rpid!,
+      pageNum: currentPage + 1,
+      type: replyType.index,
+    );
     if (res['status']) {
-      res['data'] = ReplyData.fromJson(res['data']);
-      if (res['data'].replies.isNotEmpty) {
-        currentPage = currentPage + 1;
-        noMore.value = false;
-      } else {
-        if (currentPage == 0) {
-        } else {
-          noMore.value = true;
-          return;
+      List<ReplyItemModel> replies = res['data'].replies;
+      if (replies.isNotEmpty) {
+        noMore.value = '加载中...';
+        if (replyList.length == res['data'].page.count) {
+          noMore.value = '没有更多了';
         }
+      } else {
+        // 未登录状态replies可能返回null
+        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
       }
-      if (res['data'].replies.length >= res['data'].page.count) {
-        noMore.value = true;
-      }
+      currentPage++;
       if (type == 'init') {
-        List<ReplyItemModel> replies = res['data'].replies;
+        // List<ReplyItemModel> replies = res['data'].replies;
         // 添加置顶回复
         // if (res['data'].upper.top != null) {
         //   bool flag = false;
@@ -71,12 +69,12 @@ class VideoReplyReplyController extends GetxController {
         //     replies.insert(0, res['data'].upper.top);
         //   }
         // }
-        replies.insertAll(0, res['data'].topReplies);
-        res['data'].replies = replies;
-        replyList.value = res['data'].replies!;
+        // replies.insertAll(0, res['data'].topReplies);
+        // res['data'].replies = replies;
+        replyList.value = replies;
       } else {
-        replyList.addAll(res['data'].replies!);
-        res['data'].replies.addAll(replyList);
+        replyList.addAll(replies);
+        // res['data'].replies.addAll(replyList);
       }
     }
     isLoadingMore = false;

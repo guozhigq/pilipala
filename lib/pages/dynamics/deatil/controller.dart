@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class DynamicDetailController extends GetxController {
   DynamicDetailController(this.oid, this.type);
@@ -41,32 +42,23 @@ class DynamicDetailController extends GetxController {
       sort: sortType.index,
     );
     if (res['status']) {
+      List<ReplyItemModel> replies = res['data'].replies;
       acount.value = res['data'].page.acount;
-      if (res['data'].replies.isNotEmpty) {
-        currentPage = currentPage + 1;
+      if (replies.isNotEmpty) {
+        currentPage++;
         noMore.value = '加载中...';
-        if (res['data'].replies.isEmpty) {
+        if (replies.length < 20) {
           noMore.value = '没有更多了';
-          return;
         }
       } else {
-        if (currentPage == 0) {
-          noMore.value = '还没有评论';
-        } else {
-          noMore.value = '没有更多了';
-          return;
-        }
+        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
       }
-      List<ReplyItemModel> replies = res['data'].replies;
       if (reqType == 'init') {
         // 添加置顶回复
         if (res['data'].upper.top != null) {
-          bool flag = false;
-          for (var i = 0; i < res['data'].topReplies.length; i++) {
-            if (res['data'].topReplies[i].rpid == res['data'].upper.top.rpid) {
-              flag = true;
-            }
-          }
+          bool flag = res['data']
+              .topReplies
+              .any((reply) => reply.rpid == res['data'].upper.top.rpid);
           if (!flag) {
             replies.insert(0, res['data'].upper.top);
           }
@@ -76,9 +68,6 @@ class DynamicDetailController extends GetxController {
       } else {
         replyList.addAll(replies);
       }
-      if (replyList.length == acount.value) {
-        noMore.value = '没有更多了';
-      }
     }
     isLoadingMore = false;
     return res;
@@ -86,6 +75,7 @@ class DynamicDetailController extends GetxController {
 
   // 排序搜索评论
   queryBySort() {
+    feedBack();
     switch (sortType) {
       case ReplySortType.time:
         sortType = ReplySortType.like;

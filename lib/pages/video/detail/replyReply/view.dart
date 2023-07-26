@@ -85,12 +85,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '评论详情',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+                  const Text('评论详情'),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close, size: 20),
                     onPressed: () {
                       _videoReplyReplyController.currentPage = 0;
                       widget.closePanel!();
@@ -115,7 +112,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                 controller: _videoReplyReplyController.scrollController,
                 slivers: <Widget>[
                   if (widget.firstFloor != null) ...[
-                    const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                    // const SliverToBoxAdapter(child: SizedBox(height: 10)),
                     SliverToBoxAdapter(
                       child: ReplyItem(
                         replyItem: widget.firstFloor,
@@ -160,10 +157,16 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                           100,
                                       child: Center(
                                         child: Obx(
-                                          () => Text(_videoReplyReplyController
-                                                  .noMore.value
-                                              ? '没有更多了'
-                                              : '加载中'),
+                                          () => Text(
+                                            _videoReplyReplyController
+                                                .noMore.value,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     );

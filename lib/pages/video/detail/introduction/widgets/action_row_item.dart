@@ -33,7 +33,7 @@ class ActionRowItem extends StatelessWidget {
           onTap!(),
         },
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(13, 6.5, 15, 6.3),
+          padding: const EdgeInsets.fromLTRB(15, 7, 15, 7),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -62,7 +62,7 @@ class ActionRowItem extends StatelessWidget {
                             ? Theme.of(context).colorScheme.primary
                             : null,
                         fontSize:
-                            Theme.of(context).textTheme.labelSmall!.fontSize),
+                            Theme.of(context).textTheme.labelMedium!.fontSize),
                   ),
                 ),
               ),

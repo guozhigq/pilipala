@@ -51,23 +51,21 @@ class IntroDetail extends StatelessWidget {
                     Text(
                       videoDetail!.title,
                       style: const TextStyle(
-                        fontSize: 18,
-                        letterSpacing: 0.5,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        const SizedBox(width: 2),
                         StatView(
-                          theme: 'black',
+                          theme: 'gray',
                           view: videoDetail!.stat!.view,
                           size: 'medium',
                         ),
                         const SizedBox(width: 10),
                         StatDanMu(
-                          theme: 'black',
+                          theme: 'gray',
                           danmu: videoDetail!.stat!.danmaku,
                           size: 'medium',
                         ),
@@ -75,7 +73,10 @@ class IntroDetail extends StatelessWidget {
                         Text(
                           Utils.dateFormat(videoDetail!.pubdate,
                               formatType: 'detail'),
-                          style: const TextStyle(fontSize: 12),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                       ],
                     ),
