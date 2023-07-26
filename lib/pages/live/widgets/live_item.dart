@@ -104,7 +104,7 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 8),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,15 +112,14 @@ class LiveContent extends StatelessWidget {
             Text(
               liveItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+              style: const TextStyle(
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
             Row(
               children: [
                 const UpTag(),

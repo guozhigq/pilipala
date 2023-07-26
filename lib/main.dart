@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           title: 'PiLiPaLa',
           theme: ThemeData(
+            fontFamily: 'HarmonyOS',
             colorScheme: lightDynamic ??
                 ColorScheme.fromSeed(
                   seedColor: Colors.green,
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           darkTheme: ThemeData(
+            fontFamily: 'HarmonyOS',
             colorScheme: darkDynamic ??
                 ColorScheme.fromSeed(
                   seedColor: Colors.green,

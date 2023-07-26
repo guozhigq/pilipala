@@ -108,8 +108,7 @@ class ReplyItem extends StatelessWidget {
                                 replyItem!.member!.vip!['vipStatus'] > 0
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.titleSmall!.fontSize,
+                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 6),

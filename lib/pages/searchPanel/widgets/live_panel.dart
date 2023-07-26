@@ -12,8 +12,8 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
       controller: ctr!.scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: StyleString.cardSpace,
-        mainAxisSpacing: StyleString.cardSpace,
+        crossAxisSpacing: StyleString.cardSpace + 2,
+        mainAxisSpacing: StyleString.cardSpace + 3,
         mainAxisExtent:
             MediaQuery.of(context).size.width / 2 / StyleString.aspectRatio +
                 65,
@@ -22,7 +22,7 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
       itemBuilder: (context, index) {
         var i = list![index];
         return Card(
-          elevation: 0.8,
+          elevation: 0,
           clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
             borderRadius: StyleString.mdRadius,
@@ -32,40 +32,46 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
             onTap: () {},
             child: Column(
               children: [
-                AspectRatio(
-                  aspectRatio: StyleString.aspectRatio,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
-                          tag: Utils.makeHeroTag(i.roomid),
-                          child: NetworkImgLayer(
-                            // 指定图片尺寸
-                            // src: videoItem.pic + '@${(maxWidth * 2).toInt()}w',
-                            src: i.cover + '@.webp',
-                            type: 'emote',
-                            width: maxWidth,
-                            height: maxHeight,
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AnimatedOpacity(
-                            opacity: 1,
-                            duration: const Duration(milliseconds: 200),
-                            child: LiveStat(
-                              online: i.online,
-                              cateName: i.cateName,
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: StyleString.imgRadius,
+                    topRight: StyleString.imgRadius,
+                    bottomLeft: StyleString.imgRadius,
+                    bottomRight: StyleString.imgRadius,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: StyleString.aspectRatio,
+                    child: LayoutBuilder(builder: (context, boxConstraints) {
+                      double maxWidth = boxConstraints.maxWidth;
+                      double maxHeight = boxConstraints.maxHeight;
+                      return Stack(
+                        children: [
+                          Hero(
+                            tag: Utils.makeHeroTag(i.roomid),
+                            child: NetworkImgLayer(
+                              src: i.cover + '@.webp',
+                              type: 'emote',
+                              width: maxWidth,
+                              height: maxHeight,
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: AnimatedOpacity(
+                              opacity: 1,
+                              duration: const Duration(milliseconds: 200),
+                              child: LiveStat(
+                                online: i.online,
+                                cateName: i.cateName,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
                 ),
                 LiveContent(liveItem: i)
               ],
@@ -84,7 +90,7 @@ class LiveContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 6, 7),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,6 +104,7 @@ class LiveContent extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3,
                         color: i['type'] == 'em'
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.onSurface,

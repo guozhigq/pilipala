@@ -122,7 +122,7 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 4, 6, 2),
+        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -130,8 +130,8 @@ class VideoContent extends StatelessWidget {
               Text(
                 videoItem.title,
                 textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                style: const TextStyle(
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.3,
                 ),
@@ -149,6 +149,7 @@ class VideoContent extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
+                          letterSpacing: 0.3,
                           color: i['type'] == 'em'
                               ? Theme.of(context).colorScheme.primary
                               : Theme.of(context).colorScheme.onSurface,

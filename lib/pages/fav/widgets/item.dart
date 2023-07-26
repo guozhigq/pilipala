@@ -76,9 +76,11 @@ class VideoContent extends StatelessWidget {
             Text(
               favFolderItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                  fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
+              ),
             ),
             Text(
               '${favFolderItem.mediaCount}个内容',

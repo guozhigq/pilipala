@@ -81,9 +81,7 @@ class MenuRow extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 child: Text(
                   text!,
-                  style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium?.fontSize),
+                  style: const TextStyle(fontSize: 13),
                 ),
               ),
             ],

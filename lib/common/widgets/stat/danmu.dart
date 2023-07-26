@@ -20,8 +20,7 @@ class StatDanMu extends StatelessWidget {
     return Row(
       children: [
         Icon(
-          // CupertinoIcons.ellipses_bubble,
-          Icons.subtitles_sharp,
+          Icons.subtitles_outlined,
           size: 14,
           color: color,
         ),

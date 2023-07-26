@@ -50,8 +50,11 @@ class IntroDetail extends StatelessWidget {
                   children: [
                     Text(
                       videoDetail!.title,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          letterSpacing: 0.5, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Row(

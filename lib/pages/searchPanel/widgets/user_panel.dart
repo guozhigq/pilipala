@@ -42,9 +42,8 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                     children: [
                       Text(
                         i!.uname,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.titleMedium!.fontSize,
+                        style: const TextStyle(
+                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(width: 6),

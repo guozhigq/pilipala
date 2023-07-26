@@ -52,15 +52,12 @@ class VideoCardV extends StatelessWidget {
           },
           child: Column(
             children: [
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: StyleString.imgRadius,
-                    topRight: StyleString.imgRadius,
-                    bottomLeft: StyleString.imgRadius,
-                    bottomRight: StyleString.imgRadius,
-                  ),
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: StyleString.imgRadius,
+                  topRight: StyleString.imgRadius,
+                  bottomLeft: StyleString.imgRadius,
+                  bottomRight: StyleString.imgRadius,
                 ),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
@@ -116,7 +113,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 10),
+        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -126,79 +123,63 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+              style: const TextStyle(
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
               maxLines: Get.find<RcmdController>().crossAxisCount,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(
-              height: 18,
-              child: Row(
-                children: [
-                  if (videoItem.rcmdReason != null &&
-                      videoItem.rcmdReason.content != '') ...[
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
+
+            Row(
+              children: [
+                if (videoItem.rcmdReason != null &&
+                        videoItem.rcmdReason.content != '' ||
+                    videoItem.isFollowed == 1) ...[
+                  Container(
+                      padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
                       decoration: BoxDecoration(
                           color: Theme.of(context)
                               .colorScheme
                               .primaryContainer
                               .withOpacity(0.6),
                           borderRadius: BorderRadius.circular(3)),
-                      child: Text(
-                        videoItem.rcmdReason.content,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4)
-                  ] else if (videoItem.isFollowed == 1) ...[
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Text(
-                        '已关注',
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4)
-                  ],
-                  Expanded(
-                    child: LayoutBuilder(builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return SizedBox(
-                        width: constraints.maxWidth,
+                      child: Center(
                         child: Text(
-                          videoItem.owner.name,
-                          maxLines: 1,
+                          videoItem.rcmdReason != null &&
+                                  videoItem.rcmdReason.content != ''
+                              ? videoItem.rcmdReason.content
+                              : '已关注',
                           style: TextStyle(
                             fontSize: Theme.of(context)
                                 .textTheme
-                                .labelMedium!
+                                .labelSmall!
                                 .fontSize,
-                            color: Theme.of(context).colorScheme.outline,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                      );
-                    }),
-                  ),
+                      )),
+                  const SizedBox(width: 4)
                 ],
-              ),
+                Expanded(
+                  child: LayoutBuilder(builder:
+                      (BuildContext context, BoxConstraints constraints) {
+                    return SizedBox(
+                      width: constraints.maxWidth,
+                      child: Text(
+                        videoItem.owner.name,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelMedium!.fontSize,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
             // Row(
             //   children: [

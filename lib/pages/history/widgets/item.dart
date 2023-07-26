@@ -59,7 +59,7 @@ class HistoryItem extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                StyleString.cardSpace, 7, StyleString.cardSpace, 7),
+                StyleString.cardSpace, 5, StyleString.cardSpace, 5),
             child: LayoutBuilder(
               builder: (context, boxConstraints) {
                 double width =
@@ -121,12 +121,6 @@ class HistoryItem extends StatelessWidget {
               },
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 8,
-            endIndent: 12,
-            color: Theme.of(context).dividerColor.withOpacity(0.08),
-          )
         ],
       ),
     );
@@ -148,8 +142,8 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+              style: const TextStyle(
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),

@@ -131,8 +131,8 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+              style: const TextStyle(
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),

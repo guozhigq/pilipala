@@ -126,7 +126,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return SliverPadding(
       padding: const EdgeInsets.only(
-          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 15),
+          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 13),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(
@@ -149,12 +149,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             !widget.loadingStatus
                                 ? widget.videoDetail!.title
                                 : videoItem['title'],
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                    letterSpacing: 0.5,
-                                    fontWeight: FontWeight.w500),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w500,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -274,7 +273,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           !widget.loadingStatus
                               ? widget.videoDetail!.owner!.name
                               : videoItem['owner'].name,
-                          style: const TextStyle(fontSize: 12.5),
+                          style: const TextStyle(fontSize: 13),
                         ),
                         const SizedBox(width: 10),
                         Text(
