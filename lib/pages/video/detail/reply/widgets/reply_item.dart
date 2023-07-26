@@ -653,6 +653,7 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
+        print(picList);
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {

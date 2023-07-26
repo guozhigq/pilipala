@@ -146,8 +146,6 @@ class _ImagePreviewState extends State<ImagePreview>
                             ],
                           ),
                         );
-                      } else {
-                        return const SizedBox();
                       }
                     },
                     initGestureConfigHandler: (ExtendedImageState state) {
