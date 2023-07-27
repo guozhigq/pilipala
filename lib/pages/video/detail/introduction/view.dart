@@ -148,7 +148,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
+                  InkWell(
                     onTap: () => showIntroDetail(),
                     child: Row(
                       children: [
@@ -178,23 +178,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                 return t.highlightColor.withOpacity(0.2);
                               }),
                             ),
-                            onPressed: () {
-                              showBottomSheet(
-                                context: context,
-                                enableDrag: true,
-                                builder: (BuildContext context) {
-                                  return IntroDetail(
-                                      videoDetail: widget.videoDetail!);
-                                },
-                              );
-                            },
+                            onPressed: () => showIntroDetail(),
                             icon: const Icon(Icons.more_horiz),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () => showIntroDetail(),
                     child: Row(
                       children: [

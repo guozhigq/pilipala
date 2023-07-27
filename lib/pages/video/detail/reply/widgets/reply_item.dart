@@ -34,7 +34,12 @@ class ReplyItem extends StatelessWidget {
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
-        onTap: () => replyReply!(replyItem),
+        onTap: () {
+          feedBack();
+          if (replyReply != null) {
+            replyReply!(replyItem);
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 4, 8, 2),
           child: content(context),
