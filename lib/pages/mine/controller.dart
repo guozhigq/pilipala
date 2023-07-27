@@ -36,6 +36,13 @@ class MineController extends GetxController {
           'pageTitle': '登录bilibili',
         },
       );
+    } else {
+      int mid = user.get(UserBoxKey.userMid);
+      String face = user.get(UserBoxKey.userFace);
+      Get.toNamed(
+        '/member?mid=$mid',
+        arguments: {'face': face},
+      );
     }
   }
 

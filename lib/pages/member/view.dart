@@ -108,7 +108,7 @@ class _MemberPageState extends State<MemberPage>
                                         const SizedBox(height: 14),
                                         Row(
                                           children: [
-                                            Expanded(
+                                            Flexible(
                                                 child: Text(
                                               _memberController
                                                   .memberInfo.value.name!,

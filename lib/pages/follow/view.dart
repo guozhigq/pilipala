@@ -46,7 +46,7 @@ class _FollowPageState extends State<FollowPage> {
         titleSpacing: 0,
         centerTitle: false,
         title: Text(
-          '我的关注',
+          '${_followController.name}的关注',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -72,9 +72,13 @@ class _FollowPageState extends State<FollowPage> {
                           ),
                   );
                 } else {
-                  return HttpError(
-                    errMsg: data['msg'],
-                    fn: () => _followController.queryFollowings('init'),
+                  return CustomScrollView(
+                    slivers: [
+                      HttpError(
+                        errMsg: data['msg'],
+                        fn: () => _followController.queryFollowings('init'),
+                      )
+                    ],
                   );
                 }
               } else {

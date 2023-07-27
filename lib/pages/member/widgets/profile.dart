@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/live/item.dart';
@@ -81,42 +82,54 @@ Widget profile(ctr, {loadingStatus = false}) {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Column(
-                          children: [
-                            Text(
-                              !loadingStatus
-                                  ? ctr.userStat!['following'].toString()
-                                  : '-',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              '关注',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize),
-                            )
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text(
+                        InkWell(
+                          onTap: () {
+                            Get.toNamed(
+                                '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                          },
+                          child: Column(
+                            children: [
+                              Text(
                                 !loadingStatus
-                                    ? Utils.numFormat(
-                                        ctr.userStat!['follower'],
-                                      )
+                                    ? ctr.userStat!['following'].toString()
                                     : '-',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text('粉丝',
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '关注',
                                 style: TextStyle(
                                     fontSize: Theme.of(context)
                                         .textTheme
                                         .labelMedium!
-                                        .fontSize))
-                          ],
+                                        .fontSize),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Get.toNamed(
+                                '/fan?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                          },
+                          child: Column(
+                            children: [
+                              Text(
+                                  !loadingStatus
+                                      ? Utils.numFormat(
+                                          ctr.userStat!['follower'],
+                                        )
+                                      : '-',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              Text('粉丝',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .fontSize))
+                            ],
+                          ),
                         ),
                         Column(
                           children: [
@@ -172,7 +185,9 @@ Widget profile(ctr, {loadingStatus = false}) {
                     )
                   ] else ...[
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        SmartDialog.showToast('功能开发中 💪');
+                      },
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.only(left: 80, right: 80),
                         foregroundColor:

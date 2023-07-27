@@ -46,7 +46,7 @@ class _FansPageState extends State<FansPage> {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          '我的粉丝',
+          '${_fansController.name}的粉丝',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
