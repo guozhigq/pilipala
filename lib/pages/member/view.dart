@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/member/archive/view.dart';
 import 'package:pilipala/pages/member/dynamic/index.dart';
 import 'package:pilipala/pages/member/index.dart';
@@ -21,12 +24,23 @@ class _MemberPageState extends State<MemberPage>
   Future? _futureBuilderFuture;
   final ScrollController _extendNestCtr = ScrollController();
   late TabController _tabController;
+  final StreamController<bool> appbarStream = StreamController<bool>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
+    _extendNestCtr.addListener(
+      () {
+        double offset = _extendNestCtr.position.pixels;
+        if (offset > 250) {
+          appbarStream.add(true);
+        } else {
+          appbarStream.add(false);
+        }
+      },
+    );
   }
 
   @override
@@ -41,9 +55,46 @@ class _MemberPageState extends State<MemberPage>
               pinned: false,
               primary: true,
               elevation: 0,
-              scrolledUnderElevation: 0,
+              scrolledUnderElevation: 1,
               forceElevated: innerBoxIsScrolled,
               expandedHeight: 320,
+              titleSpacing: 0,
+              title: StreamBuilder(
+                stream: appbarStream.stream,
+                initialData: false,
+                builder: (context, AsyncSnapshot snapshot) {
+                  return AnimatedOpacity(
+                    opacity: snapshot.data ? 1 : 0,
+                    curve: Curves.easeOut,
+                    duration: const Duration(milliseconds: 500),
+                    child: Row(
+                      children: [
+                        Row(
+                          children: [
+                            NetworkImgLayer(
+                              width: 35,
+                              height: 35,
+                              type: 'avatar',
+                              src: _memberController.face ?? '',
+                            ),
+                            const SizedBox(width: 10),
+                            Obx(
+                              () => Text(
+                                _memberController.memberInfo.value.name ?? '',
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
               actions: [
                 IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
                 const SizedBox(width: 4),
