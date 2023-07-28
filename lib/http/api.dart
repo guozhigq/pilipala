@@ -234,4 +234,7 @@ class Api {
   // w_rid=d893cf98a4e010cf326373194a648360&
   // wts=1689767832
   static const String memberArchive = '/x/space/wbi/arc/search';
+
+  // 用户动态
+  static const String memberDynamic = '/x/polymer/web-dynamic/v1/feed/space';
 }

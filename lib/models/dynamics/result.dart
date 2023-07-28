@@ -234,7 +234,7 @@ class Vote {
   int? endTime;
   int? joinNum;
   int? status;
-  String? type;
+  int? type;
   int? uid;
   int? voteId;
 

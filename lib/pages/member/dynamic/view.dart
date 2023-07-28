@@ -2,20 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_more_list/loading_more_list.dart';
-import 'package:pilipala/common/widgets/pull_to_refresh_header.dart';
-import 'package:pilipala/common/widgets/video_card_h.dart';
-import 'package:pilipala/models/member/archive.dart';
-import 'package:pilipala/pages/member/archive/index.dart';
-import 'package:pull_to_refresh_notification/pull_to_refresh_notification.dart';
+import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/dynamics/widgets/dynamic_panel.dart';
 
-class ArchivePanel extends StatefulWidget {
-  const ArchivePanel({super.key});
+import 'controller.dart';
+
+class MemberDynamicPanel extends StatefulWidget {
+  const MemberDynamicPanel({super.key});
 
   @override
-  State<ArchivePanel> createState() => _ArchivePanelState();
+  State<MemberDynamicPanel> createState() => _MemberDynamicPanelState();
 }
 
-class _ArchivePanelState extends State<ArchivePanel>
+class _MemberDynamicPanelState extends State<MemberDynamicPanel>
     with AutomaticKeepAliveClientMixin {
   DateTime lastRefreshTime = DateTime.now();
   late final LoadMoreListSource source = LoadMoreListSource();
@@ -25,38 +24,15 @@ class _ArchivePanelState extends State<ArchivePanel>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return PullToRefreshNotification(
-      onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1));
-        return true;
-      },
-      maxDragOffset: 50,
-      child: GlowNotificationWidget(
-        Column(
-          children: <Widget>[
-            // 下拉刷新指示器
-            // PullToRefreshContainer(
-            //   (PullToRefreshScrollNotificationInfo? info) {
-            //     return PullToRefreshHeader(info, lastRefreshTime);
-            //   },
-            // ),
-            const SizedBox(height: 4),
-            Expanded(
-              child: LoadingMoreList<VListItemModel>(
-                ListConfig<VListItemModel>(
-                  sourceList: source,
-                  itemBuilder:
-                      (BuildContext c, VListItemModel item, int index) {
-                    return VideoCardH(videoItem: item);
-                  },
-                  indicatorBuilder: _buildIndicator,
-                ),
-              ),
-            )
-          ],
+    return Expanded(
+      child: LoadingMoreList<DynamicItemModel>(
+        ListConfig<DynamicItemModel>(
+          sourceList: source,
+          itemBuilder: (BuildContext c, DynamicItemModel item, int index) {
+            return DynamicPanel(item: item);
+          },
+          indicatorBuilder: _buildIndicator,
         ),
-        showGlowLeading: false,
       ),
     );
   }
@@ -142,18 +118,17 @@ class _ArchivePanelState extends State<ArchivePanel>
   }
 }
 
-class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
-  final ArchiveController _archiveController = Get.put(ArchiveController());
+class LoadMoreListSource extends LoadingMoreBase<DynamicItemModel> {
+  final _dynamicController = Get.put(MemberDynamicPanelController());
 
-  @override
+  // @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
-    var res = await _archiveController.getMemberArchive();
+    var res = await _dynamicController.getMemberDynamic();
     if (res['status']) {
-      addAll(res['data'].list.vlist);
+      addAll(res['data'].items);
     }
-    print(length);
-    if (length < res['data'].page['count']) {
+    if (res['data'].hasMore) {
       isSuccess = true;
     } else {
       isSuccess = false;

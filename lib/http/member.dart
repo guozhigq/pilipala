@@ -1,4 +1,5 @@
 import 'package:pilipala/http/index.dart';
+import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/utils/wbi_sign.dart';
@@ -87,6 +88,28 @@ class MemberHttp {
       return {
         'status': true,
         'data': MemberArchiveDataModel.fromJson(res.data['data'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 用户动态
+  static Future memberDynamic({String? offset, int? mid}) async {
+    var res = await Request().get(Api.memberDynamic, data: {
+      'offset': offset ?? '',
+      'host_mid': mid,
+      'timezone_offset': '-480',
+      'features': 'itemOpusStyle',
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': DynamicsDataModel.fromJson(res.data['data']),
       };
     } else {
       return {

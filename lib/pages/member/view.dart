@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/member/archive/view.dart';
+import 'package:pilipala/pages/member/dynamic/index.dart';
 import 'package:pilipala/pages/member/index.dart';
 
 import 'widgets/profile.dart';
@@ -266,7 +267,7 @@ class _MemberPageState extends State<MemberPage>
               controller: _tabController,
               children: const [
                 Text('主页'),
-                Text('动态'),
+                MemberDynamicPanel(),
                 ArchivePanel(),
               ],
             ))
