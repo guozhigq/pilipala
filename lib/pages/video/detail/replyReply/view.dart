@@ -65,6 +65,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     _futureBuilderFuture = _videoReplyReplyController.queryReplyList();
   }
 
+  void replyReply(replyItem) {}
+
   @override
   void dispose() {
     // _videoReplyReplyController.scrollController.dispose();
@@ -122,6 +124,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                           _videoReplyReplyController.replyList.add(replyItem);
                         },
                         replyType: widget.replyType,
+                        replyReply: (replyItem) => replyReply(replyItem),
                       ),
                     ),
                     SliverToBoxAdapter(

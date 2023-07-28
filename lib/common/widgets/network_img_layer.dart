@@ -58,7 +58,8 @@ class NetworkImgLayer extends StatelessWidget {
   }
 
   Widget placeholder(context) {
-    return SizedBox(
+    return Container(
+      color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.6),
       width: width ?? double.infinity,
       height: height ?? double.infinity,
       child: Center(
