@@ -14,6 +14,7 @@ class GStrorage {
   static late final Box historyword;
   static late final Box localCache;
   static late final Box setting;
+  static late final Box video;
 
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -48,6 +49,8 @@ class GStrorage {
     hotKeyword = await Hive.openBox('hotKeyword');
     // 搜索历史
     historyword = await Hive.openBox('historyWord');
+    // 视频设置
+    video = await Hive.openBox('video');
   }
 }
 
@@ -70,4 +73,13 @@ class SettingBoxKey {
 class LocalCacheKey {
   // 历史记录暂停状态 默认false
   static const String historyStatus = 'historyStatus';
+}
+
+class VideoBoxKey {
+  // 视频比例
+  static const String videoFit = 'videoFit';
+  // 亮度
+  static const String videoBrightness = 'videoBrightness';
+  // 倍速
+  static const String videoSpeed = 'videoSpeed';
 }

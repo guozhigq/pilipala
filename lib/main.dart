@@ -1,5 +1,4 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
 import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

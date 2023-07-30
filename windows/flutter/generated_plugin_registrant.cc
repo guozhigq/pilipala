@@ -8,26 +8,18 @@
 
 #include <connectivity_plus/connectivity_plus_windows_plugin.h>
 #include <dynamic_color/dynamic_color_plugin_c_api.h>
-#include <flutter_meedu_media_kit/flutter_meedu_media_kit_plugin_c_api.h>
-#include <fullscreen_window/fullscreen_window_plugin_c_api.h>
 #include <media_kit_libs_windows_video/media_kit_libs_windows_video_plugin_c_api.h>
 #include <media_kit_video/media_kit_video_plugin_c_api.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <screen_brightness_windows/screen_brightness_windows_plugin.h>
-#include <screen_retriever/screen_retriever_plugin.h>
 #include <share_plus/share_plus_windows_plugin_c_api.h>
 #include <url_launcher_windows/url_launcher_windows.h>
-#include <window_manager/window_manager_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   ConnectivityPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
   DynamicColorPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DynamicColorPluginCApi"));
-  FlutterMeeduMediaKitPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FlutterMeeduMediaKitPluginCApi"));
-  FullscreenWindowPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FullscreenWindowPluginCApi"));
   MediaKitLibsWindowsVideoPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
   MediaKitVideoPluginCApiRegisterWithRegistrar(
@@ -36,12 +28,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("PermissionHandlerWindowsPlugin"));
   ScreenBrightnessWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ScreenBrightnessWindowsPlugin"));
-  ScreenRetrieverPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("ScreenRetrieverPlugin"));
   SharePlusWindowsPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SharePlusWindowsPluginCApi"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
-  WindowManagerPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("WindowManagerPlugin"));
 }

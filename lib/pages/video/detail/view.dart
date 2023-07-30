@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -11,6 +10,7 @@ import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 
 import 'widgets/app_bar.dart';
 
@@ -27,21 +27,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     with TickerProviderStateMixin, RouteAware {
   final VideoDetailController videoDetailController =
       Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
-  MeeduPlayerController? _meeduPlayerController;
+  PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
 
-  StreamSubscription? _playerEventSubs;
   bool isPlay = false;
-  PlayerStatus playerStatus = PlayerStatus.paused;
+  PlayerStatus playerStatus = PlayerStatus.playing;
   bool isShowCover = true;
   double doubleOffset = 0;
 
   @override
   void initState() {
     super.initState();
-    _meeduPlayerController = videoDetailController.meeduPlayerController;
-    _playerEventSubs = _meeduPlayerController!.onPlayerStatusChanged.listen(
+    plPlayerController = videoDetailController.plPlayerController;
+    plPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) {
         videoDetailController.markHeartBeat();
         playerStatus = status;
@@ -70,24 +69,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     );
   }
 
-  Future<void> _meeduDispose() async {
-    if (_meeduPlayerController != null) {
-      _playerEventSubs?.cancel();
-      await _meeduPlayerController!.dispose();
-      _meeduPlayerController = null;
-      // The next line disables the wakelock again.
-    }
-  }
-
   void continuePlay() async {
     await _extendNestCtr.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    _meeduPlayerController!.play();
+    plPlayerController!.play();
   }
 
   @override
   void dispose() {
-    videoDetailController.meeduPlayerController.dispose();
+    plPlayerController!.dispose();
     if (videoDetailController.timer != null) {
       videoDetailController.timer!.cancel();
     }
@@ -97,9 +87,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if (!_meeduPlayerController!.pipAvailable.value) {
-      _meeduPlayerController!.pause();
-    }
     if (videoDetailController.timer!.isActive) {
       videoDetailController.timer!.cancel();
     }
@@ -111,7 +98,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
-      _meeduPlayerController!.play();
+      plPlayerController!.play();
     }
     if (!videoDetailController.timer!.isActive) {
       videoDetailController.loopHeartBeat();
@@ -167,34 +154,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               tag: videoDetailController.heroTag,
                               child: Stack(
                                 children: [
-                                  AspectRatio(
-                                    aspectRatio: 16 / 9,
-                                    child: MeeduVideoPlayer(
-                                      controller: _meeduPlayerController!,
-                                      header: (BuildContext context,
-                                          MeeduPlayerController
-                                              meeduPlayerController,
-                                          Responsive responsive) {
-                                        return AppBar(
-                                          toolbarHeight: 40,
-                                          backgroundColor: Colors.transparent,
-                                          primary: false,
-                                          elevation: 0,
-                                          scrolledUnderElevation: 0,
-                                          foregroundColor: Colors.white,
-                                          leading: IconButton(
-                                            onPressed: () {
-                                              Get.back();
-                                            },
-                                            icon: const Icon(
-                                              Icons.arrow_back_ios,
-                                              size: 19,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                  if (plPlayerController!
+                                          .videoPlayerController !=
+                                      null)
+                                    PLVideoPlayer(
+                                        controller: plPlayerController!),
                                   Visibility(
                                     visible: isShowCover,
                                     child: Positioned(
@@ -305,8 +269,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             builder: ((context, snapshot) {
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
-                continuePlay,
-                playerStatus,
+                () {},
+                playerStatus != PlayerStatus.playing,
                 null,
               );
             }),

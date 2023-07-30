@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
 import 'package:pilipala/models/live/room_info.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 
 class LiveRoomController extends GetxController {
   String cover = '';
@@ -13,13 +13,15 @@ class LiveRoomController extends GetxController {
   double volume = 0.0;
   // 静音状态
   RxBool volumeOff = false.obs;
+  PlPlayerController plPlayerController =
+      PlPlayerController(controlsEnabled: false);
 
-  MeeduPlayerController meeduPlayerController = MeeduPlayerController(
-    colorTheme: Theme.of(Get.context!).colorScheme.primary,
-    pipEnabled: true,
-    controlsStyle: ControlsStyle.live,
-    enabledButtons: const EnabledButtons(pip: true),
-  );
+  // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
+  //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
+  //   pipEnabled: true,
+  //   controlsStyle: ControlsStyle.live,
+  //   enabledButtons: const EnabledButtons(pip: true),
+  // );
 
   @override
   void onInit() {
@@ -36,19 +38,21 @@ class LiveRoomController extends GetxController {
   }
 
   playerInit(source) {
-    meeduPlayerController.setDataSource(
+    plPlayerController.setDataSource(
       DataSource(
+        videoSource: source,
+        audioSource: null,
         type: DataSourceType.network,
-        source: source,
         httpHeaders: {
           'user-agent':
               'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15',
           'referer': HttpString.baseUrl
         },
       ),
+      // 硬解
+      enableHA: true,
       autoplay: true,
     );
-    volume = meeduPlayerController.volume.value;
   }
 
   Future queryLiveInfo() async {
@@ -68,12 +72,12 @@ class LiveRoomController extends GetxController {
     if (value == 0) {
       // 设置音量
       volumeOff.value = false;
-      meeduPlayerController.setVolume(volume);
+      // meeduPlayerController.setVolume(volume);
     } else {
       // 取消音量
       volume = value;
       volumeOff.value = true;
-      meeduPlayerController.setVolume(0);
+      // meeduPlayerController.setVolume(0);
     }
   }
 }

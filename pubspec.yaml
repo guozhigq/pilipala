@@ -80,15 +80,33 @@ dependencies:
   # 下滑关闭
   dismissible_page: ^1.0.2
   # 媒体播放
-  flutter_meedu_media_kit:
+  # flutter_meedu_media_kit:
     # path: /Users/rr/Desktop/code/flutter_meedu_media_kit/package
-    git:
-      url: https://github.com/guozhigq/flutter_meedu_media_kit.git
-      ref: feature-custom
-      path: package
+    # git:
+    #   url: https://github.com/guozhigq/flutter_meedu_media_kit.git
+    #   ref: feature-custom
+    #   path: package
   custom_sliding_segmented_control: ^1.7.5
   # 加密
   crypto: ^3.0.3
+
+  # 视频播放器
+  media_kit: ^1.1.1                              # Primary package.
+  media_kit_video: ^1.1.1                        # For video rendering.
+  media_kit_native_event_loop: ^1.0.6            # Support for higher number of concurrent instances & better performance.
+  media_kit_libs_android_video: ^1.3.0           # Android package for video native libraries.
+  media_kit_libs_ios_video: ^1.0.5               # iOS package for video native libraries.
+  media_kit_libs_macos_video: ^1.0.6             # macOS package for video native libraries.
+  media_kit_libs_windows_video: ^1.0.5           # Windows package for video native libraries.
+  media_kit_libs_linux: ^1.0.2 
+  
+  # 音量、亮度、屏幕控制
+  volume_controller: ^2.0.7
+  screen_brightness: ^0.2.2
+  wakelock_plus: ^1.1.1
+  universal_platform: ^1.0.0+1
+  # 进度条
+  audio_video_progress_bar: ^1.0.1
   
 dev_dependencies:
   flutter_test:

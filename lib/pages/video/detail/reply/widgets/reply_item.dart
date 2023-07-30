@@ -595,11 +595,11 @@ InlineSpan buildContent(
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-                      .meeduPlayerController
-                      .seekTo(
-                        Duration(seconds: Utils.duration(matchStr)),
-                      );
+                  // Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+                  //     .meeduPlayerController
+                  //     .seekTo(
+                  //       Duration(seconds: Utils.duration(matchStr)),
+                  //     );
                 },
             ),
           );

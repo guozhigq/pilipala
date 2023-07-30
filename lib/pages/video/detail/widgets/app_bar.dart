@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_media_kit/meedu_player.dart';
 
 class ScrollAppBar extends StatelessWidget {
   final double scrollVal;
   final Function callback;
-  final PlayerStatus playerStatus;
+  final bool playerStatus;
 
   const ScrollAppBar(
     this.scrollVal,
@@ -34,18 +33,9 @@ class ScrollAppBar extends StatelessWidget {
             centerTitle: true,
             title: TextButton(
               onPressed: () => callback(),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.play_arrow_rounded),
-                  Text(
-                    playerStatus == PlayerStatus.paused
-                        ? '继续播放'
-                        : playerStatus == PlayerStatus.completed
-                            ? '重新播放'
-                            : '播放中',
-                  )
-                ],
+                children: [Icon(Icons.play_arrow_rounded), Text('继续播放')],
               ),
             ),
             actions: [
