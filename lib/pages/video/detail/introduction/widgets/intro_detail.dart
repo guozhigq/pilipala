@@ -55,7 +55,7 @@ class IntroDetail extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         StatView(
@@ -94,6 +94,7 @@ class IntroDetail extends StatelessWidget {
                             Text(videoDetail!.bvid!),
                             const SizedBox(height: 4),
                             Text.rich(
+                              style: const TextStyle(height: 1.4),
                               TextSpan(
                                 children: [
                                   buildContent(context, videoDetail!),
