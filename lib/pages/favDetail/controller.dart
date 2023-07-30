@@ -40,6 +40,7 @@ class FavDetailController extends GetxController {
         favList.addAll(res['data'].medias);
       }
     }
+    currentPage += 1;
     return res;
   }
 
