@@ -15,7 +15,8 @@ class FollowController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid'] ?? user.get(UserBoxKey.userMid));
+    mid = int.parse(
+        Get.parameters['mid'] ?? user.get(UserBoxKey.userMid).toString());
     name = Get.parameters['name'] ?? user.get(UserBoxKey.userName);
   }
 

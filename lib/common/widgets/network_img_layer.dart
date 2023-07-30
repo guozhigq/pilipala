@@ -30,6 +30,7 @@ class NetworkImgLayer extends StatelessWidget {
     // double pr = 2;
     return src != ''
         ? ClipRRect(
+            clipBehavior: Clip.hardEdge,
             borderRadius: BorderRadius.circular(type == 'avatar'
                 ? 50
                 : type == 'emote'
