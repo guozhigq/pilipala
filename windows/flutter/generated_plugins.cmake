@@ -5,16 +5,12 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   dynamic_color
-  flutter_meedu_media_kit
-  fullscreen_window
   media_kit_libs_windows_video
   media_kit_video
   permission_handler_windows
   screen_brightness_windows
-  screen_retriever
   share_plus
   url_launcher_windows
-  window_manager
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
