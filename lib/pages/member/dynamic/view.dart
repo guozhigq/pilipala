@@ -24,15 +24,14 @@ class _MemberDynamicPanelState extends State<MemberDynamicPanel>
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: LoadingMoreList<DynamicItemModel>(
-        ListConfig<DynamicItemModel>(
-          sourceList: source,
-          itemBuilder: (BuildContext c, DynamicItemModel item, int index) {
-            return DynamicPanel(item: item);
-          },
-          indicatorBuilder: _buildIndicator,
-        ),
+    super.build(context);
+    return LoadingMoreList<DynamicItemModel>(
+      ListConfig<DynamicItemModel>(
+        sourceList: source,
+        itemBuilder: (BuildContext c, DynamicItemModel item, int index) {
+          return DynamicPanel(item: item);
+        },
+        indicatorBuilder: _buildIndicator,
       ),
     );
   }

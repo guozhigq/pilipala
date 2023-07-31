@@ -17,7 +17,7 @@ class FavDetailData {
         ? json['medias']
             .map<FavDetailItemData>((e) => FavDetailItemData.fromJson(e))
             .toList()
-        : [FavDetailItemData()];
+        : [];
     hasMore = json['has_more'];
   }
 }

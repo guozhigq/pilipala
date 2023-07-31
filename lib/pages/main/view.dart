@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
@@ -18,6 +19,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
   final DynamicsController _dynamicController = Get.put(DynamicsController());
+  final MediaController _mediaController = Get.put(MediaController());
 
   PageController? _pageController;
 
@@ -86,6 +88,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _dynamicController.flag = true;
     } else {
       _dynamicController.flag = false;
+    }
+
+    if (currentPage is MediaPage) {
+      _mediaController.queryFavFolder();
     }
   }
 

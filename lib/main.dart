@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
           ),
           navigatorObservers: [
             VideoDetailPage.routeObserver,
-            SearchPage.routeObserver
+            SearchPage.routeObserver,
           ],
         );
       }),

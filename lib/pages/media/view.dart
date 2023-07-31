@@ -5,11 +5,21 @@ import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
-class MediaPage extends StatelessWidget {
+class MediaPage extends StatefulWidget {
   const MediaPage({super.key});
 
   @override
+  State<MediaPage> createState() => _MediaPageState();
+}
+
+class _MediaPageState extends State<MediaPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final MediaController mediaController = Get.put(MediaController());
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
