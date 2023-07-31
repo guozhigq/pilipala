@@ -41,11 +41,11 @@ dependencies:
   get: ^4.6.5
 
   # 网络
-  dio: ^5.1.1
-  cookie_jar: ^3.0.0
-  dio_http2_adapter: ^2.2.0
-  dio_cookie_manager: ^2.1.4
-  connectivity_plus: ^3.0.4
+  dio: ^5.3.0
+  cookie_jar: ^4.0.8
+  dio_http2_adapter: ^2.3.1
+  dio_cookie_manager: ^3.1.0
+  connectivity_plus: ^4.0.1
 
   # 图片
   cached_network_image: ^3.2.3
@@ -68,7 +68,7 @@ dependencies:
   # 浏览器
   webview_flutter: ^4.2.2
   # 解决sliver滑动不同步
-  extended_nested_scroll_view: ^6.0.0
+  extended_nested_scroll_view: ^6.1.2
   # 上拉加载
   loading_more_list: ^5.0.3
   # 下拉刷新
