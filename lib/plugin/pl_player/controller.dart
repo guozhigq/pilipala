@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/plugin/pl_player/models/data_source.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -14,6 +15,7 @@ import 'package:volume_controller/volume_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'models/data_status.dart';
+import 'models/play_speed.dart';
 import 'models/play_status.dart';
 
 Box videoStorage = GStrorage.video;
@@ -177,7 +179,7 @@ class PlPlayerController {
     DataSource dataSource, {
     bool autoplay = true,
     // 默认不循环
-    PlaylistMode looping = PlaylistMode.single,
+    PlaylistMode looping = PlaylistMode.none,
     // 初始化播放位置
     Duration seekTo = Duration.zero,
     // 初始化播放速度
@@ -195,6 +197,7 @@ class PlPlayerController {
       _duration.value = duration ?? Duration.zero;
       // 初始化视频倍速
       _playbackSpeed.value = speed;
+      // 初始化数据加载状态
       dataStatus.status.value = DataStatus.loading;
 
       if (_videoPlayerController != null &&
@@ -202,10 +205,12 @@ class PlPlayerController {
         await pause(notify: false);
       }
 
+      // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
           dataSource, _looping, enableHA, width, height);
-
+      // 获取视频时长 00:00
       _duration.value = _videoPlayerController!.state.duration;
+      // 数据加载完成
       dataStatus.status.value = DataStatus.loaded;
 
       await _initializePlayer(seekTo: seekTo);
@@ -382,6 +387,8 @@ class PlPlayerController {
       position = Duration.zero;
     }
     _position.value = position;
+    print('seek 🌹duration : ${duration.value.inSeconds}');
+
     if (duration.value.inSeconds != 0) {
       // await _videoPlayerController!.stream.buffer.first;
       await _videoPlayerController?.seek(position);
@@ -389,11 +396,13 @@ class PlPlayerController {
       //   play();
       // }
     } else {
+      print('🌹🌹');
       _timerForSeek?.cancel();
       _timerForSeek =
           Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
         //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
+          print('🌹🌹🌹');
           await _videoPlayerController?.seek(position);
           // if (playerStatus.stopped) {
           //   play();
@@ -413,11 +422,11 @@ class PlPlayerController {
 
   /// 设置倍速
   Future<void> togglePlaybackSpeed() async {
-    List<double> allowedSpeeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0];
-    if (allowedSpeeds.indexOf(_playbackSpeed.value) <
-        allowedSpeeds.length - 1) {
-      setPlaybackSpeed(
-          allowedSpeeds[allowedSpeeds.indexOf(_playbackSpeed.value) + 1]);
+    List<double> allowedSpeeds =
+        PlaySpeed.values.map<double>((e) => e.value).toList();
+    int index = allowedSpeeds.indexOf(_playbackSpeed.value);
+    if (index < allowedSpeeds.length - 1) {
+      setPlaybackSpeed(allowedSpeeds[index + 1]);
     } else {
       setPlaybackSpeed(allowedSpeeds[0]);
     }
@@ -451,6 +460,7 @@ class PlPlayerController {
 
   /// 更改播放状态
   Future<void> togglePlay() async {
+    feedBack();
     if (playerStatus.playing) {
       pause();
     } else {
@@ -474,6 +484,7 @@ class PlPlayerController {
   }
 
   void onChangedSliderStart() {
+    feedBack();
     _isSliderMoving = true;
   }
 
@@ -600,6 +611,7 @@ class PlPlayerController {
 
   /// 关闭控制栏
   void onCloseControl(bool val) {
+    feedBack();
     _controlsClose.value = val;
     showControls.value = !val;
   }

@@ -10,12 +10,18 @@ import 'package:pilipala/utils/feed_back.dart';
 
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
-import 'widgets/header_control.dart';
 
 class PLVideoPlayer extends StatefulWidget {
   final PlPlayerController controller;
+  final PreferredSizeWidget? headerControl;
+  final Widget? danmuWidget;
 
-  const PLVideoPlayer({required this.controller, super.key});
+  const PLVideoPlayer({
+    required this.controller,
+    this.headerControl,
+    this.danmuWidget,
+    super.key,
+  });
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -97,6 +103,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               onVerticalDragUpdate: (DragUpdateDetails details) {},
               onVerticalDragEnd: (DragEndDetails details) {}),
         ),
+        // 头部、底部控制条
         if (_.controlsEnabled)
           Obx(
             () => Column(
@@ -107,7 +114,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     controller: animationController,
                     visible: !_.controlsClose.value && _.showControls.value,
                     position: 'top',
-                    child: HeaderControl(controller: widget.controller),
+                    child: widget.headerControl!,
                   ),
                 ),
                 const Spacer(),
@@ -166,7 +173,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     //   print(details);
                     // },
                     onSeek: (duration) {
-                      print(duration);
+                      feedBack();
                       _.onChangedSlider(duration.inSeconds.toDouble());
                       _.seekTo(duration);
                     },
@@ -195,27 +202,28 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
         // 锁
-        Obx(
-          () => Align(
-            alignment: Alignment.centerLeft,
-            child: FractionalTranslation(
-              translation: const Offset(0.5, 0.0),
-              child: Visibility(
-                visible: _.showControls.value,
-                child: ComBtn(
-                  icon: Icon(
-                    _.controlsClose.value
-                        ? FontAwesomeIcons.lock
-                        : FontAwesomeIcons.lockOpen,
-                    size: 15,
-                    color: Colors.white,
+        if (_.controlsEnabled)
+          Obx(
+            () => Align(
+              alignment: Alignment.centerLeft,
+              child: FractionalTranslation(
+                translation: const Offset(0.5, 0.0),
+                child: Visibility(
+                  visible: _.showControls.value,
+                  child: ComBtn(
+                    icon: Icon(
+                      _.controlsClose.value
+                          ? FontAwesomeIcons.lock
+                          : FontAwesomeIcons.lockOpen,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    fuc: () => _.onCloseControl(!_.controlsClose.value),
                   ),
-                  fuc: () => _.onCloseControl(!_.controlsClose.value),
                 ),
               ),
             ),
           ),
-        ),
         //
         Obx(() {
           if (_.dataStatus.loading || _.isBuffering.value) {

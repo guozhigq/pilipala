@@ -13,6 +13,7 @@ import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
 import 'widgets/app_bar.dart';
+import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -158,7 +159,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .videoPlayerController !=
                                       null)
                                     PLVideoPlayer(
-                                        controller: plPlayerController!),
+                                      controller: plPlayerController!,
+                                      headerControl: HeaderControl(
+                                        controller: plPlayerController,
+                                        videoDetailCtr: videoDetailController,
+                                      ),
+                                    ),
                                   Visibility(
                                     visible: isShowCover,
                                     child: Positioned(
@@ -194,37 +200,41 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 0,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color:
-                                Theme.of(context).dividerColor.withOpacity(0.1),
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 280,
-                            margin: const EdgeInsets.only(left: 20),
-                            child: Obx(
-                              () => TabBar(
-                                controller: videoDetailController.tabCtr,
-                                dividerColor: Colors.transparent,
-                                indicatorColor:
-                                    Theme.of(context).colorScheme.background,
-                                tabs: videoDetailController.tabs
-                                    .map((String name) => Tab(text: name))
-                                    .toList(),
-                              ),
+                    Opacity(
+                      opacity: 0,
+                      child: Container(
+                        width: double.infinity,
+                        height: 0,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.1),
                             ),
                           ),
-                        ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Container(
+                              width: 280,
+                              margin: const EdgeInsets.only(left: 20),
+                              child: Obx(
+                                () => TabBar(
+                                  controller: videoDetailController.tabCtr,
+                                  dividerColor: Colors.transparent,
+                                  indicatorColor:
+                                      Theme.of(context).colorScheme.background,
+                                  tabs: videoDetailController.tabs
+                                      .map((String name) => Tab(text: name))
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Expanded(

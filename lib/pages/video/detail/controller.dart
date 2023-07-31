@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
@@ -21,6 +22,11 @@ class VideoDetailController extends GetxController
   // 视频aid
   String bvid = Get.parameters['bvid']!;
   int cid = int.parse(Get.parameters['cid']!);
+  late PlayUrlModel data;
+  // 当前画质
+  late VideoQuality currentVideoQa;
+  // 当前音质
+  late AudioQuality currentAudioQa;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -86,6 +92,29 @@ class VideoDetailController extends GetxController
     });
   }
 
+  /// 更新画质、音质
+  /// TODO 继续进度播放
+  updatePlayer() {
+    Duration position = plPlayerController.position.value;
+    plPlayerController.removeListeners();
+    plPlayerController.isBuffering.value = false;
+    plPlayerController.buffered.value = Duration.zero;
+
+    /// 暂不匹配解码规则
+
+    /// 根据currentVideoQa 重新设置videoUrl
+    VideoItem firstVideo =
+        data.dash!.video!.firstWhere((i) => i.id == currentVideoQa.code);
+    String videoUrl = firstVideo.baseUrl!;
+
+    /// 根据currentAudioQa 重新设置audioUrl
+    AudioItem firstAudio =
+        data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa.code);
+    String audioUrl = firstAudio.baseUrl ?? '';
+
+    playerInit(videoUrl, audioUrl, defaultST: position);
+  }
+
   playerInit(source, audioSource,
       {Duration defaultST = Duration.zero, int duration = 0}) async {
     plPlayerController.setDataSource(
@@ -111,14 +140,27 @@ class VideoDetailController extends GetxController
   queryVideoUrl() async {
     var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
     if (result['status']) {
-      PlayUrlModel data = result['data'];
-      // 指定质量的视频 -> 最高质量的视频
-      String videoUrl = data.dash!.video!.first.baseUrl!;
-      String audioUrl =
-          data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first.baseUrl! : '';
-      playerInit(videoUrl, audioUrl,
-          defaultST: Duration(milliseconds: data.lastPlayTime!),
-          duration: data.timeLength ?? 0);
+      data = result['data'];
+
+      /// 优先顺序 省流模式 -> 设置中指定质量 -> 当前可选的最高质量
+      VideoItem firstVideo = data.dash!.video!.first;
+      String videoUrl = firstVideo.baseUrl!;
+      //
+      currentVideoQa = VideoQualityCode.fromCode(firstVideo.id!)!;
+
+      /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
+      AudioItem firstAudio =
+          data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first : AudioItem();
+      String audioUrl = firstAudio.baseUrl ?? '';
+      //
+      currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
+
+      playerInit(
+        videoUrl,
+        audioUrl,
+        defaultST: Duration(milliseconds: data.lastPlayTime!),
+        duration: data.timeLength ?? 0,
+      );
     }
   }
 

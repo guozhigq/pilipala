@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
 import '../utils.dart';
-import 'common_btn.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
@@ -67,21 +66,21 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
           ),
           Row(
             children: [
-              Obx(
-                () => ComBtn(
-                  icon: Icon(
-                    _.playerStatus.paused
-                        ? FontAwesomeIcons.play
-                        : _.playerStatus.playing
-                            ? FontAwesomeIcons.pause
-                            : FontAwesomeIcons.rotateRight,
-                    size: 15,
-                    color: Colors.white,
-                  ),
-                  fuc: () => _.togglePlay(),
-                ),
-              ),
-              const SizedBox(width: 6),
+              // Obx(
+              //   () => ComBtn(
+              //     icon: Icon(
+              //       _.playerStatus.paused
+              //           ? FontAwesomeIcons.play
+              //           : _.playerStatus.playing
+              //               ? FontAwesomeIcons.pause
+              //               : FontAwesomeIcons.rotateRight,
+              //       size: 15,
+              //       color: Colors.white,
+              //     ),
+              //     fuc: () => _.togglePlay(),
+              //   ),
+              // ),
+              // const SizedBox(width: 6),
               // 播放时间
               Obx(() {
                 return Text(
@@ -104,33 +103,33 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
               const Spacer(),
               // 倍速
-              Obx(
-                () => SizedBox(
-                  width: 45,
-                  height: 34,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () {
-                      _.togglePlaybackSpeed();
-                    },
-                    child: Text(
-                      '${_.playbackSpeed.toString()}X',
-                      style: textStyle,
-                    ),
-                  ),
-                ),
-              ),
-              ComBtn(
-                icon: const Icon(
-                  Icons.fit_screen_sharp,
-                  size: 18,
-                  color: Colors.white,
-                ),
-                fuc: () => _.toggleVideoFit(),
-              ),
-              const SizedBox(width: 4),
+              // Obx(
+              //   () => SizedBox(
+              //     width: 45,
+              //     height: 34,
+              //     child: TextButton(
+              //       style: ButtonStyle(
+              //         padding: MaterialStateProperty.all(EdgeInsets.zero),
+              //       ),
+              //       onPressed: () {
+              //         _.togglePlaybackSpeed();
+              //       },
+              //       child: Text(
+              //         '${_.playbackSpeed.toString()}X',
+              //         style: textStyle,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // ComBtn(
+              //   icon: const Icon(
+              //     Icons.fit_screen_sharp,
+              //     size: 18,
+              //     color: Colors.white,
+              //   ),
+              //   fuc: () => _.toggleVideoFit(),
+              // ),
+              // const SizedBox(width: 4),
               // 全屏
               ComBtn(
                 icon: const Icon(
