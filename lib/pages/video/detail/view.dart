@@ -55,7 +55,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           isPlay = true;
           setState(() {});
           // 播放完成停止 or 切换下一个
-          if (status == PlayerStatus.completed) {}
+          if (status == PlayerStatus.completed) {
+            // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
+            plPlayerController!.seekTo(Duration.zero);
+            plPlayerController!.onLockControl(false);
+          }
         }
       },
     );
@@ -177,6 +181,38 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                             .videoItem['pic'],
                                         width: maxWidth,
                                         height: maxHeight,
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 关闭自动播放时 手动播放
+                                  Obx(
+                                    () => Visibility(
+                                      visible: isShowCover &&
+                                          videoDetailController
+                                              .isEffective.value &&
+                                          !videoDetailController.autoPlay.value,
+                                      child: Positioned(
+                                        right: 12,
+                                        bottom: 6,
+                                        child: TextButton.icon(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith((states) {
+                                              return Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer;
+                                            }),
+                                          ),
+                                          onPressed: () => videoDetailController
+                                              .handlePlay(),
+                                          icon: const Icon(
+                                            Icons.play_circle_outline,
+                                            size: 20,
+                                          ),
+                                          label: const Text('Play'),
+                                        ),
                                       ),
                                     ),
                                   ),

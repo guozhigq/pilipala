@@ -50,6 +50,10 @@ class VideoDetailController extends GetxController
   Box user = GStrorage.user;
   Box localCache = GStrorage.localCache;
   PlPlayerController plPlayerController = PlPlayerController();
+  // 是否开始自动播放 存在多p的情况下，第二p需要为true
+  RxBool autoPlay = true.obs;
+  // 视频资源是否有效
+  RxBool isEffective = true.obs;
 
   @override
   void onInit() {
@@ -130,10 +134,15 @@ class VideoDetailController extends GetxController
       ),
       // 硬解
       enableHA: true,
-      autoplay: true,
+      autoplay: autoPlay.value,
       seekTo: defaultST,
       duration: Duration(milliseconds: duration),
     );
+  }
+
+  // 手动点击播放
+  handlePlay() {
+    plPlayerController.togglePlay();
   }
 
   // 视频链接

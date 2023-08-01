@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
 
 import '../utils.dart';
 
@@ -56,6 +57,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 onDragStart: (duration) {
                   _.onChangedSliderStart();
                 },
+                onDragUpdate: (duration) {
+                  _.onUodatedSliderProgress(duration.timeStamp);
+                },
                 onSeek: (duration) {
                   _.onChangedSliderEnd();
                   _.onChangedSlider(duration.inSeconds.toDouble());
@@ -80,7 +84,10 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               //     fuc: () => _.togglePlay(),
               //   ),
               // ),
-              // const SizedBox(width: 6),
+              PlayOrPauseButton(
+                controller: _,
+              ),
+              const SizedBox(width: 4),
               // 播放时间
               Obx(() {
                 return Text(

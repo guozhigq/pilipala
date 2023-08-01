@@ -39,6 +39,7 @@ class PlPlayerController {
   // 播放位置
   final Rx<Duration> _position = Rx(Duration.zero);
   final Rx<Duration> _sliderPosition = Rx(Duration.zero);
+  final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
   final Rx<Duration> _duration = Rx(Duration.zero);
   final Rx<Duration> _buffered = Rx(Duration.zero);
 
@@ -51,13 +52,13 @@ class PlPlayerController {
   final Rx<bool> _showVolumeStatus = false.obs;
   final Rx<bool> _showBrightnessStatus = false.obs;
   final Rx<bool> _doubleSpeedStatus = false.obs;
-  final Rx<bool> _controlsClose = false.obs;
+  final Rx<bool> _controlsLock = false.obs;
 
   Rx<bool> videoFitChanged = false.obs;
   final Rx<BoxFit> _videoFit = Rx(BoxFit.fill);
 
   ///
-  bool _isSliderMoving = false;
+  Rx<bool> _isSliderMoving = false.obs;
   PlaylistMode _looping = PlaylistMode.none;
   bool _autoPlay = false;
   final bool _listenersInitialized = false;
@@ -112,9 +113,14 @@ class PlPlayerController {
   /// [videoController] instace of Player
   VideoController? get videoController => _videoController;
 
+  Rx<bool> get isSliderMoving => _isSliderMoving;
+
   /// 进度条位置及监听
   Rx<Duration> get sliderPosition => _sliderPosition;
   Stream<Duration> get onSliderPositionChanged => _sliderPosition.stream;
+
+  Rx<Duration> get sliderTempPosition => _sliderTempPosition;
+  // Stream<Duration> get onSliderPositionChanged => _sliderPosition.stream;
 
   /// 是否展示控制条及监听
   Rx<bool> get showControls => _showControls;
@@ -151,9 +157,11 @@ class PlPlayerController {
 
   Rx<bool> isBuffering = true.obs;
 
-  Rx<bool> get controlsClose => _controlsClose;
+  /// 屏幕锁 为true时，关闭控制栏
+  Rx<bool> get controlsLock => _controlsLock;
 
   PlPlayerController({
+    // 直播间 传false 关闭控制栏
     this.controlsEnabled = true,
     this.fits = const [
       BoxFit.contain,
@@ -349,7 +357,7 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.position.listen((event) {
           _position.value = event;
-          if (!_isSliderMoving) {
+          if (!isSliderMoving.value) {
             _sliderPosition.value = event;
           }
         }),
@@ -387,8 +395,6 @@ class PlPlayerController {
       position = Duration.zero;
     }
     _position.value = position;
-    print('seek 🌹duration : ${duration.value.inSeconds}');
-
     if (duration.value.inSeconds != 0) {
       // await _videoPlayerController!.stream.buffer.first;
       await _videoPlayerController?.seek(position);
@@ -396,13 +402,11 @@ class PlPlayerController {
       //   play();
       // }
     } else {
-      print('🌹🌹');
       _timerForSeek?.cancel();
       _timerForSeek =
           Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
         //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
-          print('🌹🌹🌹');
           await _videoPlayerController?.seek(position);
           // if (playerStatus.stopped) {
           //   play();
@@ -471,7 +475,7 @@ class PlPlayerController {
   /// 隐藏控制条
   void _hideTaskControls() {
     _timer = Timer(const Duration(milliseconds: 3000), () {
-      if (!_isSliderMoving) {
+      if (!isSliderMoving.value) {
         controls = false;
       }
       _timer = null;
@@ -485,11 +489,15 @@ class PlPlayerController {
 
   void onChangedSliderStart() {
     feedBack();
-    _isSliderMoving = true;
+    _isSliderMoving.value = true;
+  }
+
+  void onUodatedSliderProgress(value) {
+    _sliderTempPosition.value = value;
   }
 
   void onChangedSliderEnd() {
-    _isSliderMoving = false;
+    _isSliderMoving.value = false;
     _hideTaskControls();
   }
 
@@ -610,9 +618,9 @@ class PlPlayerController {
   }
 
   /// 关闭控制栏
-  void onCloseControl(bool val) {
+  void onLockControl(bool val) {
     feedBack();
-    _controlsClose.value = val;
+    _controlsLock.value = val;
     showControls.value = !val;
   }
 
@@ -642,10 +650,12 @@ class PlPlayerController {
     _position.close();
     _playerEventSubs?.cancel();
     _sliderPosition.close();
+    _sliderTempPosition.close();
+    _isSliderMoving.close();
     _duration.close();
     _buffered.close();
     _showControls.close();
-    _controlsClose.close();
+    _controlsLock.close();
 
     playerStatus.status.close();
     dataStatus.status.close();
