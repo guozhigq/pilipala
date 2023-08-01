@@ -13,6 +13,7 @@ import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
 import 'widgets/app_bar.dart';
+import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -54,7 +55,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           isPlay = true;
           setState(() {});
           // 播放完成停止 or 切换下一个
-          if (status == PlayerStatus.completed) {}
+          if (status == PlayerStatus.completed) {
+            // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
+            plPlayerController!.seekTo(Duration.zero);
+            plPlayerController!.onLockControl(false);
+          }
         }
       },
     );
@@ -158,7 +163,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .videoPlayerController !=
                                       null)
                                     PLVideoPlayer(
-                                        controller: plPlayerController!),
+                                      controller: plPlayerController!,
+                                      headerControl: HeaderControl(
+                                        controller: plPlayerController,
+                                        videoDetailCtr: videoDetailController,
+                                      ),
+                                    ),
                                   Visibility(
                                     visible: isShowCover,
                                     child: Positioned(
@@ -171,6 +181,38 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                             .videoItem['pic'],
                                         width: maxWidth,
                                         height: maxHeight,
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 关闭自动播放时 手动播放
+                                  Obx(
+                                    () => Visibility(
+                                      visible: isShowCover &&
+                                          videoDetailController
+                                              .isEffective.value &&
+                                          !videoDetailController.autoPlay.value,
+                                      child: Positioned(
+                                        right: 12,
+                                        bottom: 6,
+                                        child: TextButton.icon(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith((states) {
+                                              return Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer;
+                                            }),
+                                          ),
+                                          onPressed: () => videoDetailController
+                                              .handlePlay(),
+                                          icon: const Icon(
+                                            Icons.play_circle_outline,
+                                            size: 20,
+                                          ),
+                                          label: const Text('Play'),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -194,37 +236,41 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 0,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color:
-                                Theme.of(context).dividerColor.withOpacity(0.1),
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 280,
-                            margin: const EdgeInsets.only(left: 20),
-                            child: Obx(
-                              () => TabBar(
-                                controller: videoDetailController.tabCtr,
-                                dividerColor: Colors.transparent,
-                                indicatorColor:
-                                    Theme.of(context).colorScheme.background,
-                                tabs: videoDetailController.tabs
-                                    .map((String name) => Tab(text: name))
-                                    .toList(),
-                              ),
+                    Opacity(
+                      opacity: 0,
+                      child: Container(
+                        width: double.infinity,
+                        height: 0,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.1),
                             ),
                           ),
-                        ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Container(
+                              width: 280,
+                              margin: const EdgeInsets.only(left: 20),
+                              child: Obx(
+                                () => TabBar(
+                                  controller: videoDetailController.tabCtr,
+                                  dividerColor: Colors.transparent,
+                                  indicatorColor:
+                                      Theme.of(context).colorScheme.background,
+                                  tabs: videoDetailController.tabs
+                                      .map((String name) => Tab(text: name))
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Expanded(

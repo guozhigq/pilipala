@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/plugin/pl_player/models/data_source.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -14,6 +15,7 @@ import 'package:volume_controller/volume_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'models/data_status.dart';
+import 'models/play_speed.dart';
 import 'models/play_status.dart';
 
 Box videoStorage = GStrorage.video;
@@ -37,6 +39,7 @@ class PlPlayerController {
   // 播放位置
   final Rx<Duration> _position = Rx(Duration.zero);
   final Rx<Duration> _sliderPosition = Rx(Duration.zero);
+  final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
   final Rx<Duration> _duration = Rx(Duration.zero);
   final Rx<Duration> _buffered = Rx(Duration.zero);
 
@@ -49,13 +52,13 @@ class PlPlayerController {
   final Rx<bool> _showVolumeStatus = false.obs;
   final Rx<bool> _showBrightnessStatus = false.obs;
   final Rx<bool> _doubleSpeedStatus = false.obs;
-  final Rx<bool> _controlsClose = false.obs;
+  final Rx<bool> _controlsLock = false.obs;
 
   Rx<bool> videoFitChanged = false.obs;
   final Rx<BoxFit> _videoFit = Rx(BoxFit.fill);
 
   ///
-  bool _isSliderMoving = false;
+  Rx<bool> _isSliderMoving = false.obs;
   PlaylistMode _looping = PlaylistMode.none;
   bool _autoPlay = false;
   final bool _listenersInitialized = false;
@@ -110,9 +113,14 @@ class PlPlayerController {
   /// [videoController] instace of Player
   VideoController? get videoController => _videoController;
 
+  Rx<bool> get isSliderMoving => _isSliderMoving;
+
   /// 进度条位置及监听
   Rx<Duration> get sliderPosition => _sliderPosition;
   Stream<Duration> get onSliderPositionChanged => _sliderPosition.stream;
+
+  Rx<Duration> get sliderTempPosition => _sliderTempPosition;
+  // Stream<Duration> get onSliderPositionChanged => _sliderPosition.stream;
 
   /// 是否展示控制条及监听
   Rx<bool> get showControls => _showControls;
@@ -149,9 +157,11 @@ class PlPlayerController {
 
   Rx<bool> isBuffering = true.obs;
 
-  Rx<bool> get controlsClose => _controlsClose;
+  /// 屏幕锁 为true时，关闭控制栏
+  Rx<bool> get controlsLock => _controlsLock;
 
   PlPlayerController({
+    // 直播间 传false 关闭控制栏
     this.controlsEnabled = true,
     this.fits = const [
       BoxFit.contain,
@@ -177,7 +187,7 @@ class PlPlayerController {
     DataSource dataSource, {
     bool autoplay = true,
     // 默认不循环
-    PlaylistMode looping = PlaylistMode.single,
+    PlaylistMode looping = PlaylistMode.none,
     // 初始化播放位置
     Duration seekTo = Duration.zero,
     // 初始化播放速度
@@ -195,6 +205,7 @@ class PlPlayerController {
       _duration.value = duration ?? Duration.zero;
       // 初始化视频倍速
       _playbackSpeed.value = speed;
+      // 初始化数据加载状态
       dataStatus.status.value = DataStatus.loading;
 
       if (_videoPlayerController != null &&
@@ -202,10 +213,12 @@ class PlPlayerController {
         await pause(notify: false);
       }
 
+      // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
           dataSource, _looping, enableHA, width, height);
-
+      // 获取视频时长 00:00
       _duration.value = _videoPlayerController!.state.duration;
+      // 数据加载完成
       dataStatus.status.value = DataStatus.loaded;
 
       await _initializePlayer(seekTo: seekTo);
@@ -344,7 +357,7 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.position.listen((event) {
           _position.value = event;
-          if (!_isSliderMoving) {
+          if (!isSliderMoving.value) {
             _sliderPosition.value = event;
           }
         }),
@@ -413,11 +426,11 @@ class PlPlayerController {
 
   /// 设置倍速
   Future<void> togglePlaybackSpeed() async {
-    List<double> allowedSpeeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.50, 1.75, 2.0];
-    if (allowedSpeeds.indexOf(_playbackSpeed.value) <
-        allowedSpeeds.length - 1) {
-      setPlaybackSpeed(
-          allowedSpeeds[allowedSpeeds.indexOf(_playbackSpeed.value) + 1]);
+    List<double> allowedSpeeds =
+        PlaySpeed.values.map<double>((e) => e.value).toList();
+    int index = allowedSpeeds.indexOf(_playbackSpeed.value);
+    if (index < allowedSpeeds.length - 1) {
+      setPlaybackSpeed(allowedSpeeds[index + 1]);
     } else {
       setPlaybackSpeed(allowedSpeeds[0]);
     }
@@ -451,6 +464,7 @@ class PlPlayerController {
 
   /// 更改播放状态
   Future<void> togglePlay() async {
+    feedBack();
     if (playerStatus.playing) {
       pause();
     } else {
@@ -461,7 +475,7 @@ class PlPlayerController {
   /// 隐藏控制条
   void _hideTaskControls() {
     _timer = Timer(const Duration(milliseconds: 3000), () {
-      if (!_isSliderMoving) {
+      if (!isSliderMoving.value) {
         controls = false;
       }
       _timer = null;
@@ -474,11 +488,16 @@ class PlPlayerController {
   }
 
   void onChangedSliderStart() {
-    _isSliderMoving = true;
+    feedBack();
+    _isSliderMoving.value = true;
+  }
+
+  void onUodatedSliderProgress(value) {
+    _sliderTempPosition.value = value;
   }
 
   void onChangedSliderEnd() {
-    _isSliderMoving = false;
+    _isSliderMoving.value = false;
     _hideTaskControls();
   }
 
@@ -599,8 +618,9 @@ class PlPlayerController {
   }
 
   /// 关闭控制栏
-  void onCloseControl(bool val) {
-    _controlsClose.value = val;
+  void onLockControl(bool val) {
+    feedBack();
+    _controlsLock.value = val;
     showControls.value = !val;
   }
 
@@ -630,10 +650,12 @@ class PlPlayerController {
     _position.close();
     _playerEventSubs?.cancel();
     _sliderPosition.close();
+    _sliderTempPosition.close();
+    _isSliderMoving.close();
     _duration.close();
     _buffered.close();
     _showControls.close();
-    _controlsClose.close();
+    _controlsLock.close();
 
     playerStatus.status.close();
     dataStatus.status.close();

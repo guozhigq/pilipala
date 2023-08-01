@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
 
 import '../utils.dart';
-import 'common_btn.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
@@ -57,6 +57,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 onDragStart: (duration) {
                   _.onChangedSliderStart();
                 },
+                onDragUpdate: (duration) {
+                  _.onUodatedSliderProgress(duration.timeStamp);
+                },
                 onSeek: (duration) {
                   _.onChangedSliderEnd();
                   _.onChangedSlider(duration.inSeconds.toDouble());
@@ -67,21 +70,24 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
           ),
           Row(
             children: [
-              Obx(
-                () => ComBtn(
-                  icon: Icon(
-                    _.playerStatus.paused
-                        ? FontAwesomeIcons.play
-                        : _.playerStatus.playing
-                            ? FontAwesomeIcons.pause
-                            : FontAwesomeIcons.rotateRight,
-                    size: 15,
-                    color: Colors.white,
-                  ),
-                  fuc: () => _.togglePlay(),
-                ),
+              // Obx(
+              //   () => ComBtn(
+              //     icon: Icon(
+              //       _.playerStatus.paused
+              //           ? FontAwesomeIcons.play
+              //           : _.playerStatus.playing
+              //               ? FontAwesomeIcons.pause
+              //               : FontAwesomeIcons.rotateRight,
+              //       size: 15,
+              //       color: Colors.white,
+              //     ),
+              //     fuc: () => _.togglePlay(),
+              //   ),
+              // ),
+              PlayOrPauseButton(
+                controller: _,
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               // 播放时间
               Obx(() {
                 return Text(
@@ -104,33 +110,33 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
               const Spacer(),
               // 倍速
-              Obx(
-                () => SizedBox(
-                  width: 45,
-                  height: 34,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () {
-                      _.togglePlaybackSpeed();
-                    },
-                    child: Text(
-                      '${_.playbackSpeed.toString()}X',
-                      style: textStyle,
-                    ),
-                  ),
-                ),
-              ),
-              ComBtn(
-                icon: const Icon(
-                  Icons.fit_screen_sharp,
-                  size: 18,
-                  color: Colors.white,
-                ),
-                fuc: () => _.toggleVideoFit(),
-              ),
-              const SizedBox(width: 4),
+              // Obx(
+              //   () => SizedBox(
+              //     width: 45,
+              //     height: 34,
+              //     child: TextButton(
+              //       style: ButtonStyle(
+              //         padding: MaterialStateProperty.all(EdgeInsets.zero),
+              //       ),
+              //       onPressed: () {
+              //         _.togglePlaybackSpeed();
+              //       },
+              //       child: Text(
+              //         '${_.playbackSpeed.toString()}X',
+              //         style: textStyle,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // ComBtn(
+              //   icon: const Icon(
+              //     Icons.fit_screen_sharp,
+              //     size: 18,
+              //     color: Colors.white,
+              //   ),
+              //   fuc: () => _.toggleVideoFit(),
+              // ),
+              // const SizedBox(width: 4),
               // 全屏
               ComBtn(
                 icon: const Icon(

@@ -1,3 +1,5 @@
+import 'package:pilipala/models/video/play/quality.dart';
+
 class PlayUrlModel {
   PlayUrlModel({
     this.from,
@@ -32,7 +34,7 @@ class PlayUrlModel {
   String? seekParam;
   String? seekType;
   Dash? dash;
-  List? supportFormats;
+  List<FormatItem>? supportFormats;
   // String? highFormat;
   int? lastPlayTime;
   int? lastPlayCid;
@@ -51,7 +53,11 @@ class PlayUrlModel {
     seekParam = json['seek_param'];
     seekType = json['seek_type'];
     dash = Dash.fromJson(json['dash']);
-    supportFormats = json['support_formats'];
+    supportFormats = json['support_formats'] != null
+        ? json['support_formats']
+            .map<FormatItem>((e) => FormatItem.fromJson(e))
+            .toList()
+        : [];
     lastPlayTime = json['last_play_time'];
     lastPlayCid = json['last_play_cid'];
   }
@@ -101,6 +107,7 @@ class VideoItem {
     this.startWithSap,
     this.segmentBase,
     this.codecid,
+    this.quality,
   });
 
   int? id;
@@ -116,6 +123,7 @@ class VideoItem {
   int? startWithSap;
   Map? segmentBase;
   int? codecid;
+  VideoQuality? quality;
 
   VideoItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -131,6 +139,7 @@ class VideoItem {
     startWithSap = json['startWithSap'];
     segmentBase = json['segmentBase'];
     codecid = json['codecid'];
+    quality = VideoQuality.values.firstWhere((i) => i.code == json['id']);
   }
 }
 
@@ -149,6 +158,7 @@ class AudioItem {
     this.startWithSap,
     this.segmentBase,
     this.codecid,
+    this.quality,
   });
 
   int? id;
@@ -164,6 +174,7 @@ class AudioItem {
   int? startWithSap;
   Map? segmentBase;
   int? codecid;
+  String? quality;
 
   AudioItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -179,5 +190,31 @@ class AudioItem {
     startWithSap = json['startWithSap'];
     segmentBase = json['segmentBase'];
     codecid = json['codecid'];
+    quality =
+        AudioQuality.values.firstWhere((i) => i.code == json['id']).description;
+  }
+}
+
+class FormatItem {
+  FormatItem({
+    this.quality,
+    this.format,
+    this.newDesc,
+    this.displayDesc,
+    this.codecs,
+  });
+
+  int? quality;
+  String? format;
+  String? newDesc;
+  String? displayDesc;
+  List? codecs;
+
+  FormatItem.fromJson(Map<String, dynamic> json) {
+    quality = json['quality'];
+    format = json['format'];
+    newDesc = json['new_description'];
+    displayDesc = json['display_desc'];
+    codecs = json['codecs'];
   }
 }
