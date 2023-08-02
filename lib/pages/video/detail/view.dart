@@ -59,6 +59,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
             plPlayerController!.seekTo(Duration.zero);
             plPlayerController!.onLockControl(false);
+            plPlayerController!.videoPlayerController!.pause();
           }
         }
       },
