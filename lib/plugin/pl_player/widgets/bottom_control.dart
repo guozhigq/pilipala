@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
 
-import '../utils.dart';
-
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   const BottomControl({this.controller, Key? key}) : super(key: key);
@@ -138,14 +136,52 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               // ),
               // const SizedBox(width: 4),
               // 全屏
-              ComBtn(
-                icon: const Icon(
-                  FontAwesomeIcons.expand,
-                  size: 15,
-                  color: Colors.white,
-                ),
-                fuc: () => {},
-              ),
+              Obx(() => ComBtn(
+                    icon: Icon(
+                      _.isFullScreen.value
+                          ? FontAwesomeIcons.a
+                          : FontAwesomeIcons.expand,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    fuc: () async {
+                      if (!_.isFullScreen.value) {
+                        /// 按照视频宽高比决定全屏方向
+                        if (_.direction.value == 'horizontal') {
+                          /// 进入全屏
+                          await enterFullScreen();
+                          // 横屏
+                          await landScape();
+                        } else {
+                          // 竖屏
+                          await verticalScreen();
+                        }
+
+                        _.toggleFullScreen(true);
+                        var result = await showDialog(
+                          context: Get.context!,
+                          builder: (context) => Dialog.fullscreen(
+                            backgroundColor: Colors.black,
+                            child: PLVideoPlayer(
+                              controller: _,
+                              headerControl: _.headerControl,
+                            ),
+                          ),
+                        );
+                        if (result == null) {
+                          // 退出全屏
+                          exitFullScreen();
+                          await verticalScreen();
+                          _.toggleFullScreen(false);
+                        }
+                      } else {
+                        Get.back();
+                        exitFullScreen();
+                        await verticalScreen();
+                        _.toggleFullScreen(false);
+                      }
+                    },
+                  )),
             ],
           ),
         ],

@@ -109,21 +109,21 @@ class VideoDetailController extends GetxController
     /// 根据currentVideoQa 重新设置videoUrl
     VideoItem firstVideo =
         data.dash!.video!.firstWhere((i) => i.id == currentVideoQa.code);
-    String videoUrl = firstVideo.baseUrl!;
+    // String videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
     AudioItem firstAudio =
         data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa.code);
     String audioUrl = firstAudio.baseUrl ?? '';
 
-    playerInit(videoUrl, audioUrl, defaultST: position);
+    playerInit(firstVideo, audioUrl, defaultST: position);
   }
 
-  playerInit(source, audioSource,
+  playerInit(firstVideo, audioSource,
       {Duration defaultST = Duration.zero, int duration = 0}) async {
     plPlayerController.setDataSource(
       DataSource(
-        videoSource: source,
+        videoSource: firstVideo.baseUrl,
         audioSource: audioSource,
         type: DataSourceType.network,
         httpHeaders: {
@@ -137,6 +137,9 @@ class VideoDetailController extends GetxController
       autoplay: autoPlay.value,
       seekTo: defaultST,
       duration: Duration(milliseconds: duration),
+      // 宽>高 水平 否则 垂直
+      direction:
+          firstVideo.width - firstVideo.height > 0 ? 'horizontal' : 'vertical',
     );
   }
 
@@ -153,7 +156,7 @@ class VideoDetailController extends GetxController
 
       /// 优先顺序 省流模式 -> 设置中指定质量 -> 当前可选的最高质量
       VideoItem firstVideo = data.dash!.video!.first;
-      String videoUrl = firstVideo.baseUrl!;
+      // String videoUrl = firstVideo.baseUrl!;
       //
       currentVideoQa = VideoQualityCode.fromCode(firstVideo.id!)!;
 
@@ -162,15 +165,17 @@ class VideoDetailController extends GetxController
           data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first : AudioItem();
       String audioUrl = firstAudio.baseUrl ?? '';
       //
-      currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
-
+      if (firstAudio.id != null) {
+        currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
+      }
       playerInit(
-        videoUrl,
+        firstVideo,
         audioUrl,
         defaultST: Duration(milliseconds: data.lastPlayTime!),
         duration: data.timeLength ?? 0,
       );
     }
+    return result;
   }
 
   void loopHeartBeat() {

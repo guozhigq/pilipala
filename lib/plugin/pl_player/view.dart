@@ -75,6 +75,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
+    widget.controller.headerControl = widget.headerControl;
 
     Future.microtask(() async {
       try {
@@ -149,6 +150,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   Widget build(BuildContext context) {
+    print('🌹🌹🌹🌹🌹：33333');
     final _ = widget.controller;
     Color colorTheme = Theme.of(context).colorScheme.primary;
     TextStyle subTitleStyle = const TextStyle(
@@ -387,6 +389,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // 双击左边区域 👈
                 onDoubleTapSeekBackward();
               } else if (tapPosition < sectionWidth * 2) {
+                print('🌹🌹🌹🌹🌹：333356555553');
                 if (_.playerStatus.status.value == PlayerStatus.playing) {
                   _.togglePlay();
                 } else {
@@ -443,15 +446,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           Obx(
             () => Column(
               children: [
-                ClipRect(
-                  clipBehavior: Clip.hardEdge,
-                  child: AppBarAni(
-                    controller: animationController,
-                    visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'top',
-                    child: widget.headerControl!,
+                if (widget.headerControl != null)
+                  ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: AppBarAni(
+                      controller: animationController,
+                      visible: !_.controlsLock.value && _.showControls.value,
+                      position: 'top',
+                      child: widget.headerControl!,
+                    ),
                   ),
-                ),
                 const Spacer(),
                 ClipRect(
                   clipBehavior: Clip.hardEdge,
