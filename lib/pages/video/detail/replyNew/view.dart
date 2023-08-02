@@ -110,6 +110,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _replyContentController.dispose();
     super.dispose();
   }
