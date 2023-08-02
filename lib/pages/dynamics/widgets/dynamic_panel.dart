@@ -37,7 +37,10 @@ class DynamicPanel extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              author(item, context),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                child: author(item, context),
+              ),
               if (item!.modules!.moduleDynamic!.desc != null)
                 content(item, context, source),
               forWard(item, context, _dynamicsController, source),

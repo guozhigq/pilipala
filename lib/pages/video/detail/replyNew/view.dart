@@ -117,12 +117,12 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: sheetHeight,
+      height: 400,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
         ),
         color: Theme.of(context).colorScheme.background,
       ),
@@ -143,7 +143,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   autofocus: false,
                   focusNode: replyContentFocusNode,
                   decoration: const InputDecoration(
-                      hintText: "输入回复内容", border: InputBorder.none),
+                      hintText: "输入回复内容",
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                      )),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),

@@ -60,7 +60,14 @@ class VideoReplySkeleton extends StatelessWidget {
                     ),
                     const Spacer(),
                     Container(
-                      width: 40,
+                      width: 30,
+                      height: 14,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      color: bgColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 30,
                       height: 14,
                       margin: const EdgeInsets.only(bottom: 4),
                       color: bgColor,

@@ -117,7 +117,7 @@ class ModuleAuthorModel {
     this.pubTime,
     this.pubTs,
     this.type,
-    // this.vip,
+    this.vip,
   });
 
   String? face;
@@ -130,6 +130,7 @@ class ModuleAuthorModel {
   String? pubTime;
   int? pubTs;
   String? type;
+  Map? vip;
 
   ModuleAuthorModel.fromJson(Map<String, dynamic> json) {
     face = json['face'];
@@ -142,6 +143,7 @@ class ModuleAuthorModel {
     pubTime = json['pub_time'];
     pubTs = json['pub_ts'] == 0 ? null : json['pub_ts'];
     type = json['type'];
+    vip = json['vip'];
   }
 }
 

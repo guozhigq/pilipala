@@ -79,6 +79,22 @@ class ReplyItem extends StatelessWidget {
                 ),
               ),
             ),
+          if (replyItem!.member!.vip!['vipStatus'] > 0 &&
+              replyItem!.member!.vip!['vipType'] == 2)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: Theme.of(context).colorScheme.background,
+                ),
+                child: Image.asset(
+                  'assets/images/big-vip.png',
+                  height: 14,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -111,9 +127,8 @@ class ReplyItem extends StatelessWidget {
                     Text(
                       replyItem!.member!.uname!,
                       style: TextStyle(
-                        color: replyItem!.isUp! ||
-                                replyItem!.member!.vip!['vipStatus'] > 0
-                            ? Theme.of(context).colorScheme.primary
+                        color: replyItem!.member!.vip!['vipStatus'] > 0
+                            ? const Color.fromARGB(255, 251, 100, 163)
                             : Theme.of(context).colorScheme.outline,
                         fontSize: 13,
                       ),
@@ -257,16 +272,21 @@ class ReplyItem extends StatelessWidget {
           Icon(Icons.favorite, color: Colors.red[400], size: 18),
         SizedBox(
           height: 28,
-          width: 42,
-          child: TextButton(
+          width: 28,
+          child: IconButton(
             style: ButtonStyle(
               padding: MaterialStateProperty.all(EdgeInsets.zero),
             ),
-            child: Text('回复',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.outline)),
+            icon: Icon(
+              Icons.reply_outlined,
+              size: 18,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            // child: Text('回复',
+            //     style: Theme.of(context)
+            //         .textTheme
+            //         .labelMedium!
+            //         .copyWith(color: Theme.of(context).colorScheme.outline)),
             onPressed: () {
               feedBack();
               showModalBottomSheet(

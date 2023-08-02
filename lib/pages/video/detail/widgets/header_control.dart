@@ -27,7 +27,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
 class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
   List<PlaySpeed> playSpeed = PlaySpeed.values;
-
+  TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
 
   @override
@@ -38,25 +38,20 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 设置面板
   void showSettingSheet() {
-    TextStyle subTitleStyle =
-        TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline);
     showModalBottomSheet(
+      elevation: 0,
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) {
         return Container(
           width: double.infinity,
-          height: 420,
+          height: 400,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            bottom: MediaQuery.of(context).padding.bottom + 23,
-          ),
+          margin: const EdgeInsets.all(12),
           child: Column(
             children: [
               SizedBox(
@@ -174,11 +169,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            bottom: MediaQuery.of(context).padding.bottom,
-          ),
+          margin: const EdgeInsets.all(12),
           child: Material(
             child: ListView(
               physics: const NeverScrollableScrollPhysics(),
@@ -234,8 +225,6 @@ class _HeaderControlState extends State<HeaderControl> {
       }
     }
 
-    TextStyle subTitleStyle =
-        TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline);
     showModalBottomSheet(
       context: context,
       elevation: 0,
@@ -249,11 +238,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            bottom: MediaQuery.of(context).padding.bottom,
-          ),
+          margin: const EdgeInsets.all(12),
           child: Column(
             children: [
               SizedBox(
@@ -279,7 +264,6 @@ class _HeaderControlState extends State<HeaderControl> {
               Expanded(
                 child: Material(
                   child: Scrollbar(
-                    thumbVisibility: true,
                     child: ListView(
                       children: [
                         for (var i = 0; i < totalQaSam; i++) ...[
@@ -329,8 +313,6 @@ class _HeaderControlState extends State<HeaderControl> {
     AudioQuality currentAudioQa = widget.videoDetailCtr!.currentAudioQa;
 
     List<AudioItem> audio = videoInfo.dash!.audio!;
-    TextStyle subTitleStyle =
-        TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline);
     showModalBottomSheet(
       context: context,
       elevation: 0,
@@ -344,11 +326,7 @@ class _HeaderControlState extends State<HeaderControl> {
             color: Theme.of(context).colorScheme.background,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            bottom: MediaQuery.of(context).padding.bottom,
-          ),
+          margin: const EdgeInsets.all(12),
           child: Column(
             children: [
               const SizedBox(height: 45, child: Center(child: Text('选择音质'))),

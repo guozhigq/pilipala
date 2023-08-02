@@ -142,7 +142,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     ThemeData t = Theme.of(context);
     return SliverPadding(
       padding: const EdgeInsets.only(
-          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 13),
+          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || videoItem.isNotEmpty
             ? Column(

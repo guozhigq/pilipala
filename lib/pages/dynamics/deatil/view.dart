@@ -100,7 +100,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 1,
         centerTitle: false,
         titleSpacing: 0,
         title: StreamBuilder(

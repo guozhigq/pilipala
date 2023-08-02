@@ -21,34 +21,37 @@ class HotKeyword extends StatelessWidget {
       children: [
         for (var i in hotSearchList!)
           SizedBox(
-            width: width! / 2 - 8,
+            width: width! / 2 - 4,
             child: Material(
               borderRadius: BorderRadius.circular(3),
               clipBehavior: Clip.hardEdge,
               child: InkWell(
                 onTap: () => onClick!(i.keyword),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: width! / 2 -
-                          (i.icon != null && i.icon != '' ? 50 : 12),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(6, 5, 0, 5),
-                        child: Text(
-                          i.keyword!,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(fontSize: 14),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 2,
+                      right: hotSearchList!.indexOf(i) % 2 == 1 ? 10 : 0),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(6, 5, 4, 5),
+                          child: Text(
+                            i.keyword!,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                         ),
                       ),
-                    ),
-                    if (i.icon != null && i.icon != '')
-                      SizedBox(
-                        width: 40,
-                        child:
-                            CachedNetworkImage(imageUrl: i.icon!, height: 15.0),
-                      ),
-                  ],
+                      if (i.icon != null && i.icon != '')
+                        SizedBox(
+                          height: 15,
+                          child: CachedNetworkImage(
+                              imageUrl: i.icon!, height: 15.0),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
