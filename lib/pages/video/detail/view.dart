@@ -35,12 +35,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late StreamController<double> appbarStream;
 
   PlayerStatus playerStatus = PlayerStatus.playing;
-  bool isShowCover = true;
+  // bool isShowCover = true;
   double doubleOffset = 0;
 
   Box localCache = GStrorage.localCache;
   late double statusBarHeight;
   final videoHeight = Get.size.width * 9 / 16;
+  late Future _futureBuilderFuture;
 
   @override
   void initState() {
@@ -51,12 +52,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         videoDetailController.markHeartBeat();
         playerStatus = status;
         if (status == PlayerStatus.playing) {
-          isShowCover = false;
-          setState(() {});
+          videoDetailController.isShowCover.value = false;
           videoDetailController.loopHeartBeat();
         } else {
           videoDetailController.timer!.cancel();
-          // setState(() {});
           // 播放完成停止 or 切换下一个
           if (status == PlayerStatus.completed) {
             // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
@@ -78,6 +77,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     );
 
     statusBarHeight = localCache.get('statusBarHeight');
+    _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
   void continuePlay() async {
@@ -165,60 +165,98 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               tag: videoDetailController.heroTag,
                               child: Stack(
                                 children: [
-                                  if (plPlayerController!
-                                          .videoPlayerController !=
-                                      null)
-                                    PLVideoPlayer(
-                                      controller: plPlayerController!,
-                                      headerControl: HeaderControl(
-                                        controller: plPlayerController,
-                                        videoDetailCtr: videoDetailController,
-                                      ),
-                                    ),
-                                  Visibility(
-                                    visible: isShowCover,
-                                    child: Positioned(
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: NetworkImgLayer(
-                                        type: 'emote',
-                                        src: videoDetailController
-                                            .videoItem['pic'],
-                                        width: maxWidth,
-                                        height: maxHeight,
+                                  FutureBuilder(
+                                    future: _futureBuilderFuture,
+                                    builder: ((context, snapshot) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data['status']) {
+                                        return PLVideoPlayer(
+                                          controller: plPlayerController!,
+                                          headerControl: HeaderControl(
+                                            controller: plPlayerController,
+                                            videoDetailCtr:
+                                                videoDetailController,
+                                          ),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    }),
+                                  ),
+                                  Obx(
+                                    () => Visibility(
+                                      visible: videoDetailController
+                                          .isShowCover.value,
+                                      child: Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: NetworkImgLayer(
+                                          type: 'emote',
+                                          src: videoDetailController
+                                              .videoItem['pic'],
+                                          width: maxWidth,
+                                          height: maxHeight,
+                                        ),
                                       ),
                                     ),
                                   ),
 
                                   /// 关闭自动播放时 手动播放
-                                  Visibility(
-                                    visible: isShowCover &&
-                                        videoDetailController
-                                            .isEffective.value &&
-                                        !videoDetailController.autoPlay.value,
-                                    child: Positioned(
-                                      right: 12,
-                                      bottom: 6,
-                                      child: TextButton.icon(
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.resolveWith(
-                                                  (states) {
-                                            return Theme.of(context)
-                                                .colorScheme
-                                                .primaryContainer;
-                                          }),
-                                        ),
-                                        onPressed: () =>
-                                            videoDetailController.handlePlay(),
-                                        icon: const Icon(
-                                          Icons.play_circle_outline,
-                                          size: 20,
-                                        ),
-                                        label: const Text('Play'),
-                                      ),
-                                    ),
+                                  Obx(
+                                    () => Visibility(
+                                        visible: videoDetailController
+                                                .isShowCover.value &&
+                                            videoDetailController
+                                                .isEffective.value &&
+                                            !videoDetailController
+                                                .autoPlay.value,
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: AppBar(
+                                                primary: false,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                actions: [
+                                                  /// TODO
+                                                  IconButton(
+                                                      tooltip: '稍后再看',
+                                                      onPressed: () {},
+                                                      icon: const Icon(Icons
+                                                          .history_outlined))
+                                                ],
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 12,
+                                              bottom: 6,
+                                              child: TextButton.icon(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith(
+                                                              (states) {
+                                                    return Theme.of(context)
+                                                        .colorScheme
+                                                        .primaryContainer;
+                                                  }),
+                                                ),
+                                                onPressed: () =>
+                                                    videoDetailController
+                                                        .handlePlay(),
+                                                icon: const Icon(
+                                                  Icons.play_circle_outline,
+                                                  size: 20,
+                                                ),
+                                                label: const Text('Play'),
+                                              ),
+                                            ),
+                                          ],
+                                        )),
                                   ),
                                 ],
                               ),

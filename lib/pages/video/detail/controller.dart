@@ -54,6 +54,8 @@ class VideoDetailController extends GetxController
   RxBool autoPlay = true.obs;
   // 视频资源是否有效
   RxBool isEffective = true.obs;
+  // 封面图的展示
+  RxBool isShowCover = true.obs;
 
   @override
   void onInit() {
@@ -74,7 +76,7 @@ class VideoDetailController extends GetxController
       heroTag = Get.arguments['heroTag'];
     }
     tabCtr = TabController(length: 2, vsync: this);
-    queryVideoUrl();
+    // queryVideoUrl();
   }
 
   showReplyReplyPanel() {
@@ -119,9 +121,9 @@ class VideoDetailController extends GetxController
     playerInit(firstVideo, audioUrl, defaultST: position);
   }
 
-  playerInit(firstVideo, audioSource,
+  Future playerInit(firstVideo, audioSource,
       {Duration defaultST = Duration.zero, int duration = 0}) async {
-    plPlayerController.setDataSource(
+    await plPlayerController.setDataSource(
       DataSource(
         videoSource: firstVideo.baseUrl,
         audioSource: audioSource,
@@ -149,7 +151,7 @@ class VideoDetailController extends GetxController
   }
 
   // 视频链接
-  queryVideoUrl() async {
+  Future queryVideoUrl() async {
     var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
     if (result['status']) {
       data = result['data'];
@@ -168,7 +170,7 @@ class VideoDetailController extends GetxController
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
       }
-      playerInit(
+      await playerInit(
         firstVideo,
         audioUrl,
         defaultST: Duration(milliseconds: data.lastPlayTime!),
