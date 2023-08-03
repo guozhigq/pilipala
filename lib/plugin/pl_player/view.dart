@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
@@ -15,11 +16,11 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume_controller/volume_controller.dart';
 
+import 'utils/fullscreen.dart';
 import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
 import 'widgets/forward_seek.dart';
-import 'widgets/play_pause_btn.dart';
 
 class PLVideoPlayer extends StatefulWidget {
   final PlPlayerController controller;
@@ -54,6 +55,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   double _volumeValue = 0.0;
   bool _volumeIndicator = false;
   Timer? _volumeTimer;
+
+  double _distance = 0.0;
 
   bool _volumeInterceptEventStream = false;
 
@@ -142,15 +145,65 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     });
   }
 
+  Future<void> triggerFullScreen() async {
+    PlPlayerController _ = widget.controller;
+    if (!_.isFullScreen.value) {
+      /// 按照视频宽高比决定全屏方向
+      if (_.direction.value == 'horizontal') {
+        /// 进入全屏
+        await enterFullScreen();
+        // 横屏
+        await landScape();
+      } else {
+        // 竖屏
+        await verticalScreen();
+      }
+
+      _.toggleFullScreen(true);
+      var result = await showDialog(
+        context: Get.context!,
+        useSafeArea: false,
+        builder: (context) => Dialog.fullscreen(
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              primary: false,
+              toolbarHeight: 0,
+              backgroundColor: Colors.black,
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+            ),
+            body: SafeArea(
+              bottom: true,
+              child: PLVideoPlayer(
+                controller: _,
+                headerControl: _.headerControl,
+              ),
+            ),
+          ),
+        ),
+      );
+      if (result == null) {
+        // 退出全屏
+        exitFullScreen();
+        await verticalScreen();
+        _.toggleFullScreen(false);
+      }
+    } else {
+      Get.back();
+      exitFullScreen();
+      await verticalScreen();
+      _.toggleFullScreen(false);
+    }
+  }
+
   @override
   void dispose() {
-    super.dispose();
     animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('🌹🌹🌹🌹🌹：33333');
     final _ = widget.controller;
     Color colorTheme = Theme.of(context).colorScheme.primary;
     TextStyle subTitleStyle = const TextStyle(
@@ -389,7 +442,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // 双击左边区域 👈
                 onDoubleTapSeekBackward();
               } else if (tapPosition < sectionWidth * 2) {
-                print('🌹🌹🌹🌹🌹：333356555553');
                 if (_.playerStatus.status.value == PlayerStatus.playing) {
                   _.togglePlay();
                 } else {
@@ -415,23 +467,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             onHorizontalDragUpdate: (DragUpdateDetails details) {},
             onHorizontalDragEnd: (DragEndDetails details) {},
             // 垂直方向 音量/亮度调节
-            onVerticalDragUpdate: (DragUpdateDetails details) {
+            onVerticalDragUpdate: (DragUpdateDetails details) async {
               final totalWidth = MediaQuery.of(context).size.width;
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
-
+              final delta = details.delta.dy;
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
-                final delta = details.delta.dy;
                 final brightness = _brightnessValue - delta / 100.0;
                 final result = brightness.clamp(0.0, 1.0);
                 setBrightness(result);
               } else if (tapPosition < sectionWidth * 2) {
                 // 全屏
-                print('全屏');
+                final double dy = details.delta.dy;
+                const double threshold = 7.0; // 滑动阈值
+                if (dy > _distance && dy > threshold) {
+                  if (!_.isFullScreen.value) {
+                    await triggerFullScreen();
+                  }
+                  _distance = 0.0;
+                } else if (dy < _distance && dy < -threshold) {
+                  if (_.isFullScreen.value) {
+                    await triggerFullScreen();
+                  }
+                  _distance = 0.0;
+                }
+                _distance = dy;
+
+                // triggerFullScreen();
               } else {
                 // 右边区域 👈
-                final delta = details.delta.dy;
                 final volume = _volumeValue - delta / 100.0;
                 final result = volume.clamp(0.0, 1.0);
                 setVolume(result);
@@ -463,7 +528,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
                     position: 'bottom',
-                    child: BottomControl(controller: widget.controller),
+                    child: BottomControl(
+                        controller: widget.controller,
+                        triggerFullScreen: triggerFullScreen),
                   ),
                 ),
               ],
@@ -658,20 +725,5 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
       ],
     );
-  }
-}
-
-class MSliderTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    SliderThemeData? sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    final double trackLeft = offset.dx;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, -1, trackWidth, 3);
   }
 }
