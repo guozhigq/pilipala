@@ -72,6 +72,7 @@ class SSearchController extends GetxController {
     // 手动刷新
     historyList.refresh();
     histiryWord.put('cacheList', historyCacheList);
+    searchFocusNode.unfocus();
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
 

@@ -7,6 +7,7 @@ class ReplyHttp {
     required int oid,
     required int pageNum,
     required int type,
+    int? ps,
     int sort = 1,
   }) async {
     var res = await Request().get(Api.replyList, data: {
@@ -14,6 +15,7 @@ class ReplyHttp {
       'pn': pageNum,
       'type': type,
       'sort': sort,
+      'ps': ps ?? 20
     });
     if (res.data['code'] == 0) {
       return {

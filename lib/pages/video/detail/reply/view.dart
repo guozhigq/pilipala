@@ -189,7 +189,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                     if (data['status']) {
                       // 请求成功
                       return Obx(
-                        () => _videoReplyController.replyList.isEmpty
+                        () => _videoReplyController.isLoadingMore &&
+                                _videoReplyController.replyList.isEmpty
                             ? SliverList(
                                 delegate: SliverChildBuilderDelegate(
                                     (context, index) {

@@ -117,6 +117,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             ),
           ),
           child: PageView(
+            physics: const NeverScrollableScrollPhysics(),
             controller: _pageController,
             onPageChanged: (index) {
               selectedIndex = index;

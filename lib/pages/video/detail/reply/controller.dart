@@ -24,6 +24,7 @@ class VideoReplyController extends GetxController {
   int currentPage = 0;
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
+  int ps = 20;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
@@ -36,14 +37,21 @@ class VideoReplyController extends GetxController {
     var res = await ReplyHttp.replyList(
       oid: aid!,
       pageNum: currentPage + 1,
+      ps: ps,
       type: ReplyType.video.index,
       sort: sortType.index,
     );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
-        currentPage++;
         noMore.value = '加载中...';
+
+        /// 第一页回复数小于20
+        if (currentPage == 0 && replies.length < 20) {
+          noMore.value = '没有更多了';
+        }
+        currentPage++;
+
         if (replyList.length == res['data'].page.acount) {
           noMore.value = '没有更多了';
         }
