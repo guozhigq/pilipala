@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/sliver_header.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
@@ -11,6 +12,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/app_bar.dart';
 import 'widgets/header_control.dart';
@@ -32,10 +34,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
 
-  bool isPlay = false;
   PlayerStatus playerStatus = PlayerStatus.playing;
-  bool isShowCover = true;
+  // bool isShowCover = true;
   double doubleOffset = 0;
+
+  Box localCache = GStrorage.localCache;
+  late double statusBarHeight;
+  final videoHeight = Get.size.width * 9 / 16;
+  late Future _futureBuilderFuture;
 
   @override
   void initState() {
@@ -46,19 +52,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         videoDetailController.markHeartBeat();
         playerStatus = status;
         if (status == PlayerStatus.playing) {
-          isPlay = false;
-          isShowCover = false;
-          setState(() {});
+          videoDetailController.isShowCover.value = false;
           videoDetailController.loopHeartBeat();
         } else {
           videoDetailController.timer!.cancel();
-          isPlay = true;
-          setState(() {});
           // 播放完成停止 or 切换下一个
           if (status == PlayerStatus.completed) {
             // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
             plPlayerController!.seekTo(Duration.zero);
             plPlayerController!.onLockControl(false);
+            plPlayerController!.videoPlayerController!.pause();
           }
         }
       },
@@ -72,6 +75,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         appbarStream.add(offset);
       },
     );
+
+    statusBarHeight = localCache.get('statusBarHeight');
+    _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
   void continuePlay() async {
@@ -120,7 +126,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final double statusBarHeight = MediaQuery.of(context).padding.top;
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight;
@@ -132,7 +137,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Scaffold(
             resizeToAvoidBottomInset: false,
             key: videoDetailController.scaffoldKey,
-            backgroundColor: Colors.transparent,
+            // fix 1px black line
+            // backgroundColor: Colors.transparent,
+            backgroundColor: Theme.of(context).colorScheme.background,
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
@@ -149,8 +156,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     backgroundColor: Theme.of(context).colorScheme.background,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
-                        padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top),
+                        padding: EdgeInsets.only(top: statusBarHeight),
                         child: LayoutBuilder(
                           builder: (context, boxConstraints) {
                             double maxWidth = boxConstraints.maxWidth;
@@ -159,28 +165,39 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               tag: videoDetailController.heroTag,
                               child: Stack(
                                 children: [
-                                  if (plPlayerController!
-                                          .videoPlayerController !=
-                                      null)
-                                    PLVideoPlayer(
-                                      controller: plPlayerController!,
-                                      headerControl: HeaderControl(
-                                        controller: plPlayerController,
-                                        videoDetailCtr: videoDetailController,
-                                      ),
-                                    ),
-                                  Visibility(
-                                    visible: isShowCover,
-                                    child: Positioned(
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: NetworkImgLayer(
-                                        type: 'emote',
-                                        src: videoDetailController
-                                            .videoItem['pic'],
-                                        width: maxWidth,
-                                        height: maxHeight,
+                                  FutureBuilder(
+                                    future: _futureBuilderFuture,
+                                    builder: ((context, snapshot) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data['status']) {
+                                        return PLVideoPlayer(
+                                          controller: plPlayerController!,
+                                          headerControl: HeaderControl(
+                                            controller: plPlayerController,
+                                            videoDetailCtr:
+                                                videoDetailController,
+                                          ),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    }),
+                                  ),
+                                  Obx(
+                                    () => Visibility(
+                                      visible: videoDetailController
+                                          .isShowCover.value,
+                                      child: Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: NetworkImgLayer(
+                                          type: 'emote',
+                                          src: videoDetailController
+                                              .videoItem['pic'],
+                                          width: maxWidth,
+                                          height: maxHeight,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -188,33 +205,58 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   /// 关闭自动播放时 手动播放
                                   Obx(
                                     () => Visibility(
-                                      visible: isShowCover &&
-                                          videoDetailController
-                                              .isEffective.value &&
-                                          !videoDetailController.autoPlay.value,
-                                      child: Positioned(
-                                        right: 12,
-                                        bottom: 6,
-                                        child: TextButton.icon(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty
-                                                    .resolveWith((states) {
-                                              return Theme.of(context)
-                                                  .colorScheme
-                                                  .primaryContainer;
-                                            }),
-                                          ),
-                                          onPressed: () => videoDetailController
-                                              .handlePlay(),
-                                          icon: const Icon(
-                                            Icons.play_circle_outline,
-                                            size: 20,
-                                          ),
-                                          label: const Text('Play'),
-                                        ),
-                                      ),
-                                    ),
+                                        visible: videoDetailController
+                                                .isShowCover.value &&
+                                            videoDetailController
+                                                .isEffective.value &&
+                                            !videoDetailController
+                                                .autoPlay.value,
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: AppBar(
+                                                primary: false,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                actions: [
+                                                  /// TODO
+                                                  IconButton(
+                                                      tooltip: '稍后再看',
+                                                      onPressed: () {},
+                                                      icon: const Icon(Icons
+                                                          .history_outlined))
+                                                ],
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 12,
+                                              bottom: 6,
+                                              child: TextButton.icon(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith(
+                                                              (states) {
+                                                    return Theme.of(context)
+                                                        .colorScheme
+                                                        .primaryContainer;
+                                                  }),
+                                                ),
+                                                onPressed: () =>
+                                                    videoDetailController
+                                                        .handlePlay(),
+                                                icon: const Icon(
+                                                  Icons.play_circle_outline,
+                                                  size: 20,
+                                                ),
+                                                label: const Text('Play'),
+                                              ),
+                                            ),
+                                          ],
+                                        )),
                                   ),
                                 ],
                               ),

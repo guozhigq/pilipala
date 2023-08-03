@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -53,6 +54,9 @@ class PlPlayerController {
   final Rx<bool> _showBrightnessStatus = false.obs;
   final Rx<bool> _doubleSpeedStatus = false.obs;
   final Rx<bool> _controlsLock = false.obs;
+  final Rx<bool> _isFullScreen = false.obs;
+
+  final Rx<String> _direction = 'horizontal'.obs;
 
   Rx<bool> videoFitChanged = false.obs;
   final Rx<BoxFit> _videoFit = Rx(BoxFit.fill);
@@ -81,6 +85,8 @@ class PlPlayerController {
     BoxFit.fitWidth,
     BoxFit.scaleDown
   ];
+
+  PreferredSizeWidget? headerControl;
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -160,6 +166,12 @@ class PlPlayerController {
   /// 屏幕锁 为true时，关闭控制栏
   Rx<bool> get controlsLock => _controlsLock;
 
+  /// 全屏状态
+  Rx<bool> get isFullScreen => _isFullScreen;
+
+  /// 全屏方向
+  Rx<String> get direction => _direction;
+
   PlPlayerController({
     // 直播间 传false 关闭控制栏
     this.controlsEnabled = true,
@@ -197,6 +209,9 @@ class PlPlayerController {
     double? width,
     double? height,
     Duration? duration,
+    // 方向
+    String? direction,
+    // 全屏模式
   }) async {
     try {
       _autoPlay = autoplay;
@@ -207,6 +222,8 @@ class PlPlayerController {
       _playbackSpeed.value = speed;
       // 初始化数据加载状态
       dataStatus.status.value = DataStatus.loading;
+      // 初始化全屏方向
+      _direction.value = direction ?? 'horizontal';
 
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
@@ -622,6 +639,10 @@ class PlPlayerController {
     feedBack();
     _controlsLock.value = val;
     showControls.value = !val;
+  }
+
+  void toggleFullScreen(bool val) {
+    _isFullScreen.value = val;
   }
 
   /// 截屏

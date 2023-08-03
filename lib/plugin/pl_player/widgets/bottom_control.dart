@@ -5,11 +5,11 @@ import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
 
-import '../utils.dart';
-
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
-  const BottomControl({this.controller, Key? key}) : super(key: key);
+  final Function? triggerFullScreen;
+  const BottomControl({this.controller, this.triggerFullScreen, Key? key})
+      : super(key: key);
 
   @override
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -138,13 +138,17 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               // ),
               // const SizedBox(width: 4),
               // 全屏
-              ComBtn(
-                icon: const Icon(
-                  FontAwesomeIcons.expand,
-                  size: 15,
-                  color: Colors.white,
+              Obx(
+                () => ComBtn(
+                  icon: Icon(
+                    _.isFullScreen.value
+                        ? FontAwesomeIcons.a
+                        : FontAwesomeIcons.expand,
+                    size: 15,
+                    color: Colors.white,
+                  ),
+                  fuc: () => triggerFullScreen!(),
                 ),
-                fuc: () => {},
               ),
             ],
           ),
