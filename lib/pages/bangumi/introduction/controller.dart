@@ -3,31 +3,36 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
-class VideoIntroController extends GetxController {
+class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
+  int seasonId = int.parse(Get.parameters['seasonId']!);
 
   // 是否预渲染 骨架屏
   bool preRender = false;
 
   // 视频详情 上个页面传入
   Map? videoItem = {};
+  BangumiInfoModel? bangumiItem;
 
   // 请求状态
   RxBool isLoading = false.obs;
 
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
+  Rx<BangumiInfoModel> bangumiDetail = BangumiInfoModel().obs;
 
   // 请求返回的信息
   String responseMsg = '请求异常';
@@ -54,51 +59,46 @@ class VideoIntroController extends GetxController {
   void onInit() {
     super.onInit();
     if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('videoItem')) {
+      if (Get.arguments.containsKey('bangumiItem')) {
         preRender = true;
-        var args = Get.arguments['videoItem'];
-        videoItem!['pic'] = args.pic;
-        if (args.title is String) {
-          videoItem!['title'] = args.title;
-        } else {
-          String str = '';
-          for (Map map in args.title) {
-            str += map['text'];
-          }
-          videoItem!['title'] = str;
-        }
-        if (args.stat != null) {
-          videoItem!['stat'] = args.stat;
-        }
-        videoItem!['pubdate'] = args.pubdate;
-        videoItem!['owner'] = args.owner;
+        bangumiItem = Get.arguments['bangumiItem'];
+        // bangumiItem!['pic'] = args.pic;
+        // if (args.title is String) {
+        //   videoItem!['title'] = args.title;
+        // } else {
+        //   String str = '';
+        //   for (Map map in args.title) {
+        //     str += map['text'];
+        //   }
+        //   videoItem!['title'] = str;
+        // }
+        // if (args.stat != null) {
+        //   videoItem!['stat'] = args.stat;
+        // }
+        // videoItem!['pubdate'] = args.pubdate;
+        // videoItem!['owner'] = args.owner;
       }
     }
     userLogin = user.get(UserBoxKey.userLogin) != null;
   }
 
-  // 获取视频简介&分p
-  Future queryVideoIntro() async {
-    var result = await VideoHttp.videoIntro(bvid: bvid);
+  // 获取番剧简介&选集
+  Future queryBangumiIntro() async {
+    print('🐶🐶: $seasonId');
+    var result = await SearchHttp.bangumiInfo(seasonId: seasonId);
+    print("🐶🐶:${result['data']}");
     if (result['status']) {
-      videoDetail.value = result['data']!;
-      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-          .tabs
-          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
-      // 获取到粉丝数再返回
-      await queryUserStat();
-    } else {
-      responseMsg = result['msg'];
+      bangumiDetail.value = result['data'];
     }
     if (userLogin) {
       // 获取点赞状态
-      queryHasLikeVideo();
+      // queryHasLikeVideo();
       // 获取投币状态
-      queryHasCoinVideo();
+      // queryHasCoinVideo();
       // 获取收藏状态
-      queryHasFavVideo();
+      // queryHasFavVideo();
       //
-      queryFollowStatus();
+      // queryFollowStatus();
     }
     return result;
   }
@@ -392,10 +392,10 @@ class VideoIntroController extends GetxController {
 
   // 修改分P或番剧分集
   Future changeSeasonOrbangu(bvid, cid) async {
-    var _videoDetailCtr =
+    VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    _videoDetailCtr.bvid = bvid;
-    _videoDetailCtr.cid = cid;
-    _videoDetailCtr.queryVideoUrl();
+    videoDetailCtr.bvid = bvid;
+    videoDetailCtr.cid = cid;
+    videoDetailCtr.queryVideoUrl();
   }
 }

@@ -57,7 +57,7 @@ class VideoDetailData {
   bool? isChargeableSeason;
   bool? isStory;
   bool? noCache;
-  List<Page>? pages;
+  List<Part>? pages;
   Subtitle? subtitle;
   // Label? label;
   UgcSeason? ugcSeason;
@@ -136,7 +136,7 @@ class VideoDetailData {
     noCache = json["no_cache"];
     pages = json["pages"] == null
         ? []
-        : List<Page>.from(json["pages"]!.map((e) => Page.fromJson(e)));
+        : List<Part>.from(json["pages"]!.map((e) => Part.fromJson(e)));
     subtitle =
         json["subtitle"] == null ? null : Subtitle.fromJson(json["subtitle"]);
     ugcSeason = json["ugc_season"] != null
@@ -352,7 +352,7 @@ class Owner {
   }
 }
 
-class Page {
+class Part {
   int? cid;
   int? page;
   String? from;
@@ -363,7 +363,7 @@ class Page {
   Dimension? dimension;
   String? firstFrame;
 
-  Page({
+  Part({
     this.cid,
     this.page,
     this.from,
@@ -375,11 +375,11 @@ class Page {
     this.firstFrame,
   });
 
-  fromRawJson(String str) => Page.fromJson(json.decode(str));
+  fromRawJson(String str) => Part.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  Page.fromJson(Map<String, dynamic> json) {
+  Part.fromJson(Map<String, dynamic> json) {
     cid = json["cid"];
     page = json["page"];
     from = json["from"];
@@ -620,7 +620,7 @@ class EpisodeItem {
   int? cid;
   String? title;
   int? attribute;
-  Page? page;
+  Part? page;
   String? bvid;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
@@ -631,7 +631,7 @@ class EpisodeItem {
     cid = json['cid'];
     title = json['title'];
     attribute = json['attribute'];
-    page = Page.fromJson(json['page']);
+    page = Part.fromJson(json['page']);
     bvid = json['bvid'];
   }
 }

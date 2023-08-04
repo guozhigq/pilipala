@@ -95,7 +95,7 @@ class BangumiInfoModel {
     jpTitle = json['jp_title'];
     link = json['link'];
     mediaId = json['media_id'];
-    newEp = json['newEp'];
+    newEp = json['new_ep'];
     playStrategy = json['play_strategy'];
     positive = json['positive'];
     publish = json['publish'];
@@ -184,7 +184,7 @@ class EpisodeItem {
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     aid = json['aid'];
-    badge = json['badge'];
+    badge = json['badge'] != '' ? json['badge'] : null;
     badgeInfo = json['badge_info'];
     badgeType = json['badge_type'];
     bvid = json['bvid'];

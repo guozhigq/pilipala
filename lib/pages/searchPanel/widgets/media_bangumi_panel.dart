@@ -5,6 +5,7 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/bangumi/info.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/utils.dart';
 
 Widget searchMbangumiPanel(BuildContext context, ctr, list) {
@@ -19,8 +20,12 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
       var i = list![index];
       return InkWell(
         onTap: () {
-          Get.toNamed('/video?bvid=${i.bvid}&cid=${i.cid}',
-              arguments: {'videoItem': i, 'heroTag': Utils.makeHeroTag(i.id)});
+          /// TODO 番剧详情页面
+          // Get.toNamed('/video?bvid=${i.bvid}&cid=${i.cid}', arguments: {
+          //   'videoItem': i,
+          //   'heroTag': Utils.makeHeroTag(i.id),
+          //   'videoType': SearchType.media_bangumi
+          // });
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -107,10 +112,12 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                             String pic = episode.cover!;
                             String heroTag = Utils.makeHeroTag(cid);
                             Get.toNamed(
-                              '/video?bvid=$bvid&cid=$cid',
+                              '/video?bvid=$bvid&cid=$cid&seasonId=${i.seasonId}',
                               arguments: {
                                 'pic': pic,
                                 'heroTag': heroTag,
+                                'videoType': SearchType.media_bangumi,
+                                'bangumiItem': res['data'],
                               },
                             );
                           }

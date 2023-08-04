@@ -153,7 +153,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         /// 进入全屏
         await enterFullScreen();
         // 横屏
-        await landScape();
+        // await landScape();
       } else {
         // 竖屏
         await verticalScreen();
