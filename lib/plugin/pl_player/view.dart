@@ -57,6 +57,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Timer? _volumeTimer;
 
   double _distance = 0.0;
+  // 初始手指落下位置
+  double _initTapPositoin = 0.0;
 
   bool _volumeInterceptEventStream = false;
 
@@ -464,8 +466,28 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.setPlaybackSpeed(currentSpeed / 2);
             },
             // 水平位置 快进
-            onHorizontalDragUpdate: (DragUpdateDetails details) {},
-            onHorizontalDragEnd: (DragEndDetails details) {},
+            onHorizontalDragUpdate: (DragUpdateDetails details) {
+              final tapPosition = details.localPosition.dx;
+              int curSliderPosition = _.sliderPosition.value.inSeconds;
+              late int result;
+              if (tapPosition - _initTapPositoin > 0) {
+                // 快进
+                /// TODO  优化屏幕越小效果越明显
+                result = (curSliderPosition + 1)
+                    .clamp(0, _.duration.value.inSeconds);
+              } else {
+                // 快退
+                result = (curSliderPosition - 1)
+                    .clamp(0, _.duration.value.inSeconds);
+              }
+              _.onUodatedSliderProgress(Duration(seconds: result));
+              _.onChangedSliderStart();
+              _initTapPositoin = tapPosition;
+            },
+            onHorizontalDragEnd: (DragEndDetails details) {
+              _.onChangedSliderEnd();
+              _.seekTo(_.sliderPosition.value);
+            },
             // 垂直方向 音量/亮度调节
             onVerticalDragUpdate: (DragUpdateDetails details) async {
               final totalWidth = MediaQuery.of(context).size.width;
@@ -546,7 +568,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               return Container();
             }
             return Positioned(
-              bottom: -3,
+              bottom: -3.5,
               left: 0,
               right: 0,
               child: SlideTransition(

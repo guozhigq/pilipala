@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
-import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
@@ -403,7 +403,7 @@ class _HeaderControlState extends State<HeaderControl> {
               size: 15,
               color: Colors.white,
             ),
-            fuc: () => Get.offAll(const HomePage()),
+            fuc: () => Get.offAll(const MainApp()),
           ),
           const Spacer(),
           // ComBtn(

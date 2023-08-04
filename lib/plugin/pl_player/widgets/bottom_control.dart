@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class BottomControl extends StatelessWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
@@ -55,6 +56,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 barHeight: 3.0,
                 thumbRadius: 5.5,
                 onDragStart: (duration) {
+                  feedBack();
                   _.onChangedSliderStart();
                 },
                 onDragUpdate: (duration) {

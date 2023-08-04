@@ -505,15 +505,16 @@ class PlPlayerController {
   }
 
   void onChangedSliderStart() {
-    feedBack();
     _isSliderMoving.value = true;
   }
 
-  void onUodatedSliderProgress(value) {
+  void onUodatedSliderProgress(Duration value) {
     _sliderTempPosition.value = value;
+    _sliderPosition.value = value;
   }
 
   void onChangedSliderEnd() {
+    feedBack();
     _isSliderMoving.value = false;
     _hideTaskControls();
   }
