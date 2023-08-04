@@ -10,6 +10,7 @@ import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -330,75 +331,18 @@ class BangumiIntroController extends GetxController {
     return result;
   }
 
-  // 关注/取关up
-  Future actionRelationMod() async {
-    feedBack();
-    if (user.get(UserBoxKey.userMid) == null) {
-      SmartDialog.showToast('账号未登录');
-      return;
-    }
-    int currentStatus = followStatus['attribute'];
-    int actionStatus = 0;
-    switch (currentStatus) {
-      case 0:
-        actionStatus = 1;
-        break;
-      case 2:
-        actionStatus = 2;
-        break;
-      default:
-        actionStatus = 0;
-        break;
-    }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
-          actions: [
-            TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
-            TextButton(
-              onPressed: () async {
-                var result = await VideoHttp.relationMod(
-                  mid: videoDetail.value.owner!.mid!,
-                  act: actionStatus,
-                  reSrc: 14,
-                );
-                if (result['status']) {
-                  switch (currentStatus) {
-                    case 0:
-                      actionStatus = 2;
-                      break;
-                    case 2:
-                      actionStatus = 0;
-                      break;
-                    default:
-                      actionStatus = 0;
-                      break;
-                  }
-                  followStatus['attribute'] = actionStatus;
-                  followStatus.refresh();
-                }
-                SmartDialog.dismiss();
-              },
-              child: const Text('确认'),
-            )
-          ],
-        );
-      },
-    );
-  }
-
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid) async {
+  Future changeSeasonOrbangu(bvid, cid, aid) async {
+    // 重新获取视频资源
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid = cid;
     videoDetailCtr.queryVideoUrl();
+    // 重新请求评论
+    VideoReplyController videoReplyCtr =
+        Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+    videoReplyCtr.aid = aid;
+    videoReplyCtr.queryReplyList(type: 'init');
   }
 }

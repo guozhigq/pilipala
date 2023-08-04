@@ -64,18 +64,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   itemCount: widget.pages.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      onTap: () async {
-                        if (widget.pages[index].badge != null) {
-                          SmartDialog.showToast('需要大会员');
-                          return;
-                        }
-                        await widget.changeFuc!(
-                          widget.pages[index].bvid,
-                          widget.pages[index].cid,
-                        );
-                        currentIndex = index;
-                        setState(() {});
-                      },
+                      onTap: () => changeFucCall(widget.pages[index], index),
                       dense: false,
                       title: Text(
                         widget.pages[index].longTitle!,
@@ -101,6 +90,20 @@ class _BangumiPanelState extends State<BangumiPanel> {
         ),
       ),
     );
+  }
+
+  void changeFucCall(item, i) async {
+    if (item.badge != null) {
+      SmartDialog.showToast('需要大会员');
+      return;
+    }
+    await widget.changeFuc!(
+      item.bvid,
+      item.cid,
+      item.aid,
+    );
+    currentIndex = i;
+    setState(() {});
   }
 
   @override
@@ -158,18 +161,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                       borderRadius: BorderRadius.circular(6),
                       clipBehavior: Clip.hardEdge,
                       child: InkWell(
-                        onTap: () async {
-                          if (widget.pages[i].badge != null) {
-                            SmartDialog.showToast('需要大会员');
-                            return;
-                          }
-                          await widget.changeFuc!(
-                            widget.pages[i].bvid,
-                            widget.pages[i].cid,
-                          );
-                          currentIndex = i;
-                          setState(() {});
-                        },
+                        onTap: () => changeFucCall(widget.pages[i], i),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 8, horizontal: 10),

@@ -62,14 +62,23 @@ class HistoryItem extends StatelessWidget {
               int cid = result['data'].cid!;
               String pic = result['data'].pic!;
               String heroTag = Utils.makeHeroTag(cid);
-              Get.toNamed(
-                '/video?bvid=$bvid&cid=$cid&epId=${result['data'].epId}',
-                arguments: {
-                  'pic': pic,
-                  'heroTag': heroTag,
-                  'videoType': SearchType.media_bangumi,
-                },
-              );
+              var epid = result['data'].epId;
+              if (epid != null) {
+                Get.toNamed(
+                  '/video?bvid=$bvid&cid=$cid&epId=${result['data'].epId}',
+                  arguments: {
+                    'pic': pic,
+                    'heroTag': heroTag,
+                    'videoType': SearchType.media_bangumi,
+                  },
+                );
+              } else {
+                int cid = videoItem.history.cid ??
+                    // videoItem.history.oid ??
+                    await SearchHttp.ab2c(aid: aid, bvid: bvid);
+                Get.toNamed('/video?bvid=$bvid&cid=$cid',
+                    arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
+              }
             }
           } else {
             if (videoItem.history.epid != '') {

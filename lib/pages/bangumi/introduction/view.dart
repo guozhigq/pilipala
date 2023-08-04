@@ -304,14 +304,20 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   // 点赞收藏转发 布局样式2
                   actionGrid(context, bangumiIntroController),
                   // 番剧分p
-                  if (!widget.loadingStatus &&
-                      widget.bangumiDetail!.episodes!.isNotEmpty) ...[
+                  if ((!widget.loadingStatus &&
+                          widget.bangumiDetail!.episodes!.isNotEmpty) ||
+                      bangumiItem != null &&
+                          bangumiItem!.episodes!.isNotEmpty) ...[
                     BangumiPanel(
-                      pages: widget.bangumiDetail!.episodes!,
-                      cid: widget.bangumiDetail!.episodes!.first.cid,
+                      pages: bangumiItem != null
+                          ? bangumiItem!.episodes!
+                          : widget.bangumiDetail!.episodes!,
+                      cid: bangumiItem != null
+                          ? bangumiItem!.episodes!.first.cid
+                          : widget.bangumiDetail!.episodes!.first.cid,
                       sheetHeight: sheetHeight,
-                      changeFuc: (bvid, cid) =>
-                          bangumiIntroController.changeSeasonOrbangu(bvid, cid),
+                      changeFuc: (bvid, cid, aid) => bangumiIntroController
+                          .changeSeasonOrbangu(bvid, cid, aid),
                     )
                   ],
                 ],
