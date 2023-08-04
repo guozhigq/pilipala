@@ -86,7 +86,7 @@ class BangumiInfo extends StatefulWidget {
 }
 
 class _BangumiInfoState extends State<BangumiInfo> {
-  late BangumiInfoModel bangumiItem;
+  late BangumiInfoModel? bangumiItem;
   final BangumiIntroController bangumiIntroController =
       Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
   bool isExpand = false;
@@ -98,7 +98,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   @override
   void initState() {
     super.initState();
-    bangumiItem = bangumiIntroController.bangumiItem!;
+    bangumiItem = bangumiIntroController.bangumiItem;
     videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     sheetHeight = localCache.get('sheetHeight');
@@ -139,176 +139,189 @@ class _BangumiInfoState extends State<BangumiInfo> {
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 13),
       sliver: SliverToBoxAdapter(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                NetworkImgLayer(
-                  width: 105,
-                  height: 160,
-                  src: !widget.loadingStatus
-                      ? widget.bangumiDetail!.cover!
-                      : bangumiItem.cover!,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: InkWell(
-                    onTap: () => showIntroDetail(),
-                    child: SizedBox(
-                      height: 158,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  !widget.loadingStatus
-                                      ? widget.bangumiDetail!.title!
-                                      : bangumiItem.title!,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              SizedBox(
-                                width: 34,
-                                height: 34,
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    padding: MaterialStateProperty.all(
-                                        EdgeInsets.zero),
-                                    backgroundColor:
-                                        MaterialStateProperty.resolveWith(
-                                            (states) {
-                                      return t.colorScheme.primaryContainer
-                                          .withOpacity(0.7);
-                                    }),
-                                  ),
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.favorite_border_rounded,
-                                    color: t.colorScheme.primary,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              // const SizedBox(width: 6),
-                              StatView(
-                                theme: 'gray',
-                                view: !widget.loadingStatus
-                                    ? widget.bangumiDetail!.stat!['views']
-                                    : bangumiItem.stat!['views'],
-                                size: 'medium',
-                              ),
-                              const SizedBox(width: 6),
-                              StatDanMu(
-                                theme: 'gray',
-                                danmu: !widget.loadingStatus
-                                    ? widget.bangumiDetail!.stat!['danmakus']
-                                    : bangumiItem.stat!['danmakus'],
-                                size: 'medium',
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Text(
-                                !widget.loadingStatus
-                                    ? widget.bangumiDetail!.areas!.first['name']
-                                    : bangumiItem.areas!.first['name'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: t.colorScheme.outline,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                !widget.loadingStatus
-                                    ? widget.bangumiDetail!
-                                        .publish!['pub_time_show']
-                                    : bangumiItem.publish!['pub_time_show'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: t.colorScheme.outline,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                !widget.loadingStatus
-                                    ? widget.bangumiDetail!.newEp!['desc']
-                                    : bangumiItem.newEp!['desc'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: t.colorScheme.outline,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            '简介：${!widget.loadingStatus ? widget.bangumiDetail!.evaluate! : bangumiItem.evaluate!}',
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.colorScheme.outline,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem.rating!['score']!}',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: t.colorScheme.primary,
-                            ),
-                          ),
-                        ],
+        child: !widget.loadingStatus || bangumiItem != null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      NetworkImgLayer(
+                        width: 105,
+                        height: 160,
+                        src: !widget.loadingStatus
+                            ? widget.bangumiDetail!.cover!
+                            : bangumiItem!.cover!,
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => showIntroDetail(),
+                          child: SizedBox(
+                            height: 158,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        !widget.loadingStatus
+                                            ? widget.bangumiDetail!.title!
+                                            : bangumiItem!.title!,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    SizedBox(
+                                      width: 34,
+                                      height: 34,
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          padding: MaterialStateProperty.all(
+                                              EdgeInsets.zero),
+                                          backgroundColor:
+                                              MaterialStateProperty.resolveWith(
+                                                  (states) {
+                                            return t
+                                                .colorScheme.primaryContainer
+                                                .withOpacity(0.7);
+                                          }),
+                                        ),
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.favorite_border_rounded,
+                                          color: t.colorScheme.primary,
+                                          size: 22,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    // const SizedBox(width: 6),
+                                    StatView(
+                                      theme: 'gray',
+                                      view: !widget.loadingStatus
+                                          ? widget.bangumiDetail!.stat!['views']
+                                          : bangumiItem!.stat!['views'],
+                                      size: 'medium',
+                                    ),
+                                    const SizedBox(width: 6),
+                                    StatDanMu(
+                                      theme: 'gray',
+                                      danmu: !widget.loadingStatus
+                                          ? widget
+                                              .bangumiDetail!.stat!['danmakus']
+                                          : bangumiItem!.stat!['danmakus'],
+                                      size: 'medium',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Text(
+                                      !widget.loadingStatus
+                                          ? widget.bangumiDetail!.areas!
+                                              .first['name']
+                                          : bangumiItem!.areas!.first['name'],
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: t.colorScheme.outline,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      !widget.loadingStatus
+                                          ? widget.bangumiDetail!
+                                              .publish!['pub_time_show']
+                                          : bangumiItem!
+                                              .publish!['pub_time_show'],
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: t.colorScheme.outline,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      !widget.loadingStatus
+                                          ? widget.bangumiDetail!.newEp!['desc']
+                                          : bangumiItem!.newEp!['desc'],
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: t.colorScheme.outline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '简介：${!widget.loadingStatus ? widget.bangumiDetail!.evaluate! : bangumiItem!.evaluate!}',
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: t.colorScheme.outline,
+                                  ),
+                                ),
+                                const Spacer(),
+                                if (bangumiItem != null &&
+                                    bangumiItem!.rating != null)
+                                  Text(
+                                    '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: t.colorScheme.primary,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            // 点赞收藏转发 布局样式1
-            // SingleChildScrollView(
-            //   padding: const EdgeInsets.only(top: 7, bottom: 7),
-            //   scrollDirection: Axis.horizontal,
-            //   child: actionRow(
-            //     context,
-            //     bangumiIntroController,
-            //     videoDetailCtr,
-            //   ),
-            // ),
-            // 点赞收藏转发 布局样式2
-            actionGrid(context, bangumiIntroController),
-            // 番剧分p
-            if (!widget.loadingStatus &&
-                widget.bangumiDetail!.episodes!.isNotEmpty) ...[
-              BangumiPanel(
-                pages: widget.bangumiDetail!.episodes!,
-                cid: widget.bangumiDetail!.episodes!.first.cid,
-                sheetHeight: sheetHeight,
-                changeFuc: (bvid, cid) =>
-                    bangumiIntroController.changeSeasonOrbangu(bvid, cid),
+                  const SizedBox(height: 6),
+                  // 点赞收藏转发 布局样式1
+                  // SingleChildScrollView(
+                  //   padding: const EdgeInsets.only(top: 7, bottom: 7),
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: actionRow(
+                  //     context,
+                  //     bangumiIntroController,
+                  //     videoDetailCtr,
+                  //   ),
+                  // ),
+                  // 点赞收藏转发 布局样式2
+                  actionGrid(context, bangumiIntroController),
+                  // 番剧分p
+                  if (!widget.loadingStatus &&
+                      widget.bangumiDetail!.episodes!.isNotEmpty) ...[
+                    BangumiPanel(
+                      pages: widget.bangumiDetail!.episodes!,
+                      cid: widget.bangumiDetail!.episodes!.first.cid,
+                      sheetHeight: sheetHeight,
+                      changeFuc: (bvid, cid) =>
+                          bangumiIntroController.changeSeasonOrbangu(bvid, cid),
+                    )
+                  ],
+                ],
               )
-            ],
-          ],
-        ),
+            : const SizedBox(
+                height: 100,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
       ),
     );
   }

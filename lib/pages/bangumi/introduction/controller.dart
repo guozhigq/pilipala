@@ -18,7 +18,12 @@ import 'package:share_plus/share_plus.dart';
 class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
-  int seasonId = int.parse(Get.parameters['seasonId']!);
+  var seasonId = Get.parameters['seasonId'] != null
+      ? int.parse(Get.parameters['seasonId']!)
+      : null;
+  var epId = Get.parameters['epId'] != null
+      ? int.parse(Get.parameters['epId']!)
+      : null;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -84,9 +89,7 @@ class BangumiIntroController extends GetxController {
 
   // 获取番剧简介&选集
   Future queryBangumiIntro() async {
-    print('🐶🐶: $seasonId');
-    var result = await SearchHttp.bangumiInfo(seasonId: seasonId);
-    print("🐶🐶:${result['data']}");
+    var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
     if (result['status']) {
       bangumiDetail.value = result['data'];
     }

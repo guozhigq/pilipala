@@ -143,88 +143,93 @@ class _BangumiPanelState extends State<BangumiPanel> {
         SingleChildScrollView(
           padding: const EdgeInsets.only(top: 7, bottom: 7),
           scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (int i = 0; i < widget.pages.length; i++) ...[
-                Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Material(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    borderRadius: BorderRadius.circular(6),
-                    clipBehavior: Clip.hardEdge,
-                    child: InkWell(
-                      onTap: () async {
-                        if (widget.pages[i].badge != null) {
-                          SmartDialog.showToast('需要大会员');
-                          return;
-                        }
-                        await widget.changeFuc!(
-                          widget.pages[i].bvid,
-                          widget.pages[i].cid,
-                        );
-                        currentIndex = i;
-                        setState(() {});
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                if (i == currentIndex) ...[
-                                  Image.asset(
-                                    'assets/images/live.gif',
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    height: 12,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width,
+            ),
+            child: Row(
+              children: [
+                for (int i = 0; i < widget.pages.length; i++) ...[
+                  Container(
+                    width: 150,
+                    margin: const EdgeInsets.only(right: 10),
+                    child: Material(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                      borderRadius: BorderRadius.circular(6),
+                      clipBehavior: Clip.hardEdge,
+                      child: InkWell(
+                        onTap: () async {
+                          if (widget.pages[i].badge != null) {
+                            SmartDialog.showToast('需要大会员');
+                            return;
+                          }
+                          await widget.changeFuc!(
+                            widget.pages[i].bvid,
+                            widget.pages[i].cid,
+                          );
+                          currentIndex = i;
+                          setState(() {});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  if (i == currentIndex) ...[
+                                    Image.asset(
+                                      'assets/images/live.gif',
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      height: 12,
+                                    ),
+                                    const SizedBox(width: 6)
+                                  ],
+                                  Text(
+                                    '第${i + 1}话',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: i == currentIndex
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSurface),
                                   ),
-                                  const SizedBox(width: 6)
+                                  const SizedBox(width: 2),
+                                  if (widget.pages[i].badge != null) ...[
+                                    Image.asset(
+                                      'assets/images/big-vip.png',
+                                      height: 16,
+                                    ),
+                                  ],
                                 ],
-                                Text(
-                                  '第${i + 1}话',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: i == currentIndex
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
-                                ),
-                                const SizedBox(width: 2),
-                                if (widget.pages[i].badge != null) ...[
-                                  Image.asset(
-                                    'assets/images/big-vip.png',
-                                    height: 16,
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              widget.pages[i].longTitle!,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: i == currentIndex
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                widget.pages[i].longTitle!,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: i == currentIndex
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ]
-            ],
+                ]
+              ],
+            ),
           ),
         )
       ],

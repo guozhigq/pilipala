@@ -66,6 +66,7 @@ class VideoDetailData {
   HonorReply? honorReply;
   String? likeIcon;
   bool? needJumpBv;
+  String? epId;
 
   VideoDetailData({
     this.bvid,
@@ -101,6 +102,7 @@ class VideoDetailData {
     this.honorReply,
     this.likeIcon,
     this.needJumpBv,
+    this.epId,
   });
 
   VideoDetailData.fromJson(Map<String, dynamic> json) {
@@ -150,6 +152,15 @@ class VideoDetailData {
         : HonorReply.fromJson(json["honor_reply"]);
     likeIcon = json["like_icon"];
     needJumpBv = json["need_jump_bv"];
+    if (json['redirect_url'] != null) {
+      RegExp regex = RegExp(r'\d+');
+      Iterable<Match> matches = regex.allMatches(json['redirect_url']);
+      List<String> numbers = [];
+      for (Match match in matches) {
+        numbers.add(match.group(0)!);
+      }
+      epId = numbers[0];
+    }
   }
 
   Map<String, dynamic> toJson() => {

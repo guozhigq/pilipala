@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
+import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -47,6 +51,50 @@ class HistoryItem extends StatelessWidget {
             '/liveRoom?roomid=${videoItem.history.oid}',
             arguments: {'liveItem': liveItem},
           );
+        } else if (videoItem.badge == '番剧' ||
+            videoItem.tagName.contains('动画')) {
+          /// hack
+          var bvid = videoItem.history.bvid;
+          if (bvid != null && bvid != '') {
+            var result = await VideoHttp.videoIntro(bvid: bvid);
+            if (result['status']) {
+              String bvid = result['data'].bvid!;
+              int cid = result['data'].cid!;
+              String pic = result['data'].pic!;
+              String heroTag = Utils.makeHeroTag(cid);
+              Get.toNamed(
+                '/video?bvid=$bvid&cid=$cid&epId=${result['data'].epId}',
+                arguments: {
+                  'pic': pic,
+                  'heroTag': heroTag,
+                  'videoType': SearchType.media_bangumi,
+                },
+              );
+            }
+          } else {
+            if (videoItem.history.epid != '') {
+              SmartDialog.showLoading(msg: '获取中...');
+              var res =
+                  await SearchHttp.bangumiInfo(epId: videoItem.history.epid);
+              SmartDialog.dismiss();
+              if (res['status']) {
+                EpisodeItem episode = res['data'].episodes.first;
+                String bvid = episode.bvid!;
+                int cid = episode.cid!;
+                String pic = episode.cover!;
+                String heroTag = Utils.makeHeroTag(cid);
+                Get.toNamed(
+                  '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
+                  arguments: {
+                    'pic': pic,
+                    'heroTag': heroTag,
+                    'videoType': SearchType.media_bangumi,
+                    'bangumiItem': res['data'],
+                  },
+                );
+              }
+            }
+          }
         } else {
           int cid = videoItem.history.cid ??
               // videoItem.history.oid ??
@@ -150,7 +198,7 @@ class VideoContent extends StatelessWidget {
               maxLines: videoItem.videos > 1 ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
-            if (videoItem.videos > 1)
+            if (videoItem.showTitle != null)
               Text(
                 videoItem.showTitle,
                 textAlign: TextAlign.start,
