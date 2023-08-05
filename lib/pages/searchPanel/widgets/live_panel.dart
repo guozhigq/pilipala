@@ -49,7 +49,7 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
                           Hero(
                             tag: Utils.makeHeroTag(i.roomid),
                             child: NetworkImgLayer(
-                              src: i.cover + '@.webp',
+                              src: i.cover,
                               type: 'emote',
                               width: maxWidth,
                               height: maxHeight,

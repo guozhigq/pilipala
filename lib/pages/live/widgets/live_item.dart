@@ -65,7 +65,7 @@ class LiveCardV extends StatelessWidget {
                         Hero(
                           tag: heroTag,
                           child: NetworkImgLayer(
-                            src: '${liveItem.cover!}@.webp',
+                            src: liveItem.cover!,
                             width: maxWidth,
                             height: maxHeight,
                           ),

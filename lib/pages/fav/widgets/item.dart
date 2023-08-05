@@ -42,7 +42,7 @@ class FavItem extends StatelessWidget {
                         return Hero(
                           tag: heroTag,
                           child: NetworkImgLayer(
-                            src: favFolderItem.cover + '@.webp',
+                            src: favFolderItem.cover,
                             width: maxWidth,
                             height: maxHeight,
                           ),

@@ -11,6 +11,7 @@ class NetworkImgLayer extends StatelessWidget {
   final String? type;
   final Duration? fadeOutDuration;
   final Duration? fadeInDuration;
+  final int? quality;
 
   const NetworkImgLayer({
     Key? key,
@@ -22,6 +23,8 @@ class NetworkImgLayer extends StatelessWidget {
     this.type,
     this.fadeOutDuration,
     this.fadeInDuration,
+    // 图片质量 默认1%
+    this.quality = 1,
   }) : super(key: key);
 
   @override
@@ -37,7 +40,8 @@ class NetworkImgLayer extends StatelessWidget {
                     ? 0
                     : StyleString.imgRadius.x),
             child: CachedNetworkImage(
-              imageUrl: src!.startsWith('//') ? 'https:${src!}' : src!,
+              imageUrl:
+                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality}q.webp',
               width: width ?? double.infinity,
               height: height ?? double.infinity,
               alignment: Alignment.center,

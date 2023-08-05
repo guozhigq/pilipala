@@ -82,9 +82,8 @@ class HistoryItem extends StatelessWidget {
                                   tag: heroTag,
                                   child: NetworkImgLayer(
                                     src: (videoItem.cover != ''
-                                            ? videoItem.cover
-                                            : videoItem.covers.first) +
-                                        '@.webp',
+                                        ? videoItem.cover
+                                        : videoItem.covers.first),
                                     width: maxWidth,
                                     height: maxHeight,
                                   ),

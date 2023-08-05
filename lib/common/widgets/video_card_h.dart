@@ -76,7 +76,7 @@ class VideoCardH extends StatelessWidget {
                                   Hero(
                                     tag: heroTag,
                                     child: NetworkImgLayer(
-                                      src: videoItem.pic + '@.webp',
+                                      src: videoItem.pic,
                                       width: maxWidth,
                                       height: maxHeight,
                                     ),
