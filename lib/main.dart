@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -16,11 +17,15 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  await GStrorage.init();
-  runApp(const MyApp());
-  await Request.setCookie();
-  await Data.init();
-  await GStrorage.lazyInit();
+  SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+      .then((_) async {
+    await GStrorage.init();
+    runApp(const MyApp());
+    await Request.setCookie();
+    await Data.init();
+    await GStrorage.lazyInit();
+  });
 }
 
 class MyApp extends StatelessWidget {
