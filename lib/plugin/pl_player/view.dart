@@ -504,12 +504,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 final double dy = details.delta.dy;
                 const double threshold = 7.0; // 滑动阈值
                 if (dy > _distance && dy > threshold) {
-                  if (!_.isFullScreen.value) {
+                  if (_.isFullScreen.value) {
+                    // 下滑退出全屏
                     await triggerFullScreen();
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
-                  if (_.isFullScreen.value) {
+                  if (!_.isFullScreen.value) {
+                    // 上滑进入全屏
                     await triggerFullScreen();
                   }
                   _distance = 0.0;
