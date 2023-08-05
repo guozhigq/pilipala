@@ -41,9 +41,10 @@ class FavDetailItemData {
     this.bvId,
     this.bvid,
     // this.season,
-    // this.ogv,
+    this.ogv,
     this.stat,
     this.cid,
+    this.epId,
   });
 
   int? id;
@@ -62,8 +63,10 @@ class FavDetailItemData {
   int? favTime;
   String? bvId;
   String? bvid;
+  Map? ogv;
   Stat? stat;
   int? cid;
+  String? epId;
 
   FavDetailItemData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -82,8 +85,22 @@ class FavDetailItemData {
     favTime = json['fav_time'];
     bvId = json['bv_id'];
     bvid = json['bvid'];
+    ogv = json['ogv'];
     stat = Stat.fromJson(json['cnt_info']);
-    cid = json['ugc']['first_cid'];
+    cid = json['ugc'] != null ? json['ugc']['first_cid'] : null;
+    if (json['link'] != null && json['link'].contains('/bangumi')) {
+      epId = resolveEpId(json['link']);
+    }
+  }
+
+  String resolveEpId(url) {
+    RegExp regex = RegExp(r'\d+');
+    Iterable<Match> matches = regex.allMatches(url);
+    List<String> numbers = [];
+    for (Match match in matches) {
+      numbers.add(match.group(0)!);
+    }
+    return numbers[0];
   }
 }
 
