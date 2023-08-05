@@ -69,7 +69,8 @@ class UserHttp {
       'keyword': keyword,
       'order': order,
       'type': 0,
-      'tid': 0
+      'tid': 0,
+      'platform': 'web'
     });
     if (res.data['code'] == 0) {
       FavDetailData data = FavDetailData.fromJson(res.data['data']);

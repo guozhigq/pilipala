@@ -13,6 +13,7 @@ import 'package:pilipala/pages/bangumi/widgets/bangumi_panel.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/action_item.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/action_row_item.dart';
+import 'package:pilipala/pages/video/detail/introduction/widgets/fav_panel.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -110,14 +111,14 @@ class _BangumiInfoState extends State<BangumiInfo> {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    // showModalBottomSheet(
-    //   context: context,
-    //   useRootNavigator: true,
-    //   isScrollControlled: true,
-    //   builder: (context) {
-    //     return FavPanel(ctr: videoIntroController);
-    //   },
-    // );
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return FavPanel(ctr: bangumiIntroController);
+      },
+    );
   }
 
   // 视频介绍
@@ -356,12 +357,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           ? widget.bangumiDetail!.stat!['likes']!.toString()
                           : '-'),
                 ),
-                ActionItem(
-                    icon: const Icon(FontAwesomeIcons.clock),
-                    onTap: () => () {},
-                    selectStatus: false,
-                    loadingStatus: widget.loadingStatus,
-                    text: '稍后再看'),
                 Obx(
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.b),
@@ -377,13 +372,22 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.star),
                       selectIcon: const Icon(FontAwesomeIcons.solidStar),
-                      // onTap: () => videoIntroController.actionFavVideo(),
                       onTap: () => showFavBottomSheet(),
                       selectStatus: bangumiIntroController.hasFav.value,
                       loadingStatus: widget.loadingStatus,
                       text: !widget.loadingStatus
                           ? widget.bangumiDetail!.stat!['favorite']!.toString()
                           : '-'),
+                ),
+                ActionItem(
+                  icon: const Icon(FontAwesomeIcons.comment),
+                  selectIcon: const Icon(FontAwesomeIcons.reply),
+                  onTap: () => videoDetailCtr!.tabCtr!.animateTo(1),
+                  selectStatus: false,
+                  loadingStatus: widget.loadingStatus,
+                  text: !widget.loadingStatus
+                      ? widget.bangumiDetail!.stat!['reply']!.toString()
+                      : '-',
                 ),
                 ActionItem(
                     icon: const Icon(FontAwesomeIcons.shareFromSquare),
