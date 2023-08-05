@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -620,11 +620,12 @@ InlineSpan buildContent(
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  // Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-                  //     .meeduPlayerController
-                  //     .seekTo(
-                  //       Duration(seconds: Utils.duration(matchStr)),
-                  //     );
+                  // 跳转到指定位置
+                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+                      .plPlayerController
+                      .seekTo(
+                        Duration(seconds: Utils.duration(matchStr)),
+                      );
                 },
             ),
           );
@@ -684,7 +685,6 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
-        print(picList);
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
