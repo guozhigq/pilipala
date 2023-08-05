@@ -42,7 +42,6 @@ class LiveCardV extends StatelessWidget {
         },
         child: InkWell(
           onTap: () async {
-            await Future.delayed(const Duration(milliseconds: 200));
             Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
                 arguments: {'liveItem': liveItem, 'heroTag': heroTag});
           },

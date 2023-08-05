@@ -45,7 +45,6 @@ class VideoCardV extends StatelessWidget {
         },
         child: InkWell(
           onTap: () async {
-            await Future.delayed(const Duration(milliseconds: 200));
             String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
             Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
                 arguments: {'videoItem': videoItem, 'heroTag': heroTag});

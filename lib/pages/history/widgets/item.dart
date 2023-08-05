@@ -24,7 +24,6 @@ class HistoryItem extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
-        await Future.delayed(const Duration(milliseconds: 200));
         if (videoItem.history.business.contains('article')) {
           int cid = videoItem.history.cid ??
               // videoItem.history.oid ??

@@ -47,6 +47,13 @@ class MyApp extends StatelessWidget {
                   brightness: Brightness.light,
                 ),
             useMaterial3: true,
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: ZoomPageTransitionsBuilder(
+                  allowEnterRouteSnapshotting: false,
+                ),
+              },
+            ),
           ),
           darkTheme: ThemeData(
             fontFamily: 'HarmonyOS',
