@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/sliver_header.dart';
+import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
@@ -324,16 +326,25 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               return CustomScrollView(
                                 key: const PageStorageKey<String>('简介'),
                                 slivers: <Widget>[
-                                  const VideoIntroPanel(),
-                                  SliverPersistentHeader(
-                                    floating: true,
-                                    pinned: true,
-                                    delegate: SliverHeaderDelegate(
-                                      height: 50,
-                                      child:
-                                          const MenuRow(loadingStatus: false),
+                                  if (videoDetailController.videoType ==
+                                      SearchType.video) ...[
+                                    const VideoIntroPanel(),
+                                  ] else if (videoDetailController.videoType ==
+                                      SearchType.media_bangumi) ...[
+                                    const BangumiIntroPanel()
+                                  ],
+                                  if (videoDetailController.videoType ==
+                                      SearchType.video) ...[
+                                    SliverPersistentHeader(
+                                      floating: true,
+                                      pinned: true,
+                                      delegate: SliverHeaderDelegate(
+                                        height: 50,
+                                        child:
+                                            const MenuRow(loadingStatus: false),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                   const RelatedVideoPanel(),
                                 ],
                               );

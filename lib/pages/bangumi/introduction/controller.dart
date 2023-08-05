@@ -3,31 +3,42 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
-class VideoIntroController extends GetxController {
+class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
+  var seasonId = Get.parameters['seasonId'] != null
+      ? int.parse(Get.parameters['seasonId']!)
+      : null;
+  var epId = Get.parameters['epId'] != null
+      ? int.parse(Get.parameters['epId']!)
+      : null;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
 
   // 视频详情 上个页面传入
   Map? videoItem = {};
+  BangumiInfoModel? bangumiItem;
 
   // 请求状态
   RxBool isLoading = false.obs;
 
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
+  Rx<BangumiInfoModel> bangumiDetail = BangumiInfoModel().obs;
 
   // 请求返回的信息
   String responseMsg = '请求异常';
@@ -54,51 +65,44 @@ class VideoIntroController extends GetxController {
   void onInit() {
     super.onInit();
     if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('videoItem')) {
+      if (Get.arguments.containsKey('bangumiItem')) {
         preRender = true;
-        var args = Get.arguments['videoItem'];
-        videoItem!['pic'] = args.pic;
-        if (args.title is String) {
-          videoItem!['title'] = args.title;
-        } else {
-          String str = '';
-          for (Map map in args.title) {
-            str += map['text'];
-          }
-          videoItem!['title'] = str;
-        }
-        if (args.stat != null) {
-          videoItem!['stat'] = args.stat;
-        }
-        videoItem!['pubdate'] = args.pubdate;
-        videoItem!['owner'] = args.owner;
+        bangumiItem = Get.arguments['bangumiItem'];
+        // bangumiItem!['pic'] = args.pic;
+        // if (args.title is String) {
+        //   videoItem!['title'] = args.title;
+        // } else {
+        //   String str = '';
+        //   for (Map map in args.title) {
+        //     str += map['text'];
+        //   }
+        //   videoItem!['title'] = str;
+        // }
+        // if (args.stat != null) {
+        //   videoItem!['stat'] = args.stat;
+        // }
+        // videoItem!['pubdate'] = args.pubdate;
+        // videoItem!['owner'] = args.owner;
       }
     }
     userLogin = user.get(UserBoxKey.userLogin) != null;
   }
 
-  // 获取视频简介&分p
-  Future queryVideoIntro() async {
-    var result = await VideoHttp.videoIntro(bvid: bvid);
+  // 获取番剧简介&选集
+  Future queryBangumiIntro() async {
+    var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
     if (result['status']) {
-      videoDetail.value = result['data']!;
-      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-          .tabs
-          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
-      // 获取到粉丝数再返回
-      await queryUserStat();
-    } else {
-      responseMsg = result['msg'];
+      bangumiDetail.value = result['data'];
     }
     if (userLogin) {
       // 获取点赞状态
-      queryHasLikeVideo();
+      // queryHasLikeVideo();
       // 获取投币状态
-      queryHasCoinVideo();
+      // queryHasCoinVideo();
       // 获取收藏状态
-      queryHasFavVideo();
+      // queryHasFavVideo();
       //
-      queryFollowStatus();
+      // queryFollowStatus();
     }
     return result;
   }
@@ -327,75 +331,18 @@ class VideoIntroController extends GetxController {
     return result;
   }
 
-  // 关注/取关up
-  Future actionRelationMod() async {
-    feedBack();
-    if (user.get(UserBoxKey.userMid) == null) {
-      SmartDialog.showToast('账号未登录');
-      return;
-    }
-    int currentStatus = followStatus['attribute'];
-    int actionStatus = 0;
-    switch (currentStatus) {
-      case 0:
-        actionStatus = 1;
-        break;
-      case 2:
-        actionStatus = 2;
-        break;
-      default:
-        actionStatus = 0;
-        break;
-    }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
-          actions: [
-            TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
-            TextButton(
-              onPressed: () async {
-                var result = await VideoHttp.relationMod(
-                  mid: videoDetail.value.owner!.mid!,
-                  act: actionStatus,
-                  reSrc: 14,
-                );
-                if (result['status']) {
-                  switch (currentStatus) {
-                    case 0:
-                      actionStatus = 2;
-                      break;
-                    case 2:
-                      actionStatus = 0;
-                      break;
-                    default:
-                      actionStatus = 0;
-                      break;
-                  }
-                  followStatus['attribute'] = actionStatus;
-                  followStatus.refresh();
-                }
-                SmartDialog.dismiss();
-              },
-              child: const Text('确认'),
-            )
-          ],
-        );
-      },
-    );
-  }
-
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid) async {
-    var _videoDetailCtr =
+  Future changeSeasonOrbangu(bvid, cid, aid) async {
+    // 重新获取视频资源
+    VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    _videoDetailCtr.bvid = bvid;
-    _videoDetailCtr.cid = cid;
-    _videoDetailCtr.queryVideoUrl();
+    videoDetailCtr.bvid = bvid;
+    videoDetailCtr.cid = cid;
+    videoDetailCtr.queryVideoUrl();
+    // 重新请求评论
+    VideoReplyController videoReplyCtr =
+        Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+    videoReplyCtr.aid = aid;
+    videoReplyCtr.queryReplyList(type: 'init');
   }
 }

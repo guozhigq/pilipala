@@ -27,6 +27,7 @@ class _SearchPanelState extends State<SearchPanel>
   late SearchPanelController? _searchPanelController;
 
   bool _isLoadingMore = false;
+  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -53,6 +54,7 @@ class _SearchPanelState extends State<SearchPanel>
         }
       }
     });
+    _futureBuilderFuture = _searchPanelController!.onSearch();
   }
 
   @override
@@ -63,7 +65,7 @@ class _SearchPanelState extends State<SearchPanel>
         await _searchPanelController!.onRefresh();
       },
       child: FutureBuilder(
-        future: _searchPanelController!.onSearch(),
+        future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data;

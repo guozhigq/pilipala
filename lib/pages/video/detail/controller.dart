@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -22,6 +23,9 @@ class VideoDetailController extends GetxController
   // 视频aid
   String bvid = Get.parameters['bvid']!;
   int cid = int.parse(Get.parameters['cid']!);
+  // 视频类型 默认投稿视频
+  SearchType videoType = SearchType.video;
+
   late PlayUrlModel data;
   // 当前画质
   late VideoQuality currentVideoQa;
@@ -74,6 +78,7 @@ class VideoDetailController extends GetxController
         bgCover.value = Get.arguments['pic'];
       }
       heroTag = Get.arguments['heroTag'];
+      videoType = Get.arguments['videoType'] ?? SearchType.video;
     }
     tabCtr = TabController(length: 2, vsync: this);
     // queryVideoUrl();

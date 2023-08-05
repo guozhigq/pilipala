@@ -277,10 +277,12 @@ class SearchMBangumiModel {
   SearchMBangumiModel({this.list});
   List<SearchMBangumiItemModel>? list;
   SearchMBangumiModel.fromJson(Map<String, dynamic> json) {
-    list = json['result']
-        .map<SearchMBangumiItemModel>(
-            (e) => SearchMBangumiItemModel.fromJson(e))
-        .toList();
+    list = json['result'] != null
+        ? json['result']
+            .map<SearchMBangumiItemModel>(
+                (e) => SearchMBangumiItemModel.fromJson(e))
+            .toList()
+        : [];
   }
 }
 
