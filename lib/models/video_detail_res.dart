@@ -153,14 +153,18 @@ class VideoDetailData {
     likeIcon = json["like_icon"];
     needJumpBv = json["need_jump_bv"];
     if (json['redirect_url'] != null) {
-      RegExp regex = RegExp(r'\d+');
-      Iterable<Match> matches = regex.allMatches(json['redirect_url']);
-      List<String> numbers = [];
-      for (Match match in matches) {
-        numbers.add(match.group(0)!);
-      }
-      epId = numbers[0];
+      epId = resolveEpId(json['redirect_url']);
     }
+  }
+
+  String resolveEpId(url) {
+    RegExp regex = RegExp(r'\d+');
+    Iterable<Match> matches = regex.allMatches(url);
+    List<String> numbers = [];
+    for (Match match in matches) {
+      numbers.add(match.group(0)!);
+    }
+    return numbers[0];
   }
 
   Map<String, dynamic> toJson() => {

@@ -144,7 +144,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 () => ComBtn(
                   icon: Icon(
                     _.isFullScreen.value
-                        ? FontAwesomeIcons.a
+                        ? FontAwesomeIcons.compress
                         : FontAwesomeIcons.expand,
                     size: 15,
                     color: Colors.white,

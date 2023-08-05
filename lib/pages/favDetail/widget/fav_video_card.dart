@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/search.dart';
+import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -20,7 +23,7 @@ class FavVideoCardH extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int id = videoItem.id;
-    String bvid = IdUtils.av2bv(id);
+    String bvid = videoItem.bvid ?? IdUtils.av2bv(id);
     String heroTag = Utils.makeHeroTag(id);
     return Dismissible(
       movementDuration: const Duration(milliseconds: 300),
@@ -44,9 +47,33 @@ class FavVideoCardH extends StatelessWidget {
       },
       child: InkWell(
         onTap: () async {
-          await Future.delayed(const Duration(milliseconds: 200));
-          Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
-              arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+          // int? seasonId;
+          String? epId;
+          if (videoItem.ogv != null && videoItem.ogv['type_name'] == '番剧') {
+            videoItem.cid = await SearchHttp.ab2c(bvid: bvid);
+            // seasonId = videoItem.ogv['season_id'];
+            epId = videoItem.epId;
+          } else if (videoItem.page == 0 || videoItem.page > 1) {
+            var result = await VideoHttp.videoIntro(bvid: bvid);
+            if (result['status']) {
+              epId = result['data'].epId;
+            }
+          }
+
+          Map<String, String> parameters = {
+            'bvid': bvid,
+            'cid': videoItem.cid.toString(),
+            'epId': epId ?? '',
+          };
+          // if (seasonId != null) {
+          //   parameters['seasonId'] = seasonId.toString();
+          // }
+          Get.toNamed('/video', parameters: parameters, arguments: {
+            'videoItem': videoItem,
+            'heroTag': heroTag,
+            'videoType':
+                epId != null ? SearchType.media_bangumi : SearchType.video,
+          });
         },
         child: Column(
           children: [
