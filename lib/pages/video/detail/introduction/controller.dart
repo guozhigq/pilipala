@@ -8,6 +8,7 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
+import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -391,11 +392,22 @@ class VideoIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid) async {
-    var _videoDetailCtr =
+  Future changeSeasonOrbangu(bvid, cid, aid) async {
+    // 重新获取视频资源
+    VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    _videoDetailCtr.bvid = bvid;
-    _videoDetailCtr.cid = cid;
-    _videoDetailCtr.queryVideoUrl();
+    videoDetailCtr.bvid = bvid;
+    videoDetailCtr.cid = cid;
+    videoDetailCtr.queryVideoUrl();
+    // 重新请求评论
+    try {
+      /// 未渲染回复组件时可能异常
+      VideoReplyController videoReplyCtr =
+          Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+      videoReplyCtr.aid = aid;
+      videoReplyCtr.queryReplyList(type: 'init');
+    } catch (_) {}
+    this.bvid = bvid;
+    await queryVideoIntro();
   }
 }

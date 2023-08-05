@@ -63,7 +63,11 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
           if (snapshot.data['status']) {
             // 请求成功
             // return _buildView(context, false, videoDetail);
-            return VideoInfo(loadingStatus: false, videoDetail: videoDetail);
+            return Obx(
+              () => VideoInfo(
+                  loadingStatus: false,
+                  videoDetail: videoIntroController.videoDetail.value),
+            );
           } else {
             // 请求错误
             return HttpError(
@@ -235,8 +239,13 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   // 合集
                   if (!widget.loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
-                    seasonPanel(widget.videoDetail!.ugcSeason!,
-                        widget.videoDetail!.pages!.first.cid, sheetHeight)
+                    SeasonPanel(
+                      ugcSeason: widget.videoDetail!.ugcSeason!,
+                      cid: widget.videoDetail!.pages!.first.cid,
+                      sheetHeight: sheetHeight,
+                      changeFuc: (bvid, cid, aid) => videoIntroController
+                          .changeSeasonOrbangu(bvid, cid, aid),
+                    )
                   ],
                   GestureDetector(
                     onTap: () {
