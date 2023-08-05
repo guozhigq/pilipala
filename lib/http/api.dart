@@ -237,4 +237,10 @@ class Api {
 
   // 用户动态
   static const String memberDynamic = '/x/polymer/web-dynamic/v1/feed/space';
+
+  // 稍后再看
+  static const String toViewLater = '/x/v2/history/toview/add';
+
+  // 移除已观看
+  static const String toViewDel = '/x/v2/history/toview/del';
 }

@@ -1,8 +1,10 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -42,6 +44,11 @@ class VideoCardV extends StatelessWidget {
           if (longPressEnd != null) {
             longPressEnd!();
           }
+        },
+        // 双击 稍后再看
+        onDoubleTap: () async {
+          var res = await UserHttp.toViewLater(bvid: videoItem.bvid);
+          SmartDialog.showToast(res['msg']);
         },
         child: InkWell(
           onTap: () async {

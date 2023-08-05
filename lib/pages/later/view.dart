@@ -28,10 +28,28 @@ class _LaterPageState extends State<LaterPage> {
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: Text(
-          '稍后再看',
-          style: Theme.of(context).textTheme.titleMedium,
+        title: Obx(
+          () => Text(
+            '稍后再看 (${_laterController.laterList.length}/100)',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => _laterController.toViewDel(),
+            child: const Text('移除已看'),
+          ),
+          // IconButton(
+          //   tooltip: '一键清空',
+          //   onPressed: () {},
+          //   icon: Icon(
+          //     Icons.clear_all_outlined,
+          //     size: 21,
+          //     color: Theme.of(context).colorScheme.primary,
+          //   ),
+          // ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: CustomScrollView(
         controller: _laterController.scrollController,

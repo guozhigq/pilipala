@@ -143,4 +143,40 @@ class UserHttp {
     );
     return res;
   }
+
+  // 稍后再看
+  static Future toViewLater({String? bvid, dynamic aid}) async {
+    var data = {'csrf': await Request.getCsrf()};
+    if (bvid != null) {
+      data['bvid'] = bvid;
+    } else if (aid != null) {
+      data['aid'] = aid;
+    }
+    var res = await Request().post(
+      Api.toViewLater,
+      queryParameters: data,
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': 'yeah！稍后再看'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 移除已观看
+  static Future toViewDel() async {
+    var res = await Request().post(
+      Api.toViewDel,
+      queryParameters: {
+        'jsonp': 'jsonp',
+        'viewed': true,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': 'yeah！成功移除'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }

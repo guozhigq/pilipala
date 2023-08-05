@@ -6,6 +6,7 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -38,6 +39,11 @@ class VideoCardH extends StatelessWidget {
         if (longPressEnd != null) {
           longPressEnd!();
         }
+      },
+      // 双击 稍后再看
+      onDoubleTap: () async {
+        var res = await UserHttp.toViewLater(bvid: videoItem.bvid);
+        SmartDialog.showToast(res['msg']);
       },
       child: InkWell(
         onTap: () async {
