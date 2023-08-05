@@ -96,13 +96,13 @@ class BangumiIntroController extends GetxController {
     }
     if (userLogin) {
       // 获取点赞状态
-      // queryHasLikeVideo();
+      queryHasLikeVideo();
       // 获取投币状态
-      // queryHasCoinVideo();
+      queryHasCoinVideo();
       // 获取收藏状态
-      // queryHasFavVideo();
+      queryHasFavVideo();
       //
-      // queryFollowStatus();
+      queryFollowStatus();
     }
     return result;
   }
@@ -340,9 +340,12 @@ class BangumiIntroController extends GetxController {
     videoDetailCtr.cid = cid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
-    VideoReplyController videoReplyCtr =
-        Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
-    videoReplyCtr.aid = aid;
-    videoReplyCtr.queryReplyList(type: 'init');
+    try {
+      /// 未渲染回复组件时可能异常
+      VideoReplyController videoReplyCtr =
+          Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+      videoReplyCtr.aid = aid;
+      videoReplyCtr.queryReplyList(type: 'init');
+    } catch (_) {}
   }
 }
