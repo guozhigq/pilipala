@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 
 class ScrollAppBar extends StatelessWidget {
   final double scrollVal;
   final Function callback;
-  final bool playerStatus;
+  final PlayerStatus playerStatus;
 
   const ScrollAppBar(
     this.scrollVal,
@@ -33,9 +34,18 @@ class ScrollAppBar extends StatelessWidget {
             centerTitle: true,
             title: TextButton(
               onPressed: () => callback(),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [Icon(Icons.play_arrow_rounded), Text('继续播放')],
+                children: [
+                  const Icon(Icons.play_arrow_rounded),
+                  Text(
+                    playerStatus == PlayerStatus.paused
+                        ? '继续播放'
+                        : playerStatus == PlayerStatus.completed
+                            ? '重新播放'
+                            : '播放中',
+                  )
+                ],
               ),
             ),
             actions: [

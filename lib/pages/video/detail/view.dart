@@ -82,6 +82,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
+  // 继续播放或重新播放
   void continuePlay() async {
     await _extendNestCtr.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
@@ -103,6 +104,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (videoDetailController.timer!.isActive) {
       videoDetailController.timer!.cancel();
     }
+    plPlayerController!.pause();
     super.didPushNext();
   }
 
@@ -368,8 +370,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             builder: ((context, snapshot) {
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
-                () {},
-                playerStatus != PlayerStatus.playing,
+                () => continuePlay(),
+                playerStatus,
                 null,
               );
             }),
