@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
@@ -6,6 +9,7 @@ import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
+import 'package:pilipala/pages/main/index.dart';
 
 import 'controller.dart';
 
@@ -26,14 +30,25 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
-    _rcmdController.scrollController.addListener(
+    ScrollController scrollController = _rcmdController.scrollController;
+    StreamController<bool> mainStream =
+        Get.find<MainController>().bottomBarStream;
+    scrollController.addListener(
       () {
-        if (_rcmdController.scrollController.position.pixels >=
-            _rcmdController.scrollController.position.maxScrollExtent - 200) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 200) {
           if (!_rcmdController.isLoadingMore) {
             _rcmdController.isLoadingMore = true;
             _rcmdController.onLoad();
           }
+        }
+
+        final ScrollDirection direction =
+            scrollController.position.userScrollDirection;
+        if (direction == ScrollDirection.forward) {
+          mainStream.add(true);
+        } else if (direction == ScrollDirection.reverse) {
+          mainStream.add(false);
         }
       },
     );

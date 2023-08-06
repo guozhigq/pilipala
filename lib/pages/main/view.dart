@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -105,6 +107,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
     return Scaffold(
+      extendBody: true,
       body: FadeTransition(
         opacity: _fadeAnimation!,
         child: SlideTransition(
@@ -129,21 +132,33 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        // type: BottomNavigationBarType.shifting,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-        selectedFontSize: 12.4,
-        onTap: (value) => setIndex(value),
-        items: [
-          ..._mainController.navigationBars.map((e) {
-            return BottomNavigationBarItem(
-              icon: e['icon'],
-              label: e['label'],
-            );
-          }).toList(),
-        ],
+      bottomNavigationBar: StreamBuilder(
+        stream: _mainController.bottomBarStream.stream,
+        initialData: true,
+        builder: (context, AsyncSnapshot snapshot) {
+          return AnimatedSlide(
+            curve: Curves.linear,
+            duration: const Duration(milliseconds: 300),
+            offset: Offset(0, snapshot.data ? 0 : 1),
+            child: BottomNavigationBar(
+              currentIndex: selectedIndex,
+              // type: BottomNavigationBarType.shifting,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor:
+                  Theme.of(context).colorScheme.onSurfaceVariant,
+              selectedFontSize: 12.4,
+              onTap: (value) => setIndex(value),
+              items: [
+                ..._mainController.navigationBars.map((e) {
+                  return BottomNavigationBarItem(
+                    icon: e['icon'],
+                    label: e['label'],
+                  );
+                }).toList(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

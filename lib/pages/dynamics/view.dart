@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -36,17 +40,26 @@ class _DynamicsPageState extends State<DynamicsPage>
   void initState() {
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
-
-    _dynamicsController.scrollController.addListener(
+    ScrollController scrollController = _dynamicsController.scrollController;
+    StreamController<bool> mainStream =
+        Get.find<MainController>().bottomBarStream;
+    scrollController.addListener(
       () async {
-        if (_dynamicsController.scrollController.position.pixels >=
-            _dynamicsController.scrollController.position.maxScrollExtent -
-                200) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 200) {
           if (!_isLoadingMore) {
             _isLoadingMore = true;
             await _dynamicsController.queryFollowDynamic(type: 'onLoad');
             _isLoadingMore = false;
           }
+        }
+
+        final ScrollDirection direction =
+            scrollController.position.userScrollDirection;
+        if (direction == ScrollDirection.forward) {
+          mainStream.add(true);
+        } else if (direction == ScrollDirection.reverse) {
+          mainStream.add(false);
         }
       },
     );

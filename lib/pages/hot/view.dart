@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
@@ -6,6 +9,7 @@ import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/pages/hot/controller.dart';
+import 'package:pilipala/pages/main/index.dart';
 
 class HotPage extends StatefulWidget {
   const HotPage({Key? key}) : super(key: key);
@@ -26,14 +30,25 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   void initState() {
     super.initState();
     _futureBuilderFuture = _hotController.queryHotFeed('init');
-    _hotController.scrollController.addListener(
+    ScrollController scrollController = _hotController.scrollController;
+    StreamController<bool> mainStream =
+        Get.find<MainController>().bottomBarStream;
+    scrollController.addListener(
       () {
-        if (_hotController.scrollController.position.pixels >=
-            _hotController.scrollController.position.maxScrollExtent - 200) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 200) {
           if (!_hotController.isLoadingMore) {
             _hotController.isLoadingMore = true;
             _hotController.onLoad();
           }
+        }
+
+        final ScrollDirection direction =
+            scrollController.position.userScrollDirection;
+        if (direction == ScrollDirection.forward) {
+          mainStream.add(true);
+        } else if (direction == ScrollDirection.reverse) {
+          mainStream.add(false);
         }
       },
     );
