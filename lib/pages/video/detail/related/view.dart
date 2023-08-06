@@ -27,17 +27,24 @@ class RelatedVideoPanel extends GetView<ReleatedController> {
                       return SizedBox(
                           height: MediaQuery.of(context).padding.bottom);
                     } else {
-                      return VideoCardH(
-                        videoItem: snapshot.data['data'][index],
-                        longPress: () {
-                          ReleatedController().popupDialog =
-                              _createPopupDialog(snapshot.data['data'][index]);
-                          Overlay.of(context)
-                              .insert(ReleatedController().popupDialog!);
-                        },
-                        longPressEnd: () {
-                          ReleatedController().popupDialog?.remove();
-                        },
+                      return Material(
+                        child: VideoCardH(
+                          videoItem: snapshot.data['data'][index],
+                          longPress: () {
+                            try {
+                              ReleatedController().popupDialog =
+                                  _createPopupDialog(
+                                      snapshot.data['data'][index]);
+                              Overlay.of(context)
+                                  .insert(ReleatedController().popupDialog!);
+                            } catch (_) {
+                              return {};
+                            }
+                          },
+                          longPressEnd: () {
+                            ReleatedController().popupDialog?.remove();
+                          },
+                        ),
                       );
                     }
                   }, childCount: snapshot.data['data'].length + 1));

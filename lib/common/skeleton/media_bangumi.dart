@@ -28,9 +28,9 @@ class _MediaBangumiSkeletonState extends State<MediaBangumiSkeleton> {
                   color: bgColor),
             ),
             const SizedBox(width: 10),
-            SizedBox(
-              height: 148,
-              child: Expanded(
+            Expanded(
+              child: SizedBox(
+                height: 148,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

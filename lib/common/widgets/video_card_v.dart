@@ -45,11 +45,6 @@ class VideoCardV extends StatelessWidget {
             longPressEnd!();
           }
         },
-        // 双击 稍后再看
-        onDoubleTap: () async {
-          var res = await UserHttp.toViewLater(bvid: videoItem.bvid);
-          SmartDialog.showToast(res['msg']);
-        },
         child: InkWell(
           onTap: () async {
             String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
@@ -119,7 +114,7 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
+        padding: const EdgeInsets.fromLTRB(4, 5, 0, 3),
         // 单列
         // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
         child: Column(
@@ -184,6 +179,26 @@ class VideoContent extends StatelessWidget {
                       ),
                     );
                   }),
+                ),
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: IconButton(
+                    tooltip: '稍后再看',
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () async {
+                      var res =
+                          await UserHttp.toViewLater(bvid: videoItem.bvid);
+                      SmartDialog.showToast(res['msg']);
+                    },
+                    icon: Icon(
+                      Icons.more_vert_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 14,
+                    ),
+                  ),
                 ),
               ],
             ),

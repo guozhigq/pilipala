@@ -60,29 +60,26 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
           ),
           const SizedBox(width: 10)
         ],
-        title: Hero(
-          tag: 'searchWrap',
-          child: Obx(
-            () => TextField(
-              autofocus: true,
-              focusNode: _searchController.searchFocusNode,
-              controller: _searchController.controller.value,
-              textInputAction: TextInputAction.search,
-              onChanged: (value) => _searchController.onChange(value),
-              decoration: InputDecoration(
-                hintText: _searchController.hintText,
-                border: InputBorder.none,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.clear,
-                    size: 22,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  onPressed: () => _searchController.onClear(),
+        title: Obx(
+          () => TextField(
+            autofocus: true,
+            focusNode: _searchController.searchFocusNode,
+            controller: _searchController.controller.value,
+            textInputAction: TextInputAction.search,
+            onChanged: (value) => _searchController.onChange(value),
+            decoration: InputDecoration(
+              hintText: _searchController.hintText,
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  size: 22,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
+                onPressed: () => _searchController.onClear(),
               ),
-              onSubmitted: (String value) => _searchController.submit(),
             ),
+            onSubmitted: (String value) => _searchController.submit(),
           ),
         ),
       ),

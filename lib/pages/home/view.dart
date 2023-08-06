@@ -165,49 +165,45 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Hero(
-                        tag: 'searchWrap',
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.toNamed('/search', parameters: {
-                              'hintText': ctr.defaultSearch.value
-                            });
-                          },
-                          child: Container(
-                            width: 250,
-                            height: 45,
-                            clipBehavior: Clip.hardEdge,
-                            padding: const EdgeInsets.only(left: 12, right: 22),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(25)),
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onInverseSurface,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.search_outlined,
-                                  size: 23,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                const SizedBox(width: 7),
-                                Expanded(
-                                  child: Obx(
-                                    () => Text(
-                                      ctr.defaultSearch.value,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .outline),
-                                    ),
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.toNamed('/search', parameters: {
+                            'hintText': ctr.defaultSearch.value
+                          });
+                        },
+                        child: Container(
+                          width: 250,
+                          height: 45,
+                          clipBehavior: Clip.hardEdge,
+                          padding: const EdgeInsets.only(left: 12, right: 22),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(25)),
+                            color:
+                                Theme.of(context).colorScheme.onInverseSurface,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search_outlined,
+                                size: 23,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                              const SizedBox(width: 7),
+                              Expanded(
+                                child: Obx(
+                                  () => Text(
+                                    ctr.defaultSearch.value,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
