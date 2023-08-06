@@ -66,7 +66,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
           _homeController.onRefresh();
         } else {
-          await Future.delayed(const Duration(microseconds: 300));
           _homeController.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
@@ -82,7 +81,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
           _dynamicController.onRefresh();
         } else {
-          await Future.delayed(const Duration(microseconds: 300));
           _dynamicController.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;

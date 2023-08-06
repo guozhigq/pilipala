@@ -167,6 +167,10 @@ class Api {
   // 热搜
   static const String hotSearchList =
       'https://s.search.bilibili.com/main/hotword';
+
+  // 默认搜索词
+  static const String searchDefault = '/x/web-interface/wbi/search/default';
+
   // 搜索关键词
   static const String serachSuggest =
       'https://s.search.bilibili.com/main/suggest';

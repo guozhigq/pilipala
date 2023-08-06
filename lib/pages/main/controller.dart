@@ -35,5 +35,6 @@ class MainController extends GetxController {
       'label': "媒体库",
     }
   ].obs;
-  final StreamController<bool> bottomBarStream = StreamController<bool>();
+  final StreamController<bool> bottomBarStream =
+      StreamController<bool>.broadcast();
 }

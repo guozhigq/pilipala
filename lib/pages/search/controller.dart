@@ -19,6 +19,7 @@ class SSearchController extends GetxController {
   RxList<SearchSuggestItem> searchSuggestList = [SearchSuggestItem()].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
+  String hintText = '搜索';
 
   @override
   void onInit() {
@@ -33,7 +34,13 @@ class SSearchController extends GetxController {
     }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
-      onClickKeyword(Get.parameters['keyword']!);
+      if (Get.parameters['keyword'] != null) {
+        onClickKeyword(Get.parameters['keyword']!);
+      }
+      if (Get.parameters['hintText'] != null) {
+        hintText = Get.parameters['hintText']!;
+        searchKeyWord.value = hintText;
+      }
     }
     historyCacheList = histiryWord.get('cacheList') ?? [];
     historyList.value = historyCacheList;
