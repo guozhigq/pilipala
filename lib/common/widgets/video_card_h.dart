@@ -56,63 +56,53 @@ class VideoCardH extends StatelessWidget {
             SmartDialog.showToast(err.toString());
           }
         },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  StyleString.safeSpace, 6, StyleString.safeSpace, 6),
-              child: LayoutBuilder(
-                builder: (context, boxConstraints) {
-                  double width =
-                      (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
-                  return SizedBox(
-                    height: width / StyleString.aspectRatio,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: StyleString.aspectRatio,
-                          child: LayoutBuilder(
-                            builder: (context, boxConstraints) {
-                              double maxWidth = boxConstraints.maxWidth;
-                              double maxHeight = boxConstraints.maxHeight;
-                              return Stack(
-                                children: [
-                                  Hero(
-                                    tag: heroTag,
-                                    child: NetworkImgLayer(
-                                      src: videoItem.pic,
-                                      width: maxWidth,
-                                      height: maxHeight,
-                                    ),
-                                  ),
-                                  pBadge(Utils.timeFormat(videoItem.duration!),
-                                      context, null, 6.0, 6.0, null,
-                                      type: 'gray'),
-                                  if (videoItem.rcmdReason != null &&
-                                      videoItem.rcmdReason.content != '')
-                                    pBadge(videoItem.rcmdReason.content,
-                                        context, 6.0, 6.0, null, null),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        VideoContent(videoItem: videoItem)
-                      ],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+              StyleString.safeSpace, 7, StyleString.safeSpace, 7),
+          child: LayoutBuilder(
+            builder: (context, boxConstraints) {
+              double width =
+                  (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
+              return SizedBox(
+                height: width / StyleString.aspectRatio,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: StyleString.aspectRatio,
+                      child: LayoutBuilder(
+                        builder: (context, boxConstraints) {
+                          double maxWidth = boxConstraints.maxWidth;
+                          double maxHeight = boxConstraints.maxHeight;
+                          return Stack(
+                            children: [
+                              Hero(
+                                tag: heroTag,
+                                child: NetworkImgLayer(
+                                  src: videoItem.pic,
+                                  width: maxWidth,
+                                  height: maxHeight,
+                                ),
+                              ),
+                              pBadge(Utils.timeFormat(videoItem.duration!),
+                                  context, null, 6.0, 6.0, null,
+                                  type: 'gray'),
+                              if (videoItem.rcmdReason != null &&
+                                  videoItem.rcmdReason.content != '')
+                                pBadge(videoItem.rcmdReason.content, context,
+                                    6.0, 6.0, null, null),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-            // Divider(
-            //   height: 1,
-            //   indent: 8,
-            //   endIndent: 12,
-            //   color: Theme.of(context).dividerColor.withOpacity(0.08),
-            // )
-          ],
+                    VideoContent(videoItem: videoItem)
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
