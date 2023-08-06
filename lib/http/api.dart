@@ -243,4 +243,10 @@ class Api {
 
   // 移除已观看
   static const String toViewDel = '/x/v2/history/toview/del';
+
+  // 追番
+  static const String bangumiAdd = '/pgc/web/follow/add';
+
+  // 取消追番
+  static const String bangumiDel = '/pgc/web/follow/del';
 }

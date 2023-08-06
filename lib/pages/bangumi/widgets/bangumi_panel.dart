@@ -111,7 +111,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10, bottom: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -143,87 +143,161 @@ class _BangumiPanelState extends State<BangumiPanel> {
             ],
           ),
         ),
-        SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 7, bottom: 7),
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width,
-            ),
-            child: Row(
-              children: [
-                for (int i = 0; i < widget.pages.length; i++) ...[
-                  Container(
-                    width: 150,
-                    margin: const EdgeInsets.only(right: 10),
-                    child: Material(
-                      color: Theme.of(context).colorScheme.onInverseSurface,
-                      borderRadius: BorderRadius.circular(6),
-                      clipBehavior: Clip.hardEdge,
-                      child: InkWell(
-                        onTap: () => changeFucCall(widget.pages[i], i),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  if (i == currentIndex) ...[
-                                    Image.asset(
-                                      'assets/images/live.gif',
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      height: 12,
-                                    ),
-                                    const SizedBox(width: 6)
-                                  ],
-                                  Text(
-                                    '第${i + 1}话',
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        color: i == currentIndex
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .onSurface),
+        SizedBox(
+          height: 60,
+          child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.pages.length,
+              itemBuilder: ((context, i) {
+                return Container(
+                  width: 150,
+                  margin: const EdgeInsets.only(right: 10),
+                  child: Material(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    borderRadius: BorderRadius.circular(6),
+                    clipBehavior: Clip.hardEdge,
+                    child: InkWell(
+                      onTap: () => changeFucCall(widget.pages[i], i),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                if (i == currentIndex) ...[
+                                  Image.asset(
+                                    'assets/images/live.gif',
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    height: 12,
                                   ),
-                                  const SizedBox(width: 2),
-                                  if (widget.pages[i].badge != null) ...[
-                                    Image.asset(
-                                      'assets/images/big-vip.png',
-                                      height: 16,
-                                    ),
-                                  ],
+                                  const SizedBox(width: 6)
                                 ],
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                widget.pages[i].longTitle!,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: i == currentIndex
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurface),
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            ],
-                          ),
+                                Text(
+                                  '第${i + 1}话',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: i == currentIndex
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                ),
+                                const SizedBox(width: 2),
+                                if (widget.pages[i].badge != null) ...[
+                                  Image.asset(
+                                    'assets/images/big-vip.png',
+                                    height: 16,
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              widget.pages[i].longTitle!,
+                              maxLines: 1,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: i == currentIndex
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ]
-              ],
-            ),
-          ),
+                );
+              })),
         )
+        // SingleChildScrollView(
+        //   padding: const EdgeInsets.only(top: 7, bottom: 7),
+        //   scrollDirection: Axis.horizontal,
+        //   child: ConstrainedBox(
+        //     constraints: BoxConstraints(
+        //       minWidth: MediaQuery.of(context).size.width,
+        //     ),
+        //     child: Row(
+        //       children: [
+        //         for (int i = 0; i < widget.pages.length; i++) ...[
+        //           Container(
+        //             width: 150,
+        //             margin: const EdgeInsets.only(right: 10),
+        //             child: Material(
+        //               color: Theme.of(context).colorScheme.onInverseSurface,
+        //               borderRadius: BorderRadius.circular(6),
+        //               clipBehavior: Clip.hardEdge,
+        //               child: InkWell(
+        //                 onTap: () => changeFucCall(widget.pages[i], i),
+        //                 child: Padding(
+        //                   padding: const EdgeInsets.symmetric(
+        //                       vertical: 8, horizontal: 10),
+        //                   child: Column(
+        //                     crossAxisAlignment: CrossAxisAlignment.start,
+        //                     children: [
+        //                       Row(
+        //                         children: [
+        //                           if (i == currentIndex) ...[
+        //                             Image.asset(
+        //                               'assets/images/live.gif',
+        //                               color:
+        //                                   Theme.of(context).colorScheme.primary,
+        //                               height: 12,
+        //                             ),
+        //                             const SizedBox(width: 6)
+        //                           ],
+        //                           Text(
+        //                             '第${i + 1}话',
+        //                             style: TextStyle(
+        //                                 fontSize: 13,
+        //                                 color: i == currentIndex
+        //                                     ? Theme.of(context)
+        //                                         .colorScheme
+        //                                         .primary
+        //                                     : Theme.of(context)
+        //                                         .colorScheme
+        //                                         .onSurface),
+        //                           ),
+        //                           const SizedBox(width: 2),
+        //                           if (widget.pages[i].badge != null) ...[
+        //                             Image.asset(
+        //                               'assets/images/big-vip.png',
+        //                               height: 16,
+        //                             ),
+        //                           ],
+        //                         ],
+        //                       ),
+        //                       const SizedBox(height: 3),
+        //                       Text(
+        //                         widget.pages[i].longTitle!,
+        //                         maxLines: 1,
+        //                         style: TextStyle(
+        //                             fontSize: 13,
+        //                             color: i == currentIndex
+        //                                 ? Theme.of(context).colorScheme.primary
+        //                                 : Theme.of(context)
+        //                                     .colorScheme
+        //                                     .onSurface),
+        //                         overflow: TextOverflow.ellipsis,
+        //                       )
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ]
+        //       ],
+        //     ),
+        //   ),
+        // )
       ],
     );
   }
