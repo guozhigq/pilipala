@@ -38,6 +38,7 @@ class BangumiInfoModel {
     this.total,
     this.type,
     this.userStatus,
+    this.staff,
   });
 
   Map? activity;
@@ -78,6 +79,7 @@ class BangumiInfoModel {
   int? total;
   int? type;
   Map? userStatus;
+  String? staff;
 
   BangumiInfoModel.fromJson(Map<String, dynamic> json) {
     activity = json['activity'];
@@ -120,6 +122,7 @@ class BangumiInfoModel {
     total = json['total'];
     type = json['type'];
     userStatus = json['user_status'];
+    staff = json['staff'];
   }
 }
 

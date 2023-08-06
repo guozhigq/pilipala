@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -18,6 +19,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
+import 'widgets/intro_detail.dart';
 
 class BangumiIntroPanel extends StatefulWidget {
   const BangumiIntroPanel({super.key});
@@ -90,7 +92,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
   late BangumiInfoModel? bangumiItem;
   final BangumiIntroController bangumiIntroController =
       Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
-  bool isExpand = false;
 
   late VideoDetailController? videoDetailCtr;
   Box localCache = GStrorage.localCache;
@@ -124,13 +125,13 @@ class _BangumiInfoState extends State<BangumiInfo> {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    // showBottomSheet(
-    //   context: context,
-    //   enableDrag: true,
-    //   builder: (BuildContext context) {
-    //     return IntroDetail(videoDetail: widget.videoDetail!);
-    //   },
-    // );
+    showBottomSheet(
+      context: context,
+      enableDrag: true,
+      builder: (BuildContext context) {
+        return IntroDetail(bangumiDetail: widget.bangumiDetail!);
+      },
+    );
   }
 
   @override
@@ -138,7 +139,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
     ThemeData t = Theme.of(context);
     return SliverPadding(
       padding: const EdgeInsets.only(
-          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 13),
+          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 20),
       sliver: SliverToBoxAdapter(
         child: !widget.loadingStatus || bangumiItem != null
             ? Column(
@@ -148,12 +149,25 @@ class _BangumiInfoState extends State<BangumiInfo> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      NetworkImgLayer(
-                        width: 105,
-                        height: 160,
-                        src: !widget.loadingStatus
-                            ? widget.bangumiDetail!.cover!
-                            : bangumiItem!.cover!,
+                      Stack(
+                        children: [
+                          NetworkImgLayer(
+                            width: 105,
+                            height: 160,
+                            src: !widget.loadingStatus
+                                ? widget.bangumiDetail!.cover!
+                                : bangumiItem!.cover!,
+                          ),
+                          if (bangumiItem != null &&
+                              bangumiItem!.rating != null)
+                            pBadge(
+                                '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
+                                context,
+                                null,
+                                6,
+                                6,
+                                null),
+                        ],
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -196,7 +210,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                                 .withOpacity(0.7);
                                           }),
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () =>
+                                            bangumiIntroController.bangumiAdd(),
                                         icon: Icon(
                                           Icons.favorite_border_rounded,
                                           color: t.colorScheme.primary,
@@ -208,7 +223,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                 ),
                                 Row(
                                   children: [
-                                    // const SizedBox(width: 6),
                                     StatView(
                                       theme: 'gray',
                                       view: !widget.loadingStatus
@@ -227,7 +241,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 6),
                                 Row(
                                   children: [
                                     Text(
@@ -252,38 +266,29 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                         color: t.colorScheme.outline,
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      !widget.loadingStatus
-                                          ? widget.bangumiDetail!.newEp!['desc']
-                                          : bangumiItem!.newEp!['desc'],
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: t.colorScheme.outline,
-                                      ),
-                                    ),
                                   ],
                                 ),
-                                const SizedBox(height: 10),
+                                // const SizedBox(height: 4),
                                 Text(
-                                  '简介：${!widget.loadingStatus ? widget.bangumiDetail!.evaluate! : bangumiItem!.evaluate!}',
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
+                                  !widget.loadingStatus
+                                      ? widget.bangumiDetail!.newEp!['desc']
+                                      : bangumiItem!.newEp!['desc'],
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: t.colorScheme.outline,
                                   ),
                                 ),
+                                // const SizedBox(height: 10),
                                 const Spacer(),
-                                if (bangumiItem != null &&
-                                    bangumiItem!.rating != null)
-                                  Text(
-                                    '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: t.colorScheme.primary,
-                                    ),
+                                Text(
+                                  '简介：${!widget.loadingStatus ? widget.bangumiDetail!.evaluate! : bangumiItem!.evaluate!}',
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: t.colorScheme.outline,
                                   ),
+                                ),
                               ],
                             ),
                           ),

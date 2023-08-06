@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/search.dart';
-import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
@@ -93,6 +92,7 @@ class BangumiIntroController extends GetxController {
     var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
     if (result['status']) {
       bangumiDetail.value = result['data'];
+      epId = bangumiDetail.value.episodes!.first.id;
     }
     if (userLogin) {
       // 获取点赞状态
@@ -101,18 +101,8 @@ class BangumiIntroController extends GetxController {
       queryHasCoinVideo();
       // 获取收藏状态
       queryHasFavVideo();
-      //
-      queryFollowStatus();
     }
     return result;
-  }
-
-  // 获取up主粉丝数
-  Future queryUserStat() async {
-    var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
-    if (result['status']) {
-      userStat = result['data'];
-    }
   }
 
   // 获取点赞状态
@@ -138,54 +128,10 @@ class BangumiIntroController extends GetxController {
     }
   }
 
-  // 一键三连
-  Future actionOneThree() async {
-    if (user.get(UserBoxKey.userMid) == null) {
-      SmartDialog.showToast('账号未登录');
-      return;
-    }
-    if (hasLike.value && hasCoin.value && hasFav.value) {
-      // 已点赞、投币、收藏
-      SmartDialog.showToast('🙏 UP已经收到了～');
-      return false;
-    }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: const Text('一键三连 给UP送温暖'),
-          actions: [
-            TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
-            TextButton(
-              onPressed: () async {
-                var result = await VideoHttp.oneThree(bvid: bvid);
-                if (result['status']) {
-                  hasLike.value = result["data"]["like"];
-                  hasCoin.value = result["data"]["coin"];
-                  hasFav.value = result["data"]["fav"];
-                  SmartDialog.showToast('三连成功 🎉');
-                } else {
-                  SmartDialog.showToast(result['msg']);
-                }
-                SmartDialog.dismiss();
-              },
-              child: const Text('确认'),
-            )
-          ],
-        );
-      },
-    );
-  }
-
   // （取消）点赞
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
-      // hasLike.value = result["data"] == 1 ? true : false;
       if (!hasLike.value) {
         SmartDialog.showToast('点赞成功 👍');
         hasLike.value = true;
@@ -270,10 +216,7 @@ class BangumiIntroController extends GetxController {
           delMediaIdsNew.add(i.id);
         }
       }
-    } catch (e) {
-      // ignore: avoid_print
-      print(e);
-    }
+    } catch (_) {}
     var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: addMediaIdsNew.join(','),
@@ -297,15 +240,6 @@ class BangumiIntroController extends GetxController {
     return result;
   }
 
-  Future queryVideoInFolder() async {
-    var result = await VideoHttp.videoInFolder(
-        mid: user.get(UserBoxKey.userMid), rid: IdUtils.bv2av(bvid));
-    if (result['status']) {
-      favFolderData.value = result['data'];
-    }
-    return result;
-  }
-
   // 选择文件夹
   onChoose(bool checkValue, int index) {
     feedBack();
@@ -320,15 +254,6 @@ class BangumiIntroController extends GetxController {
     }
     favFolderData.value.list = datalist;
     favFolderData.refresh();
-  }
-
-  // 查询关注状态
-  Future queryFollowStatus() async {
-    var result = await VideoHttp.hasFollow(mid: videoDetail.value.owner!.mid!);
-    if (result['status']) {
-      followStatus.value = result['data'];
-    }
-    return result;
   }
 
   // 修改分P或番剧分集
@@ -347,5 +272,19 @@ class BangumiIntroController extends GetxController {
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
+  }
+
+  // 追番
+  Future bangumiAdd() async {
+    var result =
+        await VideoHttp.bangumiAdd(seasonId: bangumiDetail.value.seasonId);
+    SmartDialog.showToast(result['msg']);
+  }
+
+  // 取消追番
+  Future bangumiDel() async {
+    var result =
+        await VideoHttp.bangumiDel(seasonId: bangumiDetail.value.seasonId);
+    SmartDialog.showToast(result['msg']);
   }
 }

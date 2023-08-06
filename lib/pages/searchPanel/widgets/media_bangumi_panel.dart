@@ -104,23 +104,24 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                           SmartDialog.showLoading(msg: '获取中...');
                           var res = await SearchHttp.bangumiInfo(
                               seasonId: i.seasonId);
-                          SmartDialog.dismiss();
-                          if (res['status']) {
-                            EpisodeItem episode = res['data'].episodes.first;
-                            String bvid = episode.bvid!;
-                            int cid = episode.cid!;
-                            String pic = episode.cover!;
-                            String heroTag = Utils.makeHeroTag(cid);
-                            Get.toNamed(
-                              '/video?bvid=$bvid&cid=$cid&seasonId=${i.seasonId}',
-                              arguments: {
-                                'pic': pic,
-                                'heroTag': heroTag,
-                                'videoType': SearchType.media_bangumi,
-                                'bangumiItem': res['data'],
-                              },
-                            );
-                          }
+                          SmartDialog.dismiss().then((value) {
+                            if (res['status']) {
+                              EpisodeItem episode = res['data'].episodes.first;
+                              String bvid = episode.bvid!;
+                              int cid = episode.cid!;
+                              String pic = episode.cover!;
+                              String heroTag = Utils.makeHeroTag(cid);
+                              Get.toNamed(
+                                '/video?bvid=$bvid&cid=$cid&seasonId=${i.seasonId}',
+                                arguments: {
+                                  'pic': pic,
+                                  'heroTag': heroTag,
+                                  'videoType': SearchType.media_bangumi,
+                                  'bangumiItem': res['data'],
+                                },
+                              );
+                            }
+                          });
                         },
                         child: const Text('观看'),
                       ),
