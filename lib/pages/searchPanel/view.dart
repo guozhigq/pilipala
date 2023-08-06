@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/media_bangumi.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -104,7 +105,18 @@ class _SearchPanelState extends State<SearchPanel>
               addRepaintBoundaries: false,
               itemCount: 15,
               itemBuilder: (context, index) {
-                return const VideoCardHSkeleton();
+                switch (widget.searchType) {
+                  case SearchType.video:
+                    return const VideoCardHSkeleton();
+                  case SearchType.media_bangumi:
+                    return const MediaBangumiSkeleton();
+                  case SearchType.bili_user:
+                    return const VideoCardHSkeleton();
+                  case SearchType.live_room:
+                    return const VideoCardHSkeleton();
+                  default:
+                    return const VideoCardHSkeleton();
+                }
               },
             );
           }

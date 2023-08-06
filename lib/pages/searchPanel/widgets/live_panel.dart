@@ -6,7 +6,7 @@ import 'package:pilipala/utils/utils.dart';
 Widget searchLivePanel(BuildContext context, ctr, list) {
   return Padding(
     padding: const EdgeInsets.only(
-        left: StyleString.cardSpace, right: StyleString.cardSpace),
+        left: StyleString.safeSpace, right: StyleString.safeSpace),
     child: GridView.builder(
       primary: false,
       controller: ctr!.scrollController,
@@ -16,71 +16,80 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
         mainAxisSpacing: StyleString.cardSpace + 3,
         mainAxisExtent:
             MediaQuery.of(context).size.width / 2 / StyleString.aspectRatio +
-                65,
+                60,
       ),
       itemCount: list.length,
       itemBuilder: (context, index) {
-        var i = list![index];
-        return Card(
-          elevation: 0,
-          clipBehavior: Clip.hardEdge,
-          shape: RoundedRectangleBorder(
-            borderRadius: StyleString.mdRadius,
-          ),
-          margin: EdgeInsets.zero,
-          child: InkWell(
-            onTap: () {},
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: StyleString.imgRadius,
-                    topRight: StyleString.imgRadius,
-                    bottomLeft: StyleString.imgRadius,
-                    bottomRight: StyleString.imgRadius,
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: StyleString.aspectRatio,
-                    child: LayoutBuilder(builder: (context, boxConstraints) {
-                      double maxWidth = boxConstraints.maxWidth;
-                      double maxHeight = boxConstraints.maxHeight;
-                      return Stack(
-                        children: [
-                          Hero(
-                            tag: Utils.makeHeroTag(i.roomid),
-                            child: NetworkImgLayer(
-                              src: i.cover,
-                              type: 'emote',
-                              width: maxWidth,
-                              height: maxHeight,
-                            ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: AnimatedOpacity(
-                              opacity: 1,
-                              duration: const Duration(milliseconds: 200),
-                              child: LiveStat(
-                                online: i.online,
-                                cateName: i.cateName,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-                  ),
-                ),
-                LiveContent(liveItem: i)
-              ],
-            ),
-          ),
-        );
+        return LiveItem(liveItem: list![index]);
       },
     ),
   );
+}
+
+class LiveItem extends StatelessWidget {
+  final dynamic liveItem;
+  const LiveItem({Key? key, required this.liveItem}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(
+        borderRadius: StyleString.mdRadius,
+      ),
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () {},
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: StyleString.imgRadius,
+                topRight: StyleString.imgRadius,
+                bottomLeft: StyleString.imgRadius,
+                bottomRight: StyleString.imgRadius,
+              ),
+              child: AspectRatio(
+                aspectRatio: StyleString.aspectRatio,
+                child: LayoutBuilder(builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
+                  return Stack(
+                    children: [
+                      Hero(
+                        tag: Utils.makeHeroTag(liveItem.roomid),
+                        child: NetworkImgLayer(
+                          src: liveItem.cover,
+                          type: 'emote',
+                          width: maxWidth,
+                          height: maxHeight,
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: AnimatedOpacity(
+                          opacity: 1,
+                          duration: const Duration(milliseconds: 200),
+                          child: LiveStat(
+                            online: liveItem.online,
+                            cateName: liveItem.cateName,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+            LiveContent(liveItem: liveItem)
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class LiveContent extends StatelessWidget {

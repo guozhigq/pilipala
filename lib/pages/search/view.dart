@@ -17,6 +17,13 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> with RouteAware {
   final SSearchController _searchController = Get.put(SSearchController());
+  late Future? _futureBuilderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureBuilderFuture = _searchController.queryHotSearchList();
+  }
 
   @override
   // 返回当前页面时
@@ -53,26 +60,29 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
           ),
           const SizedBox(width: 10)
         ],
-        title: Obx(
-          () => TextField(
-            autofocus: true,
-            focusNode: _searchController.searchFocusNode,
-            controller: _searchController.controller.value,
-            textInputAction: TextInputAction.search,
-            onChanged: (value) => _searchController.onChange(value),
-            decoration: InputDecoration(
-              hintText: '搜索',
-              border: InputBorder.none,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  size: 22,
-                  color: Theme.of(context).colorScheme.outline,
+        title: Hero(
+          tag: 'searchWrap',
+          child: Obx(
+            () => TextField(
+              autofocus: true,
+              focusNode: _searchController.searchFocusNode,
+              controller: _searchController.controller.value,
+              textInputAction: TextInputAction.search,
+              onChanged: (value) => _searchController.onChange(value),
+              decoration: InputDecoration(
+                hintText: _searchController.hintText,
+                border: InputBorder.none,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.clear,
+                    size: 22,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  onPressed: () => _searchController.onClear(),
                 ),
-                onPressed: () => _searchController.onClear(),
               ),
+              onSubmitted: (String value) => _searchController.submit(),
             ),
-            onSubmitted: (String value) => _searchController.submit(),
           ),
         ),
       ),
@@ -159,7 +169,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             builder: (context, boxConstraints) {
               final double width = boxConstraints.maxWidth;
               return FutureBuilder(
-                future: _searchController.queryHotSearchList(),
+                future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;

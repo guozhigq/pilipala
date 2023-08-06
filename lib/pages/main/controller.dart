@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
@@ -33,4 +35,6 @@ class MainController extends GetxController {
       'label': "媒体库",
     }
   ].obs;
+  final StreamController<bool> bottomBarStream =
+      StreamController<bool>.broadcast();
 }
