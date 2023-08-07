@@ -31,6 +31,9 @@ class LiveRoomController extends GetxController {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
       if (liveItem.pic != null && liveItem.pic != '') {
+        cover = liveItem.pic;
+      }
+      if (liveItem.cover != null && liveItem.cover != '') {
         cover = liveItem.cover;
       }
     }
