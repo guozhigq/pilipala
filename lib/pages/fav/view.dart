@@ -13,6 +13,13 @@ class FavPage extends StatefulWidget {
 
 class _FavPageState extends State<FavPage> {
   final FavController _favController = Get.put(FavController());
+  late Future _futureBuilderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureBuilderFuture = _favController.queryFavFolder();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +33,7 @@ class _FavPageState extends State<FavPage> {
         ),
       ),
       body: FutureBuilder(
-        future: _favController.queryFavFolder(),
+        future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data as Map;

@@ -14,13 +14,22 @@ class MediaPage extends StatefulWidget {
 
 class _MediaPageState extends State<MediaPage>
     with AutomaticKeepAliveClientMixin {
+  late MediaController mediaController;
+  late Future _futureBuilderFuture;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    mediaController = Get.put(MediaController());
+    _futureBuilderFuture = mediaController.queryFavFolder();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    final MediaController mediaController = Get.put(MediaController());
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(toolbarHeight: 30),
@@ -107,7 +116,7 @@ class _MediaPageState extends State<MediaPage>
             ),
           ),
           trailing: IconButton(
-            onPressed: () => mediaController.queryFavFolder(),
+            onPressed: () => _futureBuilderFuture,
             icon: const Icon(
               Icons.refresh,
               size: 20,
@@ -119,7 +128,7 @@ class _MediaPageState extends State<MediaPage>
           width: double.infinity,
           height: 170,
           child: FutureBuilder(
-              future: mediaController.queryFavFolder(),
+              future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data as Map;

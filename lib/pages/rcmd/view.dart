@@ -23,6 +23,7 @@ class RcmdPage extends StatefulWidget {
 class _RcmdPageState extends State<RcmdPage>
     with AutomaticKeepAliveClientMixin {
   final RcmdController _rcmdController = Get.put(RcmdController());
+  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +31,7 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -71,7 +73,7 @@ class _RcmdPageState extends State<RcmdPage>
                 : const EdgeInsets.fromLTRB(
                     StyleString.safeSpace, 0, StyleString.safeSpace, 0),
             sliver: FutureBuilder(
-              future: _rcmdController.queryRcmdFeed('init'),
+              future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data as Map;

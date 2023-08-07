@@ -22,10 +22,12 @@ class LivePage extends StatefulWidget {
 
 class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
+  late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _liveController.queryLiveList('init');
     ScrollController scrollController = _liveController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -64,7 +66,7 @@ class _LivePageState extends State<LivePage> {
             padding: const EdgeInsets.fromLTRB(
                 StyleString.safeSpace, 0, StyleString.safeSpace, 0),
             sliver: FutureBuilder(
-              future: _liveController.queryLiveList('init'),
+              future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data as Map;
