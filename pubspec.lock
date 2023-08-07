@@ -901,6 +901,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  protobuf:
+    dependency: "direct main"
+    description:
+      name: protobuf
+      sha256: "4034a02b7e231e7e60bff30a8ac13a7347abfdac0798595fae0b90a3f0afe759"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   pub_semver:
     dependency: transitive
     description:
