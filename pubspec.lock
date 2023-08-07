@@ -649,10 +649,10 @@ packages:
     dependency: "direct main"
     description:
       name: media_kit
-      sha256: "272a9f1dd77ed57b48707fdb0ec0e4a048ef958feccc0d0dd751135fe924b63a"
+      sha256: eb47c2d51b7c06b319d8c776b47be912c5a4f53af7ab4814927a52a76442609e
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2+1"
   media_kit_libs_android_video:
     dependency: "direct main"
     description:
@@ -665,26 +665,26 @@ packages:
     dependency: "direct main"
     description:
       name: media_kit_libs_ios_video
-      sha256: c691220334c1828e1fd24db4ebbdfdd6c576f0345bc6cc435b355798d6e4b7ed
+      sha256: b65d1f22442e6074948f501e7156c310fbf133cd63aa914c84d0d4db1c683ee0
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "1.1.1"
   media_kit_libs_linux:
     dependency: "direct main"
     description:
       name: media_kit_libs_linux
-      sha256: "21acc71cbae3518b3aeef9023a6a3a3decb579a40153764333814987ccd61040"
+      sha256: "838b9e8041d376873cc938872c75812989d0feb247ad93afd8dbc92bf052680a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.1.0"
   media_kit_libs_macos_video:
     dependency: "direct main"
     description:
       name: media_kit_libs_macos_video
-      sha256: "28ad624666cd20ed78f96a26917dddf6f286ea4bab21620676cc59ba62f3d3e5"
+      sha256: dcabf2731b6b7dee143c18617fd32a063146303e7388f87dd4e974e03c9c795a
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.1.1"
   media_kit_libs_windows_video:
     dependency: "direct main"
     description:
@@ -697,18 +697,18 @@ packages:
     dependency: "direct main"
     description:
       name: media_kit_native_event_loop
-      sha256: "5351f0c28124b5358756515d8619abad182cdefe967468d7fb5b274737cc2f59"
+      sha256: e37ce6fb5fa71b8cf513c6a6cd591367743a342a385e7da621a047dd8ef6f4a4
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.7"
   media_kit_video:
     dependency: "direct main"
     description:
       name: media_kit_video
-      sha256: "3ac0403d67710dfb2bf6aabfa6caff1b163e70fb7e1a88423bc1be569b4df6b3"
+      sha256: "4b627683ef9e7f5cd049fd01be4b5deb5f31effc878503f108c81b19fd745040"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   meta:
     dependency: transitive
     description:

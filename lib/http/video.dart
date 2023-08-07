@@ -113,10 +113,6 @@ class VideoHttp {
     try {
       var res = await Request().get(Api.videoUrl, data: data);
       if (res.data['code'] == 0) {
-        // List<HotVideoItemModel> list = [];
-        // for (var i in res.data['data']['list']) {
-        //   list.add(HotVideoItemModel.fromJson(i));
-        // }
         return {
           'status': true,
           'data': PlayUrlModel.fromJson(res.data['data'])

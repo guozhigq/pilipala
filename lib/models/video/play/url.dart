@@ -78,7 +78,7 @@ class Dash {
   List<VideoItem>? video;
   List<AudioItem>? audio;
   Map? dolby;
-  String? flac;
+  Map? flac;
 
   Dash.fromJson(Map<String, dynamic> json) {
     duration = json['duration'];
@@ -88,7 +88,7 @@ class Dash {
         ? json['audio'].map<AudioItem>((e) => AudioItem.fromJson(e)).toList()
         : [];
     dolby = json['dolby'];
-    flac = json['flac'] ?? '';
+    flac = json['flac'] ?? {};
   }
 }
 
