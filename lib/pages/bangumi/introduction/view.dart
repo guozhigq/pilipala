@@ -89,20 +89,19 @@ class BangumiInfo extends StatefulWidget {
 }
 
 class _BangumiInfoState extends State<BangumiInfo> {
-  late BangumiInfoModel? bangumiItem;
-  final BangumiIntroController bangumiIntroController =
-      Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
-
-  late VideoDetailController? videoDetailCtr;
+  String heroTag = Get.arguments['heroTag'];
+  late final BangumiIntroController bangumiIntroController;
+  late final VideoDetailController videoDetailCtr;
   Box localCache = GStrorage.localCache;
+  late final BangumiInfoModel? bangumiItem;
   late double sheetHeight;
 
   @override
   void initState() {
     super.initState();
+    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+    videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     bangumiItem = bangumiIntroController.bangumiItem;
-    videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     sheetHeight = localCache.get('sheetHeight');
   }
 
