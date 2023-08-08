@@ -41,10 +41,9 @@ class _HomePageState extends State<HomePage>
           CustomAppBar(stream: stream, ctr: _homeController),
           Container(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
-            child: Stack(
+            child: Row(
               children: [
-                Align(
-                  alignment: Alignment.center,
+                Expanded(
                   child: Theme(
                     data: ThemeData(
                       splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
@@ -93,6 +92,23 @@ class _HomePageState extends State<HomePage>
                     ),
                   ),
                 ),
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: IconButton(
+                    tooltip: '全部分类',
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () async {},
+                    icon: Icon(
+                      Icons.dataset_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 19,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14)
               ],
             ),
           ),
