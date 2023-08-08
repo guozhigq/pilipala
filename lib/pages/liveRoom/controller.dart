@@ -14,7 +14,7 @@ class LiveRoomController extends GetxController {
   // 静音状态
   RxBool volumeOff = false.obs;
   PlPlayerController plPlayerController =
-      PlPlayerController(controlsEnabled: false);
+      PlPlayerController.getInstance(controlsEnabled: false);
 
   // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
   //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
