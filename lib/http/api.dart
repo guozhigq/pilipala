@@ -253,4 +253,25 @@ class Api {
 
   // 取消追番
   static const String bangumiDel = '/pgc/web/follow/del';
+
+  // 番剧列表
+  // https://api.bilibili.com/pgc/season/index/result?
+  // st=1&
+  // order=3
+  // season_version=-1  全部-1 正片1 电影2 其他3
+  // spoken_language_type=-1  全部-1 原生1 中文配音2
+  // area=-1&
+  // is_finish=-1&
+  // copyright=-1&
+  // season_status=-1&
+  // season_month=-1&
+  // year=-1&
+  // style_id=-1&
+  // sort=0&
+  // page=1&
+  // season_type=1&
+  // pagesize=20&
+  // type=1
+  static const String bangumiList =
+      '/pgc/season/index/result?st=1&order=3&season_version=-1&spoken_language_type=-1&area=-1&is_finish=-1&copyright=-1&season_status=-1&season_month=-1&year=-1&style_id=-1&sort=0&season_type=1&pagesize=20&type=1';
 }
