@@ -54,13 +54,18 @@ class VideoDetailController extends GetxController
   RxString bgCover = ''.obs;
   Box user = GStrorage.user;
   Box localCache = GStrorage.localCache;
-  PlPlayerController plPlayerController = PlPlayerController();
+  PlPlayerController plPlayerController = PlPlayerController.getInstance();
   // 是否开始自动播放 存在多p的情况下，第二p需要为true
   RxBool autoPlay = true.obs;
   // 视频资源是否有效
   RxBool isEffective = true.obs;
   // 封面图的展示
   RxBool isShowCover = true.obs;
+
+  late VideoItem firstVideo;
+  late String videoUrl;
+  late String audioUrl;
+  late Duration defaultST;
 
   @override
   void onInit() {
@@ -107,7 +112,7 @@ class VideoDetailController extends GetxController
   /// 更新画质、音质
   /// TODO 继续进度播放
   updatePlayer() {
-    Duration position = plPlayerController.position.value;
+    defaultST = plPlayerController.position.value;
     plPlayerController.removeListeners();
     plPlayerController.isBuffering.value = false;
     plPlayerController.buffered.value = Duration.zero;
@@ -115,24 +120,23 @@ class VideoDetailController extends GetxController
     /// 暂不匹配解码规则
 
     /// 根据currentVideoQa 重新设置videoUrl
-    VideoItem firstVideo =
+    firstVideo =
         data.dash!.video!.firstWhere((i) => i.id == currentVideoQa.code);
-    // String videoUrl = firstVideo.baseUrl!;
+    videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
     AudioItem firstAudio =
         data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa.code);
-    String audioUrl = firstAudio.baseUrl ?? '';
+    audioUrl = firstAudio.baseUrl ?? '';
 
-    playerInit(firstVideo, audioUrl, defaultST: position);
+    playerInit();
   }
 
-  Future playerInit(firstVideo, audioSource,
-      {Duration defaultST = Duration.zero, int duration = 0}) async {
+  Future playerInit({video, audio, seekToTime, duration}) async {
     await plPlayerController.setDataSource(
       DataSource(
-        videoSource: firstVideo.baseUrl,
-        audioSource: audioSource,
+        videoSource: video ?? videoUrl,
+        audioSource: audio ?? audioUrl,
         type: DataSourceType.network,
         httpHeaders: {
           'user-agent':
@@ -143,11 +147,14 @@ class VideoDetailController extends GetxController
       // 硬解
       enableHA: true,
       autoplay: autoPlay.value,
-      seekTo: defaultST,
-      duration: Duration(milliseconds: duration),
+      seekTo: seekToTime ?? defaultST,
+      duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction:
-          firstVideo.width - firstVideo.height > 0 ? 'horizontal' : 'vertical',
+      direction: (firstVideo.width! - firstVideo.height!) > 0
+          ? 'horizontal'
+          : 'vertical',
+      // 默认1倍速
+      speed: 1.0,
     );
   }
 
@@ -163,25 +170,21 @@ class VideoDetailController extends GetxController
       data = result['data'];
 
       /// 优先顺序 省流模式 -> 设置中指定质量 -> 当前可选的最高质量
-      VideoItem firstVideo = data.dash!.video!.first;
-      // String videoUrl = firstVideo.baseUrl!;
+      firstVideo = data.dash!.video!.first;
+      videoUrl = firstVideo.baseUrl!;
       //
       currentVideoQa = VideoQualityCode.fromCode(firstVideo.id!)!;
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       AudioItem firstAudio =
           data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first : AudioItem();
-      String audioUrl = firstAudio.baseUrl ?? '';
+      audioUrl = firstAudio.baseUrl ?? '';
       //
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
       }
-      await playerInit(
-        firstVideo,
-        audioUrl,
-        defaultST: Duration(milliseconds: data.lastPlayTime!),
-        duration: data.timeLength ?? 0,
-      );
+      defaultST = Duration(milliseconds: data.lastPlayTime!);
+      await playerInit();
     } else {
       SmartDialog.showToast(result['msg'].toString());
     }

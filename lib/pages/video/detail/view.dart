@@ -49,8 +49,25 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void initState() {
     super.initState();
     plPlayerController = videoDetailController.plPlayerController;
+    playerListener();
+
+    appbarStream = StreamController<double>();
+
+    _extendNestCtr.addListener(
+      () {
+        double offset = _extendNestCtr.position.pixels;
+        appbarStream.add(offset);
+      },
+    );
+
+    statusBarHeight = localCache.get('statusBarHeight');
+    _futureBuilderFuture = videoDetailController.queryVideoUrl();
+  }
+
+  // 播放器状态监听
+  void playerListener() {
     plPlayerController!.onPlayerStatusChanged.listen(
-      (PlayerStatus status) {
+      (PlayerStatus status) async {
         videoDetailController.markHeartBeat();
         playerStatus = status;
         if (status == PlayerStatus.playing) {
@@ -68,18 +85,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         }
       },
     );
-
-    appbarStream = StreamController<double>();
-
-    _extendNestCtr.addListener(
-      () {
-        double offset = _extendNestCtr.position.pixels;
-        appbarStream.add(offset);
-      },
-    );
-
-    statusBarHeight = localCache.get('statusBarHeight');
-    _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
   // 继续播放或重新播放
@@ -104,6 +109,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (videoDetailController.timer!.isActive) {
       videoDetailController.timer!.cancel();
     }
+    videoDetailController.defaultST = plPlayerController!.position.value;
     plPlayerController!.pause();
     super.didPushNext();
   }
@@ -111,6 +117,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 返回当前页面时
   void didPopNext() async {
+    videoDetailController.playerInit();
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();

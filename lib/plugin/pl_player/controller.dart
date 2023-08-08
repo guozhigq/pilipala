@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
@@ -13,7 +12,7 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:volume_controller/volume_controller.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
+// import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'models/data_status.dart';
 import 'models/play_speed.dart';
@@ -24,6 +23,9 @@ Box videoStorage = GStrorage.video;
 class PlPlayerController {
   Player? _videoPlayerController;
   VideoController? _videoController;
+
+  // 添加一个私有静态变量来保存实例
+  static PlPlayerController? _instance;
 
   // 流事件  监听播放状态变化
   StreamSubscription? _playerEventSubs;
@@ -43,6 +45,8 @@ class PlPlayerController {
   final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
   final Rx<Duration> _duration = Rx(Duration.zero);
   final Rx<Duration> _buffered = Rx(Duration.zero);
+
+  final Rx<int> _playerCount = Rx(0);
 
   final Rx<double> _playbackSpeed = 1.0.obs;
   final Rx<double> _currentVolume = 1.0.obs;
@@ -172,10 +176,24 @@ class PlPlayerController {
   /// 全屏方向
   Rx<String> get direction => _direction;
 
-  PlPlayerController({
-    // 直播间 传false 关闭控制栏
-    this.controlsEnabled = true,
-    this.fits = const [
+  Rx<int> get playerCount => _playerCount;
+
+  // 添加一个私有构造函数
+  PlPlayerController._() {
+    controlsEnabled = controlsEnabled;
+    // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
+    //   if (status == PlayerStatus.playing) {
+    //     WakelockPlus.enable();
+    //   } else {
+    //     WakelockPlus.disable();
+    //   }
+    // });
+  }
+
+  // 获取实例 传参
+  static PlPlayerController getInstance({
+    bool controlsEnabled = true,
+    List<BoxFit> fits = const [
       BoxFit.contain,
       BoxFit.cover,
       BoxFit.fill,
@@ -184,14 +202,10 @@ class PlPlayerController {
       BoxFit.scaleDown
     ],
   }) {
-    controlsEnabled = controlsEnabled;
-    _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
-      if (status == PlayerStatus.playing) {
-        WakelockPlus.enable();
-      } else {
-        WakelockPlus.enable();
-      }
-    });
+    // 如果实例尚未创建，则创建一个新实例
+    _instance ??= PlPlayerController._();
+    _instance!._playerCount.value += 1;
+    return _instance!;
   }
 
   // 初始化资源
@@ -258,6 +272,9 @@ class PlPlayerController {
     double? width,
     double? height,
   ) async {
+    // 每次配置时先移除监听
+    removeListeners();
+
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -663,6 +680,12 @@ class PlPlayerController {
   }
 
   Future<void> dispose() async {
+    // 每次减1，最后销毁
+    _playerCount.value -= 1;
+    if (playerCount.value > 0) {
+      return;
+    }
+
     _timer?.cancel();
     _timerForVolume?.cancel();
     _timerForGettingVolume?.cancel();
@@ -685,5 +708,6 @@ class PlPlayerController {
     removeListeners();
     await _videoPlayerController?.dispose();
     _videoPlayerController = null;
+    _instance = null;
   }
 }
