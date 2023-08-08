@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:get/get.dart';
@@ -280,85 +281,43 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               onlyOneScrollInBody: true,
               body: Container(
                 color: Theme.of(context).colorScheme.background,
-                child: Column(
-                  children: [
-                    Opacity(
-                      opacity: 0,
-                      child: Container(
-                        width: double.infinity,
-                        height: 0,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Theme.of(context)
-                                  .dividerColor
-                                  .withOpacity(0.1),
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              width: 280,
-                              margin: const EdgeInsets.only(left: 20),
-                              child: Obx(
-                                () => TabBar(
-                                  controller: videoDetailController.tabCtr,
-                                  dividerColor: Colors.transparent,
-                                  indicatorColor:
-                                      Theme.of(context).colorScheme.background,
-                                  tabs: videoDetailController.tabs
-                                      .map((String name) => Tab(text: name))
-                                      .toList(),
+                child: Expanded(
+                  child: TabBarView(
+                    controller: videoDetailController.tabCtr,
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          return CustomScrollView(
+                            key: const PageStorageKey<String>('简介'),
+                            slivers: <Widget>[
+                              if (videoDetailController.videoType ==
+                                  SearchType.video) ...[
+                                const VideoIntroPanel(),
+                              ] else if (videoDetailController.videoType ==
+                                  SearchType.media_bangumi) ...[
+                                const BangumiIntroPanel()
+                              ],
+                              if (videoDetailController.videoType ==
+                                  SearchType.video) ...[
+                                SliverPersistentHeader(
+                                  floating: true,
+                                  pinned: true,
+                                  delegate: SliverHeaderDelegate(
+                                    height: 50,
+                                    child: const MenuRow(loadingStatus: false),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
+                              ],
+                              const RelatedVideoPanel(),
+                            ],
+                          );
+                        },
                       ),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: videoDetailController.tabCtr,
-                        children: [
-                          Builder(
-                            builder: (context) {
-                              return CustomScrollView(
-                                key: const PageStorageKey<String>('简介'),
-                                slivers: <Widget>[
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    const VideoIntroPanel(),
-                                  ] else if (videoDetailController.videoType ==
-                                      SearchType.media_bangumi) ...[
-                                    const BangumiIntroPanel()
-                                  ],
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    SliverPersistentHeader(
-                                      floating: true,
-                                      pinned: true,
-                                      delegate: SliverHeaderDelegate(
-                                        height: 50,
-                                        child:
-                                            const MenuRow(loadingStatus: false),
-                                      ),
-                                    ),
-                                  ],
-                                  const RelatedVideoPanel(),
-                                ],
-                              );
-                            },
-                          ),
-                          VideoReplyPanel(
-                            bvid: videoDetailController.bvid,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
+                      VideoReplyPanel(
+                        bvid: videoDetailController.bvid,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -391,6 +391,7 @@ class ReplyItemRow extends StatelessWidget {
                           ),
                           if (replies![i].isUp)
                             const WidgetSpan(
+                              alignment: PlaceholderAlignment.top,
                               child: UpTag(),
                             ),
                           buildContent(

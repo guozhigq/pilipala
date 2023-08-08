@@ -118,7 +118,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 500,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(

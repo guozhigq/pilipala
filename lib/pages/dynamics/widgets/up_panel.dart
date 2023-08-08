@@ -40,7 +40,7 @@ class _UpPanelState extends State<UpPanel> {
       1,
       UpItem(
         face: user.get(UserBoxKey.userFace),
-        uname: '我的',
+        uname: '我',
         mid: user.get(UserBoxKey.userMid),
       ),
     );
