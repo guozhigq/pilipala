@@ -51,6 +51,10 @@ class BangumiCardV extends StatelessWidget {
             var res = await SearchHttp.bangumiInfo(seasonId: seasonId);
             SmartDialog.dismiss().then((value) {
               if (res['status']) {
+                if (res['data'].episodes.isEmpty) {
+                  SmartDialog.showToast('资源加载失败');
+                  return;
+                }
                 EpisodeItem episode = res['data'].episodes.first;
                 String bvid = episode.bvid!;
                 int cid = episode.cid!;

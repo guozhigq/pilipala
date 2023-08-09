@@ -38,9 +38,8 @@ class _BangumiPageState extends State<BangumiPage>
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           if (!_bangumidController.isLoadingMore) {
-            await _bangumidController.onLoad();
-            await Future.delayed(const Duration(milliseconds: 200));
             _bangumidController.isLoadingMore = true;
+            await _bangumidController.onLoad();
           }
         }
 
