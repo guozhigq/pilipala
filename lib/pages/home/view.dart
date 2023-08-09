@@ -100,8 +100,13 @@ class _HomePageState extends State<HomePage>
                         dividerColor: Colors.transparent,
                         unselectedLabelColor:
                             Theme.of(context).colorScheme.outline,
-                        onTap: (value) =>
-                            {feedBack(), _homeController.initialIndex = value},
+                        onTap: (value) {
+                          feedBack();
+                          if (_homeController.initialIndex == value) {
+                            _homeController.ctrList[value]().animateToTop();
+                          }
+                          _homeController.initialIndex = value;
+                        },
                       ),
                     ),
                   ),
