@@ -65,121 +65,119 @@ class _BangumiPageState extends State<BangumiPage>
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(StyleString.imgRadius),
       ),
-      child: Expanded(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            await _bangumidController.queryBangumiListFeed(type: 'init');
-            return _bangumidController.queryBangumiFollow();
-          },
-          child: CustomScrollView(
-            controller: _bangumidController.scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Obx(
-                  () => Visibility(
-                    visible: _bangumidController.userLogin.value,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, bottom: 10, left: 6),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '最近追番',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await _bangumidController.queryBangumiListFeed(type: 'init');
+          return _bangumidController.queryBangumiFollow();
+        },
+        child: CustomScrollView(
+          controller: _bangumidController.scrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Obx(
+                () => Visibility(
+                  visible: _bangumidController.userLogin.value,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 10, bottom: 10, left: 6),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '最近追番',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          height: 254,
-                          child: FutureBuilder(
-                            future: _bangumidController.queryBangumiFollow(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                Map data = snapshot.data as Map;
-                                if (data['status']) {
-                                  return Obx(
-                                    () => ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: _bangumidController
-                                          .bangumiFollowList.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          width: Get.size.width / 3,
-                                          height: 254,
-                                          margin: EdgeInsets.only(
-                                              right: index <
-                                                      _bangumidController
-                                                              .bangumiFollowList
-                                                              .length -
-                                                          1
-                                                  ? StyleString.safeSpace
-                                                  : 0),
-                                          child: BangumiCardV(
-                                            bangumiItem: _bangumidController
-                                                .bangumiFollowList[index],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  return SizedBox();
-                                }
+                      ),
+                      SizedBox(
+                        height: 254,
+                        child: FutureBuilder(
+                          future: _bangumidController.queryBangumiFollow(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              Map data = snapshot.data as Map;
+                              if (data['status']) {
+                                return Obx(
+                                  () => ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: _bangumidController
+                                        .bangumiFollowList.length,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        width: Get.size.width / 3,
+                                        height: 254,
+                                        margin: EdgeInsets.only(
+                                            right: index <
+                                                    _bangumidController
+                                                            .bangumiFollowList
+                                                            .length -
+                                                        1
+                                                ? StyleString.safeSpace
+                                                : 0),
+                                        child: BangumiCardV(
+                                          bangumiItem: _bangumidController
+                                              .bangumiFollowList[index],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
                               } else {
                                 return SizedBox();
                               }
-                            },
-                          ),
+                            } else {
+                              return SizedBox();
+                            }
+                          },
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10, left: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '推荐',
-                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),
                 ),
               ),
-              SliverPadding(
-                padding: EdgeInsets.zero,
-                sliver: FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map data = snapshot.data as Map;
-                      if (data['status']) {
-                        return Obx(() => contentGrid(_bangumidController,
-                            _bangumidController.bangumiList));
-                      } else {
-                        return HttpError(
-                          errMsg: data['msg'],
-                          fn: () => {},
-                        );
-                      }
-                    } else {
-                      return contentGrid(_bangumidController, []);
-                    }
-                  },
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10, left: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '推荐',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
               ),
-              const LoadingMore()
-            ],
-          ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.zero,
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(() => contentGrid(_bangumidController,
+                          _bangumidController.bangumiList));
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => {},
+                      );
+                    }
+                  } else {
+                    return contentGrid(_bangumidController, []);
+                  }
+                },
+              ),
+            ),
+            const LoadingMore()
+          ],
         ),
       ),
     );
