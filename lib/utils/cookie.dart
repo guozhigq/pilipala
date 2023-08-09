@@ -21,6 +21,8 @@ class SetCookie {
     await cookieJar.saveFromResponse(Uri.parse(url), jarCookies);
     // 重新设置 cookie
     Request.setCookie();
+    Request.cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(url), jarCookies);
     return true;
   }
 }

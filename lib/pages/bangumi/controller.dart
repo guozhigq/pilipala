@@ -18,8 +18,9 @@ class BangumiController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(
-        Get.parameters['mid'] ?? user.get(UserBoxKey.userMid).toString());
+    if (user.get(UserBoxKey.userMid) != null) {
+      mid = int.parse(user.get(UserBoxKey.userMid).toString());
+    }
     userLogin.value = user.get(UserBoxKey.userLogin) != null;
   }
 

@@ -95,10 +95,6 @@ class Request {
       //Http请求头.
       headers: {
         // 'cookie': '',
-        "env": 'prod',
-        "app-key": 'android',
-        "x-bili-aurora-eid": 'UlMFQVcABlAH',
-        "x-bili-aurora-zone": 'sh001',
         'referer': 'https://www.bilibili.com/',
       },
     );
@@ -106,17 +102,22 @@ class Request {
     Box user = GStrorage.user;
     if (user.get(UserBoxKey.userMid) != null) {
       options.headers['x-bili-mid'] = user.get(UserBoxKey.userMid).toString();
+      options.headers['env'] = 'prod';
+      options.headers['app-key'] = 'android64';
+      options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
+      options.headers['x-bili-aurora-zone'] = 'sh001';
     }
     dio.options = options;
     //添加拦截器
-    dio.interceptors
-      ..add(ApiInterceptor())
-      // 日志拦截器 输出请求、响应内容
-      ..add(LogInterceptor(
-        request: false,
-        requestHeader: false,
-        responseHeader: false,
-      ));
+    dio.interceptors.add(ApiInterceptor());
+
+    // 日志拦截器 输出请求、响应内容
+    // dio.interceptors.add(LogInterceptor(
+    //   request: false,
+    //   requestHeader: false,
+    //   responseHeader: false,
+    // ));
+
     dio.transformer = BackgroundTransformer();
     dio.options.validateStatus = (status) {
       return status! >= 200 && status < 300 || status == 304 || status == 302;
@@ -161,7 +162,7 @@ class Request {
    * post请求
    */
   post(url, {data, queryParameters, options, cancelToken, extra}) async {
-    print('post-data: $data');
+    // print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
@@ -171,7 +172,7 @@ class Request {
         options: options,
         cancelToken: cancelToken,
       );
-      print('post success: ${response.data}');
+      // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
       print('post error: $e');

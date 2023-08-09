@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/pages/bangumi/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/live/index.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
@@ -51,6 +53,9 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     Get.find<BangumiController>,
   ];
   RxString defaultSearch = '输入关键词搜索'.obs;
+  Box user = GStrorage.user;
+  RxBool userLogin = false.obs;
+  RxString userFace = ''.obs;
 
   @override
   void onInit() {
@@ -61,6 +66,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       vsync: this,
     );
     searchDefault();
+    userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+    userFace.value = user.get(UserBoxKey.userFace) ?? '';
   }
 
   void onRefresh() {
@@ -80,5 +87,11 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (res.data['code'] == 0) {
       defaultSearch.value = res.data['data']['name'];
     }
+  }
+
+  // 更新登录状态
+  void updateLoginStatus(val) {
+    userLogin.value = val ?? false;
+    userFace.value = user.get(UserBoxKey.userFace) ?? '';
   }
 }

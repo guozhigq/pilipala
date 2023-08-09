@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/bangumi/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
@@ -10,7 +8,6 @@ import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,6 +26,19 @@ class _HomePageState extends State<HomePage>
   @override
   bool get wantKeepAlive => true;
 
+  showUserBottonSheet() {
+    feedBack();
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => const SizedBox(
+        height: 450,
+        child: MinePage(),
+      ),
+      clipBehavior: Clip.hardEdge,
+      isScrollControlled: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -38,7 +48,11 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(toolbarHeight: 0, elevation: 0),
       body: Column(
         children: [
-          CustomAppBar(stream: stream, ctr: _homeController),
+          CustomAppBar(
+            stream: stream,
+            ctr: _homeController,
+            callback: showUserBottonSheet,
+          ),
           Container(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
             child: Row(
@@ -132,13 +146,15 @@ class _HomePageState extends State<HomePage>
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final Stream<bool>? stream;
-  final ctr;
+  final HomeController? ctr;
+  final Function? callback;
 
   const CustomAppBar({
     super.key,
     this.height = kToolbarHeight,
     this.stream,
     this.ctr,
+    this.callback,
   });
 
   @override
@@ -146,8 +162,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    Box user = GStrorage.user;
-
     return StreamBuilder(
       stream: stream,
       initialData: true,
@@ -168,103 +182,108 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   bottom: 4,
                   top: MediaQuery.of(context).padding.top,
                 ),
-                child: Row(
-                  children: [
-                    const Text(
-                      'PLPL',
-                      style: TextStyle(
-                        height: 2.8,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Jura-Bold',
-                      ),
+                child: Row(children: [
+                  const Text(
+                    'PLPL',
+                    style: TextStyle(
+                      height: 2.8,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jura-Bold',
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed('/search', parameters: {
-                            'hintText': ctr.defaultSearch.value
-                          });
-                        },
-                        child: Container(
-                          width: 250,
-                          height: 45,
-                          clipBehavior: Clip.hardEdge,
-                          padding: const EdgeInsets.only(left: 12, right: 22),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(25)),
-                            color:
-                                Theme.of(context).colorScheme.onInverseSurface,
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search_outlined,
-                                size: 23,
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                              const SizedBox(width: 7),
-                              Expanded(
-                                child: Obx(
-                                  () => Text(
-                                    ctr.defaultSearch.value,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline),
-                                  ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.toNamed('/search',
+                            parameters: {'hintText': ctr!.defaultSearch.value});
+                      },
+                      child: Container(
+                        width: 250,
+                        height: 42,
+                        clipBehavior: Clip.hardEdge,
+                        padding: const EdgeInsets.only(left: 12, right: 22),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(25)),
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.search_outlined,
+                              size: 21,
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Obx(
+                                () => Text(
+                                  ctr!.defaultSearch.value,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    if (user.get(UserBoxKey.userLogin) ?? false) ...[
-                      GestureDetector(
-                        onTap: () {
-                          feedBack();
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (_) => const SizedBox(
-                              height: 450,
-                              child: MinePage(),
+                  ),
+                  const SizedBox(width: 10),
+                  // SizedBox(
+                  //   width: 36,
+                  //   height: 36,
+                  //   child: IconButton(
+                  //     style: ButtonStyle(
+                  //       padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  //     ),
+                  //     onPressed: () {},
+                  //     icon: const Icon(Icons.notifications_none_outlined,
+                  //         size: 22),
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 8),
+                  Obx(
+                    () => ctr!.userLogin.value
+                        ? GestureDetector(
+                            onTap: () => callback!(),
+                            child: NetworkImgLayer(
+                              type: 'avatar',
+                              width: 34,
+                              height: 34,
+                              src: ctr!.userFace.value,
                             ),
-                            clipBehavior: Clip.hardEdge,
-                            isScrollControlled: true,
-                          );
-                        },
-                        child: NetworkImgLayer(
-                          type: 'avatar',
-                          width: 34,
-                          height: 34,
-                          src: user.get(UserBoxKey.userFace),
-                        ),
-                      )
-                    ] else ...[
-                      IconButton(
-                        onPressed: () {
-                          feedBack();
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (_) => const SizedBox(
-                              height: 450,
-                              child: MinePage(),
+                          )
+                        : SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: IconButton(
+                              style: ButtonStyle(
+                                padding:
+                                    MaterialStateProperty.all(EdgeInsets.zero),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith((states) {
+                                  return Theme.of(context)
+                                      .colorScheme
+                                      .onInverseSurface;
+                                }),
+                              ),
+                              onPressed: () => callback!(),
+                              icon: Icon(
+                                Icons.person_rounded,
+                                size: 22,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
-                            clipBehavior: Clip.hardEdge,
-                            isScrollControlled: true,
-                          );
-                        },
-                        icon: const Icon(CupertinoIcons.person, size: 22),
-                      )
-                    ],
-                  ],
-                ),
+                          ),
+                  ),
+                ]),
               ),
             ),
           ),

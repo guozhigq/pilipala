@@ -1,7 +1,11 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
+import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/controller.dart';
+import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -25,6 +29,8 @@ class SettingController extends GetxController {
     await Get.find<MineController>().resetUserInfo();
     userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
     userInfoCache.put('userInfoCache', null);
+    HomeController homeCtr = Get.find<HomeController>();
+    homeCtr.updateLoginStatus(false);
   }
 
   // 开启关闭震动反馈
