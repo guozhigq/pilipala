@@ -45,6 +45,7 @@ class BangumiListItemModel {
     this.subTitle,
     this.title,
     this.titleIcon,
+    this.progress,
   });
 
   String? badge;
@@ -64,6 +65,8 @@ class BangumiListItemModel {
   String? title;
   String? titleIcon;
 
+  String? progress;
+
   BangumiListItemModel.fromJson(Map<String, dynamic> json) {
     badge = json['badge'] == '' ? null : json['badge'];
     badgeType = json['badge_type'];
@@ -81,5 +84,7 @@ class BangumiListItemModel {
     subTitle = json['sub_title'];
     title = json['title'];
     titleIcon = json['title_icon'];
+
+    progress = json['progress'];
   }
 }

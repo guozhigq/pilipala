@@ -98,8 +98,9 @@ class BangumiCardV extends StatelessWidget {
                         ),
                         if (bangumiItem.badge != null)
                           pBadge(bangumiItem.badge, context, 6, 6, null, null),
-                        pBadge(bangumiItem.order, context, null, null, 6, 6,
-                            type: 'gray'),
+                        if (bangumiItem.order != null)
+                          pBadge(bangumiItem.order, context, null, null, 6, 6,
+                              type: 'gray'),
                       ],
                     );
                   }),
@@ -130,71 +131,40 @@ class BangumiContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              bangumiItem.title,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
             Row(
               children: [
                 Expanded(
-                  child: LayoutBuilder(builder:
-                      (BuildContext context, BoxConstraints constraints) {
-                    return SizedBox(
-                      width: constraints.maxWidth,
-                      child: Text(
-                        bangumiItem.indexShow,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelMedium!.fontSize,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                // SizedBox(
-                //   width: 20,
-                //   height: 20,
-                //   child: IconButton(
-                //     tooltip: '稍后再看',
-                //     style: ButtonStyle(
-                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                //     ),
-                //     onPressed: () async {
-                //       var res =
-                //           await UserHttp.toViewLater(bvid: videoItem.bvid);
-                //       SmartDialog.showToast(res['msg']);
-                //     },
-                //     icon: Icon(
-                //       Icons.more_vert_outlined,
-                //       color: Theme.of(context).colorScheme.outline,
-                //       size: 14,
-                //     ),
-                //   ),
-                // ),
+                    child: Text(
+                  bangumiItem.title,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ],
             ),
-            // Row(
-            //   children: [
-            //     StatView(
-            //       theme: 'black',
-            //       view: videoItem.stat.view,
-            //     ),
-            //     const SizedBox(width: 6),
-            //     StatDanMu(
-            //       theme: 'black',
-            //       danmu: videoItem.stat.danmaku,
-            //     ),
-            //   ],
-            // ),
+            if (bangumiItem.indexShow != null)
+              Text(
+                bangumiItem.indexShow,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            if (bangumiItem.progress != null)
+              Text(
+                bangumiItem.progress,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
           ],
         ),
       ),
