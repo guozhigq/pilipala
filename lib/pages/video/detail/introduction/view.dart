@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -103,13 +102,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late double sheetHeight;
 
   late final bool loadingStatus; // 加载状态
-  late final int viewCount; // 观看
-  late final int danmakuCount; // 弹幕
-  late final String pubDate; // 发布日期
 
-  late final owner;
-  late final follower;
-  late final followStatus;
+  late final dynamic owner;
+  late final dynamic follower;
+  late final dynamic followStatus;
 
   @override
   void initState() {
@@ -121,16 +117,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     sheetHeight = localCache.get('sheetHeight');
 
     loadingStatus = widget.loadingStatus;
-    viewCount = !loadingStatus
-        ? widget.videoDetail!.stat!.view
-        : videoItem['stat'].view;
-    danmakuCount = !loadingStatus
-        ? widget.videoDetail!.stat!.danmaku
-        : videoItem['stat'].danmaku;
-    pubDate = Utils.dateFormat(
-        !loadingStatus ? widget.videoDetail!.pubdate : videoItem['pubdate'],
-        formatType: 'detail');
-
     owner = loadingStatus ? videoItem['owner'] : widget.videoDetail!.owner;
     follower = loadingStatus
         ? '-'
@@ -235,14 +221,31 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     child: Row(
                       children: [
                         StatView(
-                            theme: 'gray', view: viewCount, size: 'medium'),
+                          theme: 'gray',
+                          view: !widget.loadingStatus
+                              ? widget.videoDetail!.stat!.view
+                              : videoItem['stat'].view,
+                          size: 'medium',
+                        ),
                         const SizedBox(width: 10),
                         StatDanMu(
-                            theme: 'gray', danmu: danmakuCount, size: 'medium'),
+                          theme: 'gray',
+                          danmu: !widget.loadingStatus
+                              ? widget.videoDetail!.stat!.danmaku
+                              : videoItem['stat'].danmaku,
+                          size: 'medium',
+                        ),
                         const SizedBox(width: 10),
                         Text(
-                          pubDate,
-                          style: TextStyle(fontSize: 12, color: outline),
+                          Utils.dateFormat(
+                              !widget.loadingStatus
+                                  ? widget.videoDetail!.pubdate
+                                  : videoItem['pubdate'],
+                              formatType: 'detail'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: t.colorScheme.outline,
+                          ),
                         ),
                       ],
                     ),
