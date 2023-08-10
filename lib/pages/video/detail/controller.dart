@@ -32,6 +32,8 @@ class VideoDetailController extends GetxController
   late VideoQuality currentVideoQa;
   // 当前音质
   late AudioQuality currentAudioQa;
+  // 当前解码格式
+  late VideoDecodeFormats currentDecodeFormats;
 
   // 是否预渲染 骨架屏
   bool preRender = false;
@@ -114,9 +116,11 @@ class VideoDetailController extends GetxController
 
     /// 暂不匹配解码规则
 
-    /// 根据currentVideoQa 重新设置videoUrl
-    VideoItem firstVideo =
-        data.dash!.video!.firstWhere((i) => i.id == currentVideoQa.code);
+    /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
+    List<VideoItem> videoList =
+        data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
+    VideoItem firstVideo = videoList
+        .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
     // String videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
@@ -176,6 +180,13 @@ class VideoDetailController extends GetxController
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
       }
+
+      /// 优先顺序 设置中指定解码格式 -> 当前可选的首个解码格式
+      List<FormatItem> supportFormats = data.supportFormats!;
+      List supportDecodeFormats = supportFormats.first.codecs!;
+      currentDecodeFormats =
+          VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
+
       await playerInit(
         firstVideo,
         audioUrl,
