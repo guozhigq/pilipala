@@ -29,6 +29,7 @@ class Request {
 
   /// 设置cookie
   static setCookie() async {
+    Box user = GStrorage.user;
     var cookiePath = await Utils.getCookiePath();
     var cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -38,18 +39,21 @@ class Request {
     dio.interceptors.add(cookieManager);
     var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    var cookie2 = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.tUrl));
+    if (user.get(UserBoxKey.userMid) != null) {
+      var cookie2 = await cookieManager.cookieJar
+          .loadForRequest(Uri.parse(HttpString.tUrl));
+      if (cookie2.isEmpty) {
+        try {
+          await Request().get(HttpString.tUrl);
+        } catch (e) {
+          log("setCookie, ${e.toString()}");
+        }
+      }
+    }
+
     if (cookie.isEmpty) {
       try {
         await Request().get(HttpString.baseUrl);
-      } catch (e) {
-        log("setCookie, ${e.toString()}");
-      }
-    }
-    if (cookie2.isEmpty) {
-      try {
-        await Request().get(HttpString.tUrl);
       } catch (e) {
         log("setCookie, ${e.toString()}");
       }
@@ -95,7 +99,6 @@ class Request {
       //Http请求头.
       headers: {
         // 'cookie': '',
-        'referer': 'https://www.bilibili.com/',
       },
     );
 
@@ -106,17 +109,18 @@ class Request {
       options.headers['app-key'] = 'android64';
       options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
       options.headers['x-bili-aurora-zone'] = 'sh001';
+      options.headers['referer'] = 'https://www.bilibili.com/';
     }
     dio.options = options;
     //添加拦截器
     dio.interceptors.add(ApiInterceptor());
 
     // 日志拦截器 输出请求、响应内容
-    // dio.interceptors.add(LogInterceptor(
-    //   request: false,
-    //   requestHeader: false,
-    //   responseHeader: false,
-    // ));
+    dio.interceptors.add(LogInterceptor(
+      request: false,
+      requestHeader: false,
+      responseHeader: false,
+    ));
 
     dio.transformer = BackgroundTransformer();
     dio.options.validateStatus = (status) {
