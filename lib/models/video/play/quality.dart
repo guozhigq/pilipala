@@ -113,6 +113,14 @@ extension VideoDecodeFormatsCode on VideoDecodeFormats {
   ];
   get code => _codeList[index];
 
+  static VideoDecodeFormats? fromCode(String code) {
+    final index = _codeList.indexOf(code);
+    if (index != -1) {
+      return VideoDecodeFormats.values[index];
+    }
+    return null;
+  }
+
   static VideoDecodeFormats? fromString(String val) {
     var result = VideoDecodeFormats.values.first;
     for (var i in _codeList) {
