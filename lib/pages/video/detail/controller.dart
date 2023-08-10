@@ -28,6 +28,8 @@ class VideoDetailController extends GetxController
   SearchType videoType = SearchType.video;
 
   late PlayUrlModel data;
+
+  Box setting = GStrorage.setting;
   // 当前画质
   late VideoQuality currentVideoQa;
   // 当前音质
@@ -167,25 +169,65 @@ class VideoDetailController extends GetxController
       data = result['data'];
 
       /// 优先顺序 省流模式 -> 设置中指定质量 -> 当前可选的最高质量
-      VideoItem firstVideo = data.dash!.video!.first;
-      // String videoUrl = firstVideo.baseUrl!;
-      //
-      currentVideoQa = VideoQualityCode.fromCode(firstVideo.id!)!;
+      List<VideoItem> allVideosList = data.dash!.video!;
+      late VideoItem firstVideo;
+
+      try {
+        // 当前可播放的最高质量视频
+        int currentHighVideoQa = allVideosList.first.quality!.code;
+        //
+        int cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa,
+            defaultValue: currentHighVideoQa);
+        int resVideoQa = currentHighVideoQa;
+        if (cacheVideoQa <= currentHighVideoQa) {
+          // 如果默认设置的画质比当前可用的低，使用默认值
+          resVideoQa = cacheVideoQa;
+        }
+        currentVideoQa = VideoQualityCode.fromCode(resVideoQa)!;
+
+        /// 取出符合当前画质的videoList
+        List<VideoItem> videosList =
+            allVideosList.where((e) => e.quality!.code == resVideoQa).toList();
+
+        /// 优先顺序 设置中指定解码格式 -> 当前可选的首个解码格式
+        List<FormatItem> supportFormats = data.supportFormats!;
+        // 根据画质选编码格式
+        List supportDecodeFormats =
+            supportFormats.firstWhere((e) => e.quality == resVideoQa).codecs!;
+
+        try {
+          currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+              SettingBoxKey.defaultDecode,
+              defaultValue: supportDecodeFormats.first))!;
+        } catch (_) {}
+
+        /// 取出符合当前解码格式的videoItem
+        firstVideo = videosList
+            .firstWhere((e) => e.codecs!.startsWith(currentDecodeFormats.code));
+      } catch (_) {}
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
-      AudioItem firstAudio =
-          data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first : AudioItem();
+      late AudioItem firstAudio;
+      try {
+        if (data.dash!.audio!.isNotEmpty) {
+          firstAudio = data.dash!.audio!.first;
+          int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
+              defaultValue: data.dash!.audio!.first.id);
+          // 选择最接近的那个音轨
+          try {
+            firstAudio =
+                data.dash!.audio!.firstWhere((e) => e.id == resultAudioQa);
+          } catch (_) {}
+        } else {
+          firstAudio = AudioItem();
+        }
+      } catch (_) {}
+
       String audioUrl = firstAudio.baseUrl ?? '';
       //
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
       }
-
-      /// 优先顺序 设置中指定解码格式 -> 当前可选的首个解码格式
-      List<FormatItem> supportFormats = data.supportFormats!;
-      List supportDecodeFormats = supportFormats.first.codecs!;
-      currentDecodeFormats =
-          VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
 
       await playerInit(
         firstVideo,
