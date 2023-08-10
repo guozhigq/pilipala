@@ -27,19 +27,23 @@ class IntroDetail extends StatelessWidget {
         height: sheetHeight,
         child: Column(
           children: [
-            Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSecondaryContainer
-                          .withOpacity(0.5),
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+            InkWell(
+              onTap: () => Get.back(),
+              child: Container(
+                height: 35,
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Center(
+                  child: Container(
+                    width: 32,
+                    height: 3,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSecondaryContainer
+                            .withOpacity(0.5),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(3))),
+                  ),
                 ),
               ),
             ),

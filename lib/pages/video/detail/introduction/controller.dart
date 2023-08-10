@@ -51,6 +51,8 @@ class VideoIntroController extends GetxController {
   RxMap followStatus = {}.obs;
   int _tempThemeValue = -1;
 
+  RxInt lastPlayCid = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -76,6 +78,7 @@ class VideoIntroController extends GetxController {
       }
     }
     userLogin = user.get(UserBoxKey.userLogin) != null;
+    lastPlayCid.value = int.parse(Get.parameters['cid']!);
   }
 
   // 获取视频简介&分p
@@ -83,6 +86,9 @@ class VideoIntroController extends GetxController {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
+      if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
+        lastPlayCid.value = videoDetail.value.pages!.first.cid!;
+      }
       Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
           .tabs
           .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
