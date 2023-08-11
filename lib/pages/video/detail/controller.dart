@@ -13,40 +13,47 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  int tabInitialIndex = 0;
-  TabController? tabCtr;
-  // tabs
-  RxList<String> tabs = <String>['简介', '评论'].obs;
-
-  // 视频aid
+  /// 路由传参
   String bvid = Get.parameters['bvid']!;
   int cid = int.parse(Get.parameters['cid']!);
-  // 视频类型 默认投稿视频
-  SearchType videoType = SearchType.video;
-
-  late PlayUrlModel data;
-
-  Box setting = GStrorage.setting;
-  // 当前画质
-  late VideoQuality currentVideoQa;
-  // 当前音质
-  late AudioQuality currentAudioQa;
-  // 当前解码格式
-  late VideoDecodeFormats currentDecodeFormats;
-
-  // 是否预渲染 骨架屏
-  bool preRender = false;
-
-  // 视频详情 上个页面传入
+  String heroTag = Get.arguments['heroTag'];
+  // 视频详情
   Map videoItem = {};
+  // 视频类型 默认投稿视频
+  SearchType videoType = Get.arguments['videoType'] ?? SearchType.video;
 
+  /// tabs相关配置
+  int tabInitialIndex = 0;
+  late TabController tabCtr;
+  RxList<String> tabs = <String>['简介', '评论'].obs;
+
+  // 请求返回的视频信息
+  late PlayUrlModel data;
   // 请求状态
   RxBool isLoading = false.obs;
 
-  String heroTag = '';
+  /// 播放器配置 画质 音质 解码格式
+  late VideoQuality currentVideoQa;
+  late AudioQuality currentAudioQa;
+  late VideoDecodeFormats currentDecodeFormats;
+  PlPlayerController plPlayerController = PlPlayerController();
+  // 是否开始自动播放 存在多p的情况下，第二p需要为true
+  RxBool autoPlay = true.obs;
+  // 视频资源是否有效
+  RxBool isEffective = true.obs;
+  // 封面图的展示
+  RxBool isShowCover = true.obs;
+  // 硬解
+  RxBool enableHA = true.obs;
+
+  /// 本地存储
+  Box user = GStrorage.user;
+  Box localCache = GStrorage.localCache;
+  Box setting = GStrorage.setting;
 
   int oid = 0;
   // 评论id 请求楼中楼评论使用
@@ -55,38 +62,27 @@ class VideoDetailController extends GetxController
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   Timer? timer;
-  RxString bgCover = ''.obs;
-  Box user = GStrorage.user;
-  Box localCache = GStrorage.localCache;
-  PlPlayerController plPlayerController = PlPlayerController();
-  // 是否开始自动播放 存在多p的情况下，第二p需要为true
-  RxBool autoPlay = true.obs;
-  // 视频资源是否有效
-  RxBool isEffective = true.obs;
-  // 封面图的展示
-  RxBool isShowCover = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('videoItem')) {
-        preRender = true;
-        var args = Get.arguments['videoItem'];
+    Map argMap = Get.arguments;
+    var keys = argMap.keys.toList();
+    if (keys.isNotEmpty) {
+      if (keys.contains('videoItem')) {
+        var args = argMap['videoItem'];
         if (args.pic != null && args.pic != '') {
           videoItem['pic'] = args.pic;
-          bgCover.value = args.pic;
         }
       }
-      if (Get.arguments.containsKey('pic')) {
-        videoItem['pic'] = Get.arguments['pic'];
-        bgCover.value = Get.arguments['pic'];
+      if (keys.contains('pic')) {
+        videoItem['pic'] = argMap['pic'];
       }
-      heroTag = Get.arguments['heroTag'];
-      videoType = Get.arguments['videoType'] ?? SearchType.video;
     }
     tabCtr = TabController(length: 2, vsync: this);
-    // queryVideoUrl();
+    autoPlay.value =
+        setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
+    enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
   }
 
   showReplyReplyPanel() {
@@ -123,7 +119,6 @@ class VideoDetailController extends GetxController
         data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
     VideoItem firstVideo = videoList
         .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
-    // String videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
     AudioItem firstAudio =
@@ -147,7 +142,7 @@ class VideoDetailController extends GetxController
         },
       ),
       // 硬解
-      enableHA: true,
+      enableHA: enableHA.value,
       autoplay: autoPlay.value,
       seekTo: defaultST,
       duration: Duration(milliseconds: duration),
@@ -180,8 +175,10 @@ class VideoDetailController extends GetxController
             defaultValue: currentHighVideoQa);
         int resVideoQa = currentHighVideoQa;
         if (cacheVideoQa <= currentHighVideoQa) {
-          // 如果默认设置的画质比当前可用的低，使用默认值
-          resVideoQa = cacheVideoQa;
+          List<int> numbers = data.acceptQuality!
+              .where((e) => e <= currentHighVideoQa)
+              .toList();
+          resVideoQa = Utils.findClosestNumber(cacheVideoQa, numbers);
         }
         currentVideoQa = VideoQualityCode.fromCode(resVideoQa)!;
 
@@ -208,16 +205,17 @@ class VideoDetailController extends GetxController
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       late AudioItem firstAudio;
+      List audiosList = data.dash!.audio!;
       try {
-        if (data.dash!.audio!.isNotEmpty) {
-          firstAudio = data.dash!.audio!.first;
+        if (audiosList.isNotEmpty) {
+          firstAudio = audiosList.first;
           int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
-              defaultValue: data.dash!.audio!.first.id);
+              defaultValue: firstAudio.id);
           // 选择最接近的那个音轨
-          try {
-            firstAudio =
-                data.dash!.audio!.firstWhere((e) => e.id == resultAudioQa);
-          } catch (_) {}
+          firstAudio = audiosList.firstWhere(
+            (e) => e.id == resultAudioQa,
+            orElse: () => AudioItem(),
+          );
         } else {
           firstAudio = AudioItem();
         }
