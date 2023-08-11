@@ -23,7 +23,16 @@ class MinePage extends StatelessWidget {
         elevation: 0,
         toolbarHeight: kTextTabBarHeight + 20,
         backgroundColor: Colors.transparent,
-        title: null,
+        centerTitle: false,
+        title: const Text(
+          'PLPL',
+          style: TextStyle(
+            height: 2.8,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Jura-Bold',
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () => mineController.onChangeTheme(),

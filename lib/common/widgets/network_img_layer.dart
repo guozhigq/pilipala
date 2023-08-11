@@ -37,8 +37,6 @@ class NetworkImgLayer extends StatelessWidget {
     int picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
 
     // double pr = 2;
-    print(
-        '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? picQuality}q.webp');
     return src != ''
         ? ClipRRect(
             clipBehavior: Clip.hardEdge,

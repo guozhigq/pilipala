@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePage>
                         onTap: (value) {
                           feedBack();
                           if (_homeController.initialIndex == value) {
-                            _homeController.ctrList[value]().animateToTop();
+                            _homeController.tabsCtrList[value]().animateToTop();
                           }
                           _homeController.initialIndex = value;
                         },
@@ -134,12 +134,7 @@ class _HomePageState extends State<HomePage>
           Expanded(
             child: TabBarView(
               controller: _homeController.tabController,
-              children: const [
-                LivePage(),
-                RcmdPage(),
-                HotPage(),
-                BangumiPage(),
-              ],
+              children: _homeController.tabsPageList,
             ),
           ),
         ],
@@ -179,25 +174,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: AnimatedContainer(
               curve: Curves.linear,
               duration: const Duration(milliseconds: 300),
-              height: snapshot.data ? 94 : MediaQuery.of(context).padding.top,
+              height: snapshot.data ? 96 : MediaQuery.of(context).padding.top,
               child: Container(
                 padding: EdgeInsets.only(
-                  left: 12,
+                  left: 14,
                   right: 12,
                   bottom: 4,
                   top: MediaQuery.of(context).padding.top,
                 ),
                 child: Row(children: [
-                  const Text(
-                    'PLPL',
-                    style: TextStyle(
-                      height: 2.8,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Jura-Bold',
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -206,7 +191,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       },
                       child: Container(
                         width: 250,
-                        height: 42,
+                        height: 44,
                         clipBehavior: Clip.hardEdge,
                         padding: const EdgeInsets.only(left: 12, right: 22),
                         decoration: BoxDecoration(
@@ -241,33 +226,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // SizedBox(
-                  //   width: 36,
-                  //   height: 36,
-                  //   child: IconButton(
-                  //     style: ButtonStyle(
-                  //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  //     ),
-                  //     onPressed: () {},
-                  //     icon: const Icon(Icons.notifications_none_outlined,
-                  //         size: 22),
-                  //   ),
-                  // ),
-                  // const SizedBox(width: 8),
                   Obx(
                     () => ctr!.userLogin.value
                         ? GestureDetector(
                             onTap: () => callback!(),
                             child: NetworkImgLayer(
                               type: 'avatar',
-                              width: 34,
-                              height: 34,
+                              width: 38,
+                              height: 38,
                               src: ctr!.userFace.value,
                             ),
                           )
                         : SizedBox(
-                            width: 36,
-                            height: 36,
+                            width: 38,
+                            height: 38,
                             child: IconButton(
                               style: ButtonStyle(
                                 padding:
