@@ -31,13 +31,19 @@ class _PlaySettingState extends State<PlaySetting> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
     TextStyle subTitleStyle = Theme.of(context)
         .textTheme
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('播放设置'),
+        centerTitle: false,
+        titleSpacing: 0,
+        title: Text(
+          '播放设置',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: ListView(
         children: [
@@ -45,15 +51,17 @@ class _PlaySettingState extends State<PlaySetting> {
             title: '自动播放',
             subTitle: '进入详情页自动播放',
             setKey: SettingBoxKey.autoPlayEnable,
+            defaultVal: true,
           ),
           const SetSwitchItem(
             title: '开启硬解',
             subTitle: '以较低功耗播放视频',
             setKey: SettingBoxKey.enableHA,
+            defaultVal: true,
           ),
           ListTile(
             dense: false,
-            title: const Text('默认画质'),
+            title: Text('默认画质', style: titleStyle),
             subtitle: Text(
               '当前画质' + VideoQualityCode.fromCode(defaultVideoQa)!.description!,
               style: subTitleStyle,
@@ -78,7 +86,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           ListTile(
             dense: false,
-            title: const Text('默认音质'),
+            title: Text('默认音质', style: titleStyle),
             subtitle: Text(
               '当前音质' + AudioQualityCode.fromCode(defaultAudioQa)!.description!,
               style: subTitleStyle,
@@ -103,7 +111,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           ListTile(
             dense: false,
-            title: const Text('默认解码格式'),
+            title: Text('默认解码格式', style: titleStyle),
             subtitle: Text(
               '当前解码格式' +
                   VideoDecodeFormatsCode.fromCode(defaultDecode)!.description!,

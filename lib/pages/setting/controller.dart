@@ -11,10 +11,12 @@ import 'package:pilipala/utils/storage.dart';
 
 class SettingController extends GetxController {
   Box user = GStrorage.user;
-  RxBool userLogin = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
   Box setting = GStrorage.setting;
+  Box userInfoCache = GStrorage.userInfo;
+
+  RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
+  RxInt picQuality = 10.obs;
 
   @override
   void onInit() {
@@ -22,6 +24,8 @@ class SettingController extends GetxController {
     userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
+    picQuality.value =
+        setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
   }
 
   loginOut() async {

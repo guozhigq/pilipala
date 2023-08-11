@@ -6,11 +6,13 @@ class SetSwitchItem extends StatefulWidget {
   final String? title;
   final String? subTitle;
   final String? setKey;
+  final bool? defaultVal;
 
   const SetSwitchItem({
     this.title,
     this.subTitle,
     this.setKey,
+    this.defaultVal,
     Key? key,
   }) : super(key: key);
 
@@ -26,11 +28,12 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
   @override
   void initState() {
     super.initState();
-    val = Setting.get(widget.setKey, defaultValue: false);
+    val = Setting.get(widget.setKey, defaultValue: widget.defaultVal ?? false);
   }
 
   @override
   Widget build(BuildContext context) {
+    TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
     TextStyle subTitleStyle = Theme.of(context)
         .textTheme
         .labelMedium!
@@ -40,7 +43,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
       onTap: () {
         Setting.put(widget.setKey, !val);
       },
-      title: Text(widget.title!),
+      title: Text(widget.title!, style: titleStyle),
       subtitle: widget.subTitle != null
           ? Text(widget.subTitle!, style: subTitleStyle)
           : null,

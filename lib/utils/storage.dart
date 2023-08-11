@@ -76,6 +76,7 @@ class SettingBoxKey {
   static const String autoUpgradeEnable = 'autoUpgradeEnable';
   static const String autoPlayEnable = 'autoPlayEnable';
   static const String enableHA = 'enableHA';
+  static const String defaultPicQa = 'defaultPicQa';
 
   static const String danmakuEnable = 'danmakuEnable';
 }

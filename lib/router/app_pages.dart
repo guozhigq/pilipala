@@ -15,6 +15,7 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
 import 'package:pilipala/pages/setting/play_setting.dart';
+import 'package:pilipala/pages/setting/style_setting.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
@@ -71,6 +72,8 @@ class Routes {
     GetPage(name: '/replyReply', page: () => const VideoReplyReplyPanel()),
 
     // 播放设置
-    GetPage(name: '/playSetting', page: () => const PlaySetting())
+    GetPage(name: '/playSetting', page: () => const PlaySetting()),
+
+    GetPage(name: '/styleSetting', page: () => const StyleSetting()),
   ];
 }
