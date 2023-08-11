@@ -4,8 +4,10 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/custom_toast.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
@@ -33,19 +35,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color brandColor = Colors.green;
+    Box setting = GStrorage.setting;
+    ThemeType currentThemeValue = ThemeType.values[setting
+        .get(SettingBoxKey.themeMode, defaultValue: ThemeType.system.code)];
     return DynamicColorBuilder(
-      builder: ((lightDynamic, darkDynamic) {
+      builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        ColorScheme? lightColorScheme;
+        ColorScheme? darkColorScheme;
+        if (lightDynamic != null && darkDynamic != null) {
+          // dynamic取色成功
+          lightColorScheme = lightDynamic.harmonized();
+          darkColorScheme = darkDynamic.harmonized();
+        } else {
+          // dynamic取色失败，采用品牌色
+          lightColorScheme = ColorScheme.fromSeed(
+            seedColor: brandColor,
+            brightness: Brightness.light,
+          );
+          darkColorScheme = ColorScheme.fromSeed(
+            seedColor: brandColor,
+            brightness: Brightness.dark,
+          );
+        }
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
           title: 'PiLiPaLa',
           theme: ThemeData(
             // fontFamily: 'HarmonyOS',
-            colorScheme: lightDynamic ??
-                ColorScheme.fromSeed(
-                  seedColor: Colors.green,
-                  brightness: Brightness.light,
-                ),
+            colorScheme: currentThemeValue == ThemeType.dark
+                ? darkColorScheme
+                : lightColorScheme,
             useMaterial3: true,
             pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -57,11 +78,9 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData(
             // fontFamily: 'HarmonyOS',
-            colorScheme: darkDynamic ??
-                ColorScheme.fromSeed(
-                  seedColor: Colors.green,
-                  brightness: Brightness.dark,
-                ),
+            colorScheme: currentThemeValue == ThemeType.light
+                ? lightColorScheme
+                : darkColorScheme,
             useMaterial3: true,
           ),
           localizationsDelegates: const [

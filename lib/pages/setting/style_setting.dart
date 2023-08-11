@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
@@ -16,11 +17,13 @@ class _StyleSettingState extends State<StyleSetting> {
   final SettingController settingController = Get.put(SettingController());
   Box setting = GStrorage.setting;
   late int picQuality;
+  late ThemeType _tempThemeValue;
 
   @override
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+    _tempThemeValue = settingController.themeType.value;
   }
 
   @override
@@ -74,7 +77,7 @@ class _StyleSettingState extends State<StyleSetting> {
                       final SettingController settingController =
                           Get.put(SettingController());
                       return AlertDialog(
-                        title: Text('图片清晰度 - $picQuality%', style: titleStyle),
+                        title: const Text('图片质量'),
                         contentPadding: const EdgeInsets.only(
                             top: 20, left: 8, right: 8, bottom: 8),
                         content: SizedBox(
@@ -94,7 +97,11 @@ class _StyleSettingState extends State<StyleSetting> {
                         actions: [
                           TextButton(
                               onPressed: () => Get.back(),
-                              child: const Text('取消')),
+                              child: Text('取消',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline))),
                           TextButton(
                             onPressed: () {
                               setting.put(
@@ -119,6 +126,63 @@ class _StyleSettingState extends State<StyleSetting> {
                 style: Theme.of(context).textTheme.titleSmall,
               ),
             ),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('主题模式'),
+                    contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                    content: StatefulBuilder(
+                        builder: (context, StateSetter setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (var i in ThemeType.values) ...[
+                            RadioListTile(
+                              value: i,
+                              title: Text(i.description, style: titleStyle),
+                              groupValue: _tempThemeValue,
+                              onChanged: (ThemeType? value) {
+                                setState(() {
+                                  _tempThemeValue = i;
+                                });
+                              },
+                            ),
+                          ]
+                        ],
+                      );
+                    }),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            '取消',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.outline),
+                          )),
+                      TextButton(
+                          onPressed: () {
+                            settingController.themeType.value = _tempThemeValue;
+                            setting.put(
+                                SettingBoxKey.themeMode, _tempThemeValue.code);
+                            Get.forceAppUpdate();
+                            Get.back();
+                          },
+                          child: const Text('确定'))
+                    ],
+                  );
+                },
+              );
+            },
+            title: Text('主题模式', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前模式：${settingController.themeType.value.description}',
+                style: subTitleStyle)),
+            trailing: const Icon(Icons.arrow_right_alt_outlined),
           ),
         ],
       ),

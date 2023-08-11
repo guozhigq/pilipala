@@ -1,11 +1,9 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
+import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/controller.dart';
-import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -17,6 +15,7 @@ class SettingController extends GetxController {
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
   RxInt picQuality = 10.obs;
+  Rx<ThemeType> themeType = ThemeType.system.obs;
 
   @override
   void onInit() {
@@ -26,6 +25,8 @@ class SettingController extends GetxController {
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
     picQuality.value =
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+    themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
+        defaultValue: ThemeType.system.code)];
   }
 
   loginOut() async {
