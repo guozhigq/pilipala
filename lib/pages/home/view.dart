@@ -53,82 +53,57 @@ class _HomePageState extends State<HomePage>
             ctr: _homeController,
             callback: showUserBottonSheet,
           ),
-          Container(
+          Padding(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Theme(
-                    data: ThemeData(
-                      splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
-                      highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: TabBar(
-                        controller: _homeController.tabController,
-                        tabs: [
-                          for (var i in _homeController.tabs)
-                            // Tab(text: i['label'])
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 0, vertical: 11),
-                              child: Row(
-                                children: [
-                                  i['icon'],
-                                  const SizedBox(width: 4),
-                                  Text(i['label'])
-                                ],
-                              ),
-                            ),
-                        ],
-                        isScrollable: true,
-                        indicatorWeight: 0,
-                        indicatorPadding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 5),
-                        indicator: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.8),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                        ),
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: Theme.of(context).colorScheme.primary,
-                        labelStyle: const TextStyle(fontSize: 13),
-                        dividerColor: Colors.transparent,
-                        unselectedLabelColor:
-                            Theme.of(context).colorScheme.outline,
-                        onTap: (value) {
-                          feedBack();
-                          if (_homeController.initialIndex == value) {
-                            _homeController.tabsCtrList[value]().animateToTop();
-                          }
-                          _homeController.initialIndex = value;
-                        },
-                      ),
-                    ),
+            child: Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
+                highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
+              ),
+              child: TabBar(
+                controller: _homeController.tabController,
+                tabs: [
+                  for (var i in _homeController.tabs) Tab(text: i['label'])
+                ],
+                isScrollable: true,
+                indicatorWeight: 0,
+                indicatorPadding: const EdgeInsets.only(
+                    top: 37, left: 18, right: 18, bottom: 6),
+                indicatorColor: Colors.black,
+                indicator: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.centerLeft,
+                    radius: 20.00,
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.background,
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(2),
+                    bottomLeft: Radius.circular(2),
+                    bottomRight: Radius.circular(4),
                   ),
                 ),
-                SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: IconButton(
-                    tooltip: '全部分类',
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () async {},
-                    icon: Icon(
-                      Icons.dataset_outlined,
-                      color: Theme.of(context).colorScheme.outline,
-                      size: 19,
-                    ),
-                  ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Theme.of(context).colorScheme.primary,
+                labelStyle:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                dividerColor: Colors.transparent,
+                unselectedLabelStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
+                  fontWeight: FontWeight.normal,
                 ),
-                const SizedBox(width: 14)
-              ],
+                unselectedLabelColor: Theme.of(context).colorScheme.outline,
+                onTap: (value) {
+                  feedBack();
+                  if (_homeController.initialIndex == value) {
+                    _homeController.tabsCtrList[value]().animateToTop();
+                  }
+                  _homeController.initialIndex = value;
+                },
+              ),
             ),
           ),
           Expanded(
@@ -174,15 +149,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: AnimatedContainer(
               curve: Curves.linear,
               duration: const Duration(milliseconds: 300),
-              height: snapshot.data ? 96 : MediaQuery.of(context).padding.top,
+              height: snapshot.data
+                  ? MediaQuery.of(context).padding.top + 42
+                  : MediaQuery.of(context).padding.top,
               child: Container(
                 padding: EdgeInsets.only(
-                  left: 14,
+                  left: 12,
                   right: 12,
-                  bottom: 4,
+                  bottom: 0,
                   top: MediaQuery.of(context).padding.top,
                 ),
                 child: Row(children: [
+                  Image.asset(
+                    'assets/images/logo/logo_android_2.png',
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -191,7 +173,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       },
                       child: Container(
                         width: 250,
-                        height: 44,
+                        height: 40,
                         clipBehavior: Clip.hardEdge,
                         padding: const EdgeInsets.only(left: 12, right: 22),
                         decoration: BoxDecoration(
