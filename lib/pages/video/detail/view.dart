@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/sliver_header.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
@@ -156,8 +158,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
                     expandedHeight: videoHeight,
-                    // backgroundColor: Colors.transparent,
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor:
+                        MediaQuery.of(Get.context!).platformBrightness ==
+                                Brightness.dark
+                            ? Colors.black
+                            : Theme.of(context).colorScheme.background,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
                         padding: EdgeInsets.only(top: statusBarHeight),
@@ -226,10 +231,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 backgroundColor:
                                                     Colors.transparent,
                                                 actions: [
-                                                  /// TODO
                                                   IconButton(
                                                       tooltip: '稍后再看',
-                                                      onPressed: () {},
+                                                      onPressed: () async {
+                                                        var res = await UserHttp
+                                                            .toViewLater(
+                                                                bvid:
+                                                                    videoDetailController
+                                                                        .bvid);
+                                                        SmartDialog.showToast(
+                                                            res['msg']);
+                                                      },
                                                       icon: const Icon(Icons
                                                           .history_outlined))
                                                 ],

@@ -37,10 +37,7 @@ class IntroDetail extends StatelessWidget {
                     width: 32,
                     height: 3,
                     decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondaryContainer
-                            .withOpacity(0.5),
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(3))),
                   ),

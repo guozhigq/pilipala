@@ -210,7 +210,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               }),
                             ),
                             onPressed: showIntroDetail,
-                            icon: const Icon(Icons.more_horiz),
+                            icon: Icon(
+                              Icons.more_horiz,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                         ),
                       ],
