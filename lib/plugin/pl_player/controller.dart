@@ -230,8 +230,6 @@ class PlPlayerController {
     try {
       _autoPlay = autoplay;
       _looping = looping;
-      // 初始化视频时长
-      _duration.value = duration ?? Duration.zero;
       // 初始化视频倍速
       _playbackSpeed.value = speed;
       // 初始化数据加载状态
@@ -248,7 +246,7 @@ class PlPlayerController {
       _videoPlayerController = await _createVideoController(
           dataSource, _looping, enableHA, width, height);
       // 获取视频时长 00:00
-      _duration.value = _videoPlayerController!.state.duration;
+      _duration.value = duration ?? _videoPlayerController!.state.duration;
       // 数据加载完成
       dataStatus.status.value = DataStatus.loaded;
 
@@ -274,7 +272,8 @@ class PlPlayerController {
   ) async {
     // 每次配置时先移除监听
     removeListeners();
-
+    isBuffering.value = false;
+    buffered.value = Duration.zero;
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -430,7 +429,7 @@ class PlPlayerController {
     }
     _position.value = position;
     if (duration.value.inSeconds != 0) {
-      // await _videoPlayerController!.stream.buffer.first;
+      await _videoPlayerController!.stream.buffer.first;
       await _videoPlayerController?.seek(position);
       // if (playerStatus.stopped) {
       //   play();

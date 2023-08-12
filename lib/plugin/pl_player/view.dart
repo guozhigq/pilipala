@@ -648,6 +648,23 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             return Container();
           }
         }),
+        Obx(() {
+          if (_.buffered.value == Duration.zero) {
+            return Positioned.fill(
+              child: Container(
+                color: Colors.black,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/loading.gif',
+                    height: 25,
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return Container();
+          }
+        }),
 
         /// 点击 快进/快退
         if (_mountSeekBackwardButton || _mountSeekForwardButton)
