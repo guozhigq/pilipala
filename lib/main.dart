@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color brandColor = Colors.green;
+    Color brandColor = const Color.fromARGB(255, 92, 182, 123);
     Box setting = GStrorage.setting;
     ThemeType currentThemeValue = ThemeType.values[setting
         .get(SettingBoxKey.themeMode, defaultValue: ThemeType.system.code)];
