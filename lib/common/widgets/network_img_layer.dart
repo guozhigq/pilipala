@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/utils/storage.dart';
+
+Box setting = GStrorage.setting;
 
 class NetworkImgLayer extends StatelessWidget {
   final String? src;
@@ -24,12 +28,14 @@ class NetworkImgLayer extends StatelessWidget {
     this.fadeOutDuration,
     this.fadeInDuration,
     // 图片质量 默认1%
-    this.quality = 1,
+    this.quality,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double pr = MediaQuery.of(context).devicePixelRatio;
+    int picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+
     // double pr = 2;
     return src != ''
         ? ClipRRect(
@@ -41,7 +47,7 @@ class NetworkImgLayer extends StatelessWidget {
                     : StyleString.imgRadius.x),
             child: CachedNetworkImage(
               imageUrl:
-                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality}q.webp',
+                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? picQuality}q.webp',
               width: width ?? double.infinity,
               height: height ?? double.infinity,
               alignment: Alignment.center,

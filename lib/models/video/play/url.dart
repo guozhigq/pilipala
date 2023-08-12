@@ -29,7 +29,7 @@ class PlayUrlModel {
   int? timeLength;
   String? acceptFormat;
   List<dynamic>? acceptDesc;
-  List<dynamic>? acceptQuality;
+  List<int>? acceptQuality;
   int? videoCodecid;
   String? seekParam;
   String? seekType;
@@ -48,7 +48,7 @@ class PlayUrlModel {
     timeLength = json['timelength'];
     acceptFormat = json['accept_format'];
     acceptDesc = json['accept_description'];
-    acceptQuality = json['accept_quality'];
+    acceptQuality = json['accept_quality'].map<int>((e) => e as int).toList();
     videoCodecid = json['video_codecid'];
     seekParam = json['seek_param'];
     seekType = json['seek_type'];

@@ -68,6 +68,17 @@ class UserBoxKey {
 class SettingBoxKey {
   static const String themeMode = 'themeMode';
   static const String feedBackEnable = 'feedBackEnable';
+  static const String defaultFontSize = 'fontSize';
+  static const String defaultVideoQa = 'defaultVideoQa';
+  static const String defaultAudioQa = 'defaultAudioQa';
+  static const String defaultDecode = 'defaultDecode';
+  static const String defaultVideoSpeed = 'defaultVideoSpeed';
+  static const String autoUpgradeEnable = 'autoUpgradeEnable';
+  static const String autoPlayEnable = 'autoPlayEnable';
+  static const String enableHA = 'enableHA';
+  static const String defaultPicQa = 'defaultPicQa';
+
+  static const String danmakuEnable = 'danmakuEnable';
 }
 
 class LocalCacheKey {

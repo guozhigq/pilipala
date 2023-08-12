@@ -29,7 +29,8 @@ class DynamicsPage extends StatefulWidget {
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
-  Future? _futureBuilderFuture;
+  late Future _futureBuilderFuture;
+  late Future _futureBuilderFutureUp;
   bool _isLoadingMore = false;
   Box user = GStrorage.user;
 
@@ -40,6 +41,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   void initState() {
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
+    _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
     ScrollController scrollController = _dynamicsController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -175,50 +177,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                   icon: const Icon(Icons.history, size: 21),
                 ),
               ),
-              Positioned(
-                left: 10,
-                top: 0,
-                bottom: 0,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: user.get(UserBoxKey.userLogin) ?? false
-                      ? GestureDetector(
-                          onTap: () {
-                            feedBack();
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (_) => const SizedBox(
-                                height: 450,
-                                child: MinePage(),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                              isScrollControlled: true,
-                            );
-                          },
-                          child: NetworkImgLayer(
-                            type: 'avatar',
-                            width: 30,
-                            height: 30,
-                            src: user.get(UserBoxKey.userFace),
-                          ),
-                        )
-                      : IconButton(
-                          onPressed: () {
-                            feedBack();
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (_) => const SizedBox(
-                                height: 450,
-                                child: MinePage(),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                              isScrollControlled: true,
-                            );
-                          },
-                          icon: const Icon(CupertinoIcons.person, size: 22),
-                        ),
-                ),
-              ),
             ],
           ),
         ),
@@ -229,7 +187,7 @@ class _DynamicsPageState extends State<DynamicsPage>
           controller: _dynamicsController.scrollController,
           slivers: [
             FutureBuilder(
-              future: _dynamicsController.queryFollowUp(),
+              future: _futureBuilderFutureUp,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data;

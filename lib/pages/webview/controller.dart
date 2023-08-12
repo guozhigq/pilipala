@@ -7,6 +7,7 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
+import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/cookie.dart';
@@ -71,17 +72,24 @@ class WebviewController extends GetxController {
                 print('网页登录： $result');
                 if (result['status'] && result['data'].isLogin) {
                   SmartDialog.showToast('登录成功');
-                  Box user = GStrorage.user;
-                  user.put(UserBoxKey.userLogin, true);
-                  user.put(UserBoxKey.userName, result['data'].uname);
-                  user.put(UserBoxKey.userFace, result['data'].face);
-                  user.put(UserBoxKey.userMid, result['data'].mid);
-                  Box userInfoCache = GStrorage.userInfo;
-                  userInfoCache.put('userInfoCache', result['data']);
-                  Get.find<MineController>().userInfo.value = result['data'];
-                  Get.find<MineController>().onInit();
-                  Get.find<RcmdController>().queryRcmdFeed('onRefresh');
-                  Get.find<DynamicsController>().queryFollowDynamic();
+                  try {
+                    Box user = GStrorage.user;
+                    user.put(UserBoxKey.userLogin, true);
+                    user.put(UserBoxKey.userName, result['data'].uname);
+                    user.put(UserBoxKey.userFace, result['data'].face);
+                    user.put(UserBoxKey.userMid, result['data'].mid);
+
+                    Box userInfoCache = GStrorage.userInfo;
+                    userInfoCache.put('userInfoCache', result['data']);
+
+                    Get.find<MineController>().userInfo.value = result['data'];
+                    Get.find<MineController>().onInit();
+                    Get.find<RcmdController>().queryRcmdFeed('onRefresh');
+                    Get.find<DynamicsController>().queryFollowDynamic();
+
+                    HomeController homeCtr = Get.find<HomeController>();
+                    homeCtr.updateLoginStatus(true);
+                  } catch (_) {}
                   Get.back();
                 }
               } catch (e) {

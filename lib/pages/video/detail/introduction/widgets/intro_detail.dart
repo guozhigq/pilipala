@@ -27,19 +27,20 @@ class IntroDetail extends StatelessWidget {
         height: sheetHeight,
         child: Column(
           children: [
-            Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSecondaryContainer
-                          .withOpacity(0.5),
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+            InkWell(
+              onTap: () => Get.back(),
+              child: Container(
+                height: 35,
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Center(
+                  child: Container(
+                    width: 32,
+                    height: 3,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(3))),
+                  ),
                 ),
               ),
             ),
@@ -125,33 +126,29 @@ class IntroDetail extends StatelessWidget {
     // type
     // 1 普通文本
     // 2 @用户
-    List<InlineSpan> spanChilds = [];
-    if (descV2.isNotEmpty) {
-      for (var i = 0; i < descV2.length; i++) {
-        if (descV2[i].type == 1) {
-          spanChilds.add(TextSpan(text: descV2[i].rawText));
-        } else if (descV2[i].type == 2) {
-          spanChilds.add(
-            TextSpan(
-              text: '@${descV2[i].rawText}',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  String heroTag = Utils.makeHeroTag(descV2[i].bizId);
-                  Get.toNamed(
-                    '/member?mid=${descV2[i].bizId}',
-                    arguments: {'face': '', 'heroTag': heroTag},
-                  );
-                },
-            ),
+    List<TextSpan> spanChilds = List.generate(descV2.length, (index) {
+      final currentDesc = descV2[index];
+      switch (currentDesc.type) {
+        case 1:
+          return TextSpan(text: currentDesc.rawText);
+        case 2:
+          final colorSchemePrimary = Theme.of(context).colorScheme.primary;
+          final heroTag = Utils.makeHeroTag(currentDesc.bizId);
+          return TextSpan(
+            text: '@${currentDesc.rawText}',
+            style: TextStyle(color: colorSchemePrimary),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                Get.toNamed(
+                  '/member?mid=${currentDesc.bizId}',
+                  arguments: {'face': '', 'heroTag': heroTag},
+                );
+              },
           );
-        }
+        default:
+          return TextSpan();
       }
-    } else {
-      spanChilds.add(TextSpan(text: desc));
-    }
+    });
     return TextSpan(children: spanChilds);
   }
 }

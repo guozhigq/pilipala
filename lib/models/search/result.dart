@@ -224,10 +224,12 @@ class SearchLiveItemModel {
     this.liveTime,
     this.uname,
     this.uface,
+    this.face,
     this.userCover,
     this.type,
     this.title,
     this.cover,
+    this.pic,
     this.online,
     this.rankIndex,
     this.rankScore,
@@ -242,16 +244,19 @@ class SearchLiveItemModel {
   String? liveTime;
   String? uname;
   String? uface;
+  String? face;
   String? userCover;
   String? type;
   List? title;
   String? cover;
+  String? pic;
   int? online;
   int? rankIndex;
   int? rankScore;
   int? roomid;
   int? attentions;
   String? cateName;
+  Map? watchedShow;
 
   SearchLiveItemModel.fromJson(Map<String, dynamic> json) {
     rankOffset = json['rank_offset'];
@@ -260,10 +265,12 @@ class SearchLiveItemModel {
     liveTime = json['live_time'];
     uname = json['uname'];
     uface = json['uface'];
+    face = json['uface'];
     userCover = json['user_cover'];
     type = json['type'];
     title = Em.regTitle(json['title']);
     cover = json['cover'];
+    pic = json['cover'];
     online = json['online'];
     rankIndex = json['rank_index'];
     rankScore = json['rank_score'];

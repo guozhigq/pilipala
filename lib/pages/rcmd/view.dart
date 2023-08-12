@@ -23,6 +23,7 @@ class RcmdPage extends StatefulWidget {
 class _RcmdPageState extends State<RcmdPage>
     with AutomaticKeepAliveClientMixin {
   final RcmdController _rcmdController = Get.put(RcmdController());
+  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +31,7 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -57,49 +59,56 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RefreshIndicator(
-      onRefresh: () async {
-        return await _rcmdController.onRefresh();
-      },
-      child: CustomScrollView(
-        controller: _rcmdController.scrollController,
-        slivers: [
-          SliverPadding(
-            // 单列布局 EdgeInsets.zero
-            padding: _rcmdController.crossAxisCount == 1
-                ? EdgeInsets.zero
-                : const EdgeInsets.fromLTRB(
-                    StyleString.safeSpace, 0, StyleString.safeSpace, 0),
-            sliver: FutureBuilder(
-              future: _rcmdController.queryRcmdFeed('init'),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data as Map;
-                  if (data['status']) {
-                    return Obx(() => contentGrid(
-                        _rcmdController, _rcmdController.videoList));
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(StyleString.imgRadius),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          return await _rcmdController.onRefresh();
+        },
+        child: CustomScrollView(
+          controller: _rcmdController.scrollController,
+          slivers: [
+            SliverPadding(
+              // 单列布局 EdgeInsets.zero
+              padding: _rcmdController.crossAxisCount == 1
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              sliver: FutureBuilder(
+                future: _rcmdController.queryRcmdFeed('init'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(() => contentGrid(
+                          _rcmdController, _rcmdController.videoList));
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => {},
+                      );
+                    }
                   } else {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => {},
-                    );
+                    // 缓存数据
+                    if (_rcmdController.videoList.length > 1) {
+                      return contentGrid(
+                          _rcmdController, _rcmdController.videoList);
+                    }
+                    // 骨架屏
+                    else {
+                      return contentGrid(_rcmdController, []);
+                    }
                   }
-                } else {
-                  // 缓存数据
-                  if (_rcmdController.videoList.length > 1) {
-                    return contentGrid(
-                        _rcmdController, _rcmdController.videoList);
-                  }
-                  // 骨架屏
-                  else {
-                    return contentGrid(_rcmdController, []);
-                  }
-                }
-              },
+                },
+              ),
             ),
-          ),
-          const LoadingMore()
-        ],
+            const LoadingMore()
+          ],
+        ),
       ),
     );
   }

@@ -119,6 +119,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
   # flutter_launcher_icons:
   #   git:
   #     url: https://github.com/nvi9/flutter_launcher_icons.git
@@ -130,12 +131,12 @@ flutter_icons:
   android: true
   ios: true
   remove_alpha_ios: false
-  image_path: assets/images/logo/logo_android.png
-  image_path_android: assets/images/logo/logo_android.png
+  image_path: assets/images/logo/logo_android_2.png
+  image_path_android: assets/images/logo/logo_android_2.png
   image_path_ios: assets/images/logo/logo_ios.png
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: assets/images/logo/logo_android.png
-  adaptive_icon_monochrome: assets/images/logo/logo_android.png
+  adaptive_icon_foreground: assets/images/logo/logo_android_2.png
+  adaptive_icon_monochrome: assets/images/logo/logo_android_2.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -170,9 +171,9 @@ flutter:
     - family: Jura-Bold
       fonts:
         - asset: assets/fonts/Jura-Bold.ttf
-    - family: HarmonyOS
-      fonts:
-        - asset: assets/fonts/HarmonyOS_Sans_SC_Regular.ttf
+    # - family: HarmonyOS
+    #   fonts:
+    #     - asset: assets/fonts/HarmonyOS_Sans_SC_Regular.ttf
        
   
   # For details regarding fonts from package dependencies,

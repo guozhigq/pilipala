@@ -56,7 +56,7 @@ class SSearchController extends GetxController {
   }
 
   void onClear() {
-    if (searchKeyWord.value.isNotEmpty) {
+    if (searchKeyWord.value.isNotEmpty && controller.value.text != '') {
       controller.value.clear();
       searchKeyWord.value = '';
       searchSuggestList.value = [];

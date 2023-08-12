@@ -211,13 +211,13 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Obx(
       () => Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(10, 25, 4, 0),
+        padding: const EdgeInsets.fromLTRB(10, 25, 6, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_searchController.historyList.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(6, 0, 1, 2),
+                padding: const EdgeInsets.fromLTRB(6, 0, 0, 2),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

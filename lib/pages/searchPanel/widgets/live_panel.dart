@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -32,6 +33,7 @@ class LiveItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String heroTag = Utils.makeHeroTag(liveItem.roomid);
     return Card(
       elevation: 0,
       clipBehavior: Clip.hardEdge,
@@ -40,7 +42,10 @@ class LiveItem extends StatelessWidget {
       ),
       margin: EdgeInsets.zero,
       child: InkWell(
-        onTap: () {},
+        onTap: () async {
+          Get.toNamed('/liveRoom?roomid=${liveItem.roomid}',
+              arguments: {'liveItem': liveItem, 'heroTag': heroTag});
+        },
         child: Column(
           children: [
             ClipRRect(
@@ -58,7 +63,7 @@ class LiveItem extends StatelessWidget {
                   return Stack(
                     children: [
                       Hero(
-                        tag: Utils.makeHeroTag(liveItem.roomid),
+                        tag: heroTag,
                         child: NetworkImgLayer(
                           src: liveItem.cover,
                           type: 'emote',
