@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
+import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -17,6 +18,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late dynamic defaultVideoQa;
   late dynamic defaultAudioQa;
   late dynamic defaultDecode;
+  late int defaultFullScreenMode;
 
   @override
   void initState() {
@@ -27,6 +29,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: AudioQuality.values.last.code);
     defaultDecode = setting.get(SettingBoxKey.defaultDecode,
         defaultValue: VideoDecodeFormats.values.last.code);
+    defaultFullScreenMode = setting.get(SettingBoxKey.fullScreenMode,
+        defaultValue: FullScreenMode.values.first.code);
   }
 
   @override
@@ -68,7 +72,7 @@ class _PlaySettingState extends State<PlaySetting> {
             ),
             trailing: PopupMenuButton(
               initialValue: defaultVideoQa,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 22),
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
               onSelected: (item) {
                 defaultVideoQa = item;
                 setting.put(SettingBoxKey.defaultVideoQa, item);
@@ -93,7 +97,7 @@ class _PlaySettingState extends State<PlaySetting> {
             ),
             trailing: PopupMenuButton(
               initialValue: defaultAudioQa,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 22),
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
               onSelected: (item) {
                 defaultAudioQa = item;
                 setting.put(SettingBoxKey.defaultAudioQa, item);
@@ -119,7 +123,7 @@ class _PlaySettingState extends State<PlaySetting> {
             ),
             trailing: PopupMenuButton(
               initialValue: defaultDecode,
-              icon: const Icon(Icons.arrow_forward_rounded, size: 22),
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
               onSelected: (item) {
                 defaultDecode = item;
                 setting.put(SettingBoxKey.defaultDecode, item);
@@ -127,6 +131,33 @@ class _PlaySettingState extends State<PlaySetting> {
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                 for (var i in VideoDecodeFormats.values) ...[
+                  PopupMenuItem(
+                    value: i.code,
+                    child: Text(i.description),
+                  ),
+                ]
+              ],
+            ),
+          ),
+          ListTile(
+            dense: false,
+            title: Text('默认全屏方式', style: titleStyle),
+            subtitle: Text(
+              '当前全屏方式：' +
+                  FullScreenModeCode.fromCode(defaultFullScreenMode)!
+                      .description,
+              style: subTitleStyle,
+            ),
+            trailing: PopupMenuButton(
+              initialValue: defaultFullScreenMode,
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
+              onSelected: (item) {
+                defaultFullScreenMode = item;
+                setting.put(SettingBoxKey.fullScreenMode, item);
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                for (var i in FullScreenMode.values) ...[
                   PopupMenuItem(
                     value: i.code,
                     child: Text(i.description),

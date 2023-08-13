@@ -79,6 +79,7 @@ class SettingBoxKey {
   static const String defaultPicQa = 'defaultPicQa';
 
   static const String danmakuEnable = 'danmakuEnable';
+  static const String fullScreenMode = 'fullScreenMode';
 }
 
 class LocalCacheKey {
