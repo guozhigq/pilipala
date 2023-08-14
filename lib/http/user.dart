@@ -1,7 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/user/fav_detail.dart';

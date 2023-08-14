@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/up.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';

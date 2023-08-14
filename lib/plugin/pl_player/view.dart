@@ -721,7 +721,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           },
                           child: BackwardSeekIndicator(
                             onChanged: (value) {
-                              print(value);
                               // _seekBarDeltaValueNotifier.value = -value;
                             },
                             onSubmitted: (value) {

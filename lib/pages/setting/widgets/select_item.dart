@@ -19,8 +19,8 @@ class SetSelectItem extends StatefulWidget {
 }
 
 class _SetSelectItemState extends State<SetSelectItem> {
-  Box Setting = GStrorage.setting;
-  late var currentVal;
+  Box setting = GStrorage.setting;
+  late dynamic currentVal;
   late int currentIndex;
   late List menus;
   late List<PopupMenuEntry> popMenuItems;
@@ -33,7 +33,7 @@ class _SetSelectItemState extends State<SetSelectItem> {
       case 'defaultVideoQa':
         defaultVal = VideoQuality.values.last.description;
         List<VideoQuality> list = menus = VideoQuality.values.reversed.toList();
-        currentVal = Setting.get(widget.setKey, defaultValue: defaultVal);
+        currentVal = setting.get(widget.setKey, defaultValue: defaultVal);
         currentIndex =
             list.firstWhere((i) => i.description == currentVal).index;
 
@@ -50,7 +50,7 @@ class _SetSelectItemState extends State<SetSelectItem> {
       case 'defaultAudioQa':
         defaultVal = AudioQuality.values.last.description;
         List<AudioQuality> list = menus = AudioQuality.values.reversed.toList();
-        currentVal = Setting.get(widget.setKey, defaultValue: defaultVal);
+        currentVal = setting.get(widget.setKey, defaultValue: defaultVal);
         currentIndex =
             list.firstWhere((i) => i.description == currentVal).index;
 
@@ -65,7 +65,7 @@ class _SetSelectItemState extends State<SetSelectItem> {
         break;
       case 'defaultDecode':
         defaultVal = VideoDecodeFormats.values[0].description;
-        currentVal = Setting.get(widget.setKey, defaultValue: defaultVal);
+        currentVal = setting.get(widget.setKey, defaultValue: defaultVal);
         List<VideoDecodeFormats> list = menus = VideoDecodeFormats.values;
 
         currentIndex =
@@ -82,7 +82,7 @@ class _SetSelectItemState extends State<SetSelectItem> {
         break;
       case 'defaultVideoSpeed':
         defaultVal = '1.0';
-        currentVal = Setting.get(widget.setKey, defaultValue: defaultVal);
+        currentVal = setting.get(widget.setKey, defaultValue: defaultVal);
 
         break;
     }

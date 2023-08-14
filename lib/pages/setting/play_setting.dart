@@ -67,7 +67,7 @@ class _PlaySettingState extends State<PlaySetting> {
             dense: false,
             title: Text('默认画质', style: titleStyle),
             subtitle: Text(
-              '当前画质' + VideoQualityCode.fromCode(defaultVideoQa)!.description!,
+              '当前画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
               style: subTitleStyle,
             ),
             trailing: PopupMenuButton(
@@ -92,7 +92,7 @@ class _PlaySettingState extends State<PlaySetting> {
             dense: false,
             title: Text('默认音质', style: titleStyle),
             subtitle: Text(
-              '当前音质' + AudioQualityCode.fromCode(defaultAudioQa)!.description!,
+              '当前音质${AudioQualityCode.fromCode(defaultAudioQa)!.description!}',
               style: subTitleStyle,
             ),
             trailing: PopupMenuButton(
@@ -117,8 +117,7 @@ class _PlaySettingState extends State<PlaySetting> {
             dense: false,
             title: Text('默认解码格式', style: titleStyle),
             subtitle: Text(
-              '当前解码格式' +
-                  VideoDecodeFormatsCode.fromCode(defaultDecode)!.description!,
+              '当前解码格式${VideoDecodeFormatsCode.fromCode(defaultDecode)!.description!}',
               style: subTitleStyle,
             ),
             trailing: PopupMenuButton(
@@ -143,9 +142,7 @@ class _PlaySettingState extends State<PlaySetting> {
             dense: false,
             title: Text('默认全屏方式', style: titleStyle),
             subtitle: Text(
-              '当前全屏方式：' +
-                  FullScreenModeCode.fromCode(defaultFullScreenMode)!
-                      .description,
+              '当前全屏方式：${FullScreenModeCode.fromCode(defaultFullScreenMode)!.description}',
               style: subTitleStyle,
             ),
             trailing: PopupMenuButton(

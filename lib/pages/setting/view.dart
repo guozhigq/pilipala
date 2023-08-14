@@ -7,10 +7,6 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle subTitleStyle = Theme.of(context)
-        .textTheme
-        .labelMedium!
-        .copyWith(color: Theme.of(context).colorScheme.outline);
     final SettingController settingController = Get.put(SettingController());
     return Scaffold(
       appBar: AppBar(

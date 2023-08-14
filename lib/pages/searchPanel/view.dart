@@ -49,7 +49,7 @@ class _SearchPanelState extends State<SearchPanel>
           scrollController.position.maxScrollExtent - 100) {
         if (!_isLoadingMore) {
           _isLoadingMore = true;
-          await _searchPanelController!.onSearch(type: 'onLoad');
+          await _searchPanelController.onSearch(type: 'onLoad');
           _isLoadingMore = false;
         }
       }

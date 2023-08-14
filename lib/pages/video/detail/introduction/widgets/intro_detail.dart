@@ -121,7 +121,6 @@ class IntroDetail extends StatelessWidget {
   }
 
   InlineSpan buildContent(BuildContext context, content) {
-    String desc = content.desc;
     List descV2 = content.descV2;
     // type
     // 1 普通文本
@@ -146,7 +145,7 @@ class IntroDetail extends StatelessWidget {
               },
           );
         default:
-          return TextSpan();
+          return const TextSpan();
       }
     });
     return TextSpan(children: spanChilds);

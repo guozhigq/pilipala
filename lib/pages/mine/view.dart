@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/theme_type.dart';
-import 'package:pilipala/utils/storage.dart';
 import 'controller.dart';
 
 class MinePage extends StatelessWidget {

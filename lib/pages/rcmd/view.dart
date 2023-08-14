@@ -79,7 +79,7 @@ class _RcmdPageState extends State<RcmdPage>
                   ? EdgeInsets.zero
                   : const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
               sliver: FutureBuilder(
-                future: _rcmdController.queryRcmdFeed('init'),
+                future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;

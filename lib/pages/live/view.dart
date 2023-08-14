@@ -73,7 +73,7 @@ class _LivePageState extends State<LivePage> {
               padding:
                   const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
               sliver: FutureBuilder(
-                future: _liveController.queryLiveList('init'),
+                future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;

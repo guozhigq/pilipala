@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
 import 'package:pilipala/pages/searchPanel/index.dart';
 import 'controller.dart';
 

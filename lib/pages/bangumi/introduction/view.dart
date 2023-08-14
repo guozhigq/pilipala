@@ -388,7 +388,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                 ActionItem(
                   icon: const Icon(FontAwesomeIcons.comment),
                   selectIcon: const Icon(FontAwesomeIcons.reply),
-                  onTap: () => videoDetailCtr.tabCtr!.animateTo(1),
+                  onTap: () => videoDetailCtr.tabCtr.animateTo(1),
                   selectStatus: false,
                   loadingStatus: false,
                   text: !widget.loadingStatus

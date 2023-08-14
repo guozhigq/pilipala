@@ -319,7 +319,6 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 选择音质
   void showSetAudioQa() {
-    List<FormatItem> videoFormat = videoInfo.supportFormats!;
     AudioQuality currentAudioQa = widget.videoDetailCtr!.currentAudioQa;
 
     List<AudioItem> audio = videoInfo.dash!.audio!;

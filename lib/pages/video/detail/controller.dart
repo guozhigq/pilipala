@@ -142,7 +142,6 @@ class VideoDetailController extends GetxController
   }
 
   Future playerInit({video, audio, seekToTime, duration}) async {
-    print('data.timeLength:${data.timeLength}');
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,

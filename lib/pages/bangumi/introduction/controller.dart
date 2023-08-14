@@ -7,7 +7,6 @@ import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -66,6 +68,7 @@ class PlPlayerController {
   final Rx<BoxFit> _videoFit = Rx(BoxFit.fill);
 
   ///
+  // ignore: prefer_final_fields
   Rx<bool> _isSliderMoving = false.obs;
   PlaylistMode _looping = PlaylistMode.none;
   bool _autoPlay = false;
