@@ -5,7 +5,6 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/user.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -106,17 +105,13 @@ class VideoCardV extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final videoItem;
+  final dynamic videoItem;
   const VideoContent({Key? key, required this.videoItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 0, 3),
-        // 单列
-        // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
+        padding: const EdgeInsets.fromLTRB(4, 8, 0, 3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -124,12 +119,8 @@ class VideoContent extends StatelessWidget {
             Text(
               videoItem.title,
               textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-              maxLines: Get.find<RcmdController>().crossAxisCount,
+              style: const TextStyle(fontSize: 13),
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
 
@@ -181,37 +172,89 @@ class VideoContent extends StatelessWidget {
                   }),
                 ),
                 SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: IconButton(
+                  width: 24,
+                  height: 24,
+                  child: PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
                     tooltip: '稍后再看',
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () async {
-                      var res =
-                          await UserHttp.toViewLater(bvid: videoItem.bvid);
-                      SmartDialog.showToast(res['msg']);
-                    },
                     icon: Icon(
                       Icons.more_vert_outlined,
                       color: Theme.of(context).colorScheme.outline,
                       size: 14,
                     ),
+                    position: PopupMenuPosition.under,
+                    // constraints: const BoxConstraints(maxHeight: 35),
+                    onSelected: (String type) {},
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        onTap: () async {
+                          var res =
+                              await UserHttp.toViewLater(bvid: videoItem.bvid);
+                          SmartDialog.showToast(res['msg']);
+                        },
+                        value: 'pause',
+                        height: 35,
+                        child: const Row(
+                          children: [
+                            Icon(Icons.watch_later_outlined, size: 16),
+                            SizedBox(width: 6),
+                            Text('稍后再看', style: TextStyle(fontSize: 13))
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
             // Row(
             //   children: [
+            //     const SizedBox(width: 1),
             //     StatView(
-            //       theme: 'black',
+            //       theme: 'gray',
             //       view: videoItem.stat.view,
             //     ),
-            //     const SizedBox(width: 6),
+            //     const SizedBox(width: 10),
             //     StatDanMu(
-            //       theme: 'black',
+            //       theme: 'gray',
             //       danmu: videoItem.stat.danmaku,
+            //     ),
+            //     const Spacer(),
+            //     SizedBox(
+            //       width: 24,
+            //       height: 24,
+            //       child: PopupMenuButton<String>(
+            //         padding: EdgeInsets.zero,
+            //         tooltip: '稍后再看',
+            //         icon: Icon(
+            //           Icons.more_vert_outlined,
+            //           color: Theme.of(context).colorScheme.outline,
+            //           size: 14,
+            //         ),
+            //         position: PopupMenuPosition.under,
+            //         // constraints: const BoxConstraints(maxHeight: 35),
+            //         onSelected: (String type) {},
+            //         itemBuilder: (BuildContext context) =>
+            //             <PopupMenuEntry<String>>[
+            //           PopupMenuItem<String>(
+            //             onTap: () async {
+            //               var res =
+            //                   await UserHttp.toViewLater(bvid: videoItem.bvid);
+            //               SmartDialog.showToast(res['msg']);
+            //             },
+            //             value: 'pause',
+            //             height: 35,
+            //             child: const Row(
+            //               children: [
+            //                 Icon(Icons.watch_later_outlined, size: 16),
+            //                 SizedBox(width: 6),
+            //                 Text('稍后再看', style: TextStyle(fontSize: 13))
+            //               ],
+            //             ),
+            //           ),
+            //         ],
+            //       ),
             //     ),
             //   ],
             // ),
@@ -237,7 +280,7 @@ class VideoStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 45,
+      height: 48,
       padding: const EdgeInsets.only(top: 22, left: 6, right: 6),
       decoration: const BoxDecoration(
         gradient: LinearGradient(

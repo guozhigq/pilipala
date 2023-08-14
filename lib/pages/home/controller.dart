@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/common/tab_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -12,7 +11,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  RxString defaultSearch = '输入关键词搜索'.obs;
   Box user = GStrorage.user;
   RxBool userLogin = false.obs;
   RxString userFace = ''.obs;
@@ -21,7 +19,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   void onInit() {
     super.onInit();
 
-    searchDefault();
     userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
     userFace.value = user.get(UserBoxKey.userFace) ?? '';
 
@@ -47,13 +44,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     int index = tabController.index;
     var ctr = tabsCtrList[index];
     ctr().animateToTop();
-  }
-
-  void searchDefault() async {
-    var res = await Request().get(Api.searchDefault);
-    if (res.data['code'] == 0) {
-      defaultSearch.value = res.data['data']['name'];
-    }
   }
 
   // 更新登录状态

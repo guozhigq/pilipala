@@ -15,22 +15,34 @@ class MainController extends GetxController {
   RxList navigationBars = [
     {
       'icon': const Icon(
-        Icons.motion_photos_on_outlined,
+        Icons.favorite_outline,
         size: 21,
       ),
-      'label': "推荐",
+      'selectIcon': const Icon(
+        Icons.favorite,
+        size: 21,
+      ),
+      'label': "首页",
     },
     {
       'icon': const Icon(
-        Icons.bolt,
+        Icons.motion_photos_on_outlined,
+        size: 21,
+      ),
+      'selectIcon': const Icon(
+        Icons.motion_photos_on,
         size: 21,
       ),
       'label': "动态",
     },
     {
       'icon': const Icon(
-        Icons.folder_open_outlined,
+        Icons.folder_outlined,
         size: 20,
+      ),
+      'selectIcon': const Icon(
+        Icons.folder,
+        size: 21,
       ),
       'label': "媒体库",
     }

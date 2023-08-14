@@ -135,21 +135,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         initialData: true,
         builder: (context, AsyncSnapshot snapshot) {
           return AnimatedSlide(
-            curve: Curves.linear,
-            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOutCubicEmphasized,
+            duration: const Duration(milliseconds: 1000),
             offset: Offset(0, snapshot.data ? 0 : 1),
-            child: BottomNavigationBar(
-              currentIndex: selectedIndex,
-              // type: BottomNavigationBarType.shifting,
-              selectedItemColor: Theme.of(context).colorScheme.primary,
-              unselectedItemColor:
-                  Theme.of(context).colorScheme.outline.withOpacity(0.5),
-              selectedFontSize: 12.4,
-              onTap: (value) => setIndex(value),
-              items: [
+            child: NavigationBar(
+              onDestinationSelected: (value) => setIndex(value),
+              selectedIndex: selectedIndex,
+              destinations: <Widget>[
                 ..._mainController.navigationBars.map((e) {
-                  return BottomNavigationBarItem(
+                  return NavigationDestination(
                     icon: e['icon'],
+                    selectedIcon: e['selectIcon'],
                     label: e['label'],
                   );
                 }).toList(),

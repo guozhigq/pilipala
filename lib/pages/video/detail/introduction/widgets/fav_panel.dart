@@ -102,10 +102,11 @@ class _FavPanelState extends State<FavPanel> {
           ),
           Padding(
             padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 12,
-                bottom: MediaQuery.of(context).padding.bottom),
+              left: 20,
+              right: 20,
+              top: 12,
+              bottom: MediaQuery.of(context).padding.bottom + 12,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
