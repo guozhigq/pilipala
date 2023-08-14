@@ -483,7 +483,11 @@ class _HeaderControlState extends State<HeaderControl> {
               size: 15,
               color: Colors.white,
             ),
-            fuc: () => Get.offAll(const MainApp()),
+            fuc: () {
+              // 销毁播放器实例
+              widget.controller!.dispose(type: 'all');
+              Get.offAll(const MainApp());
+            },
           ),
           const Spacer(),
           // ComBtn(

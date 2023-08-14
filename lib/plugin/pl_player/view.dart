@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:pilipala/common/widgets/app_bar_ani.dart';
 import 'package:pilipala/plugin/pl_player/controller.dart';
 import 'package:pilipala/plugin/pl_player/models/duration.dart';
 import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
@@ -20,6 +19,7 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume_controller/volume_controller.dart';
 
 import 'utils/fullscreen.dart';
+import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
@@ -453,6 +453,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
+        Obx(() {
+          if (_.buffered.value == Duration.zero) {
+            return Positioned.fill(
+              child: Container(
+                color: Colors.black,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/loading.gif',
+                    height: 25,
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return Container();
+          }
+        }),
+
         /// 手势
         Positioned.fill(
           left: 16,
@@ -669,23 +687,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               child: Image.asset(
                 'assets/images/loading.gif',
                 height: 25,
-              ),
-            );
-          } else {
-            return Container();
-          }
-        }),
-        Obx(() {
-          if (_.buffered.value == Duration.zero) {
-            return Positioned.fill(
-              child: Container(
-                color: Colors.black,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/loading.gif',
-                    height: 25,
-                  ),
-                ),
               ),
             );
           } else {

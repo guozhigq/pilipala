@@ -678,11 +678,13 @@ class PlPlayerController {
     videoFitChangedTimer?.cancel();
   }
 
-  Future<void> dispose() async {
+  Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
-    _playerCount.value -= 1;
-    if (playerCount.value > 0) {
-      return;
+    if (type == 'single') {
+      _playerCount.value -= 1;
+      if (playerCount.value > 0) {
+        return;
+      }
     }
 
     _timer?.cancel();
