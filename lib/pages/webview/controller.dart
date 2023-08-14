@@ -69,6 +69,7 @@ class WebviewController extends GetxController {
                 await SetCookie.onSet(tCookies, HttpString.tUrl);
                 await UserHttp.userInfo();
                 var result = await UserHttp.userInfo();
+                UserHttp.thirdLogin();
                 print('网页登录： $result');
                 if (result['status'] && result['data'].isLogin) {
                   SmartDialog.showToast('登录成功');
