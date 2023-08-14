@@ -47,8 +47,7 @@ class VideoHttp {
     }
   }
 
-  static Future rcmdVideoListApp(
-      {required int ps, required int freshIdx}) async {
+  static Future rcmdVideoListApp({int? ps, required int freshIdx}) async {
     try {
       var res = await Request().get(
         Api.recommendListApp,

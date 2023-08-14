@@ -1,10 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
+import 'package:pilipala/common/widgets/stat/up.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -22,6 +28,44 @@ class VideoCardV extends StatelessWidget {
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
+
+  void onPushDetail(heroTag) async {
+    String goto = videoItem.goto;
+    switch (goto) {
+      case 'bangumi':
+        if (videoItem.bangumiBadge == '电影') {
+          SmartDialog.showToast('暂不支持电影观看');
+          return;
+        }
+        int epId = videoItem.param;
+        SmartDialog.showLoading(msg: '资源获取中');
+        var result = await SearchHttp.bangumiInfo(seasonId: null, epId: epId);
+        if (result['status']) {
+          var bangumiDetail = result['data'];
+          int cid = bangumiDetail.episodes!.first.cid;
+          String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
+          SmartDialog.dismiss().then(
+            (value) => Get.toNamed(
+              '/video?bvid=$bvid&cid=$cid&epId=$epId',
+              arguments: {
+                'pic': videoItem.pic,
+                'heroTag': heroTag,
+                'videoType': SearchType.media_bangumi,
+              },
+            ),
+          );
+        }
+        break;
+      case 'av':
+        String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
+        Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}', arguments: {
+          // 'videoItem': videoItem,
+          'pic': videoItem.pic,
+          'heroTag': heroTag,
+        });
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +89,7 @@ class VideoCardV extends StatelessWidget {
           }
         },
         child: InkWell(
-          onTap: () async {
-            String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
-            Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
-                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
-          },
+          onTap: () async => onPushDetail(heroTag),
           child: Column(
             children: [
               ClipRRect(
@@ -126,11 +166,15 @@ class VideoContent extends StatelessWidget {
 
             Row(
               children: [
+                if (videoItem.goto == 'bangumi') ...[
+                  UpTag(
+                    tagText: videoItem.bangumiBadge,
+                  ),
+                ],
                 if (videoItem.rcmdReason != null &&
-                        videoItem.rcmdReason.content != '' ||
-                    videoItem.isFollowed == 1) ...[
+                    videoItem.rcmdReason.content != '') ...[
                   Container(
-                      padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
+                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
                       decoration: BoxDecoration(
                           color: Theme.of(context)
                               .colorScheme
@@ -139,21 +183,19 @@ class VideoContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(3)),
                       child: Center(
                         child: Text(
-                          videoItem.rcmdReason != null &&
-                                  videoItem.rcmdReason.content != ''
-                              ? videoItem.rcmdReason.content
-                              : '已关注',
+                          videoItem.rcmdReason.content,
                           style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelSmall!
-                                .fontSize,
+                            fontSize: 11,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       )),
                   const SizedBox(width: 4)
                 ],
+                if (videoItem.adInfo != null)
+                  const UpTag(
+                    tagText: '推广',
+                  ),
                 Expanded(
                   child: LayoutBuilder(builder:
                       (BuildContext context, BoxConstraints constraints) {

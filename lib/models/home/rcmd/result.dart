@@ -20,6 +20,8 @@ class RecVideoItemAppModel {
     this.bangumiView,
     this.bangumiFollow,
     this.bangumiBadge,
+    this.cardType,
+    this.adInfo,
   });
 
   int? id;
@@ -34,13 +36,16 @@ class RecVideoItemAppModel {
   Owner? owner;
   RcmdReason? rcmdReason;
   String? goto;
-  String? param;
+  int? param;
   String? uri;
   String? talkBack;
   // 番剧
   String? bangumiView;
   String? bangumiFollow;
   String? bangumiBadge;
+
+  String? cardType;
+  Map? adInfo;
 
   RecVideoItemAppModel.fromJson(Map<String, dynamic> json) {
     id = json['player_args'] != null
@@ -58,7 +63,7 @@ class RecVideoItemAppModel {
         ? RcmdReason.fromJson(json['rcmd_reason_style'])
         : null;
     goto = json['goto'];
-    param = json['param'];
+    param = int.parse(json['param']);
     uri = json['uri'];
     talkBack = json['talk_back'];
 
@@ -67,6 +72,9 @@ class RecVideoItemAppModel {
       bangumiFollow = json['cover_left_text_2'];
       bangumiBadge = json['badge'];
     }
+
+    cardType = json['card_type'];
+    adInfo = json['ad_info'];
   }
 }
 
@@ -113,6 +121,6 @@ class RcmdReason {
   String? content;
 
   RcmdReason.fromJson(Map<String, dynamic> json) {
-    content = json["title"] ?? '';
+    content = json["text"] ?? '';
   }
 }

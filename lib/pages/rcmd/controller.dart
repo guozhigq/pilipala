@@ -3,17 +3,14 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/home/rcmd/result.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
-  int count = 12;
   int _currentPage = 0;
   int crossAxisCount = 2;
   RxList<RecVideoItemAppModel> videoList = [RecVideoItemAppModel()].obs;
   bool isLoadingMore = false;
-  bool flag = false;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
 
@@ -36,7 +33,6 @@ class RcmdController extends GetxController {
       _currentPage = 0;
     }
     var res = await VideoHttp.rcmdVideoListApp(
-      ps: count,
       freshIdx: _currentPage,
     );
     if (res['status']) {

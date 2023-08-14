@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
 class UpTag extends StatelessWidget {
-  const UpTag({super.key});
-
+  final String? tagText;
+  const UpTag({super.key, this.tagText = 'UP'});
   @override
   Widget build(BuildContext context) {
+    Color primary = Theme.of(context).colorScheme.primary;
     return Container(
-      width: 14,
-      height: 10,
+      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(2),
-          border: Border.all(color: Theme.of(context).colorScheme.outline)),
-      margin: const EdgeInsets.only(right: 4),
+          borderRadius: BorderRadius.circular(3),
+          color: tagText == 'UP' ? primary : null,
+          border: Border.all(color: primary)),
+      margin: const EdgeInsets.only(right: 5),
       child: Center(
         child: Text(
-          'UP',
+          tagText!,
           style: TextStyle(
-              fontSize: 6, color: Theme.of(context).colorScheme.outline),
+            fontSize: 9,
+            color: tagText == 'UP'
+                ? Theme.of(context).colorScheme.onPrimary
+                : primary,
+          ),
         ),
       ),
     );
