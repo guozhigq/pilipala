@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/common/widgets/app_bar_ani.dart';
 import 'package:pilipala/plugin/pl_player/controller.dart';
 import 'package:pilipala/plugin/pl_player/models/duration.dart';
+import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:pilipala/plugin/pl_player/models/play_status.dart';
 import 'package:pilipala/plugin/pl_player/utils.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume_controller/volume_controller.dart';
 
@@ -61,6 +64,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   double _initTapPositoin = 0.0;
 
   bool _volumeInterceptEventStream = false;
+
+  Box setting = GStrorage.setting;
+  late FullScreenMode mode;
 
   void onDoubleTapSeekBackward() {
     setState(() {
@@ -149,16 +155,37 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Future<void> triggerFullScreen() async {
     PlPlayerController _ = widget.controller;
+    mode = FullScreenModeCode.fromCode(
+        setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
+
     if (!_.isFullScreen.value) {
       /// 按照视频宽高比决定全屏方向
-      if (_.direction.value == 'horizontal') {
-        /// 进入全屏
-        await enterFullScreen();
-        // 横屏
-        // await landScape();
-      } else {
-        // 竖屏
-        await verticalScreen();
+      switch (mode) {
+        case FullScreenMode.auto:
+          if (_.direction.value == 'horizontal') {
+            /// 进入全屏
+            await enterFullScreen();
+            // 横屏
+            // await landScape();
+          } else {
+            // 竖屏
+            await verticalScreen();
+          }
+          break;
+        case FullScreenMode.vertical:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          // await landScape();
+          break;
+        case FullScreenMode.horizontal:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          // await landScape();
+          break;
       }
 
       _.toggleFullScreen(true);

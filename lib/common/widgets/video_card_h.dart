@@ -57,7 +57,7 @@ class VideoCardH extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, boxConstraints) {
               double width =
-                  (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
+                  (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
               return SizedBox(
                 height: width / StyleString.aspectRatio,
                 child: Row(
@@ -83,10 +83,10 @@ class VideoCardH extends StatelessWidget {
                               pBadge(Utils.timeFormat(videoItem.duration!),
                                   context, null, 6.0, 6.0, null,
                                   type: 'gray'),
-                              if (videoItem.rcmdReason != null &&
-                                  videoItem.rcmdReason.content != '')
-                                pBadge(videoItem.rcmdReason.content, context,
-                                    6.0, 6.0, null, null),
+                              // if (videoItem.rcmdReason != null &&
+                              //     videoItem.rcmdReason.content != '')
+                              //   pBadge(videoItem.rcmdReason.content, context,
+                              //       6.0, 6.0, null, null),
                             ],
                           );
                         },
@@ -124,7 +124,6 @@ class VideoContent extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  letterSpacing: 0.3,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -198,24 +197,59 @@ class VideoContent extends StatelessWidget {
                 //       color: Theme.of(context).colorScheme.outline),
                 // )
                 const Spacer(),
+                // SizedBox(
+                //   width: 20,
+                //   height: 20,
+                //   child: IconButton(
+                //     tooltip: '稍后再看',
+                //     style: ButtonStyle(
+                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
+                //     ),
+                //     onPressed: () async {
+                //       var res =
+                //           await UserHttp.toViewLater(bvid: videoItem.bvid);
+                //       SmartDialog.showToast(res['msg']);
+                //     },
+                //     icon: Icon(
+                //       Icons.more_vert_outlined,
+                //       color: Theme.of(context).colorScheme.outline,
+                //       size: 14,
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: IconButton(
+                  width: 24,
+                  height: 24,
+                  child: PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
                     tooltip: '稍后再看',
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () async {
-                      var res =
-                          await UserHttp.toViewLater(bvid: videoItem.bvid);
-                      SmartDialog.showToast(res['msg']);
-                    },
                     icon: Icon(
                       Icons.more_vert_outlined,
                       color: Theme.of(context).colorScheme.outline,
                       size: 14,
                     ),
+                    position: PopupMenuPosition.under,
+                    // constraints: const BoxConstraints(maxHeight: 35),
+                    onSelected: (String type) {},
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        onTap: () async {
+                          var res =
+                              await UserHttp.toViewLater(bvid: videoItem.bvid);
+                          SmartDialog.showToast(res['msg']);
+                        },
+                        value: 'pause',
+                        height: 35,
+                        child: const Row(
+                          children: [
+                            Icon(Icons.watch_later_outlined, size: 16),
+                            SizedBox(width: 6),
+                            Text('稍后再看', style: TextStyle(fontSize: 13))
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

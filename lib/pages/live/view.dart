@@ -70,7 +70,8 @@ class _LivePageState extends State<LivePage> {
           slivers: [
             SliverPadding(
               // 单列布局 EdgeInsets.zero
-              padding: EdgeInsets.zero,
+              padding:
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
               sliver: FutureBuilder(
                 future: _liveController.queryLiveList('init'),
                 builder: (context, snapshot) {
@@ -118,13 +119,13 @@ class _LivePageState extends State<LivePage> {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 2,
+        mainAxisSpacing: StyleString.cardSpace + 4,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 3,
+        crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
+            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 64,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

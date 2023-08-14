@@ -103,7 +103,7 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
+        padding: const EdgeInsets.fromLTRB(4, 8, 0, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -154,7 +154,7 @@ class VideoStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 45,
+      height: 50,
       padding: const EdgeInsets.only(top: 22, left: 10, right: 10),
       decoration: const BoxDecoration(
         gradient: LinearGradient(

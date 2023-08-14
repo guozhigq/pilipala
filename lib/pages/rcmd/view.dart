@@ -77,7 +77,7 @@ class _RcmdPageState extends State<RcmdPage>
               // 单列布局 EdgeInsets.zero
               padding: _rcmdController.crossAxisCount == 1
                   ? EdgeInsets.zero
-                  : const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  : const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
               sliver: FutureBuilder(
                 future: _rcmdController.queryRcmdFeed('init'),
                 builder: (context, snapshot) {
@@ -124,13 +124,13 @@ class _RcmdPageState extends State<RcmdPage>
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 2,
+        mainAxisSpacing: StyleString.cardSpace + 4,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 3,
+        crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
         crossAxisCount: ctr.crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
+            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 64,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

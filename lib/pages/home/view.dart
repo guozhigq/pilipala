@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/bangumi/index.dart';
-import 'package:pilipala/pages/hot/index.dart';
-import 'package:pilipala/pages/live/index.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
@@ -53,49 +50,21 @@ class _HomePageState extends State<HomePage>
             ctr: _homeController,
             callback: showUserBottonSheet,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
-            child: Theme(
-              data: ThemeData(
-                splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
-                highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
-              ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            height: 42,
+            child: Align(
+              alignment: Alignment.center,
               child: TabBar(
                 controller: _homeController.tabController,
                 tabs: [
                   for (var i in _homeController.tabs) Tab(text: i['label'])
                 ],
                 isScrollable: true,
-                indicatorWeight: 0,
-                indicatorPadding: const EdgeInsets.only(
-                    top: 37, left: 18, right: 18, bottom: 6),
-                indicatorColor: Colors.black,
-                indicator: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.centerLeft,
-                    radius: 20.00,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.background,
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(4),
-                    topRight: Radius.circular(2),
-                    bottomLeft: Radius.circular(2),
-                    bottomRight: Radius.circular(4),
-                  ),
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: Theme.of(context).colorScheme.primary,
-                labelStyle:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 dividerColor: Colors.transparent,
-                unselectedLabelStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontWeight: FontWeight.normal,
-                ),
-                unselectedLabelColor: Theme.of(context).colorScheme.outline,
+                enableFeedback: true,
+                splashBorderRadius: BorderRadius.circular(10),
                 onTap: (value) {
                   feedBack();
                   if (_homeController.initialIndex == value) {
@@ -141,83 +110,52 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       stream: stream,
       initialData: true,
       builder: (context, AsyncSnapshot snapshot) {
-        return ClipRect(
-          clipBehavior: Clip.hardEdge,
-          child: AnimatedOpacity(
-            opacity: snapshot.data ? 1 : 0,
-            duration: const Duration(milliseconds: 300),
-            child: AnimatedContainer(
-              curve: Curves.linear,
-              duration: const Duration(milliseconds: 300),
-              height: snapshot.data
-                  ? MediaQuery.of(context).padding.top + 42
-                  : MediaQuery.of(context).padding.top,
-              child: Container(
-                padding: EdgeInsets.only(
-                  left: 12,
-                  right: 12,
-                  bottom: 0,
-                  top: MediaQuery.of(context).padding.top,
-                ),
-                child: Row(children: [
-                  Image.asset(
-                    'assets/images/logo/logo_android_2.png',
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.toNamed('/search',
-                            parameters: {'hintText': ctr!.defaultSearch.value});
-                      },
-                      child: Container(
-                        width: 250,
-                        height: 40,
-                        clipBehavior: Clip.hardEdge,
-                        padding: const EdgeInsets.only(left: 12, right: 22),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(25)),
-                          color: Theme.of(context).colorScheme.onInverseSurface,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search_outlined,
-                              size: 21,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Obx(
-                                () => Text(
-                                  ctr!.defaultSearch.value,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+        return AnimatedOpacity(
+          opacity: snapshot.data ? 1 : 0,
+          duration: const Duration(milliseconds: 300),
+          child: AnimatedContainer(
+            curve: Curves.easeInOutCubicEmphasized,
+            duration: const Duration(milliseconds: 500),
+            height: snapshot.data
+                ? MediaQuery.of(context).padding.top + 52
+                : MediaQuery.of(context).padding.top,
+            child: Container(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                bottom: 0,
+                top: MediaQuery.of(context).padding.top + 4,
+              ),
+              child: Row(
+                children: [
+                  const Expanded(child: SearchPage()),
                   const SizedBox(width: 10),
                   Obx(
                     () => ctr!.userLogin.value
-                        ? GestureDetector(
-                            onTap: () => callback!(),
-                            child: NetworkImgLayer(
-                              type: 'avatar',
-                              width: 38,
-                              height: 38,
-                              src: ctr!.userFace.value,
-                            ),
+                        ? Stack(
+                            children: [
+                              NetworkImgLayer(
+                                type: 'avatar',
+                                width: 34,
+                                height: 34,
+                                src: ctr!.userFace.value,
+                              ),
+                              Positioned.fill(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => callback!(),
+                                    splashColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withOpacity(0.3),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(50),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           )
                         : SizedBox(
                             width: 38,
@@ -242,7 +180,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                           ),
                   ),
-                ]),
+                ],
               ),
             ),
           ),
