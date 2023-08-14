@@ -67,7 +67,9 @@ class VideoHttp {
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
         for (var i in res.data['data']['items']) {
-          list.add(RecVideoItemAppModel.fromJson(i));
+          if (i['card_goto'] != 'ad_av') {
+            list.add(RecVideoItemAppModel.fromJson(i));
+          }
         }
         return {'status': true, 'data': list};
       } else {
