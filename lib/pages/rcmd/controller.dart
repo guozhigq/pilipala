@@ -17,14 +17,14 @@ class RcmdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // if (recVideo.get('cacheList') != null &&
-    //     recVideo.get('cacheList').isNotEmpty) {
-    //   List<RecVideoItemModel> list = [];
-    //   for (var i in recVideo.get('cacheList')) {
-    //     list.add(i);
-    //   }
-    //   videoList.value = list;
-    // }
+    if (recVideo.get('cacheList') != null &&
+        recVideo.get('cacheList').isNotEmpty) {
+      List<RecVideoItemAppModel> list = [];
+      for (var i in recVideo.get('cacheList')) {
+        list.add(i);
+      }
+      videoList.value = list;
+    }
   }
 
   // 获取推荐
@@ -47,7 +47,7 @@ class RcmdController extends GetxController {
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
       }
-      // recVideo.put('cacheList', res['data']);
+      recVideo.put('cacheList', res['data']);
       _currentPage += 1;
     }
     isLoadingMore = false;

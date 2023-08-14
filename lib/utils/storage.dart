@@ -1,8 +1,8 @@
 // import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
@@ -38,9 +38,10 @@ class GStrorage {
   }
 
   static regAdapter() {
-    Hive.registerAdapter(RecVideoItemModelAdapter());
+    Hive.registerAdapter(RecVideoItemAppModelAdapter());
     Hive.registerAdapter(RcmdReasonAdapter());
-    Hive.registerAdapter(StatAdapter());
+    Hive.registerAdapter(RcmdStatAdapter());
+    Hive.registerAdapter(RcmdOwnerAdapter());
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());

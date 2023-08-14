@@ -1,5 +1,8 @@
-import 'dart:developer';
+import 'package:hive/hive.dart';
 
+part 'result.g.dart';
+
+@HiveType(typeId: 0)
 class RecVideoItemAppModel {
   RecVideoItemAppModel({
     this.id,
@@ -24,27 +27,47 @@ class RecVideoItemAppModel {
     this.adInfo,
   });
 
+  @HiveField(0)
   int? id;
+  @HiveField(1)
   int? aid;
+  @HiveField(2)
   String? bvid;
+  @HiveField(3)
   int? cid;
+  @HiveField(4)
   String? pic;
-  Stat? stat;
+  @HiveField(5)
+  RcmdStat? stat;
+  @HiveField(6)
   String? duration;
+  @HiveField(7)
   String? title;
+  @HiveField(8)
   int? isFollowed;
-  Owner? owner;
+  @HiveField(9)
+  RcmdOwner? owner;
+  @HiveField(10)
   RcmdReason? rcmdReason;
+  @HiveField(11)
   String? goto;
+  @HiveField(12)
   int? param;
+  @HiveField(13)
   String? uri;
+  @HiveField(14)
   String? talkBack;
   // 番剧
+  @HiveField(15)
   String? bangumiView;
+  @HiveField(16)
   String? bangumiFollow;
+  @HiveField(17)
   String? bangumiBadge;
 
+  @HiveField(18)
   String? cardType;
+  @HiveField(19)
   Map? adInfo;
 
   RecVideoItemAppModel.fromJson(Map<String, dynamic> json) {
@@ -52,13 +75,14 @@ class RecVideoItemAppModel {
         ? json['player_args']['aid']
         : int.parse(json['param'] ?? '-1');
     aid = json['player_args'] != null ? json['player_args']['aid'] : -1;
+    bvid = null;
     cid = json['player_args'] != null ? json['player_args']['cid'] : -1;
     pic = json['cover'];
-    stat = Stat.fromJson(json);
+    stat = RcmdStat.fromJson(json);
     duration = json['cover_right_text'];
     title = json['title'];
     isFollowed = 0;
-    owner = Owner.fromJson(json);
+    owner = RcmdOwner.fromJson(json);
     rcmdReason = json['rcmd_reason_style'] != null
         ? RcmdReason.fromJson(json['rcmd_reason_style'])
         : null;
@@ -78,32 +102,36 @@ class RecVideoItemAppModel {
   }
 }
 
-class Stat {
-  Stat({
+@HiveType(typeId: 1)
+class RcmdStat {
+  RcmdStat({
     this.view,
     this.like,
     this.danmu,
   });
+  @HiveField(0)
   String? view;
+  @HiveField(1)
   String? like;
+  @HiveField(2)
   String? danmu;
 
-  Stat.fromJson(Map<String, dynamic> json) {
+  RcmdStat.fromJson(Map<String, dynamic> json) {
     view = json["cover_left_text_1"];
     danmu = json['cover_left_text_2'];
   }
 }
 
-class Owner {
-  Owner({this.name});
+@HiveType(typeId: 2)
+class RcmdOwner {
+  RcmdOwner({this.name, this.mid});
 
+  @HiveField(0)
   String? name;
+  @HiveField(1)
   int? mid;
 
-  Owner.fromJson(Map<String, dynamic> json) {
-    if (json['goto'] == 'bangumi') {
-      log(json.toString());
-    }
+  RcmdOwner.fromJson(Map<String, dynamic> json) {
     name = json['goto'] == 'av'
         ? json['args']['up_name']
         : json['desc_button'] != null
@@ -113,11 +141,13 @@ class Owner {
   }
 }
 
+@HiveType(typeId: 8)
 class RcmdReason {
   RcmdReason({
     this.content,
   });
 
+  @HiveField(0)
   String? content;
 
   RcmdReason.fromJson(Map<String, dynamic> json) {
