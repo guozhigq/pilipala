@@ -14,7 +14,7 @@ class VideoCardHSkeleton extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, boxConstraints) {
             double width =
-                (boxConstraints.maxWidth - StyleString.cardSpace * 9) / 2;
+                (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
             return SizedBox(
               height: width / StyleString.aspectRatio,
               child: Row(

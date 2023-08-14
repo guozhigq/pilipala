@@ -31,6 +31,10 @@ class GStrorage {
     localCache = await Hive.openBox('localCache');
     // 设置
     setting = await Hive.openBox('setting');
+    // 热搜关键词
+    hotKeyword = await Hive.openBox('hotKeyword');
+    // 搜索历史
+    historyword = await Hive.openBox('historyWord');
   }
 
   static regAdapter() {
@@ -45,10 +49,6 @@ class GStrorage {
   }
 
   static Future<void> lazyInit() async {
-    // 热搜关键词
-    hotKeyword = await Hive.openBox('hotKeyword');
-    // 搜索历史
-    historyword = await Hive.openBox('historyWord');
     // 视频设置
     video = await Hive.openBox('video');
   }
