@@ -143,7 +143,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               // type: BottomNavigationBarType.shifting,
               selectedItemColor: Theme.of(context).colorScheme.primary,
               unselectedItemColor:
-                  Theme.of(context).colorScheme.onSurfaceVariant,
+                  Theme.of(context).colorScheme.outline.withOpacity(0.5),
               selectedFontSize: 12.4,
               onTap: (value) => setIndex(value),
               items: [

@@ -14,32 +14,30 @@ class SettingPage extends StatelessWidget {
     final SettingController settingController = Get.put(SettingController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('设置'),
+        centerTitle: false,
+        titleSpacing: 0,
+        title: Text(
+          '设置',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: Column(
         children: [
-          Obx(
-            () => ListTile(
-              enableFeedback: true,
-              onTap: () => settingController.onOpenFeedBack(),
-              title: const Text('震动反馈'),
-              subtitle: Text('请确定手机设置中已开启震动反馈', style: subTitleStyle),
-              trailing: Transform.scale(
-                scale: 0.8,
-                child: Switch(
-                    thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                        (Set<MaterialState> states) {
-                      if (states.isNotEmpty &&
-                          states.first == MaterialState.selected) {
-                        return const Icon(Icons.done);
-                      }
-                      return null; // All other states will use the default thumbIcon.
-                    }),
-                    value: settingController.feedBackEnable.value,
-                    onChanged: (value) => settingController.onOpenFeedBack()),
-              ),
-            ),
+          ListTile(
+            onTap: () => Get.toNamed('/playSetting'),
+            dense: false,
+            title: const Text('播放设置'),
           ),
+          ListTile(
+            onTap: () => Get.toNamed('/styleSetting'),
+            dense: false,
+            title: const Text('外观设置'),
+          ),
+          // ListTile(
+          //   onTap: () {},
+          //   dense: false,
+          //   title: const Text('其他设置'),
+          // ),
           Obx(
             () => Visibility(
               visible: settingController.userLogin.value,

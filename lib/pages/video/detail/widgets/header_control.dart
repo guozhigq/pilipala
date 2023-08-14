@@ -28,6 +28,7 @@ class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
   List<PlaySpeed> playSpeed = PlaySpeed.values;
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
+  TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
 
   @override
@@ -81,7 +82,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       enabled: false,
                       leading:
                           const Icon(Icons.network_cell_outlined, size: 20),
-                      title: const Text('省流模式'),
+                      title: Text('省流模式', style: titleStyle),
                       subtitle: Text('低画质 ｜ 减少视频缓存', style: subTitleStyle),
                       trailing: Transform.scale(
                         scale: 0.75,
@@ -99,22 +100,22 @@ class _HeaderControlState extends State<HeaderControl> {
                         ),
                       ),
                     ),
-                    Obx(
-                      () => ListTile(
-                        onTap: () => {Get.back(), showSetSpeedSheet()},
-                        dense: true,
-                        leading: const Icon(Icons.speed_outlined, size: 20),
-                        title: const Text('播放速度'),
-                        subtitle: Text(
-                            '当前倍速 x${widget.controller!.playbackSpeed}',
-                            style: subTitleStyle),
-                      ),
-                    ),
+                    // Obx(
+                    //   () => ListTile(
+                    //     onTap: () => {Get.back(), showSetSpeedSheet()},
+                    //     dense: true,
+                    //     leading: const Icon(Icons.speed_outlined, size: 20),
+                    //     title: Text('播放速度', style: titleStyle),
+                    //     subtitle: Text(
+                    //         '当前倍速 x${widget.controller!.playbackSpeed}',
+                    //         style: subTitleStyle),
+                    //   ),
+                    // ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
                       dense: true,
                       leading: const Icon(Icons.play_circle_outline, size: 20),
-                      title: const Text('选择画质'),
+                      title: Text('选择画质', style: titleStyle),
                       subtitle: Text(
                           '当前画质 ${widget.videoDetailCtr!.currentVideoQa.description}',
                           style: subTitleStyle),
@@ -123,24 +124,33 @@ class _HeaderControlState extends State<HeaderControl> {
                       onTap: () => {Get.back(), showSetAudioQa()},
                       dense: true,
                       leading: const Icon(Icons.album_outlined, size: 20),
-                      title: const Text('选择音质'),
+                      title: Text('选择音质', style: titleStyle),
                       subtitle: Text(
                           '当前音质 ${widget.videoDetailCtr!.currentAudioQa.description}',
                           style: subTitleStyle),
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () => {Get.back(), showSetDecodeFormats()},
                       dense: true,
-                      enabled: false,
-                      leading: const Icon(Icons.play_circle_outline, size: 20),
-                      title: const Text('播放设置'),
+                      leading: const Icon(Icons.av_timer_outlined, size: 20),
+                      title: Text('解码格式', style: titleStyle),
+                      subtitle: Text(
+                          '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
+                          style: subTitleStyle),
                     ),
+                    // ListTile(
+                    //   onTap: () {},
+                    //   dense: true,
+                    //   enabled: false,
+                    //   leading: const Icon(Icons.play_circle_outline, size: 20),
+                    //   title: Text('播放设置', style: titleStyle),
+                    // ),
                     ListTile(
                       onTap: () {},
                       dense: true,
                       enabled: false,
                       leading: const Icon(Icons.subtitles_outlined, size: 20),
-                      title: const Text('弹幕设置'),
+                      title: Text('弹幕设置', style: titleStyle),
                     ),
                   ],
                 ),
@@ -250,7 +260,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('选择画质'),
+                      Text('选择画质', style: titleStyle),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.info_outline,
@@ -329,7 +339,9 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              const SizedBox(height: 45, child: Center(child: Text('选择音质'))),
+              SizedBox(
+                  height: 45,
+                  child: Center(child: Text('选择音质', style: titleStyle))),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -352,6 +364,74 @@ class _HeaderControlState extends State<HeaderControl> {
                             style: subTitleStyle,
                           ),
                           trailing: currentAudioQa.code == i.id
+                              ? Icon(
+                                  Icons.done,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              : const SizedBox(),
+                        ),
+                      ]
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 选择解码格式
+  void showSetDecodeFormats() {
+    // 当前选中的解码格式
+    VideoDecodeFormats currentDecodeFormats =
+        widget.videoDetailCtr!.currentDecodeFormats;
+    // 当前视频可用的解码格式
+    List<FormatItem> videoFormat = videoInfo.supportFormats!;
+    List list = videoFormat.first.codecs!;
+
+    showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          width: double.infinity,
+          height: 250,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.background,
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+          margin: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              SizedBox(
+                  height: 45,
+                  child: Center(child: Text('选择解码格式', style: titleStyle))),
+              Expanded(
+                child: Material(
+                  child: ListView(
+                    children: [
+                      for (var i in list) ...[
+                        ListTile(
+                          onTap: () {
+                            widget.videoDetailCtr!.currentDecodeFormats =
+                                VideoDecodeFormatsCode.fromString(i)!;
+                            widget.videoDetailCtr!.updatePlayer();
+                            Get.back();
+                          },
+                          dense: true,
+                          contentPadding:
+                              const EdgeInsets.only(left: 20, right: 20),
+                          title: Text(VideoDecodeFormatsCode.fromString(i)!
+                              .description!),
+                          subtitle: Text(
+                            i!,
+                            style: subTitleStyle,
+                          ),
+                          trailing: i.startsWith(currentDecodeFormats.code)
                               ? Icon(
                                   Icons.done,
                                   color: Theme.of(context).colorScheme.primary,

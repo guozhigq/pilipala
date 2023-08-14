@@ -580,9 +580,11 @@ class UgcSeason {
     intro = json['intro'];
     signState = json['sign_state'];
     attribute = json['attribute'];
-    sections = json['sections']
-        .map<SectionItem>((e) => SectionItem.fromJson(e))
-        .toList();
+    sections = json['sections'] != null
+        ? json['sections']
+            .map<SectionItem>((e) => SectionItem.fromJson(e))
+            .toList()
+        : [];
     stat = Stat.fromJson(json['stat']);
     epCount = json['ep_count'];
     seasonType = json['season_type'];

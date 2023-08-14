@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'controller.dart';
 
 class MinePage extends StatelessWidget {
@@ -21,16 +23,23 @@ class MinePage extends StatelessWidget {
         elevation: 0,
         toolbarHeight: kTextTabBarHeight + 20,
         backgroundColor: Colors.transparent,
-        title: null,
+        centerTitle: false,
+        title: const Text(
+          'PLPL',
+          style: TextStyle(
+            height: 2.8,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Jura-Bold',
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: () {
-              Get.changeThemeMode(ThemeMode.dark);
-            },
+            onPressed: () => mineController.onChangeTheme(),
             icon: Icon(
-              Get.theme == ThemeData.light()
-                  ? CupertinoIcons.moon
-                  : CupertinoIcons.sun_max,
+              mineController.themeType.value == ThemeType.dark
+                  ? CupertinoIcons.sun_max
+                  : CupertinoIcons.moon,
               size: 22,
             ),
           ),
@@ -93,7 +102,7 @@ class MinePage extends StatelessWidget {
                         src: _mineController.userInfo.value.face,
                         width: 85,
                         height: 85)
-                    : Image.asset('assets/images/loading.png'),
+                    : Image.asset('assets/images/noface.jpeg'),
               ),
             ),
           ),

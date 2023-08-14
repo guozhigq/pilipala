@@ -37,10 +37,10 @@ class _BangumiPanelState extends State<BangumiPanel> {
         color: Theme.of(context).colorScheme.background,
         child: Column(
           children: [
-            Container(
-              height: 45,
-              padding: const EdgeInsets.only(left: 14, right: 14),
-              child: Row(
+            AppBar(
+              toolbarHeight: 45,
+              automaticallyImplyLeading: false,
+              title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -53,10 +53,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   ),
                 ],
               ),
-            ),
-            Divider(
-              height: 1,
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              titleSpacing: 10,
             ),
             Expanded(
               child: Material(
@@ -66,8 +63,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
                     return ListTile(
                       onTap: () => changeFucCall(widget.pages[index], index),
                       dense: false,
+                      leading: index == currentIndex
+                          ? Image.asset(
+                              'assets/images/live.gif',
+                              color: Theme.of(context).colorScheme.primary,
+                              height: 12,
+                            )
+                          : null,
                       title: Text(
-                        widget.pages[index].longTitle!,
+                        '第${index + 1}话  ${widget.pages[index].longTitle!}',
                         style: TextStyle(
                           fontSize: 14,
                           color: index == currentIndex
@@ -148,6 +152,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: widget.pages.length,
+              itemExtent: 150,
               itemBuilder: ((context, i) {
                 return Container(
                   width: 150,

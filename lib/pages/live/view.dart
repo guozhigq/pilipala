@@ -54,47 +54,54 @@ class _LivePageState extends State<LivePage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        return await _liveController.onRefresh();
-      },
-      child: CustomScrollView(
-        controller: _liveController.scrollController,
-        slivers: [
-          SliverPadding(
-            // 单列布局 EdgeInsets.zero
-            padding: const EdgeInsets.fromLTRB(
-                StyleString.safeSpace, 0, StyleString.safeSpace, 0),
-            sliver: FutureBuilder(
-              future: _futureBuilderFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data as Map;
-                  if (data['status']) {
-                    return Obx(() =>
-                        contentGrid(_liveController, _liveController.liveList));
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(StyleString.imgRadius),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          return await _liveController.onRefresh();
+        },
+        child: CustomScrollView(
+          controller: _liveController.scrollController,
+          slivers: [
+            SliverPadding(
+              // 单列布局 EdgeInsets.zero
+              padding: EdgeInsets.zero,
+              sliver: FutureBuilder(
+                future: _liveController.queryLiveList('init'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(() => contentGrid(
+                          _liveController, _liveController.liveList));
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => {},
+                      );
+                    }
                   } else {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => {},
-                    );
+                    // 缓存数据
+                    if (_liveController.liveList.length > 1) {
+                      return contentGrid(
+                          _liveController, _liveController.liveList);
+                    }
+                    // 骨架屏
+                    else {
+                      return contentGrid(_liveController, []);
+                    }
                   }
-                } else {
-                  // 缓存数据
-                  if (_liveController.liveList.length > 1) {
-                    return contentGrid(
-                        _liveController, _liveController.liveList);
-                  }
-                  // 骨架屏
-                  else {
-                    return contentGrid(_liveController, []);
-                  }
-                }
-              },
+                },
+              ),
             ),
-          ),
-          const LoadingMore()
-        ],
+            const LoadingMore()
+          ],
+        ),
       ),
     );
   }

@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/sliver_header.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
@@ -164,8 +165,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
                     expandedHeight: videoHeight,
-                    // backgroundColor: Colors.transparent,
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor:
+                        MediaQuery.of(Get.context!).platformBrightness ==
+                                Brightness.dark
+                            ? Colors.black
+                            : Theme.of(context).colorScheme.background,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
                         padding: EdgeInsets.only(top: statusBarHeight),
@@ -234,10 +238,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 backgroundColor:
                                                     Colors.transparent,
                                                 actions: [
-                                                  /// TODO
                                                   IconButton(
                                                       tooltip: '稍后再看',
-                                                      onPressed: () {},
+                                                      onPressed: () async {
+                                                        var res = await UserHttp
+                                                            .toViewLater(
+                                                                bvid:
+                                                                    videoDetailController
+                                                                        .bvid);
+                                                        SmartDialog.showToast(
+                                                            res['msg']);
+                                                      },
                                                       icon: const Icon(Icons
                                                           .history_outlined))
                                                 ],
@@ -288,43 +299,66 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               onlyOneScrollInBody: true,
               body: Container(
                 color: Theme.of(context).colorScheme.background,
-                child: Expanded(
-                  child: TabBarView(
-                    controller: videoDetailController.tabCtr,
-                    children: [
-                      Builder(
-                        builder: (context) {
-                          return CustomScrollView(
-                            key: const PageStorageKey<String>('简介'),
-                            slivers: <Widget>[
-                              if (videoDetailController.videoType ==
-                                  SearchType.video) ...[
-                                const VideoIntroPanel(),
-                              ] else if (videoDetailController.videoType ==
-                                  SearchType.media_bangumi) ...[
-                                const BangumiIntroPanel()
-                              ],
-                              if (videoDetailController.videoType ==
-                                  SearchType.video) ...[
-                                SliverPersistentHeader(
-                                  floating: true,
-                                  pinned: true,
-                                  delegate: SliverHeaderDelegate(
-                                    height: 50,
-                                    child: const MenuRow(loadingStatus: false),
-                                  ),
-                                ),
-                              ],
-                              const RelatedVideoPanel(),
-                            ],
-                          );
-                        },
+                child: Column(
+                  children: [
+                    Opacity(
+                      opacity: 0,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 0,
+                        child: Obx(
+                          () => TabBar(
+                            controller: videoDetailController.tabCtr,
+                            dividerColor: Colors.transparent,
+                            indicatorColor:
+                                Theme.of(context).colorScheme.background,
+                            tabs: videoDetailController.tabs
+                                .map((String name) => Tab(text: name))
+                                .toList(),
+                          ),
+                        ),
                       ),
-                      VideoReplyPanel(
-                        bvid: videoDetailController.bvid,
-                      )
-                    ],
-                  ),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: videoDetailController.tabCtr,
+                        children: [
+                          Builder(
+                            builder: (context) {
+                              return CustomScrollView(
+                                key: const PageStorageKey<String>('简介'),
+                                slivers: <Widget>[
+                                  if (videoDetailController.videoType ==
+                                      SearchType.video) ...[
+                                    const VideoIntroPanel(),
+                                  ] else if (videoDetailController.videoType ==
+                                      SearchType.media_bangumi) ...[
+                                    const BangumiIntroPanel()
+                                  ],
+                                  if (videoDetailController.videoType ==
+                                      SearchType.video) ...[
+                                    SliverPersistentHeader(
+                                      floating: true,
+                                      pinned: true,
+                                      delegate: SliverHeaderDelegate(
+                                        height: 50,
+                                        child:
+                                            const MenuRow(loadingStatus: false),
+                                      ),
+                                    ),
+                                  ],
+                                  const RelatedVideoPanel(),
+                                ],
+                              );
+                            },
+                          ),
+                          VideoReplyPanel(
+                            bvid: videoDetailController.bvid,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

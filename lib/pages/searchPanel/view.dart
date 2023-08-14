@@ -25,7 +25,7 @@ class SearchPanel extends StatefulWidget {
 
 class _SearchPanelState extends State<SearchPanel>
     with AutomaticKeepAliveClientMixin {
-  late SearchPanelController? _searchPanelController;
+  late SearchPanelController _searchPanelController;
 
   bool _isLoadingMore = false;
   late Future _futureBuilderFuture;
@@ -41,10 +41,9 @@ class _SearchPanelState extends State<SearchPanel>
         keyword: widget.keyword,
         searchType: widget.searchType,
       ),
-      tag: widget.searchType!.type + widget.tag!,
+      tag: widget.searchType!.type,
     );
-    ScrollController scrollController =
-        _searchPanelController!.scrollController;
+    ScrollController scrollController = _searchPanelController.scrollController;
     scrollController.addListener(() async {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 100) {
@@ -55,7 +54,7 @@ class _SearchPanelState extends State<SearchPanel>
         }
       }
     });
-    _futureBuilderFuture = _searchPanelController!.onSearch();
+    _futureBuilderFuture = _searchPanelController.onSearch();
   }
 
   @override
@@ -63,7 +62,7 @@ class _SearchPanelState extends State<SearchPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        await _searchPanelController!.onRefresh();
+        await _searchPanelController.onRefresh();
       },
       child: FutureBuilder(
         future: _futureBuilderFuture,
@@ -71,7 +70,7 @@ class _SearchPanelState extends State<SearchPanel>
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data;
             var ctr = _searchPanelController;
-            List list = ctr!.resultList;
+            List list = ctr.resultList;
             if (data['status']) {
               return Obx(() {
                 switch (widget.searchType) {
