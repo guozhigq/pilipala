@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/index.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/tab_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -54,6 +55,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (res.data['code'] == 0) {
       defaultSearch.value = res.data['data']['name'];
     }
+    UserHttp.thirdLogin();
   }
 
   // 更新登录状态

@@ -58,6 +58,9 @@ class Request {
         log("setCookie, ${e.toString()}");
       }
     }
+    var cookieString =
+        cookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    dio.options.headers['cookie'] = cookieString;
   }
 
   // 移除cookie

@@ -63,6 +63,8 @@ class UserBoxKey {
   static const String userMid = 'userMid';
   // 登录状态
   static const String userLogin = 'userLogin';
+  // 凭证
+  static const String accessKey = 'accessKey';
 }
 
 class SettingBoxKey {

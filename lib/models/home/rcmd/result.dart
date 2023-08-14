@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 class RecVideoItemAppModel {
   RecVideoItemAppModel({
     this.id,
@@ -11,30 +13,60 @@ class RecVideoItemAppModel {
     this.isFollowed,
     this.owner,
     this.rcmdReason,
+    this.goto,
+    this.param,
+    this.uri,
+    this.talkBack,
+    this.bangumiView,
+    this.bangumiFollow,
+    this.bangumiBadge,
   });
 
   int? id;
   int? aid;
-  int? bvid;
+  String? bvid;
   int? cid;
   String? pic;
   Stat? stat;
-  int? duration;
+  String? duration;
   String? title;
   int? isFollowed;
   Owner? owner;
-  String? rcmdReason;
+  RcmdReason? rcmdReason;
+  String? goto;
+  String? param;
+  String? uri;
+  String? talkBack;
+  // 番剧
+  String? bangumiView;
+  String? bangumiFollow;
+  String? bangumiBadge;
 
   RecVideoItemAppModel.fromJson(Map<String, dynamic> json) {
-    id = json['player_args']['aid'];
-    aid = json['player_args']['aid'];
-    cid = json['player_args']['cid'];
+    id = json['player_args'] != null
+        ? json['player_args']['aid']
+        : int.parse(json['param'] ?? '-1');
+    aid = json['player_args'] != null ? json['player_args']['aid'] : -1;
+    cid = json['player_args'] != null ? json['player_args']['cid'] : -1;
     pic = json['cover'];
     stat = Stat.fromJson(json);
-    duration = json['player_args']['duration'];
+    duration = json['cover_right_text'];
     title = json['title'];
     isFollowed = 0;
     owner = Owner.fromJson(json);
+    rcmdReason = json['rcmd_reason_style'] != null
+        ? RcmdReason.fromJson(json['rcmd_reason_style'])
+        : null;
+    goto = json['goto'];
+    param = json['param'];
+    uri = json['uri'];
+    talkBack = json['talk_back'];
+
+    if (json['goto'] == 'bangumi') {
+      bangumiView = json['cover_left_text_1'];
+      bangumiFollow = json['cover_left_text_2'];
+      bangumiBadge = json['badge'];
+    }
   }
 }
 
@@ -42,15 +74,15 @@ class Stat {
   Stat({
     this.view,
     this.like,
-    this.danmaku,
+    this.danmu,
   });
   String? view;
   String? like;
-  String? danmaku;
+  String? danmu;
 
   Stat.fromJson(Map<String, dynamic> json) {
     view = json["cover_left_text_1"];
-    danmaku = json['cover_left_text_2'];
+    danmu = json['cover_left_text_2'];
   }
 }
 
@@ -58,8 +90,29 @@ class Owner {
   Owner({this.name});
 
   String? name;
+  int? mid;
 
   Owner.fromJson(Map<String, dynamic> json) {
-    name = json['args']['up_name'];
+    if (json['goto'] == 'bangumi') {
+      log(json.toString());
+    }
+    name = json['goto'] == 'av'
+        ? json['args']['up_name']
+        : json['desc_button'] != null
+            ? json['desc_button']['text']
+            : '';
+    mid = json['args']['up_id'] ?? -1;
+  }
+}
+
+class RcmdReason {
+  RcmdReason({
+    this.content,
+  });
+
+  String? content;
+
+  RcmdReason.fromJson(Map<String, dynamic> json) {
+    content = json["title"] ?? '';
   }
 }

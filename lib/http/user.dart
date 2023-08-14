@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/api.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
@@ -177,6 +180,21 @@ class UserHttp {
       return {'status': true, 'msg': 'yeah！成功移除'};
     } else {
       return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 获取用户凭证
+  static Future thirdLogin() async {
+    var res = await Request().get(
+      'https://passport.bilibili.com/login/app/third',
+      data: {
+        'appkey': Constants.appKey,
+        'api': Constants.thirdApi,
+        'sign': Constants.thirdSign,
+      },
+    );
+    if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
+      Request().get(res.data['data']['confirm_uri']);
     }
   }
 }
