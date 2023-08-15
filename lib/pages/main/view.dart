@@ -94,6 +94,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void dispose() async {
+    await GStrorage.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Box localCache = GStrorage.localCache;
     double statusBarHeight = MediaQuery.of(context).padding.top;
