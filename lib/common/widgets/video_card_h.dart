@@ -82,9 +82,14 @@ class VideoCardH extends StatelessWidget {
                                   height: maxHeight,
                                 ),
                               ),
-                              pBadge(Utils.timeFormat(videoItem.duration!),
-                                  context, null, 6.0, 6.0, null,
-                                  type: 'gray'),
+                              PBadge(
+                                text: Utils.timeFormat(videoItem.duration!),
+                                top: null,
+                                right: 6.0,
+                                bottom: 6.0,
+                                left: null,
+                                type: 'gray',
+                              ),
                               // if (videoItem.rcmdReason != null &&
                               //     videoItem.rcmdReason.content != '')
                               //   pBadge(videoItem.rcmdReason.content, context,

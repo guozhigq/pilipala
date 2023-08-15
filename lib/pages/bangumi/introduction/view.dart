@@ -161,13 +161,14 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           ),
                           if (bangumiItem != null &&
                               bangumiItem!.rating != null)
-                            pBadge(
-                                '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
-                                context,
-                                null,
-                                6,
-                                6,
-                                null),
+                            PBadge(
+                              text:
+                                  '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
+                              top: null,
+                              right: 6,
+                              bottom: 6,
+                              left: null,
+                            ),
                         ],
                       ),
                       const SizedBox(width: 10),

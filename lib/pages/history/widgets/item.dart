@@ -147,23 +147,26 @@ class HistoryItem extends StatelessWidget {
                                 if (!BusinessType
                                     .hiddenDurationType.hiddenDurationType
                                     .contains(videoItem.history.business))
-                                  pBadge(
-                                      videoItem.progress == -1
-                                          ? '已看完'
-                                          : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
-                                      context,
-                                      null,
-                                      6.0,
-                                      6.0,
-                                      null,
-                                      type: 'gray'),
+                                  PBadge(
+                                    text: videoItem.progress == -1
+                                        ? '已看完'
+                                        : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
+                                    right: 6.0,
+                                    bottom: 6.0,
+                                    type: 'gray',
+                                  ),
                                 // 右上角
                                 if (BusinessType.showBadge.showBadge
                                         .contains(videoItem.history.business) ||
                                     videoItem.history.business ==
                                         BusinessType.live.type)
-                                  pBadge(videoItem.badge, context, 6.0, 6.0,
-                                      null, null),
+                                  PBadge(
+                                    text: videoItem.badge,
+                                    top: 6.0,
+                                    right: 6.0,
+                                    bottom: null,
+                                    left: null,
+                                  ),
                               ],
                             );
                           },

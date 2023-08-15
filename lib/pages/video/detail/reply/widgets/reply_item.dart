@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -139,7 +140,13 @@ class ReplyItem extends StatelessWidget {
                       height: 11,
                     ),
                     const SizedBox(width: 6),
-                    if (replyItem!.isUp!) const UpTag(),
+                    if (replyItem!.isUp!)
+                      const PBadge(
+                        text: 'UP',
+                        size: 'small',
+                        stack: 'normal',
+                        fs: 9,
+                      ),
                   ],
                 ),
                 Positioned(
@@ -208,8 +215,15 @@ class ReplyItem extends StatelessWidget {
                 children: [
                   if (replyItem!.isTop!)
                     const WidgetSpan(
-                        alignment: PlaceholderAlignment.top,
-                        child: UpTag(tagText: 'TOP')),
+                      alignment: PlaceholderAlignment.top,
+                      child: PBadge(
+                        text: 'TOP',
+                        size: 'small',
+                        stack: 'normal',
+                        type: 'line',
+                        fs: 9,
+                      ),
+                    ),
                   buildContent(context, replyItem!, replyReply, null),
                 ],
               ),
@@ -392,7 +406,12 @@ class ReplyItemRow extends StatelessWidget {
                           if (replies![i].isUp)
                             const WidgetSpan(
                               alignment: PlaceholderAlignment.top,
-                              child: UpTag(),
+                              child: PBadge(
+                                text: 'UP',
+                                size: 'small',
+                                stack: 'normal',
+                                fs: 9,
+                              ),
                             ),
                           buildContent(
                               context, replies![i], replyReply, replyItem),
@@ -758,33 +777,4 @@ InlineSpan buildContent(
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);
-}
-
-class UpTag extends StatelessWidget {
-  final String? tagText;
-  const UpTag({super.key, this.tagText = 'UP'});
-  @override
-  Widget build(BuildContext context) {
-    Color primary = Theme.of(context).colorScheme.primary;
-    return Container(
-      width: 24,
-      height: 14,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(3),
-          color: tagText == 'UP' ? primary : null,
-          border: Border.all(color: primary)),
-      margin: const EdgeInsets.only(right: 4),
-      child: Center(
-        child: Text(
-          tagText!,
-          style: TextStyle(
-            fontSize: 9,
-            color: tagText == 'UP'
-                ? Theme.of(context).colorScheme.onPrimary
-                : primary,
-          ),
-        ),
-      ),
-    );
-  }
 }

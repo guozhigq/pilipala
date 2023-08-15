@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -121,7 +121,12 @@ class LiveContent extends StatelessWidget {
             ),
             Row(
               children: [
-                const UpTag(),
+                const PBadge(
+                  text: 'UP',
+                  size: 'small',
+                  stack: 'normal',
+                  fs: 9,
+                ),
                 Expanded(
                   child: Text(
                     liveItem.uname,

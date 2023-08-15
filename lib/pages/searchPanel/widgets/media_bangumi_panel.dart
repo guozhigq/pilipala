@@ -41,8 +41,13 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                     height: 148,
                     src: i.cover,
                   ),
-                  pBadge(i.mediaType == 1 ? '番剧' : '国创', context, 6.0, 4.0,
-                      null, null)
+                  PBadge(
+                    text: i.mediaType == 1 ? '番剧' : '国创',
+                    top: 6.0,
+                    right: 4.0,
+                    bottom: null,
+                    left: null,
+                  )
                 ],
               ),
               const SizedBox(width: 10),

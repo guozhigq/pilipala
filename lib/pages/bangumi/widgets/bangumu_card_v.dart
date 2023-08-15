@@ -97,10 +97,21 @@ class BangumiCardV extends StatelessWidget {
                           ),
                         ),
                         if (bangumiItem.badge != null)
-                          pBadge(bangumiItem.badge, context, 6, 6, null, null),
+                          PBadge(
+                              text: bangumiItem.badge,
+                              top: 6,
+                              right: 6,
+                              bottom: null,
+                              left: null),
                         if (bangumiItem.order != null)
-                          pBadge(bangumiItem.order, context, null, null, 6, 6,
-                              type: 'gray'),
+                          PBadge(
+                            text: bangumiItem.order,
+                            top: null,
+                            right: null,
+                            bottom: 6,
+                            left: 6,
+                            type: 'gray',
+                          ),
                       ],
                     );
                   }),

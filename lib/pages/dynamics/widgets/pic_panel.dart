@@ -85,7 +85,14 @@ Widget picWidget(item, context) {
               children: list,
             ),
             if (len == 1 && origAspectRatio < 0.4)
-              pBadge('长图', context, null, null, 6.0, 6.0, type: 'gray')
+              const PBadge(
+                text: '长图',
+                top: null,
+                right: null,
+                bottom: 6.0,
+                left: 6.0,
+                type: 'gray',
+              )
           ],
         ),
       );

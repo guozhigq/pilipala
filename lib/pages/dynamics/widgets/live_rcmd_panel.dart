@@ -77,10 +77,21 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
                   src: item.modules.moduleDynamic.major.liveRcmd.cover,
                 ),
               ),
-              pBadge(watchedShow['text_large'], context, 6, 56, null, null,
-                  type: 'gray'),
-              pBadge(
-                  liveStatus == 1 ? '直播中' : '直播结束', context, 6, 6, null, null),
+              PBadge(
+                text: watchedShow['text_large'],
+                top: 6,
+                right: 56,
+                bottom: null,
+                left: null,
+                type: 'gray',
+              ),
+              PBadge(
+                text: liveStatus == 1 ? '直播中' : '直播结束',
+                top: 6,
+                right: 6,
+                bottom: null,
+                left: null,
+              ),
               Positioned(
                 left: 0,
                 right: 0,

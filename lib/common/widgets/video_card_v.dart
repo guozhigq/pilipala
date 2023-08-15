@@ -2,8 +2,8 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
-import 'package:pilipala/common/widgets/stat/up.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
@@ -164,35 +164,23 @@ class VideoContent extends StatelessWidget {
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
-                  UpTag(
-                    tagText: videoItem.bangumiBadge,
-                  ),
+                  PBadge(
+                    text: videoItem.bangumiBadge,
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'line',
+                    fs: 9,
+                  )
                 ],
                 if (videoItem.rcmdReason != null &&
                     videoItem.rcmdReason.content != '') ...[
-                  Container(
-                      padding: const EdgeInsets.fromLTRB(3, 1, 3, 1),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Center(
-                        child: Text(
-                          videoItem.rcmdReason.content,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      )),
-                  const SizedBox(width: 4)
+                  PBadge(
+                    text: videoItem.rcmdReason.content,
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'color',
+                  )
                 ],
-                if (videoItem.adInfo != null)
-                  const UpTag(
-                    tagText: '推广',
-                  ),
                 Expanded(
                   child: LayoutBuilder(builder:
                       (BuildContext context, BoxConstraints constraints) {
