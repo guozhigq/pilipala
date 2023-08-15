@@ -78,8 +78,11 @@ class _LivePageState extends State<LivePage> {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return Obx(() => contentGrid(
-                          _liveController, _liveController.liveList));
+                      return SliverLayoutBuilder(
+                          builder: (context, boxConstraints) {
+                        return Obx(() => contentGrid(
+                            _liveController, _liveController.liveList));
+                      });
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
@@ -116,6 +119,14 @@ class _LivePageState extends State<LivePage> {
   }
 
   Widget contentGrid(ctr, liveList) {
+    double maxWidth = Get.size.width;
+    int baseWidth = 500;
+    int step = 300;
+    int crossAxisCount =
+        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    if (maxWidth < 300) {
+      crossAxisCount = 1;
+    }
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
@@ -123,9 +134,9 @@ class _LivePageState extends State<LivePage> {
         // 列间距
         crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
-        crossAxisCount: ctr.crossAxisCount,
+        crossAxisCount: crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 64,
+            Get.size.width / crossAxisCount / StyleString.aspectRatio + 66,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

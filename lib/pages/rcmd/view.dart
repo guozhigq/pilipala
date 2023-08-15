@@ -84,8 +84,11 @@ class _RcmdPageState extends State<RcmdPage>
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return Obx(() => contentGrid(
-                          _rcmdController, _rcmdController.videoList));
+                      return SliverLayoutBuilder(
+                          builder: (context, boxConstraints) {
+                        return Obx(() => contentGrid(
+                            _rcmdController, _rcmdController.videoList));
+                      });
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
@@ -121,6 +124,14 @@ class _RcmdPageState extends State<RcmdPage>
   }
 
   Widget contentGrid(ctr, videoList) {
+    double maxWidth = Get.size.width;
+    int baseWidth = 500;
+    int step = 300;
+    int crossAxisCount =
+        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    if (maxWidth < 300) {
+      crossAxisCount = 1;
+    }
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
@@ -128,16 +139,14 @@ class _RcmdPageState extends State<RcmdPage>
         // 列间距
         crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
-        crossAxisCount: ctr.crossAxisCount,
+        crossAxisCount: crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 64,
+            Get.size.width / crossAxisCount / StyleString.aspectRatio + 66,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return videoList!.isNotEmpty
-              ?
-              // VideoCardV(videoItem: videoList![index])
-              VideoCardV(
+              ? VideoCardV(
                   videoItem: videoList[index],
                   longPress: () {
                     _rcmdController.popupDialog =
