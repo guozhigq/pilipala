@@ -76,7 +76,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           videoDetailController.isShowCover.value = false;
           videoDetailController.loopHeartBeat();
         } else {
-          videoDetailController.timer!.cancel();
+          if (videoDetailController.timer != null) {
+            videoDetailController.timer!.cancel();
+          }
           // 播放完成停止 or 切换下一个
           if (status == PlayerStatus.completed) {
             // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
@@ -98,6 +100,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    plPlayerController!.pause();
     plPlayerController!.dispose();
     if (videoDetailController.timer != null) {
       videoDetailController.timer!.cancel();
