@@ -17,14 +17,19 @@ class GStrorage {
   static late final Box video;
 
   static Future<void> init() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getApplicationSupportDirectory();
     final path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
     // 用户信息
     user = await Hive.openBox('user');
     // 首页推荐视频
-    recVideo = await Hive.openBox('recVideo');
+    recVideo = await Hive.openBox(
+      'recVideo',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 20;
+      },
+    );
     // 登录用户信息
     userInfo = await Hive.openBox('userInfo');
     // 本地缓存
@@ -32,9 +37,19 @@ class GStrorage {
     // 设置
     setting = await Hive.openBox('setting');
     // 热搜关键词
-    hotKeyword = await Hive.openBox('hotKeyword');
+    hotKeyword = await Hive.openBox(
+      'hotKeyword',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 10;
+      },
+    );
     // 搜索历史
-    historyword = await Hive.openBox('historyWord');
+    historyword = await Hive.openBox(
+      'historyWord',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 10;
+      },
+    );
   }
 
   static regAdapter() {
@@ -52,6 +67,25 @@ class GStrorage {
   static Future<void> lazyInit() async {
     // 视频设置
     video = await Hive.openBox('video');
+  }
+
+  static Future<void> close() async {
+    user.compact();
+    user.close();
+    recVideo.compact();
+    recVideo.close();
+    userInfo.compact();
+    userInfo.close();
+    hotKeyword.compact();
+    hotKeyword.close();
+    historyword.compact();
+    historyword.close();
+    localCache.compact();
+    localCache.close();
+    setting.compact();
+    setting.close();
+    video.compact();
+    video.close();
   }
 }
 
