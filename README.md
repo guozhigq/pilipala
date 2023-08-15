@@ -5,13 +5,11 @@
 
 <div align="center">
     <h1>PiliPala</h1>
-    <p>使用Flutter开发的BiliBili第三方客户端，以下是其中一些页面</p>
+    <p>使用Flutter开发的BiliBili第三方客户端</p>
     <br/>
-    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/home.png" width="19.2%" alt="home" />
-    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/bangumi.png" width="19.2%" alt="bangumi" />
-    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/search.png" width="19.2%" alt="search" />
-    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/bangumi_detail.png" width="19.2%" alt="bangumi_detail" />
-    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/dynamic.png" width="19.2%" alt="dynamic" />
+     <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/510shots_so.png" width="32%" alt="home" />
+    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/174shots_so.png" width="32%" alt="home" />
+    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/850shots_so.png" width="32%" alt="home" />
     <br/>
     <br/>
 </div>
