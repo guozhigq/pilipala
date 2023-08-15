@@ -66,8 +66,13 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['items']) {
-          if (i['card_goto'] != 'ad_av') {
+          // 屏蔽推广和拉黑用户
+          if (i['card_goto'] != 'ad_av' &&
+              (i['args'] != null &&
+                  !blackMidsList.contains(i['args']['up_mid']))) {
             list.add(RecVideoItemAppModel.fromJson(i));
           }
         }
@@ -89,8 +94,12 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['list']) {
-          list.add(HotVideoItemModel.fromJson(i));
+          if (!blackMidsList.contains(i['owner']['mid'])) {
+            list.add(HotVideoItemModel.fromJson(i));
+          }
         }
         return {'status': true, 'data': list};
       } else {

@@ -278,4 +278,7 @@ class Api {
   // 我的订阅
   static const String bangumiFollow =
       '/x/space/bangumi/follow/list?type=1&follow_status=0&pn=1&ps=15&ts=1691544359969';
+
+  // 黑名单
+  static const String blackLst = '/x/relation/blacks';
 }

@@ -117,6 +117,8 @@ class SettingBoxKey {
 
   static const String danmakuEnable = 'danmakuEnable';
   static const String fullScreenMode = 'fullScreenMode';
+
+  static const String blackMidsList = 'blackMidsList';
 }
 
 class LocalCacheKey {
