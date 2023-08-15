@@ -210,41 +210,43 @@ class VideoContent extends StatelessWidget {
                     );
                   }),
                 ),
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    tooltip: '稍后再看',
-                    icon: Icon(
-                      Icons.more_vert_outlined,
-                      color: Theme.of(context).colorScheme.outline,
-                      size: 14,
-                    ),
-                    position: PopupMenuPosition.under,
-                    // constraints: const BoxConstraints(maxHeight: 35),
-                    onSelected: (String type) {},
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        onTap: () async {
-                          var res =
-                              await UserHttp.toViewLater(bvid: videoItem.bvid);
-                          SmartDialog.showToast(res['msg']);
-                        },
-                        value: 'pause',
-                        height: 35,
-                        child: const Row(
-                          children: [
-                            Icon(Icons.watch_later_outlined, size: 16),
-                            SizedBox(width: 6),
-                            Text('稍后再看', style: TextStyle(fontSize: 13))
-                          ],
-                        ),
+                if (videoItem.goto == 'av')
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      tooltip: '稍后再看',
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 14,
                       ),
-                    ],
+                      position: PopupMenuPosition.under,
+                      // constraints: const BoxConstraints(maxHeight: 35),
+                      onSelected: (String type) {},
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            int aid = videoItem.param;
+                            var res = await UserHttp.toViewLater(
+                                bvid: IdUtils.av2bv(aid));
+                            SmartDialog.showToast(res['msg']);
+                          },
+                          value: 'pause',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined, size: 16),
+                              SizedBox(width: 6),
+                              Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
             // Row(

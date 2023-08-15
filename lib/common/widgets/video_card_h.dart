@@ -16,12 +16,14 @@ class VideoCardH extends StatelessWidget {
   final videoItem;
   final Function()? longPress;
   final Function()? longPressEnd;
+  final String source;
 
   const VideoCardH({
     Key? key,
     required this.videoItem,
     this.longPress,
     this.longPressEnd,
+    this.source = 'normal',
   }) : super(key: key);
 
   @override
@@ -92,7 +94,7 @@ class VideoCardH extends StatelessWidget {
                         },
                       ),
                     ),
-                    VideoContent(videoItem: videoItem)
+                    VideoContent(videoItem: videoItem, source: source)
                   ],
                 ),
               );
@@ -107,7 +109,9 @@ class VideoCardH extends StatelessWidget {
 class VideoContent extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
-  const VideoContent({super.key, required this.videoItem});
+  final String source;
+  const VideoContent(
+      {super.key, required this.videoItem, this.source = 'normal'});
 
   @override
   Widget build(BuildContext context) {
@@ -217,41 +221,42 @@ class VideoContent extends StatelessWidget {
                 //     ),
                 //   ),
                 // ),
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    tooltip: '稍后再看',
-                    icon: Icon(
-                      Icons.more_vert_outlined,
-                      color: Theme.of(context).colorScheme.outline,
-                      size: 14,
-                    ),
-                    position: PopupMenuPosition.under,
-                    // constraints: const BoxConstraints(maxHeight: 35),
-                    onSelected: (String type) {},
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        onTap: () async {
-                          var res =
-                              await UserHttp.toViewLater(bvid: videoItem.bvid);
-                          SmartDialog.showToast(res['msg']);
-                        },
-                        value: 'pause',
-                        height: 35,
-                        child: const Row(
-                          children: [
-                            Icon(Icons.watch_later_outlined, size: 16),
-                            SizedBox(width: 6),
-                            Text('稍后再看', style: TextStyle(fontSize: 13))
-                          ],
-                        ),
+                if (source == 'normal')
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      tooltip: '稍后再看',
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 14,
                       ),
-                    ],
+                      position: PopupMenuPosition.under,
+                      // constraints: const BoxConstraints(maxHeight: 35),
+                      onSelected: (String type) {},
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            var res = await UserHttp.toViewLater(
+                                bvid: videoItem.bvid);
+                            SmartDialog.showToast(res['msg']);
+                          },
+                          value: 'pause',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined, size: 16),
+                              SizedBox(width: 6),
+                              Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ],
