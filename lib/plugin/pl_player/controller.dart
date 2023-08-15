@@ -540,7 +540,10 @@ class PlPlayerController {
 
   /// 音量
   Future<void> getCurrentVolume() async {
-    _currentVolume.value = await VolumeController().getVolume();
+    // mac try...catch
+    try {
+      _currentVolume.value = await VolumeController().getVolume();
+    } catch (_) {}
   }
 
   Future<void> setVolume(double volumeNew,

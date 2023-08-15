@@ -98,7 +98,7 @@ dependencies:
   media_kit_libs_ios_video: ^1.1.2               # iOS package for video native libraries.
   media_kit_libs_macos_video: ^1.1.2             # macOS package for video native libraries.
   media_kit_libs_windows_video: ^1.0.6           # Windows package for video native libraries.
-  media_kit_libs_linux: ^1.1.0
+  media_kit_libs_linux: ^1.1.0 
   
   # 音量、亮度、屏幕控制
   volume_controller: ^2.0.7
@@ -128,16 +128,19 @@ dev_dependencies:
   hive_generator: ^2.0.0
   build_runner: ^2.3.3
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  remove_alpha_ios: false
+  remove_alpha_ios: true
   image_path: assets/images/logo/logo_android_2.png
   image_path_android: assets/images/logo/logo_android_2.png
   image_path_ios: assets/images/logo/logo_ios.png
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: assets/images/logo/logo_android_2.png
   adaptive_icon_monochrome: assets/images/logo/logo_android_2.png
+  macos:
+    generate: true
+    image_path: assets/images/logo/logo_ios.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
