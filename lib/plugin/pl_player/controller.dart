@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/plugin/pl_player/models/data_source.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -73,6 +74,12 @@ class PlPlayerController {
   PlaylistMode _looping = PlaylistMode.none;
   bool _autoPlay = false;
   final bool _listenersInitialized = false;
+
+  // 记录历史记录
+  String _bvid = '';
+  int _cid = 0;
+  int _heartDuration = 0;
+  bool _enableHeart = true;
 
   Timer? _timer;
   Timer? _timerForSeek;
@@ -228,7 +235,11 @@ class PlPlayerController {
     Duration? duration,
     // 方向
     String? direction,
-    // 全屏模式
+    // 记录历史记录
+    String bvid = '',
+    int cid = 0,
+    // 历史记录开关
+    bool enableHeart = true,
   }) async {
     try {
       _autoPlay = autoplay;
@@ -239,6 +250,9 @@ class PlPlayerController {
       dataStatus.status.value = DataStatus.loading;
       // 初始化全屏方向
       _direction.value = direction ?? 'horizontal';
+      _bvid = bvid;
+      _cid = cid;
+      _enableHeart = enableHeart;
 
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
@@ -277,6 +291,9 @@ class PlPlayerController {
     removeListeners();
     isBuffering.value = false;
     buffered.value = Duration.zero;
+    _heartDuration = 0;
+    _position.value = Duration.zero;
+
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -383,6 +400,7 @@ class PlPlayerController {
           } else {
             // playerStatus.status.value = PlayerStatus.paused;
           }
+          makeHeartBeat(_position.value.inSeconds, type: 'status');
         }),
         videoPlayerController!.stream.completed.listen((event) {
           if (event) {
@@ -390,12 +408,14 @@ class PlPlayerController {
           } else {
             // playerStatus.status.value = PlayerStatus.playing;
           }
+          makeHeartBeat(_position.value.inSeconds, type: 'status');
         }),
         videoPlayerController!.stream.position.listen((event) {
           _position.value = event;
           if (!isSliderMoving.value) {
             _sliderPosition.value = event;
           }
+          makeHeartBeat(event.inSeconds);
         }),
         videoPlayerController!.stream.duration.listen((event) {
           duration.value = event;
@@ -684,10 +704,36 @@ class PlPlayerController {
     videoFitChangedTimer?.cancel();
   }
 
+  // 记录播放记录
+  Future makeHeartBeat(progress, {type = 'playing'}) async {
+    if (!_enableHeart) {
+      return false;
+    }
+    // 播放状态变化时，更新
+    if (type == 'status') {
+      await VideoHttp.heartBeat(
+        bvid: _bvid,
+        cid: _cid,
+        progress:
+            playerStatus.status.value == PlayerStatus.completed ? -1 : progress,
+      );
+    } else
+    // 正常播放时，间隔5秒更新一次
+    if (progress - _heartDuration >= 5) {
+      _heartDuration = progress;
+      await VideoHttp.heartBeat(
+        bvid: _bvid,
+        cid: _cid,
+        progress: progress,
+      );
+    }
+  }
+
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
     if (type == 'single') {
       _playerCount.value -= 1;
+      _heartDuration = 0;
       if (playerCount.value > 0) {
         return;
       }

@@ -61,7 +61,6 @@ class VideoDetailController extends GetxController
 
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  Timer? timer;
   RxString bgCover = ''.obs;
   PlPlayerController plPlayerController = PlPlayerController.getInstance();
 
@@ -69,6 +68,8 @@ class VideoDetailController extends GetxController
   late String videoUrl;
   late String audioUrl;
   late Duration defaultST;
+  // 默认记录历史记录
+  bool enableHeart = true;
 
   @override
   void onInit() {
@@ -90,6 +91,11 @@ class VideoDetailController extends GetxController
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
+
+    if (user.get(UserBoxKey.userMid) == null ||
+        localCache.get(LocalCacheKey.historyPause) == true) {
+      enableHeart = false;
+    }
   }
 
   showReplyReplyPanel() {
@@ -164,6 +170,9 @@ class VideoDetailController extends GetxController
           : 'vertical',
       // 默认1倍速
       speed: 1.0,
+      bvid: bvid,
+      cid: cid,
+      enableHeart: enableHeart,
     );
   }
 
@@ -264,35 +273,5 @@ class VideoDetailController extends GetxController
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;
-  }
-
-  void loopHeartBeat() {
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      markHeartBeat();
-    });
-  }
-
-  void markHeartBeat() async {
-    if (user.get(UserBoxKey.userMid) == null) {
-      return;
-    }
-    if (localCache.get(LocalCacheKey.historyStatus) == true) {
-      return;
-    }
-    Duration progress = plPlayerController.position.value;
-    await VideoHttp.heartBeat(
-      bvid: bvid,
-      cid: cid,
-      progress: progress.inSeconds,
-    );
-  }
-
-  @override
-  void onClose() {
-    markHeartBeat();
-    if (timer != null && timer!.isActive) {
-      timer!.cancel();
-    }
-    super.onClose();
   }
 }

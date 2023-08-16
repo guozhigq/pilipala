@@ -70,6 +70,7 @@ class HistoryController extends GetxController {
                   SmartDialog.showToast(
                       !pauseStatus.value ? '暂停观看历史' : '恢复观看历史');
                   pauseStatus.value = !pauseStatus.value;
+                  localCache.put(LocalCacheKey.historyPause, pauseStatus.value);
                 }
                 SmartDialog.dismiss();
               },
@@ -85,7 +86,7 @@ class HistoryController extends GetxController {
   Future historyStatus() async {
     var res = await UserHttp.historyStatus();
     pauseStatus.value = res.data['data'];
-    localCache.put(LocalCacheKey.historyStatus, res.data['data']);
+    localCache.put(LocalCacheKey.historyPause, res.data['data']);
   }
 
   // 清空观看历史

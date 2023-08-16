@@ -122,8 +122,8 @@ class SettingBoxKey {
 }
 
 class LocalCacheKey {
-  // 历史记录暂停状态 默认false
-  static const String historyStatus = 'historyStatus';
+  // 历史记录暂停状态 默认false 记录
+  static const String historyPause = 'historyPause';
 }
 
 class VideoBoxKey {

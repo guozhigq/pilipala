@@ -70,15 +70,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void playerListener() {
     plPlayerController!.onPlayerStatusChanged.listen(
       (PlayerStatus status) async {
-        videoDetailController.markHeartBeat();
         playerStatus = status;
         if (status == PlayerStatus.playing) {
           videoDetailController.isShowCover.value = false;
-          videoDetailController.loopHeartBeat();
         } else {
-          if (videoDetailController.timer != null) {
-            videoDetailController.timer!.cancel();
-          }
           // 播放完成停止 or 切换下一个
           if (status == PlayerStatus.completed) {
             // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
@@ -102,18 +97,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void dispose() {
     plPlayerController!.pause();
     plPlayerController!.dispose();
-    if (videoDetailController.timer != null) {
-      videoDetailController.timer!.cancel();
-    }
     super.dispose();
   }
 
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if (videoDetailController.timer!.isActive) {
-      videoDetailController.timer!.cancel();
-    }
     videoDetailController.defaultST = plPlayerController!.position.value;
     plPlayerController!.pause();
     super.didPushNext();
@@ -126,9 +115,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();
-    }
-    if (!videoDetailController.timer!.isActive) {
-      videoDetailController.loopHeartBeat();
     }
     super.didPopNext();
   }
