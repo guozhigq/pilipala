@@ -324,18 +324,27 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       SearchType.media_bangumi) ...[
                                     const BangumiIntroPanel()
                                   ],
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    SliverPersistentHeader(
-                                      floating: true,
-                                      pinned: true,
-                                      delegate: SliverHeaderDelegate(
-                                        height: 50,
-                                        child:
-                                            const MenuRow(loadingStatus: false),
-                                      ),
+                                  // if (videoDetailController.videoType ==
+                                  //     SearchType.video) ...[
+                                  //   SliverPersistentHeader(
+                                  //     floating: true,
+                                  //     pinned: true,
+                                  //     delegate: SliverHeaderDelegate(
+                                  //       height: 50,
+                                  //       child:
+                                  //           const MenuRow(loadingStatus: false),
+                                  //     ),
+                                  //   ),
+                                  // ],
+                                  SliverToBoxAdapter(
+                                    child: Divider(
+                                      indent: 12,
+                                      endIndent: 12,
+                                      color: Theme.of(context)
+                                          .dividerColor
+                                          .withOpacity(0.06),
                                     ),
-                                  ],
+                                  ),
                                   const RelatedVideoPanel(),
                                 ],
                               );
