@@ -39,7 +39,7 @@ class PlPlayerController {
   ///
   final PlPlayerDataStatus dataStatus = PlPlayerDataStatus();
 
-  bool controlsEnabled = true;
+  // bool controlsEnabled = false;
 
   /// 响应数据
   // 播放位置
@@ -62,6 +62,8 @@ class PlPlayerController {
   final Rx<bool> _doubleSpeedStatus = false.obs;
   final Rx<bool> _controlsLock = false.obs;
   final Rx<bool> _isFullScreen = false.obs;
+  // 默认投稿视频格式
+  static Rx<String> _videoType = 'archive'.obs;
 
   final Rx<String> _direction = 'horizontal'.obs;
 
@@ -188,9 +190,12 @@ class PlPlayerController {
 
   Rx<int> get playerCount => _playerCount;
 
+  ///
+  Rx<String> get videoType => _videoType;
+
   // 添加一个私有构造函数
   PlPlayerController._() {
-    controlsEnabled = controlsEnabled;
+    _videoType = videoType;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -202,7 +207,7 @@ class PlPlayerController {
 
   // 获取实例 传参
   static PlPlayerController getInstance({
-    bool controlsEnabled = true,
+    String videoType = 'archive',
     List<BoxFit> fits = const [
       BoxFit.contain,
       BoxFit.cover,
@@ -215,6 +220,7 @@ class PlPlayerController {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
     _instance!._playerCount.value += 1;
+    _videoType.value = videoType;
     return _instance!;
   }
 
@@ -672,9 +678,18 @@ class PlPlayerController {
     }
   }
 
-  /// 设置长按倍速状态
+  /// 设置长按倍速状态 live模式下禁用
   void setDoubleSpeedStatus(bool val) {
+    if (videoType.value == 'live') {
+      return;
+    }
     _doubleSpeedStatus.value = val;
+    double currentSpeed = playbackSpeed;
+    if (val) {
+      setPlaybackSpeed(currentSpeed * 2);
+    } else {
+      setPlaybackSpeed(currentSpeed / 2);
+    }
   }
 
   /// 关闭控制栏

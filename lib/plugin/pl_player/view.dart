@@ -262,7 +262,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
-        /// 长按倍速
+        /// 长按倍速 toast
         Obx(
           () => Align(
             alignment: Alignment.topCenter,
@@ -301,7 +301,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
-        /// 时间进度
+        /// 时间进度 toast
         Obx(
           () => Align(
             alignment: Alignment.topCenter,
@@ -482,6 +482,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.controls = !_.showControls.value;
             },
             onDoubleTapDown: (details) {
+              // live模式下禁用
+              if (_.videoType.value == 'live') {
+                return;
+              }
               final totalWidth = MediaQuery.of(context).size.width;
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
@@ -501,17 +505,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             },
             onLongPressStart: (detail) {
               feedBack();
-              double currentSpeed = _.playbackSpeed;
               _.setDoubleSpeedStatus(true);
-              _.setPlaybackSpeed(currentSpeed * 2);
             },
             onLongPressEnd: (details) {
-              double currentSpeed = _.playbackSpeed;
               _.setDoubleSpeedStatus(false);
-              _.setPlaybackSpeed(currentSpeed / 2);
             },
-            // 水平位置 快进
+
+            /// 水平位置 快进 live模式下禁用
             onHorizontalDragUpdate: (DragUpdateDetails details) {
+              if (_.videoType.value == 'live') {
+                return;
+              }
               final tapPosition = details.localPosition.dx;
               int curSliderPosition = _.sliderPosition.value.inSeconds;
               late int result;
@@ -530,6 +534,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _initTapPositoin = tapPosition;
             },
             onHorizontalDragEnd: (DragEndDetails details) {
+              if (_.videoType.value == 'live') {
+                return;
+              }
               _.onChangedSliderEnd();
               _.seekTo(_.sliderPosition.value);
             },
@@ -562,8 +569,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   _distance = 0.0;
                 }
                 _distance = dy;
-
-                // triggerFullScreen();
               } else {
                 // 右边区域 👈
                 final volume = _volumeValue - delta / 100.0;
@@ -576,9 +581,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        if (_.controlsEnabled)
-          Obx(
-            () => Column(
+        Obx(
+          () => Visibility(
+            visible: _.videoType.value != 'live',
+            child: Column(
               children: [
                 if (widget.headerControl != null)
                   ClipRect(
@@ -605,7 +611,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ],
             ),
           ),
-        // 进度条
+        ),
+
+        /// 进度条 live模式下禁用
         Obx(
           () {
             final int value = _.sliderPosition.value.inSeconds;
@@ -658,9 +666,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 锁
-        if (_.controlsEnabled)
-          Obx(
-            () => Align(
+        Obx(
+          () => Visibility(
+            visible: _.videoType.value != 'live',
+            child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
                 translation: const Offset(0.5, 0.0),
@@ -680,6 +689,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ),
             ),
           ),
+        ),
         //
         Obx(() {
           if (_.dataStatus.loading || _.isBuffering.value) {
