@@ -108,7 +108,7 @@ dependencies:
   # 进度条
   audio_video_progress_bar: ^1.0.1
   animations: ^2.0.7
-  # auto_orientation: ^2.3.1
+  auto_orientation: ^2.3.1
   
   # 获取appx信息
   package_info_plus: ^4.1.0

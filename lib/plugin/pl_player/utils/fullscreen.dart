@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-// import 'package:auto_orientation/auto_orientation.dart';
+import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/services.dart';
 
 //横屏
 /// 低版本xcode不支持auto_orientation
-// Future<void> landScape() async {
-//   if (Platform.isAndroid || Platform.isIOS) {
-//     await AutoOrientation.landscapeAutoMode(forceSensor: true);
-//   }
-// }
+Future<void> landScape() async {
+  if (Platform.isAndroid || Platform.isIOS) {
+    await AutoOrientation.landscapeAutoMode(forceSensor: true);
+  }
+}
 
 //竖屏
 Future<void> verticalScreen() async {
