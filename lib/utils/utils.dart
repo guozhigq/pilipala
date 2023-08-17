@@ -178,4 +178,20 @@ class Utils {
     } catch (_) {}
     return closestNumber;
   }
+
+  // 版本对比
+  static bool needUpdate(localVersion, remoteVersion) {
+    List<String> localVersionList = localVersion.split('.');
+    List<String> remoteVersionList = remoteVersion.split('v')[1].split('.');
+    for (int i = 0; i < localVersionList.length; i++) {
+      int localVersion = int.parse(localVersionList[i]);
+      int remoteVersion = int.parse(remoteVersionList[i]);
+      if (remoteVersion > localVersion) {
+        return true;
+      } else if (remoteVersion < localVersion) {
+        return false;
+      }
+    }
+    return false;
+  }
 }

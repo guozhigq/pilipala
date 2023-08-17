@@ -49,6 +49,11 @@ class SettingPage extends StatelessWidget {
               ),
             ),
           ),
+          ListTile(
+            onTap: () => Get.toNamed('/about'),
+            dense: false,
+            title: const Text('关于'),
+          ),
         ],
       ),
     );

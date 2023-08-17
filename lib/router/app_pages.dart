@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pilipala/pages/about/index.dart';
 import 'package:pilipala/pages/blacklist/index.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
@@ -82,5 +83,7 @@ class Routes {
 
     //
     GetPage(name: '/blackListPage', page: () => const BlackListPage()),
+    // 关于
+    GetPage(name: '/about', page: () => const AboutPage()),
   ];
 }

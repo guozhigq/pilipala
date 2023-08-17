@@ -281,4 +281,8 @@ class Api {
 
   // 黑名单
   static const String blackLst = '/x/relation/blacks';
+
+  // github 获取最新版
+  static const String latestApp =
+      'https://api.github.com/repos/guozhigq/pilipala/releases/latest';
 }

@@ -110,6 +110,10 @@ dependencies:
   animations: ^2.0.7
   # auto_orientation: ^2.3.1
   
+  # 获取appx信息
+  package_info_plus: ^4.1.0
+  url_launcher: ^6.1.12
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
