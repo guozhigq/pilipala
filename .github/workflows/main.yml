@@ -59,16 +59,16 @@ jobs:
               id: version
               run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
 
-            - name: 获取当前日期
-              id: date
-              run: echo "date=$(date +'%m%d')" >>$GITHUB_OUTPUT
+            # - name: 获取当前日期
+            #   id: date
+            #   run: echo "date=$(date +'%m%d')" >>$GITHUB_OUTPUT
 
             - name: 重命名应用 Pili-arm64-v8a-*.*.*.0101.apk
               run: |
-                DATE=${{ steps.date.outputs.date }}
+                # DATE=${{ steps.date.outputs.date }}
                 for file in build/app/outputs/flutter-apk/app-*-release.apk; do
                   if [[ $file =~ app-(.*)-release.apk ]]; then
-                    new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}-${{ steps.version.outputs.version }}($DATE).apk"
+                    new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}-${{ steps.version.outputs.version }}.apk"
                     mv "$file" "$new_file_name"
                   fi
                 done
