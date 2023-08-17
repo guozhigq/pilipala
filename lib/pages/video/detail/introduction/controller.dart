@@ -414,6 +414,7 @@ class VideoIntroController extends GetxController {
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
     this.bvid = bvid;
+    lastPlayCid.value = cid;
     await queryVideoIntro();
   }
 }
