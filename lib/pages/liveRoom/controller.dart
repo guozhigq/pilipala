@@ -74,12 +74,10 @@ class LiveRoomController extends GetxController {
     if (value == 0) {
       // 设置音量
       volumeOff.value = false;
-      // meeduPlayerController.setVolume(volume);
     } else {
       // 取消音量
       volume = value;
       volumeOff.value = true;
-      // meeduPlayerController.setVolume(0);
     }
   }
 }

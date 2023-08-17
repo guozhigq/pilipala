@@ -101,7 +101,7 @@ dependencies:
   media_kit_libs_linux: ^1.1.1 
   
   # 音量、亮度、屏幕控制
-  volume_controller: ^2.0.7
+  flutter_volume_controller: ^1.2.7
   screen_brightness: ^0.2.2
   wakelock_plus: ^1.1.1
   universal_platform: ^1.0.0+1

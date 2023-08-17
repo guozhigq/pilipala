@@ -459,6 +459,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      sha256: "950e77c2bbe1692bc0874fc7fb491b96a4dc340457f4ea1641443d0a6c1ea360"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.15"
   flutter_smart_dialog:
     dependency: "direct main"
     description:
@@ -472,6 +480,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_volume_controller:
+    dependency: "direct main"
+    description:
+      name: flutter_volume_controller
+      sha256: "7f88cb046b00fd80e98bcb7926b9e3879f004f30905109fdf6c5d09b8d28eb2e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.7"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1283,7 +1299,7 @@ packages:
     source: hosted
     version: "0.4.0+2"
   volume_controller:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: volume_controller
       sha256: "189bdc7a554f476b412e4c8b2f474562b09d74bc458c23667356bce3ca1d48c9"

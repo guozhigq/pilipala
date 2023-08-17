@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
@@ -15,7 +16,6 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:volume_controller/volume_controller.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'models/data_status.dart';
@@ -569,7 +569,7 @@ class PlPlayerController {
   Future<void> getCurrentVolume() async {
     // mac try...catch
     try {
-      _currentVolume.value = await VolumeController().getVolume();
+      _currentVolume.value = (await FlutterVolumeController.getVolume())!;
     } catch (_) {}
   }
 
@@ -586,7 +586,8 @@ class PlPlayerController {
     volume.value = volumeNew;
 
     try {
-      VolumeController().setVolume(volumeNew, showSystemUI: false);
+      FlutterVolumeController.showSystemUI = false;
+      await FlutterVolumeController.setVolume(volumeNew);
     } catch (err) {
       print(err);
     }

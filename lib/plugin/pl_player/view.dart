@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -16,7 +17,6 @@ import 'package:pilipala/plugin/pl_player/utils.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-import 'package:volume_controller/volume_controller.dart';
 
 import 'utils/fullscreen.dart';
 import 'widgets/app_bar_ani.dart';
@@ -90,9 +90,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
     Future.microtask(() async {
       try {
-        VolumeController().showSystemUI = false;
-        _volumeValue = await VolumeController().getVolume();
-        VolumeController().listener((value) {
+        FlutterVolumeController.showSystemUI = true;
+        _volumeValue = (await FlutterVolumeController.getVolume())!;
+        FlutterVolumeController.addListener((value) {
           if (mounted && !_volumeInterceptEventStream) {
             setState(() {
               _volumeValue = value;
@@ -118,7 +118,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Future<void> setVolume(double value) async {
     try {
-      VolumeController().setVolume(value);
+      FlutterVolumeController.showSystemUI = false;
+      await FlutterVolumeController.setVolume(value);
     } catch (_) {}
     setState(() {
       _volumeValue = value;
