@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
@@ -68,7 +69,7 @@ class PlPlayerController {
   final Rx<String> _direction = 'horizontal'.obs;
 
   Rx<bool> videoFitChanged = false.obs;
-  final Rx<BoxFit> _videoFit = Rx(BoxFit.fill);
+  final Rx<BoxFit> _videoFit = Rx(BoxFit.contain);
 
   ///
   // ignore: prefer_final_fields
@@ -93,13 +94,13 @@ class PlPlayerController {
 
   // final Durations durations;
 
-  List<BoxFit> fits = [
-    BoxFit.contain,
-    BoxFit.cover,
-    BoxFit.fill,
-    BoxFit.fitHeight,
-    BoxFit.fitWidth,
-    BoxFit.scaleDown
+  List<Map<String, dynamic>> videoFitType = [
+    {'attr': BoxFit.contain, 'desc': '包含'},
+    {'attr': BoxFit.cover, 'desc': '覆盖'},
+    {'attr': BoxFit.fill, 'desc': '填充'},
+    {'attr': BoxFit.fitHeight, 'desc': '高度适应'},
+    {'attr': BoxFit.fitWidth, 'desc': '宽度适应'},
+    {'attr': BoxFit.scaleDown, 'desc': '缩小适应'},
   ];
 
   PreferredSizeWidget? headerControl;
@@ -631,10 +632,17 @@ class PlPlayerController {
   void toggleVideoFit() {
     videoFitChangedTimer?.cancel();
     videoFitChanged.value = true;
-    if (fits.indexOf(_videoFit.value) < fits.length - 1) {
-      _videoFit.value = fits[fits.indexOf(_videoFit.value) + 1];
+    // 范围内
+    List attrs = videoFitType.map((e) => e['attr']).toList();
+    if (attrs.indexOf(_videoFit.value) < attrs.length - 1) {
+      int index = attrs.indexOf(_videoFit.value);
+      _videoFit.value = attrs[index + 1];
+      print(videoFitType[index + 1]['desc']);
+      SmartDialog.showToast(videoFitType[index + 1]['desc']);
     } else {
-      _videoFit.value = fits[0];
+      // 默认 contain
+      _videoFit.value = videoFitType.first['attr'];
+      SmartDialog.showToast(videoFitType.first['desc']);
     }
     videoFitChangedTimer = Timer(const Duration(seconds: 1), () {
       videoFitChangedTimer = null;
@@ -655,9 +663,10 @@ class PlPlayerController {
 
   /// 读取fit
   Future<void> getVideoFit() async {
-    String fitValue = videoStorage.get(VideoBoxKey.videoBrightness,
-        defaultValue: 'fitHeight');
-    _videoFit.value = fits.firstWhere((element) => element.name == fitValue);
+    String fitValue =
+        videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
+    _videoFit.value = videoFitType
+        .firstWhere((element) => element['attr'] == fitValue)['attr'];
   }
 
   /// 缓存亮度
