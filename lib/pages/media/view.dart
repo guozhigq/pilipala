@@ -116,7 +116,11 @@ class _MediaPageState extends State<MediaPage>
             ),
           ),
           trailing: IconButton(
-            onPressed: () => _futureBuilderFuture,
+            onPressed: () {
+              setState(() {
+                _futureBuilderFuture = mediaController.queryFavFolder();
+              });
+            },
             icon: const Icon(
               Icons.refresh,
               size: 20,

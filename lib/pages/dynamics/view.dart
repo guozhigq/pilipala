@@ -224,7 +224,14 @@ class _DynamicsPageState extends State<DynamicsPage>
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
-                      fn: () => _dynamicsController.onRefresh(),
+                      fn: () {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _dynamicsController.queryFollowDynamic();
+                          _futureBuilderFutureUp =
+                              _dynamicsController.queryFollowUp();
+                        });
+                      },
                     );
                   }
                 } else {

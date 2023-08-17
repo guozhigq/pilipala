@@ -145,7 +145,10 @@ class DynamicsController extends GetxController {
     }
   }
 
-  Future queryFollowUp() async {
+  Future queryFollowUp({type = 'init'}) async {
+    if (type == 'init') {
+      upData = FollowUpModel().obs;
+    }
     var res = await DynamicsHttp.followUp();
     if (res['status']) {
       upData.value = res['data'];

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -86,12 +87,28 @@ class WebviewController extends GetxController {
                     Get.find<MineController>().userInfo.value = result['data'];
                     Get.find<MineController>().onInit();
                     Get.find<RcmdController>().queryRcmdFeed('onRefresh');
-                    Get.find<DynamicsController>().queryFollowDynamic();
+                    Get.find<DynamicsController>().onRefresh();
 
                     HomeController homeCtr = Get.find<HomeController>();
                     homeCtr.updateLoginStatus(true);
-                  } catch (_) {}
+                  } catch (err) {
+                    SmartDialog.show(builder: (context) {
+                      return AlertDialog(
+                        title: const Text('登录遇到问题'),
+                        content: Text(err.toString()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => controller.reload(),
+                            child: const Text('确认'),
+                          )
+                        ],
+                      );
+                    });
+                  }
                   Get.back();
+                } else {
+                  // 获取用户信息失败
+                  SmartDialog.showToast(result.msg);
                 }
               } catch (e) {
                 print(e);
