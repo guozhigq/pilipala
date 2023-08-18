@@ -248,6 +248,9 @@ class Api {
   // 移除已观看
   static const String toViewDel = '/x/v2/history/toview/del';
 
+  // 清空稍后再看
+  static const String toViewClear = '/x/v2/history/toview/clear';
+
   // 追番
   static const String bangumiAdd = '/pgc/web/follow/add';
 

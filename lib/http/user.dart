@@ -85,6 +85,12 @@ class UserHttp {
   static Future<dynamic> seeYouLater() async {
     var res = await Request().get(Api.seeYouLater);
     if (res.data['code'] == 0) {
+      if (res.data['data']['count'] == 0) {
+        return {
+          'status': true,
+          'data': {'list': [], 'count': 0}
+        };
+      }
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']['list']) {
         list.add(HotVideoItemModel.fromJson(i));
@@ -193,6 +199,22 @@ class UserHttp {
     );
     if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
       Request().get(res.data['data']['confirm_uri']);
+    }
+  }
+
+  // 清空稍后再看
+  static Future toViewClear() async {
+    var res = await Request().post(
+      Api.toViewClear,
+      queryParameters: {
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '操作完成'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
     }
   }
 }
