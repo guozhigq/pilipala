@@ -37,11 +37,11 @@ class VideoCardH extends StatelessWidget {
           longPress!();
         }
       },
-      onLongPressEnd: (details) {
-        if (longPressEnd != null) {
-          longPressEnd!();
-        }
-      },
+      // onLongPressEnd: (details) {
+      //   if (longPressEnd != null) {
+      //     longPressEnd!();
+      //   }
+      // },
       child: InkWell(
         onTap: () async {
           try {

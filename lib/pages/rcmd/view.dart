@@ -128,7 +128,9 @@ class _RcmdPageState extends State<RcmdPage>
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        child: OverlayPop(videoItem: videoItem),
+        closeFn: _rcmdController.popupDialog?.remove,
+        child: OverlayPop(
+            videoItem: videoItem, closeFn: _rcmdController.popupDialog?.remove),
       ),
     );
   }

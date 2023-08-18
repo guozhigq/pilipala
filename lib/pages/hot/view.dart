@@ -126,7 +126,9 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        child: OverlayPop(videoItem: videoItem),
+        closeFn: _hotController.popupDialog?.remove,
+        child: OverlayPop(
+            videoItem: videoItem, closeFn: _hotController.popupDialog?.remove),
       ),
     );
   }

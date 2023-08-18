@@ -35,11 +35,11 @@ class LiveCardV extends StatelessWidget {
             longPress!();
           }
         },
-        onLongPressEnd: (details) {
-          if (longPressEnd != null) {
-            longPressEnd!();
-          }
-        },
+        // onLongPressEnd: (details) {
+        //   if (longPressEnd != null) {
+        //     longPressEnd!();
+        //   }
+        // },
         child: InkWell(
           onTap: () async {
             Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',

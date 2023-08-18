@@ -113,7 +113,9 @@ class _LivePageState extends State<LivePage> {
   OverlayEntry _createPopupDialog(liveItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        child: OverlayPop(videoItem: liveItem),
+        closeFn: _liveController.popupDialog?.remove,
+        child: OverlayPop(
+            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
       ),
     );
   }
