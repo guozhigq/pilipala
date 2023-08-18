@@ -30,7 +30,7 @@ class SettingController extends GetxController {
   }
 
   loginOut() async {
-    await Request.removeCookie();
+    await Request.cookieManager.cookieJar.deleteAll();
     await Get.find<MineController>().resetUserInfo();
     userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
     userInfoCache.put('userInfoCache', null);

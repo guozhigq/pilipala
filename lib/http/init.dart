@@ -15,17 +15,8 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 class Request {
   static final Request _instance = Request._internal();
   static late CookieManager cookieManager;
-
+  static late final Dio dio;
   factory Request() => _instance;
-
-  static Dio dio = Dio()
-    ..httpClientAdapter = Http2Adapter(
-      ConnectionManager(
-        idleTimeout: const Duration(milliseconds: 10000),
-        // Ignore bad certificate
-        onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
-      ),
-    );
 
   /// 设置cookie
   static setCookie() async {
@@ -61,16 +52,6 @@ class Request {
     var cookieString =
         cookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
     dio.options.headers['cookie'] = cookieString;
-  }
-
-  // 移除cookie
-  static removeCookie() async {
-    await cookieManager.cookieJar
-        .saveFromResponse(Uri.parse(HttpString.baseUrl), []);
-    await cookieManager.cookieJar
-        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), []);
-    cookieManager.cookieJar.deleteAll();
-    dio.interceptors.add(cookieManager);
   }
 
   // 从cookie中获取 csrf token
@@ -114,7 +95,16 @@ class Request {
       options.headers['x-bili-aurora-zone'] = 'sh001';
       options.headers['referer'] = 'https://www.bilibili.com/';
     }
-    dio.options = options;
+
+    dio = Dio(options)
+      ..httpClientAdapter = Http2Adapter(
+        ConnectionManager(
+          idleTimeout: const Duration(milliseconds: 10000),
+          // Ignore bad certificate
+          onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
+        ),
+      );
+
     //添加拦截器
     dio.interceptors.add(ApiInterceptor());
 

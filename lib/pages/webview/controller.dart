@@ -59,16 +59,7 @@ class WebviewController extends GetxController {
                         'https://passport.bilibili.com/web/sso/exchange_cookie') ||
                     url.startsWith('https://m.bilibili.com/'))) {
               try {
-                var cookies =
-                    await WebviewCookieManager().getCookies(HttpString.baseUrl);
-                var apiCookies = await WebviewCookieManager()
-                    .getCookies(HttpString.baseApiUrl);
-                var tCookies =
-                    await WebviewCookieManager().getCookies(HttpString.tUrl);
-                await SetCookie.onSet(cookies, HttpString.baseUrl);
-                await SetCookie.onSet(apiCookies, HttpString.baseApiUrl);
-                await SetCookie.onSet(tCookies, HttpString.tUrl);
-                await UserHttp.userInfo();
+                await SetCookie.onSet();
                 var result = await UserHttp.userInfo();
                 UserHttp.thirdLogin();
                 print('网页登录： $result');
