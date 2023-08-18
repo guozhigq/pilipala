@@ -5,11 +5,14 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -142,6 +145,32 @@ class DynamicsController extends GetxController {
       /// TODO
       case 'DYNAMIC_TYPE_UGC_SEASON':
         print('合集');
+        break;
+      case 'DYNAMIC_TYPE_PGC_UNION':
+        print('DYNAMIC_TYPE_PGC_UNION 番剧');
+        DynamicArchiveModel pgc = item.modules.moduleDynamic.major.pgc;
+        if (pgc.epid != null) {
+          SmartDialog.showLoading(msg: '获取中...');
+          var res = await SearchHttp.bangumiInfo(epId: pgc.epid);
+          SmartDialog.dismiss();
+          if (res['status']) {
+            EpisodeItem episode = res['data'].episodes.first;
+            String bvid = episode.bvid!;
+            int cid = episode.cid!;
+            String pic = episode.cover!;
+            String heroTag = Utils.makeHeroTag(cid);
+            Get.toNamed(
+              '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
+              arguments: {
+                'pic': pic,
+                'heroTag': heroTag,
+                'videoType': SearchType.media_bangumi,
+                'bangumiItem': res['data'],
+              },
+            );
+          }
+        }
+        break;
     }
   }
 
