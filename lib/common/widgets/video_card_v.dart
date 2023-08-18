@@ -14,8 +14,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final videoItem;
+  final dynamic videoItem;
   final Function()? longPress;
   final Function()? longPressEnd;
 
@@ -89,48 +88,20 @@ class VideoCardV extends StatelessWidget {
           onTap: () async => onPushDetail(heroTag),
           child: Column(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: StyleString.imgRadius,
-                  topRight: StyleString.imgRadius,
-                  bottomLeft: StyleString.imgRadius,
-                  bottomRight: StyleString.imgRadius,
-                ),
-                child: AspectRatio(
-                  aspectRatio: StyleString.aspectRatio,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
-                          tag: heroTag,
-                          child: NetworkImgLayer(
-                            src: videoItem.pic,
-                            width: maxWidth,
-                            height: maxHeight,
-                          ),
-                        ),
-                        // if (videoItem.stat.view is int &&
-                        //     videoItem.stat.danmaku is int)
-                        //   Positioned(
-                        //     left: 0,
-                        //     right: 0,
-                        //     bottom: 0,
-                        //     child: AnimatedOpacity(
-                        //       opacity: 1,
-                        //       duration: const Duration(milliseconds: 200),
-                        //       child: VideoStat(
-                        //         view: videoItem.stat.view,
-                        //         danmaku: videoItem.stat.danmaku,
-                        //         duration: videoItem.duration,
-                        //       ),
-                        //     ),
-                        //   ),
-                      ],
-                    );
-                  }),
-                ),
+              AspectRatio(
+                aspectRatio: StyleString.aspectRatio,
+                child: LayoutBuilder(builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
+                  return Hero(
+                    tag: heroTag,
+                    child: NetworkImgLayer(
+                      src: videoItem.pic,
+                      width: maxWidth,
+                      height: maxHeight,
+                    ),
+                  );
+                }),
               ),
               VideoContent(videoItem: videoItem)
             ],
@@ -155,7 +126,6 @@ class VideoContent extends StatelessWidget {
           children: [
             Text(
               videoItem.title,
-              textAlign: TextAlign.start,
               style: const TextStyle(fontSize: 13),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -182,21 +152,15 @@ class VideoContent extends StatelessWidget {
                   )
                 ],
                 Expanded(
-                  child: LayoutBuilder(builder:
-                      (BuildContext context, BoxConstraints constraints) {
-                    return SizedBox(
-                      width: constraints.maxWidth,
-                      child: Text(
-                        videoItem.owner.name,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelMedium!.fontSize,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    );
-                  }),
+                  child: Text(
+                    videoItem.owner.name,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
                 ),
                 if (videoItem.goto == 'av')
                   SizedBox(

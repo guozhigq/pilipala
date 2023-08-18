@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -41,7 +42,9 @@ class _RcmdPageState extends State<RcmdPage>
             scrollController.position.maxScrollExtent - 200) {
           if (!_rcmdController.isLoadingMore) {
             _rcmdController.isLoadingMore = true;
-            _rcmdController.onLoad();
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              _rcmdController.onLoad();
+            });
           }
         }
 
@@ -74,30 +77,36 @@ class _RcmdPageState extends State<RcmdPage>
           controller: _rcmdController.scrollController,
           slivers: [
             SliverPadding(
-              // 单列布局 EdgeInsets.zero
-              padding: _rcmdController.crossAxisCount == 1
-                  ? EdgeInsets.zero
-                  : const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              padding:
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
               sliver: FutureBuilder(
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return SliverLayoutBuilder(
-                          builder: (context, boxConstraints) {
-                        return Obx(() => contentGrid(
-                            _rcmdController, _rcmdController.videoList));
-                      });
+                      return Platform.isAndroid || Platform.isIOS
+                          ? Obx(() => contentGrid(
+                              _rcmdController, _rcmdController.videoList))
+                          : SliverLayoutBuilder(
+                              builder: (context, boxConstraints) {
+                              return Obx(() => contentGrid(
+                                  _rcmdController, _rcmdController.videoList));
+                            });
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
-                        fn: () => {},
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _rcmdController.queryRcmdFeed('init');
+                          });
+                        },
                       );
                     }
                   } else {
                     // 缓存数据
-                    if (_rcmdController.videoList.length > 1) {
+                    if (_rcmdController.videoList.isNotEmpty) {
                       return contentGrid(
                           _rcmdController, _rcmdController.videoList);
                     }
@@ -118,9 +127,10 @@ class _RcmdPageState extends State<RcmdPage>
 
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
-        builder: (context) => AnimatedDialog(
-              child: OverlayPop(videoItem: videoItem),
-            ));
+      builder: (context) => AnimatedDialog(
+        child: OverlayPop(videoItem: videoItem),
+      ),
+    );
   }
 
   Widget contentGrid(ctr, videoList) {

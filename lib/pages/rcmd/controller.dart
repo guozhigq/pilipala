@@ -8,9 +8,8 @@ import 'package:pilipala/utils/storage.dart';
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
   int _currentPage = 0;
-  int crossAxisCount = 2;
-  RxList<RecVideoItemAppModel> videoList = [RecVideoItemAppModel()].obs;
-  bool isLoadingMore = false;
+  RxList<RecVideoItemAppModel> videoList = <RecVideoItemAppModel>[].obs;
+  bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
 
@@ -29,6 +28,9 @@ class RcmdController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
+    if (isLoadingMore == false) {
+      return;
+    }
     if (type == 'onRefresh') {
       _currentPage = 0;
     }
@@ -37,7 +39,7 @@ class RcmdController extends GetxController {
     );
     if (res['status']) {
       if (type == 'init') {
-        if (videoList.length > 1) {
+        if (videoList.isNotEmpty) {
           videoList.addAll(res['data']);
         } else {
           videoList.value = res['data'];
@@ -56,6 +58,7 @@ class RcmdController extends GetxController {
 
   // 下拉刷新
   Future onRefresh() async {
+    isLoadingMore = true;
     queryRcmdFeed('onRefresh');
   }
 
