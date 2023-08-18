@@ -22,7 +22,11 @@ import 'controller.dart';
 import 'widgets/intro_detail.dart';
 
 class BangumiIntroPanel extends StatefulWidget {
-  const BangumiIntroPanel({super.key});
+  final int? cid;
+  const BangumiIntroPanel({
+    Key? key,
+    this.cid,
+  }) : super(key: key);
 
   @override
   State<BangumiIntroPanel> createState() => _BangumiIntroPanelState();
@@ -69,7 +73,11 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
             );
           }
         } else {
-          return BangumiInfo(loadingStatus: true, bangumiDetail: bangumiDetail);
+          return BangumiInfo(
+            loadingStatus: true,
+            bangumiDetail: bangumiDetail,
+            cid: widget.cid,
+          );
         }
       },
     );
@@ -79,11 +87,13 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
 class BangumiInfo extends StatefulWidget {
   final bool loadingStatus;
   final BangumiInfoModel? bangumiDetail;
+  final int? cid;
 
   const BangumiInfo({
     Key? key,
     this.loadingStatus = false,
     this.bangumiDetail,
+    this.cid,
   }) : super(key: key);
 
   @override
@@ -97,6 +107,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   Box localCache = GStrorage.localCache;
   late final BangumiInfoModel? bangumiItem;
   late double sheetHeight;
+  int? cid;
 
   @override
   void initState() {
@@ -105,6 +116,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     bangumiItem = bangumiIntroController.bangumiItem;
     sheetHeight = localCache.get('sheetHeight');
+    cid = widget.cid!;
   }
 
   // 收藏
@@ -320,9 +332,10 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       pages: bangumiItem != null
                           ? bangumiItem!.episodes!
                           : widget.bangumiDetail!.episodes!,
-                      cid: bangumiItem != null
-                          ? bangumiItem!.episodes!.first.cid
-                          : widget.bangumiDetail!.episodes!.first.cid,
+                      cid: cid ??
+                          (bangumiItem != null
+                              ? bangumiItem!.episodes!.first.cid
+                              : widget.bangumiDetail!.episodes!.first.cid),
                       sheetHeight: sheetHeight,
                       changeFuc: (bvid, cid, aid) => bangumiIntroController
                           .changeSeasonOrbangu(bvid, cid, aid),

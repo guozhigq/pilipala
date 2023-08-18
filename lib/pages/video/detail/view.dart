@@ -322,7 +322,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     const VideoIntroPanel(),
                                   ] else if (videoDetailController.videoType ==
                                       SearchType.media_bangumi) ...[
-                                    const BangumiIntroPanel()
+                                    BangumiIntroPanel(
+                                        cid: videoDetailController.cid)
                                   ],
                                   // if (videoDetailController.videoType ==
                                   //     SearchType.video) ...[

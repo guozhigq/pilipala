@@ -22,77 +22,106 @@ class BangumiPanel extends StatefulWidget {
 
 class _BangumiPanelState extends State<BangumiPanel> {
   late int currentIndex;
+  final ScrollController listViewScrollCtr = ScrollController();
+  final ScrollController listViewScrollCtr_2 = ScrollController();
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.pages.indexWhere((e) => e.cid == widget.cid!);
+    scrollToIndex();
+  }
+
+  @override
+  void dispose() {
+    listViewScrollCtr.dispose();
+    listViewScrollCtr_2.dispose();
+    super.dispose();
   }
 
   void showBangumiPanel() {
     showBottomSheet(
       context: context,
-      builder: (_) => Container(
-        height: widget.sheetHeight,
-        color: Theme.of(context).colorScheme.background,
-        child: Column(
-          children: [
-            AppBar(
-              toolbarHeight: 45,
-              automaticallyImplyLeading: false,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              await Future.delayed(const Duration(milliseconds: 200));
+              listViewScrollCtr_2.animateTo(currentIndex * 56,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut);
+            });
+            // 在这里使用 setState 更新状态
+            return Container(
+              height: widget.sheetHeight,
+              color: Theme.of(context).colorScheme.background,
+              child: Column(
                 children: [
-                  Text(
-                    '合集（${widget.pages.length}）',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  AppBar(
+                    toolbarHeight: 45,
+                    automaticallyImplyLeading: false,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '合集（${widget.pages.length}）',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    titleSpacing: 10,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                  Expanded(
+                    child: Material(
+                      child: ListView.builder(
+                        controller: listViewScrollCtr_2,
+                        itemCount: widget.pages.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            onTap: () {
+                              setState(() {
+                                changeFucCall(widget.pages[index], index);
+                              });
+                            },
+                            dense: false,
+                            leading: index == currentIndex
+                                ? Image.asset(
+                                    'assets/images/live.gif',
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    height: 12,
+                                  )
+                                : null,
+                            title: Text(
+                              '第${index + 1}话  ${widget.pages[index].longTitle!}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: index == currentIndex
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            trailing: widget.pages[index].badge != null
+                                ? Image.asset(
+                                    'assets/images/big-vip.png',
+                                    height: 20,
+                                  )
+                                : const SizedBox(),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
-              titleSpacing: 10,
-            ),
-            Expanded(
-              child: Material(
-                child: ListView.builder(
-                  itemCount: widget.pages.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () => changeFucCall(widget.pages[index], index),
-                      dense: false,
-                      leading: index == currentIndex
-                          ? Image.asset(
-                              'assets/images/live.gif',
-                              color: Theme.of(context).colorScheme.primary,
-                              height: 12,
-                            )
-                          : null,
-                      title: Text(
-                        '第${index + 1}话  ${widget.pages[index].longTitle!}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: index == currentIndex
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      trailing: widget.pages[index].badge != null
-                          ? Image.asset(
-                              'assets/images/big-vip.png',
-                              height: 20,
-                            )
-                          : const SizedBox(),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -108,6 +137,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
     );
     currentIndex = i;
     setState(() {});
+    scrollToIndex();
+  }
+
+  void scrollToIndex() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 在回调函数中获取更新后的状态
+      listViewScrollCtr.animateTo(currentIndex * 150,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    });
   }
 
   @override
@@ -150,6 +188,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
         SizedBox(
           height: 60,
           child: ListView.builder(
+              controller: listViewScrollCtr,
               scrollDirection: Axis.horizontal,
               itemCount: widget.pages.length,
               itemExtent: 150,
@@ -222,87 +261,6 @@ class _BangumiPanelState extends State<BangumiPanel> {
                 );
               })),
         )
-        // SingleChildScrollView(
-        //   padding: const EdgeInsets.only(top: 7, bottom: 7),
-        //   scrollDirection: Axis.horizontal,
-        //   child: ConstrainedBox(
-        //     constraints: BoxConstraints(
-        //       minWidth: MediaQuery.of(context).size.width,
-        //     ),
-        //     child: Row(
-        //       children: [
-        //         for (int i = 0; i < widget.pages.length; i++) ...[
-        //           Container(
-        //             width: 150,
-        //             margin: const EdgeInsets.only(right: 10),
-        //             child: Material(
-        //               color: Theme.of(context).colorScheme.onInverseSurface,
-        //               borderRadius: BorderRadius.circular(6),
-        //               clipBehavior: Clip.hardEdge,
-        //               child: InkWell(
-        //                 onTap: () => changeFucCall(widget.pages[i], i),
-        //                 child: Padding(
-        //                   padding: const EdgeInsets.symmetric(
-        //                       vertical: 8, horizontal: 10),
-        //                   child: Column(
-        //                     crossAxisAlignment: CrossAxisAlignment.start,
-        //                     children: [
-        //                       Row(
-        //                         children: [
-        //                           if (i == currentIndex) ...[
-        //                             Image.asset(
-        //                               'assets/images/live.gif',
-        //                               color:
-        //                                   Theme.of(context).colorScheme.primary,
-        //                               height: 12,
-        //                             ),
-        //                             const SizedBox(width: 6)
-        //                           ],
-        //                           Text(
-        //                             '第${i + 1}话',
-        //                             style: TextStyle(
-        //                                 fontSize: 13,
-        //                                 color: i == currentIndex
-        //                                     ? Theme.of(context)
-        //                                         .colorScheme
-        //                                         .primary
-        //                                     : Theme.of(context)
-        //                                         .colorScheme
-        //                                         .onSurface),
-        //                           ),
-        //                           const SizedBox(width: 2),
-        //                           if (widget.pages[i].badge != null) ...[
-        //                             Image.asset(
-        //                               'assets/images/big-vip.png',
-        //                               height: 16,
-        //                             ),
-        //                           ],
-        //                         ],
-        //                       ),
-        //                       const SizedBox(height: 3),
-        //                       Text(
-        //                         widget.pages[i].longTitle!,
-        //                         maxLines: 1,
-        //                         style: TextStyle(
-        //                             fontSize: 13,
-        //                             color: i == currentIndex
-        //                                 ? Theme.of(context).colorScheme.primary
-        //                                 : Theme.of(context)
-        //                                     .colorScheme
-        //                                     .onSurface),
-        //                         overflow: TextOverflow.ellipsis,
-        //                       )
-        //                     ],
-        //                   ),
-        //                 ),
-        //               ),
-        //             ),
-        //           ),
-        //         ]
-        //       ],
-        //     ),
-        //   ),
-        // )
       ],
     );
   }
