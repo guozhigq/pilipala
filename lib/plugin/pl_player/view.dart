@@ -178,7 +178,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           /// 进入全屏
           await enterFullScreen();
           // 横屏
-          await landScape();
+          await verticalScreen();
           break;
         case FullScreenMode.horizontal:
 

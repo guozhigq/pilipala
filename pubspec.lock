@@ -57,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  auto_orientation:
-    dependency: "direct main"
-    description:
-      name: auto_orientation
-      sha256: cd56bb59b36fa54cc28ee254bc600524f022a4862f31d5ab20abd7bb1c54e678
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -309,10 +301,10 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: "3866d67f93523161b643187af65f5ac08bc991a5bcdaf41a2d587fe4ccb49993"
+      sha256: ce75a1b40947fea0a0e16ce73337122a86762e38b982e1ccb909daa3b9bc4197
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.0"
+    version: "5.3.2"
   dio_cookie_manager:
     dependency: "direct main"
     description:
