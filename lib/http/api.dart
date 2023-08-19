@@ -248,9 +248,44 @@ class Api {
   // 移除已观看
   static const String toViewDel = '/x/v2/history/toview/del';
 
+  // 清空稍后再看
+  static const String toViewClear = '/x/v2/history/toview/clear';
+
   // 追番
   static const String bangumiAdd = '/pgc/web/follow/add';
 
   // 取消追番
   static const String bangumiDel = '/pgc/web/follow/del';
+
+  // 番剧列表
+  // https://api.bilibili.com/pgc/season/index/result?
+  // st=1&
+  // order=3
+  // season_version=-1  全部-1 正片1 电影2 其他3
+  // spoken_language_type=-1  全部-1 原生1 中文配音2
+  // area=-1&
+  // is_finish=-1&
+  // copyright=-1&
+  // season_status=-1&
+  // season_month=-1&
+  // year=-1&
+  // style_id=-1&
+  // sort=0&
+  // page=1&
+  // season_type=1&
+  // pagesize=20&
+  // type=1
+  static const String bangumiList =
+      '/pgc/season/index/result?st=1&order=3&season_version=-1&spoken_language_type=-1&area=-1&is_finish=-1&copyright=-1&season_status=-1&season_month=-1&year=-1&style_id=-1&sort=0&season_type=1&pagesize=20&type=1';
+
+  // 我的订阅
+  static const String bangumiFollow =
+      '/x/space/bangumi/follow/list?type=1&follow_status=0&pn=1&ps=15&ts=1691544359969';
+
+  // 黑名单
+  static const String blackLst = '/x/relation/blacks';
+
+  // github 获取最新版
+  static const String latestApp =
+      'https://api.github.com/repos/guozhigq/pilipala/releases/latest';
 }

@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -10,9 +12,11 @@ class MineController extends GetxController {
   Rx<UserInfoData> userInfo = UserInfoData().obs;
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
-  Box user = GStrorage.user;
   RxBool userLogin = false.obs;
+  Box user = GStrorage.user;
+  Box setting = GStrorage.setting;
   Box userInfoCache = GStrorage.userInfo;
+  Rx<ThemeType> themeType = ThemeType.system.obs;
 
   @override
   onInit() {
@@ -21,13 +25,13 @@ class MineController extends GetxController {
     if (userInfoCache.get('userInfoCache') != null) {
       userInfo.value = userInfoCache.get('userInfoCache');
     }
+
+    themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
+        defaultValue: ThemeType.system.code)];
   }
 
   onLogin() async {
     if (!userLogin.value) {
-      /// TODO
-      Get.back();
-      await Future.delayed(const Duration(milliseconds: 150));
       Get.toNamed(
         '/webview',
         parameters: {
@@ -89,5 +93,32 @@ class MineController extends GetxController {
     await user.delete(UserBoxKey.userLogin);
     userLogin.value = false;
     // Get.find<MainController>().resetLast();
+  }
+
+  onChangeTheme() {
+    Brightness currentBrightness =
+        MediaQuery.of(Get.context!).platformBrightness;
+    ThemeType currentTheme = themeType.value;
+    switch (currentTheme) {
+      case ThemeType.dark:
+        setting.put(SettingBoxKey.themeMode, ThemeType.light.code);
+        themeType.value = ThemeType.light;
+        break;
+      case ThemeType.light:
+        setting.put(SettingBoxKey.themeMode, ThemeType.dark.code);
+        themeType.value = ThemeType.dark;
+        break;
+      case ThemeType.system:
+        // 判断当前的颜色模式
+        if (currentBrightness == Brightness.light) {
+          setting.put(SettingBoxKey.themeMode, ThemeType.dark.code);
+          themeType.value = ThemeType.dark;
+        } else {
+          setting.put(SettingBoxKey.themeMode, ThemeType.light.code);
+          themeType.value = ThemeType.light;
+        }
+        break;
+    }
+    Get.forceAppUpdate();
   }
 }

@@ -88,6 +88,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                             tag: SearchType.values[index].type)
                         .animateToTop();
                   }
+
                   _searchResultController!.tabIndex = index;
                 },
               ),

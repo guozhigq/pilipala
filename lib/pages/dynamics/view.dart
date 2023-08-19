@@ -1,17 +1,15 @@
 import 'dart:async';
 
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/main/index.dart';
-import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -29,9 +27,11 @@ class DynamicsPage extends StatefulWidget {
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
-  Future? _futureBuilderFuture;
+  late Future _futureBuilderFuture;
+  late Future _futureBuilderFutureUp;
   bool _isLoadingMore = false;
   Box user = GStrorage.user;
+  EventBus eventBus = EventBus();
 
   @override
   bool get wantKeepAlive => true;
@@ -40,6 +40,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   void initState() {
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
+    _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
     ScrollController scrollController = _dynamicsController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -63,6 +64,14 @@ class _DynamicsPageState extends State<DynamicsPage>
         }
       },
     );
+
+    eventBus.on(EventName.loginEvent, (args) {
+      _dynamicsController.userLogin.value = args['status'];
+      setState(() {
+        _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
+        _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
+      });
+    });
   }
 
   @override
@@ -108,115 +117,82 @@ class _DynamicsPageState extends State<DynamicsPage>
                       return const SizedBox();
                     }
                   }),
-                  Obx(() => Visibility(
-                        visible: _dynamicsController.mid.value == -1,
-                        child: CustomSlidingSegmentedControl<int>(
-                          initialValue: _dynamicsController.initialValue.value,
-                          children: {
-                            1: Text(
-                              '全部',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize),
+                  Obx(
+                    () => _dynamicsController.userLogin.value
+                        ? Visibility(
+                            visible: _dynamicsController.mid.value == -1,
+                            child: CustomSlidingSegmentedControl<int>(
+                              initialValue:
+                                  _dynamicsController.initialValue.value,
+                              children: {
+                                1: Text(
+                                  '全部',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .fontSize),
+                                ),
+                                2: Text('投稿',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize)),
+                                3: Text('番剧',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize)),
+                                // 4: Text(
+                                //   '专栏',
+                                //   style: TextStyle(
+                                //       fontSize: Theme.of(context)
+                                //           .textTheme
+                                //           .labelMedium!
+                                //           .fontSize),
+                                // ),
+                              },
+                              padding: 13.0,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceVariant
+                                    .withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              thumbDecoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.background,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              onValueChanged: (v) {
+                                feedBack();
+                                _dynamicsController.onSelectType(v);
+                              },
                             ),
-                            2: Text('投稿',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize)),
-                            3: Text('番剧',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize)),
-                            // 4: Text(
-                            //   '专栏',
-                            //   style: TextStyle(
-                            //       fontSize: Theme.of(context)
-                            //           .textTheme
-                            //           .labelMedium!
-                            //           .fontSize),
-                            // ),
-                          },
-                          padding: 13.0,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceVariant
-                                .withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          thumbDecoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.background,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          onValueChanged: (v) {
-                            feedBack();
-                            _dynamicsController.onSelectType(v);
-                          },
-                        ),
-                      ))
+                          )
+                        : Text('动态',
+                            style: Theme.of(context).textTheme.titleMedium),
+                  )
                 ],
               ),
-              Positioned(
-                right: 4,
-                top: 0,
-                bottom: 0,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      {feedBack(), _dynamicsController.resetSearch()},
-                  icon: const Icon(Icons.history, size: 21),
-                ),
-              ),
-              Positioned(
-                left: 10,
-                top: 0,
-                bottom: 0,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: user.get(UserBoxKey.userLogin) ?? false
-                      ? GestureDetector(
-                          onTap: () {
-                            feedBack();
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (_) => const SizedBox(
-                                height: 450,
-                                child: MinePage(),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                              isScrollControlled: true,
-                            );
-                          },
-                          child: NetworkImgLayer(
-                            type: 'avatar',
-                            width: 30,
-                            height: 30,
-                            src: user.get(UserBoxKey.userFace),
-                          ),
-                        )
-                      : IconButton(
-                          onPressed: () {
-                            feedBack();
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (_) => const SizedBox(
-                                height: 450,
-                                child: MinePage(),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                              isScrollControlled: true,
-                            );
-                          },
-                          icon: const Icon(CupertinoIcons.person, size: 22),
-                        ),
+              Obx(
+                () => Visibility(
+                  visible: _dynamicsController.userLogin.value,
+                  child: Positioned(
+                    right: 4,
+                    top: 0,
+                    bottom: 0,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () =>
+                          {feedBack(), _dynamicsController.resetSearch()},
+                      icon: const Icon(Icons.history, size: 21),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -229,7 +205,7 @@ class _DynamicsPageState extends State<DynamicsPage>
           controller: _dynamicsController.scrollController,
           slivers: [
             FutureBuilder(
-              future: _dynamicsController.queryFollowUp(),
+              future: _futureBuilderFutureUp,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data;
@@ -269,7 +245,14 @@ class _DynamicsPageState extends State<DynamicsPage>
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
-                      fn: () => _dynamicsController.onRefresh(),
+                      fn: () {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _dynamicsController.queryFollowDynamic();
+                          _futureBuilderFutureUp =
+                              _dynamicsController.queryFollowUp();
+                        });
+                      },
                     );
                   }
                 } else {

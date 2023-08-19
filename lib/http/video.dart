@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:hive/hive.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/reply_type.dart';
@@ -9,12 +11,16 @@ import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/utils/storage.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
 /// res.data['data'] 为结果
 /// 返回{'status': bool, 'data': List}
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
+  static Box user = GStrorage.user;
+  static Box setting = GStrorage.setting;
+
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
     try {
@@ -42,8 +48,7 @@ class VideoHttp {
     }
   }
 
-  static Future rcmdVideoListApp(
-      {required int ps, required int freshIdx}) async {
+  static Future rcmdVideoListApp({int? ps, required int freshIdx}) async {
     try {
       var res = await Request().get(
         Api.recommendListApp,
@@ -55,12 +60,22 @@ class VideoHttp {
           'device_type': 0,
           'device_name': 'vivo',
           'pull': freshIdx == 0 ? 'true' : 'false',
+          'appkey': Constants.appKey,
+          'access_key':
+              user.get(UserBoxKey.accessKey, defaultValue: {})['value'] ?? ''
         },
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemAppModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['items']) {
-          list.add(RecVideoItemAppModel.fromJson(i));
+          // 屏蔽推广和拉黑用户
+          if (i['card_goto'] != 'ad_av' &&
+              (i['args'] != null &&
+                  !blackMidsList.contains(i['args']['up_mid']))) {
+            list.add(RecVideoItemAppModel.fromJson(i));
+          }
         }
         return {'status': true, 'data': list};
       } else {
@@ -80,8 +95,12 @@ class VideoHttp {
       );
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['list']) {
-          list.add(HotVideoItemModel.fromJson(i));
+          if (!blackMidsList.contains(i['owner']['mid'])) {
+            list.add(HotVideoItemModel.fromJson(i));
+          }
         }
         return {'status': true, 'data': list};
       } else {

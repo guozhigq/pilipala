@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
@@ -96,6 +95,13 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void dispose() async {
+    await GStrorage.close();
+    EventBus().off(EventName.loginEvent);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Box localCache = GStrorage.localCache;
     double statusBarHeight = MediaQuery.of(context).padding.top;
@@ -135,21 +141,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         initialData: true,
         builder: (context, AsyncSnapshot snapshot) {
           return AnimatedSlide(
-            curve: Curves.linear,
-            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOutCubicEmphasized,
+            duration: const Duration(milliseconds: 1000),
             offset: Offset(0, snapshot.data ? 0 : 1),
-            child: BottomNavigationBar(
-              currentIndex: selectedIndex,
-              // type: BottomNavigationBarType.shifting,
-              selectedItemColor: Theme.of(context).colorScheme.primary,
-              unselectedItemColor:
-                  Theme.of(context).colorScheme.onSurfaceVariant,
-              selectedFontSize: 12.4,
-              onTap: (value) => setIndex(value),
-              items: [
+            child: NavigationBar(
+              onDestinationSelected: (value) => setIndex(value),
+              selectedIndex: selectedIndex,
+              destinations: <Widget>[
                 ..._mainController.navigationBars.map((e) {
-                  return BottomNavigationBarItem(
+                  return NavigationDestination(
                     icon: e['icon'],
+                    selectedIcon: e['selectIcon'],
                     label: e['label'],
                   );
                 }).toList(),

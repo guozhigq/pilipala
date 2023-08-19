@@ -3,13 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -46,8 +51,19 @@ class DynamicsController extends GetxController {
   ];
   bool flag = false;
   RxInt initialValue = 1.obs;
+  Box user = GStrorage.user;
+  RxBool userLogin = false.obs;
+
+  @override
+  void onInit() {
+    userLogin.value = user.get(UserBoxKey.userLogin, defaultValue: false);
+    super.onInit();
+  }
 
   Future queryFollowDynamic({type = 'init'}) async {
+    if (!userLogin.value) {
+      return {'status': false, 'msg': '未登录'};
+    }
     if (type == 'init') {
       dynamicsList.clear();
     }
@@ -142,10 +158,39 @@ class DynamicsController extends GetxController {
       /// TODO
       case 'DYNAMIC_TYPE_UGC_SEASON':
         print('合集');
+        break;
+      case 'DYNAMIC_TYPE_PGC_UNION':
+        print('DYNAMIC_TYPE_PGC_UNION 番剧');
+        DynamicArchiveModel pgc = item.modules.moduleDynamic.major.pgc;
+        if (pgc.epid != null) {
+          SmartDialog.showLoading(msg: '获取中...');
+          var res = await SearchHttp.bangumiInfo(epId: pgc.epid);
+          SmartDialog.dismiss();
+          if (res['status']) {
+            EpisodeItem episode = res['data'].episodes.first;
+            String bvid = episode.bvid!;
+            int cid = episode.cid!;
+            String pic = episode.cover!;
+            String heroTag = Utils.makeHeroTag(cid);
+            Get.toNamed(
+              '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
+              arguments: {
+                'pic': pic,
+                'heroTag': heroTag,
+                'videoType': SearchType.media_bangumi,
+                'bangumiItem': res['data'],
+              },
+            );
+          }
+        }
+        break;
     }
   }
 
-  Future queryFollowUp() async {
+  Future queryFollowUp({type = 'init'}) async {
+    if (type == 'init') {
+      upData = FollowUpModel().obs;
+    }
     var res = await DynamicsHttp.followUp();
     if (res['status']) {
       upData.value = res['data'];

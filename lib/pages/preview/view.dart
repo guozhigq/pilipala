@@ -132,6 +132,7 @@ class _ImagePreviewState extends State<ImagePreview>
 
                         _doubleClickAnimationController.forward();
                       },
+                      // ignore: body_might_complete_normally_nullable
                       loadStateChanged: (ExtendedImageState state) {
                         if (state.extendedImageLoadState == LoadState.loading) {
                           final ImageChunkEvent? loadingProgress =

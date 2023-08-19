@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
@@ -14,7 +13,7 @@ class LiveRoomController extends GetxController {
   // 静音状态
   RxBool volumeOff = false.obs;
   PlPlayerController plPlayerController =
-      PlPlayerController(controlsEnabled: false);
+      PlPlayerController.getInstance(videoType: 'live');
 
   // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
   //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
@@ -31,6 +30,9 @@ class LiveRoomController extends GetxController {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
       if (liveItem.pic != null && liveItem.pic != '') {
+        cover = liveItem.pic;
+      }
+      if (liveItem.cover != null && liveItem.cover != '') {
         cover = liveItem.cover;
       }
     }
@@ -72,12 +74,10 @@ class LiveRoomController extends GetxController {
     if (value == 0) {
       // 设置音量
       volumeOff.value = false;
-      // meeduPlayerController.setVolume(volume);
     } else {
       // 取消音量
       volume = value;
       volumeOff.value = true;
-      // meeduPlayerController.setVolume(0);
     }
   }
 }

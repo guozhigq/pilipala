@@ -5,6 +5,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
@@ -147,23 +148,26 @@ class HistoryItem extends StatelessWidget {
                                 if (!BusinessType
                                     .hiddenDurationType.hiddenDurationType
                                     .contains(videoItem.history.business))
-                                  pBadge(
-                                      videoItem.progress == -1
-                                          ? '已看完'
-                                          : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
-                                      context,
-                                      null,
-                                      6.0,
-                                      6.0,
-                                      null,
-                                      type: 'gray'),
+                                  PBadge(
+                                    text: videoItem.progress == -1
+                                        ? '已看完'
+                                        : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
+                                    right: 6.0,
+                                    bottom: 6.0,
+                                    type: 'gray',
+                                  ),
                                 // 右上角
                                 if (BusinessType.showBadge.showBadge
                                         .contains(videoItem.history.business) ||
                                     videoItem.history.business ==
                                         BusinessType.live.type)
-                                  pBadge(videoItem.badge, context, 6.0, 6.0,
-                                      null, null),
+                                  PBadge(
+                                    text: videoItem.badge,
+                                    top: 6.0,
+                                    right: 6.0,
+                                    bottom: null,
+                                    left: null,
+                                  ),
                               ],
                             );
                           },
@@ -229,6 +233,7 @@ class VideoContent extends StatelessWidget {
               ],
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   Utils.dateFormat(videoItem.viewAt!),
@@ -236,7 +241,46 @@ class VideoContent extends StatelessWidget {
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline),
-                )
+                ),
+                if (videoItem.badge != '番剧' &&
+                    !videoItem.tagName.contains('动画') &&
+                    videoItem.history.business != 'live' &&
+                    !videoItem.history.business.contains('article'))
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      tooltip: '稍后再看',
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 14,
+                      ),
+                      position: PopupMenuPosition.under,
+                      // constraints: const BoxConstraints(maxHeight: 35),
+                      onSelected: (String type) {},
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            var res = await UserHttp.toViewLater(
+                                bvid: videoItem.history.bvid);
+                            SmartDialog.showToast(res['msg']);
+                          },
+                          value: 'pause',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined, size: 16),
+                              SizedBox(width: 6),
+                              Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ],

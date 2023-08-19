@@ -6,15 +6,20 @@ import 'package:pilipala/models/model_hot_video_item.dart';
 
 class LaterController extends GetxController {
   final ScrollController scrollController = ScrollController();
-  RxList<HotVideoItemModel> laterList = [HotVideoItemModel()].obs;
+  RxList<HotVideoItemModel> laterList = <HotVideoItemModel>[].obs;
   int count = 0;
+  RxBool isLoading = false.obs;
 
   Future queryLaterList() async {
+    isLoading.value = true;
     var res = await UserHttp.seeYouLater();
     if (res['status']) {
-      laterList.value = res['data']['list'];
       count = res['data']['count'];
+      if (count > 0) {
+        laterList.value = res['data']['list'];
+      }
     }
+    isLoading.value = false;
     return res;
   }
 
@@ -41,6 +46,36 @@ class LaterController extends GetxController {
                 SmartDialog.showToast(res['msg']);
               },
               child: const Text('确认删除'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  // 一键清空
+  Future toViewClear() async {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('清空确认'),
+          content: const Text('确定要清空你的稍后再看列表吗？'),
+          actions: [
+            TextButton(
+                onPressed: () => SmartDialog.dismiss(),
+                child: const Text('取消')),
+            TextButton(
+              onPressed: () async {
+                var res = await UserHttp.toViewClear();
+                if (res['status']) {
+                  laterList.clear();
+                }
+                SmartDialog.dismiss();
+                SmartDialog.showToast(res['msg']);
+              },
+              child: const Text('确认'),
             )
           ],
         );

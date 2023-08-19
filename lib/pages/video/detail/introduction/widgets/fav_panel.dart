@@ -33,24 +33,13 @@ class _FavPanelState extends State<FavPanel> {
       child: Column(
         children: [
           AppBar(
-            toolbarHeight: 50,
-            automaticallyImplyLeading: false,
             centerTitle: false,
-            elevation: 1,
-            title: Text(
-              '选择文件夹',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  feedBack();
-                  await widget.ctr!.actionFavVideo();
-                },
-                child: const Text('完成'),
-              ),
-              const SizedBox(width: 6),
-            ],
+            elevation: 0,
+            leading: IconButton(
+                onPressed: () => Get.back(),
+                icon: const Icon(Icons.close_outlined)),
+            title:
+                Text('添加到收藏夹', style: Theme.of(context).textTheme.titleMedium),
           ),
           Expanded(
             child: Material(
@@ -63,45 +52,33 @@ class _FavPanelState extends State<FavPanel> {
                       return Obx(
                         () => ListView.builder(
                           itemCount:
-                              widget.ctr!.favFolderData.value.list!.length + 1,
+                              widget.ctr!.favFolderData.value.list!.length,
                           itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return const SizedBox(height: 10);
-                            } else {
-                              return ListTile(
-                                onTap: () => widget.ctr!.onChoose(
-                                    widget.ctr!.favFolderData.value
-                                            .list![index - 1].favState !=
-                                        1,
-                                    index - 1),
-                                dense: true,
-                                leading:
-                                    const Icon(Icons.folder_special_outlined),
-                                minLeadingWidth: 0,
-                                title: Text(widget.ctr!.favFolderData.value
-                                    .list![index - 1].title!),
-                                subtitle: Text(
-                                  '${widget.ctr!.favFolderData.value.list![index - 1].mediaCount}个内容',
-                                  style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall!
-                                          .fontSize),
+                            return ListTile(
+                              onTap: () => widget.ctr!.onChoose(
+                                  widget.ctr!.favFolderData.value.list![index]
+                                          .favState !=
+                                      1,
+                                  index),
+                              dense: true,
+                              leading: const Icon(Icons.folder_outlined),
+                              minLeadingWidth: 0,
+                              title: Text(widget.ctr!.favFolderData.value
+                                  .list![index].title!),
+                              subtitle: Text(
+                                '${widget.ctr!.favFolderData.value.list![index].mediaCount}个内容',
+                              ),
+                              trailing: Transform.scale(
+                                scale: 0.9,
+                                child: Checkbox(
+                                  value: widget.ctr!.favFolderData.value
+                                          .list![index].favState ==
+                                      1,
+                                  onChanged: (bool? checkValue) =>
+                                      widget.ctr!.onChoose(checkValue!, index),
                                 ),
-                                trailing: Transform.scale(
-                                  scale: 0.9,
-                                  child: Checkbox(
-                                    value: widget.ctr!.favFolderData.value
-                                            .list![index - 1].favState ==
-                                        1,
-                                    onChanged: (bool? checkValue) => widget.ctr!
-                                        .onChoose(checkValue!, index - 1),
-                                  ),
-                                ),
-                              );
-                            }
+                              ),
+                            );
                           },
                         ),
                       );
@@ -117,6 +94,47 @@ class _FavPanelState extends State<FavPanel> {
                   }
                 },
               ),
+            ),
+          ),
+          Divider(
+            height: 1,
+            color: Theme.of(context).disabledColor.withOpacity(0.08),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 12,
+              bottom: MediaQuery.of(context).padding.bottom + 12,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.only(left: 30, right: 30),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .onInverseSurface, // 设置按钮背景色
+                  ),
+                  child: const Text('取消'),
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  onPressed: () async {
+                    feedBack();
+                    await widget.ctr!.actionFavVideo();
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.only(left: 30, right: 30),
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primary, // 设置按钮背景色
+                  ),
+                  child: const Text('完成'),
+                ),
+              ],
             ),
           ),
         ],

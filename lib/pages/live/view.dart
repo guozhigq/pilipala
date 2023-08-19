@@ -22,10 +22,12 @@ class LivePage extends StatefulWidget {
 
 class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
+  late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _liveController.queryLiveList('init');
     ScrollController scrollController = _liveController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -52,47 +54,58 @@ class _LivePageState extends State<LivePage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        return await _liveController.onRefresh();
-      },
-      child: CustomScrollView(
-        controller: _liveController.scrollController,
-        slivers: [
-          SliverPadding(
-            // 单列布局 EdgeInsets.zero
-            padding: const EdgeInsets.fromLTRB(
-                StyleString.safeSpace, 0, StyleString.safeSpace, 0),
-            sliver: FutureBuilder(
-              future: _liveController.queryLiveList('init'),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data as Map;
-                  if (data['status']) {
-                    return Obx(() =>
-                        contentGrid(_liveController, _liveController.liveList));
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(StyleString.imgRadius),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          return await _liveController.onRefresh();
+        },
+        child: CustomScrollView(
+          controller: _liveController.scrollController,
+          slivers: [
+            SliverPadding(
+              // 单列布局 EdgeInsets.zero
+              padding:
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return SliverLayoutBuilder(
+                          builder: (context, boxConstraints) {
+                        return Obx(() => contentGrid(
+                            _liveController, _liveController.liveList));
+                      });
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => {},
+                      );
+                    }
                   } else {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => {},
-                    );
+                    // 缓存数据
+                    if (_liveController.liveList.length > 1) {
+                      return contentGrid(
+                          _liveController, _liveController.liveList);
+                    }
+                    // 骨架屏
+                    else {
+                      return contentGrid(_liveController, []);
+                    }
                   }
-                } else {
-                  // 缓存数据
-                  if (_liveController.liveList.length > 1) {
-                    return contentGrid(
-                        _liveController, _liveController.liveList);
-                  }
-                  // 骨架屏
-                  else {
-                    return contentGrid(_liveController, []);
-                  }
-                }
-              },
+                },
+              ),
             ),
-          ),
-          const LoadingMore()
-        ],
+            const LoadingMore()
+          ],
+        ),
       ),
     );
   }
@@ -100,22 +113,32 @@ class _LivePageState extends State<LivePage> {
   OverlayEntry _createPopupDialog(liveItem) {
     return OverlayEntry(
       builder: (context) => AnimatedDialog(
-        child: OverlayPop(videoItem: liveItem),
+        closeFn: _liveController.popupDialog?.remove,
+        child: OverlayPop(
+            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
       ),
     );
   }
 
   Widget contentGrid(ctr, liveList) {
+    double maxWidth = Get.size.width;
+    int baseWidth = 500;
+    int step = 300;
+    int crossAxisCount =
+        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    if (maxWidth < 300) {
+      crossAxisCount = 1;
+    }
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 2,
+        mainAxisSpacing: StyleString.cardSpace + 4,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 3,
+        crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
-        crossAxisCount: ctr.crossAxisCount,
+        crossAxisCount: crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
+            Get.size.width / crossAxisCount / StyleString.aspectRatio + 66,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

@@ -89,7 +89,13 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
               ),
             ),
             if (content.badge != null && type == 'pgc')
-              pBadge(content.badge['text'], context, 8.0, 10.0, null, null),
+              PBadge(
+                text: content.badge['text'],
+                top: 8.0,
+                right: 10.0,
+                bottom: null,
+                left: null,
+              ),
             Positioned(
               left: 0,
               right: 0,

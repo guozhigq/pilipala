@@ -1,26 +1,22 @@
-import 'dart:io';
-import 'package:cookie_jar/cookie_jar.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
-import 'package:pilipala/utils/utils.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 class SetCookie {
-  static onSet(List cookiesList, String url) async {
-    // domain url
-    List<Cookie> jarCookies = [];
-    if (cookiesList.isNotEmpty) {
-      for (var i in cookiesList) {
-        Cookie jarCookie = Cookie(i.name, i.value);
-        jarCookies.add(jarCookie);
-      }
-    }
-    String cookiePath = await Utils.getCookiePath();
-    PersistCookieJar cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(cookiePath),
-    );
-    await cookieJar.saveFromResponse(Uri.parse(url), jarCookies);
-    // 重新设置 cookie
-    Request.setCookie();
-    return true;
+  static onSet() async {
+    var cookies = await WebviewCookieManager().getCookies(HttpString.baseUrl);
+    await Request.cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseUrl), cookies);
+    var cookieString =
+        cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    Request.dio.options.headers['cookie'] = cookieString;
+
+    cookies = await WebviewCookieManager().getCookies(HttpString.baseApiUrl);
+    await Request.cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), cookies);
+
+    cookies = await WebviewCookieManager().getCookies(HttpString.tUrl);
+    await Request.cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.tUrl), cookies);
   }
 }

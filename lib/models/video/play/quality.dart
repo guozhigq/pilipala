@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum VideoQuality {
   speed240,
   flunt360,
@@ -88,4 +90,47 @@ extension AudioQualityDesc on AudioQuality {
     'Hi-Res无损',
   ];
   get description => _descList[index];
+}
+
+enum VideoDecodeFormats {
+  AV1,
+  HEVC,
+  AVC,
+}
+
+extension VideoDecodeFormatsDesc on VideoDecodeFormats {
+  static final List<String> _descList = [
+    'AV1',
+    'HEVC',
+    'AVC',
+  ];
+  get description => _descList[index];
+}
+
+extension VideoDecodeFormatsCode on VideoDecodeFormats {
+  static final List<String> _codeList = [
+    'av01',
+    'hev1',
+    'avc1',
+  ];
+  get code => _codeList[index];
+
+  static VideoDecodeFormats? fromCode(String code) {
+    final index = _codeList.indexOf(code);
+    if (index != -1) {
+      return VideoDecodeFormats.values[index];
+    }
+    return null;
+  }
+
+  static VideoDecodeFormats? fromString(String val) {
+    var result = VideoDecodeFormats.values.first;
+    for (var i in _codeList) {
+      if (val.startsWith(i)) {
+        result = VideoDecodeFormats.values[_codeList.indexOf(i)];
+        break;
+      }
+    }
+    return result;
+  }
 }

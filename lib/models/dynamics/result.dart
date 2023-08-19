@@ -478,6 +478,8 @@ class DynamicArchiveModel {
     this.stat,
     this.title,
     this.type,
+    this.epid,
+    this.seasonId,
   });
 
   int? aid;
@@ -491,6 +493,8 @@ class DynamicArchiveModel {
   Stat? stat;
   String? title;
   int? type;
+  int? epid;
+  int? seasonId;
 
   DynamicArchiveModel.fromJson(Map<String, dynamic> json) {
     aid = json['aid'] is String ? int.parse(json['aid']) : json['aid'];
@@ -503,6 +507,8 @@ class DynamicArchiveModel {
     stat = json['stat'] != null ? Stat.fromJson(json['stat']) : null;
     title = json['title'];
     type = json['type'];
+    epid = json['epid'];
+    seasonId = json['season_id'];
   }
 }
 

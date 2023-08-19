@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/models/video/reply/data.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyReplyController extends GetxController {

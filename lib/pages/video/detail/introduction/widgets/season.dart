@@ -38,6 +38,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
       item.cid,
       item.aid,
     );
+    currentIndex = i;
     Get.back();
   }
 

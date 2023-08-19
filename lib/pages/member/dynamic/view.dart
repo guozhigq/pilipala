@@ -120,7 +120,7 @@ class _MemberDynamicPanelState extends State<MemberDynamicPanel>
 class LoadMoreListSource extends LoadingMoreBase<DynamicItemModel> {
   final _dynamicController = Get.put(MemberDynamicPanelController());
 
-  // @override
+  @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
     var res = await _dynamicController.getMemberDynamic();

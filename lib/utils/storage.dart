@@ -1,8 +1,8 @@
 // import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
@@ -17,26 +17,46 @@ class GStrorage {
   static late final Box video;
 
   static Future<void> init() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getApplicationSupportDirectory();
     final path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
     // 用户信息
     user = await Hive.openBox('user');
     // 首页推荐视频
-    recVideo = await Hive.openBox('recVideo');
+    recVideo = await Hive.openBox(
+      'recVideo',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 20;
+      },
+    );
     // 登录用户信息
     userInfo = await Hive.openBox('userInfo');
     // 本地缓存
     localCache = await Hive.openBox('localCache');
     // 设置
     setting = await Hive.openBox('setting');
+    // 热搜关键词
+    hotKeyword = await Hive.openBox(
+      'hotKeyword',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 10;
+      },
+    );
+    // 搜索历史
+    historyword = await Hive.openBox(
+      'historyWord',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 10;
+      },
+    );
   }
 
   static regAdapter() {
-    Hive.registerAdapter(RecVideoItemModelAdapter());
+    Hive.registerAdapter(RecVideoItemAppModelAdapter());
     Hive.registerAdapter(RcmdReasonAdapter());
-    Hive.registerAdapter(StatAdapter());
+    Hive.registerAdapter(RcmdStatAdapter());
+    Hive.registerAdapter(RcmdOwnerAdapter());
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());
@@ -45,12 +65,27 @@ class GStrorage {
   }
 
   static Future<void> lazyInit() async {
-    // 热搜关键词
-    hotKeyword = await Hive.openBox('hotKeyword');
-    // 搜索历史
-    historyword = await Hive.openBox('historyWord');
     // 视频设置
     video = await Hive.openBox('video');
+  }
+
+  static Future<void> close() async {
+    user.compact();
+    user.close();
+    recVideo.compact();
+    recVideo.close();
+    userInfo.compact();
+    userInfo.close();
+    hotKeyword.compact();
+    hotKeyword.close();
+    historyword.compact();
+    historyword.close();
+    localCache.compact();
+    localCache.close();
+    setting.compact();
+    setting.close();
+    video.compact();
+    video.close();
   }
 }
 
@@ -63,16 +98,32 @@ class UserBoxKey {
   static const String userMid = 'userMid';
   // 登录状态
   static const String userLogin = 'userLogin';
+  // 凭证
+  static const String accessKey = 'accessKey';
 }
 
 class SettingBoxKey {
   static const String themeMode = 'themeMode';
   static const String feedBackEnable = 'feedBackEnable';
+  static const String defaultFontSize = 'fontSize';
+  static const String defaultVideoQa = 'defaultVideoQa';
+  static const String defaultAudioQa = 'defaultAudioQa';
+  static const String defaultDecode = 'defaultDecode';
+  static const String defaultVideoSpeed = 'defaultVideoSpeed';
+  static const String autoUpgradeEnable = 'autoUpgradeEnable';
+  static const String autoPlayEnable = 'autoPlayEnable';
+  static const String enableHA = 'enableHA';
+  static const String defaultPicQa = 'defaultPicQa';
+
+  static const String danmakuEnable = 'danmakuEnable';
+  static const String fullScreenMode = 'fullScreenMode';
+
+  static const String blackMidsList = 'blackMidsList';
 }
 
 class LocalCacheKey {
-  // 历史记录暂停状态 默认false
-  static const String historyStatus = 'historyStatus';
+  // 历史记录暂停状态 默认false 记录
+  static const String historyPause = 'historyPause';
 }
 
 class VideoBoxKey {

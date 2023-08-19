@@ -29,25 +29,38 @@ class _LaterPageState extends State<LaterPage> {
         titleSpacing: 0,
         centerTitle: false,
         title: Obx(
-          () => Text(
-            '稍后再看 (${_laterController.laterList.length}/100)',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          () => _laterController.laterList.isNotEmpty
+              ? Text(
+                  '稍后再看 (${_laterController.laterList.length}/100)',
+                  style: Theme.of(context).textTheme.titleMedium,
+                )
+              : Text(
+                  '稍后再看',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => _laterController.toViewDel(),
-            child: const Text('移除已看'),
+          Obx(
+            () => _laterController.laterList.isNotEmpty
+                ? TextButton(
+                    onPressed: () => _laterController.toViewDel(),
+                    child: const Text('移除已看'),
+                  )
+                : const SizedBox(),
           ),
-          // IconButton(
-          //   tooltip: '一键清空',
-          //   onPressed: () {},
-          //   icon: Icon(
-          //     Icons.clear_all_outlined,
-          //     size: 21,
-          //     color: Theme.of(context).colorScheme.primary,
-          //   ),
-          // ),
+          Obx(
+            () => _laterController.laterList.isNotEmpty
+                ? IconButton(
+                    tooltip: '一键清空',
+                    onPressed: () => _laterController.toViewClear(),
+                    icon: Icon(
+                      Icons.clear_all_outlined,
+                      size: 21,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  )
+                : const SizedBox(),
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -61,18 +74,31 @@ class _LaterPageState extends State<LaterPage> {
                 Map data = snapshot.data as Map;
                 if (data['status']) {
                   return Obx(
-                    () => SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return VideoCardH(
-                          videoItem: _laterController.laterList[index],
-                        );
-                      }, childCount: _laterController.laterList.length),
-                    ),
+                    () => _laterController.laterList.isNotEmpty &&
+                            !_laterController.isLoading.value
+                        ? SliverList(
+                            delegate:
+                                SliverChildBuilderDelegate((context, index) {
+                              return VideoCardH(
+                                videoItem: _laterController.laterList[index],
+                                source: 'later',
+                              );
+                            }, childCount: _laterController.laterList.length),
+                          )
+                        : SliverToBoxAdapter(
+                            child: Center(
+                              child: Text(_laterController.isLoading.value
+                                  ? '加载中'
+                                  : '没有数据'),
+                            ),
+                          ),
                   );
                 } else {
                   return HttpError(
                     errMsg: data['msg'],
-                    fn: () => setState(() {}),
+                    fn: () => setState(() {
+                      _futureBuilderFuture = _laterController.queryLaterList();
+                    }),
                   );
                 }
               } else {
@@ -80,7 +106,7 @@ class _LaterPageState extends State<LaterPage> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return const VideoCardHSkeleton();
-                  }, childCount: 5),
+                  }, childCount: 10),
                 );
               }
             },

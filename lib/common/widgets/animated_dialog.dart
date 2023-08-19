@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AnimatedDialog extends StatefulWidget {
-  const AnimatedDialog({Key? key, required this.child}) : super(key: key);
+  const AnimatedDialog({Key? key, required this.child, this.closeFn})
+      : super(key: key);
 
   final Widget child;
+  final Function? closeFn;
 
   @override
   State<StatefulWidget> createState() => AnimatedDialogState();
@@ -39,12 +41,16 @@ class AnimatedDialogState extends State<AnimatedDialog>
   Widget build(BuildContext context) {
     return Material(
       color: Colors.black.withOpacity(opacityAnimation!.value),
-      child: Center(
-        child: FadeTransition(
-          opacity: scaleAnimation!,
-          child: ScaleTransition(
-            scale: scaleAnimation!,
-            child: widget.child,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        onTap: () => widget.closeFn!(),
+        child: Center(
+          child: FadeTransition(
+            opacity: scaleAnimation!,
+            child: ScaleTransition(
+              scale: scaleAnimation!,
+              child: widget.child,
+            ),
           ),
         ),
       ),

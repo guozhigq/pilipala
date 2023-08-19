@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class LiveCard extends StatelessWidget {
@@ -95,7 +93,7 @@ class LiveContent extends StatelessWidget {
             liveItem.title,
             textAlign: TextAlign.start,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            maxLines: Get.find<RcmdController>().crossAxisCount,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(

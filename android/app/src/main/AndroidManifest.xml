@@ -21,7 +21,7 @@
         </intent>
     </queries>
    <application
-        android:label="pilipala"
+        android:label="PiliPala"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">

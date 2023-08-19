@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:pilipala/pages/about/index.dart';
+import 'package:pilipala/pages/blacklist/index.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/fan/index.dart';
@@ -14,6 +16,9 @@ import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
+import 'package:pilipala/pages/setting/play_setting.dart';
+import 'package:pilipala/pages/setting/privacy_setting.dart';
+import 'package:pilipala/pages/setting/style_setting.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
@@ -68,5 +73,17 @@ class Routes {
     GetPage(name: '/member', page: () => const MemberPage()),
     // 二级回复
     GetPage(name: '/replyReply', page: () => const VideoReplyReplyPanel()),
+
+    // 播放设置
+    GetPage(name: '/playSetting', page: () => const PlaySetting()),
+    // 外观设置
+    GetPage(name: '/styleSetting', page: () => const StyleSetting()),
+    // 隐私设置
+    GetPage(name: '/privacySetting', page: () => const PrivacySetting()),
+
+    //
+    GetPage(name: '/blackListPage', page: () => const BlackListPage()),
+    // 关于
+    GetPage(name: '/about', page: () => const AboutPage()),
   ];
 }

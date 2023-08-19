@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/sliver_header.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
@@ -49,25 +51,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void initState() {
     super.initState();
     plPlayerController = videoDetailController.plPlayerController;
-    plPlayerController!.onPlayerStatusChanged.listen(
-      (PlayerStatus status) {
-        videoDetailController.markHeartBeat();
-        playerStatus = status;
-        if (status == PlayerStatus.playing) {
-          videoDetailController.isShowCover.value = false;
-          videoDetailController.loopHeartBeat();
-        } else {
-          videoDetailController.timer!.cancel();
-          // 播放完成停止 or 切换下一个
-          if (status == PlayerStatus.completed) {
-            // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
-            plPlayerController!.seekTo(Duration.zero);
-            plPlayerController!.onLockControl(false);
-            plPlayerController!.videoPlayerController!.pause();
-          }
-        }
-      },
-    );
+    playerListener();
 
     appbarStream = StreamController<double>();
 
@@ -82,6 +66,26 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
+  // 播放器状态监听
+  void playerListener() {
+    plPlayerController!.onPlayerStatusChanged.listen(
+      (PlayerStatus status) async {
+        playerStatus = status;
+        if (status == PlayerStatus.playing) {
+          videoDetailController.isShowCover.value = false;
+        } else {
+          // 播放完成停止 or 切换下一个
+          if (status == PlayerStatus.completed) {
+            // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
+            plPlayerController!.seekTo(Duration.zero);
+            plPlayerController!.onLockControl(false);
+            plPlayerController!.videoPlayerController!.pause();
+          }
+        }
+      },
+    );
+  }
+
   // 继续播放或重新播放
   void continuePlay() async {
     await _extendNestCtr.animateTo(0,
@@ -91,19 +95,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    plPlayerController!.pause();
     plPlayerController!.dispose();
-    if (videoDetailController.timer != null) {
-      videoDetailController.timer!.cancel();
-    }
     super.dispose();
   }
 
   @override
   // 离开当前页面时
   void didPushNext() async {
-    if (videoDetailController.timer!.isActive) {
-      videoDetailController.timer!.cancel();
-    }
+    videoDetailController.defaultST = plPlayerController!.position.value;
     plPlayerController!.pause();
     super.didPushNext();
   }
@@ -111,12 +111,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 返回当前页面时
   void didPopNext() async {
+    videoDetailController.playerInit();
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();
-    }
-    if (!videoDetailController.timer!.isActive) {
-      videoDetailController.loopHeartBeat();
     }
     super.didPopNext();
   }
@@ -156,8 +154,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
                     expandedHeight: videoHeight,
-                    // backgroundColor: Colors.transparent,
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor:
+                        MediaQuery.of(Get.context!).platformBrightness ==
+                                Brightness.dark
+                            ? Colors.black
+                            : Theme.of(context).colorScheme.background,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
                         padding: EdgeInsets.only(top: statusBarHeight),
@@ -226,10 +227,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 backgroundColor:
                                                     Colors.transparent,
                                                 actions: [
-                                                  /// TODO
                                                   IconButton(
                                                       tooltip: '稍后再看',
-                                                      onPressed: () {},
+                                                      onPressed: () async {
+                                                        var res = await UserHttp
+                                                            .toViewLater(
+                                                                bvid:
+                                                                    videoDetailController
+                                                                        .bvid);
+                                                        SmartDialog.showToast(
+                                                            res['msg']);
+                                                      },
                                                       icon: const Icon(Icons
                                                           .history_outlined))
                                                 ],
@@ -284,38 +292,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   children: [
                     Opacity(
                       opacity: 0,
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         height: 0,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Theme.of(context)
-                                  .dividerColor
-                                  .withOpacity(0.1),
-                            ),
+                        child: Obx(
+                          () => TabBar(
+                            controller: videoDetailController.tabCtr,
+                            dividerColor: Colors.transparent,
+                            indicatorColor:
+                                Theme.of(context).colorScheme.background,
+                            tabs: videoDetailController.tabs
+                                .map((String name) => Tab(text: name))
+                                .toList(),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Container(
-                              width: 280,
-                              margin: const EdgeInsets.only(left: 20),
-                              child: Obx(
-                                () => TabBar(
-                                  controller: videoDetailController.tabCtr,
-                                  dividerColor: Colors.transparent,
-                                  indicatorColor:
-                                      Theme.of(context).colorScheme.background,
-                                  tabs: videoDetailController.tabs
-                                      .map((String name) => Tab(text: name))
-                                      .toList(),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
@@ -333,20 +322,30 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     const VideoIntroPanel(),
                                   ] else if (videoDetailController.videoType ==
                                       SearchType.media_bangumi) ...[
-                                    const BangumiIntroPanel()
+                                    BangumiIntroPanel(
+                                        cid: videoDetailController.cid)
                                   ],
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    SliverPersistentHeader(
-                                      floating: true,
-                                      pinned: true,
-                                      delegate: SliverHeaderDelegate(
-                                        height: 50,
-                                        child:
-                                            const MenuRow(loadingStatus: false),
-                                      ),
+                                  // if (videoDetailController.videoType ==
+                                  //     SearchType.video) ...[
+                                  //   SliverPersistentHeader(
+                                  //     floating: true,
+                                  //     pinned: true,
+                                  //     delegate: SliverHeaderDelegate(
+                                  //       height: 50,
+                                  //       child:
+                                  //           const MenuRow(loadingStatus: false),
+                                  //     ),
+                                  //   ),
+                                  // ],
+                                  SliverToBoxAdapter(
+                                    child: Divider(
+                                      indent: 12,
+                                      endIndent: 12,
+                                      color: Theme.of(context)
+                                          .dividerColor
+                                          .withOpacity(0.06),
                                     ),
-                                  ],
+                                  ),
                                   const RelatedVideoPanel(),
                                 ],
                               );

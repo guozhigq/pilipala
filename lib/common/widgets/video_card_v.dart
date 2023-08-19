@@ -2,18 +2,19 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
+import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final videoItem;
+  final dynamic videoItem;
   final Function()? longPress;
   final Function()? longPressEnd;
 
@@ -23,6 +24,54 @@ class VideoCardV extends StatelessWidget {
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
+
+  void onPushDetail(heroTag) async {
+    String goto = videoItem.goto;
+    switch (goto) {
+      case 'bangumi':
+        if (videoItem.bangumiBadge == '电影') {
+          SmartDialog.showToast('暂不支持电影观看');
+          return;
+        }
+        int epId = videoItem.param;
+        SmartDialog.showLoading(msg: '资源获取中');
+        var result = await SearchHttp.bangumiInfo(seasonId: null, epId: epId);
+        if (result['status']) {
+          var bangumiDetail = result['data'];
+          int cid = bangumiDetail.episodes!.first.cid;
+          String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
+          SmartDialog.dismiss().then(
+            (value) => Get.toNamed(
+              '/video?bvid=$bvid&cid=$cid&epId=$epId',
+              arguments: {
+                'pic': videoItem.pic,
+                'heroTag': heroTag,
+                'videoType': SearchType.media_bangumi,
+              },
+            ),
+          );
+        }
+        break;
+      case 'av':
+        String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
+        Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}', arguments: {
+          // 'videoItem': videoItem,
+          'pic': videoItem.pic,
+          'heroTag': heroTag,
+        });
+        break;
+      default:
+        SmartDialog.showToast(videoItem.goto);
+        Get.toNamed(
+          '/webview',
+          parameters: {
+            'url': videoItem.uri,
+            'type': 'url',
+            'pageTitle': videoItem.title,
+          },
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,61 +89,29 @@ class VideoCardV extends StatelessWidget {
             longPress!();
           }
         },
-        onLongPressEnd: (details) {
-          if (longPressEnd != null) {
-            longPressEnd!();
-          }
-        },
+        // onLongPressEnd: (details) {
+        //   if (longPressEnd != null) {
+        //     longPressEnd!();
+        //   }
+        // },
         child: InkWell(
-          onTap: () async {
-            String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
-            Get.toNamed('/video?bvid=$bvid&cid=${videoItem.cid}',
-                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
-          },
+          onTap: () async => onPushDetail(heroTag),
           child: Column(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: StyleString.imgRadius,
-                  topRight: StyleString.imgRadius,
-                  bottomLeft: StyleString.imgRadius,
-                  bottomRight: StyleString.imgRadius,
-                ),
-                child: AspectRatio(
-                  aspectRatio: StyleString.aspectRatio,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
-                          tag: heroTag,
-                          child: NetworkImgLayer(
-                            src: videoItem.pic,
-                            width: maxWidth,
-                            height: maxHeight,
-                          ),
-                        ),
-                        // if (videoItem.stat.view is int &&
-                        //     videoItem.stat.danmaku is int)
-                        //   Positioned(
-                        //     left: 0,
-                        //     right: 0,
-                        //     bottom: 0,
-                        //     child: AnimatedOpacity(
-                        //       opacity: 1,
-                        //       duration: const Duration(milliseconds: 200),
-                        //       child: VideoStat(
-                        //         view: videoItem.stat.view,
-                        //         danmaku: videoItem.stat.danmaku,
-                        //         duration: videoItem.duration,
-                        //       ),
-                        //     ),
-                        //   ),
-                      ],
-                    );
-                  }),
-                ),
+              AspectRatio(
+                aspectRatio: StyleString.aspectRatio,
+                child: LayoutBuilder(builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
+                  return Hero(
+                    tag: heroTag,
+                    child: NetworkImgLayer(
+                      src: videoItem.pic,
+                      width: maxWidth,
+                      height: maxHeight,
+                    ),
+                  );
+                }),
               ),
               VideoContent(videoItem: videoItem)
             ],
@@ -106,112 +123,150 @@ class VideoCardV extends StatelessWidget {
 }
 
 class VideoContent extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final videoItem;
+  final dynamic videoItem;
   const VideoContent({Key? key, required this.videoItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        // 多列
-        padding: const EdgeInsets.fromLTRB(4, 5, 0, 3),
-        // 单列
-        // padding: const EdgeInsets.fromLTRB(14, 10, 4, 8),
+        padding: const EdgeInsets.fromLTRB(4, 8, 0, 3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               videoItem.title,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-              maxLines: Get.find<RcmdController>().crossAxisCount,
+              style: const TextStyle(fontSize: 13),
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
 
             Row(
               children: [
+                if (videoItem.goto == 'bangumi') ...[
+                  PBadge(
+                    text: videoItem.bangumiBadge,
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'line',
+                    fs: 9,
+                  )
+                ],
                 if (videoItem.rcmdReason != null &&
-                        videoItem.rcmdReason.content != '' ||
-                    videoItem.isFollowed == 1) ...[
-                  Container(
-                      padding: const EdgeInsets.fromLTRB(3, 0, 3, 0),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Center(
-                        child: Text(
-                          videoItem.rcmdReason != null &&
-                                  videoItem.rcmdReason.content != ''
-                              ? videoItem.rcmdReason.content
-                              : '已关注',
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelSmall!
-                                .fontSize,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      )),
-                  const SizedBox(width: 4)
+                    videoItem.rcmdReason.content != '') ...[
+                  PBadge(
+                    text: videoItem.rcmdReason.content,
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'color',
+                  )
+                ],
+                if (videoItem.goto == 'picture') ...[
+                  const PBadge(
+                    text: '动态',
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'line',
+                    fs: 9,
+                  )
                 ],
                 Expanded(
-                  child: LayoutBuilder(builder:
-                      (BuildContext context, BoxConstraints constraints) {
-                    return SizedBox(
-                      width: constraints.maxWidth,
-                      child: Text(
-                        videoItem.owner.name,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelMedium!.fontSize,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: IconButton(
-                    tooltip: '稍后再看',
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () async {
-                      var res =
-                          await UserHttp.toViewLater(bvid: videoItem.bvid);
-                      SmartDialog.showToast(res['msg']);
-                    },
-                    icon: Icon(
-                      Icons.more_vert_outlined,
+                  child: Text(
+                    videoItem.owner.name,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline,
-                      size: 14,
                     ),
                   ),
                 ),
+                if (videoItem.goto == 'av')
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      tooltip: '稍后再看',
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 14,
+                      ),
+                      position: PopupMenuPosition.under,
+                      // constraints: const BoxConstraints(maxHeight: 35),
+                      onSelected: (String type) {},
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            int aid = videoItem.param;
+                            var res = await UserHttp.toViewLater(
+                                bvid: IdUtils.av2bv(aid));
+                            SmartDialog.showToast(res['msg']);
+                          },
+                          value: 'pause',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined, size: 16),
+                              SizedBox(width: 6),
+                              Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
             // Row(
             //   children: [
+            //     const SizedBox(width: 1),
             //     StatView(
-            //       theme: 'black',
+            //       theme: 'gray',
             //       view: videoItem.stat.view,
             //     ),
-            //     const SizedBox(width: 6),
+            //     const SizedBox(width: 10),
             //     StatDanMu(
-            //       theme: 'black',
+            //       theme: 'gray',
             //       danmu: videoItem.stat.danmaku,
+            //     ),
+            //     const Spacer(),
+            //     SizedBox(
+            //       width: 24,
+            //       height: 24,
+            //       child: PopupMenuButton<String>(
+            //         padding: EdgeInsets.zero,
+            //         tooltip: '稍后再看',
+            //         icon: Icon(
+            //           Icons.more_vert_outlined,
+            //           color: Theme.of(context).colorScheme.outline,
+            //           size: 14,
+            //         ),
+            //         position: PopupMenuPosition.under,
+            //         // constraints: const BoxConstraints(maxHeight: 35),
+            //         onSelected: (String type) {},
+            //         itemBuilder: (BuildContext context) =>
+            //             <PopupMenuEntry<String>>[
+            //           PopupMenuItem<String>(
+            //             onTap: () async {
+            //               var res =
+            //                   await UserHttp.toViewLater(bvid: videoItem.bvid);
+            //               SmartDialog.showToast(res['msg']);
+            //             },
+            //             value: 'pause',
+            //             height: 35,
+            //             child: const Row(
+            //               children: [
+            //                 Icon(Icons.watch_later_outlined, size: 16),
+            //                 SizedBox(width: 6),
+            //                 Text('稍后再看', style: TextStyle(fontSize: 13))
+            //               ],
+            //             ),
+            //           ),
+            //         ],
+            //       ),
             //     ),
             //   ],
             // ),
@@ -237,7 +292,7 @@ class VideoStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 45,
+      height: 48,
       padding: const EdgeInsets.only(top: 22, left: 6, right: 6),
       decoration: const BoxDecoration(
         gradient: LinearGradient(

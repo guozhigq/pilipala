@@ -3,20 +3,23 @@ import 'dart:async';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:pilipala/common/widgets/app_bar_ani.dart';
 import 'package:pilipala/plugin/pl_player/controller.dart';
 import 'package:pilipala/plugin/pl_player/models/duration.dart';
+import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:pilipala/plugin/pl_player/models/play_status.dart';
 import 'package:pilipala/plugin/pl_player/utils.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-import 'package:volume_controller/volume_controller.dart';
 
 import 'utils/fullscreen.dart';
+import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
@@ -62,6 +65,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   bool _volumeInterceptEventStream = false;
 
+  Box setting = GStrorage.setting;
+  late FullScreenMode mode;
+
   void onDoubleTapSeekBackward() {
     setState(() {
       _mountSeekBackwardButton = true;
@@ -84,9 +90,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
     Future.microtask(() async {
       try {
-        VolumeController().showSystemUI = false;
-        _volumeValue = await VolumeController().getVolume();
-        VolumeController().listener((value) {
+        FlutterVolumeController.showSystemUI = true;
+        _volumeValue = (await FlutterVolumeController.getVolume())!;
+        FlutterVolumeController.addListener((value) {
           if (mounted && !_volumeInterceptEventStream) {
             setState(() {
               _volumeValue = value;
@@ -112,7 +118,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Future<void> setVolume(double value) async {
     try {
-      VolumeController().setVolume(value);
+      FlutterVolumeController.showSystemUI = false;
+      await FlutterVolumeController.setVolume(value);
     } catch (_) {}
     setState(() {
       _volumeValue = value;
@@ -149,16 +156,37 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Future<void> triggerFullScreen() async {
     PlPlayerController _ = widget.controller;
+    mode = FullScreenModeCode.fromCode(
+        setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
+
     if (!_.isFullScreen.value) {
       /// 按照视频宽高比决定全屏方向
-      if (_.direction.value == 'horizontal') {
-        /// 进入全屏
-        await enterFullScreen();
-        // 横屏
-        // await landScape();
-      } else {
-        // 竖屏
-        await verticalScreen();
+      switch (mode) {
+        case FullScreenMode.auto:
+          if (_.direction.value == 'horizontal') {
+            /// 进入全屏
+            await enterFullScreen();
+            // 横屏
+            await landScape();
+          } else {
+            // 竖屏
+            await verticalScreen();
+          }
+          break;
+        case FullScreenMode.vertical:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          await verticalScreen();
+          break;
+        case FullScreenMode.horizontal:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          await landScape();
+          break;
       }
 
       _.toggleFullScreen(true);
@@ -235,7 +263,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
-        /// 长按倍速
+        /// 长按倍速 toast
         Obx(
           () => Align(
             alignment: Alignment.topCenter,
@@ -274,7 +302,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
-        /// 时间进度
+        /// 时间进度 toast
         Obx(
           () => Align(
             alignment: Alignment.topCenter,
@@ -426,6 +454,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           ),
         ),
 
+        Obx(() {
+          if (_.buffered.value == Duration.zero) {
+            return Positioned.fill(
+              child: Container(
+                color: Colors.black,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/loading.gif',
+                    height: 25,
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return Container();
+          }
+        }),
+
         /// 手势
         Positioned.fill(
           left: 16,
@@ -437,6 +483,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.controls = !_.showControls.value;
             },
             onDoubleTapDown: (details) {
+              // live模式下禁用
+              if (_.videoType.value == 'live') {
+                return;
+              }
               final totalWidth = MediaQuery.of(context).size.width;
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
@@ -456,17 +506,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             },
             onLongPressStart: (detail) {
               feedBack();
-              double currentSpeed = _.playbackSpeed;
               _.setDoubleSpeedStatus(true);
-              _.setPlaybackSpeed(currentSpeed * 2);
             },
             onLongPressEnd: (details) {
-              double currentSpeed = _.playbackSpeed;
               _.setDoubleSpeedStatus(false);
-              _.setPlaybackSpeed(currentSpeed / 2);
             },
-            // 水平位置 快进
+
+            /// 水平位置 快进 live模式下禁用
             onHorizontalDragUpdate: (DragUpdateDetails details) {
+              if (_.videoType.value == 'live') {
+                return;
+              }
               final tapPosition = details.localPosition.dx;
               int curSliderPosition = _.sliderPosition.value.inSeconds;
               late int result;
@@ -485,6 +535,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _initTapPositoin = tapPosition;
             },
             onHorizontalDragEnd: (DragEndDetails details) {
+              if (_.videoType.value == 'live') {
+                return;
+              }
               _.onChangedSliderEnd();
               _.seekTo(_.sliderPosition.value);
             },
@@ -517,8 +570,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   _distance = 0.0;
                 }
                 _distance = dy;
-
-                // triggerFullScreen();
               } else {
                 // 右边区域 👈
                 final volume = _volumeValue - delta / 100.0;
@@ -531,9 +582,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        if (_.controlsEnabled)
-          Obx(
-            () => Column(
+        Obx(
+          () => Visibility(
+            visible: _.videoType.value != 'live',
+            child: Column(
               children: [
                 if (widget.headerControl != null)
                   ClipRect(
@@ -560,7 +612,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ],
             ),
           ),
-        // 进度条
+        ),
+
+        /// 进度条 live模式下禁用
         Obx(
           () {
             final int value = _.sliderPosition.value.inSeconds;
@@ -613,9 +667,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 锁
-        if (_.controlsEnabled)
-          Obx(
-            () => Align(
+        Obx(
+          () => Visibility(
+            visible: _.videoType.value != 'live',
+            child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
                 translation: const Offset(0.5, 0.0),
@@ -635,6 +690,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ),
             ),
           ),
+        ),
         //
         Obx(() {
           if (_.dataStatus.loading || _.isBuffering.value) {
@@ -676,7 +732,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           },
                           child: BackwardSeekIndicator(
                             onChanged: (value) {
-                              print(value);
                               // _seekBarDeltaValueNotifier.value = -value;
                             },
                             onSubmitted: (value) {

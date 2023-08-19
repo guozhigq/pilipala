@@ -36,7 +36,8 @@ Widget author(item, context) {
           Text(
             item.modules.moduleAuthor.name,
             style: TextStyle(
-              color: item.modules.moduleAuthor!.vip!['status'] > 0
+              color: item.modules.moduleAuthor!.vip != null &&
+                      item.modules.moduleAuthor!.vip['status'] > 0
                   ? const Color.fromARGB(255, 251, 100, 163)
                   : Theme.of(context).colorScheme.onBackground,
               fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,

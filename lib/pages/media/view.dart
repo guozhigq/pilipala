@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
@@ -14,13 +15,29 @@ class MediaPage extends StatefulWidget {
 
 class _MediaPageState extends State<MediaPage>
     with AutomaticKeepAliveClientMixin {
+  late MediaController mediaController;
+  late Future _futureBuilderFuture;
+  EventBus eventBus = EventBus();
+
   @override
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    mediaController = Get.put(MediaController());
+    _futureBuilderFuture = mediaController.queryFavFolder();
+    eventBus.on(EventName.loginEvent, (args) {
+      mediaController.userLogin.value = args['status'];
+      setState(() {
+        _futureBuilderFuture = mediaController.queryFavFolder();
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    final MediaController mediaController = Get.put(MediaController());
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(toolbarHeight: 30),
@@ -59,7 +76,7 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ],
-          Obx(() => mediaController.userLogin.value == true
+          Obx(() => mediaController.userLogin.value
               ? favFolder(mediaController, context)
               : const SizedBox())
         ],
@@ -107,7 +124,11 @@ class _MediaPageState extends State<MediaPage>
             ),
           ),
           trailing: IconButton(
-            onPressed: () => mediaController.queryFavFolder(),
+            onPressed: () {
+              setState(() {
+                _futureBuilderFuture = mediaController.queryFavFolder();
+              });
+            },
             icon: const Icon(
               Icons.refresh,
               size: 20,
@@ -119,7 +140,7 @@ class _MediaPageState extends State<MediaPage>
           width: double.infinity,
           height: 170,
           child: FutureBuilder(
-              future: mediaController.queryFavFolder(),
+              future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Map data = snapshot.data as Map;

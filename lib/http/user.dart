@@ -1,3 +1,4 @@
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
@@ -84,6 +85,12 @@ class UserHttp {
   static Future<dynamic> seeYouLater() async {
     var res = await Request().get(Api.seeYouLater);
     if (res.data['code'] == 0) {
+      if (res.data['data']['count'] == 0) {
+        return {
+          'status': true,
+          'data': {'list': [], 'count': 0}
+        };
+      }
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']['list']) {
         list.add(HotVideoItemModel.fromJson(i));
@@ -175,6 +182,37 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': 'yeah！成功移除'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 获取用户凭证
+  static Future thirdLogin() async {
+    var res = await Request().get(
+      'https://passport.bilibili.com/login/app/third',
+      data: {
+        'appkey': Constants.appKey,
+        'api': Constants.thirdApi,
+        'sign': Constants.thirdSign,
+      },
+    );
+    if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
+      Request().get(res.data['data']['confirm_uri']);
+    }
+  }
+
+  // 清空稍后再看
+  static Future toViewClear() async {
+    var res = await Request().post(
+      Api.toViewClear,
+      queryParameters: {
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '操作完成'};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

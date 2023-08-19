@@ -15,20 +15,12 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 class Request {
   static final Request _instance = Request._internal();
   static late CookieManager cookieManager;
-
+  static late final Dio dio;
   factory Request() => _instance;
-
-  static Dio dio = Dio()
-    ..httpClientAdapter = Http2Adapter(
-      ConnectionManager(
-        idleTimeout: const Duration(milliseconds: 10000),
-        // Ignore bad certificate
-        onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
-      ),
-    );
 
   /// 设置cookie
   static setCookie() async {
+    Box user = GStrorage.user;
     var cookiePath = await Utils.getCookiePath();
     var cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -38,8 +30,18 @@ class Request {
     dio.interceptors.add(cookieManager);
     var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    var cookie2 = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.tUrl));
+    if (user.get(UserBoxKey.userMid) != null) {
+      var cookie2 = await cookieManager.cookieJar
+          .loadForRequest(Uri.parse(HttpString.tUrl));
+      if (cookie2.isEmpty) {
+        try {
+          await Request().get(HttpString.tUrl);
+        } catch (e) {
+          log("setCookie, ${e.toString()}");
+        }
+      }
+    }
+
     if (cookie.isEmpty) {
       try {
         await Request().get(HttpString.baseUrl);
@@ -47,23 +49,9 @@ class Request {
         log("setCookie, ${e.toString()}");
       }
     }
-    if (cookie2.isEmpty) {
-      try {
-        await Request().get(HttpString.tUrl);
-      } catch (e) {
-        log("setCookie, ${e.toString()}");
-      }
-    }
-  }
-
-  // 移除cookie
-  static removeCookie() async {
-    await cookieManager.cookieJar
-        .saveFromResponse(Uri.parse(HttpString.baseUrl), []);
-    await cookieManager.cookieJar
-        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), []);
-    cookieManager.cookieJar.deleteAll();
-    dio.interceptors.add(cookieManager);
+    var cookieString =
+        cookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    dio.options.headers['cookie'] = cookieString;
   }
 
   // 从cookie中获取 csrf token
@@ -95,28 +83,38 @@ class Request {
       //Http请求头.
       headers: {
         // 'cookie': '',
-        "env": 'prod',
-        "app-key": 'android',
-        "x-bili-aurora-eid": 'UlMFQVcABlAH',
-        "x-bili-aurora-zone": 'sh001',
-        'referer': 'https://www.bilibili.com/',
       },
     );
 
     Box user = GStrorage.user;
     if (user.get(UserBoxKey.userMid) != null) {
       options.headers['x-bili-mid'] = user.get(UserBoxKey.userMid).toString();
+      options.headers['env'] = 'prod';
+      options.headers['app-key'] = 'android64';
+      options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
+      options.headers['x-bili-aurora-zone'] = 'sh001';
+      options.headers['referer'] = 'https://www.bilibili.com/';
     }
-    dio.options = options;
+
+    dio = Dio(options)
+      ..httpClientAdapter = Http2Adapter(
+        ConnectionManager(
+          idleTimeout: const Duration(milliseconds: 10000),
+          // Ignore bad certificate
+          onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
+        ),
+      );
+
     //添加拦截器
-    dio.interceptors
-      ..add(ApiInterceptor())
-      // 日志拦截器 输出请求、响应内容
-      ..add(LogInterceptor(
-        request: false,
-        requestHeader: false,
-        responseHeader: false,
-      ));
+    dio.interceptors.add(ApiInterceptor());
+
+    // 日志拦截器 输出请求、响应内容
+    dio.interceptors.add(LogInterceptor(
+      request: false,
+      requestHeader: false,
+      responseHeader: false,
+    ));
+
     dio.transformer = BackgroundTransformer();
     dio.options.validateStatus = (status) {
       return status! >= 200 && status < 300 || status == 304 || status == 302;
@@ -161,7 +159,7 @@ class Request {
    * post请求
    */
   post(url, {data, queryParameters, options, cancelToken, extra}) async {
-    print('post-data: $data');
+    // print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
@@ -171,7 +169,7 @@ class Request {
         options: options,
         cancelToken: cancelToken,
       );
-      print('post success: ${response.data}');
+      // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
       print('post error: $e');

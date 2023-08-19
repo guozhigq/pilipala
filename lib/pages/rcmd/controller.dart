@@ -2,17 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
+import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
-  int count = 12;
-  int _currentPage = 1;
-  int crossAxisCount = 2;
-  RxList<RecVideoItemModel> videoList = [RecVideoItemModel()].obs;
-  bool isLoadingMore = false;
-  bool flag = false;
+  int _currentPage = 0;
+  RxList<RecVideoItemAppModel> videoList = <RecVideoItemAppModel>[].obs;
+  bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
 
@@ -21,7 +18,7 @@ class RcmdController extends GetxController {
     super.onInit();
     if (recVideo.get('cacheList') != null &&
         recVideo.get('cacheList').isNotEmpty) {
-      List<RecVideoItemModel> list = [];
+      List<RecVideoItemAppModel> list = [];
       for (var i in recVideo.get('cacheList')) {
         list.add(i);
       }
@@ -31,13 +28,18 @@ class RcmdController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    var res = await VideoHttp.rcmdVideoList(
-      ps: count,
+    if (isLoadingMore == false) {
+      return;
+    }
+    if (type == 'onRefresh') {
+      _currentPage = 0;
+    }
+    var res = await VideoHttp.rcmdVideoListApp(
       freshIdx: _currentPage,
     );
     if (res['status']) {
       if (type == 'init') {
-        if (videoList.length > 1) {
+        if (videoList.isNotEmpty) {
           videoList.addAll(res['data']);
         } else {
           videoList.value = res['data'];
@@ -56,6 +58,7 @@ class RcmdController extends GetxController {
 
   // 下拉刷新
   Future onRefresh() async {
+    isLoadingMore = true;
     queryRcmdFeed('onRefresh');
   }
 

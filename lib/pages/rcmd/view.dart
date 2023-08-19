@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -23,6 +24,7 @@ class RcmdPage extends StatefulWidget {
 class _RcmdPageState extends State<RcmdPage>
     with AutomaticKeepAliveClientMixin {
   final RcmdController _rcmdController = Get.put(RcmdController());
+  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +32,7 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
+    _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -39,7 +42,9 @@ class _RcmdPageState extends State<RcmdPage>
             scrollController.position.maxScrollExtent - 200) {
           if (!_rcmdController.isLoadingMore) {
             _rcmdController.isLoadingMore = true;
-            _rcmdController.onLoad();
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              _rcmdController.onLoad();
+            });
           }
         }
 
@@ -57,78 +62,103 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RefreshIndicator(
-      onRefresh: () async {
-        return await _rcmdController.onRefresh();
-      },
-      child: CustomScrollView(
-        controller: _rcmdController.scrollController,
-        slivers: [
-          SliverPadding(
-            // 单列布局 EdgeInsets.zero
-            padding: _rcmdController.crossAxisCount == 1
-                ? EdgeInsets.zero
-                : const EdgeInsets.fromLTRB(
-                    StyleString.safeSpace, 0, StyleString.safeSpace, 0),
-            sliver: FutureBuilder(
-              future: _rcmdController.queryRcmdFeed('init'),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data as Map;
-                  if (data['status']) {
-                    return Obx(() => contentGrid(
-                        _rcmdController, _rcmdController.videoList));
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(StyleString.imgRadius),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          return await _rcmdController.onRefresh();
+        },
+        child: CustomScrollView(
+          controller: _rcmdController.scrollController,
+          slivers: [
+            SliverPadding(
+              padding:
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Platform.isAndroid || Platform.isIOS
+                          ? Obx(() => contentGrid(
+                              _rcmdController, _rcmdController.videoList))
+                          : SliverLayoutBuilder(
+                              builder: (context, boxConstraints) {
+                              return Obx(() => contentGrid(
+                                  _rcmdController, _rcmdController.videoList));
+                            });
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _rcmdController.queryRcmdFeed('init');
+                          });
+                        },
+                      );
+                    }
                   } else {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => {},
-                    );
+                    // 缓存数据
+                    if (_rcmdController.videoList.isNotEmpty) {
+                      return contentGrid(
+                          _rcmdController, _rcmdController.videoList);
+                    }
+                    // 骨架屏
+                    else {
+                      return contentGrid(_rcmdController, []);
+                    }
                   }
-                } else {
-                  // 缓存数据
-                  if (_rcmdController.videoList.length > 1) {
-                    return contentGrid(
-                        _rcmdController, _rcmdController.videoList);
-                  }
-                  // 骨架屏
-                  else {
-                    return contentGrid(_rcmdController, []);
-                  }
-                }
-              },
+                },
+              ),
             ),
-          ),
-          const LoadingMore()
-        ],
+            const LoadingMore()
+          ],
+        ),
       ),
     );
   }
 
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
-        builder: (context) => AnimatedDialog(
-              child: OverlayPop(videoItem: videoItem),
-            ));
+      builder: (context) => AnimatedDialog(
+        closeFn: _rcmdController.popupDialog?.remove,
+        child: OverlayPop(
+            videoItem: videoItem, closeFn: _rcmdController.popupDialog?.remove),
+      ),
+    );
   }
 
   Widget contentGrid(ctr, videoList) {
+    double maxWidth = Get.size.width;
+    int baseWidth = 500;
+    int step = 300;
+    int crossAxisCount =
+        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    if (maxWidth < 300) {
+      crossAxisCount = 1;
+    }
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 2,
+        mainAxisSpacing: StyleString.cardSpace + 4,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 3,
+        crossAxisSpacing: StyleString.cardSpace + 4,
         // 列数
-        crossAxisCount: ctr.crossAxisCount,
+        crossAxisCount: crossAxisCount,
         mainAxisExtent:
-            Get.size.width / ctr.crossAxisCount / StyleString.aspectRatio + 60,
+            Get.size.width / crossAxisCount / StyleString.aspectRatio + 66,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return videoList!.isNotEmpty
-              ?
-              // VideoCardV(videoItem: videoList![index])
-              VideoCardV(
+              ? VideoCardV(
                   videoItem: videoList[index],
                   longPress: () {
                     _rcmdController.popupDialog =

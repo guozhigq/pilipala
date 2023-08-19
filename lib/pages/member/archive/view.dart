@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_more_list/loading_more_list.dart';
-import 'package:pilipala/common/widgets/pull_to_refresh_header.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/pages/member/archive/index.dart';
@@ -152,7 +151,6 @@ class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
     if (res['status']) {
       addAll(res['data'].list.vlist);
     }
-    print(length);
     if (length < res['data'].page['count']) {
       isSuccess = true;
     } else {

@@ -22,7 +22,11 @@ import 'controller.dart';
 import 'widgets/intro_detail.dart';
 
 class BangumiIntroPanel extends StatefulWidget {
-  const BangumiIntroPanel({super.key});
+  final int? cid;
+  const BangumiIntroPanel({
+    Key? key,
+    this.cid,
+  }) : super(key: key);
 
   @override
   State<BangumiIntroPanel> createState() => _BangumiIntroPanelState();
@@ -33,6 +37,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
   final BangumiIntroController bangumiIntroController =
       Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
   BangumiInfoModel? bangumiDetail;
+  late Future _futureBuilderFuture;
 
 // 添加页面缓存
   @override
@@ -44,13 +49,14 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
     bangumiIntroController.bangumiDetail.listen((value) {
       bangumiDetail = value;
     });
+    _futureBuilderFuture = bangumiIntroController.queryBangumiIntro();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return FutureBuilder(
-      future: bangumiIntroController.queryBangumiIntro(),
+      future: _futureBuilderFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data['status']) {
@@ -67,7 +73,11 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
             );
           }
         } else {
-          return BangumiInfo(loadingStatus: true, bangumiDetail: bangumiDetail);
+          return BangumiInfo(
+            loadingStatus: true,
+            bangumiDetail: bangumiDetail,
+            cid: widget.cid,
+          );
         }
       },
     );
@@ -77,11 +87,13 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
 class BangumiInfo extends StatefulWidget {
   final bool loadingStatus;
   final BangumiInfoModel? bangumiDetail;
+  final int? cid;
 
   const BangumiInfo({
     Key? key,
     this.loadingStatus = false,
     this.bangumiDetail,
+    this.cid,
   }) : super(key: key);
 
   @override
@@ -89,21 +101,22 @@ class BangumiInfo extends StatefulWidget {
 }
 
 class _BangumiInfoState extends State<BangumiInfo> {
-  late BangumiInfoModel? bangumiItem;
-  final BangumiIntroController bangumiIntroController =
-      Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
-
-  late VideoDetailController? videoDetailCtr;
+  String heroTag = Get.arguments['heroTag'];
+  late final BangumiIntroController bangumiIntroController;
+  late final VideoDetailController videoDetailCtr;
   Box localCache = GStrorage.localCache;
+  late final BangumiInfoModel? bangumiItem;
   late double sheetHeight;
+  int? cid;
 
   @override
   void initState() {
     super.initState();
+    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+    videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     bangumiItem = bangumiIntroController.bangumiItem;
-    videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     sheetHeight = localCache.get('sheetHeight');
+    cid = widget.cid!;
   }
 
   // 收藏
@@ -160,13 +173,14 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           ),
                           if (bangumiItem != null &&
                               bangumiItem!.rating != null)
-                            pBadge(
-                                '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
-                                context,
-                                null,
-                                6,
-                                6,
-                                null),
+                            PBadge(
+                              text:
+                                  '评分 ${!widget.loadingStatus ? widget.bangumiDetail!.rating!['score']! : bangumiItem!.rating!['score']!}',
+                              top: null,
+                              right: 6,
+                              bottom: 6,
+                              left: null,
+                            ),
                         ],
                       ),
                       const SizedBox(width: 10),
@@ -318,9 +332,10 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       pages: bangumiItem != null
                           ? bangumiItem!.episodes!
                           : widget.bangumiDetail!.episodes!,
-                      cid: bangumiItem != null
-                          ? bangumiItem!.episodes!.first.cid
-                          : widget.bangumiDetail!.episodes!.first.cid,
+                      cid: cid ??
+                          (bangumiItem != null
+                              ? bangumiItem!.episodes!.first.cid
+                              : widget.bangumiDetail!.episodes!.first.cid),
                       sheetHeight: sheetHeight,
                       changeFuc: (bvid, cid, aid) => bangumiIntroController
                           .changeSeasonOrbangu(bvid, cid, aid),
@@ -357,10 +372,10 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
                       onTap: () => bangumiIntroController.actionLikeVideo(),
                       selectStatus: bangumiIntroController.hasLike.value,
-                      loadingStatus: widget.loadingStatus,
+                      loadingStatus: false,
                       text: !widget.loadingStatus
                           ? widget.bangumiDetail!.stat!['likes']!.toString()
-                          : '-'),
+                          : bangumiItem!.stat!['likes']!.toString()),
                 ),
                 Obx(
                   () => ActionItem(
@@ -368,10 +383,10 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       selectIcon: const Icon(FontAwesomeIcons.b),
                       onTap: () => bangumiIntroController.actionCoinVideo(),
                       selectStatus: bangumiIntroController.hasCoin.value,
-                      loadingStatus: widget.loadingStatus,
+                      loadingStatus: false,
                       text: !widget.loadingStatus
                           ? widget.bangumiDetail!.stat!['coins']!.toString()
-                          : '-'),
+                          : bangumiItem!.stat!['coins']!.toString()),
                 ),
                 Obx(
                   () => ActionItem(
@@ -379,29 +394,29 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       selectIcon: const Icon(FontAwesomeIcons.solidStar),
                       onTap: () => showFavBottomSheet(),
                       selectStatus: bangumiIntroController.hasFav.value,
-                      loadingStatus: widget.loadingStatus,
+                      loadingStatus: false,
                       text: !widget.loadingStatus
                           ? widget.bangumiDetail!.stat!['favorite']!.toString()
-                          : '-'),
+                          : bangumiItem!.stat!['favorite']!.toString()),
                 ),
                 ActionItem(
                   icon: const Icon(FontAwesomeIcons.comment),
                   selectIcon: const Icon(FontAwesomeIcons.reply),
-                  onTap: () => videoDetailCtr!.tabCtr!.animateTo(1),
+                  onTap: () => videoDetailCtr.tabCtr.animateTo(1),
                   selectStatus: false,
-                  loadingStatus: widget.loadingStatus,
+                  loadingStatus: false,
                   text: !widget.loadingStatus
                       ? widget.bangumiDetail!.stat!['reply']!.toString()
-                      : '-',
+                      : bangumiItem!.stat!['reply']!.toString(),
                 ),
                 ActionItem(
                     icon: const Icon(FontAwesomeIcons.shareFromSquare),
                     onTap: () => bangumiIntroController.actionShareVideo(),
                     selectStatus: false,
-                    loadingStatus: widget.loadingStatus,
+                    loadingStatus: false,
                     text: !widget.loadingStatus
                         ? widget.bangumiDetail!.stat!['share']!.toString()
-                        : '-'),
+                        : bangumiItem!.stat!['share']!.toString()),
               ],
             ),
           ),
@@ -465,9 +480,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
           onTap: () => videoIntroController.actionShareVideo(),
           selectStatus: false,
           loadingStatus: widget.loadingStatus,
-          // text: !widget.loadingStatus
-          //     ? widget.videoDetail!.stat!.share!.toString()
-          //     : '-',
           text: '转发'),
     ]);
   }

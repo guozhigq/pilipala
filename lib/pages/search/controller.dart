@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/index.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
@@ -20,10 +21,12 @@ class SSearchController extends GetxController {
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
+  RxString defaultSearch = '输入关键词搜索'.obs;
 
   @override
   void onInit() {
     super.onInit();
+    searchDefault();
     if (hotKeyword.get('cacheList') != null &&
         hotKeyword.get('cacheList').isNotEmpty) {
       List<HotSearchItem> list = [];
@@ -56,7 +59,7 @@ class SSearchController extends GetxController {
   }
 
   void onClear() {
-    if (searchKeyWord.value.isNotEmpty) {
+    if (searchKeyWord.value.isNotEmpty && controller.value.text != '') {
       controller.value.clear();
       searchKeyWord.value = '';
       searchSuggestList.value = [];
@@ -120,5 +123,13 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     histiryWord.put('cacheList', []);
+  }
+
+  void searchDefault() async {
+    var res = await Request().get(Api.searchDefault);
+    if (res.data['code'] == 0) {
+      searchKeyWord.value =
+          hintText = defaultSearch.value = res.data['data']['name'];
+    }
   }
 }
