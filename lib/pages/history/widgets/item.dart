@@ -116,7 +116,7 @@ class HistoryItem extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                StyleString.cardSpace, 5, StyleString.cardSpace, 5),
+                StyleString.safeSpace, 5, StyleString.safeSpace, 5),
             child: LayoutBuilder(
               builder: (context, boxConstraints) {
                 double width =

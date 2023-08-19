@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/pages/later/index.dart';
 
@@ -85,13 +86,11 @@ class _LaterPageState extends State<LaterPage> {
                               );
                             }, childCount: _laterController.laterList.length),
                           )
-                        : SliverToBoxAdapter(
-                            child: Center(
-                              child: Text(_laterController.isLoading.value
-                                  ? '加载中'
-                                  : '没有数据'),
-                            ),
-                          ),
+                        : _laterController.isLoading.value
+                            ? const SliverToBoxAdapter(
+                                child: Center(child: Text('加载中')),
+                              )
+                            : const NoData(),
                   );
                 } else {
                   return HttpError(
