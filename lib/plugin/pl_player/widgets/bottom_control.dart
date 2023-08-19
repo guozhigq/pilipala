@@ -44,29 +44,33 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               if (value > max || max <= 0) {
                 return Container();
               }
-              return ProgressBar(
-                progress: Duration(seconds: value),
-                buffered: Duration(seconds: buffer),
-                total: Duration(seconds: max),
-                progressBarColor: colorTheme,
-                baseBarColor: Colors.white.withOpacity(0.2),
-                bufferedBarColor: colorTheme.withOpacity(0.4),
-                timeLabelLocation: TimeLabelLocation.none,
-                thumbColor: colorTheme,
-                barHeight: 3.0,
-                thumbRadius: 5.5,
-                onDragStart: (duration) {
-                  feedBack();
-                  _.onChangedSliderStart();
-                },
-                onDragUpdate: (duration) {
-                  _.onUodatedSliderProgress(duration.timeStamp);
-                },
-                onSeek: (duration) {
-                  _.onChangedSliderEnd();
-                  _.onChangedSlider(duration.inSeconds.toDouble());
-                  _.seekTo(Duration(seconds: duration.inSeconds));
-                },
+              return Padding(
+                padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                child: ProgressBar(
+                  progress: Duration(seconds: value),
+                  buffered: Duration(seconds: buffer),
+                  total: Duration(seconds: max),
+                  progressBarColor: colorTheme,
+                  baseBarColor: Colors.white.withOpacity(0.2),
+                  bufferedBarColor: colorTheme.withOpacity(0.4),
+                  timeLabelLocation: TimeLabelLocation.none,
+                  thumbColor: colorTheme,
+                  barHeight: 3.0,
+                  thumbRadius: 5.5,
+                  onDragStart: (duration) {
+                    feedBack();
+                    _.onChangedSliderStart();
+                  },
+                  onDragUpdate: (duration) {
+                    _.onUodatedSliderProgress(duration.timeStamp);
+                  },
+                  onSeek: (duration) {
+                    _.onChangedSliderEnd();
+                    _.onChangedSlider(duration.inSeconds.toDouble());
+                    _.seekTo(Duration(seconds: duration.inSeconds),
+                        type: 'slider');
+                  },
+                ),
               );
             },
           ),

@@ -46,6 +46,7 @@ class PlPlayerController {
   // 播放位置
   final Rx<Duration> _position = Rx(Duration.zero);
   final Rx<Duration> _sliderPosition = Rx(Duration.zero);
+  // 展示使用
   final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
   final Rx<Duration> _duration = Rx(Duration.zero);
   final Rx<Duration> _buffered = Rx(Duration.zero);
@@ -450,7 +451,7 @@ class PlPlayerController {
   }
 
   /// 跳转至指定位置
-  Future<void> seekTo(Duration position) async {
+  Future<void> seekTo(Duration position, {type = 'seek'}) async {
     // if (position >= duration.value) {
     //   position = duration.value - const Duration(milliseconds: 100);
     // }
@@ -459,7 +460,10 @@ class PlPlayerController {
     }
     _position.value = position;
     if (duration.value.inSeconds != 0) {
-      await _videoPlayerController!.stream.buffer.first;
+      if (type != 'slider') {
+        /// 拖动进度条调节时，不等待第一帧，防止抖动
+        await _videoPlayerController!.stream.buffer.first;
+      }
       await _videoPlayerController?.seek(position);
       // if (playerStatus.stopped) {
       //   play();
