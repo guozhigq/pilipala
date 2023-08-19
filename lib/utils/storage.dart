@@ -119,6 +119,7 @@ class SettingBoxKey {
   static const String fullScreenMode = 'fullScreenMode';
 
   static const String blackMidsList = 'blackMidsList';
+  static const String autoUpdate = 'autoUpdate';
 }
 
 class LocalCacheKey {

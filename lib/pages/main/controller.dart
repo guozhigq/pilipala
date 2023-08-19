@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
@@ -49,4 +52,13 @@ class MainController extends GetxController {
   ].obs;
   final StreamController<bool> bottomBarStream =
       StreamController<bool>.broadcast();
+  Box setting = GStrorage.setting;
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
+      Utils.checkUpdata();
+    }
+  }
 }

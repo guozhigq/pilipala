@@ -4,12 +4,14 @@ class LatestDataModel {
     this.tagName,
     this.createdAt,
     this.assets,
+    this.body,
   });
 
   String? url;
   String? tagName;
   String? createdAt;
   List? assets;
+  String? body;
 
   LatestDataModel.fromJson(Map<String, dynamic> json) {
     url = json['url'];
@@ -17,6 +19,7 @@ class LatestDataModel {
     createdAt = json['created_at'];
     assets =
         json['assets'].map<AssetItem>((e) => AssetItem.fromJson(e)).toList();
+    body = json['body'];
   }
 }
 

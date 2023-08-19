@@ -4,8 +4,14 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get_utils/get_utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/http/index.dart';
+import 'package:pilipala/models/github/latest.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static Future<String> getCookiePath() async {
@@ -193,5 +199,56 @@ class Utils {
       }
     }
     return false;
+  }
+
+  // 检查更新
+  static Future<bool> checkUpdata() async {
+    SmartDialog.dismiss();
+    var currentInfo = await PackageInfo.fromPlatform();
+    var result = await Request().get(Api.latestApp);
+    LatestDataModel data = LatestDataModel.fromJson(result.data);
+    bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
+    if (isUpdate) {
+      SmartDialog.show(
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('🎉 发现新版本 '),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data.tagName!,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 8),
+                Text(data.body!),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => SmartDialog.dismiss(),
+                  child: Text(
+                    '稍后',
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.outline),
+                  )),
+              TextButton(
+                  onPressed: () async {
+                    await SmartDialog.dismiss();
+                    launchUrl(
+                      Uri.parse(
+                          'https://github.com/guozhigq/pilipala/releases'),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  },
+                  child: const Text('去下载')),
+            ],
+          );
+        },
+      );
+    }
+    return true;
   }
 }
