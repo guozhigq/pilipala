@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -36,10 +37,10 @@ class _BangumiPageState extends State<BangumiPage>
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_bangumidController.isLoadingMore) {
+          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
             _bangumidController.isLoadingMore = true;
-            await _bangumidController.onLoad();
-          }
+            _bangumidController.onLoad();
+          });
         }
 
         final ScrollDirection direction =

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -35,10 +36,10 @@ class _LivePageState extends State<LivePage> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_liveController.isLoadingMore) {
+          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
             _liveController.isLoadingMore = true;
             _liveController.onLoad();
-          }
+          });
         }
 
         final ScrollDirection direction =

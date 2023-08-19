@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -65,9 +66,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         if (_videoReplyController.scrollController.position.pixels >=
             _videoReplyController.scrollController.position.maxScrollExtent -
                 300) {
-          if (!_videoReplyController.isLoadingMore) {
+          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
             _videoReplyController.onLoad();
-          }
+          });
         }
 
         final ScrollDirection direction =

@@ -113,6 +113,8 @@ dependencies:
   package_info_plus: ^4.1.0
   url_launcher: ^6.1.12
   flutter_svg: ^2.0.7
+  # 防抖节流
+  easy_debounce: ^2.0.3
   
 dev_dependencies:
   flutter_test:

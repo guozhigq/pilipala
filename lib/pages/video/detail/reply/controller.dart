@@ -37,6 +37,9 @@ class VideoReplyController extends GetxController {
     if (type == 'init') {
       currentPage = 0;
     }
+    if (noMore.value == '没有更多了') {
+      return;
+    }
     var res = await ReplyHttp.replyList(
       oid: aid!,
       pageNum: currentPage + 1,
