@@ -6,6 +6,7 @@ import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/controller.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -46,14 +47,25 @@ class SettingController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
+                // 清空cookie
                 await Request.cookieManager.cookieJar.deleteAll();
-                await Get.find<MineController>().resetUserInfo();
-                userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+                Request.dio.options.headers['cookie'] = '';
+
+                // 清空本地存储的用户标识
                 userInfoCache.put('userInfoCache', null);
+                user.put(UserBoxKey.accessKey, {'mid': -1, 'value': ''});
+
+                // 更改我的页面登录状态
+                await Get.find<MineController>().resetUserInfo();
+
+                // 更改主页登录状态
                 HomeController homeCtr = Get.find<HomeController>();
                 homeCtr.updateLoginStatus(false);
-                user.put(UserBoxKey.accessKey, {'mid': -1, 'value': ''});
-                Request.dio.options.headers['cookie'] = '';
+
+                // 事件通知
+                EventBus eventBus = EventBus();
+                eventBus.emit(EventName.loginEvent, {'status': false});
+
                 SmartDialog.dismiss().then((value) => Get.back());
               },
               child: const Text('确认'),

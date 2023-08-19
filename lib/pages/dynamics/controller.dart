@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/bangumi/info.dart';
@@ -12,6 +13,7 @@ import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
@@ -49,8 +51,19 @@ class DynamicsController extends GetxController {
   ];
   bool flag = false;
   RxInt initialValue = 1.obs;
+  Box user = GStrorage.user;
+  RxBool userLogin = false.obs;
+
+  @override
+  void onInit() {
+    userLogin.value = user.get(UserBoxKey.userLogin, defaultValue: false);
+    super.onInit();
+  }
 
   Future queryFollowDynamic({type = 'init'}) async {
+    if (!userLogin.value) {
+      return {'status': false, 'msg': '未登录'};
+    }
     if (type == 'init') {
       dynamicsList.clear();
     }

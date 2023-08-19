@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _MediaPageState extends State<MediaPage>
     with AutomaticKeepAliveClientMixin {
   late MediaController mediaController;
   late Future _futureBuilderFuture;
+  EventBus eventBus = EventBus();
 
   @override
   bool get wantKeepAlive => true;
@@ -25,6 +27,12 @@ class _MediaPageState extends State<MediaPage>
     super.initState();
     mediaController = Get.put(MediaController());
     _futureBuilderFuture = mediaController.queryFavFolder();
+    eventBus.on(EventName.loginEvent, (args) {
+      mediaController.userLogin.value = args['status'];
+      setState(() {
+        _futureBuilderFuture = mediaController.queryFavFolder();
+      });
+    });
   }
 
   @override
@@ -68,7 +76,7 @@ class _MediaPageState extends State<MediaPage>
               ),
             ),
           ],
-          Obx(() => mediaController.userLogin.value == true
+          Obx(() => mediaController.userLogin.value
               ? favFolder(mediaController, context)
               : const SizedBox())
         ],

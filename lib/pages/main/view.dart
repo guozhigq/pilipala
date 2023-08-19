@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
@@ -96,6 +97,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   @override
   void dispose() async {
     await GStrorage.close();
+    EventBus().off(EventName.loginEvent);
     super.dispose();
   }
 

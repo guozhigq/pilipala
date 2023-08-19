@@ -6,15 +6,37 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'controller.dart';
 
-class MinePage extends StatelessWidget {
+class MinePage extends StatefulWidget {
   const MinePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final MineController mineController = Get.put(MineController());
+  State<MinePage> createState() => _MinePageState();
+}
 
+class _MinePageState extends State<MinePage> {
+  final MineController mineController = Get.put(MineController());
+  late Future _futureBuilderFuture;
+  EventBus eventBus = EventBus();
+
+  @override
+  void initState() {
+    super.initState();
+    _futureBuilderFuture = mineController.queryUserInfo();
+    eventBus.on(EventName.loginEvent, (args) {
+      mineController.userLogin.value = args['status'];
+      if (mounted) {
+        setState(() {
+          _futureBuilderFuture = mineController.queryUserInfo();
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -61,7 +83,7 @@ class MinePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
                   FutureBuilder(
-                    future: mineController.queryUserInfo(),
+                    future: _futureBuilderFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (snapshot.data['status']) {

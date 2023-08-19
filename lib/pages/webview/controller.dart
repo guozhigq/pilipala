@@ -6,11 +6,9 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/cookie.dart';
+import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -21,6 +19,7 @@ class WebviewController extends GetxController {
   final WebViewController controller = WebViewController();
   RxInt loadProgress = 0.obs;
   RxBool loadShow = true.obs;
+  EventBus eventBus = EventBus();
 
   @override
   void onInit() {
@@ -74,10 +73,8 @@ class WebviewController extends GetxController {
                     Box userInfoCache = GStrorage.userInfo;
                     userInfoCache.put('userInfoCache', result['data']);
 
-                    Get.find<MineController>().userInfo.value = result['data'];
-                    Get.find<MineController>().onInit();
-                    Get.find<RcmdController>().queryRcmdFeed('onRefresh');
-                    Get.find<DynamicsController>().onRefresh();
+                    // 通知更新
+                    eventBus.emit(EventName.loginEvent, {'status': true});
 
                     HomeController homeCtr = Get.find<HomeController>();
                     homeCtr.updateLoginStatus(true);

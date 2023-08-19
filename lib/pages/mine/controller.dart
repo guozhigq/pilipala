@@ -32,9 +32,6 @@ class MineController extends GetxController {
 
   onLogin() async {
     if (!userLogin.value) {
-      /// TODO
-      Get.back();
-      await Future.delayed(const Duration(milliseconds: 150));
       Get.toNamed(
         '/webview',
         parameters: {
