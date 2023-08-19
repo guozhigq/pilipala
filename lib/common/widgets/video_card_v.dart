@@ -60,6 +60,16 @@ class VideoCardV extends StatelessWidget {
           'heroTag': heroTag,
         });
         break;
+      default:
+        SmartDialog.showToast(videoItem.goto);
+        Get.toNamed(
+          '/webview',
+          parameters: {
+            'url': videoItem.uri,
+            'type': 'url',
+            'pageTitle': videoItem.title,
+          },
+        );
     }
   }
 
@@ -149,6 +159,15 @@ class VideoContent extends StatelessWidget {
                     stack: 'normal',
                     size: 'small',
                     type: 'color',
+                  )
+                ],
+                if (videoItem.goto == 'picture') ...[
+                  const PBadge(
+                    text: '动态',
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'line',
+                    fs: 9,
                   )
                 ],
                 Expanded(
