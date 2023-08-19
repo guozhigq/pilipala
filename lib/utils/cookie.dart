@@ -7,6 +7,9 @@ class SetCookie {
     var cookies = await WebviewCookieManager().getCookies(HttpString.baseUrl);
     await Request.cookieManager.cookieJar
         .saveFromResponse(Uri.parse(HttpString.baseUrl), cookies);
+    var cookieString =
+        cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    Request.dio.options.headers['cookie'] = cookieString;
 
     cookies = await WebviewCookieManager().getCookies(HttpString.baseApiUrl);
     await Request.cookieManager.cookieJar

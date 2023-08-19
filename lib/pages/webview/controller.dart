@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
@@ -13,7 +12,6 @@ import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rcmd/controller.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewController extends GetxController {
@@ -31,17 +29,17 @@ class WebviewController extends GetxController {
     type = Get.parameters['type']!;
     pageTitle = Get.parameters['pageTitle']!;
 
-    webviewInit();
     if (type == 'login') {
       controller.clearCache();
       controller.clearLocalStorage();
       WebViewCookieManager().clearCookies();
-      controller.setUserAgent(Request().headerUa('mob'));
     }
+    webviewInit();
   }
 
   webviewInit() {
     controller
+      ..setUserAgent(Request().headerUa('mob'))
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -52,8 +50,9 @@ class WebviewController extends GetxController {
           },
           onPageStarted: (String url) {},
           // 加载完成
-          onPageFinished: (String url) async {
+          onUrlChange: (UrlChange urlChange) async {
             loadShow.value = false;
+            String url = urlChange.url ?? '';
             if (type == 'login' &&
                 (url.startsWith(
                         'https://passport.bilibili.com/web/sso/exchange_cookie') ||

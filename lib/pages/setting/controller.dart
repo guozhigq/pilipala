@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
@@ -30,12 +32,36 @@ class SettingController extends GetxController {
   }
 
   loginOut() async {
-    await Request.cookieManager.cookieJar.deleteAll();
-    await Get.find<MineController>().resetUserInfo();
-    userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
-    userInfoCache.put('userInfoCache', null);
-    HomeController homeCtr = Get.find<HomeController>();
-    homeCtr.updateLoginStatus(false);
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确认要退出登录吗'),
+          actions: [
+            TextButton(
+              onPressed: () => SmartDialog.dismiss(),
+              child: const Text('点错了'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await Request.cookieManager.cookieJar.deleteAll();
+                await Get.find<MineController>().resetUserInfo();
+                userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+                userInfoCache.put('userInfoCache', null);
+                HomeController homeCtr = Get.find<HomeController>();
+                homeCtr.updateLoginStatus(false);
+                user.put(UserBoxKey.accessKey, {'mid': -1, 'value': ''});
+                Request.dio.options.headers['cookie'] = '';
+                SmartDialog.dismiss().then((value) => Get.back());
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
   }
 
   // 开启关闭震动反馈

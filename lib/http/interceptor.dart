@@ -17,7 +17,7 @@ class ApiInterceptor extends Interceptor {
     handler.next(options);
   }
 
-  Box setting = GStrorage.setting;
+  Box user = GStrorage.user;
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
@@ -29,7 +29,7 @@ class ApiInterceptor extends Interceptor {
             final uri = Uri.parse(locations.first);
             final accessKey = uri.queryParameters['access_key'];
             final mid = uri.queryParameters['mid'];
-            setting.put(UserBoxKey.accessKey, {'mid': mid, 'value': accessKey});
+            user.put(UserBoxKey.accessKey, {'mid': mid, 'value': accessKey});
           }
         }
       }

@@ -18,6 +18,7 @@ import 'package:pilipala/utils/storage.dart';
 /// 返回{'status': bool, 'data': List}
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
+  static Box user = GStrorage.user;
   static Box setting = GStrorage.setting;
 
   // 首页推荐视频
@@ -61,7 +62,7 @@ class VideoHttp {
           'pull': freshIdx == 0 ? 'true' : 'false',
           'appkey': Constants.appKey,
           'access_key':
-              setting.get(UserBoxKey.accessKey, defaultValue: {})['value'] ?? ''
+              user.get(UserBoxKey.accessKey, defaultValue: {})['value'] ?? ''
         },
       );
       if (res.data['code'] == 0) {
