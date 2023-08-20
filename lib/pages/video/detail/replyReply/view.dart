@@ -69,7 +69,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
 
   @override
   void dispose() {
-    scrollController.dispose();
+    // scrollController.dispose();
     super.dispose();
   }
 
