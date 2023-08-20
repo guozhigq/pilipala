@@ -54,13 +54,14 @@ class _WebviewPageState extends State<WebviewPage> {
                 ),
               ),
             ),
-            Container(
-              width: double.infinity,
-              color: Theme.of(context).colorScheme.onInverseSurface,
-              padding:
-                  const EdgeInsets.only(left: 12, right: 12, top: 6, bottom: 6),
-              child: const Text('登录成功未自动跳转?  请点击右上角「刷新登录状态」'),
-            ),
+            if (_webviewController.type.value == 'login')
+              Container(
+                width: double.infinity,
+                color: Theme.of(context).colorScheme.onInverseSurface,
+                padding: const EdgeInsets.only(
+                    left: 12, right: 12, top: 6, bottom: 6),
+                child: const Text('登录成功未自动跳转?  请点击右上角「刷新登录状态」'),
+              ),
             Expanded(
               child: WebViewWidget(controller: _webviewController.controller),
             ),

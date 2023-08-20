@@ -43,7 +43,7 @@ class UserInfoData {
   @HiveField(5)
   int? mobileVerified;
   @HiveField(6)
-  int? money;
+  double? money;
   @HiveField(7)
   int? moral;
   @HiveField(8)
@@ -88,12 +88,12 @@ class UserInfoData {
         : LevelInfo();
     mid = json['mid'];
     mobileVerified = json['mobile_verified'];
-    money = json['money'];
+    money = json['money'] is int ? json['money'].toDouble() : json['money'];
     moral = json['moral'];
     official = json['official'];
     officialVerify = json['officialVerify'];
     pendant = json['pendant'];
-    // scores = json['scores'];
+    scores = json['scores'];
     uname = json['uname'];
     vipDueDate = json['vipDueDate'];
     vipStatus = json['vipStatus'];
