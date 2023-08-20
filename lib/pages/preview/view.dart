@@ -2,9 +2,12 @@
 
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/download.dart';
 import 'controller.dart';
 
 typedef DoubleClickAnimationListener = void Function();
@@ -31,8 +34,61 @@ class _ImagePreviewState extends State<ImagePreview>
     super.initState();
     // animationController = AnimationController(
     //     vsync: this, duration: const Duration(milliseconds: 400));
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+    );
     _doubleClickAnimationController = AnimationController(
         duration: const Duration(milliseconds: 250), vsync: this);
+  }
+
+  onOpenMenu() {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          clipBehavior: Clip.hardEdge,
+          contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  _previewController.onShareImg();
+                  SmartDialog.dismiss();
+                },
+                dense: true,
+                title: const Text('分享', style: TextStyle(fontSize: 14)),
+              ),
+              ListTile(
+                onTap: () {
+                  Clipboard.setData(
+                          ClipboardData(text: _previewController.currentImgUrl))
+                      .then((value) {
+                    SmartDialog.showToast('已复制到粘贴板');
+                    SmartDialog.dismiss();
+                  }).catchError((err) {
+                    SmartDialog.showNotify(
+                      msg: err.toString(),
+                      notifyType: NotifyType.error,
+                    );
+                  });
+                },
+                dense: true,
+                title: const Text('复制链接', style: TextStyle(fontSize: 14)),
+              ),
+              ListTile(
+                onTap: () {
+                  DownloadUtils.downloadImg(_previewController.currentImgUrl);
+                },
+                dense: true,
+                title: const Text('保存到手机', style: TextStyle(fontSize: 14)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -40,6 +96,7 @@ class _ImagePreviewState extends State<ImagePreview>
     // animationController.dispose();
     _doubleClickAnimationController.dispose();
     clearGestureDetailsCache();
+    exitFullScreen();
     super.dispose();
   }
 
@@ -69,19 +126,14 @@ class _ImagePreviewState extends State<ImagePreview>
               tag: _previewController
                   .imgList[_previewController.initialPage.value],
               child: GestureDetector(
-                onTap: () {
-                  _previewController.visiable = !_previewController.visiable;
-                  setState(() {});
-                },
+                onLongPress: () => onOpenMenu(),
                 child: ExtendedImageGesturePageView.builder(
                   controller: ExtendedPageController(
                     initialPage: _previewController.initialPage.value,
                     pageSpacing: 0,
                   ),
-                  onPageChanged: (int index) {
-                    _previewController.initialPage.value = index;
-                    _previewController.currentPage.value = index + 1;
-                  },
+                  onPageChanged: (int index) =>
+                      _previewController.onChange(index),
                   canScrollPage: (GestureDetails? gestureDetails) =>
                       gestureDetails!.totalScale! <= 1.0,
                   preloadPagesCount: 2,
@@ -149,8 +201,10 @@ class _ImagePreviewState extends State<ImagePreview>
                               children: <Widget>[
                                 SizedBox(
                                   width: 150.0,
-                                  child:
-                                      LinearProgressIndicator(value: progress),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 const SizedBox(height: 10.0),
                                 Text('${((progress ?? 0.0) * 100).toInt()}%'),
@@ -179,7 +233,6 @@ class _ImagePreviewState extends State<ImagePreview>
             right: 0,
             bottom: 0,
             child: Container(
-              // height: 45,
               padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).padding.bottom, top: 20),
               decoration: const BoxDecoration(
@@ -193,36 +246,18 @@ class _ImagePreviewState extends State<ImagePreview>
                   tileMode: TileMode.mirror,
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Obx(
-                      () => Text.rich(
+              child: Obx(
+                () => Text.rich(
+                  textAlign: TextAlign.center,
+                  TextSpan(
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                      children: [
                         TextSpan(
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 18),
-                            children: [
-                              TextSpan(
-                                  text: _previewController.currentPage
-                                      .toString()),
-                              const TextSpan(text: ' / '),
-                              TextSpan(
-                                  text: _previewController.imgList.length
-                                      .toString()),
-                            ]),
-                      ),
-                    ),
-                    const Spacer(),
-                    ElevatedButton(
-                        onPressed: () => _previewController.onShareImg(),
-                        child: const Text('分享')),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                        onPressed: () => _previewController.onSaveImg(),
-                        child: const Text('保存'))
-                  ],
+                            text: _previewController.currentPage.toString()),
+                        const TextSpan(text: ' / '),
+                        TextSpan(
+                            text: _previewController.imgList.length.toString()),
+                      ]),
                 ),
               ),
             ),

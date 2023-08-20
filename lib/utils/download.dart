@@ -6,7 +6,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadUtils {
-  // 获取存储全县
+  // 获取存储权限
   static requestStoragePer() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
