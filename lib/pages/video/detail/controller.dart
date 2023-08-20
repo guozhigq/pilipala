@@ -38,7 +38,7 @@ class VideoDetailController extends GetxController
 
   /// 播放器配置 画质 音质 解码格式
   late VideoQuality currentVideoQa;
-  late AudioQuality currentAudioQa;
+  AudioQuality? currentAudioQa;
   late VideoDecodeFormats currentDecodeFormats;
   // PlPlayerController plPlayerController = PlPlayerController();
   // 是否开始自动播放 存在多p的情况下，第二p需要为true
@@ -142,9 +142,11 @@ class VideoDetailController extends GetxController
     videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
-    AudioItem firstAudio =
-        data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa.code);
-    audioUrl = firstAudio.baseUrl ?? '';
+    if (currentAudioQa != null) {
+      AudioItem firstAudio =
+          data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa!.code);
+      audioUrl = firstAudio.baseUrl ?? '';
+    }
 
     playerInit();
   }
