@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
-import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -19,6 +19,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late dynamic defaultAudioQa;
   late dynamic defaultDecode;
   late int defaultFullScreenMode;
+  late int defaultBtmProgressBehavior;
 
   @override
   void initState() {
@@ -31,6 +32,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: VideoDecodeFormats.values.last.code);
     defaultFullScreenMode = setting.get(SettingBoxKey.fullScreenMode,
         defaultValue: FullScreenMode.values.first.code);
+    defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
+        defaultValue: BtmProgresBehavior.values.first.code);
   }
 
   @override
@@ -155,6 +158,31 @@ class _PlaySettingState extends State<PlaySetting> {
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                 for (var i in FullScreenMode.values) ...[
+                  PopupMenuItem(
+                    value: i.code,
+                    child: Text(i.description),
+                  ),
+                ]
+              ],
+            ),
+          ),
+          ListTile(
+            dense: false,
+            title: Text('底部进度条展示', style: titleStyle),
+            subtitle: Text(
+              '当前展示方式：${BtmProgresBehaviorCode.fromCode(defaultBtmProgressBehavior)!.description}',
+              style: subTitleStyle,
+            ),
+            trailing: PopupMenuButton(
+              initialValue: defaultBtmProgressBehavior,
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
+              onSelected: (item) {
+                defaultBtmProgressBehavior = item;
+                setting.put(SettingBoxKey.btmProgressBehavior, item);
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                for (var i in BtmProgresBehavior.values) ...[
                   PopupMenuItem(
                     value: i.code,
                     child: Text(i.description),

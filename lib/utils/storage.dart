@@ -109,6 +109,7 @@ class SettingBoxKey {
 
   static const String blackMidsList = 'blackMidsList';
   static const String autoUpdate = 'autoUpdate';
+  static const String btmProgressBehavior = 'btmProgressBehavior';
 }
 
 class LocalCacheKey {

@@ -18,6 +18,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import 'models/bottom_progress_behavior.dart';
 import 'utils/fullscreen.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
@@ -67,6 +68,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Box setting = GStrorage.setting;
   late FullScreenMode mode;
+  late int defaultBtmProgressBehavior;
 
   void onDoubleTapSeekBackward() {
     setState(() {
@@ -87,6 +89,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
+    defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
+        defaultValue: BtmProgresBehavior.values.first.code);
 
     Future.microtask(() async {
       try {
@@ -203,7 +207,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               systemOverlayStyle: SystemUiOverlayStyle.light,
             ),
             body: SafeArea(
-              bottom: true,
+              bottom: false,
               child: PLVideoPlayer(
                 controller: _,
                 headerControl: _.headerControl,
@@ -626,6 +630,15 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             final int value = _.sliderPosition.value.inSeconds;
             final int max = _.duration.value.inSeconds;
             final int buffer = _.buffered.value.inSeconds;
+            if (defaultBtmProgressBehavior ==
+                BtmProgresBehavior.alwaysHide.code) {
+              return Container();
+            }
+            if (defaultBtmProgressBehavior ==
+                    BtmProgresBehavior.onlyShowFullScreen.code &&
+                !_.isFullScreen.value) {
+              return Container();
+            }
             if (value > max || max <= 0) {
               return Container();
             }
