@@ -121,7 +121,7 @@ class HisListItem {
     viewAt = json['view_at'];
     progress = json['progress'];
     badge = json['badge'];
-    showTitle = json['show_title'];
+    showTitle = json['show_title'] == '' ? null : json['show_title'];
     duration = json['duration'];
     current = json['current'];
     total = json['total'];

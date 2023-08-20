@@ -102,8 +102,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   Map data = snapshot.data;
                   if (data['status']) {
                     return Obx(
-                      () => _historyController.historyList.isNotEmpty &&
-                              !_historyController.isLoadingMore.value
+                      () => _historyController.historyList.isNotEmpty
                           ? SliverList(
                               delegate: SliverChildBuilderDelegate(
                                   (context, index) {

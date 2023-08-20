@@ -37,20 +37,23 @@ class HistoryItem extends StatelessWidget {
               'pageTitle': videoItem.title
             },
           );
-        } else if (videoItem.history.business == 'live' &&
-            videoItem.liveStatus == 1) {
-          LiveItemModel liveItem = LiveItemModel.fromJson({
-            'face': videoItem.authorFace,
-            'roomid': videoItem.history.oid,
-            'pic': videoItem.cover,
-            'title': videoItem.title,
-            'uname': videoItem.authorName,
-            'cover': videoItem.cover,
-          });
-          Get.toNamed(
-            '/liveRoom?roomid=${videoItem.history.oid}',
-            arguments: {'liveItem': liveItem},
-          );
+        } else if (videoItem.history.business == 'live') {
+          if (videoItem.liveStatus == 1) {
+            LiveItemModel liveItem = LiveItemModel.fromJson({
+              'face': videoItem.authorFace,
+              'roomid': videoItem.history.oid,
+              'pic': videoItem.cover,
+              'title': videoItem.title,
+              'uname': videoItem.authorName,
+              'cover': videoItem.cover,
+            });
+            Get.toNamed(
+              '/liveRoom?roomid=${videoItem.history.oid}',
+              arguments: {'liveItem': liveItem},
+            );
+          } else {
+            SmartDialog.showToast('直播未开播');
+          }
         } else if (videoItem.badge == '番剧' ||
             videoItem.tagName.contains('动画')) {
           /// hack
