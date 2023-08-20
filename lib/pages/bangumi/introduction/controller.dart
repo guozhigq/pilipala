@@ -49,7 +49,7 @@ class BangumiIntroController extends GetxController {
   RxBool hasCoin = false.obs;
   // 是否收藏
   RxBool hasFav = false.obs;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
@@ -57,6 +57,7 @@ class BangumiIntroController extends GetxController {
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
   int _tempThemeValue = -1;
+  var userInfo;
 
   @override
   void onInit() {
@@ -82,7 +83,8 @@ class BangumiIntroController extends GetxController {
         // videoItem!['owner'] = args.owner;
       }
     }
-    userLogin = user.get(UserBoxKey.userLogin) != null;
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin = userInfo != null;
   }
 
   // 获取番剧简介&选集
@@ -142,7 +144,7 @@ class BangumiIntroController extends GetxController {
 
   // 投币
   Future actionCoinVideo() async {
-    if (user.get(UserBoxKey.userMid) == null) {
+    if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
@@ -283,7 +285,7 @@ class BangumiIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: user.get(UserBoxKey.userMid), rid: IdUtils.bv2av(bvid));
+        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }

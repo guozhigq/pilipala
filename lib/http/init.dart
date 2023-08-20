@@ -20,7 +20,7 @@ class Request {
 
   /// 设置cookie
   static setCookie() async {
-    Box user = GStrorage.user;
+    Box userInfoCache = GStrorage.userInfo;
     var cookiePath = await Utils.getCookiePath();
     var cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -30,7 +30,8 @@ class Request {
     dio.interceptors.add(cookieManager);
     var cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    if (user.get(UserBoxKey.userMid) != null) {
+    var userInfo = userInfoCache.get('userInfoCache');
+    if (userInfo != null && userInfo.mid != null) {
       var cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
       if (cookie2.isEmpty) {
@@ -86,9 +87,10 @@ class Request {
       },
     );
 
-    Box user = GStrorage.user;
-    if (user.get(UserBoxKey.userMid) != null) {
-      options.headers['x-bili-mid'] = user.get(UserBoxKey.userMid).toString();
+    Box userInfoCache = GStrorage.userInfo;
+    var userInfo = userInfoCache.get('userInfoCache');
+    if (userInfo != null && userInfo.mid != null) {
+      options.headers['x-bili-mid'] = userInfo.mid.toString();
       options.headers['env'] = 'prod';
       options.headers['app-key'] = 'android64';
       options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';

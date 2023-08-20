@@ -18,7 +18,7 @@ import 'package:pilipala/utils/storage.dart';
 /// 返回{'status': bool, 'data': List}
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
-  static Box user = GStrorage.user;
+  static Box localCache = GStrorage.localCache;
   static Box setting = GStrorage.setting;
 
   // 首页推荐视频
@@ -61,8 +61,9 @@ class VideoHttp {
           'device_name': 'vivo',
           'pull': freshIdx == 0 ? 'true' : 'false',
           'appkey': Constants.appKey,
-          'access_key':
-              user.get(UserBoxKey.accessKey, defaultValue: {})['value'] ?? ''
+          'access_key': localCache
+                  .get(LocalCacheKey.accessKey, defaultValue: {})['value'] ??
+              ''
         },
       );
       if (res.data['code'] == 0) {

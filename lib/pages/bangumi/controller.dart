@@ -11,17 +11,19 @@ class BangumiController extends GetxController {
   RxList<BangumiListItemModel> bangumiFollowList = [BangumiListItemModel()].obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   late int mid;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
-    if (user.get(UserBoxKey.userMid) != null) {
-      mid = int.parse(user.get(UserBoxKey.userMid).toString());
+    userInfo = userInfoCache.get('userInfoCache');
+    if (userInfo != null) {
+      mid = userInfo.mid;
     }
-    userLogin.value = user.get(UserBoxKey.userLogin) != null;
+    userLogin.value = userInfo != null;
   }
 
   Future queryBangumiListFeed({type = 'init'}) async {

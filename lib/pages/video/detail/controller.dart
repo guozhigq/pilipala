@@ -51,7 +51,7 @@ class VideoDetailController extends GetxController
   RxBool enableHA = true.obs;
 
   /// 本地存储
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   Box localCache = GStrorage.localCache;
   Box setting = GStrorage.setting;
 
@@ -70,11 +70,13 @@ class VideoDetailController extends GetxController
   late Duration defaultST;
   // 默认记录历史记录
   bool enableHeart = true;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
     Map argMap = Get.arguments;
+    userInfo = userInfoCache.get('userInfoCache');
     var keys = argMap.keys.toList();
     if (keys.isNotEmpty) {
       if (keys.contains('videoItem')) {
@@ -92,7 +94,7 @@ class VideoDetailController extends GetxController
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
 
-    if (user.get(UserBoxKey.userMid) == null ||
+    if (userInfo == null ||
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
     }

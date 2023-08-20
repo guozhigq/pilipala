@@ -24,7 +24,8 @@ class _UpPanelState extends State<UpPanel> {
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
   static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
+  var userInfo;
 
   @override
   void initState() {
@@ -36,12 +37,13 @@ class _UpPanelState extends State<UpPanel> {
       UpItem(
           face: 'https://files.catbox.moe/8uc48f.png', uname: '全部动态', mid: -1),
     );
+    userInfo = userInfoCache.get('userInfoCache');
     upList.insert(
       1,
       UpItem(
-        face: user.get(UserBoxKey.userFace),
+        face: userInfo.face,
         uname: '我',
-        mid: user.get(UserBoxKey.userMid),
+        mid: userInfo.mid,
       ),
     );
   }

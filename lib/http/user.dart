@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/api.dart';
 import 'package:pilipala/http/init.dart';
@@ -197,8 +198,12 @@ class UserHttp {
         'sign': Constants.thirdSign,
       },
     );
-    if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
-      Request().get(res.data['data']['confirm_uri']);
+    try {
+      if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
+        Request().get(res.data['data']['confirm_uri']);
+      }
+    } catch (err) {
+      SmartDialog.showNotify(msg: '获取用户凭证: $err', notifyType: NotifyType.error);
     }
   }
 

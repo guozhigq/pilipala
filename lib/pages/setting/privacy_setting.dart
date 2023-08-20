@@ -13,12 +13,14 @@ class PrivacySetting extends StatefulWidget {
 
 class _PrivacySettingState extends State<PrivacySetting> {
   bool userLogin = false;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
+  var userInfo;
 
   @override
   void initState() {
     super.initState();
-    userLogin = user.get(UserBoxKey.userLogin) ?? false;
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin = userInfo != null;
   }
 
   @override

@@ -127,7 +127,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   // 收藏
   showFavBottomSheet() {
-    if (videoIntroController.user.get(UserBoxKey.userMid) == null) {
+    if (videoIntroController.userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }

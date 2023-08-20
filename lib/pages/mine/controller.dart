@@ -13,9 +13,8 @@ class MineController extends GetxController {
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
   RxBool userLogin = false.obs;
-  Box user = GStrorage.user;
-  Box setting = GStrorage.setting;
   Box userInfoCache = GStrorage.userInfo;
+  Box setting = GStrorage.setting;
   Rx<ThemeType> themeType = ThemeType.system.obs;
 
   @override
@@ -24,6 +23,7 @@ class MineController extends GetxController {
 
     if (userInfoCache.get('userInfoCache') != null) {
       userInfo.value = userInfoCache.get('userInfoCache');
+      userLogin.value = true;
     }
 
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
@@ -41,8 +41,8 @@ class MineController extends GetxController {
         },
       );
     } else {
-      int mid = user.get(UserBoxKey.userMid);
-      String face = user.get(UserBoxKey.userFace);
+      int mid = userInfo.value.mid!;
+      String face = userInfo.value.face!;
       Get.toNamed(
         '/member?mid=$mid',
         arguments: {'face': face},
@@ -51,7 +51,7 @@ class MineController extends GetxController {
   }
 
   Future queryUserInfo() async {
-    if (user.get(UserBoxKey.userLogin) == null) {
+    if (!userLogin.value) {
       return {'status': false};
     }
     var res = await UserHttp.userInfo();
@@ -59,18 +59,12 @@ class MineController extends GetxController {
       if (res['data'].isLogin) {
         userInfo.value = res['data'];
         userInfoCache.put('userInfoCache', res['data']);
-        user.put(UserBoxKey.userName, res['data'].uname);
-        user.put(UserBoxKey.userFace, res['data'].face);
-        user.put(UserBoxKey.userMid, res['data'].mid);
-        user.put(UserBoxKey.userLogin, true);
         userLogin.value = true;
-        // Get.find<MainController>().readuUserFace();
       } else {
         resetUserInfo();
       }
     } else {
       resetUserInfo();
-      // SmartDialog.showToast(res['msg']);
     }
     await queryUserStatOwner();
     return res;
@@ -87,12 +81,8 @@ class MineController extends GetxController {
   Future resetUserInfo() async {
     userInfo.value = UserInfoData();
     userStat.value = UserStat();
-    await user.delete(UserBoxKey.userName);
-    await user.delete(UserBoxKey.userFace);
-    await user.delete(UserBoxKey.userMid);
-    await user.delete(UserBoxKey.userLogin);
+    userInfoCache.delete('userInfoCache');
     userLogin.value = false;
-    // Get.find<MainController>().resetLast();
   }
 
   onChangeTheme() {

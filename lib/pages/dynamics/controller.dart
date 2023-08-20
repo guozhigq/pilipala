@@ -51,12 +51,14 @@ class DynamicsController extends GetxController {
   ];
   bool flag = false;
   RxInt initialValue = 1.obs;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
+  var userInfo;
 
   @override
   void onInit() {
-    userLogin.value = user.get(UserBoxKey.userLogin, defaultValue: false);
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
     super.onInit();
   }
 

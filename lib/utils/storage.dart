@@ -7,7 +7,6 @@ import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
 class GStrorage {
-  static late final Box user;
   static late final Box recVideo;
   static late final Box userInfo;
   static late final Box hotKeyword;
@@ -21,13 +20,6 @@ class GStrorage {
     final path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
-    // 用户信息
-    user = await Hive.openBox(
-      'user',
-      compactionStrategy: (entries, deletedEntries) {
-        return deletedEntries > 10;
-      },
-    );
     // 首页推荐视频
     recVideo = await Hive.openBox(
       'recVideo',
@@ -36,7 +28,12 @@ class GStrorage {
       },
     );
     // 登录用户信息
-    userInfo = await Hive.openBox('userInfo');
+    userInfo = await Hive.openBox(
+      'userInfo',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 2;
+      },
+    );
     // 本地缓存
     localCache = await Hive.openBox('localCache');
     // 设置
@@ -75,8 +72,8 @@ class GStrorage {
   }
 
   static Future<void> close() async {
-    user.compact();
-    user.close();
+    // user.compact();
+    // user.close();
     recVideo.compact();
     recVideo.close();
     userInfo.compact();
@@ -92,19 +89,6 @@ class GStrorage {
     video.compact();
     video.close();
   }
-}
-
-// 约定 key
-class UserBoxKey {
-  static const String userName = 'userName';
-  // 头像
-  static const String userFace = 'userFace';
-  // mid
-  static const String userMid = 'userMid';
-  // 登录状态
-  static const String userLogin = 'userLogin';
-  // 凭证
-  static const String accessKey = 'accessKey';
 }
 
 class SettingBoxKey {
@@ -130,6 +114,12 @@ class SettingBoxKey {
 class LocalCacheKey {
   // 历史记录暂停状态 默认false 记录
   static const String historyPause = 'historyPause';
+  // access_key
+  static const String accessKey = 'accessKey';
+
+  //
+  static const String wbiKeys = 'wbiKeys';
+  static const String timeStamp = 'timeStamp';
 }
 
 class VideoBoxKey {

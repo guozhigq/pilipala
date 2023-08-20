@@ -93,7 +93,7 @@ class UserInfoData {
     official = json['official'];
     officialVerify = json['officialVerify'];
     pendant = json['pendant'];
-    scores = json['scores'];
+    // scores = json['scores'];
     uname = json['uname'];
     vipDueDate = json['vipDueDate'];
     vipStatus = json['vipStatus'];
@@ -130,6 +130,8 @@ class LevelInfo {
     currentLevel = json['current_level'];
     currentMin = json['current_min'];
     currentExp = json['current_exp'];
-    nextExp = json['next_exp'];
+    // nextExp = json['next_exp'];
+    nextExp =
+        json['current_level'] == 6 ? json['current_exp'] : json['next_exp'];
   }
 }

@@ -14,16 +14,18 @@ class MemberController extends GetxController {
   Map? userStat;
   String? face;
   String? heroTag;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   late int ownerMid;
   // 投稿列表
   RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
-    ownerMid = user.get(UserBoxKey.userMid) ?? -1;
+    userInfo = userInfoCache.get('userInfoCache');
+    ownerMid = userInfo != null ? userInfo.mid : -1;
     face = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';
   }
@@ -57,7 +59,7 @@ class MemberController extends GetxController {
 
   // 关注/取关up
   Future actionRelationMod() async {
-    if (user.get(UserBoxKey.userMid) == null) {
+    if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }

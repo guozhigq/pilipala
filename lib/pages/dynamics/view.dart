@@ -30,7 +30,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   bool _isLoadingMore = false;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   EventBus eventBus = EventBus();
   late ScrollController scrollController;
 

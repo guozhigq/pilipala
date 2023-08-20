@@ -6,13 +6,14 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/view.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box user = GStrorage.user;
+Box userInfoCache = GStrorage.userInfo;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var userInfo = userInfoCache.get('userInfoCache');
     return SliverAppBar(
       // forceElevated: true,
       scrolledUnderElevation: 0,
@@ -55,7 +56,7 @@ class HomeAppBar extends StatelessWidget {
                     const SizedBox(width: 6),
 
                     /// TODO
-                    if (user.get(UserBoxKey.userLogin)) ...[
+                    if (userInfo != null) ...[
                       GestureDetector(
                         onTap: () => showModalBottomSheet(
                           context: context,
@@ -70,7 +71,7 @@ class HomeAppBar extends StatelessWidget {
                           type: 'avatar',
                           width: 32,
                           height: 32,
-                          src: user.get(UserBoxKey.userMid),
+                          src: userInfo.face,
                         ),
                       ),
                       const SizedBox(width: 10),

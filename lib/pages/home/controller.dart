@@ -11,16 +11,17 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   RxString userFace = ''.obs;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
-
-    userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
-    userFace.value = user.get(UserBoxKey.userFace) ?? '';
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
+    userFace.value = userInfo != null ? userInfo.face : '';
 
     // 进行tabs配置
     tabs = tabsConfig;
@@ -48,7 +49,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
 
   // 更新登录状态
   void updateLoginStatus(val) {
+    userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = val ?? false;
-    userFace.value = user.get(UserBoxKey.userFace) ?? '';
+    userFace.value = userInfo != null ? userInfo.face : '';
   }
 }
