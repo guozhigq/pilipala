@@ -41,7 +41,8 @@ class _RcmdPageState extends State<RcmdPage>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
+          EasyThrottle.throttle(
+              'my-throttler', const Duration(milliseconds: 500), () {
             _rcmdController.isLoadingMore = true;
             _rcmdController.onLoad();
           });
@@ -56,6 +57,12 @@ class _RcmdPageState extends State<RcmdPage>
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _rcmdController.scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

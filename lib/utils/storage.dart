@@ -22,12 +22,17 @@ class GStrorage {
     await Hive.initFlutter('$path/hive');
     regAdapter();
     // 用户信息
-    user = await Hive.openBox('user');
+    user = await Hive.openBox(
+      'user',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 10;
+      },
+    );
     // 首页推荐视频
     recVideo = await Hive.openBox(
       'recVideo',
       compactionStrategy: (entries, deletedEntries) {
-        return deletedEntries > 20;
+        return deletedEntries > 12;
       },
     );
     // 登录用户信息

@@ -38,6 +38,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   Box localCache = GStrorage.localCache;
   late double sheetHeight;
   Future? _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
@@ -48,12 +49,11 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     super.initState();
 
     // 上拉加载更多
-    _videoReplyReplyController.scrollController.addListener(
+    scrollController = _videoReplyReplyController.scrollController;
+    scrollController.addListener(
       () {
-        if (_videoReplyReplyController.scrollController.position.pixels >=
-            _videoReplyReplyController
-                    .scrollController.position.maxScrollExtent -
-                300) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
           if (!_videoReplyReplyController.isLoadingMore) {
             _videoReplyReplyController.onLoad();
           }
@@ -69,7 +69,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
 
   @override
   void dispose() {
-    // _videoReplyReplyController.scrollController.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 

@@ -23,13 +23,15 @@ class _BangumiPageState extends State<BangumiPage>
     with AutomaticKeepAliveClientMixin {
   final BangumiController _bangumidController = Get.put(BangumiController());
   late Future? _futureBuilderFuture;
+  late ScrollController scrollController;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    ScrollController scrollController = _bangumidController.scrollController;
+    scrollController = _bangumidController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
@@ -52,6 +54,12 @@ class _BangumiPageState extends State<BangumiPage>
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
@@ -17,23 +18,31 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   final HistoryController _historyController = Get.put(HistoryController());
   Future? _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     _futureBuilderFuture = _historyController.queryHistoryList();
     super.initState();
-
-    _historyController.scrollController.addListener(
+    scrollController = _historyController.scrollController;
+    scrollController.addListener(
       () {
-        if (_historyController.scrollController.position.pixels >=
-            _historyController.scrollController.position.maxScrollExtent -
-                300) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
           if (!_historyController.isLoadingMore.value) {
-            _historyController.onLoad();
+            EasyThrottle.throttle('history', const Duration(seconds: 1), () {
+              _historyController.onLoad();
+            });
           }
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

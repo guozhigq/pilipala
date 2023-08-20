@@ -34,6 +34,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   late VideoReplyController _videoReplyController;
   late AnimationController fabAnimationCtr;
+  late ScrollController scrollController;
 
   Future? _futureBuilderFuture;
   bool _isFabVisible = true;
@@ -61,18 +62,18 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         vsync: this, duration: const Duration(milliseconds: 300));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
-    _videoReplyController.scrollController.addListener(
+    scrollController = _videoReplyController.scrollController;
+    scrollController.addListener(
       () {
-        if (_videoReplyController.scrollController.position.pixels >=
-            _videoReplyController.scrollController.position.maxScrollExtent -
-                300) {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
           EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
             _videoReplyController.onLoad();
           });
         }
 
         final ScrollDirection direction =
-            _videoReplyController.scrollController.position.userScrollDirection;
+            scrollController.position.userScrollDirection;
         if (direction == ScrollDirection.forward) {
           _showFab();
         } else if (direction == ScrollDirection.reverse) {
@@ -113,7 +114,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   void dispose() {
     super.dispose();
     fabAnimationCtr.dispose();
-    _videoReplyController.scrollController.dispose();
+    scrollController.dispose();
   }
 
   @override

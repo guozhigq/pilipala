@@ -32,6 +32,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   bool _isLoadingMore = false;
   Box user = GStrorage.user;
   EventBus eventBus = EventBus();
+  late ScrollController scrollController;
 
   @override
   bool get wantKeepAlive => true;
@@ -41,7 +42,7 @@ class _DynamicsPageState extends State<DynamicsPage>
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
     _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
-    ScrollController scrollController = _dynamicsController.scrollController;
+    scrollController = _dynamicsController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
@@ -72,6 +73,12 @@ class _DynamicsPageState extends State<DynamicsPage>
         _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

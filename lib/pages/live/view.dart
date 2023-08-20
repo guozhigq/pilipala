@@ -24,12 +24,13 @@ class LivePage extends StatefulWidget {
 class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _liveController.queryLiveList('init');
-    ScrollController scrollController = _liveController.scrollController;
+    scrollController = _liveController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
@@ -51,6 +52,12 @@ class _LivePageState extends State<LivePage> {
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

@@ -229,6 +229,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void dispose() {
     animationController.dispose();
+    FlutterVolumeController.removeListener();
     super.dispose();
   }
 

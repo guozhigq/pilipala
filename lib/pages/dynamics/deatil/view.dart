@@ -96,6 +96,12 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   }
 
   @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
