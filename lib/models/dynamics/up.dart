@@ -8,7 +8,9 @@ class FollowUpModel {
   List<UpItem>? upList;
 
   FollowUpModel.fromJson(Map<String, dynamic> json) {
-    liveUsers = LiveUsers.fromJson(json['live_users']);
+    liveUsers = json['live_users'] != null
+        ? LiveUsers.fromJson(json['live_users'])
+        : null;
     upList = json['up_list'] != null
         ? json['up_list'].map<UpItem>((e) => UpItem.fromJson(e)).toList()
         : [];

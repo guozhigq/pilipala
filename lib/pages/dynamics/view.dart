@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
@@ -152,14 +153,12 @@ class _DynamicsPageState extends State<DynamicsPage>
                                             .textTheme
                                             .labelMedium!
                                             .fontSize)),
-                                // 4: Text(
-                                //   '专栏',
-                                //   style: TextStyle(
-                                //       fontSize: Theme.of(context)
-                                //           .textTheme
-                                //           .labelMedium!
-                                //           .fontSize),
-                                // ),
+                                4: Text('专栏',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize)),
                               },
                               padding: 13.0,
                               decoration: BoxDecoration(
@@ -186,22 +185,22 @@ class _DynamicsPageState extends State<DynamicsPage>
                   )
                 ],
               ),
-              Obx(
-                () => Visibility(
-                  visible: _dynamicsController.userLogin.value,
-                  child: Positioned(
-                    right: 4,
-                    top: 0,
-                    bottom: 0,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () =>
-                          {feedBack(), _dynamicsController.resetSearch()},
-                      icon: const Icon(Icons.history, size: 21),
-                    ),
-                  ),
-                ),
-              ),
+              // Obx(
+              //   () => Visibility(
+              //     visible: _dynamicsController.userLogin.value,
+              //     child: Positioned(
+              //       right: 4,
+              //       top: 0,
+              //       bottom: 0,
+              //       child: IconButton(
+              //         padding: EdgeInsets.zero,
+              //         onPressed: () =>
+              //             {feedBack(), _dynamicsController.resetSearch()},
+              //         icon: const Icon(Icons.history, size: 21),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -240,14 +239,24 @@ class _DynamicsPageState extends State<DynamicsPage>
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList;
                     return Obx(
-                      () => list.isEmpty
-                          ? skeleton()
-                          : SliverList(
-                              delegate:
-                                  SliverChildBuilderDelegate((context, index) {
+                      () {
+                        if (list.isEmpty) {
+                          if (_dynamicsController.isLoadingDynamic.value) {
+                            return skeleton();
+                          } else {
+                            return const NoData();
+                          }
+                        } else {
+                          return SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
                                 return DynamicPanel(item: list[index]);
-                              }, childCount: list.length),
+                              },
+                              childCount: list.length,
                             ),
+                          );
+                        }
+                      },
                     );
                   } else {
                     return HttpError(
