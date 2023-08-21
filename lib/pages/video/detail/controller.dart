@@ -228,11 +228,16 @@ class VideoDetailController extends GetxController
         // 根据画质选编码格式
         List supportDecodeFormats =
             supportFormats.firstWhere((e) => e.quality == resVideoQa).codecs!;
-
+        // 默认从设置中取AVC
+        currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+            SettingBoxKey.defaultDecode,
+            defaultValue: VideoDecodeFormats.values.last.code))!;
         try {
-          currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
-              SettingBoxKey.defaultDecode,
-              defaultValue: supportDecodeFormats.first))!;
+          // 当前视频没有对应格式返回第一个
+          currentDecodeFormats =
+              supportDecodeFormats.contains(supportDecodeFormats)
+                  ? supportDecodeFormats
+                  : supportDecodeFormats.first;
         } catch (_) {}
 
         /// 取出符合当前解码格式的videoItem
