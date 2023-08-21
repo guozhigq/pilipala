@@ -71,6 +71,10 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             // 请求错误
             return HttpError(
               errMsg: snapshot.data['msg'],
+              btnText: snapshot.data['code'] == -404 ||
+                      snapshot.data['code'] == 62002
+                  ? '返回上一页'
+                  : null,
               fn: () => Get.back(),
             );
           }

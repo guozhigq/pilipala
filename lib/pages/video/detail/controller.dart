@@ -274,6 +274,9 @@ class VideoDetailController extends GetxController
       //   duration: data.timeLength ?? 0,
       // );
     } else {
+      if (result['code'] == -404) {
+        isShowCover.value = false;
+      }
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;

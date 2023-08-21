@@ -34,9 +34,6 @@ class _ImagePreviewState extends State<ImagePreview>
     super.initState();
     // animationController = AnimationController(
     //     vsync: this, duration: const Duration(milliseconds: 400));
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-    );
     _doubleClickAnimationController = AnimationController(
         duration: const Duration(milliseconds: 250), vsync: this);
   }
@@ -96,7 +93,6 @@ class _ImagePreviewState extends State<ImagePreview>
     // animationController.dispose();
     _doubleClickAnimationController.dispose();
     clearGestureDetailsCache();
-    exitFullScreen();
     super.dispose();
   }
 
@@ -108,7 +104,7 @@ class _ImagePreviewState extends State<ImagePreview>
         primary: false,
         toolbarHeight: 0,
         backgroundColor: Colors.black,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       body: Stack(
         children: [

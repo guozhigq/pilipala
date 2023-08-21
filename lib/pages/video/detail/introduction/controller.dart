@@ -30,9 +30,6 @@ class VideoIntroController extends GetxController {
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
 
-  // 请求返回的信息
-  String responseMsg = '请求异常';
-
   // up主粉丝数
   Map userStat = {'follower': '-'};
 
@@ -79,7 +76,7 @@ class VideoIntroController extends GetxController {
         videoItem!['owner'] = args.owner;
       }
     }
-    userLogin = userInfo == null;
+    userLogin = userInfo != null;
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
   }
 
@@ -96,8 +93,6 @@ class VideoIntroController extends GetxController {
           .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
       // 获取到粉丝数再返回
       await queryUserStat();
-    } else {
-      responseMsg = result['msg'];
     }
     if (userLogin) {
       // 获取点赞状态
@@ -329,6 +324,9 @@ class VideoIntroController extends GetxController {
 
   // 查询关注状态
   Future queryFollowStatus() async {
+    if (videoDetail.value.owner == null) {
+      return;
+    }
     var result = await VideoHttp.hasFollow(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
       followStatus.value = result['data'];

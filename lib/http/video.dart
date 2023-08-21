@@ -138,7 +138,12 @@ class VideoHttp {
           'data': PlayUrlModel.fromJson(res.data['data'])
         };
       } else {
-        return {'status': false, 'data': []};
+        return {
+          'status': false,
+          'data': [],
+          'code': res.data['code'],
+          'msg': res.data['message'],
+        };
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
@@ -155,13 +160,14 @@ class VideoHttp {
       Map errMap = {
         -400: '请求错误',
         -403: '权限不足',
-        -404: '无视频',
+        -404: '视频资源失效',
         62002: '稿件不可见',
         62004: '稿件审核中',
       };
       return {
         'status': false,
         'data': null,
+        'code': result.code,
         'msg': errMap[result.code] ?? '请求异常',
       };
     }

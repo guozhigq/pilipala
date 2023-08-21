@@ -50,7 +50,11 @@ class BangumiController extends GetxController {
 
   // 我的订阅
   Future queryBangumiFollow() async {
-    var result = await BangumiHttp.bangumiFollow(mid: 17340771);
+    userInfo = userInfo ?? userInfoCache.get('userInfoCache');
+    if (userInfo == null) {
+      return;
+    }
+    var result = await BangumiHttp.bangumiFollow(mid: userInfo.mid);
     if (result['status']) {
       bangumiFollowList.value = result['data'].list;
     } else {}
