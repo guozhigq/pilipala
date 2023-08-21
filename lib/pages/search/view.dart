@@ -45,6 +45,10 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return OpenContainer(
       closedElevation: 0,
       openElevation: 0,
+      onClosed: (_) {
+        // 在 openBuilder 关闭时触发的回调函数
+        _searchController.onClear();
+      },
       openColor: Theme.of(context).colorScheme.background,
       middleColor: Theme.of(context).colorScheme.background,
       closedColor: Theme.of(context).colorScheme.background,
@@ -176,25 +180,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                     // child: Text(
                     //   _searchController.searchSuggestList[index].term!,
                     // ),
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                              text: _searchController
-                                  .searchSuggestList[index].name![0]),
-                          TextSpan(
-                            text: _searchController
-                                .searchSuggestList[index].name![1],
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text: _searchController
-                                  .searchSuggestList[index].name![2]),
-                        ],
-                      ),
-                    ),
+                    child: _searchController.searchSuggestList[index].textRich,
                   ),
                 );
               },
