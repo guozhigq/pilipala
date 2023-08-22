@@ -82,24 +82,27 @@ class GStrorage {
 }
 
 class SettingBoxKey {
-  static const String themeMode = 'themeMode';
-  static const String feedBackEnable = 'feedBackEnable';
-  static const String defaultFontSize = 'fontSize';
-  static const String defaultVideoQa = 'defaultVideoQa';
-  static const String defaultAudioQa = 'defaultAudioQa';
-  static const String defaultDecode = 'defaultDecode';
+  static const String btmProgressBehavior = 'btmProgressBehavior';
   static const String defaultVideoSpeed = 'defaultVideoSpeed';
   static const String autoUpgradeEnable = 'autoUpgradeEnable';
+  static const String feedBackEnable = 'feedBackEnable';
+  static const String defaultVideoQa = 'defaultVideoQa';
+  static const String defaultAudioQa = 'defaultAudioQa';
   static const String autoPlayEnable = 'autoPlayEnable';
-  static const String enableHA = 'enableHA';
-  static const String defaultPicQa = 'defaultPicQa';
-
-  static const String danmakuEnable = 'danmakuEnable';
   static const String fullScreenMode = 'fullScreenMode';
+  static const String defaultDecode = 'defaultDecode';
+  static const String danmakuEnable = 'danmakuEnable';
+  static const String defaultPicQa = 'defaultPicQa';
+  static const String enableHA = 'enableHA';
 
   static const String blackMidsList = 'blackMidsList';
+
   static const String autoUpdate = 'autoUpdate';
-  static const String btmProgressBehavior = 'btmProgressBehavior';
+
+  static const String themeMode = 'themeMode';
+  static const String defaultFontSize = 'fontSize';
+  static const String dynamicColor = 'dynamicColor'; // bool
+  static const String customColor = 'customColor'; // 自定义主题色
 }
 
 class LocalCacheKey {

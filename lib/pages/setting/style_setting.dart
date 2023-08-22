@@ -184,6 +184,11 @@ class _StyleSettingState extends State<StyleSetting> {
                 style: subTitleStyle)),
             trailing: const Icon(Icons.arrow_right_alt_outlined),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/colorSetting'),
+            title: Text('应用主题', style: titleStyle),
+          ),
         ],
       ),
     );
