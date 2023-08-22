@@ -120,15 +120,16 @@ class _HeaderControlState extends State<HeaderControl> {
                           '当前画质 ${widget.videoDetailCtr!.currentVideoQa.description}',
                           style: subTitleStyle),
                     ),
-                    ListTile(
-                      onTap: () => {Get.back(), showSetAudioQa()},
-                      dense: true,
-                      leading: const Icon(Icons.album_outlined, size: 20),
-                      title: Text('选择音质', style: titleStyle),
-                      subtitle: Text(
-                          '当前音质 ${widget.videoDetailCtr!.currentAudioQa.description}',
-                          style: subTitleStyle),
-                    ),
+                    if (widget.videoDetailCtr!.currentAudioQa != null)
+                      ListTile(
+                        onTap: () => {Get.back(), showSetAudioQa()},
+                        dense: true,
+                        leading: const Icon(Icons.album_outlined, size: 20),
+                        title: Text('选择音质', style: titleStyle),
+                        subtitle: Text(
+                            '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
+                            style: subTitleStyle),
+                      ),
                     ListTile(
                       onTap: () => {Get.back(), showSetDecodeFormats()},
                       dense: true,
@@ -319,7 +320,7 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 选择音质
   void showSetAudioQa() {
-    AudioQuality currentAudioQa = widget.videoDetailCtr!.currentAudioQa;
+    AudioQuality currentAudioQa = widget.videoDetailCtr!.currentAudioQa!;
 
     List<AudioItem> audio = videoInfo.dash!.audio!;
     showModalBottomSheet(

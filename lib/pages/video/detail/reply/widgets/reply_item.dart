@@ -657,11 +657,13 @@ InlineSpan buildContent(
       );
 
       if (content.atNameToMid.isEmpty && content.jumpUrl.isEmpty) {
-        spanChilds.add(TextSpan(
-            text: str,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () =>
-                  replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+        if (str != '') {
+          spanChilds.add(TextSpan(
+              text: str,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () =>
+                    replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+        }
       }
       return str;
     },

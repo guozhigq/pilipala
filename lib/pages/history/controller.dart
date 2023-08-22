@@ -9,9 +9,10 @@ import 'package:pilipala/utils/storage.dart';
 class HistoryController extends GetxController {
   final ScrollController scrollController = ScrollController();
   RxList<HisListItem> historyList = [HisListItem()].obs;
-  bool isLoadingMore = false;
+  RxBool isLoadingMore = false.obs;
   RxBool pauseStatus = false.obs;
   Box localCache = GStrorage.localCache;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -26,9 +27,9 @@ class HistoryController extends GetxController {
       max = historyList.last.history!.oid!;
       viewAt = historyList.last.viewAt!;
     }
-    isLoadingMore = true;
+    isLoadingMore.value = true;
     var res = await UserHttp.historyList(max, viewAt);
-    isLoadingMore = false;
+    isLoadingMore.value = false;
     if (res['status']) {
       if (type == 'onload') {
         historyList.addAll(res['data'].list);

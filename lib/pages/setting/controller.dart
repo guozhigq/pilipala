@@ -11,19 +11,22 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class SettingController extends GetxController {
-  Box user = GStrorage.user;
-  Box setting = GStrorage.setting;
   Box userInfoCache = GStrorage.userInfo;
+  Box setting = GStrorage.setting;
+  // Box userInfoCache = GStrorage.userInfo;
+  Box localCache = GStrorage.localCache;
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
-    userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
     picQuality.value =
@@ -53,7 +56,8 @@ class SettingController extends GetxController {
 
                 // 清空本地存储的用户标识
                 userInfoCache.put('userInfoCache', null);
-                user.put(UserBoxKey.accessKey, {'mid': -1, 'value': ''});
+                localCache
+                    .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
 
                 // 更改我的页面登录状态
                 await Get.find<MineController>().resetUserInfo();

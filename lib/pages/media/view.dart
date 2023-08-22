@@ -161,11 +161,25 @@ class _MediaPageState extends State<MediaPage>
                                       right: 14, bottom: 35),
                                   child: Center(
                                     child: IconButton(
+                                      style: ButtonStyle(
+                                        padding: MaterialStateProperty.all(
+                                            EdgeInsets.zero),
+                                        backgroundColor:
+                                            MaterialStateProperty.resolveWith(
+                                                (states) {
+                                          return Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer
+                                              .withOpacity(0.5);
+                                        }),
+                                      ),
                                       onPressed: () => Get.toNamed('/fav'),
                                       icon: Icon(
                                         Icons.arrow_forward_ios,
                                         size: 18,
-                                        color: Theme.of(context).primaryColor,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                     ),
                                   ));

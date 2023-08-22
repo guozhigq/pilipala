@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -23,22 +24,23 @@ class LivePage extends StatefulWidget {
 class _LivePageState extends State<LivePage> {
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _liveController.queryLiveList('init');
-    ScrollController scrollController = _liveController.scrollController;
+    scrollController = _liveController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_liveController.isLoadingMore) {
+          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
             _liveController.isLoadingMore = true;
             _liveController.onLoad();
-          }
+          });
         }
 
         final ScrollDirection direction =
@@ -50,6 +52,12 @@ class _LivePageState extends State<LivePage> {
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

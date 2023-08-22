@@ -30,9 +30,6 @@ class VideoIntroController extends GetxController {
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
 
-  // 请求返回的信息
-  String responseMsg = '请求异常';
-
   // up主粉丝数
   Map userStat = {'follower': '-'};
 
@@ -42,7 +39,7 @@ class VideoIntroController extends GetxController {
   RxBool hasCoin = false.obs;
   // 是否收藏
   RxBool hasFav = false.obs;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
@@ -52,10 +49,12 @@ class VideoIntroController extends GetxController {
   int _tempThemeValue = -1;
 
   RxInt lastPlayCid = 0.obs;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
+    userInfo = userInfoCache.get('userInfoCache');
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
         preRender = true;
@@ -77,7 +76,7 @@ class VideoIntroController extends GetxController {
         videoItem!['owner'] = args.owner;
       }
     }
-    userLogin = user.get(UserBoxKey.userLogin) != null;
+    userLogin = userInfo != null;
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
   }
 
@@ -94,8 +93,6 @@ class VideoIntroController extends GetxController {
           .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
       // 获取到粉丝数再返回
       await queryUserStat();
-    } else {
-      responseMsg = result['msg'];
     }
     if (userLogin) {
       // 获取点赞状态
@@ -143,7 +140,7 @@ class VideoIntroController extends GetxController {
 
   // 一键三连
   Future actionOneThree() async {
-    if (user.get(UserBoxKey.userMid) == null) {
+    if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
@@ -206,7 +203,7 @@ class VideoIntroController extends GetxController {
 
   // 投币
   Future actionCoinVideo() async {
-    if (user.get(UserBoxKey.userMid) == null) {
+    if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
@@ -302,7 +299,7 @@ class VideoIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: user.get(UserBoxKey.userMid), rid: IdUtils.bv2av(bvid));
+        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }
@@ -327,6 +324,9 @@ class VideoIntroController extends GetxController {
 
   // 查询关注状态
   Future queryFollowStatus() async {
+    if (videoDetail.value.owner == null) {
+      return;
+    }
     var result = await VideoHttp.hasFollow(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
       followStatus.value = result['data'];
@@ -337,7 +337,7 @@ class VideoIntroController extends GetxController {
   // 关注/取关up
   Future actionRelationMod() async {
     feedBack();
-    if (user.get(UserBoxKey.userMid) == null) {
+    if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }

@@ -23,7 +23,7 @@ class UserInfoDataAdapter extends TypeAdapter<UserInfoData> {
       levelInfo: fields[3] as LevelInfo?,
       mid: fields[4] as int?,
       mobileVerified: fields[5] as int?,
-      money: fields[6] as int?,
+      money: fields[6] as double?,
       moral: fields[7] as int?,
       official: (fields[8] as Map?)?.cast<dynamic, dynamic>(),
       officialVerify: (fields[9] as Map?)?.cast<dynamic, dynamic>(),

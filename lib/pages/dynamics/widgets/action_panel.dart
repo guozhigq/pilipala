@@ -37,7 +37,7 @@ class _ActionPanelState extends State<ActionPanel> {
     String dynamicId = item.idStr!;
     // 1 已点赞 2 不喜欢 0 未操作
     Like like = item.modules.moduleStat.like;
-    int count = int.parse(like.count!);
+    int count = like.count == '点赞' ? 0 : int.parse(like.count ?? '0');
     bool status = like.status!;
     int up = status ? 2 : 1;
     var res = await DynamicsHttp.likeDynamic(dynamicId: dynamicId, up: up);
@@ -47,7 +47,11 @@ class _ActionPanelState extends State<ActionPanel> {
         item.modules.moduleStat.like.count = (count + 1).toString();
         item.modules.moduleStat.like.status = true;
       } else {
-        item.modules.moduleStat.like.count = (count - 1).toString();
+        if (count == 1) {
+          item.modules.moduleStat.like.count = '点赞';
+        } else {
+          item.modules.moduleStat.like.count = (count - 1).toString();
+        }
         item.modules.moduleStat.like.status = false;
       }
       setState(() {});
@@ -63,54 +67,63 @@ class _ActionPanelState extends State<ActionPanel> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            FontAwesomeIcons.shareFromSquare,
-            size: 16,
+        Expanded(
+          flex: 1,
+          child: TextButton.icon(
+            onPressed: () {},
+            icon: const Icon(
+              FontAwesomeIcons.shareFromSquare,
+              size: 16,
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              foregroundColor: Theme.of(context).colorScheme.outline,
+            ),
+            label: Text(stat.forward!.count ?? '转发'),
           ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            foregroundColor: Theme.of(context).colorScheme.outline,
-          ),
-          label: Text(stat.forward!.count ?? '转发'),
         ),
-        TextButton.icon(
-          onPressed: () =>
-              _dynamicsController.pushDetail(widget.item, 1, action: 'comment'),
-          icon: const Icon(
-            FontAwesomeIcons.comment,
-            size: 16,
+        Expanded(
+          flex: 1,
+          child: TextButton.icon(
+            onPressed: () => _dynamicsController.pushDetail(widget.item, 1,
+                action: 'comment'),
+            icon: const Icon(
+              FontAwesomeIcons.comment,
+              size: 16,
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              foregroundColor: Theme.of(context).colorScheme.outline,
+            ),
+            label: Text(stat.comment!.count ?? '评论'),
           ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            foregroundColor: Theme.of(context).colorScheme.outline,
-          ),
-          label: Text(stat.comment!.count ?? '评论'),
         ),
-        TextButton.icon(
-          onPressed: () => onLikeDynamic(),
-          icon: Icon(
-            stat.like!.status!
-                ? FontAwesomeIcons.solidThumbsUp
-                : FontAwesomeIcons.thumbsUp,
-            size: 16,
-            color: stat.like!.status! ? primary : color,
-          ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            foregroundColor: Theme.of(context).colorScheme.outline,
-          ),
-          label: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return ScaleTransition(scale: animation, child: child);
-            },
-            child: Text(
-              stat.like!.count ?? '点赞',
-              key: ValueKey<String>(stat.like!.count ?? '点赞'),
-              style: TextStyle(
-                color: stat.like!.status! ? primary : color,
+        Expanded(
+          flex: 1,
+          child: TextButton.icon(
+            onPressed: () => onLikeDynamic(),
+            icon: Icon(
+              stat.like!.status!
+                  ? FontAwesomeIcons.solidThumbsUp
+                  : FontAwesomeIcons.thumbsUp,
+              size: 16,
+              color: stat.like!.status! ? primary : color,
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              foregroundColor: Theme.of(context).colorScheme.outline,
+            ),
+            label: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: Text(
+                stat.like!.count ?? '点赞',
+                key: ValueKey<String>(stat.like!.count ?? '点赞'),
+                style: TextStyle(
+                  color: stat.like!.status! ? primary : color,
+                ),
               ),
             ),
           ),

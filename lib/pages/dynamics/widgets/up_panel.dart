@@ -24,24 +24,28 @@ class _UpPanelState extends State<UpPanel> {
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
   static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
+  var userInfo;
 
   @override
   void initState() {
     super.initState();
     upList = widget.upData!.upList!;
-    liveList = widget.upData!.liveUsers!.items!;
+    if (widget.upData!.liveUsers != null) {
+      liveList = widget.upData!.liveUsers!.items!;
+    }
     upList.insert(
       0,
       UpItem(
           face: 'https://files.catbox.moe/8uc48f.png', uname: '全部动态', mid: -1),
     );
+    userInfo = userInfoCache.get('userInfoCache');
     upList.insert(
       1,
       UpItem(
-        face: user.get(UserBoxKey.userFace),
+        face: userInfo.face,
         uname: '我',
-        mid: user.get(UserBoxKey.userMid),
+        mid: userInfo.mid,
       ),
     );
   }
@@ -64,15 +68,20 @@ class _UpPanelState extends State<UpPanel> {
                     controller: scrollController,
                     children: [
                       const SizedBox(width: 10),
-                      for (int i = 0; i < liveList.length; i++) ...[
-                        upItemBuild(liveList[i], i)
+                      if (liveList.isNotEmpty) ...[
+                        for (int i = 0; i < liveList.length; i++) ...[
+                          upItemBuild(liveList[i], i)
+                        ],
+                        VerticalDivider(
+                          indent: 20,
+                          endIndent: 40,
+                          width: 26,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.5),
+                        ),
                       ],
-                      VerticalDivider(
-                        indent: 20,
-                        endIndent: 40,
-                        width: 26,
-                        color: Theme.of(context).primaryColor.withOpacity(0.5),
-                      ),
                       for (int i = 0; i < upList.length; i++) ...[
                         upItemBuild(upList[i], i)
                       ],
@@ -123,7 +132,8 @@ class _UpPanelState extends State<UpPanel> {
           double itemWidth = contentWidth + itemPadding.horizontal;
           double screenWidth = MediaQuery.of(context).size.width;
           double moveDistance = 0.0;
-          if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+          if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
+          } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
             moveDistance =
                 (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
           } else {

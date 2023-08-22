@@ -55,7 +55,7 @@ class VideoCardH extends StatelessWidget {
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-              StyleString.safeSpace, 7, StyleString.safeSpace, 7),
+              StyleString.safeSpace, 5, StyleString.safeSpace, 5),
           child: LayoutBuilder(
             builder: (context, boxConstraints) {
               double width =

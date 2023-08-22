@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/github/latest.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -165,7 +164,7 @@ class AboutController extends GetxController {
     }
   }
 
-  // 获取啊当前版本
+  // 获取当前版本
   Future getCurrentApp() async {
     var result = await PackageInfo.fromPlatform();
     currentVersion.value = result.version;

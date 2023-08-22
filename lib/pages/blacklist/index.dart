@@ -46,6 +46,7 @@ class _BlackListPageState extends State<BlackListPage> {
     List<int> blackMidsList =
         _blackListController.blackList.map<int>((e) => e.mid!).toList();
     setting.put(SettingBoxKey.blackMidsList, blackMidsList);
+    scrollController.removeListener(() {});
     super.dispose();
   }
 

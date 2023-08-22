@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
@@ -40,7 +41,9 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
     } else {
       oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
     }
-    type = Get.arguments['item'].basic!['comment_type'];
+    int commentType = Get.arguments['item'].basic!['comment_type'] ?? 11;
+    type = (commentType == 0) ? 11 : commentType;
+
     action =
         Get.arguments.containsKey('action') ? Get.arguments['action'] : null;
     _dynamicDetailController = Get.put(DynamicDetailController(oid, type));
@@ -56,10 +59,9 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
   void _listen() async {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 300) {
-      if (!_dynamicDetailController!.isLoadingMore) {
-        _dynamicDetailController!.isLoadingMore = true;
-        await _dynamicDetailController!.queryReplyList(reqType: 'onLoad');
-      }
+      EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+        _dynamicDetailController!.queryReplyList(reqType: 'onLoad');
+      });
     }
 
     if (scrollController.offset > 55 && !_visibleTitle) {
@@ -93,6 +95,12 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -236,6 +244,11 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
                                       replyReply: (replyItem) =>
                                           replyReply(replyItem),
                                       replyType: ReplyType.values[type],
+                                      addReply: (replyItem) {
+                                        _dynamicDetailController!
+                                            .replyList[index].replies!
+                                            .add(replyItem);
+                                      },
                                     );
                                   }
                                 },

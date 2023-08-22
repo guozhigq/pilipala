@@ -1,7 +1,9 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/pages/history/index.dart';
 
 import 'widgets/item.dart';
@@ -16,23 +18,31 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   final HistoryController _historyController = Get.put(HistoryController());
   Future? _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     _futureBuilderFuture = _historyController.queryHistoryList();
     super.initState();
-
-    _historyController.scrollController.addListener(
+    scrollController = _historyController.scrollController;
+    scrollController.addListener(
       () {
-        if (_historyController.scrollController.position.pixels >=
-            _historyController.scrollController.position.maxScrollExtent -
-                300) {
-          if (!_historyController.isLoadingMore) {
-            _historyController.onLoad();
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
+          if (!_historyController.isLoadingMore.value) {
+            EasyThrottle.throttle('history', const Duration(seconds: 1), () {
+              _historyController.onLoad();
+            });
           }
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -92,13 +102,8 @@ class _HistoryPageState extends State<HistoryPage> {
                   Map data = snapshot.data;
                   if (data['status']) {
                     return Obx(
-                      () => _historyController.historyList.isEmpty
-                          ? const SliverToBoxAdapter(
-                              child: Center(
-                                child: Text('没数据'),
-                              ),
-                            )
-                          : SliverList(
+                      () => _historyController.historyList.isNotEmpty
+                          ? SliverList(
                               delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                 return HistoryItem(
@@ -108,7 +113,12 @@ class _HistoryPageState extends State<HistoryPage> {
                               },
                                   childCount:
                                       _historyController.historyList.length),
-                            ),
+                            )
+                          : _historyController.isLoadingMore.value
+                              ? const SliverToBoxAdapter(
+                                  child: Center(child: Text('加载中')),
+                                )
+                              : const NoData(),
                     );
                   } else {
                     return HttpError(

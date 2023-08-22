@@ -60,43 +60,47 @@ Widget addWidget(item, context, type, {floor = 1}) {
         ),
       );
     case 'ADDITIONAL_TYPE_RESERVE':
-      return Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: InkWell(
-          onTap: () {},
-          child: Container(
-            width: double.infinity,
-            padding:
-                const EdgeInsets.only(left: 12, top: 10, right: 12, bottom: 10),
-            color: bgColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dynamicProperty[type].title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 1),
-                Text.rich(
-                  TextSpan(
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium!.fontSize),
+      return dynamicProperty[type].state != -1
+          ? Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: InkWell(
+                onTap: () {},
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(
+                      left: 12, top: 10, right: 12, bottom: 10),
+                  color: bgColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(text: dynamicProperty[type].desc1['text']),
-                      const TextSpan(text: '  '),
-                      TextSpan(text: dynamicProperty[type].desc2['text']),
+                      Text(
+                        dynamicProperty[type].title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 1),
+                      Text.rich(
+                        TextSpan(
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.outline,
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize),
+                          children: [
+                            TextSpan(text: dynamicProperty[type].desc1['text']),
+                            const TextSpan(text: '  '),
+                            TextSpan(text: dynamicProperty[type].desc2['text']),
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-            // TextButton(onPressed: () {}, child: Text('123'))
-          ),
-        ),
-      );
+                  // TextButton(onPressed: () {}, child: Text('123'))
+                ),
+              ),
+            )
+          : const SizedBox();
     case 'ADDITIONAL_TYPE_GOODS':
       return Padding(
           padding: const EdgeInsets.only(top: 6),

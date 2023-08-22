@@ -43,7 +43,7 @@ class UserInfoData {
   @HiveField(5)
   int? mobileVerified;
   @HiveField(6)
-  int? money;
+  double? money;
   @HiveField(7)
   int? moral;
   @HiveField(8)
@@ -88,7 +88,7 @@ class UserInfoData {
         : LevelInfo();
     mid = json['mid'];
     mobileVerified = json['mobile_verified'];
-    money = json['money'];
+    money = json['money'] is int ? json['money'].toDouble() : json['money'];
     moral = json['moral'];
     official = json['official'];
     officialVerify = json['officialVerify'];
@@ -130,6 +130,7 @@ class LevelInfo {
     currentLevel = json['current_level'];
     currentMin = json['current_min'];
     currentExp = json['current_exp'];
-    nextExp = json['next_exp'];
+    nextExp =
+        json['current_level'] == 6 ? json['current_exp'] : json['next_exp'];
   }
 }

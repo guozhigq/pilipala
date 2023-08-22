@@ -18,6 +18,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import 'models/bottom_progress_behavior.dart';
 import 'utils/fullscreen.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
@@ -67,6 +68,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Box setting = GStrorage.setting;
   late FullScreenMode mode;
+  late int defaultBtmProgressBehavior;
 
   void onDoubleTapSeekBackward() {
     setState(() {
@@ -87,6 +89,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
+    defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
+        defaultValue: BtmProgresBehavior.values.first.code);
 
     Future.microtask(() async {
       try {
@@ -203,7 +207,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               systemOverlayStyle: SystemUiOverlayStyle.light,
             ),
             body: SafeArea(
-              bottom: true,
+              bottom: false,
               child: PLVideoPlayer(
                 controller: _,
                 headerControl: _.headerControl,
@@ -229,6 +233,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void dispose() {
     animationController.dispose();
+    FlutterVolumeController.removeListener();
     super.dispose();
   }
 
@@ -253,13 +258,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       clipBehavior: Clip.hardEdge,
       fit: StackFit.passthrough,
       children: [
-        Video(
-          controller: videoController,
-          controls: NoVideoControls,
-          subtitleViewConfiguration: SubtitleViewConfiguration(
-            style: subTitleStyle,
-            textAlign: TextAlign.center,
-            padding: const EdgeInsets.all(24.0),
+        Obx(
+          () => Video(
+            controller: videoController,
+            controls: NoVideoControls,
+            subtitleViewConfiguration: SubtitleViewConfiguration(
+              style: subTitleStyle,
+              textAlign: TextAlign.center,
+              padding: const EdgeInsets.all(24.0),
+            ),
+            fit: _.videoFit.value,
           ),
         ),
 
@@ -312,38 +320,40 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 curve: Curves.easeInOut,
                 opacity: _.isSliderMoving.value ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 150),
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0x88000000),
-                    borderRadius: BorderRadius.circular(64.0),
-                  ),
-                  height: 34.0,
-                  width: 100.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Obx(() {
-                        return Text(
-                          _.sliderTempPosition.value.inMinutes >= 60
-                              ? printDurationWithHours(
-                                  _.sliderTempPosition.value)
-                              : printDuration(_.sliderTempPosition.value),
-                          style: textStyle,
-                        );
-                      }),
-                      const SizedBox(width: 2),
-                      const Text('/', style: textStyle),
-                      const SizedBox(width: 2),
-                      Obx(
-                        () => Text(
-                          _.duration.value.inMinutes >= 60
-                              ? printDurationWithHours(_.duration.value)
-                              : printDuration(_.duration.value),
-                          style: textStyle,
+                child: IntrinsicWidth(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0x88000000),
+                      borderRadius: BorderRadius.circular(64.0),
+                    ),
+                    height: 34.0,
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Obx(() {
+                          return Text(
+                            _.sliderTempPosition.value.inMinutes >= 60
+                                ? printDurationWithHours(
+                                    _.sliderTempPosition.value)
+                                : printDuration(_.sliderTempPosition.value),
+                            style: textStyle,
+                          );
+                        }),
+                        const SizedBox(width: 2),
+                        const Text('/', style: textStyle),
+                        const SizedBox(width: 2),
+                        Obx(
+                          () => Text(
+                            _.duration.value.inMinutes >= 60
+                                ? printDurationWithHours(_.duration.value)
+                                : printDuration(_.duration.value),
+                            style: textStyle,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -539,7 +549,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 return;
               }
               _.onChangedSliderEnd();
-              _.seekTo(_.sliderPosition.value);
+              _.seekTo(_.sliderPosition.value, type: 'slider');
             },
             // 垂直方向 音量/亮度调节
             onVerticalDragUpdate: (DragUpdateDetails details) async {
@@ -620,6 +630,15 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             final int value = _.sliderPosition.value.inSeconds;
             final int max = _.duration.value.inSeconds;
             final int buffer = _.buffered.value.inSeconds;
+            if (defaultBtmProgressBehavior ==
+                BtmProgresBehavior.alwaysHide.code) {
+              return Container();
+            }
+            if (defaultBtmProgressBehavior ==
+                    BtmProgresBehavior.onlyShowFullScreen.code &&
+                !_.isFullScreen.value) {
+              return Container();
+            }
             if (value > max || max <= 0) {
               return Container();
             }
@@ -695,9 +714,19 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         Obx(() {
           if (_.dataStatus.loading || _.isBuffering.value) {
             return Center(
-              child: Image.asset(
-                'assets/images/loading.gif',
-                height: 25,
+              child: Container(
+                padding: const EdgeInsets.all(30),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: Alignment.center,
+                    colors: [Colors.black26, Colors.transparent],
+                  ),
+                ),
+                child: Image.asset(
+                  'assets/images/loading.gif',
+                  height: 25,
+                ),
               ),
             );
           } else {

@@ -10,8 +10,8 @@ class Data {
 
   static Future historyStatus() async {
     Box localCache = GStrorage.localCache;
-    Box user = GStrorage.user;
-    if (user.get(UserBoxKey.userMid) == null) {
+    Box userInfoCache = GStrorage.userInfo;
+    if (userInfoCache.get('userInfoCache') == null) {
       return;
     }
     var res = await UserHttp.historyStatus();

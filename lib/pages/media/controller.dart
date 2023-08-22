@@ -8,7 +8,7 @@ import 'package:pilipala/utils/storage.dart';
 
 class MediaController extends GetxController {
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   List list = [
     {
@@ -34,21 +34,23 @@ class MediaController extends GetxController {
       'onTap': () => Get.toNamed('/later'),
     },
   ];
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
-    userLogin.value = user.get(UserBoxKey.userLogin) ?? false;
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
   }
 
   Future<dynamic> queryFavFolder() async {
-    if (!userLogin.value || GStrorage.user.get(UserBoxKey.userMid) == null) {
+    if (!userLogin.value || GStrorage.userInfo.get('userInfoCache') == null) {
       return {'status': false, 'data': [], 'msg': '未登录'};
     }
     var res = await await UserHttp.userfavFolder(
       pn: 1,
       ps: 5,
-      mid: GStrorage.user.get(UserBoxKey.userMid),
+      mid: GStrorage.userInfo.get('userInfoCache').mid,
     );
     favFolderData.value = res['data'];
     return res;

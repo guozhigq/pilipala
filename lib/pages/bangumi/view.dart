@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -22,24 +23,28 @@ class _BangumiPageState extends State<BangumiPage>
     with AutomaticKeepAliveClientMixin {
   final BangumiController _bangumidController = Get.put(BangumiController());
   late Future? _futureBuilderFuture;
+  late Future? _futureBuilderFutureFollow;
+  late ScrollController scrollController;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    ScrollController scrollController = _bangumidController.scrollController;
+    scrollController = _bangumidController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
+    _futureBuilderFutureFollow = _bangumidController.queryBangumiFollow();
     scrollController.addListener(
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_bangumidController.isLoadingMore) {
+          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
             _bangumidController.isLoadingMore = true;
-            await _bangumidController.onLoad();
-          }
+            _bangumidController.onLoad();
+          });
         }
 
         final ScrollDirection direction =
@@ -51,6 +56,12 @@ class _BangumiPageState extends State<BangumiPage>
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -80,43 +91,61 @@ class _BangumiPageState extends State<BangumiPage>
                             '最近追番',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _futureBuilderFutureFollow =
+                                    _bangumidController.queryBangumiFollow();
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.refresh,
+                              size: 20,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     SizedBox(
                       height: 258,
                       child: FutureBuilder(
-                        future: _bangumidController.queryBangumiFollow(),
+                        future: _futureBuilderFutureFollow,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
                             Map data = snapshot.data as Map;
+                            List list = _bangumidController.bangumiFollowList;
                             if (data['status']) {
                               return Obx(
-                                () => ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: _bangumidController
-                                      .bangumiFollowList.length,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      width: Get.size.width / 3,
-                                      height: 254,
-                                      margin: EdgeInsets.only(
-                                          left: StyleString.safeSpace,
-                                          right: index ==
-                                                  _bangumidController
-                                                          .bangumiFollowList
-                                                          .length -
-                                                      1
-                                              ? StyleString.safeSpace
-                                              : 0),
-                                      child: BangumiCardV(
-                                        bangumiItem: _bangumidController
-                                            .bangumiFollowList[index],
+                                () => list.isNotEmpty
+                                    ? ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: list.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            width: Get.size.width / 3,
+                                            height: 254,
+                                            margin: EdgeInsets.only(
+                                                left: StyleString.safeSpace,
+                                                right: index ==
+                                                        _bangumidController
+                                                                .bangumiFollowList
+                                                                .length -
+                                                            1
+                                                    ? StyleString.safeSpace
+                                                    : 0),
+                                            child: BangumiCardV(
+                                              bangumiItem: _bangumidController
+                                                  .bangumiFollowList[index],
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : const SizedBox(
+                                        child: Center(
+                                          child: Text('还没有追番'),
+                                        ),
                                       ),
-                                    );
-                                  },
-                                ),
                               );
                             } else {
                               return const SizedBox();

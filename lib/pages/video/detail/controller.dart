@@ -38,7 +38,7 @@ class VideoDetailController extends GetxController
 
   /// 播放器配置 画质 音质 解码格式
   late VideoQuality currentVideoQa;
-  late AudioQuality currentAudioQa;
+  AudioQuality? currentAudioQa;
   late VideoDecodeFormats currentDecodeFormats;
   // PlPlayerController plPlayerController = PlPlayerController();
   // 是否开始自动播放 存在多p的情况下，第二p需要为true
@@ -51,7 +51,7 @@ class VideoDetailController extends GetxController
   RxBool enableHA = true.obs;
 
   /// 本地存储
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   Box localCache = GStrorage.localCache;
   Box setting = GStrorage.setting;
 
@@ -70,11 +70,13 @@ class VideoDetailController extends GetxController
   late Duration defaultST;
   // 默认记录历史记录
   bool enableHeart = true;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
     Map argMap = Get.arguments;
+    userInfo = userInfoCache.get('userInfoCache');
     var keys = argMap.keys.toList();
     if (keys.isNotEmpty) {
       if (keys.contains('videoItem')) {
@@ -92,7 +94,7 @@ class VideoDetailController extends GetxController
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
 
-    if (user.get(UserBoxKey.userMid) == null ||
+    if (userInfo == null ||
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
     }
@@ -140,9 +142,11 @@ class VideoDetailController extends GetxController
     videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
-    AudioItem firstAudio =
-        data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa.code);
-    audioUrl = firstAudio.baseUrl ?? '';
+    if (currentAudioQa != null) {
+      AudioItem firstAudio =
+          data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa!.code);
+      audioUrl = firstAudio.baseUrl ?? '';
+    }
 
     playerInit();
   }
@@ -224,11 +228,16 @@ class VideoDetailController extends GetxController
         // 根据画质选编码格式
         List supportDecodeFormats =
             supportFormats.firstWhere((e) => e.quality == resVideoQa).codecs!;
-
+        // 默认从设置中取AVC
+        currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+            SettingBoxKey.defaultDecode,
+            defaultValue: VideoDecodeFormats.values.last.code))!;
         try {
-          currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
-              SettingBoxKey.defaultDecode,
-              defaultValue: supportDecodeFormats.first))!;
+          // 当前视频没有对应格式返回第一个
+          currentDecodeFormats =
+              supportDecodeFormats.contains(supportDecodeFormats)
+                  ? supportDecodeFormats
+                  : supportDecodeFormats.first;
         } catch (_) {}
 
         /// 取出符合当前解码格式的videoItem
@@ -270,6 +279,9 @@ class VideoDetailController extends GetxController
       //   duration: data.timeLength ?? 0,
       // );
     } else {
+      if (result['code'] == -404) {
+        isShowCover.value = false;
+      }
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;

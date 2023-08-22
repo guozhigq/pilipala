@@ -44,6 +44,12 @@ class _MemberPageState extends State<MemberPage>
   }
 
   @override
+  void dispose() {
+    _extendNestCtr.removeListener(() {});
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       primary: true,

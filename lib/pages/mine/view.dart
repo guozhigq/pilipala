@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'controller.dart';
 
@@ -160,10 +161,11 @@ class _MinePageState extends State<MinePage> {
             ]))
           ],
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 25),
         if (_mineController.userInfo.value.levelInfo != null) ...[
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
+              LevelInfo levelInfo = _mineController.userInfo.value.levelInfo;
               return SizedBox(
                 width: box.maxWidth,
                 height: 24,
@@ -172,48 +174,27 @@ class _MinePageState extends State<MinePage> {
                     Positioned(
                       top: 0,
                       right: 0,
-                      child: SizedBox(
-                        height: 22,
+                      bottom: 0,
+                      child: Container(
+                        color: Theme.of(context).colorScheme.primary,
+                        height: 24,
+                        constraints:
+                            const BoxConstraints(minWidth: 100), // 设置最小宽度为100
                         width: box.maxWidth *
-                            (1 -
-                                (_mineController
-                                        .userInfo.value.levelInfo!.currentExp! /
-                                    _mineController
-                                        .userInfo.value.levelInfo!.nextExp!)),
+                            (1 - (levelInfo.currentExp! / levelInfo.nextExp!)),
                         child: Center(
                           child: Text(
-                            (_mineController
-                                        .userInfo.value.levelInfo!.nextExp! -
-                                    _mineController
-                                        .userInfo.value.levelInfo!.currentExp!)
-                                .toString(),
+                            '${levelInfo.currentExp!}/${levelInfo.nextExp!}',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 12,
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
-          LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              return Container(
-                width: box.maxWidth,
-                height: 1,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-                child: Stack(
-                  children: [
                     Positioned(
-                      top: 0,
+                      top: 23,
                       left: 0,
                       bottom: 0,
                       child: Container(
@@ -224,7 +205,6 @@ class _MinePageState extends State<MinePage> {
                                     .userInfo.value.levelInfo!.nextExp!),
                         height: 1,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
@@ -234,6 +214,36 @@ class _MinePageState extends State<MinePage> {
               );
             },
           ),
+          // LayoutBuilder(
+          //   builder: (context, BoxConstraints box) {
+          //     return Container(
+          //       width: box.maxWidth,
+          //       height: 1,
+          //       color: Theme.of(context).colorScheme.onInverseSurface,
+          //       child: Stack(
+          //         children: [
+          //           Positioned(
+          //             top: 0,
+          //             left: 0,
+          //             bottom: 0,
+          //             child: Container(
+          //               width: box.maxWidth *
+          //                   (_mineController
+          //                           .userInfo.value.levelInfo!.currentExp! /
+          //                       _mineController
+          //                           .userInfo.value.levelInfo!.nextExp!),
+          //               height: 1,
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(4),
+          //                 color: Theme.of(context).colorScheme.primary,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     );
+          //   },
+          // ),
         ],
         const SizedBox(height: 30),
         Padding(

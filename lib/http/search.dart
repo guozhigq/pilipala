@@ -46,14 +46,19 @@ class SearchHttp {
     required SearchType searchType,
     required String keyword,
     required page,
+    String? order,
+    int? duration,
   }) async {
-    var res = await Request().get(Api.searchByType, data: {
+    var reqData = {
       'search_type': searchType.type,
       'keyword': keyword,
       // 'order_sort': 0,
       // 'user_type': 0,
-      'page': page
-    });
+      'page': page,
+      if (order != null) 'order': order,
+      if (duration != null) 'duration': duration,
+    };
+    var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
       Object data;
       switch (searchType) {

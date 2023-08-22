@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/media_bangumi.dart';
@@ -27,8 +28,8 @@ class _SearchPanelState extends State<SearchPanel>
     with AutomaticKeepAliveClientMixin {
   late SearchPanelController _searchPanelController;
 
-  bool _isLoadingMore = false;
   late Future _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   bool get wantKeepAlive => true;
@@ -43,18 +44,22 @@ class _SearchPanelState extends State<SearchPanel>
       ),
       tag: widget.searchType!.type,
     );
-    ScrollController scrollController = _searchPanelController.scrollController;
+    scrollController = _searchPanelController.scrollController;
     scrollController.addListener(() async {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 100) {
-        if (!_isLoadingMore) {
-          _isLoadingMore = true;
-          await _searchPanelController.onSearch(type: 'onLoad');
-          _isLoadingMore = false;
-        }
+        EasyThrottle.throttle('history', const Duration(seconds: 1), () {
+          _searchPanelController.onSearch(type: 'onLoad');
+        });
       }
     });
     _futureBuilderFuture = _searchPanelController.onSearch();
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -70,12 +75,15 @@ class _SearchPanelState extends State<SearchPanel>
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data;
             var ctr = _searchPanelController;
-            List list = ctr.resultList;
+            RxList list = ctr.resultList;
             if (data['status']) {
               return Obx(() {
                 switch (widget.searchType) {
                   case SearchType.video:
-                    return searchVideoPanel(context, ctr, list);
+                    return SearchVideoPanel(
+                      ctr: _searchPanelController,
+                      list: list.value,
+                    );
                   case SearchType.media_bangumi:
                     return searchMbangumiPanel(context, ctr, list);
                   case SearchType.bili_user:

@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
@@ -29,9 +31,9 @@ class _DynamicsPageState extends State<DynamicsPage>
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
-  bool _isLoadingMore = false;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   EventBus eventBus = EventBus();
+  late ScrollController scrollController;
 
   @override
   bool get wantKeepAlive => true;
@@ -41,18 +43,17 @@ class _DynamicsPageState extends State<DynamicsPage>
     super.initState();
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
     _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
-    ScrollController scrollController = _dynamicsController.scrollController;
+    scrollController = _dynamicsController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_isLoadingMore) {
-            _isLoadingMore = true;
-            await _dynamicsController.queryFollowDynamic(type: 'onLoad');
-            _isLoadingMore = false;
-          }
+          EasyThrottle.throttle(
+              'queryFollowDynamic', const Duration(seconds: 1), () {
+            _dynamicsController.queryFollowDynamic(type: 'onLoad');
+          });
         }
 
         final ScrollDirection direction =
@@ -72,6 +73,12 @@ class _DynamicsPageState extends State<DynamicsPage>
         _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -145,14 +152,12 @@ class _DynamicsPageState extends State<DynamicsPage>
                                             .textTheme
                                             .labelMedium!
                                             .fontSize)),
-                                // 4: Text(
-                                //   '专栏',
-                                //   style: TextStyle(
-                                //       fontSize: Theme.of(context)
-                                //           .textTheme
-                                //           .labelMedium!
-                                //           .fontSize),
-                                // ),
+                                4: Text('专栏',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize)),
                               },
                               padding: 13.0,
                               decoration: BoxDecoration(
@@ -179,22 +184,22 @@ class _DynamicsPageState extends State<DynamicsPage>
                   )
                 ],
               ),
-              Obx(
-                () => Visibility(
-                  visible: _dynamicsController.userLogin.value,
-                  child: Positioned(
-                    right: 4,
-                    top: 0,
-                    bottom: 0,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () =>
-                          {feedBack(), _dynamicsController.resetSearch()},
-                      icon: const Icon(Icons.history, size: 21),
-                    ),
-                  ),
-                ),
-              ),
+              // Obx(
+              //   () => Visibility(
+              //     visible: _dynamicsController.userLogin.value,
+              //     child: Positioned(
+              //       right: 4,
+              //       top: 0,
+              //       bottom: 0,
+              //       child: IconButton(
+              //         padding: EdgeInsets.zero,
+              //         onPressed: () =>
+              //             {feedBack(), _dynamicsController.resetSearch()},
+              //         icon: const Icon(Icons.history, size: 21),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -233,14 +238,24 @@ class _DynamicsPageState extends State<DynamicsPage>
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList;
                     return Obx(
-                      () => list.isEmpty
-                          ? skeleton()
-                          : SliverList(
-                              delegate:
-                                  SliverChildBuilderDelegate((context, index) {
+                      () {
+                        if (list.isEmpty) {
+                          if (_dynamicsController.isLoadingDynamic.value) {
+                            return skeleton();
+                          } else {
+                            return const NoData();
+                          }
+                        } else {
+                          return SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
                                 return DynamicPanel(item: list[index]);
-                              }, childCount: list.length),
+                              },
+                              childCount: list.length,
                             ),
+                          );
+                        }
+                      },
                     );
                   } else {
                     return HttpError(
@@ -261,6 +276,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 }
               },
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 40))
           ],
         ),
       ),

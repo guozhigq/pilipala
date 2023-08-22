@@ -27,3 +27,20 @@ extension SearchTypeExtension on SearchType {
       ['video', 'media_bangumi', 'live_room', 'bili_user'][index];
   String get label => ['视频', '番剧', '直播间', '用户'][index];
 }
+
+// 搜索类型为视频、专栏及相簿时
+enum ArchiveFilterType {
+  totalrank,
+  click,
+  pubdate,
+  dm,
+  stow,
+  scores,
+  // 专栏
+  // attention,
+}
+
+extension ArchiveFilterTypeExtension on ArchiveFilterType {
+  String get description =>
+      ['默认排序', '播放多', '新发布', '弹幕多', '收藏多', '评论多', '最多喜欢'][index];
+}

@@ -109,8 +109,10 @@ class WbiSign {
   // 获取最新的 img_key 和 sub_key 可以从缓存中获取
   static Future<Map<String, dynamic>> getWbiKeys() async {
     DateTime nowDate = DateTime.now();
-    if (localCache.get('wbiKeys') != null &&
-        DateTime.fromMillisecondsSinceEpoch(localCache.get('timeStamp')).day ==
+    if (localCache.get(LocalCacheKey.wbiKeys) != null &&
+        DateTime.fromMillisecondsSinceEpoch(
+                    localCache.get(LocalCacheKey.timeStamp))
+                .day ==
             nowDate.day) {
       Map cacheWbiKeys = localCache.get('wbiKeys');
       return Map<String, dynamic>.from(cacheWbiKeys);
@@ -129,8 +131,8 @@ class WbiSign {
           .substring(subUrl.lastIndexOf('/') + 1, subUrl.length)
           .split('.')[0]
     };
-    localCache.put('wbiKeys', wbiKeys);
-    localCache.put('timeStamp', nowDate.millisecondsSinceEpoch);
+    localCache.put(LocalCacheKey.wbiKeys, wbiKeys);
+    localCache.put(LocalCacheKey.timeStamp, nowDate.millisecondsSinceEpoch);
     return wbiKeys;
   }
 

@@ -5,19 +5,22 @@ import 'package:pilipala/models/follow/result.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FollowController extends GetxController {
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   int pn = 1;
   int total = 0;
   RxList<FollowItemModel> followList = [FollowItemModel()].obs;
   late int mid;
   late String name;
+  var userInfo;
 
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(
-        Get.parameters['mid'] ?? user.get(UserBoxKey.userMid).toString());
-    name = Get.parameters['name'] ?? user.get(UserBoxKey.userName);
+    userInfo = userInfoCache.get('userInfoCache');
+    mid = Get.parameters['mid'] != null
+        ? int.parse(Get.parameters['mid']!)
+        : userInfo.mid;
+    name = Get.parameters['name'] ?? userInfo.uname;
   }
 
   Future queryFollowings(type) async {

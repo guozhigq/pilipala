@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -40,12 +41,11 @@ class _RcmdPageState extends State<RcmdPage>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_rcmdController.isLoadingMore) {
+          EasyThrottle.throttle(
+              'my-throttler', const Duration(milliseconds: 500), () {
             _rcmdController.isLoadingMore = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              _rcmdController.onLoad();
-            });
-          }
+            _rcmdController.onLoad();
+          });
         }
 
         final ScrollDirection direction =
@@ -57,6 +57,12 @@ class _RcmdPageState extends State<RcmdPage>
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _rcmdController.scrollController.removeListener(() {});
+    super.dispose();
   }
 
   @override

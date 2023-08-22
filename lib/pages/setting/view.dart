@@ -34,11 +34,11 @@ class SettingPage extends StatelessWidget {
             dense: false,
             title: const Text('外观设置'),
           ),
-          // ListTile(
-          //   onTap: () {},
-          //   dense: false,
-          //   title: const Text('其他设置'),
-          // ),
+          ListTile(
+            onTap: () => Get.toNamed('/extraSetting'),
+            dense: false,
+            title: const Text('其他设置'),
+          ),
           Obx(
             () => Visibility(
               visible: settingController.userLogin.value,

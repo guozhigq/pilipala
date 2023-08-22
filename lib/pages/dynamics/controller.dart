@@ -51,29 +51,42 @@ class DynamicsController extends GetxController {
   ];
   bool flag = false;
   RxInt initialValue = 1.obs;
-  Box user = GStrorage.user;
+  Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
+  var userInfo;
+  RxBool isLoadingDynamic = false.obs;
 
   @override
   void onInit() {
-    userLogin.value = user.get(UserBoxKey.userLogin, defaultValue: false);
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
     super.onInit();
   }
 
   Future queryFollowDynamic({type = 'init'}) async {
     if (!userLogin.value) {
-      return {'status': false, 'msg': '未登录'};
+      return {'status': false, 'msg': '账号未登录'};
     }
     if (type == 'init') {
       dynamicsList.clear();
     }
+    // 下拉刷新数据渲染时会触发onLoad
+    if (type == 'onLoad' && page == 1) {
+      return;
+    }
+    isLoadingDynamic.value = true;
     var res = await DynamicsHttp.followDynamic(
       page: type == 'init' ? 1 : page,
       type: dynamicsType.value.values,
       offset: offset,
       mid: mid.value,
     );
+    isLoadingDynamic.value = false;
     if (res['status']) {
+      if (type == 'onLoad' && res['data'].items.isEmpty) {
+        SmartDialog.showToast('没有更多了');
+        return;
+      }
       if (type == 'init') {
         dynamicsList.value = res['data'].items;
       } else {
@@ -188,12 +201,19 @@ class DynamicsController extends GetxController {
   }
 
   Future queryFollowUp({type = 'init'}) async {
+    if (!userLogin.value) {
+      return {'status': false, 'msg': '账号未登录'};
+    }
     if (type == 'init') {
-      upData = FollowUpModel().obs;
+      upData.value.upList = [];
+      upData.value.liveUsers = LiveUsers();
     }
     var res = await DynamicsHttp.followUp();
     if (res['status']) {
       upData.value = res['data'];
+      if (upData.value.upList!.isEmpty) {
+        mid.value = -1;
+      }
     }
     return res;
   }
@@ -207,7 +227,8 @@ class DynamicsController extends GetxController {
 
   onRefresh() async {
     page = 1;
-    queryFollowUp();
+    print('onRefresh');
+    await queryFollowUp();
     await queryFollowDynamic();
   }
 
@@ -227,7 +248,7 @@ class DynamicsController extends GetxController {
     mid.value = -1;
     dynamicsType.value = DynamicsType.values[0];
     initialValue.value = 1;
-    SmartDialog.showToast('还原默认加载', alignment: Alignment.topCenter);
+    SmartDialog.showToast('还原默认加载');
     dynamicsList.value = [DynamicItemModel()];
     queryFollowDynamic();
   }

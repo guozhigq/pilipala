@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class SetSwitchItem extends StatefulWidget {
   final String? title;
@@ -61,6 +62,9 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
             onChanged: (value) {
               val = value;
               Setting.put(widget.setKey, value);
+              if (widget.setKey == SettingBoxKey.autoUpdate && value == true) {
+                Utils.checkUpdata();
+              }
               setState(() {});
             }),
       ),
