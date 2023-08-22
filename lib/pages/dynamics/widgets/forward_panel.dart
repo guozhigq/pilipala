@@ -100,6 +100,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     // 直播
     case 'DYNAMIC_TYPE_LIVE_RCMD':
       return liveRcmdPanel(item, context, floor: floor);
+    // 直播
     case 'DYNAMIC_TYPE_LIVE':
       return livePanel(item, context, floor: floor);
     // 合集
@@ -147,6 +148,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       return videoSeasonWidget(item, context, 'pgc', floor: floor);
     case 'DYNAMIC_TYPE_PGC_UNION':
       return videoSeasonWidget(item, context, 'pgc', floor: floor);
+    // 直播结束
     case 'DYNAMIC_TYPE_NONE':
       return Row(
         children: [
@@ -158,7 +160,23 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
           Text(item.modules.moduleDynamic.major.none.tips)
         ],
       );
+    // 课堂
+    case 'DYNAMIC_TYPE_COURSES_SEASON':
+      return Row(
+        children: [
+          Expanded(
+            child: Text(
+              "课堂💪：${item.modules.moduleDynamic.major.courses['title']}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+        ],
+      );
     default:
-      return const SizedBox(height: 0);
+      return const SizedBox(
+        width: double.infinity,
+        child: Text('🙏 暂未支持的类型，请联系开发者反馈 '),
+      );
   }
 }

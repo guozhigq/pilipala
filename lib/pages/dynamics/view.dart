@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,6 @@ class _DynamicsPageState extends State<DynamicsPage>
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
-  bool _isLoadingMore = false;
   Box userInfoCache = GStrorage.userInfo;
   EventBus eventBus = EventBus();
   late ScrollController scrollController;
@@ -50,11 +50,10 @@ class _DynamicsPageState extends State<DynamicsPage>
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_isLoadingMore) {
-            _isLoadingMore = true;
-            await _dynamicsController.queryFollowDynamic(type: 'onLoad');
-            _isLoadingMore = false;
-          }
+          EasyThrottle.throttle(
+              'queryFollowDynamic', const Duration(seconds: 1), () {
+            _dynamicsController.queryFollowDynamic(type: 'onLoad');
+          });
         }
 
         final ScrollDirection direction =
@@ -277,6 +276,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                 }
               },
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 40))
           ],
         ),
       ),

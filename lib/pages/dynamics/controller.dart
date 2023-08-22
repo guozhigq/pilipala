@@ -70,6 +70,10 @@ class DynamicsController extends GetxController {
     if (type == 'init') {
       dynamicsList.clear();
     }
+    // 下拉刷新数据渲染时会触发onLoad
+    if (type == 'onLoad' && page == 1) {
+      return;
+    }
     isLoadingDynamic.value = true;
     var res = await DynamicsHttp.followDynamic(
       page: type == 'init' ? 1 : page,
@@ -79,6 +83,10 @@ class DynamicsController extends GetxController {
     );
     isLoadingDynamic.value = false;
     if (res['status']) {
+      if (type == 'onLoad' && res['data'].items.isEmpty) {
+        SmartDialog.showToast('没有更多了');
+        return;
+      }
       if (type == 'init') {
         dynamicsList.value = res['data'].items;
       } else {
@@ -219,6 +227,7 @@ class DynamicsController extends GetxController {
 
   onRefresh() async {
     page = 1;
+    print('onRefresh');
     await queryFollowUp();
     await queryFollowDynamic();
   }
