@@ -12,13 +12,12 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
       primary: false,
       controller: ctr!.scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: StyleString.cardSpace + 2,
-        mainAxisSpacing: StyleString.cardSpace + 3,
-        mainAxisExtent:
-            MediaQuery.of(context).size.width / 2 / StyleString.aspectRatio +
-                60,
-      ),
+          crossAxisCount: 2,
+          crossAxisSpacing: StyleString.cardSpace + 2,
+          mainAxisSpacing: StyleString.cardSpace + 3,
+          mainAxisExtent:
+              MediaQuery.of(context).size.width / 2 / StyleString.aspectRatio +
+                  66 * MediaQuery.of(context).textScaleFactor),
       itemCount: list.length,
       itemBuilder: (context, index) {
         return LiveItem(liveItem: list![index]);
@@ -35,11 +34,8 @@ class LiveItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomid);
     return Card(
-      elevation: 0,
+      elevation: 1,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
       margin: EdgeInsets.zero,
       child: InkWell(
         onTap: () async {
@@ -104,7 +100,7 @@ class LiveContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(4, 5, 6, 6),
+        padding: const EdgeInsets.fromLTRB(9, 8, 9, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,7 +112,6 @@ class LiveContent extends StatelessWidget {
                     TextSpan(
                       text: i['text'],
                       style: TextStyle(
-                        fontSize: 13,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.3,
                         color: i['type'] == 'em'

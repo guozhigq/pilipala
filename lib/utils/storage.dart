@@ -100,7 +100,7 @@ class SettingBoxKey {
   static const String autoUpdate = 'autoUpdate';
 
   static const String themeMode = 'themeMode';
-  static const String defaultFontSize = 'fontSize';
+  static const String defaultTextScale = 'textScale';
   static const String dynamicColor = 'dynamicColor'; // bool
   static const String customColor = 'customColor'; // 自定义主题色
 }

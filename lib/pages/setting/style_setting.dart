@@ -189,6 +189,11 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/colorSetting'),
             title: Text('应用主题', style: titleStyle),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/fontSizeSetting'),
+            title: Text('字体大小', style: titleStyle),
+          )
         ],
       ),
     );

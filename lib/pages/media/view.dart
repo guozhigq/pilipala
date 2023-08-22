@@ -138,7 +138,7 @@ class _MediaPageState extends State<MediaPage>
         // const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
-          height: 170,
+          height: 170 * MediaQuery.of(context).textScaleFactor,
           child: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {

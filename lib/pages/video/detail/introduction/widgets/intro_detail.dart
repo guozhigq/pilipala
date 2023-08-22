@@ -100,7 +100,7 @@ class IntroDetail extends StatelessWidget {
                             Text.rich(
                               style: const TextStyle(
                                 height: 1.4,
-                                fontSize: 13,
+                                // fontSize: 13,
                               ),
                               TextSpan(
                                 children: [

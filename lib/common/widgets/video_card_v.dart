@@ -77,11 +77,8 @@ class VideoCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
-      elevation: 0,
+      elevation: 1,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -129,14 +126,13 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(4, 8, 0, 3),
+        padding: const EdgeInsets.fromLTRB(9, 8, 9, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               videoItem.title,
-              style: const TextStyle(fontSize: 13),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

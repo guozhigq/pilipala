@@ -18,6 +18,7 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
 import 'package:pilipala/pages/setting/extra_setting.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
+import 'package:pilipala/pages/setting/pages/font_size_select.dart';
 import 'package:pilipala/pages/setting/play_setting.dart';
 import 'package:pilipala/pages/setting/privacy_setting.dart';
 import 'package:pilipala/pages/setting/style_setting.dart';
@@ -87,6 +88,7 @@ class Routes {
     //
     GetPage(name: '/blackListPage', page: () => const BlackListPage()),
     GetPage(name: '/colorSetting', page: () => const ColorSelectPage()),
+    GetPage(name: '/fontSizeSetting', page: () => const FontSizeSelectPage()),
     // 关于
     GetPage(name: '/about', page: () => const AboutPage()),
   ];

@@ -23,11 +23,8 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: 0,
+      elevation: 1,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         onLongPress: () {
@@ -103,7 +100,7 @@ class LiveContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         // 多列
-        padding: const EdgeInsets.fromLTRB(4, 8, 0, 6),
+        padding: const EdgeInsets.fromLTRB(9, 9, 9, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,7 +109,6 @@ class LiveContent extends StatelessWidget {
               liveItem.title,
               textAlign: TextAlign.start,
               style: const TextStyle(
-                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),

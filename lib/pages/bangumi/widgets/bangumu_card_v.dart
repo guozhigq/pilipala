@@ -29,9 +29,6 @@ class BangumiCardV extends StatelessWidget {
     return Card(
       elevation: 0,
       clipBehavior: Clip.hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: StyleString.mdRadius,
-      ),
       margin: EdgeInsets.zero,
       child: GestureDetector(
         // onLongPress: () {
@@ -149,7 +146,6 @@ class BangumiContent extends StatelessWidget {
                   bangumiItem.title,
                   textAlign: TextAlign.start,
                   style: const TextStyle(
-                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.3,
                   ),
@@ -158,6 +154,7 @@ class BangumiContent extends StatelessWidget {
                 )),
               ],
             ),
+            const SizedBox(height: 1),
             if (bangumiItem.indexShow != null)
               Text(
                 bangumiItem.indexShow,

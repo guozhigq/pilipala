@@ -48,6 +48,9 @@ class MyApp extends StatelessWidget {
     // 是否动态取色
     bool isDynamicColor =
         setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
+    // 字体缩放大小
+    double textScale =
+        setting.get(SettingBoxKey.defaultTextScale, defaultValue: 1.0);
 
     return DynamicColorBuilder(
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
@@ -107,7 +110,9 @@ class MyApp extends StatelessWidget {
             return FlutterSmartDialog(
               toastBuilder: (String msg) => CustomToast(msg: msg),
               child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                data: MediaQuery.of(context).copyWith(
+                    textScaleFactor:
+                        MediaQuery.of(context).textScaleFactor * textScale),
                 child: child!,
               ),
             );

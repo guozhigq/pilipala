@@ -58,8 +58,11 @@ class VideoCardH extends StatelessWidget {
               StyleString.safeSpace, 5, StyleString.safeSpace, 5),
           child: LayoutBuilder(
             builder: (context, boxConstraints) {
-              double width =
-                  (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+              double width = (boxConstraints.maxWidth -
+                      StyleString.cardSpace *
+                          6 /
+                          MediaQuery.of(context).textScaleFactor) /
+                  2;
               return Container(
                 constraints: const BoxConstraints(minHeight: 88),
                 height: width / StyleString.aspectRatio,
@@ -123,7 +126,7 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
+        padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,7 +135,6 @@ class VideoContent extends StatelessWidget {
                 videoItem.title,
                 textAlign: TextAlign.start,
                 style: const TextStyle(
-                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
                 maxLines: 2,
@@ -147,7 +149,6 @@ class VideoContent extends StatelessWidget {
                       TextSpan(
                         text: i['text'],
                         style: TextStyle(
-                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
                           color: i['type'] == 'em'
@@ -177,7 +178,7 @@ class VideoContent extends StatelessWidget {
             //           color: Theme.of(context).colorScheme.surfaceTint),
             //     ),
             //   ),
-            const SizedBox(height: 4),
+            // const SizedBox(height: 4),
             Row(
               children: [
                 Text(

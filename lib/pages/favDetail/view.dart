@@ -127,32 +127,34 @@ class _FavDetailPageState extends State<FavDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 14),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            _favDetailController.item!.title!,
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .fontSize,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _favDetailController.item!.upper!.name!,
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall!
-                                    .fontSize,
-                                color: Theme.of(context).colorScheme.outline),
-                          )
-                        ],
-                      )
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            Text(
+                              _favDetailController.item!.title!,
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .fontSize,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _favDetailController.item!.upper!.name!,
+                              style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize,
+                                  color: Theme.of(context).colorScheme.outline),
+                            )
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
