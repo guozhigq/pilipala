@@ -28,7 +28,6 @@ class _SearchPanelState extends State<SearchPanel>
     with AutomaticKeepAliveClientMixin {
   late SearchPanelController _searchPanelController;
 
-  bool _isLoadingMore = false;
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
 
@@ -76,12 +75,15 @@ class _SearchPanelState extends State<SearchPanel>
           if (snapshot.connectionState == ConnectionState.done) {
             Map data = snapshot.data;
             var ctr = _searchPanelController;
-            List list = ctr.resultList;
+            RxList list = ctr.resultList;
             if (data['status']) {
               return Obx(() {
                 switch (widget.searchType) {
                   case SearchType.video:
-                    return searchVideoPanel(context, ctr, list);
+                    return SearchVideoPanel(
+                      ctr: _searchPanelController,
+                      list: list.value,
+                    );
                   case SearchType.media_bangumi:
                     return searchMbangumiPanel(context, ctr, list);
                   case SearchType.bili_user:

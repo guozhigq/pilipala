@@ -45,8 +45,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return OpenContainer(
       closedElevation: 0,
       openElevation: 0,
-      onClosed: (_) {
+      onClosed: (_) async {
         // 在 openBuilder 关闭时触发的回调函数
+        await Future.delayed(const Duration(milliseconds: 500));
         _searchController.onClear();
       },
       openColor: Theme.of(context).colorScheme.background,
