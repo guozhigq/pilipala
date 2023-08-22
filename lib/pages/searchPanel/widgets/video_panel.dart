@@ -23,7 +23,7 @@ class SearchVideoPanel extends StatelessWidget {
       alignment: Alignment.topCenter,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 34),
+          padding: const EdgeInsets.only(top: 36),
           child: ListView.builder(
             controller: ctr!.scrollController,
             addAutomaticKeepAlives: false,
@@ -43,7 +43,7 @@ class SearchVideoPanel extends StatelessWidget {
         // 分类筛选
         Container(
           width: double.infinity,
-          height: 34,
+          height: 36,
           padding: const EdgeInsets.only(left: 8, top: 0, right: 12),
           // decoration: BoxDecoration(
           //   border: Border(
@@ -52,29 +52,53 @@ class SearchVideoPanel extends StatelessWidget {
           //     ),
           //   ),
           // ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Obx(
-              () => Wrap(
-                // spacing: ,
-                children: [
-                  for (var i in controller.filterList) ...[
-                    CustomFilterChip(
-                      label: i['label'],
-                      type: i['type'],
-                      selectedType: controller.selectedType.value,
-                      callFn: (bool selected) async {
-                        controller.selectedType.value = i['type'];
-                        ctr!.order.value = i['type'].toString().split('.').last;
-                        SmartDialog.showLoading(msg: 'loooad');
-                        await ctr!.onRefresh();
-                        SmartDialog.dismiss();
-                      },
+          child: Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Obx(
+                    () => Wrap(
+                      // spacing: ,
+                      children: [
+                        for (var i in controller.filterList) ...[
+                          CustomFilterChip(
+                            label: i['label'],
+                            type: i['type'],
+                            selectedType: controller.selectedType.value,
+                            callFn: (bool selected) async {
+                              controller.selectedType.value = i['type'];
+                              ctr!.order.value =
+                                  i['type'].toString().split('.').last;
+                              SmartDialog.showLoading(msg: 'loooad');
+                              await ctr!.onRefresh();
+                              SmartDialog.dismiss();
+                            },
+                          ),
+                        ]
+                      ],
                     ),
-                  ]
-                ],
+                  ),
+                ),
               ),
-            ),
+              const VerticalDivider(indent: 7, endIndent: 8),
+              const SizedBox(width: 3),
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: IconButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () => controller.onShowFilterDialog(),
+                  icon: Icon(
+                    Icons.filter_list_outlined,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ), // 放置在ListView.builder()上方的组件
       ],
@@ -99,7 +123,7 @@ class CustomFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 32,
+      height: 34,
       child: FilterChip(
         padding: const EdgeInsets.only(left: 11, right: 11),
         labelPadding: EdgeInsets.zero,
@@ -130,6 +154,14 @@ class CustomFilterChip extends StatelessWidget {
 class VideoPanelController extends GetxController {
   RxList<Map> filterList = [{}].obs;
   Rx<ArchiveFilterType> selectedType = ArchiveFilterType.values.first.obs;
+  List<Map<String, dynamic>> timeFiltersList = [
+    {'label': '全部时长', 'value': 0},
+    {'label': '0-10分钟', 'value': 1},
+    {'label': '10-30分钟', 'value': 2},
+    {'label': '30-60分钟', 'value': 3},
+    {'label': '60分钟+', 'value': 4},
+  ];
+  RxInt currentTimeFilterval = 0.obs;
 
   @override
   void onInit() {
@@ -143,5 +175,43 @@ class VideoPanelController extends GetxController {
     super.onInit();
   }
 
-  onSelect() {}
+  onShowFilterDialog() {
+    SmartDialog.show(
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        TextStyle textStyle = Theme.of(context).textTheme.titleMedium!;
+        return AlertDialog(
+          title: const Text('时长筛选'),
+          contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 20),
+          content: StatefulBuilder(builder: (context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i in timeFiltersList) ...[
+                  RadioListTile(
+                    value: i['value'],
+                    autofocus: true,
+                    title: Text(i['label'], style: textStyle),
+                    groupValue: currentTimeFilterval.value,
+                    onChanged: (value) async {
+                      currentTimeFilterval.value = value!;
+                      setState(() {});
+                      SmartDialog.dismiss();
+                      SmartDialog.showToast("「${i['label']}」的筛选结果");
+                      SearchPanelController ctr =
+                          Get.find<SearchPanelController>(tag: 'video');
+                      ctr.duration.value = i['value'];
+                      SmartDialog.showLoading(msg: 'loooad');
+                      await ctr.onRefresh();
+                      SmartDialog.dismiss();
+                    },
+                  ),
+                ],
+              ],
+            );
+          }),
+        );
+      },
+    );
+  }
 }
