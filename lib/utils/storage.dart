@@ -9,7 +9,6 @@ import 'package:pilipala/models/user/info.dart';
 class GStrorage {
   static late final Box recVideo;
   static late final Box userInfo;
-  static late final Box hotKeyword;
   static late final Box historyword;
   static late final Box localCache;
   static late final Box setting;
@@ -38,13 +37,6 @@ class GStrorage {
     localCache = await Hive.openBox('localCache');
     // 设置
     setting = await Hive.openBox('setting');
-    // 热搜关键词
-    hotKeyword = await Hive.openBox(
-      'hotKeyword',
-      compactionStrategy: (entries, deletedEntries) {
-        return deletedEntries > 10;
-      },
-    );
     // 搜索历史
     historyword = await Hive.openBox(
       'historyWord',
@@ -78,8 +70,6 @@ class GStrorage {
     recVideo.close();
     userInfo.compact();
     userInfo.close();
-    hotKeyword.compact();
-    hotKeyword.close();
     historyword.compact();
     historyword.close();
     localCache.compact();

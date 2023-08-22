@@ -150,7 +150,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                 // 搜索建议
                 _searchSuggest(),
                 // 热搜
-                hotSearch(),
+                hotSearch(_searchController),
                 // 搜索历史
                 _history()
               ],
@@ -190,20 +190,37 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     );
   }
 
-  Widget hotSearch() {
+  Widget hotSearch(ctr) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 14, 4, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(6, 0, 0, 6),
-            child: Text(
-              '大家都在搜',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium!
-                  .copyWith(fontWeight: FontWeight.bold),
+            padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '大家都在搜',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 34,
+                  child: TextButton.icon(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(const EdgeInsets.only(
+                          left: 10, top: 6, bottom: 6, right: 10)),
+                    ),
+                    onPressed: () => ctr.queryHotSearchList(),
+                    icon: const Icon(Icons.refresh_outlined, size: 18),
+                    label: const Text('刷新'),
+                  ),
+                ),
+              ],
             ),
           ),
           LayoutBuilder(
@@ -215,15 +232,17 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return HotKeyword(
-                        width: width,
-                        hotSearchList: _searchController.hotSearchList,
-                        onClick: (keyword) async {
-                          _searchController.searchFocusNode.unfocus();
-                          await Future.delayed(
-                              const Duration(milliseconds: 150));
-                          _searchController.onClickKeyword(keyword);
-                        },
+                      return Obx(
+                        () => HotKeyword(
+                          width: width,
+                          hotSearchList: _searchController.hotSearchList.value,
+                          onClick: (keyword) async {
+                            _searchController.searchFocusNode.unfocus();
+                            await Future.delayed(
+                                const Duration(milliseconds: 150));
+                            _searchController.onClickKeyword(keyword);
+                          },
+                        ),
                       );
                     } else {
                       return HttpError(

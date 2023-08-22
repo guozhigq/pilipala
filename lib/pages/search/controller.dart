@@ -12,8 +12,7 @@ class SSearchController extends GetxController {
   final FocusNode searchFocusNode = FocusNode();
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
-  List<HotSearchItem> hotSearchList = [];
-  Box hotKeyword = GStrorage.hotKeyword;
+  RxList<HotSearchItem> hotSearchList = [HotSearchItem()].obs;
   Box histiryWord = GStrorage.historyword;
   List historyCacheList = [];
   RxList historyList = [].obs;
@@ -27,14 +26,6 @@ class SSearchController extends GetxController {
   void onInit() {
     super.onInit();
     searchDefault();
-    if (hotKeyword.get('cacheList') != null &&
-        hotKeyword.get('cacheList').isNotEmpty) {
-      List<HotSearchItem> list = [];
-      for (var i in hotKeyword.get('cacheList')) {
-        list.add(i);
-      }
-      hotSearchList = list;
-    }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {
@@ -89,8 +80,7 @@ class SSearchController extends GetxController {
   // 获取热搜关键词
   Future queryHotSearchList() async {
     var result = await SearchHttp.hotSearchList();
-    hotSearchList = result['data'].list;
-    hotKeyword.put('cacheList', result['data'].list);
+    hotSearchList.value = result['data'].list;
     return result;
   }
 
