@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -14,11 +15,23 @@ class FavPage extends StatefulWidget {
 class _FavPageState extends State<FavPage> {
   final FavController _favController = Get.put(FavController());
   late Future _futureBuilderFuture;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _favController.queryFavFolder();
+    scrollController = _favController.scrollController;
+    scrollController.addListener(
+      () {
+        if (scrollController.position.pixels >=
+            scrollController.position.maxScrollExtent - 300) {
+          EasyThrottle.throttle('history', const Duration(seconds: 1), () {
+            _favController.onLoad();
+          });
+        }
+      },
+    );
   }
 
   @override
@@ -40,6 +53,7 @@ class _FavPageState extends State<FavPage> {
             if (data['status']) {
               return Obx(
                 () => ListView.builder(
+                  controller: scrollController,
                   itemCount: _favController.favFolderData.value.list!.length,
                   itemBuilder: (context, index) {
                     return FavItem(
