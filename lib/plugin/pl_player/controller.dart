@@ -760,36 +760,39 @@ class PlPlayerController {
 
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
-    if (type == 'single') {
+    if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
       _heartDuration = 0;
-      if (playerCount.value > 0) {
-        return;
-      }
+      pause();
+      return;
     }
+    _playerCount.value = 0;
+    try {
+      _timer?.cancel();
+      _timerForVolume?.cancel();
+      _timerForGettingVolume?.cancel();
+      timerForTrackingMouse?.cancel();
+      _timerForSeek?.cancel();
+      videoFitChangedTimer?.cancel();
+      // _position.close();
+      _playerEventSubs?.cancel();
+      // _sliderPosition.close();
+      // _sliderTempPosition.close();
+      // _isSliderMoving.close();
+      // _duration.close();
+      // _buffered.close();
+      // _showControls.close();
+      // _controlsLock.close();
 
-    _timer?.cancel();
-    _timerForVolume?.cancel();
-    _timerForGettingVolume?.cancel();
-    timerForTrackingMouse?.cancel();
-    _timerForSeek?.cancel();
-    videoFitChangedTimer?.cancel();
-    _position.close();
-    _playerEventSubs?.cancel();
-    _sliderPosition.close();
-    _sliderTempPosition.close();
-    _isSliderMoving.close();
-    _duration.close();
-    _buffered.close();
-    _showControls.close();
-    _controlsLock.close();
+      // playerStatus.status.close();
+      // dataStatus.status.close();
 
-    playerStatus.status.close();
-    dataStatus.status.close();
-
-    removeListeners();
-    await _videoPlayerController?.dispose();
-    _videoPlayerController = null;
-    _instance = null;
+      removeListeners();
+      await _videoPlayerController?.dispose();
+      _videoPlayerController = null;
+      _instance = null;
+    } catch (err) {
+      print(err);
+    }
   }
 }
