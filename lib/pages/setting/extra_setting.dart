@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -11,8 +13,24 @@ class ExtraSetting extends StatefulWidget {
 }
 
 class _ExtraSettingState extends State<ExtraSetting> {
+  Box setting = GStrorage.setting;
+  late dynamic defaultReplySort;
+
+  @override
+  void initState() {
+    super.initState();
+    // 默认优先显示最新评论
+    defaultReplySort =
+        setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
+    TextStyle subTitleStyle = Theme.of(context)
+        .textTheme
+        .labelMedium!
+        .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -23,8 +41,33 @@ class _ExtraSettingState extends State<ExtraSetting> {
         ),
       ),
       body: ListView(
-        children: const [
-          SetSwitchItem(
+        children: [
+          ListTile(
+            dense: false,
+            title: Text('评论展示', style: titleStyle),
+            subtitle: Text(
+              '当前优先展示「${ReplySortType.values[defaultReplySort].titles}」',
+              style: subTitleStyle,
+            ),
+            trailing: PopupMenuButton(
+              initialValue: defaultReplySort,
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
+              onSelected: (item) {
+                defaultReplySort = item;
+                setting.put(SettingBoxKey.replySortType, item);
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                for (var i in ReplySortType.values) ...[
+                  PopupMenuItem(
+                    value: i.index,
+                    child: Text(i.titles),
+                  ),
+                ]
+              ],
+            ),
+          ),
+          const SetSwitchItem(
             title: '检查更新',
             subTitle: '每次启动时检查是否需要更新',
             setKey: SettingBoxKey.autoUpdate,

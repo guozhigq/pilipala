@@ -82,6 +82,7 @@ class GStrorage {
 }
 
 class SettingBoxKey {
+  /// 播放器
   static const String btmProgressBehavior = 'btmProgressBehavior';
   static const String defaultVideoSpeed = 'defaultVideoSpeed';
   static const String autoUpgradeEnable = 'autoUpgradeEnable';
@@ -96,10 +97,14 @@ class SettingBoxKey {
   static const String enableHA = 'enableHA';
   static const String enableOnlineTotal = 'enableOnlineTotal';
 
+  /// 隐私
   static const String blackMidsList = 'blackMidsList';
 
+  /// 其他
   static const String autoUpdate = 'autoUpdate';
+  static const String replySortType = 'replySortType';
 
+  /// 外观
   static const String themeMode = 'themeMode';
   static const String defaultTextScale = 'textScale';
   static const String dynamicColor = 'dynamicColor'; // bool
