@@ -28,7 +28,25 @@ class _SeasonPanelState extends State<SeasonPanel> {
   @override
   void initState() {
     super.initState();
-    episodes = widget.ugcSeason.sections!.first.episodes!;
+
+    /// 根据 cid 找到对应集，找到对应 episodes
+    /// 有多个episodes时，只显示其中一个
+    /// TODO 同时显示多个合集
+    List<SectionItem> sections = widget.ugcSeason.sections!;
+    for (int i = 0; i < sections.length; i++) {
+      List<EpisodeItem> episodesList = sections[i].episodes!;
+      for (int j = 0; j < episodesList.length; j++) {
+        if (episodesList[j].cid == widget.cid) {
+          episodes = episodesList;
+          continue;
+        }
+      }
+    }
+
+    /// 取对应 season_id 的 episodes
+    // episodes = widget.ugcSeason.sections!
+    //     .firstWhere((e) => e.seasonId == widget.ugcSeason.id)
+    //     .episodes!;
     currentIndex = episodes.indexWhere((e) => e.cid == widget.cid);
   }
 
@@ -136,7 +154,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    '${currentIndex + 1}/${widget.ugcSeason.epCount}',
+                    '${currentIndex + 1}/${episodes.length}',
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   const SizedBox(width: 6),

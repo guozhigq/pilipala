@@ -97,7 +97,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
-    plPlayerController!.pause();
     plPlayerController!.dispose();
     super.dispose();
   }

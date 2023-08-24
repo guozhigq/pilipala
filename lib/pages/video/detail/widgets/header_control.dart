@@ -483,10 +483,12 @@ class _HeaderControlState extends State<HeaderControl> {
               size: 15,
               color: Colors.white,
             ),
-            fuc: () {
+            fuc: () async {
               // 销毁播放器实例
-              widget.controller!.dispose(type: 'all');
-              Get.offAll(const MainApp());
+              await widget.controller!.dispose(type: 'all');
+              if (mounted) {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
             },
           ),
           const Spacer(),
