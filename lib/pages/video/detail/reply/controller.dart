@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/reply.dart';
@@ -92,23 +93,26 @@ class VideoReplyController extends GetxController {
 
   // 排序搜索评论
   queryBySort() {
-    feedBack();
-    switch (sortType) {
-      case ReplySortType.time:
-        sortType = ReplySortType.like;
-        break;
-      case ReplySortType.like:
-        sortType = ReplySortType.reply;
-        break;
-      case ReplySortType.reply:
-        sortType = ReplySortType.time;
-        break;
-      default:
-    }
-    sortTypeTitle.value = sortType.titles;
-    sortTypeLabel.value = sortType.labels;
-    currentPage = 0;
-    replyList.clear();
-    queryReplyList(type: 'init');
+    EasyThrottle.throttle('queryBySort', const Duration(seconds: 1), () {
+      feedBack();
+      switch (sortType) {
+        case ReplySortType.time:
+          sortType = ReplySortType.like;
+          break;
+        case ReplySortType.like:
+          sortType = ReplySortType.reply;
+          break;
+        case ReplySortType.reply:
+          sortType = ReplySortType.time;
+          break;
+        default:
+      }
+      sortTypeTitle.value = sortType.titles;
+      sortTypeLabel.value = sortType.labels;
+      currentPage = 0;
+      noMore.value = '';
+      replyList.clear();
+      queryReplyList(type: 'init');
+    });
   }
 }
