@@ -118,7 +118,8 @@ class _MemberDynamicPanelState extends State<MemberDynamicPanel>
 }
 
 class LoadMoreListSource extends LoadingMoreBase<DynamicItemModel> {
-  final _dynamicController = Get.put(MemberDynamicPanelController());
+  final _dynamicController =
+      Get.put(MemberDynamicPanelController(), tag: Get.arguments['heroTag']);
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {

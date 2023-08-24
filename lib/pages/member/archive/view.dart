@@ -142,7 +142,8 @@ class _ArchivePanelState extends State<ArchivePanel>
 }
 
 class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
-  final ArchiveController _archiveController = Get.put(ArchiveController());
+  final ArchiveController _archiveController =
+      Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {

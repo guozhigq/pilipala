@@ -111,6 +111,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final dynamic owner;
   late final dynamic follower;
   late final dynamic followStatus;
+  late int mid;
+  late String memberHeroTag;
 
   @override
   void initState() {
@@ -160,14 +162,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   // 用户主页
   onPushMember() {
     feedBack();
-    int mid = !loadingStatus
+    mid = !loadingStatus
         ? widget.videoDetail!.owner!.mid
         : videoItem['owner'].mid;
+    memberHeroTag = Utils.makeHeroTag(mid);
     String face = !loadingStatus
         ? widget.videoDetail!.owner!.face
         : videoItem['owner'].face;
     Get.toNamed('/member?mid=$mid',
-        arguments: {'face': face, 'heroTag': (mid + 99).toString()});
+        arguments: {'face': face, 'heroTag': memberHeroTag});
   }
 
   @override
