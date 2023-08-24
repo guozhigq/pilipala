@@ -255,6 +255,17 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             color: t.colorScheme.outline,
                           ),
                         ),
+                        const SizedBox(width: 10),
+                        if (videoIntroController.isShowOnlineTotal)
+                          Obx(
+                            () => Text(
+                              '${videoIntroController.totel.value}人在看',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: t.colorScheme.outline,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

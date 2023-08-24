@@ -37,6 +37,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
+  final VideoIntroController videoIntroController =
+      Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
 
   PlayerStatus playerStatus = PlayerStatus.playing;
   // bool isShowCover = true;
@@ -104,6 +106,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 离开当前页面时
   void didPushNext() async {
     videoDetailController.defaultST = plPlayerController!.position.value;
+    videoIntroController.isPaused = true;
     plPlayerController!.pause();
     super.didPushNext();
   }
@@ -112,6 +115,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 返回当前页面时
   void didPopNext() async {
     videoDetailController.playerInit();
+    videoIntroController.isPaused = false;
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();

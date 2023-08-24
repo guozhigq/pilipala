@@ -94,6 +94,7 @@ class SettingBoxKey {
   static const String danmakuEnable = 'danmakuEnable';
   static const String defaultPicQa = 'defaultPicQa';
   static const String enableHA = 'enableHA';
+  static const String enableOnlineTotal = 'enableOnlineTotal';
 
   static const String blackMidsList = 'blackMidsList';
 

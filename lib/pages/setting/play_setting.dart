@@ -66,6 +66,12 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableHA,
             defaultVal: true,
           ),
+          const SetSwitchItem(
+            title: '观看人数',
+            subTitle: '展示同时在看人数',
+            setKey: SettingBoxKey.enableOnlineTotal,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('默认画质', style: titleStyle),
