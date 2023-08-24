@@ -28,6 +28,13 @@ void main() async {
     await Request.setCookie();
     await Data.init();
     await GStrorage.lazyInit();
+    // 小白条、导航栏沉浸
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarColor: Colors.transparent,
+    ));
   });
 }
 
