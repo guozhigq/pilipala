@@ -50,17 +50,21 @@ class DynamicsController extends GetxController {
     },
   ];
   bool flag = false;
-  RxInt initialValue = 1.obs;
+  RxInt initialValue = 0.obs;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   var userInfo;
   RxBool isLoadingDynamic = false.obs;
+  Box setting = GStrorage.setting;
 
   @override
   void onInit() {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     super.onInit();
+    initialValue.value =
+        setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
+    dynamicsType = DynamicsType.values[initialValue.value].obs;
   }
 
   Future queryFollowDynamic({type = 'init'}) async {
@@ -99,7 +103,7 @@ class DynamicsController extends GetxController {
   }
 
   onSelectType(value) async {
-    dynamicsType.value = filterTypeList[value - 1]['value'];
+    dynamicsType.value = filterTypeList[value]['value'];
     dynamicsList.value = [DynamicItemModel()];
     page = 1;
     initialValue.value = value;
@@ -247,7 +251,7 @@ class DynamicsController extends GetxController {
   void resetSearch() {
     mid.value = -1;
     dynamicsType.value = DynamicsType.values[0];
-    initialValue.value = 1;
+    initialValue.value = 0;
     SmartDialog.showToast('还原默认加载');
     dynamicsList.value = [DynamicItemModel()];
     queryFollowDynamic();

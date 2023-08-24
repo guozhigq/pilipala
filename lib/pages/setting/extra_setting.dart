@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -15,6 +16,7 @@ class ExtraSetting extends StatefulWidget {
 class _ExtraSettingState extends State<ExtraSetting> {
   Box setting = GStrorage.setting;
   late dynamic defaultReplySort;
+  late dynamic defaultDynamicType;
 
   @override
   void initState() {
@@ -22,6 +24,9 @@ class _ExtraSettingState extends State<ExtraSetting> {
     // 默认优先显示最新评论
     defaultReplySort =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    // 优先展示全部动态 all
+    defaultDynamicType =
+        setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
   }
 
   @override
@@ -62,6 +67,31 @@ class _ExtraSettingState extends State<ExtraSetting> {
                   PopupMenuItem(
                     value: i.index,
                     child: Text(i.titles),
+                  ),
+                ]
+              ],
+            ),
+          ),
+          ListTile(
+            dense: false,
+            title: Text('动态展示', style: titleStyle),
+            subtitle: Text(
+              '当前优先展示「${DynamicsType.values[defaultDynamicType].labels}」',
+              style: subTitleStyle,
+            ),
+            trailing: PopupMenuButton(
+              initialValue: defaultDynamicType,
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
+              onSelected: (item) {
+                defaultDynamicType = item;
+                setting.put(SettingBoxKey.defaultDynamicType, item);
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                for (var i in DynamicsType.values) ...[
+                  PopupMenuItem(
+                    value: i.index,
+                    child: Text(i.labels),
                   ),
                 ]
               ],

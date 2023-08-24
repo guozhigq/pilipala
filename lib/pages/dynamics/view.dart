@@ -132,7 +132,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                               initialValue:
                                   _dynamicsController.initialValue.value,
                               children: {
-                                1: Text(
+                                0: Text(
                                   '全部',
                                   style: TextStyle(
                                       fontSize: Theme.of(context)
@@ -140,19 +140,19 @@ class _DynamicsPageState extends State<DynamicsPage>
                                           .labelMedium!
                                           .fontSize),
                                 ),
-                                2: Text('投稿',
+                                1: Text('投稿',
                                     style: TextStyle(
                                         fontSize: Theme.of(context)
                                             .textTheme
                                             .labelMedium!
                                             .fontSize)),
-                                3: Text('番剧',
+                                2: Text('番剧',
                                     style: TextStyle(
                                         fontSize: Theme.of(context)
                                             .textTheme
                                             .labelMedium!
                                             .fontSize)),
-                                4: Text('专栏',
+                                3: Text('专栏',
                                     style: TextStyle(
                                         fontSize: Theme.of(context)
                                             .textTheme

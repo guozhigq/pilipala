@@ -103,6 +103,7 @@ class SettingBoxKey {
   /// 其他
   static const String autoUpdate = 'autoUpdate';
   static const String replySortType = 'replySortType';
+  static const String defaultDynamicType = 'defaultDynamicType';
 
   /// 外观
   static const String themeMode = 'themeMode';
