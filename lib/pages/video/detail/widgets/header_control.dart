@@ -508,9 +508,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 style: ButtonStyle(
                   padding: MaterialStateProperty.all(EdgeInsets.zero),
                 ),
-                onPressed: () {
-                  _.togglePlaybackSpeed();
-                },
+                onPressed: () => showSetSpeedSheet(),
                 child: Text(
                   '${_.playbackSpeed.toString()}X',
                   style: textStyle,
