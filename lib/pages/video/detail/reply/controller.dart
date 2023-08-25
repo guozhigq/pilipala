@@ -28,6 +28,7 @@ class VideoReplyController extends GetxController {
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
   int ps = 20;
+  RxInt count = 0.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
@@ -96,6 +97,7 @@ class VideoReplyController extends GetxController {
         replyList.addAll(replies);
       }
     }
+    count.value = res['data'].page.count;
     isLoadingMore = false;
     return res;
   }

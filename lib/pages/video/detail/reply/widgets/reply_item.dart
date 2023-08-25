@@ -591,7 +591,8 @@ InlineSpan buildContent(
       if (content.jumpUrl.isNotEmpty && hasMatchMember) {
         List urlKeys = content.jumpUrl.keys.toList();
         matchUrl = matchMember.splitMapJoin(
-          RegExp("(?:${urlKeys.join("|")})"),
+          /// RegExp.escape() 转义特殊字符
+          RegExp(RegExp.escape(urlKeys.join("|"))),
           onMatch: (Match match) {
             String matchStr = match[0]!;
             spanChilds.add(
