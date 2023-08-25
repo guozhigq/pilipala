@@ -32,6 +32,15 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
     val = Setting.get(widget.setKey, defaultValue: widget.defaultVal ?? false);
   }
 
+  void switchChange(value) {
+    val = value ?? !val;
+    Setting.put(widget.setKey, val);
+    if (widget.setKey == SettingBoxKey.autoUpdate && value == true) {
+      Utils.checkUpdata();
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
@@ -41,9 +50,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return ListTile(
       enableFeedback: true,
-      onTap: () {
-        Setting.put(widget.setKey, !val);
-      },
+      onTap: () => switchChange(null),
       title: Text(widget.title!, style: titleStyle),
       subtitle: widget.subTitle != null
           ? Text(widget.subTitle!, style: subTitleStyle)
@@ -51,22 +58,16 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
       trailing: Transform.scale(
         scale: 0.8,
         child: Switch(
-            thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                (Set<MaterialState> states) {
-              if (states.isNotEmpty && states.first == MaterialState.selected) {
-                return const Icon(Icons.done);
-              }
-              return null; // All other states will use the default thumbIcon.
-            }),
-            value: val,
-            onChanged: (value) {
-              val = value;
-              Setting.put(widget.setKey, value);
-              if (widget.setKey == SettingBoxKey.autoUpdate && value == true) {
-                Utils.checkUpdata();
-              }
-              setState(() {});
-            }),
+          thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+              (Set<MaterialState> states) {
+            if (states.isNotEmpty && states.first == MaterialState.selected) {
+              return const Icon(Icons.done);
+            }
+            return null; // All other states will use the default thumbIcon.
+          }),
+          value: val,
+          onChanged: (val) => switchChange(val),
+        ),
       ),
     );
   }
