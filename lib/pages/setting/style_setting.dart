@@ -5,6 +5,7 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
+import 'widgets/switch_item.dart';
 
 class StyleSetting extends StatefulWidget {
   const StyleSetting({super.key});
@@ -65,6 +66,12 @@ class _StyleSettingState extends State<StyleSetting> {
                     onChanged: (value) => settingController.onOpenFeedBack()),
               ),
             ),
+          ),
+          const SetSwitchItem(
+            title: 'iOS路由切换',
+            subTitle: 'iOS路由切换样式，需重启',
+            setKey: SettingBoxKey.iosTransition,
+            defaultVal: false,
           ),
           ListTile(
             dense: false,
