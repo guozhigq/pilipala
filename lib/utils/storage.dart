@@ -96,6 +96,7 @@ class SettingBoxKey {
   static const String defaultPicQa = 'defaultPicQa';
   static const String enableHA = 'enableHA';
   static const String enableOnlineTotal = 'enableOnlineTotal';
+  static const String enableAutoBrightness = 'enableAutoBrightness';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';

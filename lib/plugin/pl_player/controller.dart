@@ -619,7 +619,7 @@ class PlPlayerController {
     try {
       brightness.value = brightnes;
       ScreenBrightness().setScreenBrightness(brightnes);
-      setVideoBrightness();
+      // setVideoBrightness();
     } catch (e) {
       throw 'Failed to set brightness';
     }
@@ -662,27 +662,24 @@ class PlPlayerController {
   }
 
   /// 缓存fit
-  Future<void> setVideoFit() async {
-    videoStorage.put(VideoBoxKey.videoBrightness, _videoFit.value.name);
-  }
+  // Future<void> setVideoFit() async {
+  //   videoStorage.put(VideoBoxKey.videoBrightness, _videoFit.value.name);
+  // }
 
   /// 读取fit
-  Future<void> getVideoFit() async {
-    String fitValue =
-        videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
-    _videoFit.value = videoFitType
-        .firstWhere((element) => element['attr'] == fitValue)['attr'];
-  }
-
-  /// 缓存亮度
-  Future<void> setVideoBrightness() async {}
+  // Future<void> getVideoFit() async {
+  //   String fitValue =
+  //       videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
+  //   _videoFit.value = videoFitType
+  //       .firstWhere((element) => element['attr'] == fitValue)['attr'];
+  // }
 
   /// 读取亮度
-  Future<void> getVideoBrightness() async {
-    double brightnessValue =
-        videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 0.5);
-    setBrightness(brightnessValue);
-  }
+  // Future<void> getVideoBrightness() async {
+  //   double brightnessValue =
+  //       videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 0.5);
+  //   setBrightness(brightnessValue);
+  // }
 
   set controls(bool visible) {
     _showControls.value = visible;
@@ -791,6 +788,8 @@ class PlPlayerController {
       await _videoPlayerController?.dispose();
       _videoPlayerController = null;
       _instance = null;
+      // 关闭所有视频页面恢复亮度
+      resetBrightness();
     } catch (err) {
       print(err);
     }

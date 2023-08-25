@@ -14,6 +14,7 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -68,6 +69,8 @@ class VideoDetailController extends GetxController
   late String videoUrl;
   late String audioUrl;
   late Duration defaultST;
+  // 亮度
+  double? brightness;
   // 默认记录历史记录
   bool enableHeart = true;
   var userInfo;
@@ -152,6 +155,12 @@ class VideoDetailController extends GetxController
   }
 
   Future playerInit({video, audio, seekToTime, duration}) async {
+    /// 设置/恢复 屏幕亮度
+    if (brightness != null) {
+      ScreenBrightness().setScreenBrightness(brightness!);
+    } else {
+      ScreenBrightness().resetScreenBrightness();
+    }
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,

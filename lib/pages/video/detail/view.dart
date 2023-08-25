@@ -45,6 +45,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   double doubleOffset = 0;
 
   Box localCache = GStrorage.localCache;
+  Box setting = GStrorage.setting;
   late double statusBarHeight;
   final videoHeight = Get.size.width * 9 / 16;
   late Future _futureBuilderFuture;
@@ -104,6 +105,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
+    /// 开启
+    if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)) {
+      videoDetailController.brightness = plPlayerController!.brightness.value;
+    }
     videoDetailController.defaultST = plPlayerController!.position.value;
     videoIntroController.isPaused = true;
     plPlayerController!.pause();
