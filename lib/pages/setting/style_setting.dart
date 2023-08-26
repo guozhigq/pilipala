@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -195,12 +197,21 @@ class _StyleSettingState extends State<StyleSetting> {
             dense: false,
             onTap: () => Get.toNamed('/colorSetting'),
             title: Text('应用主题', style: titleStyle),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
           ),
           ListTile(
             dense: false,
             onTap: () => Get.toNamed('/fontSizeSetting'),
             title: Text('字体大小', style: titleStyle),
-          )
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+          ),
+          if (Platform.isAndroid)
+            ListTile(
+              dense: false,
+              onTap: () => Get.toNamed('/displayModeSetting'),
+              title: Text('屏幕帧率', style: titleStyle),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+            )
         ],
       ),
     );
