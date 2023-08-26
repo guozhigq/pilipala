@@ -149,7 +149,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             key: videoDetailController.scaffoldKey,
             // fix 1px black line
             // backgroundColor: Colors.transparent,
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Colors.black,
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
@@ -162,11 +162,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
                     expandedHeight: videoHeight,
-                    backgroundColor:
-                        MediaQuery.of(Get.context!).platformBrightness ==
-                                Brightness.dark
-                            ? Colors.black
-                            : Theme.of(context).colorScheme.background,
+                    backgroundColor: Colors.black,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Padding(
                         padding: EdgeInsets.only(top: statusBarHeight),

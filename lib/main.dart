@@ -25,9 +25,6 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     runApp(const MyApp());
-    await Request.setCookie();
-    await Data.init();
-    await GStrorage.lazyInit();
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -35,6 +32,9 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
       statusBarColor: Colors.transparent,
     ));
+    await Request.setCookie();
+    Data.init();
+    GStrorage.lazyInit();
   });
 }
 
