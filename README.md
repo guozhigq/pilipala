@@ -15,7 +15,7 @@
     <br/>
 </div>
 
-### 开发环境
+## 开发环境
 Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 ```bash
@@ -31,7 +31,7 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 <br/>
 
-### 功能
+## 功能
 
 目前着重移动端(Android、iOS)，暂时没有适配桌面端、Pad端、手表端等
 
@@ -99,17 +99,18 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
   - [x] 图片质量设定
   - [x] 主题模式：亮色/暗色/跟随系统
   - [x] 震动反馈(可选)
+  - [x] 高帧率
 - [ ] 等等
 
 <br/>
 
-### 下载
+## 下载
 
 可以通过右侧release进行下载或拉取代码到本地进行编译
 
 <br/>
 
-### 声明
+## 声明
 
 此项目（PiliPala）是个人为了兴趣而开发, 仅用于学习和测试。
 所用API皆从官方网站收集, 不提供任何破解内容。
@@ -118,7 +119,13 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 <br/>
 
-### 致谢
+## 技术交流
+
+Telegram https://t.me/+lm_oOVmF0RJiODk1
+
+<br/>
+
+## 致谢
 
 - [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 - [flutter_meedu_videoplayer](https://github.com/zezo357/flutter_meedu_videoplayer)
