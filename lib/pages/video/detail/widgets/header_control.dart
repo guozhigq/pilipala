@@ -167,50 +167,46 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 选择倍速
   void showSetSpeedSheet() {
-    showModalBottomSheet(
-      context: context,
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Container(
-          width: double.infinity,
-          height: 450,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-          ),
-          margin: const EdgeInsets.all(12),
-          child: Material(
-            child: ListView(
-              physics: const NeverScrollableScrollPhysics(),
+    double currentSpeed = widget.controller!.playbackSpeed;
+    SmartDialog.show(
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('播放速度'),
+          contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+          content: StatefulBuilder(builder: (context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(
-                  height: 45,
-                  child: Center(
-                    child: Text('播放速度'),
-                  ),
-                ),
-                for (var i in playSpeed) ...[
-                  ListTile(
-                    onTap: () {
-                      widget.controller!.setPlaybackSpeed(i.value);
-                      Get.back(result: {'playbackSpeed': i.value});
-                    },
-                    dense: true,
-                    contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                    title: Text(i.description),
-                    trailing: i.value == widget.controller!.playbackSpeed
-                        ? Icon(
-                            Icons.done,
-                            color: Theme.of(context).colorScheme.primary,
-                          )
-                        : null,
-                  ),
-                ]
+                Text('$currentSpeed倍'),
+                Slider(
+                  min: PlaySpeed.values.first.value,
+                  max: PlaySpeed.values.last.value,
+                  value: currentSpeed,
+                  divisions: PlaySpeed.values.length - 1,
+                  label: '${currentSpeed}x',
+                  onChanged: (double val) =>
+                      {setState(() => currentSpeed = val)},
+                )
               ],
+            );
+          }),
+          actions: [
+            TextButton(
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
             ),
-          ),
+            TextButton(
+              onPressed: () async {
+                await SmartDialog.dismiss();
+                widget.controller!.setPlaybackSpeed(currentSpeed);
+              },
+              child: const Text('确定'),
+            ),
+          ],
         );
       },
     );

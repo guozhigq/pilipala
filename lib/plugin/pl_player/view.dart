@@ -199,22 +199,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         context: Get.context!,
         useSafeArea: false,
         builder: (context) => Dialog.fullscreen(
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            appBar: AppBar(
-              primary: false,
-              toolbarHeight: 0,
-              backgroundColor: Colors.black,
-              systemOverlayStyle: SystemUiOverlayStyle.light,
+          backgroundColor: Colors.black,
+          child: PLVideoPlayer(
+              controller: _,
+              headerControl: _.headerControl,
             ),
-            body: SafeArea(
-              bottom: false,
-              child: PLVideoPlayer(
-                controller: _,
-                headerControl: _.headerControl,
-              ),
-            ),
-          ),
         ),
       );
       if (result == null) {
