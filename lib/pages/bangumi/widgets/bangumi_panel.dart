@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class BangumiPanel extends StatefulWidget {
   final List<EpisodeItem> pages;
@@ -24,12 +26,20 @@ class _BangumiPanelState extends State<BangumiPanel> {
   late int currentIndex;
   final ScrollController listViewScrollCtr = ScrollController();
   final ScrollController listViewScrollCtr_2 = ScrollController();
+  Box userInfoCache = GStrorage.userInfo;
+  dynamic userInfo;
+  // 默认未开通
+  int vipStatus = 0;
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.pages.indexWhere((e) => e.cid == widget.cid!);
     scrollToIndex();
+    userInfo = userInfoCache.get('userInfoCache');
+    if (userInfo != null) {
+      vipStatus = userInfo.vipStatus;
+    }
   }
 
   @override
@@ -126,7 +136,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   }
 
   void changeFucCall(item, i) async {
-    if (item.badge != null) {
+    if (item.badge != null && vipStatus != 1) {
       SmartDialog.showToast('需要大会员');
       return;
     }
