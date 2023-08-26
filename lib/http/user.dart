@@ -51,10 +51,17 @@ class UserHttp {
       'up_mid': mid,
     });
     if (res.data['code'] == 0) {
-      FavFolderData data = FavFolderData.fromJson(res.data['data']);
-      return {'status': true, 'data': data};
+      late FavFolderData data;
+      if (res.data['data'] != null) {
+        data = FavFolderData.fromJson(res.data['data']);
+        return {'status': true, 'data': data};
+      }
     } else {
-      return {'status': false, 'data': [], 'msg': '账号未登录'};
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'] ?? '账号未登录'
+      };
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -51,6 +53,12 @@ class VideoIntroController extends GetxController {
   RxInt lastPlayCid = 0.obs;
   var userInfo;
 
+  // 同时观看
+  bool isShowOnlineTotal = false;
+  RxInt totel = 1.obs;
+  Timer? timer;
+  bool isPaused = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -78,6 +86,12 @@ class VideoIntroController extends GetxController {
     }
     userLogin = userInfo != null;
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
+    isShowOnlineTotal =
+        setting.get(SettingBoxKey.enableOnlineTotal, defaultValue: false);
+    if (isShowOnlineTotal) {
+      queryOnlineTotal();
+      startTimer(); // 在页面加载时启动定时器
+    }
   }
 
   // 获取视频简介&分p
@@ -416,5 +430,34 @@ class VideoIntroController extends GetxController {
     this.bvid = bvid;
     lastPlayCid.value = cid;
     await queryVideoIntro();
+  }
+
+  void startTimer() {
+    const duration = Duration(seconds: 10); // 设置定时器间隔为10秒
+    timer = Timer.periodic(duration, (Timer timer) {
+      if (!isPaused) {
+        queryOnlineTotal(); // 定时器回调函数，发起请求
+      }
+    });
+  }
+
+  // 查看同时在看人数
+  Future queryOnlineTotal() async {
+    var result = await VideoHttp.onlineTotal(
+      aid: IdUtils.bv2av(bvid),
+      bvid: bvid,
+      cid: lastPlayCid.value,
+    );
+    if (result['status']) {
+      totel.value = int.parse(result['data']['total']);
+    }
+  }
+
+  @override
+  void onClose() {
+    if (timer != null) {
+      timer!.cancel(); // 销毁页面时取消定时器
+    }
+    super.onClose();
   }
 }

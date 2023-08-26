@@ -22,10 +22,18 @@ class DynamicsHttp {
     }
     var res = await Request().get(Api.followDynamic, data: data);
     if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': DynamicsDataModel.fromJson(res.data['data']),
-      };
+      try {
+        return {
+          'status': true,
+          'data': DynamicsDataModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {
+          'status': false,
+          'data': [],
+          'msg': err.toString(),
+        };
+      }
     } else {
       return {
         'status': false,

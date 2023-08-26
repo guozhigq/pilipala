@@ -619,7 +619,7 @@ class PlPlayerController {
     try {
       brightness.value = brightnes;
       ScreenBrightness().setScreenBrightness(brightnes);
-      setVideoBrightness();
+      // setVideoBrightness();
     } catch (e) {
       throw 'Failed to set brightness';
     }
@@ -662,27 +662,24 @@ class PlPlayerController {
   }
 
   /// 缓存fit
-  Future<void> setVideoFit() async {
-    videoStorage.put(VideoBoxKey.videoBrightness, _videoFit.value.name);
-  }
+  // Future<void> setVideoFit() async {
+  //   videoStorage.put(VideoBoxKey.videoBrightness, _videoFit.value.name);
+  // }
 
   /// 读取fit
-  Future<void> getVideoFit() async {
-    String fitValue =
-        videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
-    _videoFit.value = videoFitType
-        .firstWhere((element) => element['attr'] == fitValue)['attr'];
-  }
-
-  /// 缓存亮度
-  Future<void> setVideoBrightness() async {}
+  // Future<void> getVideoFit() async {
+  //   String fitValue =
+  //       videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
+  //   _videoFit.value = videoFitType
+  //       .firstWhere((element) => element['attr'] == fitValue)['attr'];
+  // }
 
   /// 读取亮度
-  Future<void> getVideoBrightness() async {
-    double brightnessValue =
-        videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 0.5);
-    setBrightness(brightnessValue);
-  }
+  // Future<void> getVideoBrightness() async {
+  //   double brightnessValue =
+  //       videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 0.5);
+  //   setBrightness(brightnessValue);
+  // }
 
   set controls(bool visible) {
     _showControls.value = visible;
@@ -760,36 +757,41 @@ class PlPlayerController {
 
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
-    if (type == 'single') {
+    if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
       _heartDuration = 0;
-      if (playerCount.value > 0) {
-        return;
-      }
+      pause();
+      return;
     }
+    _playerCount.value = 0;
+    try {
+      _timer?.cancel();
+      _timerForVolume?.cancel();
+      _timerForGettingVolume?.cancel();
+      timerForTrackingMouse?.cancel();
+      _timerForSeek?.cancel();
+      videoFitChangedTimer?.cancel();
+      // _position.close();
+      _playerEventSubs?.cancel();
+      // _sliderPosition.close();
+      // _sliderTempPosition.close();
+      // _isSliderMoving.close();
+      // _duration.close();
+      // _buffered.close();
+      // _showControls.close();
+      // _controlsLock.close();
 
-    _timer?.cancel();
-    _timerForVolume?.cancel();
-    _timerForGettingVolume?.cancel();
-    timerForTrackingMouse?.cancel();
-    _timerForSeek?.cancel();
-    videoFitChangedTimer?.cancel();
-    _position.close();
-    _playerEventSubs?.cancel();
-    _sliderPosition.close();
-    _sliderTempPosition.close();
-    _isSliderMoving.close();
-    _duration.close();
-    _buffered.close();
-    _showControls.close();
-    _controlsLock.close();
+      // playerStatus.status.close();
+      // dataStatus.status.close();
 
-    playerStatus.status.close();
-    dataStatus.status.close();
-
-    removeListeners();
-    await _videoPlayerController?.dispose();
-    _videoPlayerController = null;
-    _instance = null;
+      removeListeners();
+      await _videoPlayerController?.dispose();
+      _videoPlayerController = null;
+      _instance = null;
+      // 关闭所有视频页面恢复亮度
+      resetBrightness();
+    } catch (err) {
+      print(err);
+    }
   }
 }

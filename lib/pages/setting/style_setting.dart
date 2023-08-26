@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -5,6 +7,7 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
+import 'widgets/switch_item.dart';
 
 class StyleSetting extends StatefulWidget {
   const StyleSetting({super.key});
@@ -65,6 +68,12 @@ class _StyleSettingState extends State<StyleSetting> {
                     onChanged: (value) => settingController.onOpenFeedBack()),
               ),
             ),
+          ),
+          const SetSwitchItem(
+            title: 'iOS路由切换',
+            subTitle: 'iOS路由切换样式，需重启',
+            setKey: SettingBoxKey.iosTransition,
+            defaultVal: false,
           ),
           ListTile(
             dense: false,
@@ -184,6 +193,25 @@ class _StyleSettingState extends State<StyleSetting> {
                 style: subTitleStyle)),
             trailing: const Icon(Icons.arrow_right_alt_outlined),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/colorSetting'),
+            title: Text('应用主题', style: titleStyle),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/fontSizeSetting'),
+            title: Text('字体大小', style: titleStyle),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+          ),
+          if (Platform.isAndroid)
+            ListTile(
+              dense: false,
+              onTap: () => Get.toNamed('/displayModeSetting'),
+              title: Text('屏幕帧率', style: titleStyle),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+            )
         ],
       ),
     );

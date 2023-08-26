@@ -160,9 +160,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                   scale: animation, child: child);
                             },
                             child: Text(
-                              _videoReplyController.sortTypeTitle.value,
-                              key: ValueKey<String>(
-                                  _videoReplyController.sortTypeTitle.value),
+                              '共${_videoReplyController.count.value}条回复',
+                              key: ValueKey<int>(
+                                  _videoReplyController.count.value),
                             ),
                           ),
                         ),

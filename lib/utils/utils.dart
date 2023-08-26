@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get_utils/get_utils.dart';
@@ -210,6 +211,7 @@ class Utils {
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
       SmartDialog.show(
+        animationType: SmartAnimationType.centerFade_otherSlide,
         builder: (context) {
           return AlertDialog(
             title: const Text('🎉 发现新版本 '),
@@ -228,27 +230,55 @@ class Utils {
             ),
             actions: [
               TextButton(
-                  onPressed: () => SmartDialog.dismiss(),
-                  child: Text(
-                    '稍后',
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.outline),
-                  )),
+                onPressed: () => SmartDialog.dismiss(),
+                child: Text(
+                  '稍后',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.outline),
+                ),
+              ),
               TextButton(
-                  onPressed: () async {
-                    await SmartDialog.dismiss();
-                    launchUrl(
-                      Uri.parse(
-                          'https://github.com/guozhigq/pilipala/releases'),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  },
-                  child: const Text('去下载')),
+                onPressed: () async {
+                  await SmartDialog.dismiss();
+                  launchUrl(
+                    Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+                child: const Text('网盘下载'),
+              ),
+              TextButton(
+                onPressed: () => matchVersion(data),
+                child: const Text('Github下载'),
+              ),
             ],
           );
         },
       );
     }
     return true;
+  }
+
+  // 下载适用于当前系统的安装包
+  static Future matchVersion(data) async {
+    await SmartDialog.dismiss();
+    // 获取设备信息
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      // [arm64-v8a]
+      String abi = androidInfo.supportedAbis.first;
+      late String downloadUrl;
+      for (var i in data.assets) {
+        if (i.downloadUrl.contains(abi)) {
+          downloadUrl = i.downloadUrl;
+        }
+      }
+      // 应用外下载
+      launchUrl(
+        Uri.parse(downloadUrl),
+        mode: LaunchMode.externalApplication,
+      );
+    }
   }
 }

@@ -387,9 +387,12 @@ class _HeaderControlState extends State<HeaderControl> {
     // 当前选中的解码格式
     VideoDecodeFormats currentDecodeFormats =
         widget.videoDetailCtr!.currentDecodeFormats;
+    VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     List<FormatItem> videoFormat = videoInfo.supportFormats!;
-    List list = videoFormat.first.codecs!;
+    List list = videoFormat
+        .firstWhere((e) => e.quality == firstVideo.quality!.code)
+        .codecs!;
 
     showModalBottomSheet(
       context: context,
@@ -483,10 +486,12 @@ class _HeaderControlState extends State<HeaderControl> {
               size: 15,
               color: Colors.white,
             ),
-            fuc: () {
+            fuc: () async {
               // 销毁播放器实例
-              widget.controller!.dispose(type: 'all');
-              Get.offAll(const MainApp());
+              await widget.controller!.dispose(type: 'all');
+              if (mounted) {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
             },
           ),
           const Spacer(),
@@ -506,9 +511,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 style: ButtonStyle(
                   padding: MaterialStateProperty.all(EdgeInsets.zero),
                 ),
-                onPressed: () {
-                  _.togglePlaybackSpeed();
-                },
+                onPressed: () => showSetSpeedSheet(),
                 child: Text(
                   '${_.playbackSpeed.toString()}X',
                   style: textStyle,

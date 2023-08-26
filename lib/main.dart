@@ -7,6 +7,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/custom_toast.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/common/color_type.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
@@ -27,6 +28,13 @@ void main() async {
     await Request.setCookie();
     await Data.init();
     await GStrorage.lazyInit();
+    // 小白条、导航栏沉浸
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarColor: Colors.transparent,
+    ));
   });
 }
 
@@ -35,15 +43,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color brandColor = const Color.fromARGB(255, 92, 182, 123);
     Box setting = GStrorage.setting;
+    // 主题色
+    Color defaultColor =
+        colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]
+            ['color'];
+    Color brandColor = defaultColor;
+    // 主题模式
     ThemeType currentThemeValue = ThemeType.values[setting
         .get(SettingBoxKey.themeMode, defaultValue: ThemeType.system.code)];
+    // 是否动态取色
+    bool isDynamicColor =
+        setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
+    // 字体缩放大小
+    double textScale =
+        setting.get(SettingBoxKey.defaultTextScale, defaultValue: 1.0);
+
     return DynamicColorBuilder(
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         ColorScheme? lightColorScheme;
         ColorScheme? darkColorScheme;
-        if (lightDynamic != null && darkDynamic != null) {
+        if (lightDynamic != null && darkDynamic != null && isDynamicColor) {
           // dynamic取色成功
           lightColorScheme = lightDynamic.harmonized();
           darkColorScheme = darkDynamic.harmonized();
@@ -93,9 +113,17 @@ class MyApp extends StatelessWidget {
           fallbackLocale: const Locale("zh", "CN"),
           getPages: Routes.getPages,
           home: const MainApp(),
-          builder: FlutterSmartDialog.init(
-            toastBuilder: (String msg) => CustomToast(msg: msg),
-          ),
+          builder: (BuildContext context, Widget? child) {
+            return FlutterSmartDialog(
+              toastBuilder: (String msg) => CustomToast(msg: msg),
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                    textScaleFactor:
+                        MediaQuery.of(context).textScaleFactor * textScale),
+                child: child!,
+              ),
+            );
+          },
           navigatorObservers: [
             VideoDetailPage.routeObserver,
             SearchPage.routeObserver,

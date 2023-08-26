@@ -68,9 +68,10 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                               text: i['text'],
                               style: TextStyle(
                                 fontSize: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall!
-                                    .fontSize,
+                                        .textTheme
+                                        .titleSmall!
+                                        .fontSize! *
+                                    MediaQuery.of(context).textScaleFactor,
                                 fontWeight: FontWeight.bold,
                                 color: i['type'] == 'em'
                                     ? Theme.of(context).colorScheme.primary

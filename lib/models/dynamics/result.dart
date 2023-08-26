@@ -360,7 +360,7 @@ class GoodItem {
 
   String? brief;
   String? cover;
-  String? id;
+  dynamic id;
   String? jumpDesc;
   String? jumpUrl;
   String? name;

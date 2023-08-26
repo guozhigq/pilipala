@@ -399,4 +399,16 @@ class VideoHttp {
       return {'status': false, 'msg': res.data['result']['toast']};
     }
   }
+
+  // 查看视频同时在看人数
+  static Future onlineTotal({int? aid, String? bvid, int? cid}) async {
+    var res = await Request().get(Api.onlineTotal, data: {
+      'aid': aid,
+      'bvid': bvid,
+      'cid': cid,
+    });
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    }
+  }
 }

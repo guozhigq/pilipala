@@ -1,10 +1,13 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyController extends GetxController {
   VideoReplyController(
@@ -25,12 +28,25 @@ class VideoReplyController extends GetxController {
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
   int ps = 20;
+  RxInt count = 0.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
 
-  ReplySortType sortType = ReplySortType.time;
+  ReplySortType _sortType = ReplySortType.time;
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
+
+  Box setting = GStrorage.setting;
+
+  @override
+  void onInit() {
+    super.onInit();
+    int deaultReplySortIndex =
+        setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    _sortType = ReplySortType.values[deaultReplySortIndex];
+    sortTypeTitle.value = _sortType.titles;
+    sortTypeLabel.value = _sortType.labels;
+  }
 
   Future queryReplyList({type = 'init'}) async {
     isLoadingMore = true;
@@ -45,7 +61,7 @@ class VideoReplyController extends GetxController {
       pageNum: currentPage + 1,
       ps: ps,
       type: ReplyType.video.index,
-      sort: sortType.index,
+      sort: _sortType.index,
     );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
@@ -81,6 +97,7 @@ class VideoReplyController extends GetxController {
         replyList.addAll(replies);
       }
     }
+    count.value = res['data'].page.count;
     isLoadingMore = false;
     return res;
   }
@@ -92,23 +109,26 @@ class VideoReplyController extends GetxController {
 
   // 排序搜索评论
   queryBySort() {
-    feedBack();
-    switch (sortType) {
-      case ReplySortType.time:
-        sortType = ReplySortType.like;
-        break;
-      case ReplySortType.like:
-        sortType = ReplySortType.reply;
-        break;
-      case ReplySortType.reply:
-        sortType = ReplySortType.time;
-        break;
-      default:
-    }
-    sortTypeTitle.value = sortType.titles;
-    sortTypeLabel.value = sortType.labels;
-    currentPage = 0;
-    replyList.clear();
-    queryReplyList(type: 'init');
+    EasyThrottle.throttle('queryBySort', const Duration(seconds: 1), () {
+      feedBack();
+      switch (_sortType) {
+        case ReplySortType.time:
+          _sortType = ReplySortType.like;
+          break;
+        case ReplySortType.like:
+          _sortType = ReplySortType.reply;
+          break;
+        case ReplySortType.reply:
+          _sortType = ReplySortType.time;
+          break;
+        default:
+      }
+      sortTypeTitle.value = _sortType.titles;
+      sortTypeLabel.value = _sortType.labels;
+      currentPage = 0;
+      noMore.value = '';
+      replyList.clear();
+      queryReplyList(type: 'init');
+    });
   }
 }

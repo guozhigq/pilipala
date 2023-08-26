@@ -156,6 +156,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         });
       }
     });
+    widget.controller.brightness.value = value;
   }
 
   Future<void> triggerFullScreen() async {

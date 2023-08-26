@@ -13,6 +13,7 @@ import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -50,17 +51,21 @@ class DynamicsController extends GetxController {
     },
   ];
   bool flag = false;
-  RxInt initialValue = 1.obs;
+  RxInt initialValue = 0.obs;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   var userInfo;
   RxBool isLoadingDynamic = false.obs;
+  Box setting = GStrorage.setting;
 
   @override
   void onInit() {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     super.onInit();
+    initialValue.value =
+        setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
+    dynamicsType = DynamicsType.values[initialValue.value].obs;
   }
 
   Future queryFollowDynamic({type = 'init'}) async {
@@ -99,7 +104,7 @@ class DynamicsController extends GetxController {
   }
 
   onSelectType(value) async {
-    dynamicsType.value = filterTypeList[value - 1]['value'];
+    dynamicsType.value = filterTypeList[value]['value'];
     dynamicsList.value = [DynamicItemModel()];
     page = 1;
     initialValue.value = value;
@@ -109,16 +114,21 @@ class DynamicsController extends GetxController {
 
   pushDetail(item, floor, {action = 'all'}) async {
     feedBack();
+
+    /// 点击评论action 直接查看评论
     if (action == 'comment') {
       Get.toNamed('/dynamicDetail',
           arguments: {'item': item, 'floor': floor, 'action': action});
       return false;
     }
     switch (item!.type) {
+      /// 转发的动态
       case 'DYNAMIC_TYPE_FORWARD':
         Get.toNamed('/dynamicDetail',
             arguments: {'item': item, 'floor': floor});
         break;
+
+      /// 图文动态查看
       case 'DYNAMIC_TYPE_DRAW':
         Get.toNamed('/dynamicDetail',
             arguments: {'item': item, 'floor': floor});
@@ -134,6 +144,8 @@ class DynamicsController extends GetxController {
           SmartDialog.showToast(err.toString());
         }
         break;
+
+      /// 专栏文章查看
       case 'DYNAMIC_TYPE_ARTICLE':
         String title = item.modules.moduleDynamic.major.opus.title;
         String url = item.modules.moduleDynamic.major.opus.jumpUrl;
@@ -144,7 +156,10 @@ class DynamicsController extends GetxController {
         break;
       case 'DYNAMIC_TYPE_PGC':
         print('番剧');
+        SmartDialog.showToast('暂未支持的类型，请联系开发者');
         break;
+
+      /// 纯文字动态查看
       case 'DYNAMIC_TYPE_WORD':
         print('纯文本');
         Get.toNamed('/dynamicDetail',
@@ -168,10 +183,19 @@ class DynamicsController extends GetxController {
         });
         break;
 
-      /// TODO
+      /// 合集查看
       case 'DYNAMIC_TYPE_UGC_SEASON':
-        print('合集');
+        DynamicArchiveModel ugcSeason =
+            item.modules.moduleDynamic.major.ugcSeason;
+        int aid = ugcSeason.aid!;
+        String bvid = IdUtils.av2bv(aid);
+        String cover = ugcSeason.cover!;
+        int cid = await SearchHttp.ab2c(bvid: bvid);
+        Get.toNamed('/video?bvid=$bvid&cid=$cid',
+            arguments: {'pic': cover, 'heroTag': bvid});
         break;
+
+      /// 番剧查看
       case 'DYNAMIC_TYPE_PGC_UNION':
         print('DYNAMIC_TYPE_PGC_UNION 番剧');
         DynamicArchiveModel pgc = item.modules.moduleDynamic.major.pgc;
@@ -247,7 +271,7 @@ class DynamicsController extends GetxController {
   void resetSearch() {
     mid.value = -1;
     dynamicsType.value = DynamicsType.values[0];
-    initialValue.value = 1;
+    initialValue.value = 0;
     SmartDialog.showToast('还原默认加载');
     dynamicsList.value = [DynamicItemModel()];
     queryFollowDynamic();

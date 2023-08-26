@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class DynamicDetailController extends GetxController {
   DynamicDetailController(this.oid, this.type);
@@ -16,9 +18,10 @@ class DynamicDetailController extends GetxController {
   RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
   RxInt acount = 0.obs;
 
-  ReplySortType sortType = ReplySortType.time;
+  ReplySortType _sortType = ReplySortType.time;
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
+  Box setting = GStrorage.setting;
 
   @override
   void onInit() {
@@ -29,6 +32,11 @@ class DynamicDetailController extends GetxController {
       acount.value =
           int.parse(item!.modules!.moduleStat!.comment!.count ?? '0');
     }
+    int deaultReplySortIndex =
+        setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    _sortType = ReplySortType.values[deaultReplySortIndex];
+    sortTypeTitle.value = _sortType.titles;
+    sortTypeLabel.value = _sortType.labels;
   }
 
   Future queryReplyList({reqType = 'init'}) async {
@@ -39,7 +47,7 @@ class DynamicDetailController extends GetxController {
       oid: oid!,
       pageNum: currentPage + 1,
       type: type!,
-      sort: sortType.index,
+      sort: _sortType.index,
     );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
@@ -76,20 +84,20 @@ class DynamicDetailController extends GetxController {
   // 排序搜索评论
   queryBySort() {
     feedBack();
-    switch (sortType) {
+    switch (_sortType) {
       case ReplySortType.time:
-        sortType = ReplySortType.like;
+        _sortType = ReplySortType.like;
         break;
       case ReplySortType.like:
-        sortType = ReplySortType.reply;
+        _sortType = ReplySortType.reply;
         break;
       case ReplySortType.reply:
-        sortType = ReplySortType.time;
+        _sortType = ReplySortType.time;
         break;
       default:
     }
-    sortTypeTitle.value = sortType.titles;
-    sortTypeLabel.value = sortType.labels;
+    sortTypeTitle.value = _sortType.titles;
+    sortTypeLabel.value = _sortType.labels;
     replyList.clear();
     queryReplyList(reqType: 'init');
   }

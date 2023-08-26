@@ -14,6 +14,7 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -68,6 +69,8 @@ class VideoDetailController extends GetxController
   late String videoUrl;
   late String audioUrl;
   late Duration defaultST;
+  // 亮度
+  double? brightness;
   // 默认记录历史记录
   bool enableHeart = true;
   var userInfo;
@@ -137,8 +140,17 @@ class VideoDetailController extends GetxController
     /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
     List<VideoItem> videoList =
         data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
-    firstVideo = videoList
-        .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    try {
+      firstVideo = videoList
+          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    } catch (_) {
+      // 当前格式不可用
+      currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+          SettingBoxKey.defaultDecode,
+          defaultValue: VideoDecodeFormats.values.last.code))!;
+      firstVideo = videoList
+          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    }
     videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
@@ -152,6 +164,12 @@ class VideoDetailController extends GetxController
   }
 
   Future playerInit({video, audio, seekToTime, duration}) async {
+    /// 设置/恢复 屏幕亮度
+    if (brightness != null) {
+      ScreenBrightness().setScreenBrightness(brightness!);
+    } else {
+      ScreenBrightness().resetScreenBrightness();
+    }
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
@@ -234,17 +252,25 @@ class VideoDetailController extends GetxController
             defaultValue: VideoDecodeFormats.values.last.code))!;
         try {
           // 当前视频没有对应格式返回第一个
-          currentDecodeFormats =
-              supportDecodeFormats.contains(supportDecodeFormats)
-                  ? supportDecodeFormats
-                  : supportDecodeFormats.first;
-        } catch (_) {}
+          currentDecodeFormats = supportDecodeFormats
+                  .contains(currentDecodeFormats)
+              ? currentDecodeFormats
+              : VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
+        } catch (e) {
+          print(e);
+        }
 
         /// 取出符合当前解码格式的videoItem
-        firstVideo = videosList
-            .firstWhere((e) => e.codecs!.startsWith(currentDecodeFormats.code));
+        try {
+          firstVideo = videosList.firstWhere(
+              (e) => e.codecs!.startsWith(currentDecodeFormats.code));
+        } catch (_) {
+          firstVideo = videosList.first;
+        }
         videoUrl = firstVideo.baseUrl!;
-      } catch (_) {}
+      } catch (err) {
+        print(err);
+      }
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       late AudioItem firstAudio;
