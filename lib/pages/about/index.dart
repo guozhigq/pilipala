@@ -47,6 +47,11 @@ class _AboutPageState extends State<AboutPage> {
               'PiliPala',
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            const SizedBox(height: 6),
+            Text(
+              '使用Flutter开发的哔哩哔哩第三方客户端',
+              style: TextStyle(color: Theme.of(context).colorScheme.outline),
+            ),
             const SizedBox(height: 20),
             Obx(
               () => ListTile(
@@ -83,16 +88,6 @@ class _AboutPageState extends State<AboutPage> {
               color: Theme.of(context).colorScheme.onInverseSurface,
             ),
             ListTile(
-              onTap: () {},
-              title: const Text('作者'),
-              trailing: Text('guozhigq', style: subTitleStyle),
-            ),
-            ListTile(
-              onTap: () {},
-              title: const Text('酷安'),
-              trailing: Text('影若风', style: subTitleStyle),
-            ),
-            ListTile(
               onTap: () => _aboutController.githubUrl(),
               title: const Text('Github'),
               trailing: Text(
@@ -123,6 +118,11 @@ class _AboutPageState extends State<AboutPage> {
               title: const Text('TG频道'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
+            ListTile(
+              onTap: () => _aboutController.aPay(),
+              title: const Text('赞助'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+            ),
             Divider(
               thickness: 8,
               height: 30,
@@ -141,11 +141,12 @@ class AboutController extends GetxController {
   late LatestDataModel remoteAppInfo;
   RxBool isUpdate = true.obs;
   RxBool isLoading = true.obs;
+  late LatestDataModel data;
 
   @override
   void onInit() {
     super.onInit();
-    init();
+    // init();
     // 获取当前版本
     getCurrentApp();
     // 获取最新的版本
@@ -153,16 +154,16 @@ class AboutController extends GetxController {
   }
 
   // 获取设备信息
-  Future init() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print(androidInfo.supportedAbis);
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      print(iosInfo);
-    }
-  }
+  // Future init() async {
+  //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //   if (Platform.isAndroid) {
+  //     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  //     print(androidInfo.supportedAbis);
+  //   } else if (Platform.isIOS) {
+  //     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+  //     print(iosInfo);
+  //   }
+  // }
 
   // 获取当前版本
   Future getCurrentApp() async {
@@ -173,7 +174,7 @@ class AboutController extends GetxController {
   // 获取远程版本
   Future getRemoteApp() async {
     var result = await Request().get(Api.latestApp);
-    LatestDataModel data = LatestDataModel.fromJson(result.data);
+    data = LatestDataModel.fromJson(result.data);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;
     isUpdate.value =
@@ -183,15 +184,7 @@ class AboutController extends GetxController {
 
   // 跳转下载/本地更新
   Future onUpdate() async {
-    // final dir = await getApplicationSupportDirectory();
-    // final path = '${dir.path}/pilipala.apk';
-    // var result = await Request()
-    //     .downloadFile(remoteAppInfo.assets!.first.downloadUrl, path);
-    // print(result);
-    launchUrl(
-      Uri.parse('https://github.com/guozhigq/pilipala/releases'),
-      mode: LaunchMode.externalApplication,
-    );
+    Utils.matchVersion(data);
   }
 
   // 跳转github
@@ -241,5 +234,17 @@ class AboutController extends GetxController {
         mode: LaunchMode.externalApplication,
       ),
     );
+  }
+
+  aPay() {
+    try {
+      launchUrl(
+        Uri.parse(
+            'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx14623ddwl1ping3ddd73'),
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 }
