@@ -140,8 +140,17 @@ class VideoDetailController extends GetxController
     /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
     List<VideoItem> videoList =
         data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
-    firstVideo = videoList
-        .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    try {
+      firstVideo = videoList
+          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    } catch (_) {
+      // 当前格式不可用
+      currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+          SettingBoxKey.defaultDecode,
+          defaultValue: VideoDecodeFormats.values.last.code))!;
+      firstVideo = videoList
+          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+    }
     videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
@@ -243,17 +252,25 @@ class VideoDetailController extends GetxController
             defaultValue: VideoDecodeFormats.values.last.code))!;
         try {
           // 当前视频没有对应格式返回第一个
-          currentDecodeFormats =
-              supportDecodeFormats.contains(supportDecodeFormats)
-                  ? supportDecodeFormats
-                  : supportDecodeFormats.first;
-        } catch (_) {}
+          currentDecodeFormats = supportDecodeFormats
+                  .contains(currentDecodeFormats)
+              ? currentDecodeFormats
+              : VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
+        } catch (e) {
+          print(e);
+        }
 
         /// 取出符合当前解码格式的videoItem
-        firstVideo = videosList
-            .firstWhere((e) => e.codecs!.startsWith(currentDecodeFormats.code));
+        try {
+          firstVideo = videosList.firstWhere(
+              (e) => e.codecs!.startsWith(currentDecodeFormats.code));
+        } catch (_) {
+          firstVideo = videosList.first;
+        }
         videoUrl = firstVideo.baseUrl!;
-      } catch (_) {}
+      } catch (err) {
+        print(err);
+      }
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       late AudioItem firstAudio;

@@ -387,9 +387,12 @@ class _HeaderControlState extends State<HeaderControl> {
     // 当前选中的解码格式
     VideoDecodeFormats currentDecodeFormats =
         widget.videoDetailCtr!.currentDecodeFormats;
+    VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     List<FormatItem> videoFormat = videoInfo.supportFormats!;
-    List list = videoFormat.first.codecs!;
+    List list = videoFormat
+        .firstWhere((e) => e.quality == firstVideo.quality!.code)
+        .codecs!;
 
     showModalBottomSheet(
       context: context,
