@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+  appscheme:
+    dependency: "direct main"
+    description:
+      name: appscheme
+      sha256: b885b65219f3839ebafc937024a1bc5ce5a75b0e458fd249ef15e80e81235b6f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.8"
   archive:
     dependency: transitive
     description:

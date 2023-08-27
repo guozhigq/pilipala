@@ -105,6 +105,8 @@ dependencies:
   easy_debounce: ^2.0.3
   # 高帧率
   flutter_displaymode: ^0.6.0
+  # scheme跳转
+  appscheme: ^1.0.8
   
 dev_dependencies:
   flutter_test:
