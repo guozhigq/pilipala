@@ -142,31 +142,34 @@ class _RcmdPageState extends State<RcmdPage>
   }
 
   Widget contentGrid(ctr, videoList) {
-    double maxWidth = Get.size.width;
-    int baseWidth = 500;
-    int step = 300;
-    int crossAxisCount =
-        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
-    if (maxWidth < 300) {
-      crossAxisCount = 1;
-    }
+    // double maxWidth = Get.size.width;
+    // int baseWidth = 500;
+    // int step = 300;
+    // int crossAxisCount =
+    //     maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    // if (maxWidth < 300) {
+    //   crossAxisCount = 1;
+    // }
+    int crossAxisCount = ctr.crossAxisCount.value;
+    double mainAxisExtent =
+        (Get.size.width / crossAxisCount / StyleString.aspectRatio) +
+            68 * MediaQuery.of(context).textScaleFactor;
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 4,
+        mainAxisSpacing: StyleString.safeSpace,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 4,
+        crossAxisSpacing: StyleString.safeSpace,
         // 列数
         crossAxisCount: crossAxisCount,
-        mainAxisExtent:
-            (Get.size.width / crossAxisCount / StyleString.aspectRatio) +
-                68 * MediaQuery.of(context).textScaleFactor,
+        mainAxisExtent: mainAxisExtent,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return videoList!.isNotEmpty
               ? VideoCardV(
                   videoItem: videoList[index],
+                  crossAxisCount: crossAxisCount,
                   longPress: () {
                     _rcmdController.popupDialog =
                         _createPopupDialog(videoList[index]);

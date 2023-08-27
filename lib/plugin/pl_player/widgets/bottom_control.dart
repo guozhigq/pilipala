@@ -30,12 +30,12 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       primary: false,
-      toolbarHeight: 73,
+      toolbarHeight: 85,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Column(
         children: [
-          const SizedBox(height: 23),
+          const SizedBox(height: 17),
           Obx(
             () {
               final int value = _.sliderPosition.value.inSeconds;
@@ -45,7 +45,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 return Container();
               }
               return Padding(
-                padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                padding: const EdgeInsets.only(left: 7, right: 5, bottom: 6),
                 child: ProgressBar(
                   progress: Duration(seconds: value),
                   buffered: Duration(seconds: buffer),

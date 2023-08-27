@@ -602,9 +602,26 @@ InlineSpan buildContent(
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 recognizer: TapGestureRecognizer()
-                  ..onTap = () => Get.toNamed('/searchResult', parameters: {
-                        'keyword': content.jumpUrl[matchStr]['title']
-                      }),
+                  ..onTap = () {
+                    String appUrlSchema =
+                        content.jumpUrl[matchStr]['app_url_schema'];
+                    if (appUrlSchema == '') {
+                      Get.toNamed(
+                        '/webview',
+                        parameters: {
+                          'url': matchStr,
+                          'type': 'url',
+                          'pageTitle': ''
+                        },
+                      );
+                    } else {
+                      if (appUrlSchema.startsWith('bilibili://search')) {
+                        Get.toNamed('/searchResult', parameters: {
+                          'keyword': content.jumpUrl[matchStr]['title']
+                        });
+                      }
+                    }
+                  },
               ),
             );
             spanChilds.add(

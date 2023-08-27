@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -48,12 +49,17 @@ Future<void> enterFullScreen() async {
 //退出全屏显示
 Future<void> exitFullScreen() async {
   dynamic document;
+  late SystemUiMode mode = SystemUiMode.edgeToEdge;
   try {
     if (kIsWeb) {
       document.exitFullscreen();
     } else if (Platform.isAndroid || Platform.isIOS) {
+      if (Platform.isAndroid &&
+          (await DeviceInfoPlugin().androidInfo).version.sdkInt < 29) {
+        mode = SystemUiMode.manual;
+      }
       await SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
+        mode,
         overlays: SystemUiOverlay.values,
       );
       await SystemChrome.setPreferredOrientations([]);

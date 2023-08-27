@@ -146,7 +146,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                 // 搜索建议
                 _searchSuggest(),
                 // 热搜
-                hotSearch(_searchController),
+                Visibility(
+                    visible: _searchController.enableHotKey,
+                    child: hotSearch(_searchController)),
                 // 搜索历史
                 _history()
               ],

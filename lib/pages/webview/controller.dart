@@ -63,6 +63,13 @@ class WebviewController extends GetxController {
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.startsWith('bilibili://')) {
+              if (request.url.startsWith('bilibili://video/')) {
+                String str = Uri.parse(request.url).pathSegments[0];
+                Get.offAndToNamed(
+                  '/searchResult',
+                  parameters: {'keyword': str},
+                );
+              }
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;

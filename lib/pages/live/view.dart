@@ -129,14 +129,15 @@ class _LivePageState extends State<LivePage> {
   }
 
   Widget contentGrid(ctr, liveList) {
-    double maxWidth = Get.size.width;
-    int baseWidth = 500;
-    int step = 300;
-    int crossAxisCount =
-        maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
-    if (maxWidth < 300) {
-      crossAxisCount = 1;
-    }
+    // double maxWidth = Get.size.width;
+    // int baseWidth = 500;
+    // int step = 300;
+    // int crossAxisCount =
+    //     maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
+    // if (maxWidth < 300) {
+    //   crossAxisCount = 1;
+    // }
+    int crossAxisCount = ctr.crossAxisCount.value;
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
@@ -147,13 +148,15 @@ class _LivePageState extends State<LivePage> {
         crossAxisCount: crossAxisCount,
         mainAxisExtent:
             Get.size.width / crossAxisCount / StyleString.aspectRatio +
-                68 * MediaQuery.of(context).textScaleFactor,
+                (crossAxisCount == 1 ? 48 : 68) *
+                    MediaQuery.of(context).textScaleFactor,
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return liveList!.isNotEmpty
               ? LiveCardV(
                   liveItem: liveList[index],
+                  crossAxisCount: crossAxisCount,
                   longPress: () {
                     _liveController.popupDialog =
                         _createPopupDialog(liveList[index]);

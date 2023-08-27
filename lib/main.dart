@@ -13,6 +13,7 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
+import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
@@ -25,9 +26,6 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     runApp(const MyApp());
-    await Request.setCookie();
-    await Data.init();
-    await GStrorage.lazyInit();
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -35,6 +33,10 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
       statusBarColor: Colors.transparent,
     ));
+    await Request.setCookie();
+    Data.init();
+    GStrorage.lazyInit();
+    PiliSchame.init();
   });
 }
 

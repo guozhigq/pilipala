@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
@@ -47,6 +48,13 @@ class _ExtraSettingState extends State<ExtraSetting> {
       ),
       body: ListView(
         children: [
+          SetSwitchItem(
+            title: '大家都在搜',
+            subTitle: '是否展示「大家都在搜」',
+            setKey: SettingBoxKey.enableHotKey,
+            defaultVal: true,
+            callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),

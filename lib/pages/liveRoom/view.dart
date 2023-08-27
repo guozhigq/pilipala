@@ -48,32 +48,35 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       appBar: AppBar(
         centerTitle: false,
         titleSpacing: 0,
-        title: Row(
-          children: [
-            NetworkImgLayer(
-              width: 34,
-              height: 34,
-              type: 'avatar',
-              src: _liveRoomController.liveItem.face,
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _liveRoomController.liveItem.uname,
-                  style: const TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 1),
-                if (_liveRoomController.liveItem.watchedShow != null)
-                  Text(
-                      _liveRoomController.liveItem.watchedShow['text_large'] ??
-                          '',
-                      style: const TextStyle(fontSize: 12)),
-              ],
-            ),
-          ],
-        ),
+        title: _liveRoomController.liveItem != null
+            ? Row(
+                children: [
+                  NetworkImgLayer(
+                    width: 34,
+                    height: 34,
+                    type: 'avatar',
+                    src: _liveRoomController.liveItem.face,
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _liveRoomController.liveItem.uname,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 1),
+                      if (_liveRoomController.liveItem.watchedShow != null)
+                        Text(
+                            _liveRoomController
+                                    .liveItem.watchedShow['text_large'] ??
+                                '',
+                            style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ],
+              )
+            : const SizedBox(),
         // actions: [
         //   SizedBox(
         //     height: 34,
@@ -94,21 +97,22 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                       ? PLVideoPlayer(controller: plPlayerController!)
                       : const SizedBox(),
                 ),
-                if (_liveRoomController.liveItem.cover != null)
-                  Visibility(
-                    visible: isShowCover,
-                    child: Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: NetworkImgLayer(
-                        type: 'emote',
-                        src: _liveRoomController.liveItem.cover,
-                        width: Get.size.width,
-                        height: videoHeight,
-                      ),
-                    ),
-                  ),
+                // if (_liveRoomController.liveItem != null &&
+                //     _liveRoomController.liveItem.cover != null)
+                //   Visibility(
+                //     visible: isShowCover,
+                //     child: Positioned(
+                //       top: 0,
+                //       left: 0,
+                //       right: 0,
+                //       child: NetworkImgLayer(
+                //         type: 'emote',
+                //         src: _liveRoomController.liveItem.cover,
+                //         width: Get.size.width,
+                //         height: videoHeight,
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

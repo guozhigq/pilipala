@@ -56,14 +56,20 @@ class SearchPanelController extends GetxController {
     // 匹配输入内容，如果是AV、BV号且有结果 直接跳转详情页
     Map matchRes = IdUtils.matchAvorBv(input: keyword);
     List matchKeys = matchRes.keys.toList();
-    if (matchKeys.isNotEmpty && searchType == SearchType.video) {
-      String bvid = resultList.first.bvid;
-      int aid = resultList.first.aid;
+    String bvid = resultList.first.bvid;
+    // keyword 可能输入纯数字
+    int aid = resultList.first.aid;
+    if (matchKeys.isNotEmpty && searchType == SearchType.video ||
+        aid.toString() == keyword) {
       String heroTag = Utils.makeHeroTag(bvid);
-
       int cid = await SearchHttp.ab2c(aid: aid, bvid: bvid);
-      if (matchKeys.first == 'BV' && matchRes[matchKeys.first] == bvid ||
-          matchKeys.first == 'AV' && matchRes[matchKeys.first] == aid) {
+      if (matchKeys.isNotEmpty &&
+              matchKeys.first == 'BV' &&
+              matchRes[matchKeys.first] == bvid ||
+          matchKeys.isNotEmpty &&
+              matchKeys.first == 'AV' &&
+              matchRes[matchKeys.first] == aid ||
+          aid.toString() == keyword) {
         Get.toNamed(
           '/video?bvid=$bvid&cid=$cid',
           arguments: {'videoItem': resultList.first, 'heroTag': heroTag},

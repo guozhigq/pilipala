@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
@@ -74,6 +75,13 @@ class _StyleSettingState extends State<StyleSetting> {
             subTitle: 'iOS路由切换样式，需重启',
             setKey: SettingBoxKey.iosTransition,
             defaultVal: false,
+          ),
+          SetSwitchItem(
+            title: '首页单列',
+            subTitle: '每行展示一个内容卡片',
+            setKey: SettingBoxKey.enableSingleRow,
+            defaultVal: false,
+            callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
           ListTile(
             dense: false,

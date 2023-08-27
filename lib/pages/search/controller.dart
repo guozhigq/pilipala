@@ -21,6 +21,8 @@ class SSearchController extends GetxController {
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
   RxString defaultSearch = '输入关键词搜索'.obs;
+  Box setting = GStrorage.setting;
+  bool enableHotKey = true;
 
   @override
   void onInit() {
@@ -38,6 +40,7 @@ class SSearchController extends GetxController {
     }
     historyCacheList = histiryWord.get('cacheList') ?? [];
     historyList.value = historyCacheList;
+    enableHotKey = setting.get(SettingBoxKey.enableHotKey, defaultValue: true);
   }
 
   void onChange(value) {
