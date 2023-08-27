@@ -53,20 +53,29 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   void initState() {
     super.initState();
-    plPlayerController = videoDetailController.plPlayerController;
-    playerListener();
+    statusBarHeight = localCache.get('statusBarHeight');
+    videoSourceInit();
+    appbarStreamListen();
+  }
 
+  // 获取视频资源，初始化播放器
+  Future<void> videoSourceInit() async {
+    _futureBuilderFuture = videoDetailController.queryVideoUrl();
+    if (videoDetailController.autoPlay.value) {
+      plPlayerController = videoDetailController.plPlayerController;
+      playerListener();
+    }
+  }
+
+  // 流
+  appbarStreamListen() {
     appbarStream = StreamController<double>();
-
     _extendNestCtr.addListener(
       () {
         double offset = _extendNestCtr.position.pixels;
         appbarStream.add(offset);
       },
     );
-
-    statusBarHeight = localCache.get('statusBarHeight');
-    _futureBuilderFuture = videoDetailController.queryVideoUrl();
   }
 
   // 播放器状态监听
@@ -94,6 +103,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     await _extendNestCtr.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     plPlayerController!.play();
+  }
+
+  Future<void> handlePlay() async {
+    await videoDetailController.playerInit();
+    plPlayerController = videoDetailController.plPlayerController;
+    videoDetailController.autoPlay.value = true;
+    videoDetailController.isShowCover.value = false;
+    playerListener();
   }
 
   @override
@@ -179,13 +196,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     builder: ((context, snapshot) {
                                       if (snapshot.hasData &&
                                           snapshot.data['status']) {
-                                        return PLVideoPlayer(
-                                          controller: plPlayerController!,
-                                          headerControl: HeaderControl(
-                                            controller: plPlayerController,
-                                            videoDetailCtr:
-                                                videoDetailController,
-                                          ),
+                                        return Obx(
+                                          () => videoDetailController
+                                                  .autoPlay.value
+                                              ? PLVideoPlayer(
+                                                  controller:
+                                                      plPlayerController!,
+                                                  headerControl: HeaderControl(
+                                                    controller:
+                                                        plPlayerController,
+                                                    videoDetailCtr:
+                                                        videoDetailController,
+                                                  ),
+                                                )
+                                              : const SizedBox(),
                                         );
                                       } else {
                                         return const SizedBox();
@@ -228,28 +252,31 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                               right: 0,
                                               child: AppBar(
                                                 primary: false,
+                                                foregroundColor: Colors.white,
                                                 backgroundColor:
                                                     Colors.transparent,
                                                 actions: [
                                                   IconButton(
-                                                      tooltip: '稍后再看',
-                                                      onPressed: () async {
-                                                        var res = await UserHttp
-                                                            .toViewLater(
-                                                                bvid:
-                                                                    videoDetailController
-                                                                        .bvid);
-                                                        SmartDialog.showToast(
-                                                            res['msg']);
-                                                      },
-                                                      icon: const Icon(Icons
-                                                          .history_outlined))
+                                                    tooltip: '稍后再看',
+                                                    onPressed: () async {
+                                                      var res = await UserHttp
+                                                          .toViewLater(
+                                                              bvid:
+                                                                  videoDetailController
+                                                                      .bvid);
+                                                      SmartDialog.showToast(
+                                                          res['msg']);
+                                                    },
+                                                    icon: const Icon(
+                                                        Icons.history_outlined),
+                                                  ),
+                                                  const SizedBox(width: 14)
                                                 ],
                                               ),
                                             ),
                                             Positioned(
                                               right: 12,
-                                              bottom: 6,
+                                              bottom: 10,
                                               child: TextButton.icon(
                                                 style: ButtonStyle(
                                                   backgroundColor:
@@ -261,9 +288,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                         .primaryContainer;
                                                   }),
                                                 ),
-                                                onPressed: () =>
-                                                    videoDetailController
-                                                        .handlePlay(),
+                                                onPressed: () => handlePlay(),
                                                 icon: const Icon(
                                                   Icons.play_circle_outline,
                                                   size: 20,
