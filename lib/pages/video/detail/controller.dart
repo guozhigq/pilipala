@@ -41,7 +41,6 @@ class VideoDetailController extends GetxController
   late VideoQuality currentVideoQa;
   AudioQuality? currentAudioQa;
   late VideoDecodeFormats currentDecodeFormats;
-  // PlPlayerController plPlayerController = PlPlayerController();
   // 是否开始自动播放 存在多p的情况下，第二p需要为true
   RxBool autoPlay = true.obs;
   // 视频资源是否有效
@@ -183,7 +182,6 @@ class VideoDetailController extends GetxController
       ),
       // 硬解
       enableHA: enableHA.value,
-      autoplay: autoPlay.value,
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
@@ -196,11 +194,6 @@ class VideoDetailController extends GetxController
       cid: cid,
       enableHeart: enableHeart,
     );
-  }
-
-  // 手动点击播放
-  handlePlay() {
-    plPlayerController.togglePlay();
   }
 
   // 视频链接
@@ -292,7 +285,9 @@ class VideoDetailController extends GetxController
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
       }
       defaultST = Duration(milliseconds: data.lastPlayTime!);
-      await playerInit();
+      if (autoPlay.value) {
+        await playerInit();
+      }
     } else {
       if (result['code'] == -404) {
         isShowCover.value = false;
