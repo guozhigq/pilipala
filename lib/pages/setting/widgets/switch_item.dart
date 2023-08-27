@@ -8,12 +8,14 @@ class SetSwitchItem extends StatefulWidget {
   final String? subTitle;
   final String? setKey;
   final bool? defaultVal;
+  final Function? callFn;
 
   const SetSwitchItem({
     this.title,
     this.subTitle,
     this.setKey,
     this.defaultVal,
+    this.callFn,
     Key? key,
   }) : super(key: key);
 
@@ -32,11 +34,14 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
     val = Setting.get(widget.setKey, defaultValue: widget.defaultVal ?? false);
   }
 
-  void switchChange(value) {
+  void switchChange(value) async {
     val = value ?? !val;
-    Setting.put(widget.setKey, val);
+    await Setting.put(widget.setKey, val);
     if (widget.setKey == SettingBoxKey.autoUpdate && value == true) {
       Utils.checkUpdata();
+    }
+    if (widget.callFn != null) {
+      widget.callFn!.call(val);
     }
     setState(() {});
   }

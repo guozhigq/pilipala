@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -9,12 +8,14 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
   final LiveItemModel liveItem;
+  final int crossAxisCount;
   final Function()? longPress;
   final Function()? longPressEnd;
 
   const LiveCardV({
     Key? key,
     required this.liveItem,
+    required this.crossAxisCount,
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
@@ -23,7 +24,7 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: 1,
+      elevation: crossAxisCount == 1 ? 0 : 1,
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
       child: GestureDetector(
@@ -45,12 +46,7 @@ class LiveCardV extends StatelessWidget {
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: StyleString.imgRadius,
-                  topRight: StyleString.imgRadius,
-                  bottomLeft: StyleString.imgRadius,
-                  bottomRight: StyleString.imgRadius,
-                ),
+                borderRadius: const BorderRadius.all(StyleString.imgRadius),
                 child: AspectRatio(
                   aspectRatio: StyleString.aspectRatio,
                   child: LayoutBuilder(builder: (context, boxConstraints) {
@@ -66,24 +62,25 @@ class LiveCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AnimatedOpacity(
-                            opacity: 1,
-                            duration: const Duration(milliseconds: 200),
-                            child: VideoStat(
-                              liveItem: liveItem,
+                        if (crossAxisCount != 1)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: AnimatedOpacity(
+                              opacity: 1,
+                              duration: const Duration(milliseconds: 200),
+                              child: VideoStat(
+                                liveItem: liveItem,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     );
                   }),
                 ),
               ),
-              LiveContent(liveItem: liveItem)
+              LiveContent(liveItem: liveItem, crossAxisCount: crossAxisCount)
             ],
           ),
         ),
@@ -94,13 +91,18 @@ class LiveCardV extends StatelessWidget {
 
 class LiveContent extends StatelessWidget {
   final dynamic liveItem;
-  const LiveContent({Key? key, required this.liveItem}) : super(key: key);
+  final int crossAxisCount;
+  const LiveContent(
+      {Key? key, required this.liveItem, required this.crossAxisCount})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
+      flex: crossAxisCount == 1 ? 0 : 1,
       child: Padding(
-        // 多列
-        padding: const EdgeInsets.fromLTRB(9, 9, 9, 8),
+        padding: crossAxisCount == 1
+            ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
+            : const EdgeInsets.fromLTRB(9, 8, 9, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,29 +114,40 @@ class LiveContent extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
-              maxLines: 2,
+              maxLines: crossAxisCount == 1 ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
+            if (crossAxisCount == 1) const SizedBox(height: 4),
             Row(
               children: [
-                const PBadge(
-                  text: 'UP',
-                  size: 'small',
-                  stack: 'normal',
-                  fs: 9,
+                Text(
+                  liveItem.uname,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Expanded(
-                  child: Text(
-                    liveItem.uname,
-                    textAlign: TextAlign.start,
+                if (crossAxisCount == 1) ...[
+                  Text(
+                    ' • ${liveItem!.areaName!}',
                     style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                )
+                  Text(
+                    ' • ${liveItem!.watchedShow!['text_small']}人观看',
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                ]
               ],
             ),
           ],

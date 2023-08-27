@@ -12,10 +12,14 @@ class RcmdController extends GetxController {
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
+  Box setting = GStrorage.setting;
+  RxInt crossAxisCount = 2.obs;
 
   @override
   void onInit() {
     super.onInit();
+    crossAxisCount.value =
+        setting.get(SettingBoxKey.enableSingleRow, defaultValue: false) ? 1 : 2;
     if (recVideo.get('cacheList') != null &&
         recVideo.get('cacheList').isNotEmpty) {
       List<RecVideoItemAppModel> list = [];

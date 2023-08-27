@@ -15,12 +15,14 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
+  final int crossAxisCount;
   final Function()? longPress;
   final Function()? longPressEnd;
 
   const VideoCardV({
     Key? key,
     required this.videoItem,
+    required this.crossAxisCount,
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
@@ -77,7 +79,7 @@ class VideoCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
-      elevation: 1,
+      elevation: crossAxisCount == 1 ? 0 : 1,
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
       child: GestureDetector(
@@ -100,17 +102,27 @@ class VideoCardV extends StatelessWidget {
                 child: LayoutBuilder(builder: (context, boxConstraints) {
                   double maxWidth = boxConstraints.maxWidth;
                   double maxHeight = boxConstraints.maxHeight;
-                  return Hero(
-                    tag: heroTag,
-                    child: NetworkImgLayer(
-                      src: videoItem.pic,
-                      width: maxWidth,
-                      height: maxHeight,
-                    ),
+                  return Stack(
+                    children: [
+                      Hero(
+                        tag: heroTag,
+                        child: NetworkImgLayer(
+                          src: videoItem.pic,
+                          width: maxWidth,
+                          height: maxHeight,
+                        ),
+                      ),
+                      if (crossAxisCount == 1)
+                        PBadge(
+                          bottom: 10,
+                          right: 10,
+                          text: videoItem.duration,
+                        )
+                    ],
                   );
                 }),
               ),
-              VideoContent(videoItem: videoItem)
+              VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
             ],
           ),
         ),
@@ -121,22 +133,47 @@ class VideoCardV extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  const VideoContent({Key? key, required this.videoItem}) : super(key: key);
+  final int crossAxisCount;
+  const VideoContent(
+      {Key? key, required this.videoItem, required this.crossAxisCount})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
+      flex: crossAxisCount == 1 ? 0 : 1,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(9, 8, 9, 4),
+        padding: crossAxisCount == 1
+            ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
+            : const EdgeInsets.fromLTRB(9, 8, 9, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              videoItem.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    videoItem.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (videoItem.goto == 'av' && crossAxisCount == 1) ...[
+                  const SizedBox(width: 10),
+                  WatchLater(
+                    size: 32,
+                    iconSize: 18,
+                    callFn: () async {
+                      int aid = videoItem.param;
+                      var res =
+                          await UserHttp.toViewLater(bvid: IdUtils.av2bv(aid));
+                      SmartDialog.showToast(res['msg']);
+                    },
+                  ),
+                ],
+              ],
             ),
-
+            if (crossAxisCount == 1) const SizedBox(height: 6),
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
@@ -167,6 +204,7 @@ class VideoContent extends StatelessWidget {
                   )
                 ],
                 Expanded(
+                  flex: crossAxisCount == 1 ? 0 : 1,
                   child: Text(
                     videoItem.owner.name,
                     maxLines: 1,
@@ -177,95 +215,33 @@ class VideoContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (videoItem.goto == 'av')
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      tooltip: '稍后再看',
-                      icon: Icon(
-                        Icons.more_vert_outlined,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 14,
-                      ),
-                      position: PopupMenuPosition.under,
-                      // constraints: const BoxConstraints(maxHeight: 35),
-                      onSelected: (String type) {},
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          onTap: () async {
-                            int aid = videoItem.param;
-                            var res = await UserHttp.toViewLater(
-                                bvid: IdUtils.av2bv(aid));
-                            SmartDialog.showToast(res['msg']);
-                          },
-                          value: 'pause',
-                          height: 35,
-                          child: const Row(
-                            children: [
-                              Icon(Icons.watch_later_outlined, size: 16),
-                              SizedBox(width: 6),
-                              Text('稍后再看', style: TextStyle(fontSize: 13))
-                            ],
-                          ),
-                        ),
-                      ],
+                if (crossAxisCount == 1) ...[
+                  Text(
+                    ' • ',
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
                     ),
+                  ),
+                  VideoStat(
+                    videoItem: videoItem,
+                  )
+                ],
+                const Spacer(),
+                if (videoItem.goto == 'av' && crossAxisCount != 1)
+                  WatchLater(
+                    size: 24,
+                    iconSize: 14,
+                    callFn: () async {
+                      int aid = videoItem.param;
+                      var res =
+                          await UserHttp.toViewLater(bvid: IdUtils.av2bv(aid));
+                      SmartDialog.showToast(res['msg']);
+                    },
                   ),
               ],
             ),
-            // Row(
-            //   children: [
-            //     const SizedBox(width: 1),
-            //     StatView(
-            //       theme: 'gray',
-            //       view: videoItem.stat.view,
-            //     ),
-            //     const SizedBox(width: 10),
-            //     StatDanMu(
-            //       theme: 'gray',
-            //       danmu: videoItem.stat.danmaku,
-            //     ),
-            //     const Spacer(),
-            //     SizedBox(
-            //       width: 24,
-            //       height: 24,
-            //       child: PopupMenuButton<String>(
-            //         padding: EdgeInsets.zero,
-            //         tooltip: '稍后再看',
-            //         icon: Icon(
-            //           Icons.more_vert_outlined,
-            //           color: Theme.of(context).colorScheme.outline,
-            //           size: 14,
-            //         ),
-            //         position: PopupMenuPosition.under,
-            //         // constraints: const BoxConstraints(maxHeight: 35),
-            //         onSelected: (String type) {},
-            //         itemBuilder: (BuildContext context) =>
-            //             <PopupMenuEntry<String>>[
-            //           PopupMenuItem<String>(
-            //             onTap: () async {
-            //               var res =
-            //                   await UserHttp.toViewLater(bvid: videoItem.bvid);
-            //               SmartDialog.showToast(res['msg']);
-            //             },
-            //             value: 'pause',
-            //             height: 35,
-            //             child: const Row(
-            //               children: [
-            //                 Icon(Icons.watch_later_outlined, size: 16),
-            //                 SizedBox(width: 6),
-            //                 Text('稍后再看', style: TextStyle(fontSize: 13))
-            //               ],
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ],
         ),
       ),
@@ -274,53 +250,77 @@ class VideoContent extends StatelessWidget {
 }
 
 class VideoStat extends StatelessWidget {
-  final int? view;
-  final int? danmaku;
-  final int? duration;
+  final dynamic videoItem;
 
-  const VideoStat(
-      {Key? key,
-      required this.view,
-      required this.danmaku,
-      required this.duration})
-      : super(key: key);
+  const VideoStat({
+    Key? key,
+    required this.videoItem,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.only(top: 22, left: 6, right: 6),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: <Color>[
-            Colors.transparent,
-            Colors.black54,
-          ],
-          tileMode: TileMode.mirror,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              StatView(
-                theme: 'white',
-                view: view,
-              ),
-              const SizedBox(width: 6),
-              StatDanMu(
-                theme: 'white',
-                danmu: danmaku,
-              ),
-            ],
+    return Row(
+      children: [
+        Text(
+          '${videoItem.stat.view}次观看',
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+            color: Theme.of(context).colorScheme.outline,
           ),
-          Text(
-            Utils.timeFormat(duration!),
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          )
+        ),
+        Text(
+          ' • ${videoItem.stat.danmu}条弹幕',
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class WatchLater extends StatelessWidget {
+  final double? size;
+  final double? iconSize;
+  final Function? callFn;
+
+  const WatchLater({
+    Key? key,
+    required this.size,
+    required this.iconSize,
+    this.callFn,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: PopupMenuButton<String>(
+        padding: EdgeInsets.zero,
+        tooltip: '稍后再看',
+        icon: Icon(
+          Icons.more_vert_outlined,
+          color: Theme.of(context).colorScheme.outline,
+          size: iconSize,
+        ),
+        position: PopupMenuPosition.under,
+        // constraints: const BoxConstraints(maxHeight: 35),
+        onSelected: (String type) {},
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          PopupMenuItem<String>(
+            onTap: () => callFn!(),
+            value: 'pause',
+            height: 35,
+            child: const Row(
+              children: [
+                Icon(Icons.watch_later_outlined, size: 16),
+                SizedBox(width: 6),
+                Text('稍后再看', style: TextStyle(fontSize: 13))
+              ],
+            ),
+          ),
         ],
       ),
     );
