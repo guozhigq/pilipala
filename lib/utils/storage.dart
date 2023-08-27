@@ -105,6 +105,7 @@ class SettingBoxKey {
   static const String autoUpdate = 'autoUpdate';
   static const String replySortType = 'replySortType';
   static const String defaultDynamicType = 'defaultDynamicType';
+  static const String enableHotKey = 'enableHotKey';
 
   /// 外观
   static const String themeMode = 'themeMode';
