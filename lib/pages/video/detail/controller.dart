@@ -209,27 +209,17 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       data = result['data'];
 
-      /// 优先顺序 省流模式 -> 设置中指定质量 -> 当前可选的最高质量
-      // firstVideo = data.dash!.video!.first;
-      // videoUrl = firstVideo.baseUrl!;
-      // //
-      // currentVideoQa = VideoQualityCode.fromCode(firstVideo.id!)!;
-
-      // /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
-      // AudioItem firstAudio =
-      //     data.dash!.audio!.isNotEmpty ? data.dash!.audio!.first : AudioItem();
-      // audioUrl = firstAudio.baseUrl ?? '';
-
       List<VideoItem> allVideosList = data.dash!.video!;
 
       try {
         // 当前可播放的最高质量视频
         int currentHighVideoQa = allVideosList.first.quality!.code;
-        //
+        // 使用预设的画质 ｜ 当前可用的最高质量
         int cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa,
             defaultValue: currentHighVideoQa);
         int resVideoQa = currentHighVideoQa;
         if (cacheVideoQa <= currentHighVideoQa) {
+          // 如果预设的画质低于当前最高
           List<int> numbers = data.acceptQuality!
               .where((e) => e <= currentHighVideoQa)
               .toList();
@@ -250,10 +240,16 @@ class VideoDetailController extends GetxController
         currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
             SettingBoxKey.defaultDecode,
             defaultValue: VideoDecodeFormats.values.last.code))!;
+        print(currentDecodeFormats.description);
         try {
           // 当前视频没有对应格式返回第一个
-          currentDecodeFormats = supportDecodeFormats
-                  .contains(currentDecodeFormats)
+          bool flag = false;
+          for (var i in supportDecodeFormats) {
+            if (i.startsWith(currentDecodeFormats.code)) {
+              flag = true;
+            }
+          }
+          currentDecodeFormats = flag
               ? currentDecodeFormats
               : VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
         } catch (e) {
@@ -297,13 +293,6 @@ class VideoDetailController extends GetxController
       }
       defaultST = Duration(milliseconds: data.lastPlayTime!);
       await playerInit();
-
-      // await playerInit(
-      //   firstVideo,
-      //   audioUrl,
-      //   defaultST: Duration(milliseconds: data.lastPlayTime!),
-      //   duration: data.timeLength ?? 0,
-      // );
     } else {
       if (result['code'] == -404) {
         isShowCover.value = false;
