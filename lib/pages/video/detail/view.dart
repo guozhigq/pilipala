@@ -187,120 +187,115 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           builder: (context, boxConstraints) {
                             double maxWidth = boxConstraints.maxWidth;
                             double maxHeight = boxConstraints.maxHeight;
-                            return Hero(
-                              tag: videoDetailController.heroTag,
-                              child: Stack(
-                                children: [
-                                  FutureBuilder(
-                                    future: _futureBuilderFuture,
-                                    builder: ((context, snapshot) {
-                                      if (snapshot.hasData &&
-                                          snapshot.data['status']) {
-                                        return Obx(
-                                          () => videoDetailController
-                                                  .autoPlay.value
-                                              ? PLVideoPlayer(
+                            return Stack(
+                              children: [
+                                FutureBuilder(
+                                  future: _futureBuilderFuture,
+                                  builder: ((context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data['status']) {
+                                      return Obx(
+                                        () => !videoDetailController
+                                                .autoPlay.value
+                                            ? const SizedBox()
+                                            : PLVideoPlayer(
+                                                controller: plPlayerController!,
+                                                headerControl: HeaderControl(
                                                   controller:
-                                                      plPlayerController!,
-                                                  headerControl: HeaderControl(
-                                                    controller:
-                                                        plPlayerController,
-                                                    videoDetailCtr:
-                                                        videoDetailController,
-                                                  ),
-                                                )
-                                              : const SizedBox(),
-                                        );
-                                      } else {
-                                        return const SizedBox();
-                                      }
-                                    }),
-                                  ),
-                                  Obx(
-                                    () => Visibility(
-                                      visible: videoDetailController
-                                          .isShowCover.value,
-                                      child: Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: NetworkImgLayer(
-                                          type: 'emote',
-                                          src: videoDetailController
-                                              .videoItem['pic'],
-                                          width: maxWidth,
-                                          height: maxHeight,
-                                        ),
+                                                      plPlayerController,
+                                                  videoDetailCtr:
+                                                      videoDetailController,
+                                                ),
+                                              ),
+                                      );
+                                    } else {
+                                      return const SizedBox();
+                                    }
+                                  }),
+                                ),
+
+                                Obx(
+                                  () => Visibility(
+                                    visible:
+                                        videoDetailController.isShowCover.value,
+                                    child: Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: NetworkImgLayer(
+                                        type: 'emote',
+                                        src: videoDetailController
+                                            .videoItem['pic'],
+                                        width: maxWidth,
+                                        height: maxHeight,
                                       ),
                                     ),
                                   ),
+                                ),
 
-                                  /// 关闭自动播放时 手动播放
-                                  Obx(
-                                    () => Visibility(
-                                        visible: videoDetailController
-                                                .isShowCover.value &&
-                                            videoDetailController
-                                                .isEffective.value &&
-                                            !videoDetailController
-                                                .autoPlay.value,
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 0,
-                                              left: 0,
-                                              right: 0,
-                                              child: AppBar(
-                                                primary: false,
-                                                foregroundColor: Colors.white,
+                                /// 关闭自动播放时 手动播放
+                                Obx(
+                                  () => Visibility(
+                                      visible: videoDetailController
+                                              .isShowCover.value &&
+                                          videoDetailController
+                                              .isEffective.value &&
+                                          !videoDetailController.autoPlay.value,
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: AppBar(
+                                              primary: false,
+                                              foregroundColor: Colors.white,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              actions: [
+                                                IconButton(
+                                                  tooltip: '稍后再看',
+                                                  onPressed: () async {
+                                                    var res = await UserHttp
+                                                        .toViewLater(
+                                                            bvid:
+                                                                videoDetailController
+                                                                    .bvid);
+                                                    SmartDialog.showToast(
+                                                        res['msg']);
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.history_outlined),
+                                                ),
+                                                const SizedBox(width: 14)
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 12,
+                                            bottom: 10,
+                                            child: TextButton.icon(
+                                              style: ButtonStyle(
                                                 backgroundColor:
-                                                    Colors.transparent,
-                                                actions: [
-                                                  IconButton(
-                                                    tooltip: '稍后再看',
-                                                    onPressed: () async {
-                                                      var res = await UserHttp
-                                                          .toViewLater(
-                                                              bvid:
-                                                                  videoDetailController
-                                                                      .bvid);
-                                                      SmartDialog.showToast(
-                                                          res['msg']);
-                                                    },
-                                                    icon: const Icon(
-                                                        Icons.history_outlined),
-                                                  ),
-                                                  const SizedBox(width: 14)
-                                                ],
+                                                    MaterialStateProperty
+                                                        .resolveWith((states) {
+                                                  return Theme.of(context)
+                                                      .colorScheme
+                                                      .primaryContainer;
+                                                }),
                                               ),
-                                            ),
-                                            Positioned(
-                                              right: 12,
-                                              bottom: 10,
-                                              child: TextButton.icon(
-                                                style: ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStateProperty
-                                                          .resolveWith(
-                                                              (states) {
-                                                    return Theme.of(context)
-                                                        .colorScheme
-                                                        .primaryContainer;
-                                                  }),
-                                                ),
-                                                onPressed: () => handlePlay(),
-                                                icon: const Icon(
-                                                  Icons.play_circle_outline,
-                                                  size: 20,
-                                                ),
-                                                label: const Text('Play'),
+                                              onPressed: () => handlePlay(),
+                                              icon: const Icon(
+                                                Icons.play_circle_outline,
+                                                size: 20,
                                               ),
+                                              label: const Text('Play'),
                                             ),
-                                          ],
-                                        )),
-                                  ),
-                                ],
-                              ),
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              ],
                             );
                           },
                         ),
