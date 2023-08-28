@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 
 import 'widget/fav_video_card.dart';
@@ -37,10 +40,9 @@ class _FavDetailPageState extends State<FavDetailPage> {
 
         if (_controller.position.pixels >=
             _controller.position.maxScrollExtent - 200) {
-          if (!_favDetailController.isLoadingMore) {
-            _favDetailController.isLoadingMore = true;
+          EasyThrottle.throttle('favDetail', const Duration(seconds: 1), () {
             _favDetailController.onLoad();
-          }
+          });
         }
       },
     );
@@ -183,12 +185,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 Map data = snapshot.data;
                 if (data['status']) {
                   if (_favDetailController.item!.mediaCount == 0) {
-                    return const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 300,
-                        child: Center(child: Text('没有内容')),
-                      ),
-                    );
+                    return const NoData();
                   } else {
                     return Obx(
                       () => SliverList(
@@ -207,18 +204,30 @@ class _FavDetailPageState extends State<FavDetailPage> {
                   );
                 }
               } else {
-                return const SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 300,
-                    child: Center(child: Text('加载中')),
-                  ),
+                // 骨架屏
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return const VideoCardHSkeleton();
+                  }, childCount: 10),
                 );
               }
             },
           ),
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom + 20,
+            child: Container(
+              height: MediaQuery.of(context).padding.bottom + 60,
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom),
+              child: Center(
+                child: Obx(
+                  () => Text(
+                    _favDetailController.loadingText.value,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize: 13),
+                  ),
+                ),
+              ),
             ),
           )
         ],
