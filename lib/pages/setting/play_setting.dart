@@ -78,6 +78,18 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableAutoBrightness,
             defaultVal: false,
           ),
+          const SetSwitchItem(
+            title: '自动全屏',
+            subTitle: '视频开始播放时进入全屏',
+            setKey: SettingBoxKey.enableAutoEnter,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
+            title: '自动退出',
+            subTitle: '视频结束播放时退出全屏',
+            setKey: SettingBoxKey.enableAutoExit,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('默认画质', style: titleStyle),

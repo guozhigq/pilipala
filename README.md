@@ -31,6 +31,14 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 <br/>
 
+
+## 技术交流
+
+Telegram: https://t.me/+lm_oOVmF0RJiODk1
+
+
+<br/>
+
 ## 功能
 
 目前着重移动端(Android、iOS)，暂时没有适配桌面端、Pad端、手表端等
@@ -100,6 +108,7 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
   - [x] 主题模式：亮色/暗色/跟随系统
   - [x] 震动反馈(可选)
   - [x] 高帧率
+  - [x] 自动全屏
 - [ ] 等等
 
 <br/>
@@ -117,11 +126,6 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 感谢使用
 
-<br/>
-
-## 技术交流
-
-Telegram https://t.me/+lm_oOVmF0RJiODk1
 
 <br/>
 

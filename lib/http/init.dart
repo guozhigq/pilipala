@@ -41,6 +41,7 @@ class Request {
           log("setCookie, ${e.toString()}");
         }
       }
+      setOptionsHeaders(userInfo);
     }
 
     if (cookie.isEmpty) {
@@ -69,6 +70,15 @@ class Request {
     return token;
   }
 
+  static setOptionsHeaders(userInfo) {
+    dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+    dio.options.headers['env'] = 'prod';
+    dio.options.headers['app-key'] = 'android64';
+    dio.options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
+    dio.options.headers['x-bili-aurora-zone'] = 'sh001';
+    dio.options.headers['referer'] = 'https://www.bilibili.com/';
+  }
+
   /*
    * config it and create
    */
@@ -86,17 +96,6 @@ class Request {
         // 'cookie': '',
       },
     );
-
-    Box userInfoCache = GStrorage.userInfo;
-    var userInfo = userInfoCache.get('userInfoCache');
-    if (userInfo != null && userInfo.mid != null) {
-      options.headers['x-bili-mid'] = userInfo.mid.toString();
-      options.headers['env'] = 'prod';
-      options.headers['app-key'] = 'android64';
-      options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
-      options.headers['x-bili-aurora-zone'] = 'sh001';
-      options.headers['referer'] = 'https://www.bilibili.com/';
-    }
 
     dio = Dio(options)
       ..httpClientAdapter = Http2Adapter(

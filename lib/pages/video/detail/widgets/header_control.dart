@@ -499,6 +499,28 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
+          SizedBox(
+            width: 34,
+            height: 34,
+            child: Obx(
+              () => IconButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                ),
+                onPressed: () {
+                  _.isOpenDanmu.value = !_.isOpenDanmu.value;
+                },
+                icon: Icon(
+                  _.isOpenDanmu.value
+                      ? Icons.subtitles_outlined
+                      : Icons.subtitles_off_outlined,
+                  size: 19,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
           Obx(
             () => SizedBox(
               width: 45,

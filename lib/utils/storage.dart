@@ -97,6 +97,8 @@ class SettingBoxKey {
   static const String enableHA = 'enableHA';
   static const String enableOnlineTotal = 'enableOnlineTotal';
   static const String enableAutoBrightness = 'enableAutoBrightness';
+  static const String enableAutoEnter = 'enableAutoEnter';
+  static const String enableAutoExit = 'enableAutoExit';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';

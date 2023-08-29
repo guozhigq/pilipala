@@ -114,6 +114,12 @@ dependencies:
   flutter_displaymode: ^0.6.0
   # scheme跳转
   appscheme: ^1.0.8
+  # 弹幕
+  ns_danmaku:
+    git: 
+      url: https://github.com/xiaoyaocz/flutter_ns_danmaku.git
+      ref: master
+
   
 dev_dependencies:
   flutter_test:
