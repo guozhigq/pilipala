@@ -73,6 +73,7 @@ class VideoDetailController extends GetxController
   // 默认记录历史记录
   bool enableHeart = true;
   var userInfo;
+  late bool isFirstTime = true;
 
   @override
   void onInit() {
@@ -193,6 +194,7 @@ class VideoDetailController extends GetxController
       bvid: bvid,
       cid: cid,
       enableHeart: enableHeart,
+      isFirstTime: isFirstTime,
     );
   }
 
@@ -233,7 +235,6 @@ class VideoDetailController extends GetxController
         currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
             SettingBoxKey.defaultDecode,
             defaultValue: VideoDecodeFormats.values.last.code))!;
-        print(currentDecodeFormats.description);
         try {
           // 当前视频没有对应格式返回第一个
           bool flag = false;
@@ -287,6 +288,7 @@ class VideoDetailController extends GetxController
       defaultST = Duration(milliseconds: data.lastPlayTime!);
       if (autoPlay.value) {
         await playerInit();
+        isShowCover.value = false;
       }
     } else {
       if (result['code'] == -404) {

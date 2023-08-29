@@ -11,18 +11,15 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/http/video.dart';
-import 'package:pilipala/plugin/pl_player/models/data_source.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:universal_platform/universal_platform.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-import 'models/data_status.dart';
-import 'models/play_speed.dart';
-import 'models/play_status.dart';
-
 Box videoStorage = GStrorage.video;
+Box setting = GStrorage.setting;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -84,6 +81,7 @@ class PlPlayerController {
   int _cid = 0;
   int _heartDuration = 0;
   bool _enableHeart = true;
+  bool _isFirstTime = true;
 
   Timer? _timer;
   Timer? _timerForSeek;
@@ -248,6 +246,8 @@ class PlPlayerController {
     int cid = 0,
     // 历史记录开关
     bool enableHeart = true,
+    // 是否首次加载
+    bool isFirstTime = true,
   }) async {
     try {
       _autoPlay = autoplay;
@@ -261,6 +261,7 @@ class PlPlayerController {
       _bvid = bvid;
       _cid = cid;
       _enableHeart = enableHeart;
+      _isFirstTime = isFirstTime;
 
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
@@ -280,6 +281,12 @@ class PlPlayerController {
       // listen the video player events
       if (!_listenersInitialized) {
         startListeners();
+      }
+      bool autoEnterFullcreen =
+          setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
+      if (autoEnterFullcreen && _isFirstTime) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        triggerFullScreen();
       }
     } catch (err) {
       dataStatus.status.value = DataStatus.error;
@@ -397,6 +404,8 @@ class PlPlayerController {
   }
 
   List<StreamSubscription> subscriptions = [];
+  final List<VoidCallback> _positionListeners = [];
+  final List<Function(PlayerStatus status)> _statusListeners = [];
 
   /// 播放事件监听
   void startListeners() {
@@ -408,11 +417,21 @@ class PlPlayerController {
           } else {
             // playerStatus.status.value = PlayerStatus.paused;
           }
+
+          /// 触发回调事件
+          for (var element in _statusListeners) {
+            element(event ? PlayerStatus.playing : PlayerStatus.paused);
+          }
           makeHeartBeat(_position.value.inSeconds, type: 'status');
         }),
         videoPlayerController!.stream.completed.listen((event) {
           if (event) {
             playerStatus.status.value = PlayerStatus.completed;
+
+            /// 触发回调事件
+            for (var element in _statusListeners) {
+              element(PlayerStatus.completed);
+            }
           } else {
             // playerStatus.status.value = PlayerStatus.playing;
           }
@@ -422,6 +441,11 @@ class PlPlayerController {
           _position.value = event;
           if (!isSliderMoving.value) {
             _sliderPosition.value = event;
+          }
+
+          /// 触发回调事件
+          for (var element in _positionListeners) {
+            element();
           }
           makeHeartBeat(event.inSeconds);
         }),
@@ -713,6 +737,78 @@ class PlPlayerController {
   void toggleFullScreen(bool val) {
     _isFullScreen.value = val;
   }
+
+  // 全屏
+  Future<void> triggerFullScreen({bool status = true}) async {
+    FullScreenMode mode = FullScreenModeCode.fromCode(
+        setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
+
+    if (!isFullScreen.value && status) {
+      /// 按照视频宽高比决定全屏方向
+      switch (mode) {
+        case FullScreenMode.auto:
+          if (direction.value == 'horizontal') {
+            /// 进入全屏
+            await enterFullScreen();
+            // 横屏
+            await landScape();
+          } else {
+            // 竖屏
+            await verticalScreen();
+          }
+          break;
+        case FullScreenMode.vertical:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          await verticalScreen();
+          break;
+        case FullScreenMode.horizontal:
+
+          /// 进入全屏
+          await enterFullScreen();
+          // 横屏
+          await landScape();
+          break;
+      }
+
+      toggleFullScreen(true);
+      var result = await showDialog(
+        context: Get.context!,
+        useSafeArea: false,
+        builder: (context) => Dialog.fullscreen(
+          backgroundColor: Colors.black,
+          child: PLVideoPlayer(
+            controller: this,
+            headerControl: headerControl,
+          ),
+        ),
+      );
+      if (result == null) {
+        // 退出全屏
+        exitFullScreen();
+        await verticalScreen();
+        toggleFullScreen(false);
+      }
+    } else if (isFullScreen.value) {
+      Get.back();
+      exitFullScreen();
+      await verticalScreen();
+      toggleFullScreen(false);
+    }
+  }
+
+  void addPositionListener(VoidCallback listener) =>
+      _positionListeners.add(listener);
+  void removePositionListener(VoidCallback listener) =>
+      _positionListeners.remove(listener);
+  void addStatusLister(Function(PlayerStatus status) listener) {
+    _statusListeners.add(listener);
+  }
+
+  void removeStatusLister(Function(PlayerStatus status) listener) =>
+      _statusListeners.remove(listener);
 
   /// 截屏
   Future screenshot() async {

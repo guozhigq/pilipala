@@ -31,9 +31,10 @@ class VideoIntroPanel extends StatefulWidget {
 
 class _VideoIntroPanelState extends State<VideoIntroPanel>
     with AutomaticKeepAliveClientMixin {
-  final VideoIntroController videoIntroController =
-      Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
+  late String heroTag;
+  late VideoIntroController videoIntroController;
   VideoDetailData? videoDetail;
+  late Future? _futureBuilderFuture;
 
   // 添加页面缓存
   @override
@@ -42,6 +43,11 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
   @override
   void initState() {
     super.initState();
+
+    /// fix 全屏时参数丢失
+    heroTag = Get.arguments['heroTag'];
+    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
     });
@@ -57,15 +63,20 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
   Widget build(BuildContext context) {
     super.build(context);
     return FutureBuilder(
-      future: videoIntroController.queryVideoIntro(),
+      future: _futureBuilderFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data == null) {
+            return const SliverToBoxAdapter(child: SizedBox());
+          }
           if (snapshot.data['status']) {
             // 请求成功
             return Obx(
               () => VideoInfo(
-                  loadingStatus: false,
-                  videoDetail: videoIntroController.videoDetail.value),
+                loadingStatus: false,
+                videoDetail: videoIntroController.videoDetail.value,
+                heroTag: heroTag,
+              ),
             );
           } else {
             // 请求错误
@@ -79,7 +90,11 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             );
           }
         } else {
-          return VideoInfo(loadingStatus: true, videoDetail: videoDetail);
+          return VideoInfo(
+            loadingStatus: true,
+            videoDetail: videoDetail,
+            heroTag: heroTag,
+          );
         }
       },
     );
@@ -89,8 +104,10 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 class VideoInfo extends StatefulWidget {
   final bool loadingStatus;
   final VideoDetailData? videoDetail;
+  final String? heroTag;
 
-  const VideoInfo({Key? key, this.loadingStatus = false, this.videoDetail})
+  const VideoInfo(
+      {Key? key, this.loadingStatus = false, this.videoDetail, this.heroTag})
       : super(key: key);
 
   @override
@@ -98,7 +115,8 @@ class VideoInfo extends StatefulWidget {
 }
 
 class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
-  final String heroTag = Get.arguments['heroTag'];
+  // final String heroTag = Get.arguments['heroTag'];
+  late String heroTag;
   late final VideoIntroController videoIntroController;
   late final VideoDetailController videoDetailCtr;
   late final Map<dynamic, dynamic> videoItem;
@@ -117,7 +135,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    heroTag = widget.heroTag!;
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     videoItem = videoIntroController.videoItem!;

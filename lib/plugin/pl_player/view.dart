@@ -159,67 +159,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     widget.controller.brightness.value = value;
   }
 
-  Future<void> triggerFullScreen() async {
-    PlPlayerController _ = widget.controller;
-    mode = FullScreenModeCode.fromCode(
-        setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
-
-    if (!_.isFullScreen.value) {
-      /// 按照视频宽高比决定全屏方向
-      switch (mode) {
-        case FullScreenMode.auto:
-          if (_.direction.value == 'horizontal') {
-            /// 进入全屏
-            await enterFullScreen();
-            // 横屏
-            await landScape();
-          } else {
-            // 竖屏
-            await verticalScreen();
-          }
-          break;
-        case FullScreenMode.vertical:
-
-          /// 进入全屏
-          await enterFullScreen();
-          // 横屏
-          await verticalScreen();
-          break;
-        case FullScreenMode.horizontal:
-
-          /// 进入全屏
-          await enterFullScreen();
-          // 横屏
-          await landScape();
-          break;
-      }
-
-      _.toggleFullScreen(true);
-      var result = await showDialog(
-        context: Get.context!,
-        useSafeArea: false,
-        builder: (context) => Dialog.fullscreen(
-          backgroundColor: Colors.black,
-          child: PLVideoPlayer(
-              controller: _,
-              headerControl: _.headerControl,
-            ),
-        ),
-      );
-      if (result == null) {
-        // 退出全屏
-        exitFullScreen();
-        await verticalScreen();
-        _.toggleFullScreen(false);
-      }
-    } else {
-      Get.back();
-      exitFullScreen();
-      await verticalScreen();
-      _.toggleFullScreen(false);
-    }
-  }
-
   @override
   void dispose() {
     animationController.dispose();
@@ -559,13 +498,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 if (dy > _distance && dy > threshold) {
                   if (_.isFullScreen.value) {
                     // 下滑退出全屏
-                    await triggerFullScreen();
+                    await widget.controller.triggerFullScreen(status: false);
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
                   if (!_.isFullScreen.value) {
                     // 上滑进入全屏
-                    await triggerFullScreen();
+                    await widget.controller.triggerFullScreen();
                   }
                   _distance = 0.0;
                 }
@@ -606,7 +545,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     position: 'bottom',
                     child: BottomControl(
                         controller: widget.controller,
-                        triggerFullScreen: triggerFullScreen),
+                        triggerFullScreen: widget.controller.triggerFullScreen),
                   ),
                 ),
               ],

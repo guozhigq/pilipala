@@ -41,7 +41,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
 
   PlayerStatus playerStatus = PlayerStatus.playing;
-  // bool isShowCover = true;
   double doubleOffset = 0;
 
   Box localCache = GStrorage.localCache;
@@ -49,11 +48,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late double statusBarHeight;
   final videoHeight = Get.size.width * 9 / 16;
   late Future _futureBuilderFuture;
+  // 自动退出全屏
+  late bool autoExitFullcreen;
 
   @override
   void initState() {
     super.initState();
     statusBarHeight = localCache.get('statusBarHeight');
+    autoExitFullcreen =
+        setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
     videoSourceInit();
     appbarStreamListen();
   }
@@ -63,7 +66,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _futureBuilderFuture = videoDetailController.queryVideoUrl();
     if (videoDetailController.autoPlay.value) {
       plPlayerController = videoDetailController.plPlayerController;
-      playerListener();
+      plPlayerController!.addStatusLister(playerListener);
     }
   }
 
@@ -79,23 +82,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   // 播放器状态监听
-  void playerListener() {
-    plPlayerController!.onPlayerStatusChanged.listen(
-      (PlayerStatus status) async {
-        playerStatus = status;
-        if (status == PlayerStatus.playing) {
-          videoDetailController.isShowCover.value = false;
-        } else {
-          // 播放完成停止 or 切换下一个
-          if (status == PlayerStatus.completed) {
-            // 当只有1p或多p未打开自动播放时，播放完成还原进度条，展示控制栏
-            plPlayerController!.seekTo(Duration.zero);
-            plPlayerController!.onLockControl(false);
-            plPlayerController!.videoPlayerController!.pause();
-          }
-        }
-      },
-    );
+  void playerListener(PlayerStatus? status) {
+    if (status == PlayerStatus.completed) {
+      // 结束播放退出全屏
+      if (autoExitFullcreen) {
+        plPlayerController!.triggerFullScreen(status: false);
+      }
+      // 播放完展示控制栏
+      plPlayerController!.onLockControl(false);
+    }
   }
 
   // 继续播放或重新播放
@@ -110,11 +105,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController = videoDetailController.plPlayerController;
     videoDetailController.autoPlay.value = true;
     videoDetailController.isShowCover.value = false;
-    playerListener();
   }
 
   @override
   void dispose() {
+    plPlayerController!.removeStatusLister(playerListener);
     plPlayerController!.dispose();
     super.dispose();
   }
@@ -128,6 +123,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     videoDetailController.defaultST = plPlayerController!.position.value;
     videoIntroController.isPaused = true;
+    plPlayerController!.removeStatusLister(playerListener);
     plPlayerController!.pause();
     super.didPushNext();
   }
@@ -135,12 +131,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 返回当前页面时
   void didPopNext() async {
+    videoDetailController.isFirstTime = false;
     videoDetailController.playerInit();
     videoIntroController.isPaused = false;
     if (_extendNestCtr.position.pixels == 0) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();
     }
+    plPlayerController!.addStatusLister(playerListener);
     super.didPopNext();
   }
 
