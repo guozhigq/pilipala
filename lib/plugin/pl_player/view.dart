@@ -69,6 +69,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Box setting = GStrorage.setting;
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
+  late bool enableQuickDouble;
 
   void onDoubleTapSeekBackward() {
     setState(() {
@@ -82,6 +83,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     });
   }
 
+  // 双击播放、暂停
+  void onDoubleTapCenter() {
+    final _ = widget.controller;
+    if (_.playerStatus.status.value == PlayerStatus.playing) {
+      _.togglePlay();
+    } else {
+      _.play();
+    }
+  }
+
+  doubleTapFuc(String type) {
+    if (!enableQuickDouble) {
+      onDoubleTapCenter();
+      return;
+    }
+    switch (type) {
+      case 'left':
+        // 双击左边区域 👈
+        onDoubleTapSeekBackward();
+        break;
+      case 'center':
+        onDoubleTapCenter();
+        break;
+      case 'right':
+        // 双击右边区域 👈
+        onDoubleTapSeekForward();
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +122,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     widget.controller.headerControl = widget.headerControl;
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
+    enableQuickDouble =
+        setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
 
     Future.microtask(() async {
       try {
@@ -429,19 +462,15 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               final totalWidth = MediaQuery.of(context).size.width;
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
+              String type = 'left';
               if (tapPosition < sectionWidth) {
-                // 双击左边区域 👈
-                onDoubleTapSeekBackward();
+                type = 'left';
               } else if (tapPosition < sectionWidth * 2) {
-                if (_.playerStatus.status.value == PlayerStatus.playing) {
-                  _.togglePlay();
-                } else {
-                  _.play();
-                }
+                type = 'center';
               } else {
-                // 双击右边区域 👈
-                onDoubleTapSeekForward();
+                type = 'right';
               }
+              doubleTapFuc(type);
             },
             onLongPressStart: (detail) {
               feedBack();
