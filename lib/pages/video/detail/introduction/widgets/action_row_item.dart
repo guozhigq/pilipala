@@ -8,6 +8,7 @@ class ActionRowItem extends StatelessWidget {
   final bool? loadingStatus;
   final String? text;
   final bool selectStatus;
+  final Function? onLongPress;
 
   const ActionRowItem({
     Key? key,
@@ -17,6 +18,7 @@ class ActionRowItem extends StatelessWidget {
     this.loadingStatus,
     this.text,
     this.selectStatus = false,
+    this.onLongPress,
   }) : super(key: key);
 
   @override
@@ -31,6 +33,12 @@ class ActionRowItem extends StatelessWidget {
         onTap: () => {
           feedBack(),
           onTap!(),
+        },
+        onLongPress: () {
+          feedBack();
+          if (onLongPress != null) {
+            onLongPress!();
+          }
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(15, 7, 15, 7),

@@ -55,6 +55,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             defaultVal: true,
             callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
+          const SetSwitchItem(
+            title: '快速收藏',
+            subTitle: '点按收藏至默认，长按选择文件夹',
+            setKey: SettingBoxKey.enableQuickFav,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),

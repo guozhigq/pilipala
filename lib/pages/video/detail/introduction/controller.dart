@@ -144,6 +144,8 @@ class VideoIntroController extends GetxController {
 
   // 获取收藏状态
   Future queryHasFavVideo() async {
+    /// fix 延迟查询
+    await Future.delayed(const Duration(milliseconds: 200));
     var result = await VideoHttp.hasFavVideo(aid: IdUtils.bv2av(bvid));
     if (result['status']) {
       hasFav.value = result["data"]['favoured'];
@@ -275,7 +277,27 @@ class VideoIntroController extends GetxController {
   }
 
   // （取消）收藏
-  Future actionFavVideo() async {
+  Future actionFavVideo({type = 'choose'}) async {
+    // 收藏至默认文件夹
+    if (type == 'default') {
+      await queryVideoInFolder();
+      int defaultFolderId = favFolderData.value.list!.first.id!;
+      int favStatus = favFolderData.value.list!.first.favState!;
+      print('favStatus: $favStatus');
+      var result = await VideoHttp.favVideo(
+        aid: IdUtils.bv2av(bvid),
+        addIds: favStatus == 0 ? '$defaultFolderId' : '',
+        delIds: favStatus == 1 ? '$defaultFolderId' : '',
+      );
+      if (result['status']) {
+        if (result['data']['prompt']) {
+          // 重新获取收藏状态
+          await queryHasFavVideo();
+          SmartDialog.showToast('✅ 操作成功');
+        }
+      }
+      return;
+    }
     try {
       for (var i in favFolderData.value.list!.toList()) {
         if (i.favState == 1) {
@@ -288,17 +310,19 @@ class VideoIntroController extends GetxController {
       // ignore: avoid_print
       print(e);
     }
+    SmartDialog.showLoading(msg: '请求中');
     var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
+    SmartDialog.dismiss();
     if (result['status']) {
       if (result['data']['prompt']) {
         addMediaIdsNew = [];
         delMediaIdsNew = [];
         Get.back();
         // 重新获取收藏状态
-        queryHasFavVideo();
+        await queryHasFavVideo();
         SmartDialog.showToast('✅ 操作成功');
       }
     }
