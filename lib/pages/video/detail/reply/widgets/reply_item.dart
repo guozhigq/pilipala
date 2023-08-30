@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
@@ -9,9 +10,12 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'zan.dart';
+
+Box setting = GStrorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({
@@ -41,63 +45,73 @@ class ReplyItem extends StatelessWidget {
             replyReply!(replyItem);
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 8, 2),
-          child: content(context),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 14, 8, 5),
+              child: content(context),
+            ),
+            Divider(
+              indent: 55,
+              endIndent: 15,
+              height: 0.3,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onInverseSurface
+                  .withOpacity(0.5),
+            )
+          ],
         ),
       ),
     );
   }
 
   Widget lfAvtar(context, heroTag) {
-    return Container(
-      margin: const EdgeInsets.only(top: 5),
-      child: Stack(
-        children: [
-          Hero(
-            tag: heroTag,
-            child: NetworkImgLayer(
-              src: replyItem!.member!.avatar,
-              width: 34,
-              height: 34,
-              type: 'avatar',
+    return Stack(
+      children: [
+        Hero(
+          tag: heroTag,
+          child: NetworkImgLayer(
+            src: replyItem!.member!.avatar,
+            width: 34,
+            height: 34,
+            type: 'avatar',
+          ),
+        ),
+        if (replyItem!.member!.officialVerify != null &&
+            replyItem!.member!.officialVerify!['type'] == 0)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(7),
+                color: Theme.of(context).colorScheme.background,
+              ),
+              child: Icon(
+                Icons.offline_bolt,
+                color: Theme.of(context).colorScheme.primary,
+                size: 16,
+              ),
             ),
           ),
-          if (replyItem!.member!.officialVerify != null &&
-              replyItem!.member!.officialVerify!['type'] == 0)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: Theme.of(context).colorScheme.background,
-                ),
-                child: Icon(
-                  Icons.offline_bolt,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 16,
-                ),
+        if (replyItem!.member!.vip!['vipStatus'] > 0 &&
+            replyItem!.member!.vip!['vipType'] == 2)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(7),
+                color: Theme.of(context).colorScheme.background,
+              ),
+              child: Image.asset(
+                'assets/images/big-vip.png',
+                height: 14,
               ),
             ),
-          if (replyItem!.member!.vip!['vipStatus'] > 0 &&
-              replyItem!.member!.vip!['vipType'] == 2)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: Theme.of(context).colorScheme.background,
-                ),
-                child: Image.asset(
-                  'assets/images/big-vip.png',
-                  height: 14,
-                ),
-              ),
-            ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
@@ -107,7 +121,100 @@ class ReplyItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // 头像、昵称
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: Stack(
+        //     children: [
+        //       GestureDetector(
+        //         behavior: HitTestBehavior.opaque,
+        //         onTap: () {
+        //           feedBack();
+        //           Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
+        //             'face': replyItem!.member!.avatar!,
+        //             'heroTag': heroTag
+        //           });
+        //         },
+        //         child: Row(
+        //           crossAxisAlignment: CrossAxisAlignment.center,
+        //           mainAxisSize: MainAxisSize.min,
+        //           children: <Widget>[
+        //             lfAvtar(context, heroTag),
+        //             const SizedBox(width: 12),
+        //             Text(
+        //               replyItem!.member!.uname!,
+        //               style: TextStyle(
+        //                 color: replyItem!.member!.vip!['vipStatus'] > 0
+        //                     ? const Color.fromARGB(255, 251, 100, 163)
+        //                     : Theme.of(context).colorScheme.outline,
+        //                 fontSize: 13,
+        //               ),
+        //             ),
+        //             const SizedBox(width: 6),
+        //             Image.asset(
+        //               'assets/images/lv/lv${replyItem!.member!.level}.png',
+        //               height: 11,
+        //             ),
+        //             const SizedBox(width: 6),
+        //             if (replyItem!.isUp!)
+        //               const PBadge(
+        //                 text: 'UP',
+        //                 size: 'small',
+        //                 stack: 'normal',
+        //                 fs: 9,
+        //               ),
+        //           ],
+        //         ),
+        //       ),
+        //       Positioned(
+        //         top: 0,
+        //         left: 0,
+        //         right: 0,
+        //         child: Container(
+        //           width: double.infinity,
+        //           height: 45,
+        //           decoration: BoxDecoration(
+        //             image: replyItem!.member!.userSailing!.cardbg != null
+        //                 ? DecorationImage(
+        //                     alignment: Alignment.centerRight,
+        //                     fit: BoxFit.fitHeight,
+        //                     image: NetworkImage(
+        //                       replyItem!.member!.userSailing!.cardbg!['image'],
+        //                     ),
+        //                   )
+        //                 : null,
+        //           ),
+        //         ),
+        //       ),
+        //       if (replyItem!.member!.userSailing!.cardbg != null &&
+        //           replyItem!.member!.userSailing!.cardbg!['fan']['number'] > 0)
+        //         Positioned(
+        //           top: 10,
+        //           left: Get.size.width / 7 * 5.8,
+        //           child: DefaultTextStyle(
+        //             style: TextStyle(
+        //               fontFamily: 'fansCard',
+        //               fontSize: 9,
+        //               color: Theme.of(context).colorScheme.primary,
+        //             ),
+        //             child: Column(
+        //               crossAxisAlignment: CrossAxisAlignment.start,
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               children: [
+        //                 const Text('NO.'),
+        //                 Text(
+        //                   replyItem!.member!.userSailing!.cardbg!['fan']
+        //                       ['num_desc'],
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //     ],
+        //   ),
+        // ),
+        /// fix Stack内GestureDetector  onTap无效
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: () {
             feedBack();
             Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
@@ -115,93 +222,72 @@ class ReplyItem extends StatelessWidget {
               'heroTag': heroTag
             });
           },
-          child: SizedBox(
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    lfAvtar(context, heroTag),
-                    const SizedBox(width: 12),
-                    Text(
-                      replyItem!.member!.uname!,
-                      style: TextStyle(
-                        color: replyItem!.member!.vip!['vipStatus'] > 0
-                            ? const Color.fromARGB(255, 251, 100, 163)
-                            : Theme.of(context).colorScheme.outline,
-                        fontSize: 13,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              lfAvtar(context, heroTag),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        replyItem!.member!.uname!,
+                        style: TextStyle(
+                          color: replyItem!.member!.vip!['vipStatus'] > 0
+                              ? const Color.fromARGB(255, 251, 100, 163)
+                              : Theme.of(context).colorScheme.outline,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Image.asset(
-                      'assets/images/lv/lv${replyItem!.member!.level}.png',
-                      height: 11,
-                    ),
-                    const SizedBox(width: 6),
-                    if (replyItem!.isUp!)
-                      const PBadge(
-                        text: 'UP',
-                        size: 'small',
-                        stack: 'normal',
-                        fs: 9,
+                      const SizedBox(width: 6),
+                      Image.asset(
+                        'assets/images/lv/lv${replyItem!.member!.level}.png',
+                        height: 11,
                       ),
-                  ],
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    width: double.infinity,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      image: replyItem!.member!.userSailing!.cardbg != null
-                          ? DecorationImage(
-                              alignment: Alignment.centerRight,
-                              fit: BoxFit.fitHeight,
-                              image: NetworkImage(
-                                replyItem!
-                                    .member!.userSailing!.cardbg!['image'],
-                              ),
-                            )
-                          : null,
-                    ),
+                      const SizedBox(width: 6),
+                      if (replyItem!.isUp!)
+                        const PBadge(
+                          text: 'UP',
+                          size: 'small',
+                          stack: 'normal',
+                          fs: 9,
+                        ),
+                    ],
                   ),
-                ),
-                if (replyItem!.member!.userSailing!.cardbg != null &&
-                    replyItem!.member!.userSailing!.cardbg!['fan']['number'] >
-                        0)
-                  Positioned(
-                    top: 10,
-                    left: Get.size.width / 7 * 5.8,
-                    child: DefaultTextStyle(
-                      style: TextStyle(
-                        fontFamily: 'fansCard',
-                        fontSize: 9,
-                        color: Theme.of(context).colorScheme.primary,
+                  Row(
+                    children: [
+                      Text(
+                        Utils.dateFormat(replyItem!.ctime),
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.labelSmall!.fontSize,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('NO.'),
-                          Text(
-                            replyItem!.member!.userSailing!.cardbg!['fan']
-                                ['num_desc'],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+                      if (replyItem!.replyControl != null &&
+                          replyItem!.replyControl!.location != '')
+                        Text(
+                          ' • ${replyItem!.replyControl!.location!}',
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall!
+                                  .fontSize,
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
+                    ],
+                  )
+                ],
+              ),
+            ],
           ),
         ),
         // title
         Container(
-          margin: const EdgeInsets.only(top: 0, left: 45, right: 6, bottom: 6),
+          margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
           child: SelectableRegion(
             magnifierConfiguration: const TextMagnifierConfiguration(),
             focusNode: FocusNode(),
@@ -255,52 +341,10 @@ class ReplyItem extends StatelessWidget {
   Widget bottonAction(context, replyControl) {
     return Row(
       children: [
-        const SizedBox(width: 48),
-        if (replyItem!.cardLabel!.isNotEmpty &&
-            replyItem!.cardLabel!.contains('热评'))
-          Text(
-            '热评 • ',
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium!
-                .copyWith(color: Theme.of(context).colorScheme.primary),
-          ),
-        Text(
-          Utils.dateFormat(replyItem!.ctime),
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        if (replyItem!.replyControl != null &&
-            replyItem!.replyControl!.location != '')
-          Text(
-            ' • ${replyItem!.replyControl!.location!}',
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium!
-                .copyWith(color: Theme.of(context).colorScheme.outline),
-          ),
-        const Spacer(),
-        if (replyItem!.upAction!.like!)
-          Icon(Icons.favorite, color: Colors.red[400], size: 18),
+        const SizedBox(width: 32),
         SizedBox(
-          height: 28,
-          width: 28,
-          child: IconButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(EdgeInsets.zero),
-            ),
-            icon: Icon(
-              Icons.reply_outlined,
-              size: 18,
-              color: Theme.of(context).colorScheme.outline,
-            ),
-            // child: Text('回复',
-            //     style: Theme.of(context)
-            //         .textTheme
-            //         .labelMedium!
-            //         .copyWith(color: Theme.of(context).colorScheme.outline)),
+          height: 32,
+          child: TextButton(
             onPressed: () {
               feedBack();
               showModalBottomSheet(
@@ -324,8 +368,41 @@ class ReplyItem extends StatelessWidget {
                       }
                   });
             },
+            child: Row(children: [
+              Icon(Icons.reply,
+                  size: 18,
+                  color:
+                      Theme.of(context).colorScheme.outline.withOpacity(0.8)),
+              const SizedBox(width: 3),
+              Text(
+                '回复',
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ]),
           ),
         ),
+        const SizedBox(width: 2),
+        if (replyItem!.upAction!.like!) ...[
+          Text(
+            'up主觉得很赞',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+          ),
+          const SizedBox(width: 2),
+        ],
+        if (replyItem!.cardLabel!.isNotEmpty &&
+            replyItem!.cardLabel!.contains('热评'))
+          Text(
+            '热评',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+          ),
+        const Spacer(),
         ZanButton(replyItem: replyItem, replyType: replyType),
         const SizedBox(width: 5)
       ],
@@ -595,16 +672,20 @@ InlineSpan buildContent(
           RegExp(RegExp.escape(urlKeys.join("|"))),
           onMatch: (Match match) {
             String matchStr = match[0]!;
+            String appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+            // 默认不显示关键词
+            bool enableWordRe =
+                setting.get(SettingBoxKey.enableWordRe, defaultValue: false);
             spanChilds.add(
               TextSpan(
                 text: content.jumpUrl[matchStr]['title'],
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: enableWordRe
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    String appUrlSchema =
-                        content.jumpUrl[matchStr]['app_url_schema'];
                     if (appUrlSchema == '') {
                       Get.toNamed(
                         '/webview',
@@ -615,7 +696,8 @@ InlineSpan buildContent(
                         },
                       );
                     } else {
-                      if (appUrlSchema.startsWith('bilibili://search')) {
+                      if (appUrlSchema.startsWith('bilibili://search') &&
+                          enableWordRe) {
                         Get.toNamed('/searchResult', parameters: {
                           'keyword': content.jumpUrl[matchStr]['title']
                         });
@@ -624,16 +706,18 @@ InlineSpan buildContent(
                   },
               ),
             );
-            spanChilds.add(
-              WidgetSpan(
-                child: Icon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  size: 9,
-                  color: Theme.of(context).colorScheme.primary,
+            if (appUrlSchema.startsWith('bilibili://search') && enableWordRe) {
+              spanChilds.add(
+                WidgetSpan(
+                  child: Icon(
+                    FontAwesomeIcons.magnifyingGlass,
+                    size: 9,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  alignment: PlaceholderAlignment.top,
                 ),
-                alignment: PlaceholderAlignment.top,
-              ),
-            );
+              );
+            }
             return '';
           },
           onNonMatch: (String str) {
@@ -647,7 +731,7 @@ InlineSpan buildContent(
         );
       }
       str = matchUrl.splitMapJoin(
-        RegExp(r"\d{1,2}:\d{1,2}"),
+        RegExp(r'\b\d{2}:\d{2}\b'),
         onMatch: (Match match) {
           String matchStr = match[0]!;
           spanChilds.add(

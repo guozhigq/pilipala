@@ -160,26 +160,25 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   }
 
   Widget _searchSuggest() {
+    SSearchController _ssCtr = _searchController;
     return Obx(
-      () => _searchController.searchSuggestList.isNotEmpty &&
-              _searchController.searchSuggestList.first.term != null
+      () => _ssCtr.searchSuggestList.isNotEmpty &&
+              _ssCtr.searchSuggestList.first.term != null &&
+              _ssCtr.controller.value.text != ''
           ? ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: _searchController.searchSuggestList.length,
+              itemCount: _ssCtr.searchSuggestList.length,
               itemBuilder: (context, index) {
                 return InkWell(
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  onTap: () => _searchController.onClickKeyword(
-                      _searchController.searchSuggestList[index].term!),
+                  onTap: () => _ssCtr
+                      .onClickKeyword(_ssCtr.searchSuggestList[index].term!),
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20, top: 9, bottom: 9),
-                    // child: Text(
-                    //   _searchController.searchSuggestList[index].term!,
-                    // ),
-                    child: _searchController.searchSuggestList[index].textRich,
+                    child: _ssCtr.searchSuggestList[index].textRich,
                   ),
                 );
               },

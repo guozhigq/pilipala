@@ -111,6 +111,7 @@ class SettingBoxKey {
   static const String defaultDynamicType = 'defaultDynamicType';
   static const String enableHotKey = 'enableHotKey';
   static const String enableQuickFav = 'enableQuickFav';
+  static const String enableWordRe = 'enableWordRe';
 
   /// 外观
   static const String themeMode = 'themeMode';
