@@ -23,29 +23,38 @@ class LaterController extends GetxController {
     return res;
   }
 
-  Future toViewDel() async {
+  Future toViewDel({int? aid}) async {
     SmartDialog.show(
       useSystem: true,
       animationType: SmartAnimationType.centerFade_otherSlide,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: const Text('即将删除所有已观看视频，此操作不可恢复。确定是否删除？'),
+          content: Text(
+              aid != null ? '即将移除该视频，确定是否移除' : '即将删除所有已观看视频，此操作不可恢复。确定是否删除？'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('取消')),
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
             TextButton(
               onPressed: () async {
-                var res = await UserHttp.toViewDel();
+                var res = await UserHttp.toViewDel(aid: aid);
                 if (res['status']) {
-                  laterList.clear();
-                  queryLaterList();
+                  if (aid != null) {
+                    laterList.removeWhere((e) => e.aid == aid);
+                  } else {
+                    laterList.clear();
+                    queryLaterList();
+                  }
                 }
                 SmartDialog.dismiss();
                 SmartDialog.showToast(res['msg']);
               },
-              child: const Text('确认删除'),
+              child: Text(aid != null ? '确认移除' : '确认删除'),
             )
           ],
         );
@@ -64,8 +73,12 @@ class LaterController extends GetxController {
           content: const Text('确定要清空你的稍后再看列表吗？'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('取消')),
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
             TextButton(
               onPressed: () async {
                 var res = await UserHttp.toViewClear();
