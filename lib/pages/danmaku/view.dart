@@ -112,7 +112,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
         duration: const Duration(milliseconds: 100),
         child: DanmakuView(
           createdController: (DanmakuController e) async {
-            _controller = e;
+            widget.playerController.danmakuController = _controller = e;
           },
           option: DanmakuOption(
             fontSize: 15,

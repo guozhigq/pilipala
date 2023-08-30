@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -196,6 +197,8 @@ class PlPlayerController {
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = true.obs;
+  // 关联弹幕控制器
+  DanmakuController? danmakuController;
 
   // 添加一个私有构造函数
   PlPlayerController._() {
@@ -312,7 +315,10 @@ class PlPlayerController {
     buffered.value = Duration.zero;
     _heartDuration = 0;
     _position.value = Duration.zero;
-
+    // 初始化时清空弹幕，防止上次重叠
+    if (danmakuController != null) {
+      danmakuController!.clear();
+    }
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -778,8 +784,6 @@ class PlPlayerController {
       }
 
       toggleFullScreen(true);
-      print(headerControl);
-      print(danmuWidget);
       var result = await showDialog(
         context: Get.context!,
         useSafeArea: false,

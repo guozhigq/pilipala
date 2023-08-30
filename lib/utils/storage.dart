@@ -99,6 +99,8 @@ class SettingBoxKey {
   static const String enableAutoBrightness = 'enableAutoBrightness';
   static const String enableAutoEnter = 'enableAutoEnter';
   static const String enableAutoExit = 'enableAutoExit';
+  // youtube 双击快进快退
+  static const String enableQuickDouble = 'enableQuickDouble';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';
@@ -108,6 +110,7 @@ class SettingBoxKey {
   static const String replySortType = 'replySortType';
   static const String defaultDynamicType = 'defaultDynamicType';
   static const String enableHotKey = 'enableHotKey';
+  static const String enableQuickFav = 'enableQuickFav';
 
   /// 外观
   static const String themeMode = 'themeMode';

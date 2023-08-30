@@ -122,6 +122,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final Map<dynamic, dynamic> videoItem;
 
   Box localCache = GStrorage.localCache;
+  Box setting = GStrorage.setting;
   late double sheetHeight;
 
   late final bool loadingStatus; // 加载状态
@@ -150,19 +151,50 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   // 收藏
-  showFavBottomSheet() {
+  showFavBottomSheet({type = 'tap'}) {
     if (videoIntroController.userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      builder: (context) {
-        return FavPanel(ctr: videoIntroController);
-      },
-    );
+    bool enableDragQuickFav =
+        setting.get(SettingBoxKey.enableQuickFav, defaultValue: false);
+    // 快速收藏 &
+    // 点按 收藏至默认文件夹
+    // 长按选择文件夹
+    if (enableDragQuickFav) {
+      if (type == 'tap') {
+        if (!videoIntroController.hasFav.value) {
+          videoIntroController.actionFavVideo(type: 'default');
+        } else {
+          showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            isScrollControlled: true,
+            builder: (context) {
+              return FavPanel(ctr: videoIntroController);
+            },
+          );
+        }
+      } else {
+        showModalBottomSheet(
+          context: context,
+          useRootNavigator: true,
+          isScrollControlled: true,
+          builder: (context) {
+            return FavPanel(ctr: videoIntroController);
+          },
+        );
+      }
+    } else if (type != 'longPress') {
+      showModalBottomSheet(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        builder: (context) {
+          return FavPanel(ctr: videoIntroController);
+        },
+      );
+    }
   }
 
   // 视频介绍
@@ -510,6 +542,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.heart),
           onTap: () => showFavBottomSheet(),
+          onLongPress: () => showFavBottomSheet(type: 'longPress'),
           selectStatus: videoIntroController.hasFav.value,
           loadingStatus: loadingStatus,
           text: !loadingStatus

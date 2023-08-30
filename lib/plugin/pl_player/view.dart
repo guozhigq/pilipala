@@ -69,6 +69,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Box setting = GStrorage.setting;
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
+  late bool enableQuickDouble;
 
   void onDoubleTapSeekBackward() {
     setState(() {
@@ -82,6 +83,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     });
   }
 
+  // 双击播放、暂停
+  void onDoubleTapCenter() {
+    final _ = widget.controller;
+    if (_.playerStatus.status.value == PlayerStatus.playing) {
+      _.togglePlay();
+    } else {
+      _.play();
+    }
+  }
+
+  doubleTapFuc(String type) {
+    if (!enableQuickDouble) {
+      onDoubleTapCenter();
+      return;
+    }
+    switch (type) {
+      case 'left':
+        // 双击左边区域 👈
+        onDoubleTapSeekBackward();
+        break;
+      case 'center':
+        onDoubleTapCenter();
+        break;
+      case 'right':
+        // 双击右边区域 👈
+        onDoubleTapSeekForward();
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -92,6 +123,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     widget.controller.danmuWidget = widget.danmuWidget;
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
+    enableQuickDouble =
+        setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
 
     Future.microtask(() async {
       try {
@@ -427,26 +460,22 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.controls = !_.showControls.value;
             },
             onDoubleTapDown: (details) {
-              // live模式下禁用
-              if (_.videoType.value == 'live') {
+              // live模式下禁用 锁定时🔒禁用
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               final totalWidth = MediaQuery.of(context).size.width;
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
+              String type = 'left';
               if (tapPosition < sectionWidth) {
-                // 双击左边区域 👈
-                onDoubleTapSeekBackward();
+                type = 'left';
               } else if (tapPosition < sectionWidth * 2) {
-                if (_.playerStatus.status.value == PlayerStatus.playing) {
-                  _.togglePlay();
-                } else {
-                  _.play();
-                }
+                type = 'center';
               } else {
-                // 双击右边区域 👈
-                onDoubleTapSeekForward();
+                type = 'right';
               }
+              doubleTapFuc(type);
             },
             onLongPressStart: (detail) {
               feedBack();
@@ -458,7 +487,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
             /// 水平位置 快进 live模式下禁用
             onHorizontalDragUpdate: (DragUpdateDetails details) {
-              if (_.videoType.value == 'live') {
+              // live模式下禁用 锁定时🔒禁用
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               final tapPosition = details.localPosition.dx;
@@ -479,7 +509,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _initTapPositoin = tapPosition;
             },
             onHorizontalDragEnd: (DragEndDetails details) {
-              if (_.videoType.value == 'live') {
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               _.onChangedSliderEnd();
@@ -491,6 +521,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
               final delta = details.delta.dy;
+
+              /// 锁定时禁用
+              if (_.controlsLock.value) {
+                return;
+              }
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
                 final brightness = _brightnessValue - delta / 100.0;
@@ -626,7 +661,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
-                translation: const Offset(0.5, 0.0),
+                translation: const Offset(1, 0.0),
                 child: Visibility(
                   visible: _.showControls.value,
                   child: ComBtn(

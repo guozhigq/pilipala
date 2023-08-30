@@ -110,55 +110,58 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         MediaQuery.of(context).size.width * 9 / 16;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
-    return Scaffold(
-      extendBody: true,
-      body: FadeTransition(
-        opacity: _fadeAnimation!,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 0.5),
-            end: Offset.zero,
-          ).animate(
-            CurvedAnimation(
-              parent: _slideAnimation!,
-              curve: Curves.fastOutSlowIn,
-              reverseCurve: Curves.linear,
+    return WillPopScope(
+      onWillPop: () => _mainController.onBackPressed(context),
+      child: Scaffold(
+        extendBody: true,
+        body: FadeTransition(
+          opacity: _fadeAnimation!,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.5),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: _slideAnimation!,
+                curve: Curves.fastOutSlowIn,
+                reverseCurve: Curves.linear,
+              ),
             ),
-          ),
-          child: PageView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _pageController,
-            onPageChanged: (index) {
-              selectedIndex = index;
-              setState(() {});
-            },
-            children: _mainController.pages,
+            child: PageView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _pageController,
+              onPageChanged: (index) {
+                selectedIndex = index;
+                setState(() {});
+              },
+              children: _mainController.pages,
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: StreamBuilder(
-        stream: _mainController.bottomBarStream.stream,
-        initialData: true,
-        builder: (context, AsyncSnapshot snapshot) {
-          return AnimatedSlide(
-            curve: Curves.easeInOutCubicEmphasized,
-            duration: const Duration(milliseconds: 1000),
-            offset: Offset(0, snapshot.data ? 0 : 1),
-            child: NavigationBar(
-              onDestinationSelected: (value) => setIndex(value),
-              selectedIndex: selectedIndex,
-              destinations: <Widget>[
-                ..._mainController.navigationBars.map((e) {
-                  return NavigationDestination(
-                    icon: e['icon'],
-                    selectedIcon: e['selectIcon'],
-                    label: e['label'],
-                  );
-                }).toList(),
-              ],
-            ),
-          );
-        },
+        bottomNavigationBar: StreamBuilder(
+          stream: _mainController.bottomBarStream.stream,
+          initialData: true,
+          builder: (context, AsyncSnapshot snapshot) {
+            return AnimatedSlide(
+              curve: Curves.easeInOutCubicEmphasized,
+              duration: const Duration(milliseconds: 1000),
+              offset: Offset(0, snapshot.data ? 0 : 1),
+              child: NavigationBar(
+                onDestinationSelected: (value) => setIndex(value),
+                selectedIndex: selectedIndex,
+                destinations: <Widget>[
+                  ..._mainController.navigationBars.map((e) {
+                    return NavigationDestination(
+                      icon: e['icon'],
+                      selectedIcon: e['selectIcon'],
+                      label: e['label'],
+                    );
+                  }).toList(),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

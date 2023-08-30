@@ -179,14 +179,16 @@ class UserHttp {
   }
 
   // 移除已观看
-  static Future toViewDel() async {
+  static Future toViewDel({int? aid}) async {
+    final Map<String, dynamic> params = {
+      'jsonp': 'jsonp',
+      'csrf': await Request.getCsrf(),
+    };
+
+    params[aid != null ? 'aid' : 'viewed'] = aid ?? true;
     var res = await Request().post(
       Api.toViewDel,
-      queryParameters: {
-        'jsonp': 'jsonp',
-        'viewed': true,
-        'csrf': await Request.getCsrf(),
-      },
+      queryParameters: params,
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': 'yeah！成功移除'};
