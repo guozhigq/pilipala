@@ -422,8 +422,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.controls = !_.showControls.value;
             },
             onDoubleTapDown: (details) {
-              // live模式下禁用
-              if (_.videoType.value == 'live') {
+              // live模式下禁用 锁定时🔒禁用
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               final totalWidth = MediaQuery.of(context).size.width;
@@ -453,7 +453,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
             /// 水平位置 快进 live模式下禁用
             onHorizontalDragUpdate: (DragUpdateDetails details) {
-              if (_.videoType.value == 'live') {
+              // live模式下禁用 锁定时🔒禁用
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               final tapPosition = details.localPosition.dx;
@@ -474,7 +475,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _initTapPositoin = tapPosition;
             },
             onHorizontalDragEnd: (DragEndDetails details) {
-              if (_.videoType.value == 'live') {
+              if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
               _.onChangedSliderEnd();
@@ -486,6 +487,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
               final delta = details.delta.dy;
+
+              /// 锁定时禁用
+              if (_.controlsLock.value) {
+                return;
+              }
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
                 final brightness = _brightnessValue - delta / 100.0;
@@ -621,7 +627,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
-                translation: const Offset(0.5, 0.0),
+                translation: const Offset(1, 0.0),
                 child: Visibility(
                   visible: _.showControls.value,
                   child: ComBtn(
