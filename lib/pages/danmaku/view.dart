@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/pages/danmaku/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/danmaku.dart';
+import 'package:pilipala/utils/storage.dart';
 
 /// 传入播放器控制器，监听播放进度，加载对应弹幕
 class PlDanmaku extends StatefulWidget {
@@ -25,22 +27,37 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late PlDanmakuController _plDanmakuController;
   DanmakuController? _controller;
   bool danmuPlayStatus = true;
+  Box setting = GStrorage.setting;
+  late bool enableShowDanmaku;
 
   @override
   void initState() {
     super.initState();
+    enableShowDanmaku =
+        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     _plDanmakuController =
         PlDanmakuController(widget.cid, widget.playerController);
     if (mounted) {
       playerController = widget.playerController;
       _plDanmakuController.videoDuration = playerController.duration.value;
-      _plDanmakuController
-        ..calcSegment()
-        ..queryDanmaku();
+      if (enableShowDanmaku || playerController.isOpenDanmu.value) {
+        _plDanmakuController
+          ..calcSegment()
+          ..queryDanmaku();
+      }
       playerController
         ..addStatusLister(playerListener)
         ..addPositionListener(videoPositionListen);
     }
+    playerController.isOpenDanmu.listen((p0) {
+      if (p0) {
+        if (_plDanmakuController.dmSegList.isEmpty) {
+          _plDanmakuController
+            ..calcSegment()
+            ..queryDanmaku();
+        }
+      }
+    });
   }
 
   // 播放器状态监听
@@ -61,6 +78,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
     PlDanmakuController ctr = _plDanmakuController;
     int currentPosition = position.inMilliseconds;
 
+    if (!playerController.isOpenDanmu.value) {
+      return;
+    }
     // 超出分段数返回
     if (ctr.currentSegIndex >= ctr.dmSegList.length) {
       return;

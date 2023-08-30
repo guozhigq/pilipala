@@ -101,6 +101,7 @@ class SettingBoxKey {
   static const String enableAutoExit = 'enableAutoExit';
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
+  static const String enableShowDanmaku = 'enableShowDanmaku';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';
