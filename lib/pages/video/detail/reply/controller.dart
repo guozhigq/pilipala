@@ -69,7 +69,7 @@ class VideoReplyController extends GetxController {
         noMore.value = '加载中...';
 
         /// 第一页回复数小于20
-        if (currentPage == 0 && replies.length < 20) {
+        if (currentPage == 0 && replies.length < 18) {
           noMore.value = '没有更多了';
         }
         currentPage++;

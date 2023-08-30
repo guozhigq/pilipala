@@ -61,6 +61,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableQuickFav,
             defaultVal: false,
           ),
+          const SetSwitchItem(
+            title: '评论区搜索关键词',
+            subTitle: '展示评论区搜索关键词',
+            setKey: SettingBoxKey.enableWordRe,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),
