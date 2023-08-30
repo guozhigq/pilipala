@@ -196,13 +196,15 @@ class PlPlayerController {
   Rx<String> get videoType => _videoType;
 
   /// 弹幕开关
-  Rx<bool> isOpenDanmu = true.obs;
+  Rx<bool> isOpenDanmu = false.obs;
   // 关联弹幕控制器
   DanmakuController? danmakuController;
 
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
+    isOpenDanmu.value =
+        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();

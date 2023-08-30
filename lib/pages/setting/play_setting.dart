@@ -108,6 +108,12 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableQuickDouble,
             defaultVal: true,
           ),
+          const SetSwitchItem(
+            title: '弹幕开关',
+            subTitle: '展示弹幕',
+            setKey: SettingBoxKey.enableShowDanmaku,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('默认画质', style: titleStyle),
