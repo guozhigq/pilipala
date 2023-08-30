@@ -55,7 +55,7 @@ class VideoIntroController extends GetxController {
 
   // 同时观看
   bool isShowOnlineTotal = false;
-  RxInt totel = 1.obs;
+  RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
 
@@ -473,7 +473,7 @@ class VideoIntroController extends GetxController {
       cid: lastPlayCid.value,
     );
     if (result['status']) {
-      totel.value = int.parse(result['data']['total']);
+      total.value = result['data']['total'];
     }
   }
 

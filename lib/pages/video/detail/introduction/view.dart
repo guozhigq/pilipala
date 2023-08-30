@@ -312,7 +312,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         if (videoIntroController.isShowOnlineTotal)
                           Obx(
                             () => Text(
-                              '${videoIntroController.totel.value}人在看',
+                              '${videoIntroController.total.value}人在看',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: t.colorScheme.outline,
