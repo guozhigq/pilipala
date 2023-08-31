@@ -1,6 +1,8 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/follow/result.dart';
 
 import 'controller.dart';
@@ -17,7 +19,6 @@ class _FollowPageState extends State<FollowPage> {
   final FollowController _followController = Get.put(FollowController());
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
-  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -27,11 +28,9 @@ class _FollowPageState extends State<FollowPage> {
       () async {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          if (!_isLoadingMore) {
-            _isLoadingMore = true;
-            await _followController.queryFollowings('onLoad');
-            _isLoadingMore = false;
-          }
+          EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
+            _followController.queryFollowings('onLoad');
+          });
         }
       },
     );
@@ -67,14 +66,40 @@ class _FollowPageState extends State<FollowPage> {
                 if (data['status']) {
                   List<FollowItemModel> list = _followController.followList;
                   return Obx(
-                    () => list.length == 1
-                        ? const SizedBox()
-                        : ListView.builder(
+                    () => list.isNotEmpty
+                        ? ListView.builder(
                             controller: scrollController,
-                            itemCount: list.length,
+                            itemCount: list.length + 1,
                             itemBuilder: (BuildContext context, int index) {
-                              return followItem(item: list[index]);
+                              if (index == list.length) {
+                                return Container(
+                                  height:
+                                      MediaQuery.of(context).padding.bottom +
+                                          60,
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .padding
+                                          .bottom),
+                                  child: Center(
+                                    child: Obx(
+                                      () => Text(
+                                        _followController.loadingText.value,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline,
+                                            fontSize: 13),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return followItem(item: list[index]);
+                              }
                             },
+                          )
+                        : const CustomScrollView(
+                            slivers: [NoData()],
                           ),
                   );
                 } else {
