@@ -134,11 +134,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     () => ctr!.userLogin.value
                         ? Stack(
                             children: [
-                              NetworkImgLayer(
-                                type: 'avatar',
-                                width: 34,
-                                height: 34,
-                                src: ctr!.userFace.value,
+                              Obx(
+                                () => NetworkImgLayer(
+                                  type: 'avatar',
+                                  width: 34,
+                                  height: 34,
+                                  src: ctr!.userFace.value,
+                                ),
                               ),
                               Positioned.fill(
                                 child: Material(

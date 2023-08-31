@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/fan.dart';
@@ -7,11 +8,13 @@ import 'package:pilipala/utils/storage.dart';
 class FansController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   int pn = 1;
+  int ps = 20;
   int total = 0;
   RxList<FansItemModel> fansList = [FansItemModel()].obs;
   late int mid;
   late String name;
   var userInfo;
+  RxString loadingText = '加载中...'.obs;
 
   @override
   void onInit() {
@@ -26,23 +29,31 @@ class FansController extends GetxController {
   Future queryFans(type) async {
     if (type == 'init') {
       pn = 1;
+      loadingText.value == '加载中...';
+    }
+    if (loadingText.value == '没有更多了') {
+      return;
     }
     var res = await FanHttp.fans(
       vmid: mid,
       pn: pn,
-      ps: 20,
+      ps: ps,
       orderType: 'attention',
     );
     if (res['status']) {
       if (type == 'init') {
         fansList.value = res['data'].list;
         total = res['data'].total;
-      } else if (type == 'onRefresh') {
-        fansList.insertAll(0, res['data'].list);
       } else if (type == 'onLoad') {
         fansList.addAll(res['data'].list);
       }
+      print(total);
+      if ((pn == 1 && total < ps) || res['data'].list.isEmpty) {
+        loadingText.value = '没有更多了';
+      }
       pn += 1;
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     return res;
   }

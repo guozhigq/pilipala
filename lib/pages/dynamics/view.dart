@@ -11,7 +11,6 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/main/index.dart';
-import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -32,7 +31,6 @@ class _DynamicsPageState extends State<DynamicsPage>
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   Box userInfoCache = GStrorage.userInfo;
-  EventBus eventBus = EventBus();
   late ScrollController scrollController;
 
   @override
@@ -66,12 +64,13 @@ class _DynamicsPageState extends State<DynamicsPage>
       },
     );
 
-    eventBus.on(EventName.loginEvent, (args) {
-      _dynamicsController.userLogin.value = args['status'];
-      setState(() {
-        _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
-        _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
-      });
+    _dynamicsController.userLogin.listen((status) {
+      if (mounted) {
+        setState(() {
+          _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
+          _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
+        });
+      }
     });
   }
 

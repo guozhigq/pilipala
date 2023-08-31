@@ -70,9 +70,17 @@ class NetworkImgLayer extends StatelessWidget {
 
   Widget placeholder(context) {
     return Container(
-      color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.4),
       width: width ?? double.infinity,
       height: height ?? double.infinity,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(type == 'avatar'
+            ? 50
+            : type == 'emote'
+                ? 0
+                : StyleString.imgRadius.x),
+      ),
       child: Center(
           child: Image.asset(
         type == 'avatar'
