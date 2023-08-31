@@ -56,9 +56,19 @@ class SearchPanelController extends GetxController {
     // 匹配输入内容，如果是AV、BV号且有结果 直接跳转详情页
     Map matchRes = IdUtils.matchAvorBv(input: keyword);
     List matchKeys = matchRes.keys.toList();
-    String bvid = resultList.first.bvid;
+    String? bvid;
+    try {
+      bvid = resultList.first.bvid;
+    } catch (_) {
+      bvid = null;
+    }
     // keyword 可能输入纯数字
-    int aid = resultList.first.aid;
+    int? aid;
+    try {
+      aid = resultList.first.aid;
+    } catch (_) {
+      aid = null;
+    }
     if (matchKeys.isNotEmpty && searchType == SearchType.video ||
         aid.toString() == keyword) {
       String heroTag = Utils.makeHeroTag(bvid);
