@@ -44,27 +44,25 @@ Widget picWidget(item, context) {
       double maxWidth = box.maxWidth;
       double aspectRatio = 1.0;
       double origAspectRatio = 0.0;
-      double crossCount = len == 1
-          ? 1
-          : len < 3
-              ? 2
-              : 3;
+      double crossCount = 3;
 
       double height = 0.0;
       if (len == 1) {
-        origAspectRatio =
-            aspectRatio = pictures.first.width / pictures.first.height;
+        try {
+          origAspectRatio =
+              aspectRatio = pictures.first.width / pictures.first.height;
+        } catch (_) {}
         if (aspectRatio < 0.4) {
           aspectRatio = 0.4;
         }
-        height = pictures.first.height * maxWidth / pictures.first.width;
         if (origAspectRatio < 0.5 || pictures.first.width < 1920) {
           crossCount = 2;
           height = maxWidth / 2 / aspectRatio;
         }
       } else {
         aspectRatio = 1;
-        height = maxWidth / crossCount * ((len / crossCount).ceil()) + 6;
+        height =
+            maxWidth / crossCount * ((len + crossCount - 1) ~/ crossCount) + 6;
       }
       return Container(
         padding: const EdgeInsets.only(top: 4),

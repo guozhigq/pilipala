@@ -128,7 +128,8 @@ class VideoItem {
   VideoItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     baseUrl = json['baseUrl'];
-    backupUrl = json['backupUrl'].toList().first;
+    backupUrl =
+        json['backupUrl'] != null ? json['backupUrl'].toList().first : '';
     bandWidth = json['bandWidth'];
     mimeType = json['mime_type'];
     codecs = json['codecs'];
@@ -179,7 +180,8 @@ class AudioItem {
   AudioItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     baseUrl = json['baseUrl'];
-    backupUrl = json['backupUrl'].toList().first;
+    backupUrl =
+        json['backupUrl'] != null ? json['backupUrl'].toList().first : '';
     bandWidth = json['bandWidth'];
     mimeType = json['mime_type'];
     codecs = json['codecs'];
