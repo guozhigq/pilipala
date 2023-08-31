@@ -48,9 +48,10 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   }
 
   // 更新登录状态
-  void updateLoginStatus(val) {
-    userInfo = userInfoCache.get('userInfoCache');
+  void updateLoginStatus(val) async {
+    userInfo = await userInfoCache.get('userInfoCache');
     userLogin.value = val ?? false;
+    if (val) return;
     userFace.value = userInfo != null ? userInfo.face : '';
   }
 }

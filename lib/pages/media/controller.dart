@@ -35,6 +35,7 @@ class MediaController extends GetxController {
     },
   ];
   var userInfo;
+  int? mid;
 
   @override
   void onInit() {
@@ -44,13 +45,13 @@ class MediaController extends GetxController {
   }
 
   Future<dynamic> queryFavFolder() async {
-    if (!userLogin.value || GStrorage.userInfo.get('userInfoCache') == null) {
+    if (!userLogin.value) {
       return {'status': false, 'data': [], 'msg': '未登录'};
     }
     var res = await await UserHttp.userfavFolder(
       pn: 1,
       ps: 5,
-      mid: GStrorage.userInfo.get('userInfoCache').mid,
+      mid: mid ?? GStrorage.userInfo.get('userInfoCache').mid,
     );
     favFolderData.value = res['data'];
     return res;

@@ -4,16 +4,13 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/theme_type.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/mine/controller.dart';
-import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class SettingController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   Box setting = GStrorage.setting;
-  // Box userInfoCache = GStrorage.userInfo;
   Box localCache = GStrorage.localCache;
 
   RxBool userLogin = false.obs;
@@ -59,17 +56,7 @@ class SettingController extends GetxController {
                 localCache
                     .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
 
-                // 更改我的页面登录状态
-                await Get.find<MineController>().resetUserInfo();
-
-                // 更改主页登录状态
-                HomeController homeCtr = Get.find<HomeController>();
-                homeCtr.updateLoginStatus(false);
-
-                // 事件通知
-                EventBus eventBus = EventBus();
-                eventBus.emit(EventName.loginEvent, {'status': false});
-
+                await LoginUtils.refreshLoginStatus(false);
                 SmartDialog.dismiss().then((value) => Get.back());
               },
               child: const Text('确认'),

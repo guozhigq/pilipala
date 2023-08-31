@@ -7,7 +7,6 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/models/user/info.dart';
-import 'package:pilipala/utils/event_bus.dart';
 import 'controller.dart';
 
 class MinePage extends StatefulWidget {
@@ -20,14 +19,13 @@ class MinePage extends StatefulWidget {
 class _MinePageState extends State<MinePage> {
   final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
-  EventBus eventBus = EventBus();
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = mineController.queryUserInfo();
-    eventBus.on(EventName.loginEvent, (args) {
-      mineController.userLogin.value = args['status'];
+
+    mineController.userLogin.listen((status) {
       if (mounted) {
         setState(() {
           _futureBuilderFuture = mineController.queryUserInfo();
@@ -214,36 +212,6 @@ class _MinePageState extends State<MinePage> {
               );
             },
           ),
-          // LayoutBuilder(
-          //   builder: (context, BoxConstraints box) {
-          //     return Container(
-          //       width: box.maxWidth,
-          //       height: 1,
-          //       color: Theme.of(context).colorScheme.onInverseSurface,
-          //       child: Stack(
-          //         children: [
-          //           Positioned(
-          //             top: 0,
-          //             left: 0,
-          //             bottom: 0,
-          //             child: Container(
-          //               width: box.maxWidth *
-          //                   (_mineController
-          //                           .userInfo.value.levelInfo!.currentExp! /
-          //                       _mineController
-          //                           .userInfo.value.levelInfo!.nextExp!),
-          //               height: 1,
-          //               decoration: BoxDecoration(
-          //                 borderRadius: BorderRadius.circular(4),
-          //                 color: Theme.of(context).colorScheme.primary,
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   },
-          // ),
         ],
         const SizedBox(height: 30),
         Padding(

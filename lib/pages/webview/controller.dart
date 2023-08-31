@@ -8,8 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/home/index.dart';
+import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/event_bus.dart';
+import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -94,11 +96,12 @@ class WebviewController extends GetxController {
           Box userInfoCache = GStrorage.userInfo;
           await userInfoCache.put('userInfoCache', result['data']);
 
-          // 通知更新
-          eventBus.emit(EventName.loginEvent, {'status': true});
-
           HomeController homeCtr = Get.find<HomeController>();
           homeCtr.updateLoginStatus(true);
+          homeCtr.userFace.value = result['data'].face;
+          MediaController mediaCtr = Get.find<MediaController>();
+          mediaCtr.mid = result['data'].mid;
+          await LoginUtils.refreshLoginStatus(true);
         } catch (err) {
           SmartDialog.show(builder: (context) {
             return AlertDialog(
