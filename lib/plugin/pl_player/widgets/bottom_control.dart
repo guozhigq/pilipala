@@ -24,18 +24,13 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
       fontSize: 12,
     );
 
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      primary: false,
-      toolbarHeight: 85,
-      automaticallyImplyLeading: false,
-      titleSpacing: 14,
-      title: Column(
+    return Container(
+      color: Colors.transparent,
+      height: 85,
+      padding: const EdgeInsets.only(left: 14, right: 14),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          const SizedBox(height: 17),
           Obx(
             () {
               final int value = _.sliderPosition.value.inSeconds;
@@ -45,7 +40,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 return Container();
               }
               return Padding(
-                padding: const EdgeInsets.only(left: 7, right: 5, bottom: 6),
+                padding: const EdgeInsets.only(left: 7, right: 7, bottom: 6),
                 child: ProgressBar(
                   progress: Duration(seconds: value),
                   buffered: Duration(seconds: buffer),
@@ -76,20 +71,6 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
           ),
           Row(
             children: [
-              // Obx(
-              //   () => ComBtn(
-              //     icon: Icon(
-              //       _.playerStatus.paused
-              //           ? FontAwesomeIcons.play
-              //           : _.playerStatus.playing
-              //               ? FontAwesomeIcons.pause
-              //               : FontAwesomeIcons.rotateRight,
-              //       size: 15,
-              //       color: Colors.white,
-              //     ),
-              //     fuc: () => _.togglePlay(),
-              //   ),
-              // ),
               PlayOrPauseButton(
                 controller: _,
               ),
@@ -158,6 +139,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
+          const SizedBox(height: 10),
         ],
       ),
     );

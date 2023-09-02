@@ -84,6 +84,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) {
+    playerStatus = status!;
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -163,8 +164,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Scaffold(
             resizeToAvoidBottomInset: false,
             key: videoDetailController.scaffoldKey,
-            // fix 1px black line
-            // backgroundColor: Colors.transparent,
             backgroundColor: Colors.black,
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
