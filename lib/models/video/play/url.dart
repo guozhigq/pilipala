@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:pilipala/models/video/play/quality.dart';
 
 class PlayUrlModel {
@@ -77,8 +79,8 @@ class Dash {
   double? minBufferTime;
   List<VideoItem>? video;
   List<AudioItem>? audio;
-  Map? dolby;
-  Map? flac;
+  Dolby? dolby;
+  Flac? flac;
 
   Dash.fromJson(Map<String, dynamic> json) {
     duration = json['duration'];
@@ -87,8 +89,8 @@ class Dash {
     audio = json['audio'] != null
         ? json['audio'].map<AudioItem>((e) => AudioItem.fromJson(e)).toList()
         : [];
-    dolby = json['dolby'];
-    flac = json['flac'] ?? {};
+    dolby = json['dolby'] != null ? Dolby.fromJson(json['dolby']) : null;
+    flac = json['flac'] != null ? Flac.fromJson(json['flac']) : null;
   }
 }
 
@@ -218,5 +220,35 @@ class FormatItem {
     newDesc = json['new_description'];
     displayDesc = json['display_desc'];
     codecs = json['codecs'];
+  }
+}
+
+class Dolby {
+  Dolby({
+    this.type,
+    this.audio,
+  });
+
+  // 1：普通杜比音效 2：全景杜比音效
+  int? type;
+  List<AudioItem>? audio;
+
+  Dolby.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    audio = json['audio'] != null
+        ? json['audio'].map<AudioItem>((e) => AudioItem.fromJson(e)).toList()
+        : [];
+  }
+}
+
+class Flac {
+  Flac({this.display, this.audio});
+
+  bool? display;
+  AudioItem? audio;
+
+  Flac.fromJson(Map<String, dynamic> json) {
+    display = json['display'];
+    audio = json['audio'] != null ? AudioItem.fromJson(json['audio']) : null;
   }
 }
