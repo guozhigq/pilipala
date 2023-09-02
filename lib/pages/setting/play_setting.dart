@@ -91,18 +91,6 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: false,
           ),
           const SetSwitchItem(
-            title: '自动全屏',
-            subTitle: '视频开始播放时进入全屏',
-            setKey: SettingBoxKey.enableAutoEnter,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
-            title: '自动退出',
-            subTitle: '视频结束播放时退出全屏',
-            setKey: SettingBoxKey.enableAutoExit,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: '双击快退/快进',
             subTitle: '左侧双击快退，右侧双击快进',
             setKey: SettingBoxKey.enableQuickDouble,

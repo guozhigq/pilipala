@@ -96,6 +96,17 @@ class _AboutPageState extends State<AboutPage> {
               ),
             ),
             ListTile(
+              onTap: () => _aboutController.panDownload(),
+              title: const Text('网盘下载'),
+              trailing: Text(
+                '提取码：pili',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ),
+            ListTile(
               onTap: () => _aboutController.feedback(),
               title: const Text('问题反馈'),
               trailing: Icon(
@@ -191,6 +202,14 @@ class AboutController extends GetxController {
   githubUrl() {
     launchUrl(
       Uri.parse('https://github.com/guozhigq/pilipala'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  // 从网盘下载
+  panDownload() {
+    launchUrl(
+      Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
       mode: LaunchMode.externalApplication,
     );
   }

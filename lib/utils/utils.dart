@@ -215,18 +215,23 @@ class Utils {
         builder: (context) {
           return AlertDialog(
             title: const Text('🎉 发现新版本 '),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.tagName!,
-                  style: const TextStyle(fontSize: 20),
+            content: SizedBox(
+              height: 280,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.tagName!,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(data.body!),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Text(data.body!),
-              ],
+              ),
             ),
             actions: [
               TextButton(
@@ -245,11 +250,11 @@ class Utils {
                     mode: LaunchMode.externalApplication,
                   );
                 },
-                child: const Text('网盘下载'),
+                child: const Text('网盘'),
               ),
               TextButton(
                 onPressed: () => matchVersion(data),
-                child: const Text('Github下载'),
+                child: const Text('Github'),
               ),
             ],
           );
