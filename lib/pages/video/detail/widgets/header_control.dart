@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
@@ -276,6 +275,10 @@ class _HeaderControlState extends State<HeaderControl> {
                         for (var i = 0; i < totalQaSam; i++) ...[
                           ListTile(
                             onTap: () {
+                              if (currentVideoQa.code ==
+                                  videoFormat[i].quality) {
+                                return;
+                              }
                               final int quality = videoFormat[i].quality!;
                               widget.videoDetailCtr!.currentVideoQa =
                                   VideoQualityCode.fromCode(quality)!;
@@ -345,6 +348,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       for (var i in audio) ...[
                         ListTile(
                           onTap: () {
+                            if (currentAudioQa.code == i.id) return;
                             final int quality = i.id!;
                             widget.videoDetailCtr!.currentAudioQa =
                                 AudioQualityCode.fromCode(quality)!;
@@ -416,6 +420,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       for (var i in list) ...[
                         ListTile(
                           onTap: () {
+                            if (i.startsWith(currentDecodeFormats.code)) return;
                             widget.videoDetailCtr!.currentDecodeFormats =
                                 VideoDecodeFormatsCode.fromString(i)!;
                             widget.videoDetailCtr!.updatePlayer();

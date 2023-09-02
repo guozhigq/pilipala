@@ -66,6 +66,7 @@ class VideoDetailController extends GetxController
   PlPlayerController plPlayerController = PlPlayerController.getInstance();
 
   late VideoItem firstVideo;
+  late AudioItem firstAudio;
   late String videoUrl;
   late String audioUrl;
   late Duration defaultST;
@@ -132,13 +133,6 @@ class VideoDetailController extends GetxController
     plPlayerController.isBuffering.value = false;
     plPlayerController.buffered.value = Duration.zero;
 
-    /// 暂不匹配解码规则
-
-    /// 根据currentVideoQa 重新设置videoUrl
-    // firstVideo =
-    //     data.dash!.video!.firstWhere((i) => i.id == currentVideoQa.code);
-    // videoUrl = firstVideo.baseUrl!;
-
     /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
     List<VideoItem> videoList =
         data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
@@ -146,19 +140,27 @@ class VideoDetailController extends GetxController
       firstVideo = videoList
           .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
     } catch (_) {
-      // 当前格式不可用
-      currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
-          SettingBoxKey.defaultDecode,
-          defaultValue: VideoDecodeFormats.values.last.code))!;
-      firstVideo = videoList
-          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+      if (currentVideoQa == VideoQuality.dolbyVision) {
+        firstVideo = videoList.first;
+        currentDecodeFormats =
+            VideoDecodeFormatsCode.fromString(videoList.first.codecs!)!;
+      } else {
+        // 当前格式不可用
+        currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
+            SettingBoxKey.defaultDecode,
+            defaultValue: VideoDecodeFormats.values.last.code))!;
+        firstVideo = videoList
+            .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats.code));
+      }
     }
     videoUrl = firstVideo.baseUrl!;
 
     /// 根据currentAudioQa 重新设置audioUrl
     if (currentAudioQa != null) {
-      AudioItem firstAudio =
-          data.dash!.audio!.firstWhere((i) => i.id == currentAudioQa!.code);
+      AudioItem firstAudio = data.dash!.audio!.firstWhere(
+        (i) => i.id == currentAudioQa!.code,
+        orElse: () => data.dash!.audio!.first,
+      );
       audioUrl = firstAudio.baseUrl ?? '';
     }
 
@@ -265,24 +267,33 @@ class VideoDetailController extends GetxController
       }
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
-      late AudioItem firstAudio;
-      List audiosList = data.dash!.audio!;
-      try {
-        if (audiosList.isNotEmpty) {
-          firstAudio = audiosList.first;
-          int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
-              defaultValue: firstAudio.id);
-          // 选择最接近的那个音轨
-          firstAudio = audiosList.firstWhere(
-            (e) => e.id == resultAudioQa,
-            orElse: () => AudioItem(),
-          );
-        } else {
-          firstAudio = AudioItem();
-        }
-      } catch (_) {}
+      late AudioItem? firstAudio;
+      List<AudioItem> audiosList = data.dash!.audio!;
 
-      audioUrl = firstAudio.baseUrl ?? '';
+      try {
+        int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
+            defaultValue: AudioQuality.hiRes.code);
+
+        if (data.dash!.dolby?.audio?.isNotEmpty == true) {
+          // 杜比
+          audiosList.insert(0, data.dash!.dolby!.audio!.first);
+        }
+
+        if (data.dash!.flac?.audio != null) {
+          // 无损
+          audiosList.insert(0, data.dash!.flac!.audio!);
+        }
+
+        if (audiosList.isNotEmpty) {
+          List<int> numbers = audiosList.map((map) => map.id!).toList();
+          int closestNumber = Utils.findClosestNumber(resultAudioQa, numbers);
+          firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
+        }
+      } catch (e) {
+        print(e);
+      }
+
+      audioUrl = firstAudio!.baseUrl ?? '';
       //
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
