@@ -1171,6 +1171,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+  status_bar_control:
+    dependency: "direct main"
+    description:
+      name: status_bar_control
+      sha256: "7f2c1f3f7fd13b85ed284eb7ca3f74ceb8dcfdd25636d3a84186d0a687d36693"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.1"
   stream_channel:
     dependency: transitive
     description:

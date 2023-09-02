@@ -1,14 +1,16 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:io';
+
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/download.dart';
 import 'controller.dart';
+import 'package:status_bar_control/status_bar_control.dart';
 
 typedef DoubleClickAnimationListener = void Function();
 
@@ -34,6 +36,7 @@ class _ImagePreviewState extends State<ImagePreview>
     super.initState();
     // animationController = AnimationController(
     //     vsync: this, duration: const Duration(milliseconds: 400));
+    setStatusBar();
     _doubleClickAnimationController = AnimationController(
         duration: const Duration(milliseconds: 250), vsync: this);
   }
@@ -88,9 +91,15 @@ class _ImagePreviewState extends State<ImagePreview>
     );
   }
 
+  // 设置状态栏图标透明
+  setStatusBar() async {
+    await StatusBarControl.setHidden(true, animation: StatusBarAnimation.SLIDE);
+  }
+
   @override
   void dispose() {
     // animationController.dispose();
+    StatusBarControl.setHidden(false, animation: StatusBarAnimation.SLIDE);
     _doubleClickAnimationController.dispose();
     clearGestureDetailsCache();
     super.dispose();
@@ -100,6 +109,8 @@ class _ImagePreviewState extends State<ImagePreview>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      primary: false,
+      extendBody: true,
       appBar: AppBar(
         primary: false,
         toolbarHeight: 0,

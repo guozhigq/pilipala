@@ -119,7 +119,8 @@ dependencies:
     git: 
       url: https://github.com/xiaoyaocz/flutter_ns_danmaku.git
       ref: master
-
+  # 状态栏图标控制
+  status_bar_control: ^3.2.1
   
 dev_dependencies:
   flutter_test:
