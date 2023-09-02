@@ -79,7 +79,7 @@ class VideoCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
-      elevation: crossAxisCount == 1 ? 0 : 1,
+      elevation: 0,
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
       child: GestureDetector(
@@ -112,7 +112,7 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (crossAxisCount == 1)
+                      if (crossAxisCount == 1 && videoItem.duration != null)
                         PBadge(
                           bottom: 10,
                           right: 10,
@@ -144,10 +144,10 @@ class VideoContent extends StatelessWidget {
       child: Padding(
         padding: crossAxisCount == 1
             ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
-            : const EdgeInsets.fromLTRB(9, 8, 9, 4),
+            : const EdgeInsets.fromLTRB(5, 8, 5, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
@@ -173,7 +173,13 @@ class VideoContent extends StatelessWidget {
                 ],
               ],
             ),
-            if (crossAxisCount == 1) const SizedBox(height: 6),
+            if (crossAxisCount > 1) ...[
+              const SizedBox(height: 3),
+              VideoStat(
+                videoItem: videoItem,
+              ),
+            ],
+            if (crossAxisCount == 1) const SizedBox(height: 4),
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
@@ -226,10 +232,10 @@ class VideoContent extends StatelessWidget {
                   ),
                   VideoStat(
                     videoItem: videoItem,
-                  )
+                  ),
+                  const Spacer(),
                 ],
-                const Spacer(),
-                if (videoItem.goto == 'av' && crossAxisCount != 1)
+                if (videoItem.goto == 'av' && crossAxisCount != 1) ...[
                   WatchLater(
                     size: 24,
                     iconSize: 14,
@@ -240,6 +246,9 @@ class VideoContent extends StatelessWidget {
                       SmartDialog.showToast(res['msg']);
                     },
                   ),
+                ] else ...[
+                  const SizedBox(height: 26)
+                ]
               ],
             ),
           ],
@@ -262,16 +271,16 @@ class VideoStat extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '${videoItem.stat.view}次观看',
+          '${videoItem.stat.view}观看',
           style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
             color: Theme.of(context).colorScheme.outline,
           ),
         ),
         Text(
-          ' • ${videoItem.stat.danmu}条弹幕',
+          ' • ${videoItem.stat.danmu}弹幕',
           style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
             color: Theme.of(context).colorScheme.outline,
           ),
         ),
