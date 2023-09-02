@@ -106,7 +106,7 @@ class _AboutPageState extends State<AboutPage> {
             ),
             ListTile(
               onTap: () => _aboutController.qqChanel(),
-              title: const Text('QQ频道'),
+              title: const Text('QQ群'),
               trailing: Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
@@ -207,17 +207,9 @@ class AboutController extends GetxController {
   // qq频道
   qqChanel() {
     Clipboard.setData(
-      const ClipboardData(text: 'https://pd.qq.com/s/css9rdwga'),
+      const ClipboardData(text: '489981949'),
     );
-    SmartDialog.showToast(
-      '已复制，即将在浏览器打开',
-      displayTime: const Duration(milliseconds: 500),
-    ).then(
-      (value) => launchUrl(
-        Uri.parse('https://pd.qq.com/s/css9rdwga'),
-        mode: LaunchMode.externalApplication,
-      ),
-    );
+    SmartDialog.showToast('已复制QQ群号');
   }
 
   // tg频道
