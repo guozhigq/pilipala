@@ -112,6 +112,8 @@ dependencies:
   flutter_displaymode: ^0.6.0
   # scheme跳转
   appscheme: ^1.0.8
+  # 状态栏图标控制
+  status_bar_control: ^3.2.1
   
 dev_dependencies:
   flutter_test:
