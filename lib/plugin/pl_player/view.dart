@@ -239,35 +239,25 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           () => Align(
             alignment: Alignment.topCenter,
             child: FractionalTranslation(
-              translation: const Offset(0.0, 1), // 上下偏移量（负数向上偏移）
+              translation: const Offset(0.0, 0.3), // 上下偏移量（负数向上偏移）
               child: AnimatedOpacity(
                 curve: Curves.easeInOut,
                 opacity: _.doubleSpeedStatus.value ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 150),
                 child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0x88000000),
-                    borderRadius: BorderRadius.circular(64.0),
-                  ),
-                  height: 34.0,
-                  width: 86.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 3),
-                      Image.asset(
-                        'assets/images/run-pokemon.gif',
-                        height: 20,
-                      ),
-                      const Text(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0x88000000),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    height: 32.0,
+                    width: 70.0,
+                    child: const Center(
+                      child: Text(
                         '倍速中',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: Colors.white, fontSize: 13),
                       ),
-                      const SizedBox(width: 4),
-                    ],
-                  ),
-                ),
+                    )),
               ),
             ),
           ),
