@@ -113,6 +113,8 @@ class SettingBoxKey {
   static const String enableHotKey = 'enableHotKey';
   static const String enableQuickFav = 'enableQuickFav';
   static const String enableWordRe = 'enableWordRe';
+  static const String enableSearchWord = 'enableSearchWord';
+  static const String enableRcmdDynamic = 'enableRcmdDynamic';
 
   /// 外观
   static const String themeMode = 'themeMode';

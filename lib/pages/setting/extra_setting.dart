@@ -56,6 +56,18 @@ class _ExtraSettingState extends State<ExtraSetting> {
             callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
           const SetSwitchItem(
+            title: '搜索默认词',
+            subTitle: '是否展示搜索框默认词',
+            setKey: SettingBoxKey.enableSearchWord,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '推荐动态',
+            subTitle: '是否在推荐内容中展示动态',
+            setKey: SettingBoxKey.enableRcmdDynamic,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
             title: '快速收藏',
             subTitle: '点按收藏至默认，长按选择文件夹',
             setKey: SettingBoxKey.enableQuickFav,
