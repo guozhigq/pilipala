@@ -247,7 +247,7 @@ class VideoContent extends StatelessWidget {
                     },
                   ),
                 ] else ...[
-                  const SizedBox(height: 26)
+                  const SizedBox(height: 24)
                 ]
               ],
             ),

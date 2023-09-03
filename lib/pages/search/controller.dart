@@ -27,7 +27,9 @@ class SSearchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    searchDefault();
+    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
+      searchDefault();
+    }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {

@@ -20,6 +20,8 @@ import 'package:pilipala/utils/storage.dart';
 class VideoHttp {
   static Box localCache = GStrorage.localCache;
   static Box setting = GStrorage.setting;
+  static bool enableRcmdDynamic =
+      setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
@@ -73,6 +75,7 @@ class VideoHttp {
         for (var i in res.data['data']['items']) {
           // 屏蔽推广和拉黑用户
           if (i['card_goto'] != 'ad_av' &&
+              (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
             list.add(RecVideoItemAppModel.fromJson(i));
