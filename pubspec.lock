@@ -1211,6 +1211,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  system_proxy:
+    dependency: "direct main"
+    description:
+      name: system_proxy
+      sha256: bbdfc9736a963409941fb0e7c494606c1f13c2be34de15833ee385da83cf7ab0
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   term_glyph:
     dependency: transitive
     description:
