@@ -16,6 +16,7 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'package:status_bar_control/status_bar_control.dart';
 import 'package:universal_platform/universal_platform.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -754,7 +755,7 @@ class PlPlayerController {
   Future<void> triggerFullScreen({bool status = true}) async {
     FullScreenMode mode = FullScreenModeCode.fromCode(
         setting.get(SettingBoxKey.fullScreenMode, defaultValue: 0))!;
-
+    await StatusBarControl.setHidden(true, animation: StatusBarAnimation.FADE);
     if (!isFullScreen.value && status) {
       /// 按照视频宽高比决定全屏方向
       switch (mode) {
@@ -773,7 +774,7 @@ class PlPlayerController {
 
           /// 进入全屏
           await enterFullScreen();
-          // 横屏
+          // 竖屏
           await verticalScreen();
           break;
         case FullScreenMode.horizontal:
@@ -791,20 +792,28 @@ class PlPlayerController {
         useSafeArea: false,
         builder: (context) => Dialog.fullscreen(
           backgroundColor: Colors.black,
-          child: PLVideoPlayer(
-            controller: this,
-            headerControl: headerControl,
-            danmuWidget: danmuWidget,
+          child: SafeArea(
+            bottom:
+                direction.value == 'vertical' || mode == FullScreenMode.vertical
+                    ? true
+                    : false,
+            child: PLVideoPlayer(
+              controller: this,
+              headerControl: headerControl,
+              danmuWidget: danmuWidget,
+            ),
           ),
         ),
       );
       if (result == null) {
         // 退出全屏
+        StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
         exitFullScreen();
         await verticalScreen();
         toggleFullScreen(false);
       }
     } else if (isFullScreen.value) {
+      StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
       Get.back();
       exitFullScreen();
       await verticalScreen();
