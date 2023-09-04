@@ -168,7 +168,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.favInfo['media_count'] ?? '-'}条视频',
+                  '共${_favDetailController.favList.length}条视频',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -187,14 +187,20 @@ class _FavDetailPageState extends State<FavDetailPage> {
                   if (_favDetailController.item!.mediaCount == 0) {
                     return const NoData();
                   } else {
+                    List favList = _favDetailController.favList;
                     return Obx(
-                      () => SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return FavVideoCardH(
-                            videoItem: _favDetailController.favList[index],
-                          );
-                        }, childCount: _favDetailController.favList.length),
-                      ),
+                      () => favList.isEmpty
+                          ? const SliverToBoxAdapter(child: SizedBox())
+                          : SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                return FavVideoCardH(
+                                  videoItem: favList[index],
+                                  callFn: () => _favDetailController
+                                      .onCancelFav(favList[index].id),
+                                );
+                              }, childCount: favList.length),
+                            ),
                     );
                   }
                 } else {

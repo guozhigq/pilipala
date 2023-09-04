@@ -106,6 +106,7 @@ class PlPlayerController {
   ];
 
   PreferredSizeWidget? headerControl;
+  PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
 
   /// 数据加载监听
@@ -828,6 +829,7 @@ class PlPlayerController {
             child: PLVideoPlayer(
               controller: this,
               headerControl: headerControl,
+              bottomControl: bottomControl,
               danmuWidget: danmuWidget,
             ),
           ),
@@ -878,6 +880,9 @@ class PlPlayerController {
   Future makeHeartBeat(progress, {type = 'playing'}) async {
     if (!_enableHeart) {
       return false;
+    }
+    if (videoType.value == 'live') {
+      return;
     }
     // 播放状态变化时，更新
     if (type == 'status') {
