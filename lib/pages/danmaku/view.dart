@@ -29,6 +29,11 @@ class _PlDanmakuState extends State<PlDanmaku> {
   bool danmuPlayStatus = true;
   Box setting = GStrorage.setting;
   late bool enableShowDanmaku;
+  late List blockTypes;
+  late double showArea;
+  late double opacityVal;
+  late double fontSizeVal;
+  late double danmakuSpeedVal;
 
   @override
   void initState() {
@@ -58,6 +63,11 @@ class _PlDanmakuState extends State<PlDanmaku> {
         }
       }
     });
+    blockTypes = playerController.blockTypes;
+    showArea = playerController.showArea;
+    opacityVal = playerController.opacityVal;
+    fontSizeVal = playerController.fontSizeVal;
+    danmakuSpeedVal = playerController.danmakuSpeedVal;
   }
 
   // 播放器状态监听
@@ -77,6 +87,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     }
     PlDanmakuController ctr = _plDanmakuController;
     int currentPosition = position.inMilliseconds;
+    blockTypes = playerController.blockTypes;
 
     if (!playerController.isOpenDanmu.value) {
       return;
@@ -99,14 +110,17 @@ class _PlDanmakuState extends State<PlDanmaku> {
     var delta = currentPosition - element.progress;
 
     if (delta >= 0 && delta < 200) {
-      _controller!.addItems([
-        DanmakuItem(
-          element.content,
-          color: DmUtils.decimalToColor(element.color),
-          time: element.progress,
-          type: DmUtils.getPosition(element.mode),
-        )
-      ]);
+      // 屏蔽彩色弹幕
+      if (blockTypes.contains(6) ? element.color == 16777215 : true) {
+        _controller!.addItems([
+          DanmakuItem(
+            element.content,
+            color: DmUtils.decimalToColor(element.color),
+            time: element.progress,
+            type: DmUtils.getPosition(element.mode),
+          )
+        ]);
+      }
       ctr.currentDmIndex++;
     } else {
       if (!playerController.isOpenDanmu.value) {
@@ -135,9 +149,10 @@ class _PlDanmakuState extends State<PlDanmaku> {
             widget.playerController.danmakuController = _controller = e;
           },
           option: DanmakuOption(
-            fontSize: 15,
-            area: 0.5,
-            duration: 5,
+            fontSize: 15 * fontSizeVal,
+            area: showArea,
+            opacity: opacityVal,
+            duration: danmakuSpeedVal * widget.playerController.playbackSpeed,
           ),
           statusChanged: (isPlaying) {},
         ),
