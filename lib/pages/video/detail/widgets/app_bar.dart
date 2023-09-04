@@ -48,15 +48,15 @@ class ScrollAppBar extends StatelessWidget {
                 ],
               ),
             ),
-            actions: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.share,
-                    size: 20,
-                  )),
-              const SizedBox(width: 12)
-            ],
+            // actions: [
+            //   IconButton(
+            //       onPressed: () {},
+            //       icon: const Icon(
+            //         Icons.share,
+            //         size: 20,
+            //       )),
+            //   const SizedBox(width: 12)
+            // ],
           ),
         ),
       ),
