@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
@@ -29,6 +33,7 @@ class _HeaderControlState extends State<HeaderControl> {
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
+  Box localCache = GStrorage.localCache;
 
   @override
   void initState() {
@@ -146,9 +151,8 @@ class _HeaderControlState extends State<HeaderControl> {
                     //   title: Text('播放设置', style: titleStyle),
                     // ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () => {Get.back(), showSetDanmaku()},
                       dense: true,
-                      enabled: false,
                       leading: const Icon(Icons.subtitles_outlined, size: 20),
                       title: Text('弹幕设置', style: titleStyle),
                     ),
@@ -454,6 +458,246 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  /// 弹幕功能
+  void showSetDanmaku() async {
+    // 屏蔽类型
+    List<Map<String, dynamic>> blockTypesList = [
+      {'value': 5, 'label': '顶部'},
+      {'value': 2, 'label': '滚动'},
+      {'value': 4, 'label': '底部'},
+      {'value': 6, 'label': '彩色'},
+    ];
+    List blockTypes = widget.controller!.blockTypes;
+    // 显示区域
+    List<Map<String, dynamic>> showAreas = [
+      {'value': 0.25, 'label': '1/4屏'},
+      {'value': 0.5, 'label': '半屏'},
+      {'value': 0.75, 'label': '3/4屏'},
+      {'value': 1.0, 'label': '满屏'},
+    ];
+    double showArea = widget.controller!.showArea;
+    // 不透明度
+    double opacityVal = widget.controller!.opacityVal;
+    // 字体大小
+    double fontSizeVal = widget.controller!.fontSizeVal;
+    // 弹幕速度
+    double danmakuSpeedVal = widget.controller!.danmakuSpeedVal;
+
+    DanmakuController danmakuController = widget.controller!.danmakuController!;
+    await showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, StateSetter setState) {
+          return Container(
+            width: double.infinity,
+            height: 580,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.only(left: 14, right: 14),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 45,
+                    child: Center(child: Text('弹幕设置', style: titleStyle)),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('按类型屏蔽'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 18),
+                    child: Row(
+                      children: [
+                        for (var i in blockTypesList) ...[
+                          ActionRowLineItem(
+                            onTap: () async {
+                              bool isChoose = blockTypes.contains(i['value']);
+                              if (isChoose) {
+                                blockTypes.remove(i['value']);
+                              } else {
+                                blockTypes.add(i['value']);
+                              }
+                              widget.controller!.blockTypes = blockTypes;
+                              setState(() {});
+                              try {
+                                DanmakuOption currentOption =
+                                    danmakuController.option;
+                                DanmakuOption updatedOption =
+                                    currentOption.copyWith(
+                                  hideTop: blockTypes.contains(5),
+                                  hideBottom: blockTypes.contains(4),
+                                  hideScroll: blockTypes.contains(2),
+                                  // 添加或修改其他需要修改的选项属性
+                                );
+                                danmakuController.updateOption(updatedOption);
+                              } catch (_) {}
+                            },
+                            text: i['label'],
+                            selectStatus: blockTypes.contains(i['value']),
+                          ),
+                          const SizedBox(width: 10),
+                        ]
+                      ],
+                    ),
+                  ),
+                  const Text('显示区域'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 18),
+                    child: Row(
+                      children: [
+                        for (var i in showAreas) ...[
+                          ActionRowLineItem(
+                            onTap: () {
+                              showArea = i['value'];
+                              widget.controller!.showArea = showArea;
+                              setState(() {});
+                              try {
+                                DanmakuOption currentOption =
+                                    danmakuController.option;
+                                DanmakuOption updatedOption =
+                                    currentOption.copyWith(area: i['value']);
+                                danmakuController.updateOption(updatedOption);
+                              } catch (_) {}
+                            },
+                            text: i['label'],
+                            selectStatus: showArea == i['value'],
+                          ),
+                          const SizedBox(width: 10),
+                        ]
+                      ],
+                    ),
+                  ),
+                  Text('不透明度 ${opacityVal * 100}%'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: 1,
+                        value: opacityVal,
+                        divisions: 10,
+                        label: '${opacityVal * 100}%',
+                        onChanged: (double val) {
+                          opacityVal = val;
+                          widget.controller!.opacityVal = opacityVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(opacity: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('字体大小 ${(fontSizeVal * 100).toStringAsFixed(1)}%'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0.5,
+                        max: 2.5,
+                        value: fontSizeVal,
+                        divisions: 20,
+                        label: '${(fontSizeVal * 100).toStringAsFixed(1)}%',
+                        onChanged: (double val) {
+                          fontSizeVal = val;
+                          widget.controller!.fontSizeVal = fontSizeVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(
+                              fontSize: (15 * fontSizeVal).toDouble(),
+                            );
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('弹幕时长 ${danmakuSpeedVal.toString()}'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 1,
+                        max: 6,
+                        value: danmakuSpeedVal,
+                        divisions: 10,
+                        label: danmakuSpeedVal.toString(),
+                        onChanged: (double val) {
+                          danmakuSpeedVal = val;
+                          widget.controller!.danmakuSpeedVal = danmakuSpeedVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(duration: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final _ = widget.controller!;
@@ -554,5 +798,23 @@ class _HeaderControlState extends State<HeaderControl> {
         ],
       ),
     );
+  }
+}
+
+class MSliderTrackShape extends RoundedRectSliderTrackShape {
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    SliderThemeData? sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    const double trackHeight = 3;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2 + 4;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

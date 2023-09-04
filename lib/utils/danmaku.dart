@@ -3,6 +3,7 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 
 class DmUtils {
   static Color decimalToColor(int decimalColor) {
+    // 16777215 表示白色
     int red = (decimalColor >> 16) & 0xFF;
     int green = (decimalColor >> 8) & 0xFF;
     int blue = decimalColor & 0xFF;

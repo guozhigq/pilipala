@@ -21,6 +21,7 @@ import 'package:universal_platform/universal_platform.dart';
 
 Box videoStorage = GStrorage.video;
 Box setting = GStrorage.setting;
+Box localCache = GStrorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -199,12 +200,30 @@ class PlPlayerController {
   Rx<bool> isOpenDanmu = false.obs;
   // 关联弹幕控制器
   DanmakuController? danmakuController;
+  // 弹幕相关配置
+  late List blockTypes;
+  late double showArea;
+  late double opacityVal;
+  late double fontSizeVal;
+  late double danmakuSpeedVal;
 
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
+    blockTypes =
+        localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
+    showArea = localCache.get(LocalCacheKey.danmakuShowArea, defaultValue: 0.5);
+    // 不透明度
+    opacityVal =
+        localCache.get(LocalCacheKey.danmakuOpacity, defaultValue: 1.0);
+    // 字体大小
+    fontSizeVal =
+        localCache.get(LocalCacheKey.danmakuFontScale, defaultValue: 1.0);
+    // 弹幕速度
+    danmakuSpeedVal =
+        localCache.get(LocalCacheKey.danmakuSpeed, defaultValue: 4.0);
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -524,6 +543,12 @@ class PlPlayerController {
   /// 设置倍速
   Future<void> setPlaybackSpeed(double speed) async {
     await _videoPlayerController?.setRate(speed);
+    try {
+      DanmakuOption currentOption = danmakuController!.option;
+      DanmakuOption updatedOption = currentOption.copyWith(
+          duration: (currentOption.duration / speed) * playbackSpeed);
+      danmakuController!.updateOption(updatedOption);
+    } catch (_) {}
     _playbackSpeed.value = speed;
   }
 
@@ -890,6 +915,13 @@ class PlPlayerController {
 
       // playerStatus.status.close();
       // dataStatus.status.close();
+
+      /// 缓存本次弹幕选项
+      localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
+      localCache.put(LocalCacheKey.danmakuShowArea, showArea);
+      localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
+      localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
+      localCache.put(LocalCacheKey.danmakuSpeed, danmakuSpeedVal);
 
       removeListeners();
       await _videoPlayerController?.dispose();
