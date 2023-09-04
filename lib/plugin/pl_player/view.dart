@@ -29,11 +29,13 @@ import 'widgets/forward_seek.dart';
 class PLVideoPlayer extends StatefulWidget {
   final PlPlayerController controller;
   final PreferredSizeWidget? headerControl;
+  final PreferredSizeWidget? bottomControl;
   final Widget? danmuWidget;
 
   const PLVideoPlayer({
     required this.controller,
     this.headerControl,
+    this.bottomControl,
     this.danmuWidget,
     super.key,
   });
@@ -120,6 +122,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
+    widget.controller.bottomControl = widget.bottomControl;
     widget.controller.danmuWidget = widget.danmuWidget;
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
@@ -562,34 +565,33 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
         // 头部、底部控制条
         Obx(
-          () => Visibility(
-            visible: _.videoType.value != 'live',
-            child: Column(
-              children: [
-                if (widget.headerControl != null)
-                  ClipRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: AppBarAni(
-                      controller: animationController,
-                      visible: !_.controlsLock.value && _.showControls.value,
-                      position: 'top',
-                      child: widget.headerControl!,
-                    ),
-                  ),
-                const Spacer(),
+          () => Column(
+            children: [
+              if (widget.headerControl != null)
                 ClipRect(
                   clipBehavior: Clip.hardEdge,
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'bottom',
-                    child: BottomControl(
-                        controller: widget.controller,
-                        triggerFullScreen: widget.controller.triggerFullScreen),
+                    position: 'top',
+                    child: widget.headerControl!,
                   ),
                 ),
-              ],
-            ),
+              const Spacer(),
+              ClipRect(
+                clipBehavior: Clip.hardEdge,
+                child: AppBarAni(
+                  controller: animationController,
+                  visible: !_.controlsLock.value && _.showControls.value,
+                  position: 'bottom',
+                  child: widget.bottomControl ??
+                      BottomControl(
+                          controller: widget.controller,
+                          triggerFullScreen:
+                              widget.controller.triggerFullScreen),
+                ),
+              ),
+            ],
           ),
         ),
 
@@ -606,6 +608,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             if (defaultBtmProgressBehavior ==
                     BtmProgresBehavior.onlyShowFullScreen.code &&
                 !_.isFullScreen.value) {
+              return Container();
+            }
+
+            if (_.videoType.value == 'live') {
               return Container();
             }
             if (value > max || max <= 0) {
