@@ -756,6 +756,9 @@ class PlPlayerController {
     if (videoType.value == 'live') {
       return;
     }
+    if (controlsLock.value) {
+      return;
+    }
     _doubleSpeedStatus.value = val;
     double currentSpeed = playbackSpeed;
     if (val) {

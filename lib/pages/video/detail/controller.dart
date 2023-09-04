@@ -167,7 +167,13 @@ class VideoDetailController extends GetxController
     playerInit();
   }
 
-  Future playerInit({video, audio, seekToTime, duration}) async {
+  Future playerInit({
+    video,
+    audio,
+    seekToTime,
+    duration,
+    bool autoplay = true,
+  }) async {
     /// 设置/恢复 屏幕亮度
     if (brightness != null) {
       ScreenBrightness().setScreenBrightness(brightness!);
@@ -199,6 +205,7 @@ class VideoDetailController extends GetxController
       cid: cid,
       enableHeart: enableHeart,
       isFirstTime: isFirstTime,
+      autoplay: autoplay,
     );
   }
 

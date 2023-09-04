@@ -102,6 +102,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.play();
   }
 
+  /// 未开启自动播放时触发播放
   Future<void> handlePlay() async {
     await videoDetailController.playerInit();
     plPlayerController = videoDetailController.plPlayerController;
@@ -111,8 +112,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
-    plPlayerController!.removeStatusLister(playerListener);
-    plPlayerController!.dispose();
+    if (plPlayerController != null) {
+      plPlayerController!.removeStatusLister(playerListener);
+      plPlayerController!.dispose();
+    }
     super.dispose();
   }
 
@@ -134,9 +137,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 返回当前页面时
   void didPopNext() async {
     videoDetailController.isFirstTime = false;
-    videoDetailController.playerInit();
+    bool autoplay =
+        setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
+    videoDetailController.playerInit(autoplay: autoplay);
+    videoDetailController.autoPlay.value = true;
     videoIntroController.isPaused = false;
-    if (_extendNestCtr.position.pixels == 0) {
+    if (_extendNestCtr.position.pixels == 0 && autoplay) {
       await Future.delayed(const Duration(milliseconds: 300));
       plPlayerController!.play();
     }
