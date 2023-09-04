@@ -14,7 +14,7 @@ class FavDetailController extends GetxController {
   int currentPage = 1;
   bool isLoadingMore = false;
   RxMap favInfo = {}.obs;
-  RxList<FavDetailItemData> favList = [FavDetailItemData()].obs;
+  RxList favList = [].obs;
   RxString loadingText = '加载中...'.obs;
   int mediaCount = 0;
 
@@ -61,15 +61,13 @@ class FavDetailController extends GetxController {
         aid: id, addIds: '', delIds: mediaId.toString());
     if (result['status']) {
       if (result['data']['prompt']) {
-        List<FavDetailItemData> dataList = favDetailData.value.medias!;
+        List dataList = favList;
         for (var i in dataList) {
           if (i.id == id) {
             dataList.remove(i);
             break;
           }
         }
-        favDetailData.value.medias = dataList;
-        favDetailData.refresh();
         SmartDialog.showToast('取消收藏');
       }
     }
