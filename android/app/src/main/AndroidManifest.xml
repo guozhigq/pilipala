@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.guozhigq.pilipala">
     <queries>
         <intent>
@@ -59,6 +60,27 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <!-- ADD THIS "SERVICE" element -->
+            <service
+                android:name="com.ryanheise.audioservice.AudioService"
+                android:exported="true"
+                android:foregroundServiceType="mediaPlayback"
+                tools:ignore="Instantiatable">
+                <intent-filter>
+                    <action android:name="android.media.browse.MediaBrowserService" />
+                </intent-filter>
+            </service>
+
+            <!-- ADD THIS "RECEIVER" element -->
+            <receiver
+                android:name="com.ryanheise.audioservice.MediaButtonReceiver"
+                android:exported="true"
+                tools:ignore="Instantiatable">
+                <intent-filter>
+                    <action android:name="android.intent.action.MEDIA_BUTTON" />
+                </intent-filter>
+            </receiver>
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -241,4 +263,8 @@
       -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 </manifest>

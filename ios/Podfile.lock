@@ -1,6 +1,10 @@
 PODS:
   - appscheme (1.0.4):
     - Flutter
+  - audio_service (0.0.1):
+    - Flutter
+  - audio_session (0.0.1):
+    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
@@ -13,6 +17,8 @@ PODS:
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
   - image_gallery_saver (2.0.2):
+    - Flutter
+  - just_audio (0.0.1):
     - Flutter
   - media_kit_libs_ios_video (1.0.4):
     - Flutter
@@ -50,11 +56,14 @@ PODS:
 
 DEPENDENCIES:
   - appscheme (from `.symlinks/plugins/appscheme/ios`)
+  - audio_service (from `.symlinks/plugins/audio_service/ios`)
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_volume_controller (from `.symlinks/plugins/flutter_volume_controller/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
+  - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
@@ -79,6 +88,10 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   appscheme:
     :path: ".symlinks/plugins/appscheme/ios"
+  audio_service:
+    :path: ".symlinks/plugins/audio_service/ios"
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   device_info_plus:
@@ -89,6 +102,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_volume_controller/ios"
   image_gallery_saver:
     :path: ".symlinks/plugins/image_gallery_saver/ios"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/ios"
   media_kit_libs_ios_video:
     :path: ".symlinks/plugins/media_kit_libs_ios_video/ios"
   media_kit_native_event_loop:
@@ -122,12 +137,15 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   appscheme: b1c3f8862331cb20430cf9e0e4af85dbc1572ad8
+  audio_service: f509d65da41b9521a61f1c404dd58651f265a567
+  audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
   device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
+  just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
   media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
@@ -145,6 +163,6 @@ SPEC CHECKSUMS:
   webview_cookie_manager: eaf920722b493bd0f7611b5484771ca53fed03f7
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 
-PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
+PODFILE CHECKSUM: fc8a34c4ba2e14d31df90bf03cf419a764f2778c
 
 COCOAPODS: 1.12.1

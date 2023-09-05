@@ -121,6 +121,10 @@ dependencies:
       ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1
+  # 音频播放
+  just_audio: ^0.9.34
+  audio_service: ^0.18.11
+  audio_session: any
   
 dev_dependencies:
   flutter_test:

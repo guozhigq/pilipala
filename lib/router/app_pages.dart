@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/about/index.dart';
+import 'package:pilipala/pages/audio/index.dart';
 import 'package:pilipala/pages/blacklist/index.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
@@ -107,6 +108,8 @@ class Routes {
         name: '/displayModeSetting', page: () => const SetDiaplayMode()),
     // 关于
     CustomGetPage(name: '/about', page: () => const AboutPage()),
+    // 音频播放
+    CustomGetPage(name: '/audioPlayer', page: () => const AudioPlayerPage()),
   ];
 }
 

@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -25,6 +26,18 @@ void main() async {
           [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
       .then((_) async {
     await GStrorage.init();
+
+    await AudioService.init<AudioHandler>(
+      builder: () => MyAudioHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.guozhigq.pilipala.channel.audio',
+        androidNotificationChannelName: 'Music playback',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+        androidNotificationIcon: 'drawable/audio_service_icon',
+      ),
+    );
+
     runApp(const MyApp());
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -134,4 +147,35 @@ class MyApp extends StatelessWidget {
       }),
     );
   }
+}
+
+class MyAudioHandler extends BaseAudioHandler
+    with
+        QueueHandler, // mix in default queue callback implementations
+        SeekHandler {
+  // mix in default seek callback implementations
+
+  // The most common callbacks:
+  @override
+  Future<void> play() async {
+    print('play');
+    // All 'play' requests from all origins route to here. Implement this
+    // callback to start playing audio appropriate to your app. e.g. music.
+  }
+
+  ///
+  @override
+  Future<void> pause() async {}
+
+  ///
+  @override
+  Future<void> stop() async {}
+
+  ///
+  @override
+  Future<void> seek(Duration position) async {}
+
+  ///
+  @override
+  Future<void> skipToQueueItem(int i) async {}
 }

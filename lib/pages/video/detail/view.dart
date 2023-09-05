@@ -282,6 +282,28 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                             ),
                                           ),
                                           Positioned(
+                                            right: 105,
+                                            bottom: 10,
+                                            child: TextButton.icon(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith((states) {
+                                                  return Theme.of(context)
+                                                      .colorScheme
+                                                      .primaryContainer;
+                                                }),
+                                              ),
+                                              onPressed: () =>
+                                                  Get.toNamed('/audioPlayer'),
+                                              icon: const Icon(
+                                                Icons.multitrack_audio_outlined,
+                                                size: 20,
+                                              ),
+                                              label: const Text('音频'),
+                                            ),
+                                          ),
+                                          Positioned(
                                             right: 12,
                                             bottom: 10,
                                             child: TextButton.icon(
@@ -299,7 +321,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 Icons.play_circle_outline,
                                                 size: 20,
                                               ),
-                                              label: const Text('Play'),
+                                              label: const Text('视频'),
                                             ),
                                           ),
                                         ],
