@@ -321,14 +321,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  dio_http2_adapter:
-    dependency: "direct main"
-    description:
-      name: dio_http2_adapter
-      sha256: ada89ff1ea108c191188e5112b1ae87f12f5995f8cbf50afe87a736e36f1a5af
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
   dismissible_page:
     dependency: "direct main"
     description:
@@ -589,14 +581,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  http2:
-    dependency: transitive
-    description:
-      name: http2
-      sha256: "38db0c4aa9f1cd238a5d2e86aa0cc7cc91c77e0c6c94ba64bbe85e4ff732a952"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   http_client_helper:
     dependency: transitive
     description:

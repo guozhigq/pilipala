@@ -9,7 +9,6 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/interceptor.dart';
-import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class Request {
@@ -93,18 +92,15 @@ class Request {
       receiveTimeout: const Duration(milliseconds: 12000),
       //Http请求头.
       headers: {
-        // 'cookie': '',
+        'keep-alive': true,
+        'user-agent': headerUa('pc'),
+        'Accept-Encoding': 'gzip'
       },
+      contentType: Headers.jsonContentType,
+      persistentConnection: true,
     );
 
-    dio = Dio(options)
-      ..httpClientAdapter = Http2Adapter(
-        ConnectionManager(
-          idleTimeout: const Duration(milliseconds: 10000),
-          // Ignore bad certificate
-          onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
-        ),
-      );
+    dio = Dio(options);
 
     //添加拦截器
     dio.interceptors.add(ApiInterceptor());
@@ -216,7 +212,7 @@ class Request {
           : 'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36';
     } else {
       headerUa =
-          'Mozilla/5.0 (MaciMozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36';
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15';
     }
     return headerUa;
   }
