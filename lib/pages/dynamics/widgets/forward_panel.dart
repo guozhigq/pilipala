@@ -44,19 +44,21 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
               ],
             ),
             const SizedBox(height: 2),
-            if (item.modules.moduleDynamic.topic != null) ...[
-              Padding(
-                padding: floor == 2
-                    ? EdgeInsets.zero
-                    : const EdgeInsets.only(left: 12, right: 12),
-                child: GestureDetector(
-                  child: Text(
-                    '#${item.modules.moduleDynamic.topic.name}',
-                    style: authorStyle,
-                  ),
-                ),
-              ),
-            ],
+
+            /// fix #话题跟content重复
+            // if (item.modules.moduleDynamic.topic != null) ...[
+            //   Padding(
+            //     padding: floor == 2
+            //         ? EdgeInsets.zero
+            //         : const EdgeInsets.only(left: 12, right: 12),
+            //     child: GestureDetector(
+            //       child: Text(
+            //         '#${item.modules.moduleDynamic.topic.name}',
+            //         style: authorStyle,
+            //       ),
+            //     ),
+            //   ),
+            // ],
             Text.rich(
               richNode(item, context),
               // 被转发状态(floor=2) 隐藏
@@ -71,6 +73,8 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                 : const EdgeInsets.only(left: 12, right: 12),
             child: picWidget(item, context),
           ),
+
+          /// 附加内容 商品信息、直播预约等等
           if (item.modules.moduleDynamic.additional != null)
             addWidget(
               item,

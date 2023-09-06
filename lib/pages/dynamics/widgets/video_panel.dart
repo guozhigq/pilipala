@@ -57,20 +57,21 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
         const SizedBox(height: 6),
       ],
       // const SizedBox(height: 4),
-      if (item.modules.moduleDynamic.topic != null) ...[
-        Padding(
-          padding: floor == 2
-              ? EdgeInsets.zero
-              : const EdgeInsets.only(left: 12, right: 12),
-          child: GestureDetector(
-            child: Text(
-              '#${item.modules.moduleDynamic.topic.name}',
-              style: authorStyle,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-      ],
+      /// fix #话题跟content重复
+      // if (item.modules.moduleDynamic.topic != null) ...[
+      //   Padding(
+      //     padding: floor == 2
+      //         ? EdgeInsets.zero
+      //         : const EdgeInsets.only(left: 12, right: 12),
+      //     child: GestureDetector(
+      //       child: Text(
+      //         '#${item.modules.moduleDynamic.topic.name}',
+      //         style: authorStyle,
+      //       ),
+      //     ),
+      //   ),
+      //   const SizedBox(height: 6),
+      // ],
       if (floor == 2 && item.modules.moduleDynamic.desc != null) ...[
         Text.rich(richNode(item, context)),
         const SizedBox(height: 6),

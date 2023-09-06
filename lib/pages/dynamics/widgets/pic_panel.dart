@@ -8,7 +8,9 @@ Widget picWidget(item, context) {
   String type = item.modules.moduleDynamic.major.type;
   List pictures = [];
   if (type == 'MAJOR_TYPE_OPUS') {
-    pictures = item.modules.moduleDynamic.major.opus.pics;
+    /// fix 图片跟rich_node_panel重复
+    // pictures = item.modules.moduleDynamic.major.opus.pics;
+    return const SizedBox();
   }
   if (type == 'MAJOR_TYPE_DRAW') {
     pictures = item.modules.moduleDynamic.major.draw.items;

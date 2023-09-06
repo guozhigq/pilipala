@@ -28,6 +28,8 @@ Widget content(item, context, source) {
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
+              /// fix 默认20px高度
+              style: const TextStyle(height: 0),
               richNode(item, context),
               maxLines: source == 'detail' ? 999 : 3,
               overflow: TextOverflow.ellipsis,
