@@ -43,7 +43,6 @@ dependencies:
   # 网络
   dio: ^5.3.0
   cookie_jar: ^4.0.8
-  dio_http2_adapter: ^2.3.1
   dio_cookie_manager: ^3.1.0
   connectivity_plus: ^4.0.1
 
