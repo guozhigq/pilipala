@@ -353,14 +353,14 @@ class PlPlayerController {
     var pp = player.platform as NativePlayer;
 
     // 音轨
-    // if (dataSource.audioSource != '' && dataSource.audioSource != null) {
-    //   await pp.setProperty(
-    //     'audio-files',
-    //     UniversalPlatform.isWindows
-    //         ? dataSource.audioSource!.replaceAll(';', '\\;')
-    //         : dataSource.audioSource!.replaceAll(':', '\\:'),
-    //   );
-    // }
+    if (dataSource.audioSource != '' && dataSource.audioSource != null) {
+      await pp.setProperty(
+        'audio-files',
+        UniversalPlatform.isWindows
+            ? dataSource.audioSource!.replaceAll(';', '\\;')
+            : dataSource.audioSource!.replaceAll(':', '\\:'),
+      );
+    }
 
     // 字幕
     if (dataSource.subFiles != '' && dataSource.subFiles != null) {
@@ -399,9 +399,9 @@ class PlPlayerController {
       play: false,
     );
     // 音轨
-    player.setAudioTrack(
-      AudioTrack.uri(dataSource.audioSource!),
-    );
+    // player.setAudioTrack(
+    //   AudioTrack.uri(dataSource.audioSource!),
+    // );
 
     return player;
   }
