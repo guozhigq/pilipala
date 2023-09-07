@@ -294,6 +294,9 @@ class VideoDetailController extends GetxController
         if (audiosList.isNotEmpty) {
           List<int> numbers = audiosList.map((map) => map.id!).toList();
           int closestNumber = Utils.findClosestNumber(resultAudioQa, numbers);
+          if (!numbers.contains(resultAudioQa)) {
+            closestNumber = 30280;
+          }
           firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
         }
       } catch (e) {
