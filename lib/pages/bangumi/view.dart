@@ -113,6 +113,9 @@ class _BangumiPageState extends State<BangumiPage>
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
+                            if (snapshot.data == null) {
+                              return const SizedBox();
+                            }
                             Map data = snapshot.data as Map;
                             List list = _bangumidController.bangumiFollowList;
                             if (data['status']) {

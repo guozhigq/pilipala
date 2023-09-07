@@ -85,6 +85,9 @@ class _MinePageState extends State<MinePage> {
                     future: _futureBuilderFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == null) {
+                          return const SizedBox();
+                        }
                         if (snapshot.data['status']) {
                           return Obx(
                               () => userInfoBuild(mineController, context));

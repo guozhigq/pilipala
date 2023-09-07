@@ -141,6 +141,9 @@ class _MediaPageState extends State<MediaPage>
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
                   Map data = snapshot.data as Map;
                   if (data['status']) {
                     List favFolderList =
