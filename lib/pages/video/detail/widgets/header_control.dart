@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -14,9 +18,11 @@ import 'package:pilipala/utils/storage.dart';
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
+  final Floating? floating;
   const HeaderControl({
     this.controller,
     this.videoDetailCtr,
+    this.floating,
     Key? key,
   }) : super(key: key);
 
@@ -770,6 +776,39 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
           ),
           const SizedBox(width: 4),
+          if (Platform.isAndroid) ...[
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: IconButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                ),
+                onPressed: () async {
+                  bool canUsePiP = false;
+                  widget.controller!.hiddenControls(false);
+                  try {
+                    canUsePiP = await widget.floating!.isPipAvailable;
+                  } on PlatformException catch (_) {
+                    canUsePiP = false;
+                  }
+                  if (canUsePiP) {
+                    final aspectRatio = Rational(
+                      widget.videoDetailCtr!.data.dash!.video!.first.width!,
+                      widget.videoDetailCtr!.data.dash!.video!.first.height!,
+                    );
+                    await widget.floating!.enable(aspectRatio: aspectRatio);
+                  } else {}
+                },
+                icon: const Icon(
+                  Icons.picture_in_picture_outlined,
+                  size: 19,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+          ],
           Obx(
             () => SizedBox(
               width: 45,

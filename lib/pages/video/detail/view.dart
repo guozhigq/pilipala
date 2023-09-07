@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:floating/floating.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +54,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late Future _futureBuilderFuture;
   // 自动退出全屏
   late bool autoExitFullcreen;
+  Floating? floating;
 
   @override
   void initState() {
@@ -60,6 +64,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
     videoSourceInit();
     appbarStreamListen();
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
   }
 
   // 获取视频资源，初始化播放器
@@ -83,7 +90,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   // 播放器状态监听
-  void playerListener(PlayerStatus? status) {
+  void playerListener(PlayerStatus? status) async {
     playerStatus = status!;
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
@@ -91,7 +98,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController!.triggerFullScreen(status: false);
       }
       // 播放完展示控制栏
-      plPlayerController!.onLockControl(false);
+      PiPStatus currentStatus = await floating!.pipStatus;
+      if (currentStatus == PiPStatus.disabled) {
+        plPlayerController!.onLockControl(false);
+      }
     }
   }
 
@@ -115,6 +125,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (plPlayerController != null) {
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.dispose();
+    }
+    if (floating != null) {
+      floating!.dispose();
     }
     super.dispose();
   }
@@ -162,7 +175,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight;
-    return SafeArea(
+    Widget childWhenDisabled = SafeArea(
       top: false,
       bottom: false,
       child: Stack(
@@ -209,6 +222,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                       plPlayerController,
                                                   videoDetailCtr:
                                                       videoDetailController,
+                                                  floating: floating,
                                                 ),
                                                 danmuWidget: Obx(
                                                   () => PlDanmaku(
@@ -320,13 +334,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   ),
                 ];
               },
+              // pinnedHeaderSliverHeightBuilder: () {
+              //   return playerStatus != PlayerStatus.playing
+              //       ? statusBarHeight + kToolbarHeight
+              //       : pinnedHeaderHeight;
+              // },
+              /// 不收回
               pinnedHeaderSliverHeightBuilder: () {
-                return playerStatus != PlayerStatus.playing
-                    ? statusBarHeight + kToolbarHeight
-                    : pinnedHeaderHeight;
+                return pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
               body: Container(
+                key: Key(Get.arguments['heroTag']),
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
                   children: [
@@ -402,21 +421,60 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               ),
             ),
           ),
+
+          /// 重新进入会刷新
           // 播放完成/暂停播放
-          StreamBuilder(
-            stream: appbarStream.stream,
-            initialData: 0,
-            builder: ((context, snapshot) {
-              return ScrollAppBar(
-                snapshot.data!.toDouble(),
-                () => continuePlay(),
-                playerStatus,
-                null,
-              );
-            }),
-          )
+          // StreamBuilder(
+          //   stream: appbarStream.stream,
+          //   initialData: 0,
+          //   builder: ((context, snapshot) {
+          //     return ScrollAppBar(
+          //       snapshot.data!.toDouble(),
+          //       () => continuePlay(),
+          //       playerStatus,
+          //       null,
+          //     );
+          //   }),
+          // )
         ],
       ),
     );
+    Widget childWhenEnabled = FutureBuilder(
+      key: Key(Get.arguments['heroTag']),
+      future: _futureBuilderFuture,
+      builder: ((context, snapshot) {
+        if (snapshot.hasData && snapshot.data['status']) {
+          return Obx(
+            () => !videoDetailController.autoPlay.value
+                ? const SizedBox()
+                : PLVideoPlayer(
+                    controller: plPlayerController!,
+                    headerControl: HeaderControl(
+                      controller: plPlayerController,
+                      videoDetailCtr: videoDetailController,
+                    ),
+                    danmuWidget: Obx(
+                      () => PlDanmaku(
+                        key: Key(
+                            videoDetailController.danmakuCid.value.toString()),
+                        cid: videoDetailController.danmakuCid.value,
+                        playerController: plPlayerController!,
+                      ),
+                    ),
+                  ),
+          );
+        } else {
+          return const SizedBox();
+        }
+      }),
+    );
+    if (Platform.isAndroid) {
+      return PiPSwitcher(
+        childWhenDisabled: childWhenDisabled,
+        childWhenEnabled: childWhenEnabled,
+      );
+    } else {
+      return childWhenDisabled;
+    }
   }
 }
