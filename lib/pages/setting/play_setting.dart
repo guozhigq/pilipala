@@ -61,6 +61,12 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
+            title: '后台播放',
+            subTitle: '进入后台时继续播放',
+            setKey: SettingBoxKey.enableBackgroundPlay,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
             title: '自动全屏',
             subTitle: '视频开始播放时进入全屏',
             setKey: SettingBoxKey.enableAutoEnter,

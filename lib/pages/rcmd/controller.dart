@@ -49,7 +49,7 @@ class RcmdController extends GetxController {
           videoList.value = res['data'];
         }
       } else if (type == 'onRefresh') {
-        videoList.insertAll(0, res['data']);
+        videoList.value = res['data'];
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
       }

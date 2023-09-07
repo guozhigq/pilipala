@@ -77,7 +77,8 @@ class _RcmdPageState extends State<RcmdPage>
       ),
       child: RefreshIndicator(
         onRefresh: () async {
-          return await _rcmdController.onRefresh();
+          await _rcmdController.onRefresh();
+          await Future.delayed(const Duration(milliseconds: 300));
         },
         child: CustomScrollView(
           controller: _rcmdController.scrollController,
