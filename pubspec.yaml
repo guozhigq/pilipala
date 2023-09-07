@@ -117,6 +117,8 @@ dependencies:
   status_bar_control: ^3.2.1
   # 代理
   system_proxy: ^0.1.0
+  # pip
+  floating: ^2.0.1
   
 dev_dependencies:
   flutter_test:

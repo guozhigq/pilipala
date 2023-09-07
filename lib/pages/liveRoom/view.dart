@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -19,6 +22,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   bool isShowCover = true;
   bool isPlay = true;
+  Floating? floating;
 
   @override
   void initState() {
@@ -32,19 +36,24 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         }
       },
     );
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
   }
 
   @override
   void dispose() {
     plPlayerController!.dispose();
+    if (floating != null) {
+      floating!.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
-
-    return Scaffold(
+    Widget childWhenDisabled = Scaffold(
       primary: true,
       appBar: AppBar(
         centerTitle: false,
@@ -98,6 +107,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
                         bottomControl: BottomControl(
                           controller: plPlayerController,
                           liveRoomCtr: _liveRoomController,
+                          floating: floating,
                         ),
                       )
                     : const SizedBox(),
@@ -123,5 +133,25 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         ],
       ),
     );
+    Widget childWhenEnabled = AspectRatio(
+      aspectRatio: 16 / 9,
+      child: plPlayerController!.videoPlayerController != null
+          ? PLVideoPlayer(
+              controller: plPlayerController!,
+              bottomControl: BottomControl(
+                controller: plPlayerController,
+                liveRoomCtr: _liveRoomController,
+              ),
+            )
+          : const SizedBox(),
+    );
+    if (Platform.isAndroid) {
+      return PiPSwitcher(
+        childWhenDisabled: childWhenDisabled,
+        childWhenEnabled: childWhenEnabled,
+      );
+    } else {
+      return childWhenDisabled;
+    }
   }
 }

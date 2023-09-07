@@ -752,6 +752,10 @@ class PlPlayerController {
     }
   }
 
+  void hiddenControls(bool val) {
+    showControls.value = val;
+  }
+
   /// 设置长按倍速状态 live模式下禁用
   void setDoubleSpeedStatus(bool val) {
     if (videoType.value == 'live') {
