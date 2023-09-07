@@ -107,6 +107,7 @@ class SettingBoxKey {
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
   static const String enableShowDanmaku = 'enableShowDanmaku';
+  static const String enableBackgroundPlay = 'enableBackgroundPlay';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';
