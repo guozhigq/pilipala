@@ -112,12 +112,22 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (crossAxisCount == 1 && videoItem.duration != null)
-                        PBadge(
-                          bottom: 10,
-                          right: 10,
-                          text: videoItem.duration,
-                        )
+                      if (videoItem.duration != null)
+                        if (crossAxisCount == 1) ...[
+                          PBadge(
+                            bottom: 10,
+                            right: 10,
+                            text: videoItem.duration,
+                          )
+                        ] else ...[
+                          PBadge(
+                            bottom: 6,
+                            right: 7,
+                            size: 'small',
+                            type: 'gray',
+                            text: videoItem.duration,
+                          )
+                        ],
                     ],
                   );
                 }),
@@ -174,7 +184,7 @@ class VideoContent extends StatelessWidget {
               ],
             ),
             if (crossAxisCount > 1) ...[
-              const SizedBox(height: 3),
+              const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
               ),
