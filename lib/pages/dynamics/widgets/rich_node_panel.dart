@@ -25,7 +25,9 @@ InlineSpan richNode(item, context) {
       return spacer;
     } else {
       for (var i in richTextNodes) {
-        if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
+        /// fix 渲染专栏时内容会重复
+        if (item.modules.moduleDynamic.major.opus.title == null &&
+            i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
           spanChilds.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
         }
