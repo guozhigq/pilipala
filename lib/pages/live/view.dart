@@ -84,6 +84,9 @@ class _LivePageState extends State<LivePage> {
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == null) {
+                      return const SliverToBoxAdapter(child: SizedBox());
+                    }
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       return SliverLayoutBuilder(

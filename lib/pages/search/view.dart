@@ -227,6 +227,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == null) {
+                      return const SizedBox();
+                    }
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       return Obx(
