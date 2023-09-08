@@ -48,13 +48,13 @@ class Routes {
     // 视频详情
     CustomGetPage(name: '/video', page: () => const VideoDetailPage()),
     // 图片预览
-    GetPage(
-      name: '/preview',
-      page: () => const ImagePreview(),
-      transition: Transition.fade,
-      transitionDuration: const Duration(milliseconds: 300),
-      showCupertinoParallax: false,
-    ),
+    // GetPage(
+    //   name: '/preview',
+    //   page: () => const ImagePreview(),
+    //   transition: Transition.fade,
+    //   transitionDuration: const Duration(milliseconds: 300),
+    //   showCupertinoParallax: false,
+    // ),
     //
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置

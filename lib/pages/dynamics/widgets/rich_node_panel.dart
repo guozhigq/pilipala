@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/preview/index.dart';
 
 // 富文本
 InlineSpan richNode(item, context) {
@@ -198,11 +199,11 @@ InlineSpan richNode(item, context) {
         print('有图片');
         List<OpusPicsModel> pics = item.modules.moduleDynamic.major.opus.pics;
         int len = pics.length;
-        List picList = [];
+        List<String> picList = [];
 
         if (len == 1) {
           OpusPicsModel pictureItem = pics.first;
-          picList.add(pictureItem.url);
+          picList.add(pictureItem.url!);
           spanChilds.add(const TextSpan(text: '\n'));
           spanChilds.add(
             WidgetSpan(
@@ -210,8 +211,13 @@ InlineSpan richNode(item, context) {
                 builder: (context, BoxConstraints box) {
                   return GestureDetector(
                     onTap: () {
-                      Get.toNamed('/preview',
-                          arguments: {'initialPage': 0, 'imgList': picList});
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: 0, imgList: picList);
+                        },
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(top: 4),
@@ -233,14 +239,19 @@ InlineSpan richNode(item, context) {
         if (len > 1) {
           List<Widget> list = [];
           for (var i = 0; i < len; i++) {
-            picList.add(pics[i].url);
+            picList.add(pics[i].url!);
             list.add(
               LayoutBuilder(
                 builder: (context, BoxConstraints box) {
                   return GestureDetector(
                     onTap: () {
-                      Get.toNamed('/preview',
-                          arguments: {'initialPage': i, 'imgList': picList});
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: i, imgList: picList);
+                        },
+                      );
                     },
                     child: NetworkImgLayer(
                       src: pics[i].url,
