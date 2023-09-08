@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/pages/preview/index.dart';
 
 Widget picWidget(item, context) {
   String type = item.modules.moduleDynamic.major.type;
@@ -14,7 +14,7 @@ Widget picWidget(item, context) {
     pictures = item.modules.moduleDynamic.major.draw.items;
   }
   int len = pictures.length;
-  List picList = [];
+  List<String> picList = [];
   List<Widget> list = [];
   for (var i = 0; i < len; i++) {
     picList.add(pictures[i].src ?? pictures[i].url);
@@ -23,11 +23,14 @@ Widget picWidget(item, context) {
         builder: (context, BoxConstraints box) {
           return GestureDetector(
             onTap: () {
-              Get.toNamed('/preview',
-                  arguments: {'initialPage': i, 'imgList': picList});
+              showDialog(
+                useSafeArea: false,
+                context: context,
+                builder: (context) {
+                  return ImagePreview(initialPage: i, imgList: picList);
+                },
+              );
             },
-            // child: Hero(
-            //   tag: pictures[i].src ?? pictures[i].url,
             child: NetworkImgLayer(
               src: pictures[i].src ?? pictures[i].url,
               width: box.maxWidth,

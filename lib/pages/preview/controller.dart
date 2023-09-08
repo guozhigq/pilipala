@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,17 +18,6 @@ class PreviewController extends GetxController {
   bool photos = true;
   String currentImgUrl = '';
 
-  @override
-  void onInit() {
-    super.onInit();
-    if (Get.arguments != null) {
-      initialPage.value = Get.arguments['initialPage']!;
-      currentPage.value = Get.arguments['initialPage']! + 1;
-      imgList.value = Get.arguments['imgList'];
-      currentImgUrl = imgList[initialPage.value];
-    }
-  }
-
   requestPermission() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
@@ -40,10 +30,11 @@ class PreviewController extends GetxController {
 
   // 图片分享
   void onShareImg() async {
-    requestPermission();
+    SmartDialog.showLoading();
     var response = await Dio().get(imgList[initialPage.value],
         options: Options(responseType: ResponseType.bytes));
     final temp = await getTemporaryDirectory();
+    SmartDialog.dismiss();
     String imgName =
         "plpl_pic_${DateTime.now().toString().split('-').join()}.jpg";
     var path = '${temp.path}/$imgName';
