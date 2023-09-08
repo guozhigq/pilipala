@@ -38,15 +38,25 @@ class _DynamicDetailPageState extends State<DynamicDetailPage> {
     // floor 1原创 2转发
     if (Get.arguments['floor'] == 1) {
       oid = int.parse(Get.arguments['item'].basic!['comment_id_str']);
+      print(oid);
     } else {
-      oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
+      try {
+        String type = Get.arguments['item'].modules.moduleDynamic.major.type;
+
+        /// TODO
+        if (type == 'MAJOR_TYPE_OPUS') {
+        } else {
+          oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
+        }
+      } catch (_) {}
     }
     int commentType = Get.arguments['item'].basic!['comment_type'] ?? 11;
     type = (commentType == 0) ? 11 : commentType;
 
     action =
         Get.arguments.containsKey('action') ? Get.arguments['action'] : null;
-    _dynamicDetailController = Get.put(DynamicDetailController(oid, type));
+    _dynamicDetailController =
+        Get.put(DynamicDetailController(oid, type), tag: oid.toString());
     _futureBuilderFuture = _dynamicDetailController!.queryReplyList();
     titleStreamC = StreamController<bool>();
     scrollController.addListener(_listen);

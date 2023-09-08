@@ -162,9 +162,6 @@ class DynamicsController extends GetxController {
       /// 纯文字动态查看
       case 'DYNAMIC_TYPE_WORD':
         print('纯文本');
-        if (item.modules.moduleDynamic.major.draw == null) {
-          return;
-        }
         Get.toNamed('/dynamicDetail',
             arguments: {'item': item, 'floor': floor});
         break;
