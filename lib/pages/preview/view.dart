@@ -15,7 +15,13 @@ import 'package:status_bar_control/status_bar_control.dart';
 typedef DoubleClickAnimationListener = void Function();
 
 class ImagePreview extends StatefulWidget {
-  const ImagePreview({Key? key}) : super(key: key);
+  final int? initialPage;
+  final List<String>? imgList;
+  const ImagePreview({
+    Key? key,
+    this.initialPage,
+    this.imgList,
+  }) : super(key: key);
 
   @override
   _ImagePreviewState createState() => _ImagePreviewState();
@@ -34,6 +40,11 @@ class _ImagePreviewState extends State<ImagePreview>
   @override
   void initState() {
     super.initState();
+
+    _previewController.initialPage.value = widget.initialPage!;
+    _previewController.currentPage.value = widget.initialPage! + 1;
+    _previewController.imgList.value = widget.imgList!;
+    _previewController.currentImgUrl = widget.imgList![widget.initialPage!];
     // animationController = AnimationController(
     //     vsync: this, duration: const Duration(milliseconds: 400));
     setStatusBar();
@@ -42,9 +53,8 @@ class _ImagePreviewState extends State<ImagePreview>
   }
 
   onOpenMenu() {
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
+    showDialog(
+      context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           clipBehavior: Clip.hardEdge,
@@ -55,7 +65,7 @@ class _ImagePreviewState extends State<ImagePreview>
               ListTile(
                 onTap: () {
                   _previewController.onShareImg();
-                  SmartDialog.dismiss();
+                  Get.back();
                 },
                 dense: true,
                 title: const Text('分享', style: TextStyle(fontSize: 14)),
@@ -65,8 +75,8 @@ class _ImagePreviewState extends State<ImagePreview>
                   Clipboard.setData(
                           ClipboardData(text: _previewController.currentImgUrl))
                       .then((value) {
+                    Get.back();
                     SmartDialog.showToast('已复制到粘贴板');
-                    SmartDialog.dismiss();
                   }).catchError((err) {
                     SmartDialog.showNotify(
                       msg: err.toString(),
@@ -79,6 +89,7 @@ class _ImagePreviewState extends State<ImagePreview>
               ),
               ListTile(
                 onTap: () {
+                  Get.back();
                   DownloadUtils.downloadImg(_previewController.currentImgUrl);
                 },
                 dense: true,
@@ -93,13 +104,21 @@ class _ImagePreviewState extends State<ImagePreview>
 
   // 设置状态栏图标透明
   setStatusBar() async {
-    await StatusBarControl.setHidden(true, animation: StatusBarAnimation.SLIDE);
+    if (Platform.isIOS) {
+      await StatusBarControl.setHidden(true,
+          animation: StatusBarAnimation.SLIDE);
+    }
+    if (Platform.isAndroid) {
+      await StatusBarControl.setColor(Colors.transparent);
+    }
   }
 
   @override
   void dispose() {
     // animationController.dispose();
-    StatusBarControl.setHidden(false, animation: StatusBarAnimation.SLIDE);
+    try {
+      StatusBarControl.setHidden(false, animation: StatusBarAnimation.SLIDE);
+    } catch (_) {}
     _doubleClickAnimationController.dispose();
     clearGestureDetailsCache();
     super.dispose();
@@ -129,109 +148,105 @@ class _ImagePreviewState extends State<ImagePreview>
             direction: DismissiblePageDismissDirection.down,
             disabled: _dismissDisabled,
             isFullScreen: true,
-            child: Hero(
-              tag: _previewController
-                  .imgList[_previewController.initialPage.value],
-              child: GestureDetector(
-                onLongPress: () => onOpenMenu(),
-                child: ExtendedImageGesturePageView.builder(
-                  controller: ExtendedPageController(
-                    initialPage: _previewController.initialPage.value,
-                    pageSpacing: 0,
-                  ),
-                  onPageChanged: (int index) =>
-                      _previewController.onChange(index),
-                  canScrollPage: (GestureDetails? gestureDetails) =>
-                      gestureDetails!.totalScale! <= 1.0,
-                  preloadPagesCount: 2,
-                  itemCount: _previewController.imgList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ExtendedImage.network(
-                      _previewController.imgList[index],
-                      fit: BoxFit.contain,
-                      mode: ExtendedImageMode.gesture,
-                      onDoubleTap: (ExtendedImageGestureState state) {
-                        final Offset? pointerDownPosition =
-                            state.pointerDownPosition;
-                        final double? begin = state.gestureDetails!.totalScale;
-                        double end;
-
-                        //remove old
-                        _doubleClickAnimation
-                            ?.removeListener(_doubleClickAnimationListener);
-
-                        //stop pre
-                        _doubleClickAnimationController.stop();
-
-                        //reset to use
-                        _doubleClickAnimationController.reset();
-
-                        if (begin == doubleTapScales[0]) {
-                          setState(() {
-                            _dismissDisabled = true;
-                          });
-                          end = doubleTapScales[1];
-                        } else {
-                          setState(() {
-                            _dismissDisabled = false;
-                          });
-                          end = doubleTapScales[0];
-                        }
-
-                        _doubleClickAnimationListener = () {
-                          state.handleDoubleTap(
-                              scale: _doubleClickAnimation!.value,
-                              doubleTapPosition: pointerDownPosition);
-                        };
-                        _doubleClickAnimation = _doubleClickAnimationController
-                            .drive(Tween<double>(begin: begin, end: end));
-
-                        _doubleClickAnimation!
-                            .addListener(_doubleClickAnimationListener);
-
-                        _doubleClickAnimationController.forward();
-                      },
-                      // ignore: body_might_complete_normally_nullable
-                      loadStateChanged: (ExtendedImageState state) {
-                        if (state.extendedImageLoadState == LoadState.loading) {
-                          final ImageChunkEvent? loadingProgress =
-                              state.loadingProgress;
-                          final double? progress =
-                              loadingProgress?.expectedTotalBytes != null
-                                  ? loadingProgress!.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null;
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                SizedBox(
-                                  width: 150.0,
-                                  child: LinearProgressIndicator(
-                                    value: progress,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 10.0),
-                                Text('${((progress ?? 0.0) * 100).toInt()}%'),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      initGestureConfigHandler: (ExtendedImageState state) {
-                        return GestureConfig(
-                          inPageView: true,
-                          initialScale: 1.0,
-                          maxScale: 5.0,
-                          animationMaxScale: 6.0,
-                          initialAlignment: InitialAlignment.center,
-                        );
-                      },
-                    );
-                  },
+            child: GestureDetector(
+              onLongPress: () => onOpenMenu(),
+              child: ExtendedImageGesturePageView.builder(
+                controller: ExtendedPageController(
+                  initialPage: _previewController.initialPage.value,
+                  pageSpacing: 0,
                 ),
+                onPageChanged: (int index) =>
+                    _previewController.onChange(index),
+                canScrollPage: (GestureDetails? gestureDetails) =>
+                    gestureDetails!.totalScale! <= 1.0,
+                preloadPagesCount: 2,
+                itemCount: widget.imgList!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ExtendedImage.network(
+                    widget.imgList![index],
+                    fit: BoxFit.contain,
+                    mode: ExtendedImageMode.gesture,
+                    onDoubleTap: (ExtendedImageGestureState state) {
+                      final Offset? pointerDownPosition =
+                          state.pointerDownPosition;
+                      final double? begin = state.gestureDetails!.totalScale;
+                      double end;
+
+                      //remove old
+                      _doubleClickAnimation
+                          ?.removeListener(_doubleClickAnimationListener);
+
+                      //stop pre
+                      _doubleClickAnimationController.stop();
+
+                      //reset to use
+                      _doubleClickAnimationController.reset();
+
+                      if (begin == doubleTapScales[0]) {
+                        setState(() {
+                          _dismissDisabled = true;
+                        });
+                        end = doubleTapScales[1];
+                      } else {
+                        setState(() {
+                          _dismissDisabled = false;
+                        });
+                        end = doubleTapScales[0];
+                      }
+
+                      _doubleClickAnimationListener = () {
+                        state.handleDoubleTap(
+                            scale: _doubleClickAnimation!.value,
+                            doubleTapPosition: pointerDownPosition);
+                      };
+                      _doubleClickAnimation = _doubleClickAnimationController
+                          .drive(Tween<double>(begin: begin, end: end));
+
+                      _doubleClickAnimation!
+                          .addListener(_doubleClickAnimationListener);
+
+                      _doubleClickAnimationController.forward();
+                    },
+                    // ignore: body_might_complete_normally_nullable
+                    loadStateChanged: (ExtendedImageState state) {
+                      if (state.extendedImageLoadState == LoadState.loading) {
+                        final ImageChunkEvent? loadingProgress =
+                            state.loadingProgress;
+                        final double? progress =
+                            loadingProgress?.expectedTotalBytes != null
+                                ? loadingProgress!.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null;
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                width: 150.0,
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              // const SizedBox(height: 10.0),
+                              // Text('${((progress ?? 0.0) * 100).toInt()}%',),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    initGestureConfigHandler: (ExtendedImageState state) {
+                      return GestureConfig(
+                        inPageView: true,
+                        initialScale: 1.0,
+                        maxScale: 5.0,
+                        animationMaxScale: 6.0,
+                        initialAlignment: InitialAlignment.center,
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -241,7 +256,7 @@ class _ImagePreviewState extends State<ImagePreview>
             bottom: 0,
             child: Container(
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom, top: 20),
+                  bottom: MediaQuery.of(context).padding.bottom + 30),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -262,8 +277,7 @@ class _ImagePreviewState extends State<ImagePreview>
                         TextSpan(
                             text: _previewController.currentPage.toString()),
                         const TextSpan(text: ' / '),
-                        TextSpan(
-                            text: _previewController.imgList.length.toString()),
+                        TextSpan(text: widget.imgList!.length.toString()),
                       ]),
                 ),
               ),

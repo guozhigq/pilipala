@@ -7,6 +7,7 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -773,7 +774,7 @@ InlineSpan buildContent(
 
   // 图片渲染
   if (content.pictures.isNotEmpty) {
-    List picList = [];
+    List<String> picList = [];
     int len = content.pictures.length;
     if (len == 1) {
       Map pictureItem = content.pictures.first;
@@ -785,8 +786,13 @@ InlineSpan buildContent(
             builder: (context, BoxConstraints box) {
               return GestureDetector(
                 onTap: () {
-                  Get.toNamed('/preview',
-                      arguments: {'initialPage': 0, 'imgList': picList});
+                  showDialog(
+                    useSafeArea: false,
+                    context: context,
+                    builder: (context) {
+                      return ImagePreview(initialPage: 0, imgList: picList);
+                    },
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -814,8 +820,13 @@ InlineSpan buildContent(
             builder: (context, BoxConstraints box) {
               return GestureDetector(
                 onTap: () {
-                  Get.toNamed('/preview',
-                      arguments: {'initialPage': i, 'imgList': picList});
+                  showDialog(
+                    useSafeArea: false,
+                    context: context,
+                    builder: (context) {
+                      return ImagePreview(initialPage: i, imgList: picList);
+                    },
+                  );
                 },
                 child: NetworkImgLayer(
                   src: content.pictures[i]['img_src'],
