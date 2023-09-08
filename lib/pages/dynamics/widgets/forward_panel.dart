@@ -137,7 +137,12 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(item.modules.moduleDynamic.desc.text)
+                Text.rich(
+                  richNode(item, context),
+                  // 被转发状态(floor=2) 隐藏
+                  maxLines: source == 'detail' && floor != 2 ? 999 : 4,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             )
           : item.modules.moduleDynamic.additional != null
