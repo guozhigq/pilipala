@@ -58,39 +58,37 @@ class _BottomControlState extends State<BottomControl> {
       titleSpacing: 14,
       title: Row(
         children: [
-          ComBtn(
-            icon: const Icon(
-              Icons.subtitles_outlined,
-              size: 18,
-              color: Colors.white,
-            ),
-            fuc: () => Get.back(),
-          ),
-          const SizedBox(width: 4),
+          // ComBtn(
+          //   icon: const Icon(
+          //     Icons.subtitles_outlined,
+          //     size: 18,
+          //     color: Colors.white,
+          //   ),
+          //   fuc: () => Get.back(),
+          // ),
           const Spacer(),
-          const SizedBox(width: 4),
-          ComBtn(
-            icon: const Icon(
-              Icons.hd_outlined,
-              size: 18,
-              color: Colors.white,
-            ),
-            fuc: () => {},
-          ),
-          const SizedBox(width: 4),
-          Obx(
-            () => ComBtn(
-              icon: Icon(
-                widget.liveRoomCtr!.volumeOff.value
-                    ? Icons.volume_off_outlined
-                    : Icons.volume_up_outlined,
-                size: 18,
-                color: Colors.white,
-              ),
-              fuc: () => {},
-            ),
-          ),
-          const SizedBox(width: 4),
+          // ComBtn(
+          //   icon: const Icon(
+          //     Icons.hd_outlined,
+          //     size: 18,
+          //     color: Colors.white,
+          //   ),
+          //   fuc: () => {},
+          // ),
+          // const SizedBox(width: 4),
+          // Obx(
+          //   () => ComBtn(
+          //     icon: Icon(
+          //       widget.liveRoomCtr!.volumeOff.value
+          //           ? Icons.volume_off_outlined
+          //           : Icons.volume_up_outlined,
+          //       size: 18,
+          //       color: Colors.white,
+          //     ),
+          //     fuc: () => {},
+          //   ),
+          // ),
+          // const SizedBox(width: 4),
           if (Platform.isAndroid) ...[
             SizedBox(
               width: 34,

@@ -27,7 +27,7 @@ InlineSpan richNode(item, context) {
     } else {
       for (var i in richTextNodes) {
         /// fix 渲染专栏时内容会重复
-        if (item.modules.moduleDynamic.major?.opus?.title == null &&
+        if (item.modules.moduleDynamic.major.opus.title == null &&
             i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
           spanChilds.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
@@ -193,116 +193,122 @@ InlineSpan richNode(item, context) {
           );
         }
       }
-      try {
-        if (contentType == 'major' &&
-            item.modules.moduleDynamic.major.opus.pics.isNotEmpty) {
-          // 图片可能跟其他widget重复渲染
-          List<OpusPicsModel> pics = item.modules.moduleDynamic.major.opus.pics;
-          int len = pics.length;
-          List picList = [];
+      if (contentType == 'major' &&
+          item.modules.moduleDynamic.major.opus.pics.isNotEmpty) {
+        // 图片可能跟其他widget重复渲染
+        List<OpusPicsModel> pics = item.modules.moduleDynamic.major.opus.pics;
+        int len = pics.length;
+        List<String> picList = [];
 
-          if (len == 1) {
-            OpusPicsModel pictureItem = pics.first;
-            picList.add(pictureItem.url);
-            spanChilds.add(const TextSpan(text: '\n'));
-            spanChilds.add(
-              WidgetSpan(
-                child: LayoutBuilder(
-                  builder: (context, BoxConstraints box) {
-                    return GestureDetector(
-                      onTap: () {
-                        Get.toNamed('/preview',
-                            arguments: {'initialPage': 0, 'imgList': picList});
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: NetworkImgLayer(
-                          src: pictureItem.url,
-                          width: box.maxWidth / 2,
-                          height: box.maxWidth *
-                              0.5 *
-                              pictureItem.height! /
-                              pictureItem.width!,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          }
-          if (len > 1) {
-            List<Widget> list = [];
-            for (var i = 0; i < len; i++) {
-              picList.add(pics[i].url);
-              list.add(
-                LayoutBuilder(
-                  builder: (context, BoxConstraints box) {
-                    return GestureDetector(
-                      onTap: () {
-                        Get.toNamed('/preview',
-                            arguments: {'initialPage': i, 'imgList': picList});
-                      },
+        if (len == 1) {
+          OpusPicsModel pictureItem = pics.first;
+          picList.add(pictureItem.url!);
+          spanChilds.add(const TextSpan(text: '\n'));
+          spanChilds.add(
+            WidgetSpan(
+              child: LayoutBuilder(
+                builder: (context, BoxConstraints box) {
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: 0, imgList: picList);
+                        },
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
                       child: NetworkImgLayer(
-                        src: pics[i].url,
-                        width: box.maxWidth,
-                        height: box.maxWidth,
+                        src: pictureItem.url,
+                        width: box.maxWidth / 2,
+                        height: box.maxWidth *
+                            0.5 *
+                            pictureItem.height! /
+                            pictureItem.width!,
                       ),
-                    );
-                  },
-                ),
-              );
-            }
-            spanChilds.add(
-              WidgetSpan(
-                child: LayoutBuilder(
-                  builder: (context, BoxConstraints box) {
-                    double maxWidth = box.maxWidth;
-                    double crossCount = len < 3 ? 2 : 3;
-                    double height = maxWidth /
-                            crossCount *
-                            (len % crossCount == 0
-                                ? len ~/ crossCount
-                                : len ~/ crossCount + 1) +
-                        6;
-                    return Container(
-                      padding: const EdgeInsets.only(top: 6),
-                      height: height,
-                      child: GridView.count(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: crossCount.toInt(),
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                        childAspectRatio: 1,
-                        children: list,
-                      ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        }
+        if (len > 1) {
+          List<Widget> list = [];
+          for (var i = 0; i < len; i++) {
+            picList.add(pics[i].url!);
+            list.add(
+              LayoutBuilder(
+                builder: (context, BoxConstraints box) {
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        useSafeArea: false,
+                        context: context,
+                        builder: (context) {
+                          return ImagePreview(initialPage: i, imgList: picList);
+                        },
+                      );
+                    },
+                    child: NetworkImgLayer(
+                      src: pics[i].url,
+                      width: box.maxWidth,
+                      height: box.maxWidth,
+                    ),
+                  );
+                },
               ),
             );
           }
-          // spanChilds.add(
-          //   WidgetSpan(
-          //     child: NetworkImgLayer(
-          //       src: pics.first.url,
-          //       type: 'emote',
-          //       width: 100,
-          //       height: 200,
-          //     ),
-          //   ),
-          // );
+          spanChilds.add(
+            WidgetSpan(
+              child: LayoutBuilder(
+                builder: (context, BoxConstraints box) {
+                  double maxWidth = box.maxWidth;
+                  double crossCount = len < 3 ? 2 : 3;
+                  double height = maxWidth /
+                          crossCount *
+                          (len % crossCount == 0
+                              ? len ~/ crossCount
+                              : len ~/ crossCount + 1) +
+                      6;
+                  return Container(
+                    padding: const EdgeInsets.only(top: 6),
+                    height: height,
+                    child: GridView.count(
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: crossCount.toInt(),
+                      mainAxisSpacing: 4.0,
+                      crossAxisSpacing: 4.0,
+                      childAspectRatio: 1,
+                      children: list,
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
         }
-      } catch (err) {
-        print('❌rich_node_panel err: $err');
+        // spanChilds.add(
+        //   WidgetSpan(
+        //     child: NetworkImgLayer(
+        //       src: pics.first.url,
+        //       type: 'emote',
+        //       width: 100,
+        //       height: 200,
+        //     ),
+        //   ),
+        // );
       }
       return TextSpan(
         children: spanChilds,
       );
     }
   } catch (err) {
-    print('❌❌rich_node_panel err: $err');
+    print('❌rich_node_panel err: $err');
     return spacer;
   }
 }
