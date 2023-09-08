@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/pages/preview/index.dart';
 
 // 富文本
 InlineSpan richNode(item, context) {

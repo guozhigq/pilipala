@@ -14,6 +14,7 @@ import 'package:pilipala/pages/follow/index.dart';
 import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:pilipala/pages/html/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
 import 'package:pilipala/pages/member/index.dart';
@@ -47,13 +48,13 @@ class Routes {
     // 视频详情
     CustomGetPage(name: '/video', page: () => const VideoDetailPage()),
     // 图片预览
-    GetPage(
-      name: '/preview',
-      page: () => const ImagePreview(),
-      transition: Transition.fade,
-      transitionDuration: const Duration(milliseconds: 300),
-      showCupertinoParallax: false,
-    ),
+    // GetPage(
+    //   name: '/preview',
+    //   page: () => const ImagePreview(),
+    //   transition: Transition.fade,
+    //   transitionDuration: const Duration(milliseconds: 300),
+    //   showCupertinoParallax: false,
+    // ),
     //
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
@@ -107,6 +108,8 @@ class Routes {
         name: '/displayModeSetting', page: () => const SetDiaplayMode()),
     // 关于
     CustomGetPage(name: '/about', page: () => const AboutPage()),
+    //
+    CustomGetPage(name: '/htmlRender', page: () => const HtmlRenderPage()),
   ];
 }
 

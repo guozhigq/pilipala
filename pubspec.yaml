@@ -119,6 +119,11 @@ dependencies:
   system_proxy: ^0.1.0
   # pip
   floating: ^2.0.1
+  # html解析
+  html: ^0.15.4
+  # html渲染
+  flutter_html: ^3.0.0-beta.2
+
   
 dev_dependencies:
   flutter_test:
