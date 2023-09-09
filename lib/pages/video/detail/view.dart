@@ -53,6 +53,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late Future _futureBuilderFuture;
   // 自动退出全屏
   late bool autoExitFullcreen;
+  late bool autoPlayEnable;
 
   @override
   void initState() {
@@ -63,6 +64,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
+    autoPlayEnable =
+        setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     videoSourceInit();
     appbarStreamListen();
   }
@@ -148,16 +151,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 返回当前页面时
   void didPopNext() async {
     videoDetailController.isFirstTime = false;
-    bool autoplay =
-        setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
+    bool autoplay = autoPlayEnable;
     videoDetailController.playerInit(autoplay: autoplay);
-    videoDetailController.autoPlay.value = true;
+
+    /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
+    videoDetailController.autoPlay.value =
+        !videoDetailController.isShowCover.value;
     videoIntroController.isPaused = false;
     if (_extendNestCtr.position.pixels == 0 && autoplay) {
       await Future.delayed(const Duration(milliseconds: 300));
-      plPlayerController!.play();
+      plPlayerController?.play();
     }
-    plPlayerController!.addStatusLister(playerListener);
+    plPlayerController?.addStatusLister(playerListener);
     super.didPopNext();
   }
 
