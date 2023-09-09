@@ -65,15 +65,15 @@ class SearchHttp {
         case SearchType.video:
           data = SearchVideoModel.fromJson(res.data['data']);
           break;
-        case SearchType.live_room:
-          data = SearchLiveModel.fromJson(res.data['data']);
-          break;
+        // case SearchType.live_room:
+        //   data = SearchLiveModel.fromJson(res.data['data']);
+        //   break;
         case SearchType.bili_user:
           data = SearchUserModel.fromJson(res.data['data']);
           break;
-        case SearchType.media_bangumi:
-          data = SearchMBangumiModel.fromJson(res.data['data']);
-          break;
+        // case SearchType.media_bangumi:
+        //   data = SearchMBangumiModel.fromJson(res.data['data']);
+        //   break;
       }
       return {
         'status': true,

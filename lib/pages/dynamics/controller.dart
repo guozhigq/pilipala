@@ -214,7 +214,7 @@ class DynamicsController extends GetxController {
               arguments: {
                 'pic': pic,
                 'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
+                // 'videoType': SearchType.media_bangumi,
                 'bangumiItem': res['data'],
               },
             );

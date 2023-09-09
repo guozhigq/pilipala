@@ -49,8 +49,8 @@ class FavVideoCardH extends StatelessWidget {
         Get.toNamed('/video', parameters: parameters, arguments: {
           'videoItem': videoItem,
           'heroTag': heroTag,
-          'videoType':
-              epId != null ? SearchType.media_bangumi : SearchType.video,
+          // 'videoType':
+          //     epId != null ? SearchType.media_bangumi : SearchType.video,
         });
       },
       child: Column(

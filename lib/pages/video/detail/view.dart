@@ -381,32 +381,33 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   if (videoDetailController.videoType ==
                                       SearchType.video) ...[
                                     const VideoIntroPanel(),
-                                  ] else if (videoDetailController.videoType ==
-                                      SearchType.media_bangumi) ...[
-                                    BangumiIntroPanel(
-                                        cid: videoDetailController.cid)
-                                  ],
-                                  // if (videoDetailController.videoType ==
-                                  //     SearchType.video) ...[
-                                  //   SliverPersistentHeader(
-                                  //     floating: true,
-                                  //     pinned: true,
-                                  //     delegate: SliverHeaderDelegate(
-                                  //       height: 50,
-                                  //       child:
-                                  //           const MenuRow(loadingStatus: false),
-                                  //     ),
-                                  //   ),
-                                  // ],
-                                  SliverToBoxAdapter(
-                                    child: Divider(
-                                      indent: 12,
-                                      endIndent: 12,
-                                      color: Theme.of(context)
-                                          .dividerColor
-                                          .withOpacity(0.06),
+                                  ] else
+                                    // if (videoDetailController.videoType ==
+                                    //     SearchType.media_bangumi) ...[
+                                    //   BangumiIntroPanel(
+                                    //       cid: videoDetailController.cid)
+                                    // ],
+                                    // if (videoDetailController.videoType ==
+                                    //     SearchType.video) ...[
+                                    //   SliverPersistentHeader(
+                                    //     floating: true,
+                                    //     pinned: true,
+                                    //     delegate: SliverHeaderDelegate(
+                                    //       height: 50,
+                                    //       child:
+                                    //           const MenuRow(loadingStatus: false),
+                                    //     ),
+                                    //   ),
+                                    // ],
+                                    SliverToBoxAdapter(
+                                      child: Divider(
+                                        indent: 12,
+                                        endIndent: 12,
+                                        color: Theme.of(context)
+                                            .dividerColor
+                                            .withOpacity(0.06),
+                                      ),
                                     ),
-                                  ),
                                   // const RelatedVideoPanel(),
                                 ],
                               );

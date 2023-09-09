@@ -84,12 +84,12 @@ class _SearchPanelState extends State<SearchPanel>
                       ctr: _searchPanelController,
                       list: list.value,
                     );
-                  case SearchType.media_bangumi:
-                    return searchMbangumiPanel(context, ctr, list);
+                  // case SearchType.media_bangumi:
+                  //   return searchMbangumiPanel(context, ctr, list);
                   case SearchType.bili_user:
                     return searchUserPanel(context, ctr, list);
-                  case SearchType.live_room:
-                    return searchLivePanel(context, ctr, list);
+                  // case SearchType.live_room:
+                  //   return searchLivePanel(context, ctr, list);
                   default:
                     return const SizedBox();
                 }
@@ -115,12 +115,12 @@ class _SearchPanelState extends State<SearchPanel>
                 switch (widget.searchType) {
                   case SearchType.video:
                     return const VideoCardHSkeleton();
-                  case SearchType.media_bangumi:
-                    return const MediaBangumiSkeleton();
+                  // case SearchType.media_bangumi:
+                  //   return const MediaBangumiSkeleton();
                   case SearchType.bili_user:
                     return const VideoCardHSkeleton();
-                  case SearchType.live_room:
-                    return const VideoCardHSkeleton();
+                  // case SearchType.live_room:
+                  //   return const VideoCardHSkeleton();
                   default:
                     return const VideoCardHSkeleton();
                 }

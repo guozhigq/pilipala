@@ -48,7 +48,7 @@ class VideoCardV extends StatelessWidget {
               arguments: {
                 'pic': videoItem.pic,
                 'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
+                // 'videoType': SearchType.media_bangumi,
               },
             ),
           );

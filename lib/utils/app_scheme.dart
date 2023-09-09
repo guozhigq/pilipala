@@ -119,7 +119,7 @@ class PiliSchame {
             arguments: {
               'pic': bangumiDetail.cover,
               'heroTag': heroTag,
-              'videoType': SearchType.media_bangumi,
+              // 'videoType': SearchType.media_bangumi,
             },
           ),
         );
