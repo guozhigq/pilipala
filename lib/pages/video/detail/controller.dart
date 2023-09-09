@@ -276,8 +276,8 @@ class VideoDetailController extends GetxController
           currentDecodeFormats = flag
               ? currentDecodeFormats
               : VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
-        } catch (e) {
-          print(e);
+        } catch (err) {
+          SmartDialog.showToast('DecodeFormats error: $err');
         }
 
         /// 取出符合当前解码格式的videoItem
@@ -289,7 +289,7 @@ class VideoDetailController extends GetxController
         }
         videoUrl = firstVideo.baseUrl!;
       } catch (err) {
-        print(err);
+        SmartDialog.showToast('firstVideo error: $err');
       }
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
@@ -299,7 +299,6 @@ class VideoDetailController extends GetxController
       try {
         int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
             defaultValue: AudioQuality.hiRes.code);
-
         if (data.dash!.dolby?.audio?.isNotEmpty == true) {
           // 杜比
           audiosList.insert(0, data.dash!.dolby!.audio!.first);
@@ -313,13 +312,15 @@ class VideoDetailController extends GetxController
         if (audiosList.isNotEmpty) {
           List<int> numbers = audiosList.map((map) => map.id!).toList();
           int closestNumber = Utils.findClosestNumber(resultAudioQa, numbers);
-          if (!numbers.contains(resultAudioQa)) {
+          if (!numbers.contains(resultAudioQa) &&
+              numbers.any((e) => e > resultAudioQa)) {
             closestNumber = 30280;
           }
           firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
         }
-      } catch (e) {
-        print(e);
+      } catch (err) {
+        firstAudio = audiosList.first;
+        SmartDialog.showToast('firstAudio error: $err');
       }
 
       audioUrl = firstAudio!.baseUrl ?? '';
