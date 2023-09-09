@@ -188,46 +188,7 @@ class VideoContent extends StatelessWidget {
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                StatView(
-                  theme: 'gray',
-                  view: videoItem.stat.view,
-                ),
-                const SizedBox(width: 8),
-                StatDanMu(
-                  theme: 'gray',
-                  danmu: videoItem.stat.danmaku,
-                ),
-                // Text(
-                //   Utils.dateFormat(videoItem.pubdate!),
-                //   style: TextStyle(
-                //       fontSize: 11,
-                //       color: Theme.of(context).colorScheme.outline),
-                // )
                 const Spacer(),
-                // SizedBox(
-                //   width: 20,
-                //   height: 20,
-                //   child: IconButton(
-                //     tooltip: '稍后再看',
-                //     style: ButtonStyle(
-                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                //     ),
-                //     onPressed: () async {
-                //       var res =
-                //           await UserHttp.toViewLater(bvid: videoItem.bvid);
-                //       SmartDialog.showToast(res['msg']);
-                //     },
-                //     icon: Icon(
-                //       Icons.more_vert_outlined,
-                //       color: Theme.of(context).colorScheme.outline,
-                //       size: 14,
-                //     ),
-                //   ),
-                // ),
                 if (source == 'normal')
                   SizedBox(
                     width: 24,
