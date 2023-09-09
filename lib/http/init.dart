@@ -96,7 +96,6 @@ class Request {
         'user-agent': headerUa('pc'),
         'Accept-Encoding': 'gzip'
       },
-      contentType: Headers.jsonContentType,
       persistentConnection: true,
     );
 

@@ -36,13 +36,12 @@ class VideoDetailPage extends StatefulWidget {
 
 class _VideoDetailPageState extends State<VideoDetailPage>
     with TickerProviderStateMixin, RouteAware {
-  final VideoDetailController videoDetailController =
-      Get.put(VideoDetailController(), tag: Get.arguments['heroTag']);
+  late VideoDetailController videoDetailController;
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
-  final VideoIntroController videoIntroController =
-      Get.put(VideoIntroController(), tag: Get.arguments['heroTag']);
+  late VideoIntroController videoIntroController;
+  late String heroTag;
 
   PlayerStatus playerStatus = PlayerStatus.playing;
   double doubleOffset = 0;
@@ -59,6 +58,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   void initState() {
     super.initState();
+    heroTag = Get.arguments['heroTag'];
+    videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
+    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -345,7 +347,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               },
               onlyOneScrollInBody: true,
               body: Container(
-                key: Key(Get.arguments['heroTag']),
+                key: Key(heroTag),
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
                   children: [
@@ -440,7 +442,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       ),
     );
     Widget childWhenEnabled = FutureBuilder(
-      key: Key(Get.arguments['heroTag']),
+      key: Key(heroTag),
       future: _futureBuilderFuture,
       builder: ((context, snapshot) {
         if (snapshot.hasData && snapshot.data['status']) {
