@@ -53,7 +53,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late Future _futureBuilderFuture;
   // 自动退出全屏
   late bool autoExitFullcreen;
-  Floating? floating;
 
   @override
   void initState() {
@@ -66,9 +65,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
     videoSourceInit();
     appbarStreamListen();
-    if (Platform.isAndroid) {
-      floating = Floating();
-    }
   }
 
   // 获取视频资源，初始化播放器
@@ -100,7 +96,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController!.triggerFullScreen(status: false);
       }
       // 播放完展示控制栏
-      PiPStatus currentStatus = await floating!.pipStatus;
+      PiPStatus currentStatus = await videoDetailController.floating!.pipStatus;
       if (currentStatus == PiPStatus.disabled) {
         plPlayerController!.onLockControl(false);
       }
@@ -128,8 +124,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.dispose();
     }
-    if (floating != null) {
-      floating!.dispose();
+    if (videoDetailController.floating != null) {
+      videoDetailController.floating!.dispose();
     }
     super.dispose();
   }
@@ -219,13 +215,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                             ? const SizedBox()
                                             : PLVideoPlayer(
                                                 controller: plPlayerController!,
-                                                headerControl: HeaderControl(
-                                                  controller:
-                                                      plPlayerController,
-                                                  videoDetailCtr:
-                                                      videoDetailController,
-                                                  floating: floating,
-                                                ),
+                                                headerControl:
+                                                    videoDetailController
+                                                        .headerControl,
                                                 danmuWidget: Obx(
                                                   () => PlDanmaku(
                                                     key: Key(

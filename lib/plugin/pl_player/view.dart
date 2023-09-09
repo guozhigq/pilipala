@@ -561,14 +561,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         Obx(
           () => Column(
             children: [
-              if (widget.headerControl != null)
+              if (widget.headerControl != null || _.headerControl != null)
                 ClipRect(
                   clipBehavior: Clip.hardEdge,
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
                     position: 'top',
-                    child: widget.headerControl!,
+                    child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
               const Spacer(),

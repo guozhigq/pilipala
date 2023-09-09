@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -15,6 +17,8 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+
+import 'widgets/header_control.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -76,6 +80,8 @@ class VideoDetailController extends GetxController
   bool enableHeart = true;
   var userInfo;
   late bool isFirstTime = true;
+  Floating? floating;
+  late PreferredSizeWidget headerControl;
 
   @override
   void onInit() {
@@ -104,6 +110,16 @@ class VideoDetailController extends GetxController
       enableHeart = false;
     }
     danmakuCid.value = cid;
+
+    ///
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+    );
   }
 
   showReplyReplyPanel() {
@@ -207,6 +223,9 @@ class VideoDetailController extends GetxController
       isFirstTime: isFirstTime,
       autoplay: autoplay,
     );
+
+    /// 开启自动全屏时，在player初始化完成后立即传入headerControl
+    plPlayerController.headerControl = headerControl;
   }
 
   // 视频链接
