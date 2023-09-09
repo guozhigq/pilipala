@@ -144,7 +144,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               children: [
                 const SizedBox(height: 12),
                 // 搜索建议
-                _searchSuggest(),
+                // _searchSuggest(),
                 // 热搜
                 Visibility(
                     visible: _searchController.enableHotKey,

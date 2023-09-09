@@ -276,63 +276,63 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => showIntroDetail(),
-                    child: Row(
-                      children: [
-                        StatView(
-                          theme: 'gray',
-                          view: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.view
-                              : videoItem['stat'].view,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        StatDanMu(
-                          theme: 'gray',
-                          danmu: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.danmaku
-                              : videoItem['stat'].danmaku,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          Utils.dateFormat(
-                              !widget.loadingStatus
-                                  ? widget.videoDetail!.pubdate
-                                  : videoItem['pubdate'],
-                              formatType: 'detail'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: t.colorScheme.outline,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        if (videoIntroController.isShowOnlineTotal)
-                          Obx(
-                            () => Text(
-                              '${videoIntroController.total.value}人在看',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 7),
+                  // GestureDetector(
+                  //   behavior: HitTestBehavior.translucent,
+                  //   onTap: () => showIntroDetail(),
+                  //   child: Row(
+                  //     children: [
+                  //       StatView(
+                  //         theme: 'gray',
+                  //         view: !widget.loadingStatus
+                  //             ? widget.videoDetail!.stat!.view
+                  //             : videoItem['stat'].view,
+                  //         size: 'medium',
+                  //       ),
+                  //       const SizedBox(width: 10),
+                  //       StatDanMu(
+                  //         theme: 'gray',
+                  //         danmu: !widget.loadingStatus
+                  //             ? widget.videoDetail!.stat!.danmaku
+                  //             : videoItem['stat'].danmaku,
+                  //         size: 'medium',
+                  //       ),
+                  //       const SizedBox(width: 10),
+                  //       Text(
+                  //         Utils.dateFormat(
+                  //             !widget.loadingStatus
+                  //                 ? widget.videoDetail!.pubdate
+                  //                 : videoItem['pubdate'],
+                  //             formatType: 'detail'),
+                  //         style: TextStyle(
+                  //           fontSize: 12,
+                  //           color: t.colorScheme.outline,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(width: 10),
+                  //       if (videoIntroController.isShowOnlineTotal)
+                  //         Obx(
+                  //           () => Text(
+                  //             '${videoIntroController.total.value}人在看',
+                  //             style: TextStyle(
+                  //               fontSize: 12,
+                  //               color: t.colorScheme.outline,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 7),
                   // 点赞收藏转发 布局样式1
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 7, bottom: 7),
-                    scrollDirection: Axis.horizontal,
-                    child: actionRow(
-                      context,
-                      videoIntroController,
-                      videoDetailCtr,
-                    ),
-                  ),
+                  // SingleChildScrollView(
+                  //   padding: const EdgeInsets.only(top: 7, bottom: 7),
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: actionRow(
+                  //     context,
+                  //     videoIntroController,
+                  //     videoDetailCtr,
+                  //   ),
+                  // ),
                   // 点赞收藏转发 布局样式2
                   // actionGrid(context, videoIntroController),
                   // 合集

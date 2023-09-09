@@ -51,36 +51,36 @@ class _HomePageState extends State<HomePage>
             callback: showUserBottonSheet,
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            height: 42,
-            child: Align(
-              alignment: Alignment.center,
-              child: TabBar(
-                controller: _homeController.tabController,
-                tabs: [
-                  for (var i in _homeController.tabs) Tab(text: i['label'])
-                ],
-                isScrollable: true,
-                dividerColor: Colors.transparent,
-                enableFeedback: true,
-                splashBorderRadius: BorderRadius.circular(10),
-                onTap: (value) {
-                  feedBack();
-                  if (_homeController.initialIndex == value) {
-                    _homeController.tabsCtrList[value]().animateToTop();
-                  }
-                  _homeController.initialIndex = value;
-                },
-              ),
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _homeController.tabController,
-              children: _homeController.tabsPageList,
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   height: 42,
+          //   child: Align(
+          //     alignment: Alignment.center,
+          //     child: TabBar(
+          //       controller: _homeController.tabController,
+          //       tabs: [
+          //         for (var i in _homeController.tabs) Tab(text: i['label'])
+          //       ],
+          //       isScrollable: true,
+          //       dividerColor: Colors.transparent,
+          //       enableFeedback: true,
+          //       splashBorderRadius: BorderRadius.circular(10),
+          //       onTap: (value) {
+          //         feedBack();
+          //         if (_homeController.initialIndex == value) {
+          //           _homeController.tabsCtrList[value]().animateToTop();
+          //         }
+          //         _homeController.initialIndex = value;
+          //       },
+          //     ),
+          //   ),
+          // ),
+          // Expanded(
+          //   child: TabBarView(
+          //     controller: _homeController.tabController,
+          //     children: _homeController.tabsPageList,
+          //   ),
+          // ),
         ],
       ),
     );

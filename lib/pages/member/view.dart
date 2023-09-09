@@ -308,28 +308,29 @@ class _MemberPageState extends State<MemberPage>
           return MediaQuery.of(context).padding.top + kToolbarHeight;
         },
         onlyOneScrollInBody: true,
-        body: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: TabBar(controller: _tabController, tabs: const [
-                Tab(text: '主页'),
-                Tab(text: '动态'),
-                Tab(text: '投稿'),
-              ]),
-            ),
-            Expanded(
-                child: TabBarView(
-              controller: _tabController,
-              children: const [
-                Text('主页'),
-                MemberDynamicPanel(),
-                ArchivePanel(),
-              ],
-            ))
-          ],
-        ),
+        // body: Column(
+        //   children: [
+        //     SizedBox(
+        //       width: double.infinity,
+        //       height: 50,
+        //       child: TabBar(controller: _tabController, tabs: const [
+        //         Tab(text: '主页'),
+        //         Tab(text: '动态'),
+        //         Tab(text: '投稿'),
+        //       ]),
+        //     ),
+        //     Expanded(
+        //         child: TabBarView(
+        //       controller: _tabController,
+        //       children: const [
+        //         Text('主页'),
+        //         MemberDynamicPanel(),
+        //         ArchivePanel(),
+        //       ],
+        //     ))
+        //   ],
+        // ),
+        body: ArchivePanel(),
       ),
     );
   }

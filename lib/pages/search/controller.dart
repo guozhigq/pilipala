@@ -51,7 +51,7 @@ class SSearchController extends GetxController {
       searchSuggestList.value = [];
       return;
     }
-    _debouncer.call(() => querySearchSuggest(value));
+    // _debouncer.call(() => querySearchSuggest(value));
   }
 
   void onClear() {

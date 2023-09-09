@@ -407,7 +407,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .withOpacity(0.06),
                                     ),
                                   ),
-                                  const RelatedVideoPanel(),
+                                  // const RelatedVideoPanel(),
                                 ],
                               );
                             },

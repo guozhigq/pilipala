@@ -4,7 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
+// import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -13,7 +13,7 @@ import 'package:pilipala/utils/utils.dart';
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
     const HomePage(),
-    const DynamicsPage(),
+    // const DynamicsPage(),
     const MediaPage(),
   ];
   RxList navigationBars = [
@@ -28,17 +28,17 @@ class MainController extends GetxController {
       ),
       'label': "首页",
     },
-    {
-      'icon': const Icon(
-        Icons.motion_photos_on_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.motion_photos_on,
-        size: 21,
-      ),
-      'label': "动态",
-    },
+    // {
+    //   'icon': const Icon(
+    //     Icons.motion_photos_on_outlined,
+    //     size: 21,
+    //   ),
+    //   'selectIcon': const Icon(
+    //     Icons.motion_photos_on,
+    //     size: 21,
+    //   ),
+    //   'label': "动态",
+    // },
     {
       'icon': const Icon(
         Icons.folder_outlined,
