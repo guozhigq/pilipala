@@ -234,54 +234,54 @@ class _MemberPageState extends State<MemberPage>
                                             // ]
                                           ],
                                         ),
-                                        if (_memberController.memberInfo.value
-                                                .official!['title'] !=
-                                            '') ...[
-                                          const SizedBox(height: 6),
-                                          Text.rich(
-                                            maxLines: 2,
-                                            TextSpan(
-                                              text: _memberController
-                                                          .memberInfo
-                                                          .value
-                                                          .official!['role'] ==
-                                                      1
-                                                  ? '个人认证：'
-                                                  : '企业认证：',
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: _memberController
-                                                      .memberInfo
-                                                      .value
-                                                      .official!['title'],
-                                                ),
-                                              ],
-                                            ),
-                                            softWrap: true,
-                                          ),
-                                        ],
-                                        const SizedBox(height: 4),
-                                        if (_memberController
-                                                .memberInfo.value.sign !=
-                                            '')
-                                          SelectableRegion(
-                                            magnifierConfiguration:
-                                                const TextMagnifierConfiguration(),
-                                            focusNode: FocusNode(),
-                                            selectionControls:
-                                                MaterialTextSelectionControls(),
-                                            child: Text(
-                                              _memberController
-                                                  .memberInfo.value.sign!,
-                                              textAlign: TextAlign.left,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
+                                        // if (_memberController.memberInfo.value
+                                        //         .official!['title'] !=
+                                        //     '') ...[
+                                        //   const SizedBox(height: 6),
+                                        //   Text.rich(
+                                        //     maxLines: 2,
+                                        //     TextSpan(
+                                        //       text: _memberController
+                                        //                   .memberInfo
+                                        //                   .value
+                                        //                   .official!['role'] ==
+                                        //               1
+                                        //           ? '个人认证：'
+                                        //           : '企业认证：',
+                                        //       style: TextStyle(
+                                        //         color: Theme.of(context)
+                                        //             .primaryColor,
+                                        //       ),
+                                        //       children: [
+                                        //         TextSpan(
+                                        //           text: _memberController
+                                        //               .memberInfo
+                                        //               .value
+                                        //               .official!['title'],
+                                        //         ),
+                                        //       ],
+                                        //     ),
+                                        //     softWrap: true,
+                                        //   ),
+                                        // ],
+                                        // const SizedBox(height: 4),
+                                        // if (_memberController
+                                        //         .memberInfo.value.sign !=
+                                        //     '')
+                                        //   SelectableRegion(
+                                        //     magnifierConfiguration:
+                                        //         const TextMagnifierConfiguration(),
+                                        //     focusNode: FocusNode(),
+                                        //     selectionControls:
+                                        //         MaterialTextSelectionControls(),
+                                        //     child: Text(
+                                        //       _memberController
+                                        //           .memberInfo.value.sign!,
+                                        //       textAlign: TextAlign.left,
+                                        //       maxLines: 2,
+                                        //       overflow: TextOverflow.ellipsis,
+                                        //     ),
+                                        //   ),
                                       ],
                                     ),
                                   ],
