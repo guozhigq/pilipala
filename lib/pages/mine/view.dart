@@ -138,85 +138,9 @@ class _MinePageState extends State<MinePage> {
               _mineController.userInfo.value.uname ?? '点击头像登录',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(width: 4),
-            Image.asset(
-              'assets/images/lv/lv${_mineController.userInfo.value.levelInfo != null ? _mineController.userInfo.value.levelInfo!.currentLevel : '0'}.png',
-              height: 10,
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text.rich(TextSpan(children: [
-              TextSpan(
-                  text: '硬币: ',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.outline)),
-              TextSpan(
-                  text: (_mineController.userInfo.value.money ?? 'pilipala')
-                      .toString(),
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary)),
-            ]))
           ],
         ),
         const SizedBox(height: 25),
-        if (_mineController.userInfo.value.levelInfo != null) ...[
-          LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              LevelInfo levelInfo = _mineController.userInfo.value.levelInfo;
-              return SizedBox(
-                width: box.maxWidth,
-                height: 24,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        color: Theme.of(context).colorScheme.primary,
-                        height: 24,
-                        constraints:
-                            const BoxConstraints(minWidth: 100), // 设置最小宽度为100
-                        width: box.maxWidth *
-                            (1 - (levelInfo.currentExp! / levelInfo.nextExp!)),
-                        child: Center(
-                          child: Text(
-                            '${levelInfo.currentExp!}/${levelInfo.nextExp!}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 23,
-                      left: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: box.maxWidth *
-                            (_mineController
-                                    .userInfo.value.levelInfo!.currentExp! /
-                                _mineController
-                                    .userInfo.value.levelInfo!.nextExp!),
-                        height: 1,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-        const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.only(left: 12, right: 12),
           child: LayoutBuilder(

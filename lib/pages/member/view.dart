@@ -179,59 +179,59 @@ class _MemberPageState extends State<MemberPage>
                                                       fontWeight:
                                                           FontWeight.bold),
                                             )),
-                                            const SizedBox(width: 2),
-                                            if (_memberController
-                                                    .memberInfo.value.sex ==
-                                                '女')
-                                              const Icon(
-                                                FontAwesomeIcons.venus,
-                                                size: 14,
-                                                color: Colors.pink,
-                                              ),
-                                            if (_memberController
-                                                    .memberInfo.value.sex ==
-                                                '男')
-                                              const Icon(
-                                                FontAwesomeIcons.mars,
-                                                size: 14,
-                                                color: Colors.blue,
-                                              ),
-                                            const SizedBox(width: 4),
-                                            Image.asset(
-                                              'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
-                                              height: 11,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            if (_memberController.memberInfo
-                                                        .value.vip!.status ==
-                                                    1 &&
-                                                _memberController.memberInfo
-                                                            .value.vip!.label![
-                                                        'img_label_uri_hans'] !=
-                                                    '') ...[
-                                              Image.network(
-                                                _memberController.memberInfo
-                                                        .value.vip!.label![
-                                                    'img_label_uri_hans'],
-                                                height: 20,
-                                              ),
-                                            ] else if (_memberController
-                                                        .memberInfo
-                                                        .value
-                                                        .vip!
-                                                        .status ==
-                                                    1 &&
-                                                _memberController.memberInfo
-                                                            .value.vip!.label![
-                                                        'img_label_uri_hans_static'] !=
-                                                    '') ...[
-                                              Image.network(
-                                                _memberController.memberInfo
-                                                        .value.vip!.label![
-                                                    'img_label_uri_hans_static'],
-                                                height: 20,
-                                              ),
-                                            ]
+                                            // const SizedBox(width: 2),
+                                            // if (_memberController
+                                            //         .memberInfo.value.sex ==
+                                            //     '女')
+                                            //   const Icon(
+                                            //     FontAwesomeIcons.venus,
+                                            //     size: 14,
+                                            //     color: Colors.pink,
+                                            //   ),
+                                            // if (_memberController
+                                            //         .memberInfo.value.sex ==
+                                            //     '男')
+                                            //   const Icon(
+                                            //     FontAwesomeIcons.mars,
+                                            //     size: 14,
+                                            //     color: Colors.blue,
+                                            //   ),
+                                            // const SizedBox(width: 4),
+                                            // Image.asset(
+                                            //   'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
+                                            //   height: 11,
+                                            // ),
+                                            // const SizedBox(width: 6),
+                                            // if (_memberController.memberInfo
+                                            //             .value.vip!.status ==
+                                            //         1 &&
+                                            //     _memberController.memberInfo
+                                            //                 .value.vip!.label![
+                                            //             'img_label_uri_hans'] !=
+                                            //         '') ...[
+                                            //   Image.network(
+                                            //     _memberController.memberInfo
+                                            //             .value.vip!.label![
+                                            //         'img_label_uri_hans'],
+                                            //     height: 20,
+                                            //   ),
+                                            // ] else if (_memberController
+                                            //             .memberInfo
+                                            //             .value
+                                            //             .vip!
+                                            //             .status ==
+                                            //         1 &&
+                                            //     _memberController.memberInfo
+                                            //                 .value.vip!.label![
+                                            //             'img_label_uri_hans_static'] !=
+                                            //         '') ...[
+                                            //   Image.network(
+                                            //     _memberController.memberInfo
+                                            //             .value.vip!.label![
+                                            //         'img_label_uri_hans_static'],
+                                            //     height: 20,
+                                            //   ),
+                                            // ]
                                           ],
                                         ),
                                         if (_memberController.memberInfo.value

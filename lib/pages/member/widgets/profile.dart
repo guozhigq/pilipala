@@ -76,79 +76,79 @@ Widget profile(ctr, {loadingStatus = false}) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed(
-                                '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}');
-                          },
-                          child: Column(
-                            children: [
-                              Text(
-                                !loadingStatus
-                                    ? ctr.userStat!['following'].toString()
-                                    : '-',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                '关注',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize),
-                              )
-                            ],
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed(
-                                '/fan?mid=${memberInfo.mid}&name=${memberInfo.name}');
-                          },
-                          child: Column(
-                            children: [
-                              Text(
-                                  !loadingStatus
-                                      ? Utils.numFormat(
-                                          ctr.userStat!['follower'],
-                                        )
-                                      : '-',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              Text('粉丝',
-                                  style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium!
-                                          .fontSize))
-                            ],
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            const Text('-',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text(
-                              '获赞',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 10, right: 10),
+                  //   child: Row(
+                  //     mainAxisSize: MainAxisSize.max,
+                  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //     children: [
+                  //       InkWell(
+                  //         onTap: () {
+                  //           Get.toNamed(
+                  //               '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Text(
+                  //               !loadingStatus
+                  //                   ? ctr.userStat!['following'].toString()
+                  //                   : '-',
+                  //               style: const TextStyle(
+                  //                   fontWeight: FontWeight.bold),
+                  //             ),
+                  //             Text(
+                  //               '关注',
+                  //               style: TextStyle(
+                  //                   fontSize: Theme.of(context)
+                  //                       .textTheme
+                  //                       .labelMedium!
+                  //                       .fontSize),
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       InkWell(
+                  //         onTap: () {
+                  //           Get.toNamed(
+                  //               '/fan?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                  //         },
+                  //         child: Column(
+                  //           children: [
+                  //             Text(
+                  //                 !loadingStatus
+                  //                     ? Utils.numFormat(
+                  //                         ctr.userStat!['follower'],
+                  //                       )
+                  //                     : '-',
+                  //                 style: const TextStyle(
+                  //                     fontWeight: FontWeight.bold)),
+                  //             Text('粉丝',
+                  //                 style: TextStyle(
+                  //                     fontSize: Theme.of(context)
+                  //                         .textTheme
+                  //                         .labelMedium!
+                  //                         .fontSize))
+                  //           ],
+                  //         ),
+                  //       ),
+                  //       Column(
+                  //         children: [
+                  //           const Text('-',
+                  //               style: TextStyle(fontWeight: FontWeight.bold)),
+                  //           Text(
+                  //             '获赞',
+                  //             style: TextStyle(
+                  //                 fontSize: Theme.of(context)
+                  //                     .textTheme
+                  //                     .labelMedium!
+                  //                     .fontSize),
+                  //           )
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 10),
                   if (ctr.ownerMid != ctr.mid) ...[
                     Row(
                       children: [

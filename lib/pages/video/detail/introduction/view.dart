@@ -324,15 +324,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   // ),
                   // const SizedBox(height: 7),
                   // 点赞收藏转发 布局样式1
-                  // SingleChildScrollView(
-                  //   padding: const EdgeInsets.only(top: 7, bottom: 7),
-                  //   scrollDirection: Axis.horizontal,
-                  //   child: actionRow(
-                  //     context,
-                  //     videoIntroController,
-                  //     videoDetailCtr,
-                  //   ),
-                  // ),
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(top: 7, bottom: 7),
+                    scrollDirection: Axis.horizontal,
+                    child: actionRow(
+                      context,
+                      videoIntroController,
+                      videoDetailCtr,
+                    ),
+                  ),
                   // 点赞收藏转发 布局样式2
                   // actionGrid(context, videoIntroController),
                   // 合集
@@ -516,52 +516,52 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   Widget actionRow(BuildContext context, videoIntroController, videoDetailCtr) {
     return Row(children: [
-      Obx(
-        () => ActionRowItem(
-          icon: const Icon(FontAwesomeIcons.thumbsUp),
-          onTap: () => videoIntroController.actionLikeVideo(),
-          selectStatus: videoIntroController.hasLike.value,
-          loadingStatus: loadingStatus,
-          text:
-              !loadingStatus ? widget.videoDetail!.stat!.like!.toString() : '-',
-        ),
-      ),
-      const SizedBox(width: 8),
-      Obx(
-        () => ActionRowItem(
-          icon: const Icon(FontAwesomeIcons.b),
-          onTap: () => videoIntroController.actionCoinVideo(),
-          selectStatus: videoIntroController.hasCoin.value,
-          loadingStatus: loadingStatus,
-          text:
-              !loadingStatus ? widget.videoDetail!.stat!.coin!.toString() : '-',
-        ),
-      ),
-      const SizedBox(width: 8),
-      Obx(
-        () => ActionRowItem(
-          icon: const Icon(FontAwesomeIcons.heart),
-          onTap: () => showFavBottomSheet(),
-          onLongPress: () => showFavBottomSheet(type: 'longPress'),
-          selectStatus: videoIntroController.hasFav.value,
-          loadingStatus: loadingStatus,
-          text: !loadingStatus
-              ? widget.videoDetail!.stat!.favorite!.toString()
-              : '-',
-        ),
-      ),
-      const SizedBox(width: 8),
-      ActionRowItem(
-        icon: const Icon(FontAwesomeIcons.comment),
-        onTap: () {
-          videoDetailCtr.tabCtr.animateTo(1);
-        },
-        selectStatus: false,
-        loadingStatus: loadingStatus,
-        text:
-            !loadingStatus ? widget.videoDetail!.stat!.reply!.toString() : '-',
-      ),
-      const SizedBox(width: 8),
+      // Obx(
+      //   () => ActionRowItem(
+      //     icon: const Icon(FontAwesomeIcons.thumbsUp),
+      //     onTap: () => videoIntroController.actionLikeVideo(),
+      //     selectStatus: videoIntroController.hasLike.value,
+      //     loadingStatus: loadingStatus,
+      //     text:
+      //         !loadingStatus ? widget.videoDetail!.stat!.like!.toString() : '-',
+      //   ),
+      // ),
+      // const SizedBox(width: 8),
+      // Obx(
+      //   () => ActionRowItem(
+      //     icon: const Icon(FontAwesomeIcons.b),
+      //     onTap: () => videoIntroController.actionCoinVideo(),
+      //     selectStatus: videoIntroController.hasCoin.value,
+      //     loadingStatus: loadingStatus,
+      //     text:
+      //         !loadingStatus ? widget.videoDetail!.stat!.coin!.toString() : '-',
+      //   ),
+      // ),
+      // const SizedBox(width: 8),
+      // Obx(
+      //   () => ActionRowItem(
+      //     icon: const Icon(FontAwesomeIcons.heart),
+      //     onTap: () => showFavBottomSheet(),
+      //     onLongPress: () => showFavBottomSheet(type: 'longPress'),
+      //     selectStatus: videoIntroController.hasFav.value,
+      //     loadingStatus: loadingStatus,
+      //     text: !loadingStatus
+      //         ? widget.videoDetail!.stat!.favorite!.toString()
+      //         : '-',
+      //   ),
+      // ),
+      // const SizedBox(width: 8),
+      // ActionRowItem(
+      //   icon: const Icon(FontAwesomeIcons.comment),
+      //   onTap: () {
+      //     videoDetailCtr.tabCtr.animateTo(1);
+      //   },
+      //   selectStatus: false,
+      //   loadingStatus: loadingStatus,
+      //   text:
+      //       !loadingStatus ? widget.videoDetail!.stat!.reply!.toString() : '-',
+      // ),
+      // const SizedBox(width: 8),
       ActionRowItem(
           icon: const Icon(FontAwesomeIcons.share),
           onTap: () => videoIntroController.actionShareVideo(),
