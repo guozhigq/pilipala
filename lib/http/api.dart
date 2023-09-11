@@ -164,6 +164,9 @@ class Api {
   // 清空历史记录
   static const String clearHistory = '/x/v2/history/clear';
 
+  // 删除某条历史记录
+  static const String delHistory = '/x/v2/history/delete';
+
   // 热搜
   static const String hotSearchList =
       'https://s.search.bilibili.com/main/hotword';
@@ -284,6 +287,9 @@ class Api {
 
   // 黑名单
   static const String blackLst = '/x/relation/blacks';
+
+  // 移除黑名单
+  static const String removeBlack = '/x/relation/modify';
 
   // github 获取最新版
   static const String latestApp =

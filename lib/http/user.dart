@@ -231,4 +231,21 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+
+  // 删除历史记录
+  static Future delHistory(kid) async {
+    var res = await Request().post(
+      Api.delHistory,
+      queryParameters: {
+        'kid': 'archive_$kid',
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '已删除'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }

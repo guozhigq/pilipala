@@ -66,6 +66,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 case 'clear':
                   _historyController.onClearHistory();
                   break;
+                case 'del':
+                  _historyController.onDelHistory();
+                  break;
                 default:
               }
             },
@@ -81,6 +84,10 @@ class _HistoryPageState extends State<HistoryPage> {
               const PopupMenuItem<String>(
                 value: 'clear',
                 child: Text('清空观看记录'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'del',
+                child: Text('删除已看记录'),
               ),
             ],
           ),
@@ -112,6 +119,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 return HistoryItem(
                                   videoItem:
                                       _historyController.historyList[index],
+                                  ctr: _historyController,
                                 );
                               },
                                   childCount:
