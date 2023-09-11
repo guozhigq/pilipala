@@ -67,10 +67,11 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
             );
           } else {
             // 请求错误
-            return HttpError(
-              errMsg: snapshot.data['msg'],
-              fn: () => Get.back(),
-            );
+            // return HttpError(
+            //   errMsg: snapshot.data['msg'],
+            //   fn: () => Get.back(),
+            // );
+            return SizedBox();
           }
         } else {
           return BangumiInfo(
@@ -260,9 +261,15 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                   children: [
                                     Text(
                                       !widget.loadingStatus
-                                          ? widget.bangumiDetail!.areas!
-                                              .first['name']
-                                          : bangumiItem!.areas!.first['name'],
+                                          ? (widget.bangumiDetail!.areas!
+                                                  .isNotEmpty
+                                              ? widget.bangumiDetail!.areas!
+                                                  .first['name']
+                                              : '')
+                                          : (bangumiItem!.areas!.isNotEmpty
+                                              ? bangumiItem!
+                                                  .areas!.first['name']
+                                              : ''),
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: t.colorScheme.outline,
