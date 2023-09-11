@@ -820,6 +820,9 @@ class PlPlayerController {
         builder: (context) => Dialog.fullscreen(
           backgroundColor: Colors.black,
           child: SafeArea(
+            // 忽略手机安全区域
+            left: false,
+            right: false,
             bottom:
                 direction.value == 'vertical' || mode == FullScreenMode.vertical
                     ? true
