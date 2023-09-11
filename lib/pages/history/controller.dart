@@ -121,4 +121,24 @@ class HistoryController extends GetxController {
       },
     );
   }
+
+  // 删除某条历史记录
+  Future delHistory(kid) async {
+    var res = await UserHttp.delHistory(kid);
+    if (res['status']) {
+      historyList.removeWhere((e) => e.kid == kid);
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
+  // 删除已看历史记录
+  Future onDelHistory() async {
+    List<HisListItem> result =
+        historyList.where((e) => e.progress == -1).toList();
+    for (HisListItem i in result) {
+      await UserHttp.delHistory(i.kid);
+      historyList.removeWhere((e) => e.kid == i.kid);
+    }
+    SmartDialog.showToast('操作完成');
+  }
 }

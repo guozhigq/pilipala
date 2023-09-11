@@ -11,12 +11,14 @@ import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
   final dynamic videoItem;
-  const HistoryItem({super.key, required this.videoItem});
+  final HistoryController? ctr;
+  const HistoryItem({super.key, required this.videoItem, this.ctr});
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +178,7 @@ class HistoryItem extends StatelessWidget {
                           },
                         ),
                       ),
-                      VideoContent(videoItem: videoItem)
+                      VideoContent(videoItem: videoItem, ctr: ctr)
                     ],
                   ),
                 );
@@ -191,7 +193,8 @@ class HistoryItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  const VideoContent({super.key, required this.videoItem});
+  final HistoryController? ctr;
+  const VideoContent({super.key, required this.videoItem, this.ctr});
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +256,7 @@ class VideoContent extends StatelessWidget {
                     height: 24,
                     child: PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
-                      tooltip: '稍后再看',
+                      tooltip: '功能菜单',
                       icon: Icon(
                         Icons.more_vert_outlined,
                         color: Theme.of(context).colorScheme.outline,
@@ -277,6 +280,18 @@ class VideoContent extends StatelessWidget {
                               Icon(Icons.watch_later_outlined, size: 16),
                               SizedBox(width: 6),
                               Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          onTap: () => ctr!.delHistory(videoItem.kid),
+                          value: 'pause',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.close_outlined, size: 16),
+                              SizedBox(width: 6),
+                              Text('删除记录', style: TextStyle(fontSize: 13))
                             ],
                           ),
                         ),
