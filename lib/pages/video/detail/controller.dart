@@ -317,13 +317,15 @@ class VideoDetailController extends GetxController
             closestNumber = 30280;
           }
           firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
+        } else {
+          firstAudio = AudioItem();
         }
       } catch (err) {
-        firstAudio = audiosList.first;
+        firstAudio = audiosList.isNotEmpty ? audiosList.first : AudioItem();
         SmartDialog.showToast('firstAudio error: $err');
       }
 
-      audioUrl = firstAudio!.baseUrl ?? '';
+      audioUrl = firstAudio.baseUrl ?? '';
       //
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
