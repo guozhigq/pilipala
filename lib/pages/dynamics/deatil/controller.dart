@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/reply.dart';
@@ -17,6 +18,7 @@ class DynamicDetailController extends GetxController {
   RxString noMore = ''.obs;
   RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
   RxInt acount = 0.obs;
+  final ScrollController scrollController = ScrollController();
 
   ReplySortType _sortType = ReplySortType.time;
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
