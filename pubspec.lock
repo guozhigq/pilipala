@@ -669,14 +669,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.17"
-  image_gallery_saver:
-    dependency: "direct main"
-    description:
-      name: image_gallery_saver
-      sha256: "0aba74216a4d9b0561510cb968015d56b701ba1bd94aace26aacdd8ae5761816"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.3"
   intl:
     dependency: transitive
     description:
@@ -1094,6 +1086,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  saver_gallery:
+    dependency: "direct main"
+    description:
+      name: saver_gallery
+      sha256: "3131bba4257f69901437c0f1ebd692201ca5f34512d42667513a3802f1c171d1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   screen_brightness:
     dependency: "direct main"
     description:
