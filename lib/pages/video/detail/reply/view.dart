@@ -62,6 +62,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         vsync: this, duration: const Duration(milliseconds: 300));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
+
+    fabAnimationCtr.forward();
+    scrollListener();
+  }
+
+  void scrollListener() {
     scrollController = _videoReplyController.scrollController;
     scrollController.addListener(
       () {
@@ -81,7 +87,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         }
       },
     );
-    fabAnimationCtr.forward();
   }
 
   void _showFab() {
@@ -112,9 +117,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   void dispose() {
-    super.dispose();
+    scrollController.removeListener(() {});
     fabAnimationCtr.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,7 +134,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       child: Stack(
         children: [
           CustomScrollView(
-            controller: _videoReplyController.scrollController,
+            controller: scrollController,
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(

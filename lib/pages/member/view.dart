@@ -102,7 +102,35 @@ class _MemberPageState extends State<MemberPage>
                 },
               ),
               actions: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+                PopupMenuButton(
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      onTap: () => _memberController.blockUser(),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.block, size: 19),
+                          const SizedBox(width: 10),
+                          Text(_memberController.attribute.value != 128
+                              ? '加入黑名单'
+                              : '移除黑名单'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      onTap: () => _memberController.shareUser(),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.share_outlined, size: 19),
+                          SizedBox(width: 10),
+                          Text('分享UP主'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(width: 4),
               ],
               flexibleSpace: FlexibleSpaceBar(

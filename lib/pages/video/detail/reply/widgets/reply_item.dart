@@ -744,11 +744,14 @@ InlineSpan buildContent(
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   // 跳转到指定位置
-                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-                      .plPlayerController
-                      .seekTo(
-                        Duration(seconds: Utils.duration(matchStr)),
-                      );
+                  try {
+                    Get.find<VideoDetailController>(
+                            tag: Get.arguments['heroTag'])
+                        .plPlayerController
+                        .seekTo(
+                          Duration(seconds: Utils.duration(matchStr)),
+                        );
+                  } catch (_) {}
                 },
             ),
           );
