@@ -12,20 +12,20 @@ enum SearchType {
   live_room,
   // 主播：live_user
   // live_user,
-  // 专栏：article
-  // article,
   // 话题：topic
   // topic,
   // 用户：bili_user
   bili_user,
+  // 专栏：article
+  article,
   // 相簿：photo
   // photo
 }
 
 extension SearchTypeExtension on SearchType {
   String get type =>
-      ['video', 'media_bangumi', 'live_room', 'bili_user'][index];
-  String get label => ['视频', '番剧', '直播间', '用户'][index];
+      ['video', 'media_bangumi', 'live_room', 'bili_user', 'article'][index];
+  String get label => ['视频', '番剧', '直播间', '用户', '专栏'][index];
 }
 
 // 搜索类型为视频、专栏及相簿时
