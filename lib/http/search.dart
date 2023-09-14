@@ -83,7 +83,9 @@ class SearchHttp {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['data']['numPages'] == 0 ? '没有相关数据' : '请求错误 🙅',
+        'msg': res.data['data'] != null && res.data['data']['numPages'] == 0
+            ? '没有相关数据'
+            : res.data['message'],
       };
     }
   }

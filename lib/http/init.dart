@@ -118,7 +118,8 @@ class Request {
 
     dio.transformer = BackgroundTransformer();
     dio.options.validateStatus = (status) {
-      return status! >= 200 && status < 300 || status == 304 || status == 302;
+      return status! >= 200 && status < 300 ||
+          HttpString.validateStatusCodes.contains(status);
     };
   }
 

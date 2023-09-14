@@ -45,6 +45,7 @@ dependencies:
   cookie_jar: ^4.0.8
   dio_cookie_manager: ^3.1.0
   connectivity_plus: ^4.0.1
+  dio_http2_adapter: ^2.3.1+1
 
   # 图片
   cached_network_image: ^3.2.3
