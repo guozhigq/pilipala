@@ -27,10 +27,14 @@ class SearchHttp {
     var res = await Request().get(Api.serachSuggest,
         data: {'term': term, 'main_ver': 'v1', 'highlight': term});
     if (res.data['code'] == 0) {
-      res.data['result']['term'] = term;
+      if (res.data['result'] is Map) {
+        res.data['result']['term'] = term;
+      }
       return {
         'status': true,
-        'data': SearchSuggestModel.fromJson(res.data['result']),
+        'data': res.data['result'] is Map
+            ? SearchSuggestModel.fromJson(res.data['result'])
+            : [],
       };
     } else {
       return {
