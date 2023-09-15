@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -8,18 +10,26 @@ import 'package:pilipala/models/search/suggest.dart';
 class SearchHttp {
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
-    if (res.data['code'] == 0) {
+    if (res.data is String) {
+      Map<String, dynamic> resultMap = json.decode(res.data);
+      if (resultMap['code'] == 0) {
+        return {
+          'status': true,
+          'data': HotSearchModel.fromJson(resultMap),
+        };
+      }
+    } else if (res.data is Map<String, dynamic> && res.data['code'] == 0) {
       return {
         'status': true,
         'data': HotSearchModel.fromJson(res.data),
       };
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': '请求错误 🙅',
-      };
     }
+
+    return {
+      'status': false,
+      'data': [],
+      'msg': '请求错误 🙅',
+    };
   }
 
   // 获取搜索建议
@@ -27,10 +37,14 @@ class SearchHttp {
     var res = await Request().get(Api.serachSuggest,
         data: {'term': term, 'main_ver': 'v1', 'highlight': term});
     if (res.data['code'] == 0) {
-      res.data['result']['term'] = term;
+      if (res.data['result'] is Map) {
+        res.data['result']['term'] = term;
+      }
       return {
         'status': true,
-        'data': SearchSuggestModel.fromJson(res.data['result']),
+        'data': res.data['result'] is Map
+            ? SearchSuggestModel.fromJson(res.data['result'])
+            : [],
       };
     } else {
       return {
@@ -83,7 +97,9 @@ class SearchHttp {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['data']['numPages'] == 0 ? '没有相关数据' : '请求错误 🙅',
+        'msg': res.data['data'] != null && res.data['data']['numPages'] == 0
+            ? '没有相关数据'
+            : res.data['message'],
       };
     }
   }
