@@ -12,7 +12,7 @@ class SSearchController extends GetxController {
   final FocusNode searchFocusNode = FocusNode();
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
-  RxList<HotSearchItem> hotSearchList = [HotSearchItem()].obs;
+  RxList<HotSearchItem> hotSearchList = <HotSearchItem>[].obs;
   Box histiryWord = GStrorage.historyword;
   List historyCacheList = [];
   RxList historyList = [].obs;
@@ -85,7 +85,9 @@ class SSearchController extends GetxController {
   // 获取热搜关键词
   Future queryHotSearchList() async {
     var result = await SearchHttp.hotSearchList();
-    hotSearchList.value = result['data'].list;
+    if (result['status']) {
+      hotSearchList.value = result['data'].list;
+    }
     return result;
   }
 
