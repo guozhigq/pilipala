@@ -26,11 +26,6 @@ class VideoReplyReplyController extends GetxController {
     currentPage = 0;
   }
 
-  // 上拉加载
-  Future onLoad() async {
-    queryReplyList(type: 'onLoad');
-  }
-
   Future queryReplyList({type = 'init'}) async {
     if (type == 'init') {
       currentPage = 0;
@@ -49,11 +44,11 @@ class VideoReplyReplyController extends GetxController {
         if (replyList.length == res['data'].page.count) {
           noMore.value = '没有更多了';
         }
+        currentPage++;
       } else {
         // 未登录状态replies可能返回null
         noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
       }
-      currentPage++;
       if (type == 'init') {
         // List<ReplyItemModel> replies = res['data'].replies;
         // 添加置顶回复
@@ -72,6 +67,10 @@ class VideoReplyReplyController extends GetxController {
         // res['data'].replies = replies;
         replyList.value = replies;
       } else {
+        // 每次回复之后，翻页请求有且只有相同的一条回复数据
+        if (replies.length == 1 && replies.last.rpid == replyList.last.rpid) {
+          return;
+        }
         replyList.addAll(replies);
         // res['data'].replies.addAll(replyList);
       }

@@ -199,6 +199,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   // 视频介绍
   showIntroDetail() {
+    if (loadingStatus) {
+      return;
+    }
     feedBack();
     showBottomSheet(
       context: context,
@@ -254,22 +257,25 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           ),
                         ),
                         const SizedBox(width: 20),
-                        SizedBox(
-                          width: 34,
-                          height: 34,
-                          child: IconButton(
-                            style: ButtonStyle(
-                              padding:
-                                  MaterialStateProperty.all(EdgeInsets.zero),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith((states) {
-                                return t.highlightColor.withOpacity(0.2);
-                              }),
-                            ),
-                            onPressed: showIntroDetail,
-                            icon: Icon(
-                              Icons.more_horiz,
-                              color: Theme.of(context).colorScheme.primary,
+                        Opacity(
+                          opacity: loadingStatus ? 0 : 1,
+                          child: SizedBox(
+                            width: 34,
+                            height: 34,
+                            child: IconButton(
+                              style: ButtonStyle(
+                                padding:
+                                    MaterialStateProperty.all(EdgeInsets.zero),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith((states) {
+                                  return t.highlightColor.withOpacity(0.2);
+                                }),
+                              ),
+                              onPressed: showIntroDetail,
+                              icon: Icon(
+                                Icons.more_horiz,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
                           ),
                         ),
