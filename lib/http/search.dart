@@ -75,24 +75,31 @@ class SearchHttp {
     var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
       Object data;
-      switch (searchType) {
-        case SearchType.video:
-          data = SearchVideoModel.fromJson(res.data['data']);
-          break;
-        case SearchType.live_room:
-          data = SearchLiveModel.fromJson(res.data['data']);
-          break;
-        case SearchType.bili_user:
-          data = SearchUserModel.fromJson(res.data['data']);
-          break;
-        case SearchType.media_bangumi:
-          data = SearchMBangumiModel.fromJson(res.data['data']);
-          break;
+      try {
+        switch (searchType) {
+          case SearchType.video:
+            data = SearchVideoModel.fromJson(res.data['data']);
+            break;
+          case SearchType.live_room:
+            data = SearchLiveModel.fromJson(res.data['data']);
+            break;
+          case SearchType.bili_user:
+            data = SearchUserModel.fromJson(res.data['data']);
+            break;
+          case SearchType.media_bangumi:
+            data = SearchMBangumiModel.fromJson(res.data['data']);
+            break;
+          case SearchType.article:
+            data = SearchArticleModel.fromJson(res.data['data']);
+            break;
+        }
+        return {
+          'status': true,
+          'data': data,
+        };
+      } catch (err) {
+        print(err);
       }
-      return {
-        'status': true,
-        'data': data,
-      };
     } else {
       return {
         'status': false,

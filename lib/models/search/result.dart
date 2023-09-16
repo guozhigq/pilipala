@@ -376,3 +376,72 @@ class SearchMBangumiItemModel {
     indexShow = json['index_show'];
   }
 }
+
+class SearchArticleModel {
+  SearchArticleModel({this.list});
+
+  List<SearchArticleItemModel>? list;
+
+  SearchArticleModel.fromJson(Map<String, dynamic> json) {
+    list = json['result'] != null
+        ? json['result']
+            .map<SearchArticleItemModel>(
+                (e) => SearchArticleItemModel.fromJson(e))
+            .toList()
+        : [];
+  }
+}
+
+class SearchArticleItemModel {
+  SearchArticleItemModel({
+    this.pubTime,
+    this.like,
+    this.title,
+    this.rankOffset,
+    this.mid,
+    this.imageUrls,
+    this.id,
+    this.categoryId,
+    this.view,
+    this.reply,
+    this.desc,
+    this.rankScore,
+    this.type,
+    this.templateId,
+    this.categoryName,
+  });
+
+  int? pubTime;
+  int? like;
+  List? title;
+  int? rankOffset;
+  int? mid;
+  List? imageUrls;
+  int? id;
+  int? categoryId;
+  int? view;
+  int? reply;
+  String? desc;
+  int? rankScore;
+  String? type;
+  int? templateId;
+  String? categoryName;
+
+  SearchArticleItemModel.fromJson(Map<String, dynamic> json) {
+    pubTime = json['pub_time'];
+    like = json['like'];
+    title = Em.regTitle(json['title']);
+    rankOffset = json['rank_offset'];
+    mid = json['mid'];
+    imageUrls = json['image_urls'];
+    id = json['id'];
+    categoryId = json['category_id'];
+    view = json['view'];
+    reply = json['reply'];
+    desc = json['desc'];
+    rankScore = json['rank_score'];
+    type = json['type'];
+    templateId = json['templateId'];
+    categoryName = json['category_name'];
+  }
+}

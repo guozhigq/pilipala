@@ -7,6 +7,7 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/search_type.dart';
 
 import 'controller.dart';
+import 'widgets/article_panel.dart';
 import 'widgets/live_panel.dart';
 import 'widgets/media_bangumi_panel.dart';
 import 'widgets/user_panel.dart';
@@ -90,6 +91,8 @@ class _SearchPanelState extends State<SearchPanel>
                     return searchUserPanel(context, ctr, list);
                   case SearchType.live_room:
                     return searchLivePanel(context, ctr, list);
+                  case SearchType.article:
+                    return searchArticlePanel(context, ctr, list);
                   default:
                     return const SizedBox();
                 }
