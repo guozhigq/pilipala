@@ -123,12 +123,14 @@ Widget profile(ctr, {loadingStatus = false}) {
                                       : '-',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold)),
-                              Text('粉丝',
-                                  style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium!
-                                          .fontSize))
+                              Text(
+                                '粉丝',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize),
+                              )
                             ],
                           ),
                         ),

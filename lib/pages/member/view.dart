@@ -20,7 +20,8 @@ class MemberPage extends StatefulWidget {
 
 class _MemberPageState extends State<MemberPage>
     with SingleTickerProviderStateMixin {
-  final MemberController _memberController = Get.put(MemberController());
+  late String heroTag;
+  late MemberController _memberController;
   Future? _futureBuilderFuture;
   final ScrollController _extendNestCtr = ScrollController();
   late TabController _tabController;
@@ -29,6 +30,8 @@ class _MemberPageState extends State<MemberPage>
   @override
   void initState() {
     super.initState();
+    heroTag = Get.arguments['heroTag'];
+    _memberController = Get.put(MemberController(), tag: heroTag);
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
     _extendNestCtr.addListener(
@@ -105,27 +108,33 @@ class _MemberPageState extends State<MemberPage>
                 PopupMenuButton(
                   icon: const Icon(Icons.more_vert),
                   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                    if (_memberController.ownerMid !=
+                        _memberController.mid) ...[
+                      PopupMenuItem(
+                        onTap: () => _memberController.blockUser(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.block, size: 19),
+                            const SizedBox(width: 10),
+                            Text(_memberController.attribute.value != 128
+                                ? '加入黑名单'
+                                : '移除黑名单'),
+                          ],
+                        ),
+                      )
+                    ],
                     PopupMenuItem(
-                      onTap: () => _memberController.blockUser(),
+                      onTap: () => _memberController.shareUser(),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.block, size: 19),
+                          const Icon(Icons.share_outlined, size: 19),
                           const SizedBox(width: 10),
-                          Text(_memberController.attribute.value != 128
-                              ? '加入黑名单'
-                              : '移除黑名单'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () => _memberController.shareUser(),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.share_outlined, size: 19),
-                          SizedBox(width: 10),
-                          Text('分享UP主'),
+                          Text(_memberController.ownerMid !=
+                                  _memberController.mid
+                              ? '分享UP主'
+                              : '分享我的主页'),
                         ],
                       ),
                     ),

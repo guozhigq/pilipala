@@ -16,13 +16,16 @@ class FollowPage extends StatefulWidget {
 }
 
 class _FollowPageState extends State<FollowPage> {
-  final FollowController _followController = Get.put(FollowController());
+  late String mid;
+  late FollowController _followController;
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
+    mid = Get.parameters['mid']!;
+    _followController = Get.put(FollowController(), tag: mid);
     _futureBuilderFuture = _followController.queryFollowings('init');
     scrollController.addListener(
       () async {
