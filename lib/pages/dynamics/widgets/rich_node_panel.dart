@@ -225,8 +225,10 @@ InlineSpan richNode(item, context) {
                         width: box.maxWidth / 2,
                         height: box.maxWidth *
                             0.5 *
-                            pictureItem.height! /
-                            pictureItem.width!,
+                            (pictureItem.height != null &&
+                                    pictureItem.width != null
+                                ? pictureItem.height! / pictureItem.width!
+                                : 1),
                       ),
                     ),
                   );

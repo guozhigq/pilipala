@@ -130,11 +130,19 @@ class Request {
     Response response;
     Options options;
     ResponseType resType = ResponseType.json;
-    if (extra != null) {
-      resType = extra!['resType'] ?? ResponseType.json;
-    }
+
     options = Options();
     options.responseType = resType;
+
+    if (extra != null) {
+      options.responseType = extra!['resType'] ?? ResponseType.json;
+      if (extra['ua'] != null) {
+        print(options.headers);
+        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+        // options.headers!['user-agent'] = headerUa(type: extra['ua']);
+      }
+    }
+
     try {
       response = await dio.get(
         url,
@@ -201,14 +209,19 @@ class Request {
     token.cancel("cancelled");
   }
 
-  String headerUa() {
+  String headerUa({type = 'mob'}) {
     String headerUa = '';
-    if (Platform.isIOS) {
-      headerUa =
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Mobile/15E148 Safari/604.1';
+    if (type == 'mob') {
+      if (Platform.isIOS) {
+        headerUa =
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Mobile/15E148 Safari/604.1';
+      } else {
+        headerUa =
+            'Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36';
+      }
     } else {
       headerUa =
-          'Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36';
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
     }
     return headerUa;
   }

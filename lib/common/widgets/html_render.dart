@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // ignore: must_be_immutable
 class HtmlRender extends StatelessWidget {
@@ -20,35 +20,47 @@ class HtmlRender extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       data: htmlContent,
-      // tagsList: Html.tags..addAll(["form", "label", "input"]),
       onLinkTap: (url, buildContext, attributes) => {},
       extensions: [
         TagExtension(
           tagsToExtend: {"img"},
           builder: (extensionContext) {
-            String? imgUrl = extensionContext.attributes['src'];
-            if (imgUrl!.startsWith('//')) {
-              imgUrl = 'https:$imgUrl';
+            try {
+              Map attributes = extensionContext.attributes;
+              List key = attributes.keys.toList();
+              String? imgUrl = key.contains('src')
+                  ? attributes['src']
+                  : attributes['data-src'];
+              if (imgUrl!.startsWith('//')) {
+                imgUrl = 'https:$imgUrl';
+              }
+              if (imgUrl.startsWith('http://')) {
+                imgUrl = imgUrl.replaceAll('http://', 'https://');
+              }
+              imgUrl = imgUrl.contains('@') ? imgUrl.split('@').first : imgUrl;
+              bool isEmote = imgUrl.contains('/emote/');
+              bool isMall = imgUrl.contains('/mall/');
+              if (isMall) {
+                return const SizedBox();
+              }
+              // bool inTable =
+              //     extensionContext.element!.previousElementSibling == null ||
+              //         extensionContext.element!.nextElementSibling == null;
+              // imgUrl = Utils().imageUrl(imgUrl!);
+              // return Image.network(
+              //   imgUrl,
+              //   width: isEmote ? 22 : null,
+              //   height: isEmote ? 22 : null,
+              // );
+              return NetworkImgLayer(
+                width: isEmote ? 22 : Get.size.width - 24,
+                height: isEmote ? 22 : 200,
+                src: imgUrl,
+              );
+            } catch (err) {
+              print(err);
+              return const SizedBox();
             }
-            if (imgUrl.startsWith('http://')) {
-              imgUrl = imgUrl.replaceAll('http://', 'https://');
-            }
-
-            print(imgUrl);
-            bool isEmote = imgUrl.contains('/emote/');
-            bool isMall = imgUrl.contains('/mall/');
-            if (isMall) {
-              return SizedBox();
-            }
-            // bool inTable =
-            //     extensionContext.element!.previousElementSibling == null ||
-            //         extensionContext.element!.nextElementSibling == null;
-            // imgUrl = Utils().imageUrl(imgUrl!);
-            return Image.network(
-              imgUrl,
-              width: isEmote ? 22 : null,
-              height: isEmote ? 22 : null,
-            );
           },
         ),
       ],
@@ -63,11 +75,13 @@ class HtmlRender extends StatelessWidget {
           textDecoration: TextDecoration.none,
         ),
         "p": Style(
-          margin: Margins.only(bottom: 0),
+          margin: Margins.only(bottom: 10),
         ),
         "span": Style(
           fontSize: FontSize.medium,
+          height: Height(1.65),
         ),
+        "div": Style(height: Height.auto()),
         "li > p": Style(
           display: Display.inline,
         ),
@@ -75,61 +89,7 @@ class HtmlRender extends StatelessWidget {
           padding: HtmlPaddings.only(bottom: 4),
           textAlign: TextAlign.justify,
         ),
-        "image": Style(margin: Margins.only(top: 4, bottom: 4)),
-        "p > img": Style(margin: Margins.only(top: 4, bottom: 4)),
-        "code": Style(
-            backgroundColor: Theme.of(context).colorScheme.onInverseSurface),
-        "code > span": Style(textAlign: TextAlign.start),
-        "hr": Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          border: Border(
-            top: BorderSide(
-              width: 1.0,
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-            ),
-          ),
-        ),
-        'table': Style(
-          border: Border(
-            right: BorderSide(
-              width: 0.5,
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-            ),
-            bottom: BorderSide(
-              width: 0.5,
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-            ),
-          ),
-        ),
-        'tr': Style(
-          border: Border(
-            top: BorderSide(
-              width: 1.0,
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-            ),
-            left: BorderSide(
-              width: 1.0,
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-            ),
-          ),
-        ),
-        'thead': Style(
-          backgroundColor: Theme.of(context).colorScheme.background,
-        ),
-        'th': Style(
-          padding: HtmlPaddings.only(left: 3, right: 3),
-        ),
-        'td': Style(
-          padding: HtmlPaddings.all(4.0),
-          alignment: Alignment.center,
-          textAlign: TextAlign.center,
-        ),
+        "img": Style(margin: Margins.only(top: 4, bottom: 4)),
       },
     );
   }

@@ -62,6 +62,15 @@ class VideoCardV extends StatelessWidget {
           'heroTag': heroTag,
         });
         break;
+      // 动态
+      case 'picture':
+        Get.toNamed('/htmlRender', parameters: {
+          'url': videoItem.uri,
+          'title': videoItem.title,
+          'id': videoItem.param.toString(),
+          'dynamicType': 'picture'
+        });
+        break;
       default:
         SmartDialog.showToast(videoItem.goto);
         Get.toNamed(
