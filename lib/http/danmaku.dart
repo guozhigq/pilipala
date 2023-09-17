@@ -17,17 +17,11 @@ class DanmakaHttp {
       'oid': cid,
       'segment_index': segmentIndex,
     };
-
-    // 计算函数
-    Future<DmSegMobileReply> computeTask(Map<String, int> params) async {
-      var response = await Request().get(
-        Api.webDanmaku,
-        data: params,
-        extra: {'resType': ResponseType.bytes},
-      );
-      return DmSegMobileReply.fromBuffer(response.data);
-    }
-
-    return await compute(computeTask, params);
+    var response = await Request().get(
+      Api.webDanmaku,
+      data: params,
+      extra: {'resType': ResponseType.bytes},
+    );
+    return DmSegMobileReply.fromBuffer(response.data);
   }
 }
