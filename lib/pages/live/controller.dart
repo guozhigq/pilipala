@@ -25,9 +25,9 @@ class LiveController extends GetxController {
 
   // 获取推荐
   Future queryLiveList(type) async {
-    if (type == 'init') {
-      _currentPage = 1;
-    }
+    // if (type == 'init') {
+    //   _currentPage = 1;
+    // }
     var res = await LiveHttp.liveList(
       pn: _currentPage,
     );

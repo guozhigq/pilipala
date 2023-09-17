@@ -24,7 +24,7 @@ class LiveCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
     return Card(
-      elevation: crossAxisCount == 1 ? 0 : 1,
+      elevation: 0,
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
       child: GestureDetector(
@@ -102,7 +102,7 @@ class LiveContent extends StatelessWidget {
       child: Padding(
         padding: crossAxisCount == 1
             ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
-            : const EdgeInsets.fromLTRB(9, 8, 9, 8),
+            : const EdgeInsets.fromLTRB(5, 8, 5, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

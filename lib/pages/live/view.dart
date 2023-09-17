@@ -21,10 +21,14 @@ class LivePage extends StatefulWidget {
   State<LivePage> createState() => _LivePageState();
 }
 
-class _LivePageState extends State<LivePage> {
+class _LivePageState extends State<LivePage>
+    with AutomaticKeepAliveClientMixin {
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -37,7 +41,7 @@ class _LivePageState extends State<LivePage> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
+          EasyThrottle.throttle('liveList', const Duration(seconds: 1), () {
             _liveController.isLoadingMore = true;
             _liveController.onLoad();
           });
@@ -144,9 +148,9 @@ class _LivePageState extends State<LivePage> {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 4,
+        mainAxisSpacing: StyleString.safeSpace,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 4,
+        crossAxisSpacing: StyleString.safeSpace,
         // 列数
         crossAxisCount: crossAxisCount,
         mainAxisExtent:
