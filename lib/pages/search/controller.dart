@@ -105,7 +105,7 @@ class SSearchController extends GetxController {
   Future querySearchSuggest(String value) async {
     var result = await SearchHttp.searchSuggest(term: value);
     if (result['status']) {
-      if (result['data'].isNotEmpty) {
+      if (result['data'] is SearchSuggestModel) {
         searchSuggestList.value = result['data'].tag;
       }
     }

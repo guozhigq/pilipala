@@ -510,6 +510,7 @@ class PlPlayerController {
       position = Duration.zero;
     }
     _position.value = position;
+    _heartDuration = position.inSeconds;
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
@@ -878,7 +879,7 @@ class PlPlayerController {
   }
 
   // 记录播放记录
-  Future makeHeartBeat(progress, {type = 'playing'}) async {
+  Future makeHeartBeat(int progress, {type = 'playing'}) async {
     if (!_enableHeart) {
       return false;
     }
