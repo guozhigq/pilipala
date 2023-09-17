@@ -46,7 +46,10 @@ class ApiInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
     // handler.next(err);
-    SmartDialog.showToast(await dioError(err));
+    SmartDialog.showToast(
+      await dioError(err),
+      displayType: SmartToastType.onlyRefresh,
+    );
     super.onError(err, handler);
   }
 
