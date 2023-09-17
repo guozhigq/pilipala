@@ -22,7 +22,7 @@ Widget profile(ctr, {loadingStatus = false}) {
                     width: 90,
                     height: 90,
                     type: 'avatar',
-                    src: !loadingStatus ? memberInfo.face : ctr.face,
+                    src: !loadingStatus ? memberInfo.face : ctr.face.value,
                   ),
                   if (!loadingStatus &&
                       memberInfo.liveRoom != null &&

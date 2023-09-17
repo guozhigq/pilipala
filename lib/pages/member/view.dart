@@ -8,6 +8,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/member/archive/view.dart';
 import 'package:pilipala/pages/member/dynamic/index.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 import 'widgets/profile.dart';
 
@@ -30,7 +31,8 @@ class _MemberPageState extends State<MemberPage>
   @override
   void initState() {
     super.initState();
-    heroTag = Get.arguments['heroTag'];
+    heroTag =
+        Get.arguments['heroTag'] ?? Utils.makeHeroTag(Get.parameters['mid']);
     _memberController = Get.put(MemberController(), tag: heroTag);
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
@@ -80,11 +82,13 @@ class _MemberPageState extends State<MemberPage>
                       children: [
                         Row(
                           children: [
-                            NetworkImgLayer(
-                              width: 35,
-                              height: 35,
-                              type: 'avatar',
-                              src: _memberController.face ?? '',
+                            Obx(
+                              () => NetworkImgLayer(
+                                width: 35,
+                                height: 35,
+                                type: 'avatar',
+                                src: _memberController.face.value,
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Obx(
@@ -145,34 +149,38 @@ class _MemberPageState extends State<MemberPage>
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   children: [
-                    if (_memberController.face != null)
-                      Positioned.fill(
-                        bottom: 10,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              fit: BoxFit.fitWidth,
-                              image: NetworkImage(_memberController.face!),
-                              alignment: Alignment.topCenter,
-                              isAntiAlias: true,
-                            ),
-                          ),
-                          foregroundDecoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context)
-                                    .colorScheme
-                                    .background
-                                    .withOpacity(0.44),
-                                Theme.of(context).colorScheme.background,
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              stops: const [0.0, 0.46],
-                            ),
-                          ),
-                        ),
-                      ),
+                    Obx(
+                      () => _memberController.face.value != ''
+                          ? Positioned.fill(
+                              bottom: 10,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.fitWidth,
+                                    image: NetworkImage(
+                                        _memberController.face.value),
+                                    alignment: Alignment.topCenter,
+                                    isAntiAlias: true,
+                                  ),
+                                ),
+                                foregroundDecoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .background
+                                          .withOpacity(0.44),
+                                      Theme.of(context).colorScheme.background,
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    stops: const [0.0, 0.46],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
+                    ),
                     Positioned(
                       left: 0,
                       right: 0,
