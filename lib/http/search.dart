@@ -89,9 +89,9 @@ class SearchHttp {
           case SearchType.media_bangumi:
             data = SearchMBangumiModel.fromJson(res.data['data']);
             break;
-          case SearchType.article:
-            data = SearchArticleModel.fromJson(res.data['data']);
-            break;
+          // case SearchType.article:
+          //   data = SearchArticleModel.fromJson(res.data['data']);
+          //   break;
         }
         return {
           'status': true,

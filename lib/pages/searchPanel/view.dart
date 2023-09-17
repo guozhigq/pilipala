@@ -91,8 +91,8 @@ class _SearchPanelState extends State<SearchPanel>
                     return searchUserPanel(context, ctr, list);
                   case SearchType.live_room:
                     return searchLivePanel(context, ctr, list);
-                  case SearchType.article:
-                    return searchArticlePanel(context, ctr, list);
+                  // case SearchType.article:
+                  //   return searchArticlePanel(context, ctr, list);
                   default:
                     return const SizedBox();
                 }

@@ -17,7 +17,7 @@ enum SearchType {
   // 用户：bili_user
   bili_user,
   // 专栏：article
-  article,
+  // article,
   // 相簿：photo
   // photo
 }
