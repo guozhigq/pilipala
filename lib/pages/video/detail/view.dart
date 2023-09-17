@@ -347,78 +347,40 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               },
               onlyOneScrollInBody: true,
               body: Container(
-                key: Key(heroTag),
                 color: Theme.of(context).colorScheme.background,
-                child: Column(
-                  children: [
-                    Opacity(
-                      opacity: 0,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 0,
-                        child: Obx(
-                          () => TabBar(
-                            controller: videoDetailController.tabCtr,
-                            dividerColor: Colors.transparent,
-                            indicatorColor:
-                                Theme.of(context).colorScheme.background,
-                            tabs: videoDetailController.tabs
-                                .map((String name) => Tab(text: name))
-                                .toList(),
-                          ),
+                child: CustomScrollView(
+                  key: const PageStorageKey<String>('简介'),
+                  slivers: <Widget>[
+                    if (videoDetailController.videoType ==
+                        SearchType.video) ...[
+                      const VideoIntroPanel(),
+                    ] else
+                      // if (videoDetailController.videoType ==
+                      //     SearchType.media_bangumi) ...[
+                      //   BangumiIntroPanel(
+                      //       cid: videoDetailController.cid)
+                      // ],
+                      // if (videoDetailController.videoType ==
+                      //     SearchType.video) ...[
+                      //   SliverPersistentHeader(
+                      //     floating: true,
+                      //     pinned: true,
+                      //     delegate: SliverHeaderDelegate(
+                      //       height: 50,
+                      //       child:
+                      //           const MenuRow(loadingStatus: false),
+                      //     ),
+                      //   ),
+                      // ],
+                      SliverToBoxAdapter(
+                        child: Divider(
+                          indent: 12,
+                          endIndent: 12,
+                          color:
+                              Theme.of(context).dividerColor.withOpacity(0.06),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: videoDetailController.tabCtr,
-                        children: [
-                          Builder(
-                            builder: (context) {
-                              return CustomScrollView(
-                                key: const PageStorageKey<String>('简介'),
-                                slivers: <Widget>[
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    const VideoIntroPanel(),
-                                  ] else
-                                    // if (videoDetailController.videoType ==
-                                    //     SearchType.media_bangumi) ...[
-                                    //   BangumiIntroPanel(
-                                    //       cid: videoDetailController.cid)
-                                    // ],
-                                    // if (videoDetailController.videoType ==
-                                    //     SearchType.video) ...[
-                                    //   SliverPersistentHeader(
-                                    //     floating: true,
-                                    //     pinned: true,
-                                    //     delegate: SliverHeaderDelegate(
-                                    //       height: 50,
-                                    //       child:
-                                    //           const MenuRow(loadingStatus: false),
-                                    //     ),
-                                    //   ),
-                                    // ],
-                                    SliverToBoxAdapter(
-                                      child: Divider(
-                                        indent: 12,
-                                        endIndent: 12,
-                                        color: Theme.of(context)
-                                            .dividerColor
-                                            .withOpacity(0.06),
-                                      ),
-                                    ),
-                                  // const RelatedVideoPanel(),
-                                ],
-                              );
-                            },
-                          ),
-                          VideoReplyPanel(
-                            bvid: videoDetailController.bvid,
-                          )
-                        ],
-                      ),
-                    ),
+                    // const RelatedVideoPanel(),
                   ],
                 ),
               ),

@@ -142,21 +142,15 @@ class VideoContent extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            Text(
-              videoItem.owner.name,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
             Row(
               children: [
-                StatView(
-                  theme: 'gray',
-                  view: videoItem.cntInfo['play'],
+                Text(
+                  videoItem.owner.name,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
-                const SizedBox(width: 8),
-                StatDanMu(theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
                 const Spacer(),
                 SizedBox(
                   width: 26,

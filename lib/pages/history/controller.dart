@@ -56,8 +56,7 @@ class HistoryController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content:
-              Text(!pauseStatus.value ? '啊叻？你要暂停历史记录功能吗？' : '啊叻？要恢复历史记录功能吗？'),
+          content: Text(!pauseStatus.value ? '你要暂停历史记录功能吗？' : '要恢复历史记录功能吗？'),
           actions: [
             TextButton(
                 onPressed: () => SmartDialog.dismiss(),

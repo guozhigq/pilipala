@@ -27,12 +27,6 @@ Widget followItem({item}) {
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(fontSize: 14),
     ),
-    subtitle: Text(
-      item.sign,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    ),
-    dense: true,
     trailing: const SizedBox(width: 6),
   );
 }

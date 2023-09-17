@@ -70,11 +70,11 @@ class MemberController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: Text(memberInfo.value.isFollowed! ? '取消关注UP主?' : '关注UP主?'),
+          content: Text(memberInfo.value.isFollowed! ? '取消关注该用户?' : '关注该用户?'),
           actions: [
             TextButton(
                 onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
+                child: const Text('取消')),
             TextButton(
               onPressed: () async {
                 await VideoHttp.relationMod(
