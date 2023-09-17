@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -54,9 +55,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          if (!_videoReplyReplyController.isLoadingMore) {
-            _videoReplyReplyController.onLoad();
-          }
+          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+            _videoReplyReplyController.queryReplyList(type: 'onLoad');
+          });
         }
       },
     );

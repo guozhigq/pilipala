@@ -110,6 +110,7 @@ class MemberController extends GetxController {
   // 关系查询
   Future relationSearch() async {
     if (userInfo == null) return;
+    if (mid == ownerMid) return;
     var res = await UserHttp.relationSearch(mid);
     if (res['status']) {
       attribute.value = res['data']['relation']['attribute'];
