@@ -817,6 +817,10 @@ class PlPlayerController {
       }
 
       toggleFullScreen(true);
+      bool isValid =
+          direction.value == 'vertical' || mode == FullScreenMode.vertical
+              ? true
+              : false;
       var result = await showDialog(
         context: Get.context!,
         useSafeArea: false,
@@ -824,12 +828,10 @@ class PlPlayerController {
           backgroundColor: Colors.black,
           child: SafeArea(
             // 忽略手机安全区域
+            top: isValid,
             left: false,
             right: false,
-            bottom:
-                direction.value == 'vertical' || mode == FullScreenMode.vertical
-                    ? true
-                    : false,
+            bottom: isValid,
             child: PLVideoPlayer(
               controller: this,
               headerControl: headerControl,
