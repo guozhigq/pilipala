@@ -89,11 +89,7 @@ class Request {
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
       receiveTimeout: const Duration(milliseconds: 12000),
       //Http请求头.
-      headers: {
-        'keep-alive': 'true',
-        'user-agent': headerUa(),
-      },
-      persistentConnection: true,
+      headers: {},
     );
 
     dio = Dio(options)
@@ -128,20 +124,15 @@ class Request {
    */
   get(url, {data, options, cancelToken, extra}) async {
     Response response;
-    Options options;
+    Options options = Options();
     ResponseType resType = ResponseType.json;
-
-    options = Options();
-    options.responseType = resType;
-
     if (extra != null) {
-      options.responseType = extra!['resType'] ?? ResponseType.json;
+      resType = extra!['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
-        print(options.headers);
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
-        // options.headers!['user-agent'] = headerUa(type: extra['ua']);
       }
     }
+    options.responseType = resType;
 
     try {
       response = await dio.get(
