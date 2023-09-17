@@ -18,6 +18,7 @@ class MemberHttp {
     var res = await Request().get(
       Api.memberInfo,
       data: params,
+      extra: {'ua': 'pc'},
     );
     if (res.data['code'] == 0) {
       return {
@@ -83,6 +84,7 @@ class MemberHttp {
     var res = await Request().get(
       Api.memberArchive,
       data: params,
+      extra: {'ua': 'pc'},
     );
     if (res.data['code'] == 0) {
       return {
