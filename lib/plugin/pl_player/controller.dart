@@ -449,7 +449,9 @@ class PlPlayerController {
           for (var element in _statusListeners) {
             element(event ? PlayerStatus.playing : PlayerStatus.paused);
           }
-          makeHeartBeat(_position.value.inSeconds, type: 'status');
+          if (videoPlayerController!.state.position.inSeconds != 0) {
+            makeHeartBeat(_position.value.inSeconds, type: 'status');
+          }
         }),
         videoPlayerController!.stream.completed.listen((event) {
           if (event) {
