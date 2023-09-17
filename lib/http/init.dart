@@ -89,11 +89,7 @@ class Request {
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
       receiveTimeout: const Duration(milliseconds: 12000),
       //Http请求头.
-      headers: {
-        'keep-alive': 'true',
-        'user-agent': headerUa(),
-      },
-      persistentConnection: true,
+      headers: {},
     );
 
     dio = Dio(options)
@@ -128,12 +124,14 @@ class Request {
    */
   get(url, {data, options, cancelToken, extra}) async {
     Response response;
-    Options options;
+    Options options = Options();
     ResponseType resType = ResponseType.json;
     if (extra != null) {
       resType = extra!['resType'] ?? ResponseType.json;
+      if (extra['ua'] != null) {
+        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+      }
     }
-    options = Options();
     options.responseType = resType;
     try {
       response = await dio.get(
@@ -201,14 +199,19 @@ class Request {
     token.cancel("cancelled");
   }
 
-  String headerUa() {
+  String headerUa({type = 'mob'}) {
     String headerUa = '';
-    if (Platform.isIOS) {
-      headerUa =
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Mobile/15E148 Safari/604.1';
+    if (type == 'mob') {
+      if (Platform.isIOS) {
+        headerUa =
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Mobile/15E148 Safari/604.1';
+      } else {
+        headerUa =
+            'Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36';
+      }
     } else {
       headerUa =
-          'Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36';
+          'Mozilla/5.0 (MaciMozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36';
     }
     return headerUa;
   }
