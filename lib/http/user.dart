@@ -238,7 +238,7 @@ class UserHttp {
     var res = await Request().post(
       Api.delHistory,
       queryParameters: {
-        'kid': 'archive_$kid',
+        'kid': kid,
         'jsonp': 'jsonp',
         'csrf': await Request.getCsrf(),
       },
