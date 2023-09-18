@@ -294,7 +294,7 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => _mineController.pushFollow(),
+                      onTap: () => _mineController.pushFans(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
