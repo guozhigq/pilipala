@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/search.dart';
 
 /// TODO 点击跳转
 Widget addWidget(item, context, type, {floor = 1}) {
@@ -19,8 +22,27 @@ Widget addWidget(item, context, type, {floor = 1}) {
       : Theme.of(context).colorScheme.background;
   switch (type) {
     case 'ADDITIONAL_TYPE_UGC':
+      // 转发的投稿
       return InkWell(
-        onTap: () {},
+        onTap: () async {
+          String text = dynamicProperty[type].jumpUrl;
+          RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}', caseSensitive: false);
+          Iterable<Match> matches = bvRegex.allMatches(text);
+          if (matches.isNotEmpty) {
+            Match match = matches.first;
+            String bvid = match.group(0)!;
+            String cover = dynamicProperty[type].cover;
+            try {
+              int cid = await SearchHttp.ab2c(bvid: bvid);
+              Get.toNamed('/video?bvid=$bvid&cid=$cid',
+                  arguments: {'pic': cover, 'heroTag': bvid});
+            } catch (err) {
+              SmartDialog.showToast(err.toString());
+            }
+          } else {
+            print("No match found.");
+          }
+        },
         child: Container(
           padding:
               const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
