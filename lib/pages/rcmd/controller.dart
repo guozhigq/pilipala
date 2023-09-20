@@ -14,6 +14,7 @@ class RcmdController extends GetxController {
   Box recVideo = GStrorage.recVideo;
   Box setting = GStrorage.setting;
   RxInt crossAxisCount = 2.obs;
+  late bool enableSaveLastData;
 
   @override
   void onInit() {
@@ -28,6 +29,8 @@ class RcmdController extends GetxController {
       }
       videoList.value = list;
     }
+    enableSaveLastData =
+        setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
   }
 
   // 获取推荐
@@ -49,7 +52,11 @@ class RcmdController extends GetxController {
           videoList.value = res['data'];
         }
       } else if (type == 'onRefresh') {
-        videoList.value = res['data'];
+        if (enableSaveLastData) {
+          videoList.insertAll(0, res['data']);
+        } else {
+          videoList.value = res['data'];
+        }
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
       }

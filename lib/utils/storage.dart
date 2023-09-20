@@ -121,6 +121,7 @@ class SettingBoxKey {
   static const String enableWordRe = 'enableWordRe';
   static const String enableSearchWord = 'enableSearchWord';
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
+  static const String enableSaveLastData = 'enableSaveLastData';
 
   /// 外观
   static const String themeMode = 'themeMode';

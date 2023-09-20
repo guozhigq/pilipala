@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -129,7 +130,50 @@ class IntroDetail extends StatelessWidget {
       final currentDesc = descV2[index];
       switch (currentDesc.type) {
         case 1:
-          return TextSpan(text: currentDesc.rawText);
+          List<InlineSpan> spanChildren = [];
+          RegExp urlRegExp = RegExp(r'https?://\S+\b');
+          Iterable<Match> matches = urlRegExp.allMatches(currentDesc.rawText);
+
+          int previousEndIndex = 0;
+          for (Match match in matches) {
+            if (match.start > previousEndIndex) {
+              spanChildren.add(TextSpan(
+                  text: currentDesc.rawText
+                      .substring(previousEndIndex, match.start)));
+            }
+            spanChildren.add(
+              TextSpan(
+                text: match.group(0),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary), // 设置颜色为蓝色
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    // 处理点击事件
+                    try {
+                      Get.toNamed(
+                        '/webview',
+                        parameters: {
+                          'url': match.group(0)!,
+                          'type': 'url',
+                          'pageTitle': match.group(0)!,
+                        },
+                      );
+                    } catch (err) {
+                      SmartDialog.showToast(err.toString());
+                    }
+                  },
+              ),
+            );
+            previousEndIndex = match.end;
+          }
+
+          if (previousEndIndex < currentDesc.rawText.length) {
+            spanChildren.add(TextSpan(
+                text: currentDesc.rawText.substring(previousEndIndex)));
+          }
+
+          TextSpan result = TextSpan(children: spanChildren);
+          return result;
         case 2:
           final colorSchemePrimary = Theme.of(context).colorScheme.primary;
           final heroTag = Utils.makeHeroTag(currentDesc.bizId);
