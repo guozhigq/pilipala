@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -24,11 +25,20 @@ class _WebviewPageState extends State<WebviewPage> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           actions: [
-            TextButton(
+            const SizedBox(width: 4),
+            IconButton(
               onPressed: () {
                 _webviewController.controller.reload();
               },
-              child: const Text('刷新'),
+              icon: Icon(Icons.refresh_outlined,
+                  color: Theme.of(context).colorScheme.primary),
+            ),
+            IconButton(
+              onPressed: () {
+                launchUrl(Uri.parse(_webviewController.url));
+              },
+              icon: Icon(Icons.open_in_browser_outlined,
+                  color: Theme.of(context).colorScheme.primary),
             ),
             Obx(
               () => _webviewController.type.value == 'login'
@@ -38,7 +48,7 @@ class _WebviewPageState extends State<WebviewPage> {
                     )
                   : const SizedBox(),
             ),
-            const SizedBox(width: 10)
+            const SizedBox(width: 12)
           ],
         ),
         body: Column(
