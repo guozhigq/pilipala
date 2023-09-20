@@ -38,26 +38,11 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        i!.uname,
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Image.asset(
-                        'assets/images/lv/lv${i!.level}.png',
-                        height: 11,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('粉丝：${i.fans} ', style: style),
-                      Text(' 视频：${i.videos}', style: style)
-                    ],
+                  Text(
+                    i!.uname,
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
                   ),
                   if (i.officialVerify['desc'] != '')
                     Text(

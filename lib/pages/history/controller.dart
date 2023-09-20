@@ -97,7 +97,7 @@ class HistoryController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: const Text('啊叻？你要清空历史记录功能吗？'),
+          content: const Text('你要清空历史记录功能吗？'),
           actions: [
             TextButton(
                 onPressed: () => SmartDialog.dismiss(),

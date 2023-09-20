@@ -57,29 +57,13 @@ class IntroDetail extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        StatView(
-                          theme: 'gray',
-                          view: videoDetail!.stat!.view,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        StatDanMu(
-                          theme: 'gray',
-                          danmu: videoDetail!.stat!.danmaku,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          Utils.dateFormat(videoDetail!.pubdate,
-                              formatType: 'detail'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      Utils.dateFormat(videoDetail!.pubdate,
+                          formatType: 'detail'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
