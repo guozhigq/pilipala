@@ -70,7 +70,7 @@ dependencies:
   # 解决sliver滑动不同步
   extended_nested_scroll_view: ^6.1.2
   # 上拉加载
-  loading_more_list: ^5.0.3
+  loading_more_list: ^6.0.0
   # 下拉刷新
   pull_to_refresh_notification: ^3.0.1
   # 图标

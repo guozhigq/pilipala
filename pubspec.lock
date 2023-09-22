@@ -721,18 +721,18 @@ packages:
     dependency: "direct main"
     description:
       name: loading_more_list
-      sha256: aa680edc81cf024c394dccfa7ba1db701a5efb23ec1b8c657308428ce9da11d1
+      sha256: "6b49eb935345d6cf291e0367d3c238ef0a525a08b671ee41e09ee67d41888a7a"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.3"
+    version: "6.0.0"
   loading_more_list_library:
     dependency: transitive
     description:
       name: loading_more_list_library
-      sha256: "31348925a98748ffe04f661e4b47df37103fabad39442064fcf59148a5fee2dd"
+      sha256: de6b57edbab83022180f053ec3f598dd5e1192cfd6a285882b8155e3cb5dc581
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "3.0.0"
   logging:
     dependency: transitive
     description:
