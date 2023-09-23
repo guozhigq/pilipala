@@ -195,7 +195,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
+                    var data = snapshot.data;
                     if (data['status']) {
                       // 请求成功
                       return Obx(

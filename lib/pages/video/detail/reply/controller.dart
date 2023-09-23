@@ -96,8 +96,8 @@ class VideoReplyController extends GetxController {
       } else {
         replyList.addAll(replies);
       }
+      count.value = res['data'].page.count;
     }
-    count.value = res['data'].page.count;
     isLoadingMore = false;
     return res;
   }
