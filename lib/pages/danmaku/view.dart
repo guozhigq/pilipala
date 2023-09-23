@@ -86,6 +86,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
       _controller!.onResume();
       danmuPlayStatus = true;
     }
+    if (!playerController.isOpenDanmu.value) {
+      return;
+    }
     PlDanmakuController ctr = _plDanmakuController;
     int currentPosition = position.inMilliseconds;
     blockTypes = playerController.blockTypes;
@@ -97,9 +100,6 @@ class _PlDanmakuState extends State<PlDanmaku> {
       EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
         ctr.queryDanmaku();
       });
-    }
-    if (!playerController.isOpenDanmu.value) {
-      return;
     }
     // 超出分段数返回
     if (ctr.currentSegIndex >= ctr.dmSegList.length) {
