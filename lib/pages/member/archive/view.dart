@@ -18,6 +18,8 @@ class _ArchivePanelState extends State<ArchivePanel>
     with AutomaticKeepAliveClientMixin {
   DateTime lastRefreshTime = DateTime.now();
   late final LoadMoreListSource source = LoadMoreListSource();
+  final ArchiveController _archiveController =
+      Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
 
   @override
   bool get wantKeepAlive => true;
@@ -40,14 +42,63 @@ class _ArchivePanelState extends State<ArchivePanel>
             //     return PullToRefreshHeader(info, lastRefreshTime);
             //   },
             // ),
-            const SizedBox(height: 4),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 14, top: 8, bottom: 8, right: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('排序方式'),
+                  SizedBox(
+                    height: 35,
+                    width: 85,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () {
+                        // _archiveController.order = 'click';
+                        // _archiveController.pn = 1;
+                        _archiveController.toggleSort();
+                        source.refresh(true);
+                        // LoadMoreListSource().loadData();
+                      },
+                      child: Obx(
+                        () => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                            _archiveController.currentOrder['label']!,
+                            key: ValueKey<String>(
+                                _archiveController.currentOrder['label']!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: LoadingMoreList<VListItemModel>(
                 ListConfig<VListItemModel>(
                   sourceList: source,
                   itemBuilder:
                       (BuildContext c, VListItemModel item, int index) {
-                    return VideoCardH(videoItem: item);
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          VideoCardH(videoItem: item)
+                        ],
+                      );
+                    } else {
+                      return VideoCardH(videoItem: item);
+                    }
                   },
                   indicatorBuilder: _buildIndicator,
                 ),
@@ -144,12 +195,16 @@ class _ArchivePanelState extends State<ArchivePanel>
 class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
   final ArchiveController _archiveController =
       Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
+  bool forceRefresh = false;
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
     var res = await _archiveController.getMemberArchive();
     if (res['status']) {
+      if (_archiveController.pn == 2) {
+        clear();
+      }
       addAll(res['data'].list.vlist);
     }
     if (length < res['data'].page['count']) {
@@ -158,5 +213,18 @@ class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
       isSuccess = false;
     }
     return isSuccess;
+  }
+
+  @override
+  Future<bool> refresh([bool clearBeforeRequest = false]) async {
+    // _hasMore = true;
+    // pageindex = 1;
+    // //force to refresh list when you don't want clear list before request
+    // //for the case, if your list already has 20 items.
+    forceRefresh = !clearBeforeRequest;
+    var result = await super.refresh(clearBeforeRequest);
+
+    forceRefresh = false;
+    return result;
   }
 }

@@ -109,6 +109,11 @@ class _MemberPageState extends State<MemberPage>
                 },
               ),
               actions: [
+                IconButton(
+                  onPressed: () => Get.toNamed(
+                      '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
+                  icon: const Icon(Icons.search_outlined),
+                ),
                 PopupMenuButton(
                   icon: const Icon(Icons.more_vert),
                   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
