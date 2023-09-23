@@ -102,7 +102,46 @@ class _MemberPageState extends State<MemberPage>
                 },
               ),
               actions: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+                IconButton(
+                  onPressed: () => Get.toNamed(
+                      '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
+                  icon: const Icon(Icons.search_outlined),
+                ),
+                // PopupMenuButton(
+                //   icon: const Icon(Icons.more_vert),
+                //   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                //     if (_memberController.ownerMid !=
+                //         _memberController.mid) ...[
+                //       PopupMenuItem(
+                //         onTap: () => _memberController.blockUser(),
+                //         child: Row(
+                //           mainAxisSize: MainAxisSize.min,
+                //           children: [
+                //             const Icon(Icons.block, size: 19),
+                //             const SizedBox(width: 10),
+                //             Text(_memberController.attribute.value != 128
+                //                 ? '加入黑名单'
+                //                 : '移除黑名单'),
+                //           ],
+                //         ),
+                //       )
+                //     ],
+                //     PopupMenuItem(
+                //       onTap: () => _memberController.shareUser(),
+                //       child: Row(
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           const Icon(Icons.share_outlined, size: 19),
+                //           const SizedBox(width: 10),
+                //           Text(_memberController.ownerMid !=
+                //                   _memberController.mid
+                //               ? '分享UP主'
+                //               : '分享我的主页'),
+                //         ],
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(width: 4),
               ],
               flexibleSpace: FlexibleSpaceBar(

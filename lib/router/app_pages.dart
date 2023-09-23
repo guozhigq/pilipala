@@ -18,6 +18,7 @@ import 'package:pilipala/pages/html/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/pages/member_search/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
@@ -86,6 +87,7 @@ class Routes {
     CustomGetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
     // 用户中心
     CustomGetPage(name: '/member', page: () => const MemberPage()),
+    CustomGetPage(name: '/memberSearch', page: () => const MemberSearchPage()),
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
