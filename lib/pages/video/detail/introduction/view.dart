@@ -330,17 +330,17 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 7),
                   // 点赞收藏转发 布局样式1
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 7, bottom: 7),
-                    scrollDirection: Axis.horizontal,
-                    child: actionRow(
-                      context,
-                      videoIntroController,
-                      videoDetailCtr,
-                    ),
-                  ),
+                  // SingleChildScrollView(
+                  //   padding: const EdgeInsets.only(top: 7, bottom: 7),
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: actionRow(
+                  //     context,
+                  //     videoIntroController,
+                  //     videoDetailCtr,
+                  //   ),
+                  // ),
                   // 点赞收藏转发 布局样式2
-                  // actionGrid(context, videoIntroController),
+                  actionGrid(context, videoIntroController),
                   // 合集
                   if (!loadingStatus &&
                       widget.videoDetail!.ugcSeason != null) ...[
@@ -458,7 +458,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget actionGrid(BuildContext context, videoIntroController) {
     return LayoutBuilder(builder: (context, constraints) {
       return Container(
-        padding: const EdgeInsets.only(top: 6, bottom: 10),
+        margin: const EdgeInsets.only(top: 6, bottom: 4),
         height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
           primary: false,
@@ -477,12 +477,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       ? widget.videoDetail!.stat!.like!.toString()
                       : '-'),
             ),
-            ActionItem(
-                icon: const Icon(FontAwesomeIcons.clock),
-                onTap: () => videoIntroController.actionShareVideo(),
-                selectStatus: false,
-                loadingStatus: loadingStatus,
-                text: '稍后再看'),
+            // ActionItem(
+            //     icon: const Icon(FontAwesomeIcons.clock),
+            //     onTap: () => videoIntroController.actionShareVideo(),
+            //     selectStatus: false,
+            //     loadingStatus: loadingStatus,
+            //     text: '稍后再看'),
             Obx(
               () => ActionItem(
                   icon: const Icon(FontAwesomeIcons.b),
@@ -498,8 +498,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               () => ActionItem(
                   icon: const Icon(FontAwesomeIcons.star),
                   selectIcon: const Icon(FontAwesomeIcons.solidStar),
-                  // onTap: () => videoIntroController.actionFavVideo(),
                   onTap: () => showFavBottomSheet(),
+                  onLongPress: () => showFavBottomSheet(type: 'longPress'),
                   selectStatus: videoIntroController.hasFav.value,
                   loadingStatus: loadingStatus,
                   text: !loadingStatus
@@ -507,13 +507,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       : '-'),
             ),
             ActionItem(
+                icon: const Icon(FontAwesomeIcons.comment),
+                onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+                selectStatus: false,
+                loadingStatus: loadingStatus,
+                text: !loadingStatus
+                    ? widget.videoDetail!.stat!.reply!.toString()
+                    : '评论'),
+            ActionItem(
                 icon: const Icon(FontAwesomeIcons.shareFromSquare),
                 onTap: () => videoIntroController.actionShareVideo(),
                 selectStatus: false,
                 loadingStatus: loadingStatus,
-                text: !loadingStatus
-                    ? widget.videoDetail!.stat!.share!.toString()
-                    : '-'),
+                text: '分享'),
           ],
         ),
       );

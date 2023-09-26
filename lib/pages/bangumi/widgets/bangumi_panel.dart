@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class BangumiPanel extends StatefulWidget {
@@ -30,16 +32,28 @@ class _BangumiPanelState extends State<BangumiPanel> {
   dynamic userInfo;
   // 默认未开通
   int vipStatus = 0;
+  late int cid;
+  String heroTag = Get.arguments['heroTag'];
+  late final VideoDetailController videoDetailCtr;
 
   @override
   void initState() {
     super.initState();
-    currentIndex = widget.pages.indexWhere((e) => e.cid == widget.cid!);
+    cid = widget.cid!;
+    currentIndex = widget.pages.indexWhere((e) => e.cid == cid);
     scrollToIndex();
     userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null) {
       vipStatus = userInfo.vipStatus;
     }
+    videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
+
+    videoDetailCtr.cid.listen((p0) {
+      cid = p0;
+      setState(() {});
+      currentIndex = widget.pages.indexWhere((e) => e.cid == cid);
+      scrollToIndex();
+    });
   }
 
   @override

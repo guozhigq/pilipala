@@ -13,6 +13,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -209,6 +210,9 @@ class PlPlayerController {
   late double fontSizeVal;
   late double danmakuSpeedVal;
 
+  // 播放顺序相关
+  PlayRepeat playRepeat = PlayRepeat.pause;
+
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
@@ -226,6 +230,12 @@ class PlPlayerController {
     // 弹幕速度
     danmakuSpeedVal =
         localCache.get(LocalCacheKey.danmakuSpeed, defaultValue: 4.0);
+    playRepeat = PlayRepeat.values.toList().firstWhere(
+          (e) =>
+              e.value ==
+              videoStorage.get(VideoBoxKey.playRepeat,
+                  defaultValue: PlayRepeat.pause.value),
+        );
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -908,6 +918,11 @@ class PlPlayerController {
         progress: progress,
       );
     }
+  }
+
+  setPlayRepeat(PlayRepeat type) {
+    playRepeat = type;
+    videoStorage.put(VideoBoxKey.playRepeat, type.value);
   }
 
   Future<void> dispose({String type = 'single'}) async {
