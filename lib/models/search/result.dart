@@ -6,6 +6,7 @@ class SearchVideoModel {
   List<SearchVideoItemModel>? list;
   SearchVideoModel.fromJson(Map<String, dynamic> json) {
     list = json['result']
+        .where((e) => e['available'] == true)
         .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
         .toList();
   }
@@ -17,7 +18,7 @@ class SearchVideoItemModel {
     this.id,
     this.cid,
     // this.author,
-    // this.mid,
+    this.mid,
     // this.typeid,
     // this.typename,
     this.arcurl,
@@ -47,7 +48,7 @@ class SearchVideoItemModel {
   int? id;
   int? cid;
   // String? author;
-  // String? mid;
+  int? mid;
   // String? typeid;
   // String? typename;
   String? arcurl;
@@ -80,6 +81,7 @@ class SearchVideoItemModel {
     arcurl = json['arcurl'];
     aid = json['aid'];
     bvid = json['bvid'];
+    mid = json['mid'];
     // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     title = Em.regTitle(json['title']);
     description = json['description'];

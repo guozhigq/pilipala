@@ -7,6 +7,7 @@ import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -219,6 +220,20 @@ class VideoContent extends StatelessWidget {
                               Icon(Icons.watch_later_outlined, size: 16),
                               SizedBox(width: 6),
                               Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            MemberController().blockUser(videoItem.mid);
+                          },
+                          value: 'block',
+                          height: 35,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.block, size: 16),
+                              SizedBox(width: 6),
+                              Text('拉黑up', style: TextStyle(fontSize: 13))
                             ],
                           ),
                         ),

@@ -95,4 +95,43 @@ class MemberController extends GetxController {
       },
     );
   }
+
+  // 拉黑用户
+  Future blockUser(int mid) async {
+    if (userInfoCache.get('userInfoCache') == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确定拉黑UP主?'),
+          actions: [
+            TextButton(
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                var res = await VideoHttp.relationMod(
+                  mid: mid,
+                  act: 5,
+                  reSrc: 11,
+                );
+                SmartDialog.dismiss();
+                if (res['status']) {}
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
 }
