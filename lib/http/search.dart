@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/result.dart';
 import 'package:pilipala/models/search/suggest.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class SearchHttp {
+  static Box setting = GStrorage.setting;
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
     if (res.data is String) {
@@ -78,6 +81,12 @@ class SearchHttp {
       try {
         switch (searchType) {
           case SearchType.video:
+            List<int> blackMidsList =
+                setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+            for (var i in res.data['data']['result']) {
+              // 屏蔽推广和拉黑用户
+              i['available'] = !blackMidsList.contains(i['mid']);
+            }
             data = SearchVideoModel.fromJson(res.data['data']);
             break;
           case SearchType.live_room:
