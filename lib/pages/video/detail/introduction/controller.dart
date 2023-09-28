@@ -17,6 +17,8 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'widgets/group_panel.dart';
+
 class VideoIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
@@ -428,6 +430,20 @@ class VideoIntroController extends GetxController {
                   }
                   followStatus['attribute'] = actionStatus;
                   followStatus.refresh();
+                  if (actionStatus == 2) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('关注成功'),
+                          duration: const Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: '设置分组',
+                            onPressed: setFollowGroup,
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 }
                 SmartDialog.dismiss();
               },
@@ -536,5 +552,13 @@ class VideoIntroController extends GetxController {
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
     changeSeasonOrbangu(bvid, cid, aid);
+  }
+
+  // 设置关注分组
+  void setFollowGroup() {
+    Get.bottomSheet(
+      GroupPanel(mid: videoDetail.value.owner!.mid!),
+      isScrollControlled: true,
+    );
   }
 }
