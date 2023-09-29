@@ -1,5 +1,6 @@
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/models/follow/result.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/models/member/tags.dart';
@@ -176,6 +177,36 @@ class MemberHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': [], 'msg': '操作成功'};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取某分组下的up
+  static Future followUpGroup(
+    int? mid,
+    int? tagid,
+    int? pn,
+    int? ps,
+  ) async {
+    var res = await Request().get(Api.followUpGroup, data: {
+      'mid': mid,
+      'tagid': tagid,
+      'pn': pn,
+      'ps': ps,
+    });
+    if (res.data['code'] == 0) {
+      // FollowItemModel
+      return {
+        'status': true,
+        'data': res.data['data']
+            .map<FollowItemModel>((e) => FollowItemModel.fromJson(e))
+            .toList()
+      };
     } else {
       return {
         'status': false,
