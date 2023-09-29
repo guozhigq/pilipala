@@ -19,6 +19,10 @@ class Em {
       return regCate(matchStr);
     }, onNonMatch: (String str) {
       if (str != '') {
+        str = str
+            .replaceAll('&gt;', '>')
+            .replaceAll('&#34;', '"')
+            .replaceAll('&#39;', "'");
         Map map = {'type': 'text', 'text': str};
         res.add(map);
       }

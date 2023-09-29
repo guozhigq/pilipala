@@ -11,6 +11,7 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -667,10 +668,11 @@ InlineSpan buildContent(
       // 匹配 jumpUrl
       String matchUrl = matchMember;
       if (content.jumpUrl.isNotEmpty && hasMatchMember) {
-        List urlKeys = content.jumpUrl.keys.toList();
+        List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
         matchUrl = matchMember.splitMapJoin(
           /// RegExp.escape() 转义特殊字符
-          RegExp(RegExp.escape(urlKeys.join("|"))),
+          RegExp(urlKeys.map((key) => key).join("|")),
+          // RegExp(RegExp.escape(urlKeys.join("|"))),
           onMatch: (Match match) {
             String matchStr = match[0]!;
             String appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
@@ -688,14 +690,26 @@ InlineSpan buildContent(
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     if (appUrlSchema == '') {
-                      Get.toNamed(
-                        '/webview',
-                        parameters: {
-                          'url': matchStr,
-                          'type': 'url',
-                          'pageTitle': ''
-                        },
-                      );
+                      String str = Uri.parse(matchStr).pathSegments[0];
+                      Map matchRes = IdUtils.matchAvorBv(input: str);
+                      List matchKeys = matchRes.keys.toList();
+                      if (matchKeys.isNotEmpty) {
+                        if (matchKeys.first == 'BV') {
+                          Get.toNamed(
+                            '/searchResult',
+                            parameters: {'keyword': matchRes['BV']},
+                          );
+                        }
+                      } else {
+                        Get.toNamed(
+                          '/webview',
+                          parameters: {
+                            'url': matchStr,
+                            'type': 'url',
+                            'pageTitle': ''
+                          },
+                        );
+                      }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search') &&
                           enableWordRe) {

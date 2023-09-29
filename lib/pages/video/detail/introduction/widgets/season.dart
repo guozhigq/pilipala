@@ -70,6 +70,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
     currentIndex = i;
     setState(() {});
     Get.back();
+    setState(() {});
   }
 
   @override
