@@ -9,6 +9,7 @@ import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -21,7 +22,7 @@ class BangumiIntroController extends GetxController {
       ? int.parse(Get.parameters['seasonId']!)
       : null;
   var epId = Get.parameters['epId'] != null
-      ? int.parse(Get.parameters['epId']!)
+      ? int.tryParse(Get.parameters['epId']!)
       : null;
 
   // 是否预渲染 骨架屏
@@ -257,7 +258,7 @@ class BangumiIntroController extends GetxController {
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     videoDetailCtr.bvid = bvid;
-    videoDetailCtr.cid = cid;
+    videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
@@ -291,5 +292,32 @@ class BangumiIntroController extends GetxController {
       favFolderData.value = result['data'];
     }
     return result;
+  }
+
+  /// 列表循环或者顺序播放时，自动播放下一个
+  void nextPlay() {
+    late List episodes;
+    if (bangumiDetail.value.episodes != null) {
+      episodes = bangumiDetail.value.episodes!;
+    }
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    int currentIndex =
+        episodes.indexWhere((e) => e.cid == videoDetailCtr.cid.value);
+    int nextIndex = currentIndex + 1;
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    // 列表循环
+    if (platRepeat == PlayRepeat.listCycle) {
+      if (nextIndex == episodes.length - 1) {
+        nextIndex = 0;
+      }
+    }
+    if (nextIndex <= episodes.length - 1 &&
+        platRepeat == PlayRepeat.listOrder) {}
+
+    int cid = episodes[nextIndex].cid!;
+    String bvid = episodes[nextIndex].bvid!;
+    int aid = episodes[nextIndex].aid!;
+    changeSeasonOrbangu(bvid, cid, aid);
   }
 }

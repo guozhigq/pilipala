@@ -20,6 +20,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/app_bar.dart';
@@ -41,6 +42,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final ScrollController _extendNestCtr = ScrollController();
   late StreamController<double> appbarStream;
   late VideoIntroController videoIntroController;
+  late BangumiIntroController bangumiIntroController;
   late String heroTag;
 
   PlayerStatus playerStatus = PlayerStatus.playing;
@@ -61,6 +63,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -97,6 +100,23 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       // 结束播放退出全屏
       if (autoExitFullcreen) {
         plPlayerController!.triggerFullScreen(status: false);
+      }
+
+      /// 顺序播放 列表循环
+      if (plPlayerController!.playRepeat != PlayRepeat.pause &&
+          plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
+        if (videoDetailController.videoType == SearchType.video) {
+          videoIntroController.nextPlay();
+        }
+        if (videoDetailController.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.nextPlay();
+        }
+      }
+
+      /// 单个循环
+      if (plPlayerController!.playRepeat == PlayRepeat.singleCycle) {
+        plPlayerController!.seekTo(Duration.zero);
+        plPlayerController!.play();
       }
       // 播放完展示控制栏
       try {
@@ -385,8 +405,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     const VideoIntroPanel(),
                                   ] else if (videoDetailController.videoType ==
                                       SearchType.media_bangumi) ...[
-                                    BangumiIntroPanel(
-                                        cid: videoDetailController.cid)
+                                    Obx(() => BangumiIntroPanel(
+                                        cid: videoDetailController.cid.value)),
                                   ],
                                   // if (videoDetailController.videoType ==
                                   //     SearchType.video) ...[

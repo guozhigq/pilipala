@@ -13,6 +13,7 @@ import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
@@ -56,7 +57,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (_) {
         return Container(
           width: double.infinity,
-          height: 400,
+          height: 440,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
@@ -149,13 +150,14 @@ class _HeaderControlState extends State<HeaderControl> {
                           '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
                           style: subTitleStyle),
                     ),
-                    // ListTile(
-                    //   onTap: () {},
-                    //   dense: true,
-                    //   enabled: false,
-                    //   leading: const Icon(Icons.play_circle_outline, size: 20),
-                    //   title: Text('播放设置', style: titleStyle),
-                    // ),
+                    ListTile(
+                      onTap: () => {Get.back(), showSetRepeat()},
+                      dense: true,
+                      leading: const Icon(Icons.repeat, size: 20),
+                      title: Text('播放顺序', style: titleStyle),
+                      subtitle: Text(widget.controller!.playRepeat.description,
+                          style: subTitleStyle),
+                    ),
                     ListTile(
                       onTap: () => {Get.back(), showSetDanmaku()},
                       dense: true,
@@ -700,6 +702,60 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
           );
         });
+      },
+    );
+  }
+
+  /// 播放顺序
+  void showSetRepeat() async {
+    showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          width: double.infinity,
+          height: 250,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.background,
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+          margin: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              SizedBox(
+                  height: 45,
+                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              Expanded(
+                child: Material(
+                  child: ListView(
+                    children: [
+                      for (var i in PlayRepeat.values) ...[
+                        ListTile(
+                          onTap: () {
+                            widget.controller!.setPlayRepeat(i);
+                            Get.back();
+                          },
+                          dense: true,
+                          contentPadding:
+                              const EdgeInsets.only(left: 20, right: 20),
+                          title: Text(i.description),
+                          trailing: widget.controller!.playRepeat == i
+                              ? Icon(
+                                  Icons.done,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              : const SizedBox(),
+                        )
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }

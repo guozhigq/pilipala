@@ -24,7 +24,7 @@ class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
   /// 路由传参
   String bvid = Get.parameters['bvid']!;
-  int cid = int.parse(Get.parameters['cid']!);
+  RxInt cid = int.parse(Get.parameters['cid']!).obs;
   RxInt danmakuCid = 0.obs;
   String heroTag = Get.arguments['heroTag'];
   // 视频详情
@@ -109,7 +109,7 @@ class VideoDetailController extends GetxController
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
     }
-    danmakuCid.value = cid;
+    danmakuCid.value = cid.value;
 
     ///
     if (Platform.isAndroid) {
@@ -218,7 +218,7 @@ class VideoDetailController extends GetxController
       // 默认1倍速
       speed: 1.0,
       bvid: bvid,
-      cid: cid,
+      cid: cid.value,
       enableHeart: enableHeart,
       isFirstTime: isFirstTime,
       autoplay: autoplay,
@@ -230,7 +230,7 @@ class VideoDetailController extends GetxController
 
   // 视频链接
   Future queryVideoUrl() async {
-    var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
+    var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
 

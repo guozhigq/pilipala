@@ -11,10 +11,13 @@ import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
+
+import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
   // 视频bvid
@@ -58,6 +61,7 @@ class VideoIntroController extends GetxController {
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
+  String heroTag = Get.arguments['heroTag'];
 
   @override
   void onInit() {
@@ -102,9 +106,10 @@ class VideoIntroController extends GetxController {
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
-      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-          .tabs
-          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
+      // Get.find<VideoDetailController>(tag: heroTag).tabs.value = [
+      //   '简介',
+      //   '评论 ${result['data']!.stat!.reply}'
+      // ];
       // 获取到粉丝数再返回
       await queryUserStat();
     }
@@ -425,6 +430,20 @@ class VideoIntroController extends GetxController {
                   }
                   followStatus['attribute'] = actionStatus;
                   followStatus.refresh();
+                  if (actionStatus == 2) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('关注成功'),
+                          duration: const Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: '设置分组',
+                            onPressed: setFollowGroup,
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 }
                 SmartDialog.dismiss();
               },
@@ -440,16 +459,16 @@ class VideoIntroController extends GetxController {
   Future changeSeasonOrbangu(bvid, cid, aid) async {
     // 重新获取视频资源
     VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+        Get.find<VideoDetailController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
-    videoDetailCtr.cid = cid;
+    videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
       VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+          Get.find<VideoReplyController>(tag: heroTag);
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
@@ -485,5 +504,61 @@ class VideoIntroController extends GetxController {
       timer!.cancel(); // 销毁页面时取消定时器
     }
     super.onClose();
+  }
+
+  /// 列表循环或者顺序播放时，自动播放下一个
+  void nextPlay() {
+    late List episodes;
+    // if (videoDetail.value.ugcSeason != null) {
+    //   UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+    //   List<SectionItem> sections = ugcSeason.sections!;
+    //   for (int i = 0; i < sections.length; i++) {
+    //     List<EpisodeItem> episodesList = sections[i].episodes!;
+    //     for (int j = 0; j < episodesList.length; j++) {
+    //       if (episodesList[j].cid == lastPlayCid.value) {
+    //         episodes = episodesList;
+    //         continue;
+    //       }
+    //     }
+    //   }
+    // }
+    if (videoDetail.value.ugcSeason != null) {
+      UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      List<SectionItem> sections = ugcSeason.sections!;
+      episodes = [];
+
+      for (int i = 0; i < sections.length; i++) {
+        List<EpisodeItem> episodesList = sections[i].episodes!;
+        episodes.addAll(episodesList);
+      }
+    }
+
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    int nextIndex = currentIndex + 1;
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    // 列表循环
+    if (nextIndex >= episodes.length) {
+      if (platRepeat == PlayRepeat.listCycle) {
+        nextIndex = 0;
+      }
+      if (platRepeat == PlayRepeat.listOrder) {
+        return;
+      }
+    }
+    int cid = episodes[nextIndex].cid!;
+    String bvid = episodes[nextIndex].bvid!;
+    int aid = episodes[nextIndex].aid!;
+    changeSeasonOrbangu(bvid, cid, aid);
+  }
+
+  // 设置关注分组
+  void setFollowGroup() {
+    Get.bottomSheet(
+      GroupPanel(mid: videoDetail.value.owner!.mid!),
+      isScrollControlled: true,
+    );
   }
 }

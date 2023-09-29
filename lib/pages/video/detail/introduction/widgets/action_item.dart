@@ -6,6 +6,7 @@ class ActionItem extends StatelessWidget {
   final Icon? icon;
   final Icon? selectIcon;
   final Function? onTap;
+  final Function? onLongPress;
   final bool? loadingStatus;
   final String? text;
   final bool selectStatus;
@@ -15,6 +16,7 @@ class ActionItem extends StatelessWidget {
     this.icon,
     this.selectIcon,
     this.onTap,
+    this.onLongPress,
     this.loadingStatus,
     this.text,
     this.selectStatus = false,
@@ -26,6 +28,9 @@ class ActionItem extends StatelessWidget {
       onTap: () => {
         feedBack(),
         onTap!(),
+      },
+      onLongPress: () => {
+        if (onLongPress != null) {onLongPress!()}
       },
       borderRadius: StyleString.mdRadius,
       child: Column(

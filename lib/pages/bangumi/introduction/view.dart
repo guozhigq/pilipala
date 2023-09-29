@@ -34,10 +34,12 @@ class BangumiIntroPanel extends StatefulWidget {
 
 class _BangumiIntroPanelState extends State<BangumiIntroPanel>
     with AutomaticKeepAliveClientMixin {
-  final BangumiIntroController bangumiIntroController =
-      Get.put(BangumiIntroController(), tag: Get.arguments['heroTag']);
+  late BangumiIntroController bangumiIntroController;
+  late VideoDetailController videoDetailCtr;
   BangumiInfoModel? bangumiDetail;
   late Future _futureBuilderFuture;
+  late int cid;
+  late String heroTag;
 
 // 添加页面缓存
   @override
@@ -46,10 +48,19 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
   @override
   void initState() {
     super.initState();
+    heroTag = Get.arguments['heroTag'];
+    cid = widget.cid!;
+    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+    videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     bangumiIntroController.bangumiDetail.listen((value) {
       bangumiDetail = value;
     });
     _futureBuilderFuture = bangumiIntroController.queryBangumiIntro();
+    videoDetailCtr.cid.listen((p0) {
+      print('🐶🐶$p0');
+      cid = p0;
+      setState(() {});
+    });
   }
 
   @override
@@ -61,9 +72,11 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data['status']) {
             // 请求成功
+
             return BangumiInfo(
               loadingStatus: false,
               bangumiDetail: bangumiDetail,
+              cid: cid,
             );
           } else {
             // 请求错误
@@ -77,7 +90,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
           return BangumiInfo(
             loadingStatus: true,
             bangumiDetail: bangumiDetail,
-            cid: widget.cid,
+            cid: cid,
           );
         }
       },
@@ -118,6 +131,12 @@ class _BangumiInfoState extends State<BangumiInfo> {
     bangumiItem = bangumiIntroController.bangumiItem;
     sheetHeight = localCache.get('sheetHeight');
     cid = widget.cid!;
+    print('cid:  $cid');
+    videoDetailCtr.cid.listen((p0) {
+      cid = p0;
+      print('cid:  $cid');
+      setState(() {});
+    });
   }
 
   // 收藏
