@@ -177,7 +177,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             return AnimatedOpacity(
               opacity: snapshot.data ? 1 : 0,
               duration: const Duration(milliseconds: 300),
-              child: author(_dynamicDetailController!.item, context),
+              child: AuthorPanel(item: _dynamicDetailController.item),
             );
           },
         ),
