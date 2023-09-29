@@ -11,6 +11,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/event_bus.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -50,7 +51,19 @@ class WebviewController extends GetxController {
             // Update loading bar.
             loadProgress.value = progress;
           },
-          onPageStarted: (String url) {},
+          onPageStarted: (String url) {
+            String str = Uri.parse(url).pathSegments[0];
+            Map matchRes = IdUtils.matchAvorBv(input: str);
+            List matchKeys = matchRes.keys.toList();
+            if (matchKeys.isNotEmpty) {
+              if (matchKeys.first == 'BV') {
+                Get.offAndToNamed(
+                  '/searchResult',
+                  parameters: {'keyword': matchRes['BV']},
+                );
+              }
+            }
+          },
           // 加载完成
           onUrlChange: (UrlChange urlChange) async {
             loadShow.value = false;
