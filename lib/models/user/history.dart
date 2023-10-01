@@ -79,6 +79,7 @@ class HisListItem {
     this.kid,
     this.tagName,
     this.liveStatus,
+    this.checked,
   });
 
   String? title;
@@ -105,6 +106,7 @@ class HisListItem {
   int? kid;
   String? tagName;
   int? liveStatus;
+  bool? checked;
 
   HisListItem.fromJson(Map<String, dynamic> json) {
     title = json['title'];
@@ -131,6 +133,7 @@ class HisListItem {
     kid = json['kid'];
     tagName = json['tag_name'];
     liveStatus = json['live_status'];
+    checked = false;
   }
 }
 

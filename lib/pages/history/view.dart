@@ -39,6 +39,20 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  // 选中
+  onChoose(index) {
+    _historyController.historyList[index].checked =
+        !_historyController.historyList[index].checked!;
+    _historyController.checkedCount.value =
+        _historyController.historyList.where((item) => item.checked!).length;
+    _historyController.historyList.refresh();
+  }
+
+  // 更新多选状态
+  onUpdateMultiple() {
+    setState(() {});
+  }
+
   @override
   void dispose() {
     scrollController.removeListener(() {});
@@ -48,51 +62,115 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text(
-          '观看记录',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String type) {
-              // 处理菜单项选择的逻辑
-              switch (type) {
-                case 'pause':
-                  _historyController.onPauseHistory();
-                  break;
-                case 'clear':
-                  _historyController.onClearHistory();
-                  break;
-                case 'del':
-                  _historyController.onDelHistory();
-                  break;
-                default:
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'pause',
-                child: Obx(
-                  () => Text(!_historyController.pauseStatus.value
-                      ? '暂停观看记录'
-                      : '恢复观看记录'),
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: 'clear',
-                child: Text('清空观看记录'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'del',
-                child: Text('删除已看记录'),
-              ),
-            ],
+      appBar: AppBarWidget(
+        visible: _historyController.enableMultiple.value,
+        child1: AppBar(
+          titleSpacing: 0,
+          centerTitle: false,
+          leading: IconButton(
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.arrow_back_outlined),
           ),
-          const SizedBox(width: 6),
-        ],
+          title: Text(
+            '观看记录',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          actions: [
+            // TextButton(
+            //   onPressed: () {
+            //     _historyController.enableMultiple.value = true;
+            //     setState(() {});
+            //   },
+            //   child: const Text('多选'),
+            // ),
+            PopupMenuButton<String>(
+              onSelected: (String type) {
+                // 处理菜单项选择的逻辑
+                switch (type) {
+                  case 'pause':
+                    _historyController.onPauseHistory();
+                    break;
+                  case 'clear':
+                    _historyController.onClearHistory();
+                    break;
+                  case 'del':
+                    _historyController.onDelHistory();
+                    break;
+                  case 'multiple':
+                    _historyController.enableMultiple.value = true;
+                    setState(() {});
+                    break;
+                  default:
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'pause',
+                  child: Obx(
+                    () => Text(!_historyController.pauseStatus.value
+                        ? '暂停观看记录'
+                        : '恢复观看记录'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Text('清空观看记录'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'del',
+                  child: Text('删除已看记录'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'multiple',
+                  child: Text('多选删除'),
+                ),
+              ],
+            ),
+            const SizedBox(width: 6),
+          ],
+        ),
+        child2: AppBar(
+          titleSpacing: 0,
+          centerTitle: false,
+          leading: IconButton(
+            onPressed: () {
+              _historyController.enableMultiple.value = false;
+              for (var item in _historyController.historyList) {
+                item.checked = false;
+              }
+              _historyController.checkedCount.value = 0;
+              setState(() {});
+            },
+            icon: const Icon(Icons.close_outlined),
+          ),
+          title: Obx(
+            () => Text(
+              '已选择${_historyController.checkedCount.value}项',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                for (var item in _historyController.historyList) {
+                  item.checked = true;
+                }
+                _historyController.checkedCount.value =
+                    _historyController.historyList.length;
+                _historyController.historyList.refresh();
+              },
+              child: const Text('全选'),
+            ),
+            TextButton(
+              onPressed: () => _historyController.onDelCheckedHistory(),
+              child: Text(
+                '删除',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -120,6 +198,8 @@ class _HistoryPageState extends State<HistoryPage> {
                                   videoItem:
                                       _historyController.historyList[index],
                                   ctr: _historyController,
+                                  onChoose: () => onChoose(index),
+                                  onUpdateMultiple: () => onUpdateMultiple(),
                                 );
                               },
                                   childCount:
@@ -155,6 +235,36 @@ class _HistoryPageState extends State<HistoryPage> {
           ],
         ),
       ),
+      // bottomNavigationBar: BottomAppBar(),
+    );
+  }
+}
+
+class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+  const AppBarWidget({
+    required this.child1,
+    required this.child2,
+    required this.visible,
+    Key? key,
+  }) : super(key: key);
+
+  final PreferredSizeWidget child1;
+  final PreferredSizeWidget child2;
+  final bool visible;
+  @override
+  Size get preferredSize => child1.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return ScaleTransition(
+          scale: animation,
+          child: child,
+        );
+      },
+      child: !visible ? child1 : child2,
     );
   }
 }
