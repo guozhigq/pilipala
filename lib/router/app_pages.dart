@@ -12,6 +12,7 @@ import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
 import 'package:pilipala/pages/follow/index.dart';
 import 'package:pilipala/pages/history/index.dart';
+import 'package:pilipala/pages/history_search/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/html/index.dart';
@@ -112,6 +113,9 @@ class Routes {
     CustomGetPage(name: '/about', page: () => const AboutPage()),
     //
     CustomGetPage(name: '/htmlRender', page: () => const HtmlRenderPage()),
+    // 历史记录搜索
+    CustomGetPage(
+        name: '/historySearch', page: () => const HistorySearchPage()),
   ];
 }
 

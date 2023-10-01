@@ -12,13 +12,14 @@ import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/history/index.dart';
+import 'package:pilipala/pages/history_search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
   final dynamic videoItem;
-  final HistoryController? ctr;
+  final dynamic ctr;
   final Function? onChoose;
   final Function? onUpdateMultiple;
   const HistoryItem({
@@ -132,6 +133,9 @@ class HistoryItem extends StatelessWidget {
         }
       },
       onLongPress: () {
+        if (ctr is HistorySearchController) {
+          return;
+        }
         if (!ctr!.enableMultiple.value) {
           feedBack();
           ctr!.enableMultiple.value = true;
@@ -268,7 +272,7 @@ class HistoryItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  final HistoryController? ctr;
+  final dynamic ctr;
   const VideoContent({super.key, required this.videoItem, this.ctr});
 
   @override

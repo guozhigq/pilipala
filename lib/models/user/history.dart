@@ -3,17 +3,23 @@ class HistoryData {
     this.cursor,
     this.tab,
     this.list,
+    this.page,
   });
 
   Cursor? cursor;
   List<HisTabItem>? tab;
   List<HisListItem>? list;
+  Map? page;
 
   HistoryData.fromJson(Map<String, dynamic> json) {
-    cursor = Cursor.fromJson(json['cursor']);
-    tab = json['tab'].map<HisTabItem>((e) => HisTabItem.fromJson(e)).toList();
-    list =
-        json['list'].map<HisListItem>((e) => HisListItem.fromJson(e)).toList();
+    cursor = json['cursor'] != null ? Cursor.fromJson(json['cursor']) : null;
+    tab = json['tab'] != null
+        ? json['tab'].map<HisTabItem>((e) => HisTabItem.fromJson(e)).toList()
+        : [];
+    list = json['list'] != null
+        ? json['list'].map<HisListItem>((e) => HisListItem.fromJson(e)).toList()
+        : [];
+    page = json['page'];
   }
 }
 

@@ -274,4 +274,22 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+
+  // 搜索历史记录
+  static Future searchHistory(
+      {required int pn, required String keyword}) async {
+    var res = await Request().get(
+      Api.searchHistory,
+      data: {
+        'pn': pn,
+        'keyword': keyword,
+        'business': 'all',
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }
