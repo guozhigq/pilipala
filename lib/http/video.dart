@@ -22,6 +22,7 @@ class VideoHttp {
   static Box setting = GStrorage.setting;
   static bool enableRcmdDynamic =
       setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
+  static Box userInfoCache = GStrorage.userInfo;
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
@@ -133,6 +134,11 @@ class VideoHttp {
       // 'platform': '',
       // 'high_quality': ''
     };
+    // 免登录查看1080p
+    if (userInfoCache.get('userInfoCache') == null &&
+        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
+      data['try_look'] = 1;
+    }
     try {
       var res = await Request().get(Api.videoUrl, data: data);
       if (res.data['code'] == 0) {

@@ -55,6 +55,12 @@ class _PlaySettingState extends State<PlaySetting> {
       body: ListView(
         children: [
           const SetSwitchItem(
+            title: '开启1080P',
+            subTitle: '免登录查看1080P视频',
+            setKey: SettingBoxKey.p1080,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
             title: '自动播放',
             subTitle: '进入详情页自动播放',
             setKey: SettingBoxKey.autoPlayEnable,

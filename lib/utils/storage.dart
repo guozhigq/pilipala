@@ -104,6 +104,8 @@ class SettingBoxKey {
   static const String enableAutoBrightness = 'enableAutoBrightness';
   static const String enableAutoEnter = 'enableAutoEnter';
   static const String enableAutoExit = 'enableAutoExit';
+  static const String p1080 = 'p1080';
+
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
   static const String enableShowDanmaku = 'enableShowDanmaku';
