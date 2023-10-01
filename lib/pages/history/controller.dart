@@ -8,11 +8,13 @@ import 'package:pilipala/utils/storage.dart';
 
 class HistoryController extends GetxController {
   final ScrollController scrollController = ScrollController();
-  RxList<HisListItem> historyList = [HisListItem()].obs;
+  RxList<HisListItem> historyList = <HisListItem>[].obs;
   RxBool isLoadingMore = false.obs;
   RxBool pauseStatus = false.obs;
   Box localCache = GStrorage.localCache;
   RxBool isLoading = false.obs;
+  RxBool enableMultiple = false.obs;
+  RxInt checkedCount = 0.obs;
 
   @override
   void onInit() {
@@ -56,7 +58,8 @@ class HistoryController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: Text(!pauseStatus.value ? '你要暂停历史记录功能吗？' : '要恢复历史记录功能吗？'),
+          content:
+              Text(!pauseStatus.value ? '啊叻？你要暂停历史记录功能吗？' : '啊叻？要恢复历史记录功能吗？'),
           actions: [
             TextButton(
                 onPressed: () => SmartDialog.dismiss(),
@@ -97,7 +100,7 @@ class HistoryController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: const Text('你要清空历史记录功能吗？'),
+          content: const Text('啊叻？你要清空历史记录功能吗？'),
           actions: [
             TextButton(
                 onPressed: () => SmartDialog.dismiss(),
@@ -114,6 +117,77 @@ class HistoryController extends GetxController {
                 historyList.clear();
               },
               child: const Text('确认清空'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  // 删除某条历史记录
+  Future delHistory(kid, business) async {
+    String resKid = 'archive_$kid';
+    if (business == 'live') {
+      resKid = 'live_$kid';
+    } else if (business.contains('article')) {
+      resKid = 'article_$kid';
+    }
+
+    var res = await UserHttp.delHistory(resKid);
+    if (res['status']) {
+      historyList.removeWhere((e) => e.kid == kid);
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
+  // 删除已看历史记录
+  Future onDelHistory() async {
+    /// TODO 优化
+    List<HisListItem> result =
+        historyList.where((e) => e.progress == -1).toList();
+    for (HisListItem i in result) {
+      String resKid = 'archive_${i.kid}';
+      await UserHttp.delHistory(resKid);
+      historyList.removeWhere((e) => e.kid == i.kid);
+    }
+    SmartDialog.showToast('操作完成');
+  }
+
+  // 删除选中的记录
+  Future onDelCheckedHistory() async {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确认删除所选历史记录吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '取消',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                /// TODO 优化
+                await SmartDialog.dismiss();
+                SmartDialog.showLoading(msg: '请求中');
+                List<HisListItem> result =
+                    historyList.where((e) => e.checked!).toList();
+                for (HisListItem i in result) {
+                  String resKid = 'archive_${i.kid}';
+                  await UserHttp.delHistory(resKid);
+                  historyList.removeWhere((e) => e.kid == i.kid);
+                }
+                checkedCount.value = 0;
+                SmartDialog.dismiss();
+              },
+              child: const Text('确认'),
             )
           ],
         );
