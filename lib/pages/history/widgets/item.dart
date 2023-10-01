@@ -217,31 +217,32 @@ class HistoryItem extends StatelessWidget {
                                     child: SizedBox(
                                       width: 34,
                                       height: 34,
-                                      child: IconButton(
-                                        style: ButtonStyle(
-                                          padding: MaterialStateProperty.all(
-                                              EdgeInsets.zero),
-                                          backgroundColor:
-                                              MaterialStateProperty.resolveWith(
-                                            (states) {
-                                              return Colors.white
-                                                  .withOpacity(0.8);
-                                            },
+                                      child: AnimatedScale(
+                                        scale: videoItem.checked ? 1 : 0,
+                                        duration:
+                                            const Duration(milliseconds: 250),
+                                        curve: Curves.easeInOut,
+                                        child: IconButton(
+                                          style: ButtonStyle(
+                                            padding: MaterialStateProperty.all(
+                                                EdgeInsets.zero),
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith(
+                                              (states) {
+                                                return Colors.white
+                                                    .withOpacity(0.8);
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                        onPressed: () {
-                                          feedBack();
-                                          onChoose!();
-                                        },
-                                        icon: Icon(
-                                          Icons.done_all_outlined,
-                                          color: videoItem.checked
-                                              ? Theme.of(context)
+                                          onPressed: () {
+                                            feedBack();
+                                            onChoose!();
+                                          },
+                                          icon: Icon(Icons.done_all_outlined,
+                                              color: Theme.of(context)
                                                   .colorScheme
-                                                  .primary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
+                                                  .primary),
                                         ),
                                       ),
                                     ),
