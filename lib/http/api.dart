@@ -170,6 +170,9 @@ class Api {
   // 删除某条历史记录
   static const String delHistory = '/x/v2/history/delete';
 
+  // 搜索历史记录
+  static const String searchHistory = '/x/web-goblin/history/search';
+
   // 热搜
   static const String hotSearchList =
       'https://s.search.bilibili.com/main/hotword';
