@@ -397,6 +397,7 @@ class SearchArticleItemModel {
     this.pubTime,
     this.like,
     this.title,
+    this.subTitle,
     this.rankOffset,
     this.mid,
     this.imageUrls,
@@ -414,6 +415,7 @@ class SearchArticleItemModel {
   int? pubTime;
   int? like;
   List? title;
+  String? subTitle;
   int? rankOffset;
   int? mid;
   List? imageUrls;
@@ -431,6 +433,7 @@ class SearchArticleItemModel {
     pubTime = json['pub_time'];
     like = json['like'];
     title = Em.regTitle(json['title']);
+    subTitle = json['title'].replaceAll(RegExp(r'<[^>]*>'), '');
     rankOffset = json['rank_offset'];
     mid = json['mid'];
     imageUrls = json['image_urls'];

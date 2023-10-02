@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -12,7 +13,14 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
     itemCount: list.length,
     itemBuilder: (context, index) {
       return InkWell(
-        onTap: () {},
+        onTap: () {
+          Get.toNamed('/htmlRender', parameters: {
+            'url': 'www.bilibili.com/read/cv${list[index].id}',
+            'title': list[index].subTitle,
+            'id': 'cv${list[index].id}',
+            'dynamicType': 'read'
+          });
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
               StyleString.safeSpace, 5, StyleString.safeSpace, 5),

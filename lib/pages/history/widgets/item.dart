@@ -247,26 +247,26 @@ class VideoContent extends StatelessWidget {
                           Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline),
                 ),
-                if (videoItem.badge != '番剧' &&
-                    !videoItem.tagName.contains('动画') &&
-                    videoItem.history.business != 'live' &&
-                    !videoItem.history.business.contains('article'))
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      tooltip: '功能菜单',
-                      icon: Icon(
-                        Icons.more_vert_outlined,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 14,
-                      ),
-                      position: PopupMenuPosition.under,
-                      // constraints: const BoxConstraints(maxHeight: 35),
-                      onSelected: (String type) {},
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    tooltip: '功能菜单',
+                    icon: Icon(
+                      Icons.more_vert_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 14,
+                    ),
+                    position: PopupMenuPosition.under,
+                    // constraints: const BoxConstraints(maxHeight: 35),
+                    onSelected: (String type) {},
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      if (videoItem.badge != '番剧' &&
+                          !videoItem.tagName.contains('动画') &&
+                          videoItem.history.business != 'live' &&
+                          !videoItem.history.business.contains('article'))
                         PopupMenuItem<String>(
                           onTap: () async {
                             var res = await UserHttp.toViewLater(
@@ -283,21 +283,22 @@ class VideoContent extends StatelessWidget {
                             ],
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          onTap: () => ctr!.delHistory(videoItem.kid),
-                          value: 'pause',
-                          height: 35,
-                          child: const Row(
-                            children: [
-                              Icon(Icons.close_outlined, size: 16),
-                              SizedBox(width: 6),
-                              Text('删除记录', style: TextStyle(fontSize: 13))
-                            ],
-                          ),
+                      PopupMenuItem<String>(
+                        onTap: () => ctr!.delHistory(
+                            videoItem.kid, videoItem.history.business),
+                        value: 'pause',
+                        height: 35,
+                        child: const Row(
+                          children: [
+                            Icon(Icons.close_outlined, size: 16),
+                            SizedBox(width: 6),
+                            Text('删除记录', style: TextStyle(fontSize: 13))
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ),
           ],

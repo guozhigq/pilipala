@@ -8,6 +8,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/member/archive/view.dart';
 import 'package:pilipala/pages/member/dynamic/index.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 import 'widgets/profile.dart';
 
@@ -20,7 +21,8 @@ class MemberPage extends StatefulWidget {
 
 class _MemberPageState extends State<MemberPage>
     with SingleTickerProviderStateMixin {
-  final MemberController _memberController = Get.put(MemberController());
+  late String heroTag;
+  late MemberController _memberController;
   Future? _futureBuilderFuture;
   final ScrollController _extendNestCtr = ScrollController();
   late TabController _tabController;
@@ -29,6 +31,9 @@ class _MemberPageState extends State<MemberPage>
   @override
   void initState() {
     super.initState();
+    heroTag =
+        Get.arguments['heroTag'] ?? Utils.makeHeroTag(Get.parameters['mid']);
+    _memberController = Get.put(MemberController(), tag: heroTag);
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
     _extendNestCtr.addListener(
@@ -77,11 +82,13 @@ class _MemberPageState extends State<MemberPage>
                       children: [
                         Row(
                           children: [
-                            NetworkImgLayer(
-                              width: 35,
-                              height: 35,
-                              type: 'avatar',
-                              src: _memberController.face ?? '',
+                            Obx(
+                              () => NetworkImgLayer(
+                                width: 35,
+                                height: 35,
+                                type: 'avatar',
+                                src: _memberController.face.value,
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Obx(
@@ -102,30 +109,41 @@ class _MemberPageState extends State<MemberPage>
                 },
               ),
               actions: [
+                IconButton(
+                  onPressed: () => Get.toNamed(
+                      '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
+                  icon: const Icon(Icons.search_outlined),
+                ),
                 PopupMenuButton(
                   icon: const Icon(Icons.more_vert),
                   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                    if (_memberController.ownerMid !=
+                        _memberController.mid) ...[
+                      PopupMenuItem(
+                        onTap: () => _memberController.blockUser(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.block, size: 19),
+                            const SizedBox(width: 10),
+                            Text(_memberController.attribute.value != 128
+                                ? '加入黑名单'
+                                : '移除黑名单'),
+                          ],
+                        ),
+                      )
+                    ],
                     PopupMenuItem(
-                      onTap: () => _memberController.blockUser(),
+                      onTap: () => _memberController.shareUser(),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.block, size: 19),
+                          const Icon(Icons.share_outlined, size: 19),
                           const SizedBox(width: 10),
-                          Text(_memberController.attribute.value != 128
-                              ? '加入黑名单'
-                              : '移除黑名单'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () => _memberController.shareUser(),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.share_outlined, size: 19),
-                          SizedBox(width: 10),
-                          Text('分享UP主'),
+                          Text(_memberController.ownerMid !=
+                                  _memberController.mid
+                              ? '分享UP主'
+                              : '分享我的主页'),
                         ],
                       ),
                     ),
@@ -136,34 +154,38 @@ class _MemberPageState extends State<MemberPage>
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   children: [
-                    if (_memberController.face != null)
-                      Positioned.fill(
-                        bottom: 10,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              fit: BoxFit.fitWidth,
-                              image: NetworkImage(_memberController.face!),
-                              alignment: Alignment.topCenter,
-                              isAntiAlias: true,
-                            ),
-                          ),
-                          foregroundDecoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context)
-                                    .colorScheme
-                                    .background
-                                    .withOpacity(0.44),
-                                Theme.of(context).colorScheme.background,
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              stops: const [0.0, 0.46],
-                            ),
-                          ),
-                        ),
-                      ),
+                    Obx(
+                      () => _memberController.face.value != ''
+                          ? Positioned.fill(
+                              bottom: 10,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.fitWidth,
+                                    image: NetworkImage(
+                                        _memberController.face.value),
+                                    alignment: Alignment.topCenter,
+                                    isAntiAlias: true,
+                                  ),
+                                ),
+                                foregroundDecoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .background
+                                          .withOpacity(0.44),
+                                      Theme.of(context).colorScheme.background,
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    stops: const [0.0, 0.46],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : const SizedBox(),
+                    ),
                     Positioned(
                       left: 0,
                       right: 0,

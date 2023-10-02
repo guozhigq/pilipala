@@ -22,7 +22,7 @@ Widget profile(ctr, {loadingStatus = false}) {
                     width: 90,
                     height: 90,
                     type: 'avatar',
-                    src: !loadingStatus ? memberInfo.face : ctr.face,
+                    src: !loadingStatus ? memberInfo.face : ctr.face.value,
                   ),
                   if (!loadingStatus &&
                       memberInfo.liveRoom != null &&
@@ -123,12 +123,14 @@ Widget profile(ctr, {loadingStatus = false}) {
                                       : '-',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold)),
-                              Text('粉丝',
-                                  style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium!
-                                          .fontSize))
+                              Text(
+                                '粉丝',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize),
+                              )
                             ],
                           ),
                         ),

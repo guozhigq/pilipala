@@ -18,6 +18,7 @@ class MemberHttp {
     var res = await Request().get(
       Api.memberInfo,
       data: params,
+      extra: {'ua': 'pc'},
     );
     if (res.data['code'] == 0) {
       return {
@@ -65,7 +66,7 @@ class MemberHttp {
     int ps = 30,
     int tid = 0,
     int? pn,
-    String keyword = '',
+    String? keyword,
     String order = 'pubdate',
     bool orderAvoided = true,
   }) async {
@@ -74,7 +75,7 @@ class MemberHttp {
       'ps': ps,
       'tid': tid,
       'pn': pn,
-      'keyword': keyword,
+      'keyword': keyword ?? '',
       'order': order,
       'platform': 'web',
       'web_location': 1550101,
@@ -83,6 +84,7 @@ class MemberHttp {
     var res = await Request().get(
       Api.memberArchive,
       data: params,
+      extra: {'ua': 'pc'},
     );
     if (res.data['code'] == 0) {
       return {
@@ -105,6 +107,29 @@ class MemberHttp {
       'host_mid': mid,
       'timezone_offset': '-480',
       'features': 'itemOpusStyle',
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': DynamicsDataModel.fromJson(res.data['data']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 搜索用户动态
+  static Future memberDynamicSearch({int? pn, int? ps, int? mid}) async {
+    var res = await Request().get(Api.memberDynamic, data: {
+      'keyword': '海拔',
+      'mid': mid,
+      'pn': pn,
+      'ps': ps,
+      'platform': 'web'
     });
     if (res.data['code'] == 0) {
       return {

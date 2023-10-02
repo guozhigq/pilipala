@@ -79,6 +79,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableWordRe,
             defaultVal: false,
           ),
+          const SetSwitchItem(
+            title: '首页推荐刷新',
+            subTitle: '下拉刷新时保留上次内容',
+            setKey: SettingBoxKey.enableSaveLastData,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),

@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.7
+version: 1.0.8
 
 environment:
   sdk: ">=2.19.6 <3.0.0"
@@ -70,7 +70,7 @@ dependencies:
   # 解决sliver滑动不同步
   extended_nested_scroll_view: ^6.1.2
   # 上拉加载
-  loading_more_list: ^5.0.3
+  loading_more_list: ^6.0.0
   # 下拉刷新
   pull_to_refresh_notification: ^3.0.1
   # 图标

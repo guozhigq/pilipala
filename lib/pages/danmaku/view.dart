@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -85,12 +86,20 @@ class _PlDanmakuState extends State<PlDanmaku> {
       _controller!.onResume();
       danmuPlayStatus = true;
     }
+    if (!playerController.isOpenDanmu.value) {
+      return;
+    }
     PlDanmakuController ctr = _plDanmakuController;
     int currentPosition = position.inMilliseconds;
     blockTypes = playerController.blockTypes;
-
-    if (!playerController.isOpenDanmu.value) {
-      return;
+    // 根据position判断是否有已缓存弹幕。没有则请求对应段
+    int segIndex = (currentPosition / (6 * 60 * 1000)).ceil();
+    segIndex = segIndex < 1 ? 1 : segIndex;
+    if (ctr.dmSegList[segIndex - 1].elems.isEmpty) {
+      ctr.currentSegIndex = segIndex;
+      EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
+        ctr.queryDanmaku();
+      });
     }
     // 超出分段数返回
     if (ctr.currentSegIndex >= ctr.dmSegList.length) {
@@ -140,23 +149,30 @@ class _PlDanmakuState extends State<PlDanmaku> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => AnimatedOpacity(
-        opacity: playerController.isOpenDanmu.value ? 1 : 0,
-        duration: const Duration(milliseconds: 100),
-        child: DanmakuView(
-          createdController: (DanmakuController e) async {
-            widget.playerController.danmakuController = _controller = e;
-          },
-          option: DanmakuOption(
-            fontSize: 15 * fontSizeVal,
-            area: showArea,
-            opacity: opacityVal,
-            duration: danmakuSpeedVal * widget.playerController.playbackSpeed,
+    return LayoutBuilder(builder: (context, box) {
+      double initDuration = box.maxWidth / 12;
+      return Obx(
+        () => AnimatedOpacity(
+          opacity: playerController.isOpenDanmu.value ? 1 : 0,
+          duration: const Duration(milliseconds: 100),
+          child: DanmakuView(
+            createdController: (DanmakuController e) async {
+              widget.playerController.danmakuController = _controller = e;
+            },
+            option: DanmakuOption(
+              fontSize: 15 * fontSizeVal,
+              area: showArea,
+              opacity: opacityVal,
+              hideTop: blockTypes.contains(5),
+              hideScroll: blockTypes.contains(2),
+              hideBottom: blockTypes.contains(4),
+              duration: initDuration /
+                  (danmakuSpeedVal * widget.playerController.playbackSpeed),
+            ),
+            statusChanged: (isPlaying) {},
           ),
-          statusChanged: (isPlaying) {},
         ),
-      ),
-    );
+      );
+    });
   }
 }

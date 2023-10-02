@@ -123,8 +123,15 @@ class HistoryController extends GetxController {
   }
 
   // 删除某条历史记录
-  Future delHistory(kid) async {
-    var res = await UserHttp.delHistory(kid);
+  Future delHistory(kid, business) async {
+    String resKid = 'archive_$kid';
+    if (business == 'live') {
+      resKid = 'live_$kid';
+    } else if (business.contains('article')) {
+      resKid = 'article_$kid';
+    }
+
+    var res = await UserHttp.delHistory(resKid);
     if (res['status']) {
       historyList.removeWhere((e) => e.kid == kid);
       SmartDialog.showToast(res['msg']);
@@ -136,7 +143,8 @@ class HistoryController extends GetxController {
     List<HisListItem> result =
         historyList.where((e) => e.progress == -1).toList();
     for (HisListItem i in result) {
-      await UserHttp.delHistory(i.kid);
+      String resKid = 'archive_${i.kid}';
+      await UserHttp.delHistory(resKid);
       historyList.removeWhere((e) => e.kid == i.kid);
     }
     SmartDialog.showToast('操作完成');

@@ -3,8 +3,12 @@ import 'package:html/parser.dart';
 import 'package:pilipala/http/index.dart';
 
 class HtmlHttp {
-  static Future reqHtml(id) async {
-    var response = await Request().get("https://www.bilibili.com/opus/$id");
+  // article
+  static Future reqHtml(id, dynamicType) async {
+    var response = await Request().get(
+      "https://www.bilibili.com/opus/$id",
+      extra: {'ua': 'pc'},
+    );
     Document rootTree = parse(response.data);
     Element body = rootTree.body!;
     Element appDom = body.querySelector('#app')!;
@@ -34,7 +38,46 @@ class HtmlHttp {
       'uname': uname,
       'updateTime': updateTime,
       'content': opusContent,
-      'commentId': commentId
+      'commentId': int.parse(commentId)
+    };
+  }
+
+  // read
+  static Future reqReadHtml(id, dynamicType) async {
+    var response = await Request().get(
+      "https://www.bilibili.com/$dynamicType/$id/",
+      extra: {'ua': 'pc'},
+    );
+    Document rootTree = parse(response.data);
+    Element body = rootTree.body!;
+    Element appDom = body.querySelector('#app')!;
+    Element authorHeader = appDom.querySelector('.up-left')!;
+    // 头像
+    // String avatar =
+    //     authorHeader.querySelector('.bili-avatar-img')!.attributes['data-src']!;
+    // print(avatar);
+    // avatar = 'https:${avatar.split('@')[0]}';
+    String uname = authorHeader.querySelector('.up-name')!.text.trim();
+    // 动态详情
+    Element opusDetail = appDom.querySelector('.article-content')!;
+    // 发布时间
+    // String updateTime =
+    //     opusDetail.querySelector('.opus-module-author__pub__text')!.text;
+    // print(updateTime);
+
+    //
+    String opusContent =
+        opusDetail.querySelector('#read-article-holder')!.innerHtml;
+    RegExp digitRegExp = RegExp(r'\d+');
+    Iterable<Match> matches = digitRegExp.allMatches(id);
+    String number = matches.first.group(0)!;
+    return {
+      'status': true,
+      'avatar': '',
+      'uname': uname,
+      'updateTime': '',
+      'content': opusContent,
+      'commentId': int.parse(number)
     };
   }
 }

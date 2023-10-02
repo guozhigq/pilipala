@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
@@ -110,5 +111,21 @@ class MineController extends GetxController {
         break;
     }
     Get.forceAppUpdate();
+  }
+
+  pushFollow() {
+    if (!userLogin.value) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    Get.toNamed('/follow?mid=${userInfo.value.mid}');
+  }
+
+  pushFans() {
+    if (!userLogin.value) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    Get.toNamed('/fan?mid=${userInfo.value.mid}');
   }
 }

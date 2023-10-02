@@ -449,7 +449,9 @@ class PlPlayerController {
           for (var element in _statusListeners) {
             element(event ? PlayerStatus.playing : PlayerStatus.paused);
           }
-          makeHeartBeat(_position.value.inSeconds, type: 'status');
+          if (videoPlayerController!.state.position.inSeconds != 0) {
+            makeHeartBeat(_position.value.inSeconds, type: 'status');
+          }
         }),
         videoPlayerController!.stream.completed.listen((event) {
           if (event) {
@@ -510,6 +512,7 @@ class PlPlayerController {
       position = Duration.zero;
     }
     _position.value = position;
+    _heartDuration = position.inSeconds;
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
@@ -814,6 +817,10 @@ class PlPlayerController {
       }
 
       toggleFullScreen(true);
+      bool isValid =
+          direction.value == 'vertical' || mode == FullScreenMode.vertical
+              ? true
+              : false;
       var result = await showDialog(
         context: Get.context!,
         useSafeArea: false,
@@ -821,12 +828,10 @@ class PlPlayerController {
           backgroundColor: Colors.black,
           child: SafeArea(
             // 忽略手机安全区域
+            top: isValid,
             left: false,
             right: false,
-            bottom:
-                direction.value == 'vertical' || mode == FullScreenMode.vertical
-                    ? true
-                    : false,
+            bottom: isValid,
             child: PLVideoPlayer(
               controller: this,
               headerControl: headerControl,
@@ -878,7 +883,7 @@ class PlPlayerController {
   }
 
   // 记录播放记录
-  Future makeHeartBeat(progress, {type = 'playing'}) async {
+  Future makeHeartBeat(int progress, {type = 'playing'}) async {
     if (!_enableHeart) {
       return false;
     }

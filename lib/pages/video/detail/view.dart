@@ -99,10 +99,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController!.triggerFullScreen(status: false);
       }
       // 播放完展示控制栏
-      PiPStatus currentStatus = await videoDetailController.floating!.pipStatus;
-      if (currentStatus == PiPStatus.disabled) {
-        plPlayerController!.onLockControl(false);
-      }
+      try {
+        PiPStatus currentStatus =
+            await videoDetailController.floating!.pipStatus;
+        if (currentStatus == PiPStatus.disabled) {
+          plPlayerController!.onLockControl(false);
+        }
+      } catch (_) {}
     }
   }
 
@@ -140,10 +143,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)) {
       videoDetailController.brightness = plPlayerController!.brightness.value;
     }
-    videoDetailController.defaultST = plPlayerController!.position.value;
-    videoIntroController.isPaused = true;
-    plPlayerController!.removeStatusLister(playerListener);
-    plPlayerController!.pause();
+    if (plPlayerController != null) {
+      videoDetailController.defaultST = plPlayerController!.position.value;
+      videoIntroController.isPaused = true;
+      plPlayerController!.removeStatusLister(playerListener);
+      plPlayerController!.pause();
+    }
     super.didPushNext();
   }
 

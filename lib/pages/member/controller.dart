@@ -14,7 +14,7 @@ class MemberController extends GetxController {
   late int mid;
   Rx<MemberInfoModel> memberInfo = MemberInfoModel().obs;
   Map? userStat;
-  String? face;
+  RxString face = ''.obs;
   String? heroTag;
   Box userInfoCache = GStrorage.userInfo;
   late int ownerMid;
@@ -30,7 +30,7 @@ class MemberController extends GetxController {
     mid = int.parse(Get.parameters['mid']!);
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo.mid : -1;
-    face = Get.arguments['face'] ?? '';
+    face.value = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';
     relationSearch();
   }
@@ -41,6 +41,7 @@ class MemberController extends GetxController {
     var res = await MemberHttp.memberInfo(mid: mid);
     if (res['status']) {
       memberInfo.value = res['data'];
+      face.value = res['data'].face;
     }
     return res;
   }
@@ -110,6 +111,7 @@ class MemberController extends GetxController {
   // 关系查询
   Future relationSearch() async {
     if (userInfo == null) return;
+    if (mid == ownerMid) return;
     var res = await UserHttp.relationSearch(mid);
     if (res['status']) {
       attribute.value = res['data']['relation']['attribute'];
@@ -117,7 +119,7 @@ class MemberController extends GetxController {
           ? '关注'
           : attribute.value == 2
               ? '已关注'
-              : attribute.value == 2
+              : attribute.value == 6
                   ? '已互粉'
                   : '已拉黑';
     }

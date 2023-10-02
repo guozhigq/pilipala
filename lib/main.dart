@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -60,6 +63,23 @@ class MyApp extends StatelessWidget {
     // 字体缩放大小
     double textScale =
         setting.get(SettingBoxKey.defaultTextScale, defaultValue: 1.0);
+
+    // 强制设置高帧率
+    if (Platform.isAndroid) {
+      try {
+        late List modes;
+        FlutterDisplayMode.supported.then((value) {
+          modes = value;
+          var storageDisplay = setting.get(SettingBoxKey.displayMode);
+          DisplayMode f = DisplayMode.auto;
+          if (storageDisplay != null) {
+            f = modes.firstWhere((e) => e.toString() == storageDisplay);
+          }
+          DisplayMode preferred = modes.toList().firstWhere((el) => el == f);
+          FlutterDisplayMode.setPreferredMode(preferred);
+        });
+      } catch (_) {}
+    }
 
     return DynamicColorBuilder(
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {

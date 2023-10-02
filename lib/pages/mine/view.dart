@@ -264,7 +264,7 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => Get.toNamed('/follow'),
+                      onTap: () => _mineController.pushFollow(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -294,7 +294,7 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => Get.toNamed('/fan'),
+                      onTap: () => _mineController.pushFans(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

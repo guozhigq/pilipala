@@ -121,6 +121,7 @@ class SettingBoxKey {
   static const String enableWordRe = 'enableWordRe';
   static const String enableSearchWord = 'enableSearchWord';
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
+  static const String enableSaveLastData = 'enableSaveLastData';
 
   /// 外观
   static const String themeMode = 'themeMode';
@@ -129,6 +130,7 @@ class SettingBoxKey {
   static const String customColor = 'customColor'; // 自定义主题色
   static const String iosTransition = 'iosTransition'; // ios路由
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
+  static const String displayMode = 'displayMode';
 }
 
 class LocalCacheKey {
