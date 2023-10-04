@@ -20,7 +20,7 @@ class RcmdController extends GetxController {
   void onInit() {
     super.onInit();
     crossAxisCount.value =
-        setting.get(SettingBoxKey.enableSingleRow, defaultValue: false) ? 1 : 2;
+        setting.get(SettingBoxKey.customRows, defaultValue: 2);
     if (recVideo.get('cacheList') != null &&
         recVideo.get('cacheList').isNotEmpty) {
       List<RecVideoItemAppModel> list = [];

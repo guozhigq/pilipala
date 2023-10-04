@@ -132,6 +132,7 @@ class SettingBoxKey {
   static const String customColor = 'customColor'; // 自定义主题色
   static const String iosTransition = 'iosTransition'; // ios路由
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
+  static const String customRows = 'customRows'; // 自定义列
 }
 
 class LocalCacheKey {
