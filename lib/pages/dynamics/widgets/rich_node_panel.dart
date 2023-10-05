@@ -27,8 +27,9 @@ InlineSpan richNode(item, context) {
     } else {
       for (var i in richTextNodes) {
         /// fix 渲染专栏时内容会重复
-        if (item.modules.moduleDynamic.major.opus.title == null &&
-            i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
+        // if (item.modules.moduleDynamic.major.opus.title == null &&
+        //     i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
+        if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
           spanChilds.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
         }
@@ -109,16 +110,18 @@ InlineSpan richNode(item, context) {
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
                 onTap: () {
-                  String dynamicId = item.basic['comment_id_str'];
-                  Get.toNamed(
-                    '/webview',
-                    parameters: {
-                      'url':
-                          'https://t.bilibili.com/vote/h5/index/#/result?vote_id=${i.rid}&dynamic_id=$dynamicId&isWeb=1',
-                      'type': 'vote',
-                      'pageTitle': '投票'
-                    },
-                  );
+                  try {
+                    String dynamicId = item.basic['comment_id_str'];
+                    Get.toNamed(
+                      '/webview',
+                      parameters: {
+                        'url':
+                            'https://t.bilibili.com/vote/h5/index/#/result?vote_id=${i.rid}&dynamic_id=$dynamicId&isWeb=1',
+                        'type': 'vote',
+                        'pageTitle': '投票'
+                      },
+                    );
+                  } catch (_) {}
                 },
                 child: Text(
                   '投票：${i.text}',
