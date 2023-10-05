@@ -22,12 +22,14 @@ class _StyleSettingState extends State<StyleSetting> {
   Box setting = GStrorage.setting;
   late int picQuality;
   late ThemeType _tempThemeValue;
+  late dynamic defaultCustomRows;
 
   @override
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     _tempThemeValue = settingController.themeType.value;
+    defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
 
   @override
@@ -76,12 +78,37 @@ class _StyleSettingState extends State<StyleSetting> {
             setKey: SettingBoxKey.iosTransition,
             defaultVal: false,
           ),
-          SetSwitchItem(
-            title: '首页单列',
-            subTitle: '每行展示一个内容卡片',
-            setKey: SettingBoxKey.enableSingleRow,
-            defaultVal: false,
-            callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
+          // SetSwitchItem(
+          //   title: '首页单列',
+          //   subTitle: '每行展示一个内容卡片',
+          //   setKey: SettingBoxKey.enableSingleRow,
+          //   defaultVal: false,
+          //   callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
+          // ),
+          ListTile(
+            dense: false,
+            title: Text('自定义列数', style: titleStyle),
+            subtitle: Text(
+              '当前列数',
+              style: subTitleStyle,
+            ),
+            trailing: PopupMenuButton(
+              initialValue: defaultCustomRows,
+              icon: const Icon(Icons.more_vert_outlined, size: 22),
+              onSelected: (item) {
+                defaultCustomRows = item;
+                setting.put(SettingBoxKey.customRows, item);
+                setState(() {});
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                for (var i in [1, 2, 3, 4, 5]) ...[
+                  PopupMenuItem(
+                    value: i,
+                    child: Text(i.toString()),
+                  ),
+                ]
+              ],
+            ),
           ),
           ListTile(
             dense: false,

@@ -287,23 +287,18 @@ class VideoStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          '${videoItem.stat.view}观看',
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: Theme.of(context).colorScheme.outline,
-          ),
+    return RichText(
+      maxLines: 1,
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+          color: Theme.of(context).colorScheme.outline,
         ),
-        Text(
-          ' • ${videoItem.stat.danmu}弹幕',
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-      ],
+        children: [
+          TextSpan(text: '${videoItem.stat.view}观看'),
+          TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
+        ],
+      ),
     );
   }
 }

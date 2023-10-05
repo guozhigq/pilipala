@@ -120,15 +120,18 @@ class LiveContent extends StatelessWidget {
             if (crossAxisCount == 1) const SizedBox(height: 4),
             Row(
               children: [
-                Text(
-                  liveItem.uname,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    color: Theme.of(context).colorScheme.outline,
+                Expanded(
+                  child: Text(
+                    liveItem.uname,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (crossAxisCount == 1) ...[
                   Text(
@@ -169,7 +172,7 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 50,
-      padding: const EdgeInsets.only(top: 22, left: 10, right: 10),
+      padding: const EdgeInsets.only(top: 26, left: 10, right: 10),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -181,18 +184,17 @@ class VideoStat extends StatelessWidget {
           tileMode: TileMode.mirror,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            liveItem!.areaName!,
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          ),
-          Text(
-            liveItem!.watchedShow!['text_small'],
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          ),
-        ],
+      child: RichText(
+        maxLines: 1,
+        textAlign: TextAlign.justify,
+        softWrap: false,
+        text: TextSpan(
+          style: const TextStyle(fontSize: 11, color: Colors.white),
+          children: [
+            TextSpan(text: liveItem!.areaName!),
+            TextSpan(text: liveItem!.watchedShow!['text_small']),
+          ],
+        ),
       ),
     );
   }

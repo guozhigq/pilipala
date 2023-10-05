@@ -133,6 +133,7 @@ class SettingBoxKey {
   static const String iosTransition = 'iosTransition'; // ios路由
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
   static const String displayMode = 'displayMode';
+  static const String customRows = 'customRows'; // 自定义列
 }
 
 class LocalCacheKey {
