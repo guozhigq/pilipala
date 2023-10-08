@@ -19,6 +19,7 @@ class MemberController extends GetxController {
   // 投稿列表
   RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
   var userInfo;
+  Box setting = GStrorage.setting;
 
   @override
   void onInit() {
@@ -108,12 +109,12 @@ class MemberController extends GetxController {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
-          content: const Text('确定拉黑UP主?'),
+          content: const Text('确认拉黑该用户?'),
           actions: [
             TextButton(
               onPressed: () => SmartDialog.dismiss(),
               child: Text(
-                '点错了',
+                '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
               ),
             ),
@@ -125,7 +126,12 @@ class MemberController extends GetxController {
                   reSrc: 11,
                 );
                 SmartDialog.dismiss();
-                if (res['status']) {}
+                if (res['status']) {
+                  List<int> blackMidsList =
+                      setting.get(SettingBoxKey.blackMidsList);
+                  blackMidsList.add(mid);
+                  setting.put(SettingBoxKey.blackMidsList, blackMidsList);
+                }
               },
               child: const Text('确认'),
             )

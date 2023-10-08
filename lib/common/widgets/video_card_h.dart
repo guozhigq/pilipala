@@ -34,9 +34,10 @@ class VideoCardH extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return GestureDetector(
       onLongPress: () {
-        if (longPress != null) {
-          longPress!();
-        }
+        // if (longPress != null) {
+        //   longPress!();
+        // }
+        MemberController().blockUser(videoItem.mid);
       },
       // onLongPressEnd: (details) {
       //   if (longPressEnd != null) {
