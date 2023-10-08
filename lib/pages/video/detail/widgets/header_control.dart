@@ -676,9 +676,9 @@ class _HeaderControlState extends State<HeaderControl> {
                       ),
                       child: Slider(
                         min: 1,
-                        max: 6,
+                        max: 8,
                         value: danmakuSpeedVal,
-                        divisions: 10,
+                        divisions: 14,
                         label: danmakuSpeedVal.toString(),
                         onChanged: (double val) {
                           danmakuSpeedVal = val;
