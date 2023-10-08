@@ -8,7 +8,8 @@ import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  Function? callFn;
+  HomePage({Key? key, this.callFn}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -25,15 +26,16 @@ class _HomePageState extends State<HomePage>
 
   showUserBottonSheet() {
     feedBack();
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => const SizedBox(
-        height: 450,
-        child: MinePage(),
-      ),
-      clipBehavior: Clip.hardEdge,
-      isScrollControlled: true,
-    );
+    widget.callFn!();
+    // showModalBottomSheet(
+    //   context: context,
+    //   builder: (_) => const SizedBox(
+    //     height: 450,
+    //     child: MinePage(),
+    //   ),
+    //   clipBehavior: Clip.hardEdge,
+    //   isScrollControlled: true,
+    // );
   }
 
   @override
@@ -50,37 +52,6 @@ class _HomePageState extends State<HomePage>
             ctr: _homeController,
             callback: showUserBottonSheet,
           ),
-          const SizedBox(height: 8),
-          // SizedBox(
-          //   width: double.infinity,
-          //   height: 42,
-          //   child: Align(
-          //     alignment: Alignment.center,
-          //     child: TabBar(
-          //       controller: _homeController.tabController,
-          //       tabs: [
-          //         for (var i in _homeController.tabs) Tab(text: i['label'])
-          //       ],
-          //       isScrollable: true,
-          //       dividerColor: Colors.transparent,
-          //       enableFeedback: true,
-          //       splashBorderRadius: BorderRadius.circular(10),
-          //       onTap: (value) {
-          //         feedBack();
-          //         if (_homeController.initialIndex == value) {
-          //           _homeController.tabsCtrList[value]().animateToTop();
-          //         }
-          //         _homeController.initialIndex = value;
-          //       },
-          //     ),
-          //   ),
-          // ),
-          // Expanded(
-          //   child: TabBarView(
-          //     controller: _homeController.tabController,
-          //     children: _homeController.tabsPageList,
-          //   ),
-          // ),
         ],
       ),
     );
@@ -128,8 +99,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               child: Row(
                 children: [
-                  const Expanded(child: SearchPage()),
-                  const SizedBox(width: 10),
                   Obx(
                     () => ctr!.userLogin.value
                         ? Stack(
@@ -182,6 +151,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                           ),
                   ),
+                  const SizedBox(width: 10),
+                  const Expanded(child: SearchPage()),
                 ],
               ),
             ),

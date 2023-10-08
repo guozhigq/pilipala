@@ -43,7 +43,7 @@ bool iosTransition =
 class Routes {
   static final List<GetPage> getPages = [
     // 首页(推荐)
-    CustomGetPage(name: '/', page: () => const HomePage()),
+    CustomGetPage(name: '/', page: () => HomePage()),
     // 热门
     CustomGetPage(name: '/hot', page: () => const HotPage()),
     // 视频详情

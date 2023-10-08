@@ -108,8 +108,7 @@ class Request {
     dio.interceptors.add(LogInterceptor(
       request: false,
       requestHeader: false,
-      responseHeader: true,
-      requestBody: true,
+      responseHeader: false,
     ));
 
     dio.transformer = BackgroundTransformer();

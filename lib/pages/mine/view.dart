@@ -72,38 +72,30 @@ class _MinePageState extends State<MinePage> {
           const SizedBox(width: 10),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: SizedBox(
-              height: constraint.maxHeight,
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  FutureBuilder(
-                    future: _futureBuilderFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == null) {
-                          return const SizedBox();
-                        }
-                        if (snapshot.data['status']) {
-                          return Obx(
-                              () => userInfoBuild(mineController, context));
-                        } else {
-                          return userInfoBuild(mineController, context);
-                        }
-                      } else {
-                        return userInfoBuild(mineController, context);
-                      }
-                    },
-                  ),
-                ],
-              ),
+      body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
+                  if (snapshot.data['status']) {
+                    return Obx(() => userInfoBuild(mineController, context));
+                  } else {
+                    return userInfoBuild(mineController, context);
+                  }
+                } else {
+                  return userInfoBuild(mineController, context);
+                }
+              },
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
