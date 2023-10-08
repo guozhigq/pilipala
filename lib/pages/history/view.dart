@@ -37,6 +37,9 @@ class _HistoryPageState extends State<HistoryPage> {
         }
       },
     );
+    _historyController.enableMultiple.listen((p0) {
+      setState(() {});
+    });
   }
 
   // 选中
