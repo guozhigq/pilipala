@@ -478,19 +478,20 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 return;
               }
               final tapPosition = details.localPosition.dx;
-              int curSliderPosition = _.sliderPosition.value.inSeconds;
+              double scale = 60 / MediaQuery.of(context).size.width;
+              int curSliderPosition = _.sliderPosition.value.inMilliseconds;
               late int result;
               if (tapPosition - _initTapPositoin > 0) {
                 // 快进
                 /// TODO  优化屏幕越小效果越明显
-                result = (curSliderPosition + 1)
-                    .clamp(0, _.duration.value.inSeconds);
+                result = (curSliderPosition + (500 * scale).toInt())
+                    .clamp(0, _.duration.value.inMilliseconds);
               } else {
                 // 快退
-                result = (curSliderPosition - 1)
-                    .clamp(0, _.duration.value.inSeconds);
+                result = (curSliderPosition - (500 * scale).toInt())
+                    .clamp(0, _.duration.value.inMilliseconds);
               }
-              _.onUodatedSliderProgress(Duration(seconds: result));
+              _.onUodatedSliderProgress(Duration(milliseconds: result));
               _.onChangedSliderStart();
               _initTapPositoin = tapPosition;
             },
