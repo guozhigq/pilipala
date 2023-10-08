@@ -180,7 +180,11 @@ class HistoryController extends GetxController {
                 List<HisListItem> result =
                     historyList.where((e) => e.checked!).toList();
                 for (HisListItem i in result) {
-                  String resKid = 'archive_${i.kid}';
+                  String str = 'archive';
+                  try {
+                    str = i.history!.business!;
+                  } catch (_) {}
+                  String resKid = '${str}_${i.kid}';
                   await UserHttp.delHistory(resKid);
                   historyList.removeWhere((e) => e.kid == i.kid);
                 }
