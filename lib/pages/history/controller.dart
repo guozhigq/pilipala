@@ -186,6 +186,7 @@ class HistoryController extends GetxController {
                 }
                 checkedCount.value = 0;
                 SmartDialog.dismiss();
+                enableMultiple.value = false;
               },
               child: const Text('确认'),
             )
