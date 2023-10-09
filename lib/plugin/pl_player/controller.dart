@@ -428,6 +428,8 @@ class PlPlayerController {
     // 设置倍速
     if (_playbackSpeed.value != 1.0) {
       await setPlaybackSpeed(_playbackSpeed.value);
+    } else {
+      await setPlaybackSpeed(1.0);
     }
 
     // if (_looping) {

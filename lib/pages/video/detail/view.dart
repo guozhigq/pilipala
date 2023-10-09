@@ -185,6 +185,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController.isPaused = false;
     if (_extendNestCtr.position.pixels == 0 && autoplay) {
       await Future.delayed(const Duration(milliseconds: 300));
+      plPlayerController!.seekTo(videoDetailController.defaultST);
       plPlayerController?.play();
     }
     plPlayerController?.addStatusLister(playerListener);
