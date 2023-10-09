@@ -215,7 +215,11 @@ class HistoryItem extends StatelessWidget {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    color: Colors.black.withOpacity(0.6),
+                                    color: Colors.black.withOpacity(
+                                        ctr!.enableMultiple.value &&
+                                                videoItem.checked
+                                            ? 0.6
+                                            : 0),
                                   ),
                                   child: Center(
                                     child: SizedBox(
