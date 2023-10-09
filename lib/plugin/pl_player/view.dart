@@ -479,7 +479,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               }
               final tapPosition = details.localPosition.dx;
               int curSliderPosition = _.sliderPosition.value.inMilliseconds;
-              double scale = 60000 / MediaQuery.of(context).size.width;
+              double scale = 90000 / MediaQuery.of(context).size.width;
               Duration pos = Duration(
                   milliseconds:
                       curSliderPosition + (details.delta.dx * scale).round());
