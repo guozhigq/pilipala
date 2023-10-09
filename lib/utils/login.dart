@@ -1,8 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 
 class LoginUtils {
@@ -17,12 +15,6 @@ class LoginUtils {
 
       MineController mineCtr = Get.find<MineController>();
       mineCtr.userLogin.value = status;
-
-      DynamicsController dynamicsCtr = Get.find<DynamicsController>();
-      dynamicsCtr.userLogin.value = status;
-
-      MediaController mediaCtr = Get.find<MediaController>();
-      mediaCtr.userLogin.value = status;
     } catch (err) {
       SmartDialog.showToast('refreshLoginStatus error: ${err.toString()}');
     }

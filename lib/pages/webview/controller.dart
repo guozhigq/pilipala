@@ -99,8 +99,6 @@ class WebviewController extends GetxController {
           HomeController homeCtr = Get.find<HomeController>();
           homeCtr.updateLoginStatus(true);
           homeCtr.userFace.value = result['data'].face;
-          MediaController mediaCtr = Get.find<MediaController>();
-          mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
         } catch (err) {
           SmartDialog.show(builder: (context) {

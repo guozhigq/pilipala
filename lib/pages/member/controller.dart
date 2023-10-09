@@ -127,8 +127,8 @@ class MemberController extends GetxController {
                 );
                 SmartDialog.dismiss();
                 if (res['status']) {
-                  List<int> blackMidsList =
-                      setting.get(SettingBoxKey.blackMidsList);
+                  List<int> blackMidsList = setting
+                      .get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
                   blackMidsList.add(mid);
                   setting.put(SettingBoxKey.blackMidsList, blackMidsList);
                 }
