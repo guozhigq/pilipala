@@ -163,4 +163,10 @@ class VideoBoxKey {
   static const String videoSpeed = 'videoSpeed';
   // 播放顺序
   static const String playRepeat = 'playRepeat';
+  // 默认倍速
+  static const String playSpeedDefault = 'playSpeedDefault';
+  // 默认长按倍速
+  static const String longPressSpeedDefault = 'longPressSpeedDefault';
+  // 自定义倍速集合
+  static const String customSpeedsList = 'customSpeedsList';
 }

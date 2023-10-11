@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
@@ -54,6 +55,12 @@ class _PlaySettingState extends State<PlaySetting> {
       ),
       body: ListView(
         children: [
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/playSpeedSet'),
+            title: Text('倍速设置', style: titleStyle),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+          ),
           const SetSwitchItem(
             title: '开启1080P',
             subTitle: '免登录查看1080P视频',

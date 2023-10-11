@@ -27,6 +27,7 @@ import 'package:pilipala/pages/setting/extra_setting.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/pages/display_mode.dart';
 import 'package:pilipala/pages/setting/pages/font_size_select.dart';
+import 'package:pilipala/pages/setting/pages/play_speed_set.dart';
 import 'package:pilipala/pages/setting/play_setting.dart';
 import 'package:pilipala/pages/setting/privacy_setting.dart';
 import 'package:pilipala/pages/setting/style_setting.dart';
@@ -116,6 +117,8 @@ class Routes {
     // 历史记录搜索
     CustomGetPage(
         name: '/historySearch', page: () => const HistorySearchPage()),
+
+    CustomGetPage(name: '/playSpeedSet', page: () => const PlaySpeedPage()),
   ];
 }
 

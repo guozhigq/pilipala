@@ -215,8 +215,6 @@ class VideoDetailController extends GetxController
       direction: (firstVideo.width! - firstVideo.height!) > 0
           ? 'horizontal'
           : 'vertical',
-      // 默认1倍速
-      speed: 1.0,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,

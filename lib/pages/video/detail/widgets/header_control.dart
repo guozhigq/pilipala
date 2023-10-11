@@ -41,11 +41,14 @@ class _HeaderControlState extends State<HeaderControl> {
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
   Box localCache = GStrorage.localCache;
+  Box videoStorage = GStrorage.video;
+  late List speedsList;
 
   @override
   void initState() {
     super.initState();
     videoInfo = widget.videoDetailCtr!.data;
+    speedsList = widget.controller!.speedsList;
   }
 
   /// 设置面板
@@ -184,21 +187,25 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (context) {
         return AlertDialog(
           title: const Text('播放速度'),
-          contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           content: StatefulBuilder(builder: (context, StateSetter setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
+            return Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 8,
+              runSpacing: 2,
               children: [
-                Text('$currentSpeed倍'),
-                Slider(
-                  min: PlaySpeed.values.first.value,
-                  max: PlaySpeed.values.last.value,
-                  value: currentSpeed,
-                  divisions: PlaySpeed.values.length - 1,
-                  label: '${currentSpeed}x',
-                  onChanged: (double val) =>
-                      {setState(() => currentSpeed = val)},
-                )
+                for (var i in speedsList) ...[
+                  if (i == currentSpeed) ...[
+                    FilledButton(
+                      onPressed: () => {setState(() => currentSpeed = i)},
+                      child: Text(i.toString()),
+                    ),
+                  ] else ...[
+                    FilledButton.tonal(
+                      onPressed: () => {setState(() => currentSpeed = i)},
+                      child: Text(i.toString()),
+                    ),
+                  ]
+                ]
               ],
             );
           }),
