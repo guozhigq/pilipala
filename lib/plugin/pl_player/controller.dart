@@ -55,6 +55,7 @@ class PlPlayerController {
   final Rx<int> _playerCount = Rx(0);
 
   final Rx<double> _playbackSpeed = 1.0.obs;
+  final Rx<double> _longPressSpeed = 2.0.obs;
   final Rx<double> _currentVolume = 1.0.obs;
   final Rx<double> _currentBrightness = 0.0.obs;
 
@@ -126,6 +127,9 @@ class PlPlayerController {
 
   /// 视频播放速度
   double get playbackSpeed => _playbackSpeed.value;
+
+  // 长按倍速
+  double get longPressSpeed => _longPressSpeed.value;
 
   /// 视频缓冲
   Rx<Duration> get buffered => _buffered;
@@ -209,6 +213,7 @@ class PlPlayerController {
   late double opacityVal;
   late double fontSizeVal;
   late double danmakuSpeedVal;
+  late List speedsList;
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
@@ -236,6 +241,17 @@ class PlPlayerController {
               videoStorage.get(VideoBoxKey.playRepeat,
                   defaultValue: PlayRepeat.pause.value),
         );
+    _playbackSpeed.value =
+        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
+    _longPressSpeed.value =
+        videoStorage.get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
+    List speedsListTemp =
+        videoStorage.get(VideoBoxKey.customSpeedsList, defaultValue: []);
+    speedsList = List.from(speedsListTemp);
+    for (var i in PlaySpeed.values) {
+      speedsList.add(i.value);
+    }
+
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -293,7 +309,7 @@ class PlPlayerController {
       _autoPlay = autoplay;
       _looping = looping;
       // 初始化视频倍速
-      _playbackSpeed.value = speed;
+      // _playbackSpeed.value = speed;
       // 初始化数据加载状态
       dataStatus.status.value = DataStatus.loading;
       // 初始化全屏方向
@@ -772,11 +788,10 @@ class PlPlayerController {
       return;
     }
     _doubleSpeedStatus.value = val;
-    double currentSpeed = playbackSpeed;
     if (val) {
-      setPlaybackSpeed(currentSpeed * 2);
+      setPlaybackSpeed(longPressSpeed);
     } else {
-      setPlaybackSpeed(currentSpeed / 2);
+      setPlaybackSpeed(playbackSpeed);
     }
   }
 
