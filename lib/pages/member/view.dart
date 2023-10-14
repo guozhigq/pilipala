@@ -39,7 +39,7 @@ class _MemberPageState extends State<MemberPage>
     _extendNestCtr.addListener(
       () {
         double offset = _extendNestCtr.position.pixels;
-        if (offset > 250) {
+        if (offset > 230) {
           appbarStream.add(true);
         } else {
           appbarStream.add(false);
@@ -68,7 +68,7 @@ class _MemberPageState extends State<MemberPage>
               elevation: 0,
               scrolledUnderElevation: 1,
               forceElevated: innerBoxIsScrolled,
-              expandedHeight: 320,
+              expandedHeight: 290,
               titleSpacing: 0,
               title: StreamBuilder(
                 stream: appbarStream.stream,
@@ -195,159 +195,7 @@ class _MemberPageState extends State<MemberPage>
                         color: Theme.of(context).colorScheme.background,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 18, right: 18),
-                      child: FutureBuilder(
-                        future: _futureBuilderFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            Map data = snapshot.data!;
-                            if (data['status']) {
-                              return Obx(
-                                () => Stack(
-                                  alignment: AlignmentDirectional.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        profile(_memberController),
-                                        const SizedBox(height: 14),
-                                        Row(
-                                          children: [
-                                            Flexible(
-                                                child: Text(
-                                              _memberController
-                                                  .memberInfo.value.name!,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                            )),
-                                            const SizedBox(width: 2),
-                                            if (_memberController
-                                                    .memberInfo.value.sex ==
-                                                '女')
-                                              const Icon(
-                                                FontAwesomeIcons.venus,
-                                                size: 14,
-                                                color: Colors.pink,
-                                              ),
-                                            if (_memberController
-                                                    .memberInfo.value.sex ==
-                                                '男')
-                                              const Icon(
-                                                FontAwesomeIcons.mars,
-                                                size: 14,
-                                                color: Colors.blue,
-                                              ),
-                                            const SizedBox(width: 4),
-                                            Image.asset(
-                                              'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
-                                              height: 11,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            if (_memberController.memberInfo
-                                                        .value.vip!.status ==
-                                                    1 &&
-                                                _memberController.memberInfo
-                                                            .value.vip!.label![
-                                                        'img_label_uri_hans'] !=
-                                                    '') ...[
-                                              Image.network(
-                                                _memberController.memberInfo
-                                                        .value.vip!.label![
-                                                    'img_label_uri_hans'],
-                                                height: 20,
-                                              ),
-                                            ] else if (_memberController
-                                                        .memberInfo
-                                                        .value
-                                                        .vip!
-                                                        .status ==
-                                                    1 &&
-                                                _memberController.memberInfo
-                                                            .value.vip!.label![
-                                                        'img_label_uri_hans_static'] !=
-                                                    '') ...[
-                                              Image.network(
-                                                _memberController.memberInfo
-                                                        .value.vip!.label![
-                                                    'img_label_uri_hans_static'],
-                                                height: 20,
-                                              ),
-                                            ]
-                                          ],
-                                        ),
-                                        if (_memberController.memberInfo.value
-                                                .official!['title'] !=
-                                            '') ...[
-                                          const SizedBox(height: 6),
-                                          Text.rich(
-                                            maxLines: 2,
-                                            TextSpan(
-                                              text: _memberController
-                                                          .memberInfo
-                                                          .value
-                                                          .official!['role'] ==
-                                                      1
-                                                  ? '个人认证：'
-                                                  : '企业认证：',
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: _memberController
-                                                      .memberInfo
-                                                      .value
-                                                      .official!['title'],
-                                                ),
-                                              ],
-                                            ),
-                                            softWrap: true,
-                                          ),
-                                        ],
-                                        const SizedBox(height: 4),
-                                        if (_memberController
-                                                .memberInfo.value.sign !=
-                                            '')
-                                          SelectableRegion(
-                                            magnifierConfiguration:
-                                                const TextMagnifierConfiguration(),
-                                            focusNode: FocusNode(),
-                                            selectionControls:
-                                                MaterialTextSelectionControls(),
-                                            child: Text(
-                                              _memberController
-                                                  .memberInfo.value.sign!,
-                                              textAlign: TextAlign.left,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return const SizedBox();
-                            }
-                          } else {
-                            // 骨架屏
-                            return profile(_memberController,
-                                loadingStatus: true);
-                          }
-                        },
-                      ),
-                    )
+                    profileWidget(),
                   ],
                 ),
               ),
@@ -380,6 +228,145 @@ class _MemberPageState extends State<MemberPage>
             ))
           ],
         ),
+      ),
+    );
+  }
+
+  Widget profileWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 18, right: 18),
+      child: FutureBuilder(
+        future: _futureBuilderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map data = snapshot.data!;
+            if (data['status']) {
+              return Obx(
+                () => Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        profile(_memberController),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Flexible(
+                                child: Text(
+                              _memberController.memberInfo.value.name!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            )),
+                            const SizedBox(width: 2),
+                            if (_memberController.memberInfo.value.sex == '女')
+                              const Icon(
+                                FontAwesomeIcons.venus,
+                                size: 14,
+                                color: Colors.pink,
+                              ),
+                            if (_memberController.memberInfo.value.sex == '男')
+                              const Icon(
+                                FontAwesomeIcons.mars,
+                                size: 14,
+                                color: Colors.blue,
+                              ),
+                            const SizedBox(width: 4),
+                            Image.asset(
+                              'assets/images/lv/lv${_memberController.memberInfo.value.level}.png',
+                              height: 11,
+                            ),
+                            const SizedBox(width: 6),
+                            if (_memberController
+                                        .memberInfo.value.vip!.status ==
+                                    1 &&
+                                _memberController.memberInfo.value.vip!
+                                        .label!['img_label_uri_hans'] !=
+                                    '') ...[
+                              Image.network(
+                                _memberController.memberInfo.value.vip!
+                                    .label!['img_label_uri_hans'],
+                                height: 20,
+                              ),
+                            ] else if (_memberController
+                                        .memberInfo.value.vip!.status ==
+                                    1 &&
+                                _memberController.memberInfo.value.vip!
+                                        .label!['img_label_uri_hans_static'] !=
+                                    '') ...[
+                              Image.network(
+                                _memberController.memberInfo.value.vip!
+                                    .label!['img_label_uri_hans_static'],
+                                height: 20,
+                              ),
+                            ]
+                          ],
+                        ),
+                        if (_memberController
+                                .memberInfo.value.official!['title'] !=
+                            '') ...[
+                          const SizedBox(height: 6),
+                          Text.rich(
+                            maxLines: 2,
+                            TextSpan(
+                              text: _memberController
+                                          .memberInfo.value.official!['role'] ==
+                                      1
+                                  ? '个人认证：'
+                                  : '企业认证：',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: _memberController
+                                      .memberInfo.value.official!['title'],
+                                ),
+                              ],
+                            ),
+                            softWrap: true,
+                          ),
+                        ],
+                        const SizedBox(height: 4),
+                        if (_memberController.memberInfo.value.sign != '')
+                          SelectableText(
+                            _memberController.memberInfo.value.sign!,
+                            maxLines: _memberController
+                                        .memberInfo.value.official!['title'] !=
+                                    ''
+                                ? 1
+                                : 2,
+                            style: const TextStyle(
+                                overflow: TextOverflow.ellipsis),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: SelectableText(_memberController
+                                        .memberInfo.value.sign!),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const SizedBox();
+            }
+          } else {
+            // 骨架屏
+            return profile(_memberController, loadingStatus: true);
+          }
+        },
       ),
     );
   }
