@@ -75,7 +75,11 @@ class MemberSearchController extends GetxController {
       }
       archivePn += 1;
       hasRequest = true;
+      if (res['data'].list.vlist.isEmpty) {
+        loadingStatus.value = 'finish';
+      }
     }
+
     // loadingStatus.value = 'finish';
     return res;
   }
