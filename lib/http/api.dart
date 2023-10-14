@@ -129,12 +129,14 @@ class Api {
   static const String userFavFolder = '/x/v3/fav/folder/created/list';
 
   /// 收藏夹 详情
-  /// media_id int 收藏夹id
+  /// media_id  当前收藏夹id 搜索全部时为默认收藏夹id
   /// pn int 当前页
   /// ps int pageSize
   /// keyword String 搜索词
   /// order String 排序方式 view 最多播放 mtime 最近收藏 pubtime 最近投稿
   /// tid int 分区id
+  /// platform web
+  /// type 0 当前收藏夹 1 全部收藏夹
   // https://api.bilibili.com/x/v3/fav/resource/list?media_id=76614671&pn=1&ps=20&keyword=&order=mtime&type=0&tid=0
   static const String userFavFolderDetail = '/x/v3/fav/resource/list';
 

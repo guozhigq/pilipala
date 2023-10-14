@@ -10,6 +10,7 @@ import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/fan/index.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
+import 'package:pilipala/pages/fav_search/index.dart';
 import 'package:pilipala/pages/follow/index.dart';
 import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/pages/history_search/index.dart';
@@ -119,6 +120,8 @@ class Routes {
         name: '/historySearch', page: () => const HistorySearchPage()),
 
     CustomGetPage(name: '/playSpeedSet', page: () => const PlaySpeedPage()),
+    // 收藏搜索
+    CustomGetPage(name: '/favSearch', page: () => const FavSearchPage()),
   ];
 }
 

@@ -44,6 +44,14 @@ class _FavPageState extends State<FavPage> {
           '我的收藏',
           style: Theme.of(context).textTheme.titleMedium,
         ),
+        actions: [
+          IconButton(
+            onPressed: () => Get.toNamed(
+                '/favSearch?searchType=1&mediaId=${_favController.favFolderData.value.list!.first.id}'),
+            icon: const Icon(Icons.search_outlined),
+          ),
+          const SizedBox(width: 6),
+        ],
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,
