@@ -61,7 +61,7 @@ class _BlackListPageState extends State<BlackListPage> {
         centerTitle: false,
         title: Obx(
           () => Text(
-            '黑名单管理 - ${_blackListController.blackList.length}',
+            '黑名单管理 - ${_blackListController.total.value}',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -138,6 +138,7 @@ class _BlackListPageState extends State<BlackListPage> {
 class BlackListController extends GetxController {
   int currentPage = 1;
   int pageSize = 50;
+  RxInt total = 0.obs;
   RxList<BlackListItem> blackList = [BlackListItem()].obs;
 
   Future queryBlacklist({type = 'init'}) async {
@@ -148,6 +149,7 @@ class BlackListController extends GetxController {
     if (result['status']) {
       if (type == 'init') {
         blackList.value = result['data'].list;
+        total.value = result['data'].total;
       } else {
         blackList.addAll(result['data'].list);
       }
@@ -161,6 +163,7 @@ class BlackListController extends GetxController {
     var result = await BlackHttp.removeBlack(fid: mid);
     if (result['status']) {
       blackList.removeWhere((e) => e.mid == mid);
+      total.value = total.value - 1;
       SmartDialog.showToast(result['msg']);
     }
   }
