@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/dynamics/widgets/dynamic_panel.dart';
+import 'package:pilipala/utils/utils.dart';
 
 import 'controller.dart';
 
 class MemberDynamicPanel extends StatefulWidget {
-  const MemberDynamicPanel({super.key});
+  final int? mid;
+  const MemberDynamicPanel({super.key, this.mid});
 
   @override
   State<MemberDynamicPanel> createState() => _MemberDynamicPanelState();
@@ -17,10 +19,19 @@ class MemberDynamicPanel extends StatefulWidget {
 class _MemberDynamicPanelState extends State<MemberDynamicPanel>
     with AutomaticKeepAliveClientMixin {
   DateTime lastRefreshTime = DateTime.now();
-  late final LoadMoreListSource source = LoadMoreListSource();
+  late final LoadMoreListSource source;
+  late final MemberDynamicPanelController _dynamicController;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _dynamicController = Get.put(MemberDynamicPanelController(widget.mid),
+        tag: Utils.makeHeroTag(widget.mid));
+    source = LoadMoreListSource(_dynamicController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +129,13 @@ class _MemberDynamicPanelState extends State<MemberDynamicPanel>
 }
 
 class LoadMoreListSource extends LoadingMoreBase<DynamicItemModel> {
-  final _dynamicController =
-      Get.put(MemberDynamicPanelController(), tag: Get.arguments['heroTag']);
+  late MemberDynamicPanelController ctr;
+  LoadMoreListSource(this.ctr);
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
-    var res = await _dynamicController.getMemberDynamic();
+    var res = await ctr.getMemberDynamic();
     if (res['status']) {
       addAll(res['data'].items);
     }

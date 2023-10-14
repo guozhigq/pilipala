@@ -5,10 +5,12 @@ import 'package:loading_more_list/loading_more_list.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/pages/member/archive/index.dart';
+import 'package:pilipala/utils/utils.dart';
 import 'package:pull_to_refresh_notification/pull_to_refresh_notification.dart';
 
 class ArchivePanel extends StatefulWidget {
-  const ArchivePanel({super.key});
+  final int? mid;
+  const ArchivePanel({super.key, this.mid});
 
   @override
   State<ArchivePanel> createState() => _ArchivePanelState();
@@ -17,12 +19,20 @@ class ArchivePanel extends StatefulWidget {
 class _ArchivePanelState extends State<ArchivePanel>
     with AutomaticKeepAliveClientMixin {
   DateTime lastRefreshTime = DateTime.now();
-  late final LoadMoreListSource source = LoadMoreListSource();
-  final ArchiveController _archiveController =
-      Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
+  late final LoadMoreListSource source;
+  late final ArchiveController _archiveController;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    print('🐶🐶： ${widget.mid}');
+    _archiveController = Get.put(ArchiveController(widget.mid),
+        tag: Utils.makeHeroTag(widget.mid));
+    source = LoadMoreListSource(_archiveController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,16 +203,16 @@ class _ArchivePanelState extends State<ArchivePanel>
 }
 
 class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
-  final ArchiveController _archiveController =
-      Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
+  late ArchiveController ctr;
+  LoadMoreListSource(this.ctr);
   bool forceRefresh = false;
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
-    var res = await _archiveController.getMemberArchive();
+    var res = await ctr.getMemberArchive();
     if (res['status']) {
-      if (_archiveController.pn == 2) {
+      if (ctr.pn == 2) {
         clear();
       }
       addAll(res['data'].list.vlist);

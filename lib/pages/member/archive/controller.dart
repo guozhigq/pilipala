@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 
 class ArchiveController extends GetxController {
+  ArchiveController(this.mid);
   int? mid;
   int pn = 1;
   int count = 0;
@@ -15,7 +16,8 @@ class ArchiveController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
+    mid ??= int.parse(Get.parameters['mid']!);
+    print('🐶🐶： $mid');
     currentOrder.value = orderList.first;
   }
 
