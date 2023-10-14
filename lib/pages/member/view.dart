@@ -27,12 +27,13 @@ class _MemberPageState extends State<MemberPage>
   final ScrollController _extendNestCtr = ScrollController();
   late TabController _tabController;
   final StreamController<bool> appbarStream = StreamController<bool>();
+  late int mid;
 
   @override
   void initState() {
     super.initState();
-    heroTag =
-        Get.arguments['heroTag'] ?? Utils.makeHeroTag(Get.parameters['mid']);
+    mid = int.parse(Get.parameters['mid']!);
+    heroTag = Get.arguments['heroTag'] ?? Utils.makeHeroTag(mid);
     _memberController = Get.put(MemberController(), tag: heroTag);
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
@@ -372,10 +373,10 @@ class _MemberPageState extends State<MemberPage>
             Expanded(
                 child: TabBarView(
               controller: _tabController,
-              children: const [
-                Text('主页'),
-                MemberDynamicPanel(),
-                ArchivePanel(),
+              children: [
+                const Text('主页'),
+                MemberDynamicPanel(mid: mid),
+                ArchivePanel(mid: mid),
               ],
             ))
           ],
