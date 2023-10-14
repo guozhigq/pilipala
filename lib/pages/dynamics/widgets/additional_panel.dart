@@ -124,60 +124,62 @@ Widget addWidget(item, context, type, {floor = 1}) {
             )
           : const SizedBox();
     case 'ADDITIONAL_TYPE_GOODS':
-      return Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              padding:
-                  const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: const BorderRadius.all(Radius.circular(6)),
-              ),
-              child: Row(
-                children: [
-                  NetworkImgLayer(
-                    width: 75,
-                    height: 75,
-                    src: dynamicProperty[type].items.first.cover,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          dynamicProperty[type].items.first.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          dynamicProperty[type].items.first.brief,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .fontSize,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          dynamicProperty[type].items.first.price,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ));
+      // 商品
+      return const SizedBox();
+    // return Padding(
+    //     padding: const EdgeInsets.only(top: 6),
+    //     child: InkWell(
+    //       onTap: () {},
+    //       child: Container(
+    //         padding:
+    //             const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
+    //         decoration: BoxDecoration(
+    //           color: bgColor,
+    //           borderRadius: const BorderRadius.all(Radius.circular(6)),
+    //         ),
+    //         child: Row(
+    //           children: [
+    //             NetworkImgLayer(
+    //               width: 75,
+    //               height: 75,
+    //               src: dynamicProperty[type].items.first.cover,
+    //             ),
+    //             const SizedBox(width: 10),
+    //             Expanded(
+    //               child: Column(
+    //                 crossAxisAlignment: CrossAxisAlignment.start,
+    //                 mainAxisAlignment: MainAxisAlignment.start,
+    //                 children: [
+    //                   Text(
+    //                     dynamicProperty[type].items.first.name,
+    //                     maxLines: 1,
+    //                     overflow: TextOverflow.ellipsis,
+    //                   ),
+    //                   Text(
+    //                     dynamicProperty[type].items.first.brief,
+    //                     maxLines: 1,
+    //                     style: TextStyle(
+    //                       color: Theme.of(context).colorScheme.outline,
+    //                       fontSize: Theme.of(context)
+    //                           .textTheme
+    //                           .labelMedium!
+    //                           .fontSize,
+    //                     ),
+    //                   ),
+    //                   const SizedBox(height: 2),
+    //                   Text(
+    //                     dynamicProperty[type].items.first.price,
+    //                     style: TextStyle(
+    //                       color: Theme.of(context).colorScheme.primary,
+    //                     ),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ),);
     case 'ADDITIONAL_TYPE_MATCH':
       return const SizedBox();
     case 'ADDITIONAL_TYPE_COMMON':
