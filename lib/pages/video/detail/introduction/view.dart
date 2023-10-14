@@ -239,49 +239,22 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => showIntroDetail(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            !loadingStatus
-                                ? widget.videoDetail!.title
-                                : videoItem['title'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () => showIntroDetail(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          !loadingStatus
+                              ? widget.videoDetail!.title
+                              : videoItem['title'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 20),
-                        Opacity(
-                          opacity: loadingStatus ? 0 : 1,
-                          child: SizedBox(
-                            width: 34,
-                            height: 34,
-                            child: IconButton(
-                              style: ButtonStyle(
-                                padding:
-                                    MaterialStateProperty.all(EdgeInsets.zero),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith((states) {
-                                  return t.highlightColor.withOpacity(0.2);
-                                }),
-                              ),
-                              onPressed: showIntroDetail,
-                              icon: Icon(
-                                Icons.more_horiz,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      )),
                   GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () => showIntroDetail(),
