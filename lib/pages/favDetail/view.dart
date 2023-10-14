@@ -92,13 +92,18 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 );
               },
             ),
-            // actions: [
-            //   IconButton(
-            //     onPressed: () {},
-            //     icon: const Icon(Icons.more_vert),
-            //   ),
-            //   const SizedBox(width: 4)
-            // ],
+            actions: [
+              IconButton(
+                onPressed: () => Get.toNamed(
+                    '/favSearch?searchType=0&mediaId=${Get.parameters['mediaId']!}'),
+                icon: const Icon(Icons.search_outlined),
+              ),
+              //   IconButton(
+              //     onPressed: () {},
+              //     icon: const Icon(Icons.more_vert),
+              //   ),
+              const SizedBox(width: 6),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(

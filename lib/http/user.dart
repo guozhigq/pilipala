@@ -71,14 +71,15 @@ class UserHttp {
       required int pn,
       required int ps,
       String keyword = '',
-      String order = 'mtime'}) async {
+      String order = 'mtime',
+      int type = 0}) async {
     var res = await Request().get(Api.userFavFolderDetail, data: {
       'media_id': mediaId,
       'pn': pn,
       'ps': ps,
       'keyword': keyword,
       'order': order,
-      'type': 0,
+      'type': type,
       'tid': 0,
       'platform': 'web'
     });
