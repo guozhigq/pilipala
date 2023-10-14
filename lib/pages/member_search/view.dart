@@ -157,9 +157,22 @@ class _MemberSearchPageState extends State<MemberSearchPage>
                                             return const VideoCardHSkeleton();
                                           },
                                         )
-                                      : const CustomScrollView(
+                                      : CustomScrollView(
                                           slivers: <Widget>[
-                                            NoData(),
+                                            SliverToBoxAdapter(
+                                              child: SizedBox(
+                                                height: 400,
+                                                child: Center(
+                                                  child: Text(
+                                                    '没有搜索到相关内容\n请尝试别的搜索词',
+                                                    textAlign: TextAlign.center,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleSmall,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                             );
