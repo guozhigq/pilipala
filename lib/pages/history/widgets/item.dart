@@ -297,7 +297,8 @@ class VideoContent extends StatelessWidget {
               maxLines: videoItem.videos > 1 ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
-            if (videoItem.showTitle != null)
+            if (videoItem.showTitle != null) ...[
+              const SizedBox(height: 2),
               Text(
                 videoItem.showTitle,
                 textAlign: TextAlign.start,
@@ -305,21 +306,24 @@ class VideoContent extends StatelessWidget {
                     fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     fontWeight: FontWeight.w400,
                     color: Theme.of(context).colorScheme.outline),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
             const Spacer(),
-            Row(
-              children: [
-                Text(
-                  videoItem.authorName,
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    color: Theme.of(context).colorScheme.outline,
+            if (videoItem.authorName != '')
+              Row(
+                children: [
+                  Text(
+                    videoItem.authorName,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
