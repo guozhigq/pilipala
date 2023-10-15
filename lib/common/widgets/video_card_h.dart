@@ -224,20 +224,20 @@ class VideoContent extends StatelessWidget {
                             ],
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          onTap: () async {
-                            MemberController().blockUser(videoItem.mid);
-                          },
-                          value: 'block',
-                          height: 35,
-                          child: const Row(
-                            children: [
-                              Icon(Icons.block, size: 16),
-                              SizedBox(width: 6),
-                              Text('拉黑up', style: TextStyle(fontSize: 13))
-                            ],
-                          ),
-                        ),
+                        // PopupMenuItem<String>(
+                        //   onTap: () async {
+                        //     MemberController().blockUser(videoItem.mid);
+                        //   },
+                        //   value: 'block',
+                        //   height: 35,
+                        //   child: const Row(
+                        //     children: [
+                        //       Icon(Icons.block, size: 16),
+                        //       SizedBox(width: 6),
+                        //       Text('拉黑up', style: TextStyle(fontSize: 13))
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

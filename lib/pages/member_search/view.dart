@@ -85,7 +85,7 @@ class _MemberSearchPageState extends State<MemberSearchPage>
               ? [
                   Expanded(
                     child: Center(
-                      child: Text('搜索「${_memberSearchCtr.uname.value}」的动态、视频'),
+                      child: Text('搜索「${_memberSearchCtr.uname.value}」的视频'),
                     ),
                   ),
                 ]
