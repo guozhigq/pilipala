@@ -187,15 +187,21 @@ class Utils {
   }
 
   // 版本对比
-  static bool needUpdate(localVersion, remoteVersion) {
-    List<String> localVersionList = localVersion.split('.');
-    List<String> remoteVersionList = remoteVersion.split('v')[1].split('.');
-    for (int i = 0; i < localVersionList.length; i++) {
-      int localVersion = int.parse(localVersionList[i]);
-      int remoteVersion = int.parse(remoteVersionList[i]);
-      if (remoteVersion > localVersion) {
+  static bool needUpdate(String currentVersion, String remoteVersion) {
+    List<int> current = currentVersion.split('.').map(int.parse).toList();
+    List<int> remote =
+        remoteVersion.split('v')[1].split('.').map(int.parse).toList();
+
+    int maxLength =
+        current.length > remote.length ? current.length : remote.length;
+
+    for (int i = 0; i < maxLength; i++) {
+      int currentValue = i < current.length ? current[i] : 0;
+      int remoteValue = i < remote.length ? remote[i] : 0;
+
+      if (currentValue < remoteValue) {
         return true;
-      } else if (remoteVersion < localVersion) {
+      } else if (currentValue > remoteValue) {
         return false;
       }
     }
