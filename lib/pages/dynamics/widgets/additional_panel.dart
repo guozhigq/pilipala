@@ -83,45 +83,53 @@ Widget addWidget(item, context, type, {floor = 1}) {
       );
     case 'ADDITIONAL_TYPE_RESERVE':
       return dynamicProperty[type].state != -1
-          ? Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: InkWell(
-                onTap: () {},
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                      left: 12, top: 10, right: 12, bottom: 10),
-                  color: bgColor,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        dynamicProperty[type].title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+          ? dynamicProperty[type].title != null
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(
+                          left: 12, top: 10, right: 12, bottom: 10),
+                      color: bgColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            dynamicProperty[type].title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 1),
+                          Text.rich(
+                            TextSpan(
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.outline,
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .fontSize),
+                              children: [
+                                if (dynamicProperty[type].desc1 != null)
+                                  TextSpan(
+                                      text:
+                                          dynamicProperty[type].desc1['text']),
+                                const TextSpan(text: '  '),
+                                if (dynamicProperty[type].desc2 != null)
+                                  TextSpan(
+                                      text:
+                                          dynamicProperty[type].desc2['text']),
+                              ],
+                            ),
+                          )
+                        ],
                       ),
-                      const SizedBox(height: 1),
-                      Text.rich(
-                        TextSpan(
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.outline,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium!
-                                  .fontSize),
-                          children: [
-                            TextSpan(text: dynamicProperty[type].desc1['text']),
-                            const TextSpan(text: '  '),
-                            TextSpan(text: dynamicProperty[type].desc2['text']),
-                          ],
-                        ),
-                      )
-                    ],
+                      // TextButton(onPressed: () {}, child: Text('123'))
+                    ),
                   ),
-                  // TextButton(onPressed: () {}, child: Text('123'))
-                ),
-              ),
-            )
+                )
+              : const SizedBox()
           : const SizedBox();
     case 'ADDITIONAL_TYPE_GOODS':
       // 商品
