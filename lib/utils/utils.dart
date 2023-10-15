@@ -187,21 +187,15 @@ class Utils {
   }
 
   // 版本对比
-  static bool needUpdate(String currentVersion, String remoteVersion) {
-    List<int> current = currentVersion.split('.').map(int.parse).toList();
-    List<int> remote =
-        remoteVersion.split('v')[1].split('.').map(int.parse).toList();
-
-    int maxLength =
-        current.length > remote.length ? current.length : remote.length;
-
-    for (int i = 0; i < maxLength; i++) {
-      int currentValue = i < current.length ? current[i] : 0;
-      int remoteValue = i < remote.length ? remote[i] : 0;
-
-      if (currentValue < remoteValue) {
+  static bool needUpdate(localVersion, remoteVersion) {
+    List<String> localVersionList = localVersion.split('.');
+    List<String> remoteVersionList = remoteVersion.split('v')[1].split('.');
+    for (int i = 0; i < localVersionList.length; i++) {
+      int localVersion = int.parse(localVersionList[i]);
+      int remoteVersion = int.parse(remoteVersionList[i]);
+      if (remoteVersion > localVersion) {
         return true;
-      } else if (currentValue > remoteValue) {
+      } else if (remoteVersion < localVersion) {
         return false;
       }
     }
@@ -212,7 +206,7 @@ class Utils {
   static Future<bool> checkUpdata() async {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
-    var result = await Request().get(Api.latestApp);
+    var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
