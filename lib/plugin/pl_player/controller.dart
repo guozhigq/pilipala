@@ -351,7 +351,8 @@ class PlPlayerController {
         );
 
     var pp = player.platform as NativePlayer;
-
+    // 解除倍速限制
+    await pp.setProperty("af", "scaletempo2=max-speed=8");
     // 音轨
     if (dataSource.audioSource != '' && dataSource.audioSource != null) {
       await pp.setProperty(
