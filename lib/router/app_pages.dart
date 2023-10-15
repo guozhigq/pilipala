@@ -37,6 +37,8 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/pages/setting/index.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/whisper/index.dart';
+import 'package:pilipala/pages/whisperDetail/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 Box setting = GStrorage.setting;
@@ -122,6 +124,11 @@ class Routes {
     CustomGetPage(name: '/playSpeedSet', page: () => const PlaySpeedPage()),
     // 收藏搜索
     CustomGetPage(name: '/favSearch', page: () => const FavSearchPage()),
+    // 消息页面
+    CustomGetPage(name: '/whisper', page: () => const WhisperPage()),
+    // 私信详情
+    CustomGetPage(
+        name: '/whisperDetail', page: () => const WhisperDetailPage()),
   ];
 }
 
