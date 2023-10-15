@@ -206,7 +206,7 @@ class Utils {
   static Future<bool> checkUpdata() async {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
-    var result = await Request().get(Api.latestApp);
+    var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
