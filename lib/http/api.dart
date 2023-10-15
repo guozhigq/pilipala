@@ -321,4 +321,10 @@ class Api {
 
   // 获取指定分组下的up
   static const String followUpGroup = '/x/relation/tag';
+
+  // 获取某个动态详情
+  // timezone_offset=-480
+  // id=849312409672744983
+  // features=itemOpusStyle
+  static const String dynamicDetail = '/x/polymer/web-dynamic/v1/detail';
 }

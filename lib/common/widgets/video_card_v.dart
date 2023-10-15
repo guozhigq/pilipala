@@ -5,6 +5,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -26,6 +27,11 @@ class VideoCardV extends StatelessWidget {
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
+
+  bool isStringNumeric(String str) {
+    RegExp numericRegex = RegExp(r'^\d+$');
+    return numericRegex.hasMatch(str);
+  }
 
   void onPushDetail(heroTag) async {
     String goto = videoItem.goto;
@@ -64,11 +70,35 @@ class VideoCardV extends StatelessWidget {
         break;
       // 动态
       case 'picture':
+        String dynamicType = 'picture';
+        String uri = videoItem.uri;
+        if (videoItem.uri.contains('bilibili://article/')) {
+          dynamicType = 'article';
+          RegExp regex = RegExp(r'\d+');
+          Match match = regex.firstMatch(videoItem.uri)!;
+          String matchedNumber = match.group(0)!;
+          videoItem.param = 'cv' + matchedNumber;
+        }
+        if (uri.startsWith('http')) {
+          String path = Uri.parse(uri).path;
+          if (isStringNumeric(path.split('/')[1])) {
+            // 请求接口
+            var res = await DynamicsHttp.dynamicDetail(id: path.split('/')[1]);
+            if (res['status']) {
+              Get.toNamed('/dynamicDetail', arguments: {
+                'item': res['data'],
+                'floor': 1,
+                'action': 'detail'
+              });
+            }
+            return;
+          }
+        }
         Get.toNamed('/htmlRender', parameters: {
-          'url': videoItem.uri,
+          'url': uri,
           'title': videoItem.title,
           'id': videoItem.param.toString(),
-          'dynamicType': 'picture'
+          'dynamicType': dynamicType
         });
         break;
       default:
