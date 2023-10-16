@@ -577,7 +577,8 @@ class PlPlayerController {
           duration: (currentOption.duration / speed) * playbackSpeed);
       danmakuController!.updateOption(updatedOption);
     } catch (_) {}
-    _playbackSpeed.value = speed;
+    // fix 长按倍速后放开不恢复
+    // _playbackSpeed.value = speed;
   }
 
   /// 设置倍速
