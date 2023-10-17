@@ -214,6 +214,8 @@ class PlPlayerController {
   late double fontSizeVal;
   late double danmakuSpeedVal;
   late List speedsList;
+  // 缓存
+  double? defaultDuration;
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
@@ -573,8 +575,9 @@ class PlPlayerController {
     await _videoPlayerController?.setRate(speed);
     try {
       DanmakuOption currentOption = danmakuController!.option;
+      defaultDuration ??= currentOption.duration;
       DanmakuOption updatedOption = currentOption.copyWith(
-          duration: (currentOption.duration / speed) * playbackSpeed);
+          duration: (defaultDuration! / speed) * playbackSpeed);
       danmakuController!.updateOption(updatedOption);
     } catch (_) {}
     // fix 长按倍速后放开不恢复
@@ -582,16 +585,16 @@ class PlPlayerController {
   }
 
   /// 设置倍速
-  Future<void> togglePlaybackSpeed() async {
-    List<double> allowedSpeeds =
-        PlaySpeed.values.map<double>((e) => e.value).toList();
-    int index = allowedSpeeds.indexOf(_playbackSpeed.value);
-    if (index < allowedSpeeds.length - 1) {
-      setPlaybackSpeed(allowedSpeeds[index + 1]);
-    } else {
-      setPlaybackSpeed(allowedSpeeds[0]);
-    }
-  }
+  // Future<void> togglePlaybackSpeed() async {
+  //   List<double> allowedSpeeds =
+  //       PlaySpeed.values.map<double>((e) => e.value).toList();
+  //   int index = allowedSpeeds.indexOf(_playbackSpeed.value);
+  //   if (index < allowedSpeeds.length - 1) {
+  //     setPlaybackSpeed(allowedSpeeds[index + 1]);
+  //   } else {
+  //     setPlaybackSpeed(allowedSpeeds[0]);
+  //   }
+  // }
 
   /// 播放视频
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
