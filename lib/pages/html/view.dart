@@ -139,7 +139,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
           IconButton(
             onPressed: () {
               Get.toNamed('/webview', parameters: {
-                'url': 'https:$url',
+                'url': url.startsWith('http') ? url : 'https:$url',
                 'type': 'url',
                 'pageTitle': title,
               });

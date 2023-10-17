@@ -86,4 +86,35 @@ class DynamicsHttp {
       };
     }
   }
+
+  //
+  static Future dynamicDetail({
+    String? id,
+  }) async {
+    var res = await Request().get(Api.dynamicDetail, data: {
+      'timezone_offset': -480,
+      'id': id,
+      'features': 'itemOpusStyle',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': DynamicItemModel.fromJson(res.data['data']['item']),
+        };
+      } catch (err) {
+        return {
+          'status': false,
+          'data': [],
+          'msg': err.toString(),
+        };
+      }
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

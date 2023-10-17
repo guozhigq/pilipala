@@ -355,4 +355,9 @@ class Api {
 
   static const String sessionMsg =
       'https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs';
+  // 获取某个动态详情
+  // timezone_offset=-480
+  // id=849312409672744983
+  // features=itemOpusStyle
+  static const String dynamicDetail = '/x/polymer/web-dynamic/v1/detail';
 }
