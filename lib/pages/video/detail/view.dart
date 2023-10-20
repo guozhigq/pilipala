@@ -3,18 +3,15 @@ import 'dart:io';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/common/widgets/sliver_header.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/danmaku/view.dart';
-import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
@@ -23,7 +20,6 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 
-import 'widgets/app_bar.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {

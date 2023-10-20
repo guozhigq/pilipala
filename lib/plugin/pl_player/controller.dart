@@ -332,12 +332,11 @@ class PlPlayerController {
       // 数据加载完成
       dataStatus.status.value = DataStatus.loaded;
 
-      await _initializePlayer(seekTo: seekTo);
-
       // listen the video player events
       if (!_listenersInitialized) {
         startListeners();
       }
+      await _initializePlayer(seekTo: seekTo);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -407,6 +406,7 @@ class PlPlayerController {
           player,
           configuration: VideoControllerConfiguration(
             enableHardwareAcceleration: enableHA,
+            androidAttachSurfaceAfterVideoParameters: false,
           ),
         );
 
@@ -542,6 +542,7 @@ class PlPlayerController {
     }
     _position.value = position;
     _heartDuration = position.inSeconds;
+    print('seek duration: $duration');
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
@@ -552,17 +553,19 @@ class PlPlayerController {
       //   play();
       // }
     } else {
+      print('seek duration else');
       _timerForSeek?.cancel();
       _timerForSeek =
           Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
         //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
+          await _videoPlayerController!.stream.buffer.first;
           await _videoPlayerController?.seek(position);
-          // if (playerStatus.stopped) {
-          //   play();
-          // }
+          if (playerStatus.status.value == PlayerStatus.paused) {
+            play();
+          }
           t.cancel();
-          //_timerForSeek = null;
+          _timerForSeek = null;
         }
       });
     }
@@ -595,6 +598,8 @@ class PlPlayerController {
 
   /// 播放视频
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
+    // 播放时自动隐藏控制条
+    controls = !hideControls;
     // repeat为true，将从头播放
     if (repeat) {
       await seekTo(Duration.zero);
@@ -606,11 +611,6 @@ class PlPlayerController {
 
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
-
-    // 播放时自动隐藏控制条
-    if (hideControls) {
-      _hideTaskControls();
-    }
   }
 
   /// 暂停播放

@@ -68,6 +68,12 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
+            title: 'CDN优化',
+            subTitle: '使用优质CDN线路',
+            setKey: SettingBoxKey.enableCDN,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
             title: '自动播放',
             subTitle: '进入详情页自动播放',
             setKey: SettingBoxKey.autoPlayEnable,

@@ -105,6 +105,7 @@ class SettingBoxKey {
   static const String enableAutoEnter = 'enableAutoEnter';
   static const String enableAutoExit = 'enableAutoExit';
   static const String p1080 = 'p1080';
+  static const String enableCDN = 'enableCDN';
 
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
