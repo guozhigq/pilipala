@@ -43,6 +43,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Box localCache = GStrorage.localCache;
   Box videoStorage = GStrorage.video;
   late List speedsList;
+  double buttonSpace = 8;
 
   @override
   void initState() {
@@ -276,7 +277,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('选择画质', style: titleStyle),
-                      const SizedBox(width: 4),
+                      SizedBox(width: buttonSpace),
                       Icon(
                         Icons.info_outline,
                         size: 16,
@@ -793,7 +794,7 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             fuc: () => Get.back(),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.house,
@@ -838,7 +839,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           if (Platform.isAndroid) ...[
             SizedBox(
               width: 34,
@@ -870,7 +871,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: buttonSpace),
           ],
           Obx(
             () => SizedBox(
@@ -888,7 +889,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.sliders,

@@ -123,7 +123,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 fuc: () => _.toggleVideoFit(),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 10),
               // 全屏
               Obx(
                 () => ComBtn(
@@ -139,7 +139,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
         ],
       ),
     );
