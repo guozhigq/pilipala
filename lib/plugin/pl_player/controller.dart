@@ -437,11 +437,6 @@ class PlPlayerController {
   Future _initializePlayer({
     Duration seekTo = Duration.zero,
   }) async {
-    // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
-
     // 设置倍速
     if (_playbackSpeed.value != 1.0) {
       await setPlaybackSpeed(_playbackSpeed.value);
@@ -452,6 +447,11 @@ class PlPlayerController {
     // if (_looping) {
     //   await setLooping(_looping);
     // }
+
+    // 跳转播放
+    if (seekTo != Duration.zero) {
+      await this.seekTo(seekTo);
+    }
 
     // 自动播放
     if (_autoPlay) {
@@ -542,7 +542,6 @@ class PlPlayerController {
     }
     _position.value = position;
     _heartDuration = position.inSeconds;
-    print('seek duration: $duration');
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
@@ -561,9 +560,9 @@ class PlPlayerController {
         if (duration.value.inSeconds != 0) {
           await _videoPlayerController!.stream.buffer.first;
           await _videoPlayerController?.seek(position);
-          if (playerStatus.status.value == PlayerStatus.paused) {
-            play();
-          }
+          // if (playerStatus.status.value == PlayerStatus.paused) {
+          //   play();
+          // }
           t.cancel();
           _timerForSeek = null;
         }
