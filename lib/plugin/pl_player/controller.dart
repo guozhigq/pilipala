@@ -73,6 +73,7 @@ class PlPlayerController {
 
   Rx<bool> videoFitChanged = false.obs;
   final Rx<BoxFit> _videoFit = Rx(BoxFit.contain);
+  final Rx<String> _videoFitDesc = Rx('包含');
 
   ///
   // ignore: prefer_final_fields
@@ -183,6 +184,7 @@ class PlPlayerController {
 
   /// 视频比例
   Rx<BoxFit> get videoFit => _videoFit;
+  Rx<String> get videoFitDEsc => _videoFitDesc;
 
   /// 是否长按倍速
   Rx<bool> get doubleSpeedStatus => _doubleSpeedStatus;
@@ -443,7 +445,7 @@ class PlPlayerController {
     } else {
       await setPlaybackSpeed(1.0);
     }
-
+    getVideoFit();
     // if (_looping) {
     //   await setLooping(_looping);
     // }
@@ -731,37 +733,34 @@ class PlPlayerController {
     if (attrs.indexOf(_videoFit.value) < attrs.length - 1) {
       int index = attrs.indexOf(_videoFit.value);
       _videoFit.value = attrs[index + 1];
-      print(videoFitType[index + 1]['desc']);
+      _videoFitDesc.value = videoFitType[index + 1]['desc'];
       SmartDialog.showToast(videoFitType[index + 1]['desc']);
     } else {
       // 默认 contain
       _videoFit.value = videoFitType.first['attr'];
+      _videoFitDesc.value = videoFitType.first['desc'];
       SmartDialog.showToast(videoFitType.first['desc']);
     }
     videoFitChangedTimer = Timer(const Duration(seconds: 1), () {
       videoFitChangedTimer = null;
       videoFitChanged.value = false;
     });
-    print(_videoFit.value);
-  }
-
-  /// Change Video Fit accordingly
-  void onVideoFitChange(BoxFit fit) {
-    _videoFit.value = fit;
+    setVideoFit();
   }
 
   /// 缓存fit
-  // Future<void> setVideoFit() async {
-  //   videoStorage.put(VideoBoxKey.videoBrightness, _videoFit.value.name);
-  // }
+  Future<void> setVideoFit() async {
+    List attrs = videoFitType.map((e) => e['attr']).toList();
+    int index = attrs.indexOf(_videoFit.value);
+    videoStorage.put(VideoBoxKey.cacheVideoFit, index);
+  }
 
   /// 读取fit
-  // Future<void> getVideoFit() async {
-  //   String fitValue =
-  //       videoStorage.get(VideoBoxKey.videoBrightness, defaultValue: 'contain');
-  //   _videoFit.value = videoFitType
-  //       .firstWhere((element) => element['attr'] == fitValue)['attr'];
-  // }
+  Future<void> getVideoFit() async {
+    int fitValue = videoStorage.get(VideoBoxKey.cacheVideoFit, defaultValue: 0);
+    _videoFit.value = videoFitType[fitValue]['attr'];
+    _videoFitDesc.value = videoFitType[fitValue]['desc'];
+  }
 
   /// 读取亮度
   // Future<void> getVideoBrightness() async {
