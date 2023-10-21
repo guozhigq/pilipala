@@ -170,4 +170,6 @@ class VideoBoxKey {
   static const String longPressSpeedDefault = 'longPressSpeedDefault';
   // 自定义倍速集合
   static const String customSpeedsList = 'customSpeedsList';
+  // 画面填充比例
+  static const String cacheVideoFit = 'cacheVideoFit';
 }

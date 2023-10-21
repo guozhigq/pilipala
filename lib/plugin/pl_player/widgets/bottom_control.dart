@@ -115,13 +115,20 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               //     ),
               //   ),
               // ),
-              ComBtn(
-                icon: const Icon(
-                  Icons.settings_overscan_outlined,
-                  size: 18,
-                  color: Colors.white,
+              SizedBox(
+                height: 30,
+                child: TextButton(
+                  onPressed: () => _.toggleVideoFit(),
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  child: Obx(
+                    () => Text(
+                      _.videoFitDEsc.value,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
+                  ),
                 ),
-                fuc: () => _.toggleVideoFit(),
               ),
               const SizedBox(width: 4),
               // 全屏
@@ -139,7 +146,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
         ],
       ),
     );
