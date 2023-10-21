@@ -130,7 +130,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 10),
               // 全屏
               Obx(
                 () => ComBtn(
@@ -146,7 +146,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
         ],
       ),
     );
