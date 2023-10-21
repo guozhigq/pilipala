@@ -70,36 +70,44 @@ class VideoCardV extends StatelessWidget {
         break;
       // 动态
       case 'picture':
-        String dynamicType = 'picture';
-        String uri = videoItem.uri;
-        if (videoItem.uri.contains('bilibili://article/')) {
-          dynamicType = 'article';
-          RegExp regex = RegExp(r'\d+');
-          Match match = regex.firstMatch(videoItem.uri)!;
-          String matchedNumber = match.group(0)!;
-          videoItem.param = 'cv' + matchedNumber;
-        }
-        if (uri.startsWith('http')) {
-          String path = Uri.parse(uri).path;
-          if (isStringNumeric(path.split('/')[1])) {
-            // 请求接口
-            var res = await DynamicsHttp.dynamicDetail(id: path.split('/')[1]);
-            if (res['status']) {
-              Get.toNamed('/dynamicDetail', arguments: {
-                'item': res['data'],
-                'floor': 1,
-                'action': 'detail'
-              });
-            }
-            return;
+        try {
+          String dynamicType = 'picture';
+          String uri = videoItem.uri;
+          String id = '';
+          if (videoItem.uri.startsWith('bilibili://article/')) {
+            // https://www.bilibili.com/read/cv27063554
+            dynamicType = 'read';
+            RegExp regex = RegExp(r'\d+');
+            Match match = regex.firstMatch(videoItem.uri)!;
+            String matchedNumber = match.group(0)!;
+            videoItem.param = int.parse(matchedNumber);
+            id = 'cv${videoItem.param}';
           }
+          if (uri.startsWith('http')) {
+            String path = Uri.parse(uri).path;
+            if (isStringNumeric(path.split('/')[1])) {
+              // 请求接口
+              var res =
+                  await DynamicsHttp.dynamicDetail(id: path.split('/')[1]);
+              if (res['status']) {
+                Get.toNamed('/dynamicDetail', arguments: {
+                  'item': res['data'],
+                  'floor': 1,
+                  'action': 'detail'
+                });
+              }
+              return;
+            }
+          }
+          Get.toNamed('/htmlRender', parameters: {
+            'url': uri,
+            'title': videoItem.title,
+            'id': id,
+            'dynamicType': dynamicType
+          });
+        } catch (err) {
+          SmartDialog.showToast(err.toString());
         }
-        Get.toNamed('/htmlRender', parameters: {
-          'url': uri,
-          'title': videoItem.title,
-          'id': videoItem.param.toString(),
-          'dynamicType': dynamicType
-        });
         break;
       default:
         SmartDialog.showToast(videoItem.goto);
