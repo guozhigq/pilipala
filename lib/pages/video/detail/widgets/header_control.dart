@@ -197,12 +197,20 @@ class _HeaderControlState extends State<HeaderControl> {
                 for (var i in speedsList) ...[
                   if (i == currentSpeed) ...[
                     FilledButton(
-                      onPressed: () => {setState(() => currentSpeed = i)},
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        SmartDialog.dismiss();
+                      },
                       child: Text(i.toString()),
                     ),
                   ] else ...[
                     FilledButton.tonal(
-                      onPressed: () => {setState(() => currentSpeed = i)},
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        SmartDialog.dismiss();
+                      },
                       child: Text(i.toString()),
                     ),
                   ]
@@ -220,10 +228,10 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             TextButton(
               onPressed: () async {
-                await SmartDialog.dismiss();
-                widget.controller!.setPlaybackSpeed(currentSpeed);
+                await widget.controller!.setDefaultSpeed();
+                SmartDialog.dismiss();
               },
-              child: const Text('确定'),
+              child: const Text('默认速度'),
             ),
           ],
         );

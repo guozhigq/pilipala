@@ -585,7 +585,17 @@ class PlPlayerController {
       danmakuController!.updateOption(updatedOption);
     } catch (_) {}
     // fix 长按倍速后放开不恢复
-    // _playbackSpeed.value = speed;
+    if (!doubleSpeedStatus.value) {
+      _playbackSpeed.value = speed;
+    }
+  }
+
+  // 还原默认速度
+  Future<void> setDefaultSpeed() async {
+    double speed =
+        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
+    await _videoPlayerController?.setRate(speed);
+    _playbackSpeed.value = speed;
   }
 
   /// 设置倍速
@@ -796,6 +806,7 @@ class PlPlayerController {
     if (val) {
       setPlaybackSpeed(longPressSpeed);
     } else {
+      print(playbackSpeed);
       setPlaybackSpeed(playbackSpeed);
     }
   }
