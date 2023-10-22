@@ -669,58 +669,70 @@ InlineSpan buildContent(
       String matchUrl = matchMember;
       if (content.jumpUrl.isNotEmpty && hasMatchMember) {
         List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
+        for (var index = 0; index < urlKeys.length; index++) {
+          var i = urlKeys[index];
+          if (i.contains('?')) {
+            urlKeys[index] = i.replaceAll('?', '\\?');
+          }
+        }
         matchUrl = matchMember.splitMapJoin(
           /// RegExp.escape() 转义特殊字符
           RegExp(urlKeys.map((key) => key).join("|")),
-          // RegExp(RegExp.escape(urlKeys.join("|"))),
+          // RegExp('What does the fox say\\?'),
           onMatch: (Match match) {
             String matchStr = match[0]!;
-            String appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+            String appUrlSchema = '';
+            if (content.jumpUrl[matchStr] != null) {
+              appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+            }
             // 默认不显示关键词
             bool enableWordRe =
                 setting.get(SettingBoxKey.enableWordRe, defaultValue: false);
-            spanChilds.add(
-              TextSpan(
-                text: content.jumpUrl[matchStr]['title'],
-                style: TextStyle(
-                  color: enableWordRe
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    if (appUrlSchema == '') {
-                      String str = Uri.parse(matchStr).pathSegments[0];
-                      Map matchRes = IdUtils.matchAvorBv(input: str);
-                      List matchKeys = matchRes.keys.toList();
-                      if (matchKeys.isNotEmpty) {
-                        if (matchKeys.first == 'BV') {
+            if (content.jumpUrl[matchStr] != null) {
+              spanChilds.add(
+                TextSpan(
+                  text: content.jumpUrl[matchStr]['title'],
+                  style: TextStyle(
+                    color: enableWordRe
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      if (appUrlSchema == '') {
+                        String str = Uri.parse(matchStr).pathSegments[0];
+                        Map matchRes = IdUtils.matchAvorBv(input: str);
+                        List matchKeys = matchRes.keys.toList();
+                        if (matchKeys.isNotEmpty) {
+                          if (matchKeys.first == 'BV') {
+                            Get.toNamed(
+                              '/searchResult',
+                              parameters: {'keyword': matchRes['BV']},
+                            );
+                          }
+                        } else {
                           Get.toNamed(
-                            '/searchResult',
-                            parameters: {'keyword': matchRes['BV']},
+                            '/webview',
+                            parameters: {
+                              'url': matchStr,
+                              'type': 'url',
+                              'pageTitle': ''
+                            },
                           );
                         }
                       } else {
-                        Get.toNamed(
-                          '/webview',
-                          parameters: {
-                            'url': matchStr,
-                            'type': 'url',
-                            'pageTitle': ''
-                          },
-                        );
+                        if (appUrlSchema.startsWith('bilibili://search') &&
+                            enableWordRe) {
+                          Get.toNamed('/searchResult', parameters: {
+                            'keyword': content.jumpUrl[matchStr]['title']
+                          });
+                        }
                       }
-                    } else {
-                      if (appUrlSchema.startsWith('bilibili://search') &&
-                          enableWordRe) {
-                        Get.toNamed('/searchResult', parameters: {
-                          'keyword': content.jumpUrl[matchStr]['title']
-                        });
-                      }
-                    }
-                  },
-              ),
-            );
+                    },
+                ),
+              );
+            }
+
             if (appUrlSchema.startsWith('bilibili://search') && enableWordRe) {
               spanChilds.add(
                 WidgetSpan(
