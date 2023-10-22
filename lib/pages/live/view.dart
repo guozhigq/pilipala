@@ -10,6 +10,7 @@ import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/pages/rcmd/index.dart';
 
 import 'controller.dart';
 import 'widgets/live_item.dart';
@@ -118,7 +119,7 @@ class _LivePageState extends State<LivePage>
                 },
               ),
             ),
-            const LoadingMore()
+            LoadingMore(ctr: _liveController)
           ],
         ),
       ),
@@ -176,27 +177,6 @@ class _LivePageState extends State<LivePage>
               : const VideoCardVSkeleton();
         },
         childCount: liveList!.isNotEmpty ? liveList!.length : 10,
-      ),
-    );
-  }
-}
-
-class LoadingMore extends StatelessWidget {
-  const LoadingMore({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        height: MediaQuery.of(context).padding.bottom + 80,
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-        child: Center(
-          child: Text(
-            '加载中...',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.outline, fontSize: 13),
-          ),
-        ),
       ),
     );
   }

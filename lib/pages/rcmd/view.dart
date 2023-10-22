@@ -125,7 +125,7 @@ class _RcmdPageState extends State<RcmdPage>
                 },
               ),
             ),
-            const LoadingMore()
+            LoadingMore(ctr: _rcmdController)
           ],
         ),
       ),
@@ -191,7 +191,8 @@ class _RcmdPageState extends State<RcmdPage>
 }
 
 class LoadingMore extends StatelessWidget {
-  const LoadingMore({super.key});
+  dynamic ctr;
+  LoadingMore({super.key, this.ctr});
 
   @override
   Widget build(BuildContext context) {
@@ -199,11 +200,18 @@ class LoadingMore extends StatelessWidget {
       child: Container(
         height: MediaQuery.of(context).padding.bottom + 80,
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-        child: Center(
-          child: Text(
-            '加载中...',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.outline, fontSize: 13),
+        child: GestureDetector(
+          onTap: () {
+            if (ctr != null) {
+              ctr!.onLoad();
+            }
+          },
+          child: Center(
+            child: Text(
+              '加载更多 👇',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline, fontSize: 13),
+            ),
           ),
         ),
       ),
