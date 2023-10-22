@@ -6,6 +6,7 @@ class MemberDynamicPanelController extends GetxController {
   int? mid;
   String offset = '';
   int count = 0;
+  bool hasMore = true;
 
   @override
   void onInit() {
@@ -14,12 +15,16 @@ class MemberDynamicPanelController extends GetxController {
   }
 
   Future getMemberDynamic() async {
+    if (!hasMore) {
+      return {'status': false};
+    }
     var res = await MemberHttp.memberDynamic(
       offset: offset,
       mid: mid,
     );
     if (res['status']) {
       offset = res['data'].offset;
+      hasMore = res['data'].hasMore;
     }
     return res;
   }
