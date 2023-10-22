@@ -101,7 +101,10 @@ class _OwnerFollowListState extends State<OwnerFollowList>
                                       MediaQuery.of(context).padding.bottom),
                             );
                           } else {
-                            return FollowItem(item: followList[index]);
+                            return FollowItem(
+                              item: followList[index],
+                              ctr: widget.ctr,
+                            );
                           }
                         },
                       )
