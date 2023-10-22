@@ -8,6 +8,7 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
@@ -62,6 +63,7 @@ class VideoIntroController extends GetxController {
   Timer? timer;
   bool isPaused = false;
   String heroTag = Get.arguments['heroTag'];
+  late ModelResult modelResult;
 
   @override
   void onInit() {
@@ -560,5 +562,26 @@ class VideoIntroController extends GetxController {
       GroupPanel(mid: videoDetail.value.owner!.mid!),
       isScrollControlled: true,
     );
+  }
+
+  // ai总结
+  Future aiConclusion() async {
+    SmartDialog.showLoading(msg: '正在生产ai总结');
+    var res = await VideoHttp.aiConclusion(
+      bvid: bvid,
+      cid: lastPlayCid.value,
+      upMid: videoDetail.value.owner!.mid!,
+    );
+    if (res['status']) {
+      if (res['data'].modelResult.resultType == 0) {
+        SmartDialog.showToast('该视频不支持ai总结');
+      }
+      if (res['data'].modelResult.resultType == 2 ||
+          res['data'].modelResult.resultType == 1) {
+        modelResult = res['data'].modelResult;
+      }
+    }
+    SmartDialog.dismiss();
+    return res;
   }
 }

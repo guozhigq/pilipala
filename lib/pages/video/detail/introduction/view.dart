@@ -11,6 +11,7 @@ import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
+import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -226,6 +227,17 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         arguments: {'face': face, 'heroTag': memberHeroTag});
   }
 
+  // ai总结
+  showAiBottomSheet() {
+    showBottomSheet(
+      context: context,
+      enableDrag: true,
+      builder: (BuildContext context) {
+        return AiDetail(modelResult: videoIntroController.modelResult);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData t = Theme.of(context);
@@ -239,69 +251,90 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () => showIntroDetail(),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          !loadingStatus
-                              ? widget.videoDetail!.title
-                              : videoItem['title'],
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )),
-                  GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () => showIntroDetail(),
-                    child: Row(
-                      children: [
-                        StatView(
-                          theme: 'gray',
-                          view: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.view
-                              : videoItem['stat'].view,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        StatDanMu(
-                          theme: 'gray',
-                          danmu: !widget.loadingStatus
-                              ? widget.videoDetail!.stat!.danmaku
-                              : videoItem['stat'].danmaku,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          Utils.dateFormat(
-                              !widget.loadingStatus
-                                  ? widget.videoDetail!.pubdate
-                                  : videoItem['pubdate'],
-                              formatType: 'detail'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: t.colorScheme.outline,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        if (videoIntroController.isShowOnlineTotal)
-                          Obx(
-                            () => Text(
-                              '${videoIntroController.total.value}人在看',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
-                              ),
-                            ),
-                          ),
-                      ],
+                    child: Text(
+                      !loadingStatus
+                          ? widget.videoDetail!.title
+                          : videoItem['title'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => showIntroDetail(),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 7, bottom: 6),
+                          child: Row(
+                            children: [
+                              StatView(
+                                theme: 'gray',
+                                view: !widget.loadingStatus
+                                    ? widget.videoDetail!.stat!.view
+                                    : videoItem['stat'].view,
+                                size: 'medium',
+                              ),
+                              const SizedBox(width: 10),
+                              StatDanMu(
+                                theme: 'gray',
+                                danmu: !widget.loadingStatus
+                                    ? widget.videoDetail!.stat!.danmaku
+                                    : videoItem['stat'].danmaku,
+                                size: 'medium',
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                Utils.dateFormat(
+                                    !widget.loadingStatus
+                                        ? widget.videoDetail!.pubdate
+                                        : videoItem['pubdate'],
+                                    formatType: 'detail'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: t.colorScheme.outline,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              if (videoIntroController.isShowOnlineTotal)
+                                Obx(
+                                  () => Text(
+                                    '${videoIntroController.total.value}人在看',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: t.colorScheme.outline,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        top: 6,
+                        child: GestureDetector(
+                          onTap: () async {
+                            var res = await videoIntroController.aiConclusion();
+                            if (res['status']) {
+                              if (res['data'].modelResult.resultType == 2 ||
+                                  res['data'].modelResult.resultType == 1) {
+                                showAiBottomSheet();
+                              }
+                            }
+                          },
+                          child:
+                              Image.asset('assets/images/ai.png', height: 22),
+                        ),
+                      )
+                    ],
+                  ),
                   // 点赞收藏转发 布局样式1
                   // SingleChildScrollView(
                   //   padding: const EdgeInsets.only(top: 7, bottom: 7),

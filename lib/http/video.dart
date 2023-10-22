@@ -9,9 +9,11 @@ import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
 /// res.data['data'] 为结果
@@ -418,6 +420,25 @@ class VideoHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    }
+  }
+
+  static Future aiConclusion({
+    String? bvid,
+    int? cid,
+    int? upMid,
+  }) async {
+    Map params = await WbiSign().makSign({
+      'bvid': bvid,
+      'cid': cid,
+      'up_mid': upMid,
+    });
+    var res = await Request().get(Api.aiConclusion, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': AiConclusionModel.fromJson(res.data['data']),
+      };
     }
   }
 }
