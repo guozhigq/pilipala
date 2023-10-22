@@ -218,6 +218,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             controller: videoController,
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
+            resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: SubtitleViewConfiguration(
               style: subTitleStyle,
               textAlign: TextAlign.center,
