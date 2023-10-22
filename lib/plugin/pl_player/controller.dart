@@ -328,6 +328,9 @@ class PlPlayerController {
         await pause(notify: false);
       }
 
+      if (_playerCount.value == 0) {
+        return;
+      }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
           dataSource, _looping, enableHA, width, height);
@@ -992,6 +995,8 @@ class PlPlayerController {
       localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
       localCache.put(LocalCacheKey.danmakuSpeed, danmakuSpeedVal);
 
+      var pp = _videoPlayerController!.platform as NativePlayer;
+      await pp.setProperty('audio-files', '');
       removeListeners();
       await _videoPlayerController?.dispose();
       _videoPlayerController = null;

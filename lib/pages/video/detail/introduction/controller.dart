@@ -61,12 +61,15 @@ class VideoIntroController extends GetxController {
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
-  String heroTag = Get.arguments['heroTag'];
+  String heroTag = '';
 
   @override
   void onInit() {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
+    try {
+      heroTag = Get.arguments['heroTag'];
+    } catch (_) {}
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
         preRender = true;
