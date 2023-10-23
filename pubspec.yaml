@@ -36,31 +36,31 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
   # 动态取色
-  dynamic_color: ^1.6.6
+  dynamic_color: ^1.6.8
 
   get: ^4.6.5
 
   # 网络
-  dio: ^5.3.0
+  dio: ^5.3.3
   cookie_jar: ^4.0.8
-  dio_cookie_manager: ^3.1.0
+  dio_cookie_manager: ^3.1.1
   connectivity_plus: ^4.0.1
   dio_http2_adapter: ^2.3.1+1
 
   # 图片
-  cached_network_image: ^3.2.3
+  cached_network_image: ^3.3.0
   extended_image: ^8.0.2
   saver_gallery: ^2.0.1
   
   # 存储
-  path_provider: ^2.0.14
+  path_provider: ^2.1.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
   # 设备信息
   device_info_plus: ^9.0.2
   # 权限
-  permission_handler: ^10.4.3
+  permission_handler: ^11.0.1
   # 分享
   share_plus: ^7.0.2
   # cookie 管理
@@ -76,7 +76,7 @@ dependencies:
   # 图标
   font_awesome_flutter: ^10.4.0
   # toast
-  flutter_smart_dialog: ^4.9.3+2
+  flutter_smart_dialog: ^4.9.4
   # 下滑关闭
   dismissible_page: ^1.0.2
   custom_sliding_segmented_control: ^1.7.5
@@ -89,19 +89,19 @@ dependencies:
   media_kit_libs_video: ^1.0.4   
   
   # 音量、亮度、屏幕控制
-  flutter_volume_controller: ^1.2.7
-  screen_brightness: ^0.2.2
+  flutter_volume_controller: ^1.3.0
+  screen_brightness: ^0.2.2+1
   wakelock_plus: ^1.1.1
   universal_platform: ^1.0.0+1
   # 进度条
-  audio_video_progress_bar: ^1.0.1
+  audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
   protobuf: ^3.0.0
-  animations: ^2.0.7
+  animations: ^2.0.8
   
   # 获取appx信息
   package_info_plus: ^4.1.0
-  url_launcher: ^6.1.12
+  url_launcher: ^6.1.14
   flutter_svg: ^2.0.7
   # 防抖节流
   easy_debounce: ^2.0.3
