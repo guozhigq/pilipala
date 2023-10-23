@@ -183,8 +183,8 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择倍速
   void showSetSpeedSheet() {
     double currentSpeed = widget.controller!.playbackSpeed;
-    SmartDialog.show(
-      animationType: SmartAnimationType.centerFade_otherSlide,
+    showDialog(
+      context: Get.context!,
       builder: (context) {
         return AlertDialog(
           title: const Text('播放速度'),
