@@ -86,6 +86,12 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: false,
           ),
           const SetSwitchItem(
+            title: '自动PiP播放',
+            subTitle: 'app切换至后台时画中画播放',
+            setKey: SettingBoxKey.autoPiP,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
             title: '自动全屏',
             subTitle: '视频开始播放时进入全屏',
             setKey: SettingBoxKey.enableAutoEnter,

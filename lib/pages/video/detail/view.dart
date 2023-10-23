@@ -32,7 +32,7 @@ class VideoDetailPage extends StatefulWidget {
 }
 
 class _VideoDetailPageState extends State<VideoDetailPage>
-    with TickerProviderStateMixin, RouteAware {
+    with TickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
   late VideoDetailController videoDetailController;
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
@@ -52,6 +52,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 自动退出全屏
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
+  late bool autoPiP;
+  final floating = Floating();
 
   @override
   void initState() {
@@ -65,8 +67,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
     autoPlayEnable =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
+    autoPiP = setting.get(SettingBoxKey.autoPiP, defaultValue: false);
+
     videoSourceInit();
     appbarStreamListen();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   // 获取视频资源，初始化播放器
@@ -149,6 +154,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (videoDetailController.floating != null) {
       videoDetailController.floating!.dispose();
     }
+    WidgetsBinding.instance.removeObserver(this);
+    floating.dispose();
     super.dispose();
   }
 
@@ -193,6 +200,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.didChangeDependencies();
     VideoDetailPage.routeObserver
         .subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    if (lifecycleState == AppLifecycleState.inactive && autoPiP) {
+      floating.enable(
+          aspectRatio: Rational(
+        videoDetailController.data.dash!.video!.first.width!,
+        videoDetailController.data.dash!.video!.first.height!,
+      ));
+    }
   }
 
   @override
@@ -493,6 +511,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       return PiPSwitcher(
         childWhenDisabled: childWhenDisabled,
         childWhenEnabled: childWhenEnabled,
+        floating: floating,
       );
     } else {
       return childWhenDisabled;
