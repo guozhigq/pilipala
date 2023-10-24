@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -89,6 +91,7 @@ class _OwnerFollowListState extends State<OwnerFollowList>
               return Obx(
                 () => followList.isNotEmpty
                     ? ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         controller: scrollController,
                         itemCount: followList.length + 1,
                         itemBuilder: (BuildContext context, int index) {
