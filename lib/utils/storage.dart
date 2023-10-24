@@ -136,6 +136,7 @@ class SettingBoxKey {
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
   static const String displayMode = 'displayMode';
   static const String customRows = 'customRows'; // 自定义列
+  static const String enableMYBar = 'enableMYBar';
 }
 
 class LocalCacheKey {

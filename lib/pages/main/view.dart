@@ -29,6 +29,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   late Animation<double>? _slideAnimation;
   int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
+  Box setting = GStrorage.setting;
+  late bool enableMYBar;
 
   @override
   void initState() {
@@ -45,6 +47,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         Tween(begin: 0.8, end: 1.0).animate(_animationController!);
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
     _pageController = PageController(initialPage: selectedIndex);
+    enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
   }
 
   void setIndex(int value) async {
@@ -144,21 +147,38 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           builder: (context, AsyncSnapshot snapshot) {
             return AnimatedSlide(
               curve: Curves.easeInOutCubicEmphasized,
-              duration: const Duration(milliseconds: 1000),
+              duration: const Duration(milliseconds: 500),
               offset: Offset(0, snapshot.data ? 0 : 1),
-              child: NavigationBar(
-                onDestinationSelected: (value) => setIndex(value),
-                selectedIndex: selectedIndex,
-                destinations: <Widget>[
-                  ..._mainController.navigationBars.map((e) {
-                    return NavigationDestination(
-                      icon: e['icon'],
-                      selectedIcon: e['selectIcon'],
-                      label: e['label'],
-                    );
-                  }).toList(),
-                ],
-              ),
+              child: enableMYBar
+                  ? NavigationBar(
+                      onDestinationSelected: (value) => setIndex(value),
+                      selectedIndex: selectedIndex,
+                      destinations: <Widget>[
+                        ..._mainController.navigationBars.map((e) {
+                          return NavigationDestination(
+                            icon: e['icon'],
+                            selectedIcon: e['selectIcon'],
+                            label: e['label'],
+                          );
+                        }).toList(),
+                      ],
+                    )
+                  : BottomNavigationBar(
+                      currentIndex: selectedIndex,
+                      onTap: (value) => setIndex(value),
+                      iconSize: 16,
+                      selectedFontSize: 12,
+                      unselectedFontSize: 12,
+                      items: [
+                        ..._mainController.navigationBars.map((e) {
+                          return BottomNavigationBarItem(
+                            icon: e['icon'],
+                            activeIcon: e['selectIcon'],
+                            label: e['label'],
+                          );
+                        }).toList(),
+                      ],
+                    ),
             );
           },
         ),

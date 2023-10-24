@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
@@ -77,6 +76,12 @@ class _StyleSettingState extends State<StyleSetting> {
             subTitle: 'iOS路由切换样式，需重启',
             setKey: SettingBoxKey.iosTransition,
             defaultVal: false,
+          ),
+          const SetSwitchItem(
+            title: 'MD3样式底栏',
+            subTitle: '符合Material You设计规范的底栏',
+            setKey: SettingBoxKey.enableMYBar,
+            defaultVal: true,
           ),
           // SetSwitchItem(
           //   title: '首页单列',
