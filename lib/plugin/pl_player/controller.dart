@@ -386,7 +386,9 @@ class PlPlayerController {
     // 解除倍速限制
     await pp.setProperty("af", "scaletempo2=max-speed=8");
     //  音量不一致
-    await pp.setProperty("audio", "--ao=audiotrack");
+    await pp.setProperty("volume-max", "100");
+    await pp.setProperty("ao", "audiotrack,opensles");
+
     // 音轨
     if (dataSource.audioSource != '' && dataSource.audioSource != null) {
       await pp.setProperty(
