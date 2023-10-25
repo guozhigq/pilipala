@@ -77,18 +77,31 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onVideoDetailChange(dynamic data, int cid) {
+    if (data == null) return;
     Map argMap = Get.arguments;
     final heroTag = argMap['heroTag'];
 
     late MediaItem? mediaItem;
     if (data is VideoDetailData) {
-      mediaItem = MediaItem(
-        id: heroTag,
-        title: data.title ?? "",
-        artist: data.owner?.name ?? "",
-        duration: Duration(seconds: data.duration ?? 0),
-        artUri: Uri.parse(data.pic ?? ""),
-      );
+      if ((data.pages?.length ?? 0) > 0) {
+        final current = data.pages?.firstWhere((element) => element.cid == cid);
+        mediaItem = MediaItem(
+          id: heroTag,
+          title: current?.pagePart ?? "",
+          artist: data.title ?? "",
+          album: data.title ?? "",
+          duration: Duration(seconds: current?.duration ?? 0),
+          artUri: Uri.parse(data.pic ?? ""),
+        );
+      } else {
+        mediaItem = MediaItem(
+          id: heroTag,
+          title: data.title ?? "",
+          artist: data.owner?.name ?? "",
+          duration: Duration(seconds: data.duration ?? 0),
+          artUri: Uri.parse(data.pic ?? ""),
+        );
+      }
     } else if (data is BangumiInfoModel) {
       final current =
           data.episodes?.firstWhere((element) => element.cid == cid);
@@ -110,7 +123,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       processingState: AudioProcessingState.idle,
       playing: false,
     ));
-    stop();
     _item.removeLast();
     if (_item.isNotEmpty) {
       setMediaItem(_item.last);
@@ -118,16 +130,18 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (_item.isEmpty) {
       playbackState
           .add(playbackState.value.copyWith(updatePosition: Duration.zero));
+      stop();
     }
   }
 
   clear() {
+    mediaItem.add(null);
     playbackState.add(PlaybackState(
       processingState: AudioProcessingState.idle,
       playing: false,
     ));
-    mediaItem.add(null);
     _item.clear();
+    stop();
   }
 
   onPositionChange(Duration position) {
