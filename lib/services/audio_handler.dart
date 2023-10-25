@@ -130,8 +130,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     if (_item.isEmpty) {
       playbackState
           .add(playbackState.value.copyWith(updatePosition: Duration.zero));
-      stop();
     }
+    stop();
   }
 
   clear() {
