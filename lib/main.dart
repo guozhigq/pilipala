@@ -16,6 +16,7 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -28,6 +29,7 @@ void main() async {
           [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
       .then((_) async {
     await GStrorage.init();
+    await setupServiceLocator();
     runApp(const MyApp());
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
