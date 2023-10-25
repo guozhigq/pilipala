@@ -52,14 +52,12 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
     _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
-      videoPlayerServiceHandler.onVideoIntroChange(value);
     });
   }
 
   @override
   void dispose() {
     videoIntroController.onClose();
-    videoPlayerServiceHandler.onVideoIntroDispose();
     super.dispose();
   }
 

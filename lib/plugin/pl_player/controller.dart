@@ -1021,6 +1021,7 @@ class PlPlayerController {
       _instance = null;
       // 关闭所有视频页面恢复亮度
       resetBrightness();
+      videoPlayerServiceHandler.clear();
     } catch (err) {
       print(err);
     }

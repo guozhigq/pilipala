@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
@@ -18,8 +19,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
   );
 }
 
-class VideoPlayerServiceHandler extends BaseAudioHandler
-    with QueueHandler, SeekHandler {
+class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
 
   @override
@@ -42,7 +42,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler
 
   Future<void> setMediaItem(MediaItem newMediaItem) async {
     mediaItem.add(newMediaItem);
-    addQueueItem(newMediaItem);
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
@@ -77,22 +76,36 @@ class VideoPlayerServiceHandler extends BaseAudioHandler
     setPlaybackState(status, isBuffering);
   }
 
-  onVideoIntroChange(VideoDetailData data) {
+  onVideoDetailChange(dynamic data, int cid) {
     Map argMap = Get.arguments;
     final heroTag = argMap['heroTag'];
 
-    final mediaItem = MediaItem(
-      id: heroTag,
-      title: data.title ?? "",
-      artist: data.owner?.name ?? "",
-      duration: Duration(seconds: data.duration ?? 0),
-      artUri: Uri.parse(data.pic ?? ""),
-    );
+    late MediaItem? mediaItem;
+    if (data is VideoDetailData) {
+      mediaItem = MediaItem(
+        id: heroTag,
+        title: data.title ?? "",
+        artist: data.owner?.name ?? "",
+        duration: Duration(seconds: data.duration ?? 0),
+        artUri: Uri.parse(data.pic ?? ""),
+      );
+    } else if (data is BangumiInfoModel) {
+      final current =
+          data.episodes?.firstWhere((element) => element.cid == cid);
+      mediaItem = MediaItem(
+        id: heroTag,
+        title: current?.longTitle ?? "",
+        artist: data.title ?? "",
+        duration: Duration(milliseconds: current?.duration ?? 0),
+        artUri: Uri.parse(data.cover ?? ""),
+      );
+    }
+    if (mediaItem == null) return;
     setMediaItem(mediaItem);
     _item.add(mediaItem);
   }
 
-  onVideoIntroDispose() {
+  onVideoDetailDispose() {
     playbackState.add(playbackState.value.copyWith(
       processingState: AudioProcessingState.idle,
       playing: false,
@@ -106,6 +119,15 @@ class VideoPlayerServiceHandler extends BaseAudioHandler
       playbackState
           .add(playbackState.value.copyWith(updatePosition: Duration.zero));
     }
+  }
+
+  clear() {
+    playbackState.add(PlaybackState(
+      processingState: AudioProcessingState.idle,
+      playing: false,
+    ));
+    mediaItem.add(null);
+    _item.clear();
   }
 
   onPositionChange(Duration position) {
