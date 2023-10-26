@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
@@ -14,6 +15,7 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -526,12 +528,24 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.buffering.listen((event) {
           isBuffering.value = event;
+          videoPlayerServiceHandler.onStatusChange(
+              playerStatus.status.value, event);
         }),
         // videoPlayerController!.stream.volume.listen((event) {
         //   if (!mute.value && _volumeBeforeMute != event) {
         //     _volumeBeforeMute = event / 100;
         //   }
         // }),
+        // 媒体通知监听
+        onPlayerStatusChanged.listen((event) {
+          videoPlayerServiceHandler.onStatusChange(event, isBuffering.value);
+        }),
+        onPositionChanged.listen((event) {
+          EasyThrottle.throttle(
+              'mediaServicePositon',
+              const Duration(seconds: 1),
+              () => videoPlayerServiceHandler.onPositionChange(event));
+        }),
       ],
     );
   }
@@ -1007,6 +1021,7 @@ class PlPlayerController {
       _instance = null;
       // 关闭所有视频页面恢复亮度
       resetBrightness();
+      videoPlayerServiceHandler.clear();
     } catch (err) {
       print(err);
     }
