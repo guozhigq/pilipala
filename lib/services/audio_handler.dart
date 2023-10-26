@@ -17,6 +17,7 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
       fastForwardInterval: Duration(seconds: 10),
       rewindInterval: Duration(seconds: 10),
       androidNotificationChannelDescription: 'Media notification channel',
+      androidNotificationIcon: 'drawable/ic_notification_icon',
     ),
   );
 }
@@ -75,10 +76,11 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
       processingState:
           isBuffering ? AudioProcessingState.buffering : processingState,
       controls: [
-        MediaControl.rewind.copyWith(androidIcon: 'drawable/ic_stat_replay_10'),
+        MediaControl.rewind
+            .copyWith(androidIcon: 'drawable/ic_baseline_replay_10_24'),
         if (playing) MediaControl.pause else MediaControl.play,
         MediaControl.fastForward
-            .copyWith(androidIcon: 'drawable/ic_stat_forward_10'),
+            .copyWith(androidIcon: 'drawable/ic_baseline_forward_10_24'),
       ],
       playing: playing,
       systemActions: const {
@@ -103,7 +105,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
     late MediaItem? mediaItem;
     if (data is VideoDetailData) {
-      if ((data.pages?.length ?? 0) > 0) {
+      if ((data.pages?.length ?? 0) > 1) {
         final current = data.pages?.firstWhere((element) => element.cid == cid);
         mediaItem = MediaItem(
           id: heroTag,
