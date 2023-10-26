@@ -49,7 +49,7 @@ dependencies:
 
   # 图片
   cached_network_image: ^3.3.0
-  extended_image: ^8.1.1
+  extended_image: ^8.0.2
   saver_gallery: ^2.0.1
   
   # 存储
