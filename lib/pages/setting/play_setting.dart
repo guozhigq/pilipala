@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -35,6 +36,14 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: FullScreenMode.values.first.code);
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    // 重新验证媒体通知后台播放设置
+    videoPlayerServiceHandler.revalidateSetting();
   }
 
   @override

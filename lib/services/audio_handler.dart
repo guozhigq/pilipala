@@ -1,8 +1,10 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/storage.dart';
 
 Future<VideoPlayerServiceHandler> initAudioService() async {
   return await AudioService.init(
@@ -21,6 +23,17 @@ Future<VideoPlayerServiceHandler> initAudioService() async {
 
 class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
+  Box setting = GStrorage.setting;
+  bool enableBackgroundPlay = false;
+
+  VideoPlayerServiceHandler() {
+    revalidateSetting();
+  }
+
+  revalidateSetting() {
+    enableBackgroundPlay =
+        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
+  }
 
   @override
   Future<void> play() async {
@@ -41,10 +54,13 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> setMediaItem(MediaItem newMediaItem) async {
+    if (!enableBackgroundPlay) return;
     mediaItem.add(newMediaItem);
   }
 
   Future<void> setPlaybackState(PlayerStatus status, bool isBuffering) async {
+    if (!enableBackgroundPlay) return;
+
     final AudioProcessingState processingState;
     final playing = status == PlayerStatus.playing;
     if (status == PlayerStatus.completed) {
@@ -72,11 +88,15 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onStatusChange(PlayerStatus status, bool isBuffering) {
+    if (!enableBackgroundPlay) return;
+
     if (_item.isEmpty) return;
     setPlaybackState(status, isBuffering);
   }
 
   onVideoDetailChange(dynamic data, int cid) {
+    if (!enableBackgroundPlay) return;
+
     if (data == null) return;
     Map argMap = Get.arguments;
     final heroTag = argMap['heroTag'];
@@ -119,6 +139,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onVideoDetailDispose() {
+    if (!enableBackgroundPlay) return;
+
     playbackState.add(playbackState.value.copyWith(
       processingState: AudioProcessingState.idle,
       playing: false,
@@ -135,6 +157,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   clear() {
+    if (!enableBackgroundPlay) return;
+
     mediaItem.add(null);
     playbackState.add(PlaybackState(
       processingState: AudioProcessingState.idle,
@@ -145,6 +169,8 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   }
 
   onPositionChange(Duration position) {
+    if (!enableBackgroundPlay) return;
+
     playbackState.add(playbackState.value.copyWith(
       updatePosition: position,
     ));
