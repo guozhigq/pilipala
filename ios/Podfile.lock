@@ -1,8 +1,6 @@
 PODS:
   - appscheme (1.0.4):
     - Flutter
-  - auto_orientation (0.0.1):
-    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
@@ -54,7 +52,6 @@ PODS:
 
 DEPENDENCIES:
   - appscheme (from `.symlinks/plugins/appscheme/ios`)
-  - auto_orientation (from `.symlinks/plugins/auto_orientation/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
@@ -85,8 +82,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   appscheme:
     :path: ".symlinks/plugins/appscheme/ios"
-  auto_orientation:
-    :path: ".symlinks/plugins/auto_orientation/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   device_info_plus:
@@ -132,7 +127,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   appscheme: b1c3f8862331cb20430cf9e0e4af85dbc1572ad8
-  auto_orientation: 102ed811a5938d52c86520ddd7ecd3a126b5d39d
   connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
   device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
