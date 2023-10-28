@@ -95,7 +95,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
     // 根据position判断是否有已缓存弹幕。没有则请求对应段
     int segIndex = (currentPosition / (6 * 60 * 1000)).ceil();
     segIndex = segIndex < 1 ? 1 : segIndex;
-    if (ctr.dmSegList[segIndex - 1].elems.isEmpty) {
+    if (ctr.dmSegList[segIndex - 1].elems.isEmpty &&
+        !ctr.hasrequestSeg.contains(segIndex - 1)) {
+      ctr.hasrequestSeg.add(segIndex - 1);
       ctr.currentSegIndex = segIndex;
       EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
         ctr.queryDanmaku();
