@@ -514,19 +514,7 @@ class VideoIntroController extends GetxController {
   /// 列表循环或者顺序播放时，自动播放下一个
   void nextPlay() {
     late List episodes;
-    // if (videoDetail.value.ugcSeason != null) {
-    //   UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
-    //   List<SectionItem> sections = ugcSeason.sections!;
-    //   for (int i = 0; i < sections.length; i++) {
-    //     List<EpisodeItem> episodesList = sections[i].episodes!;
-    //     for (int j = 0; j < episodesList.length; j++) {
-    //       if (episodesList[j].cid == lastPlayCid.value) {
-    //         episodes = episodesList;
-    //         continue;
-    //       }
-    //     }
-    //   }
-    // }
+    bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
       UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       List<SectionItem> sections = ugcSeason.sections!;
@@ -536,6 +524,11 @@ class VideoIntroController extends GetxController {
         List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
+    } else if (videoDetail.value.pages != null) {
+      isPages = true;
+      List<Part> pages = videoDetail.value.pages!;
+      episodes = [];
+      episodes.addAll(pages);
     }
 
     int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
@@ -554,9 +547,9 @@ class VideoIntroController extends GetxController {
       }
     }
     int cid = episodes[nextIndex].cid!;
-    String bvid = episodes[nextIndex].bvid!;
-    int aid = episodes[nextIndex].aid!;
-    changeSeasonOrbangu(bvid, cid, aid);
+    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    changeSeasonOrbangu(rBvid, cid, rAid);
   }
 
   // 设置关注分组
