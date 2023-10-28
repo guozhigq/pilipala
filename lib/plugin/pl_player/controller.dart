@@ -646,6 +646,7 @@ class PlPlayerController {
 
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
+    audioSessionHandler.setActive(true);
   }
 
   /// 暂停播放
