@@ -18,6 +18,7 @@ import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/header_control.dart';
@@ -61,7 +62,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController.videoDetail.listen((value) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          value, videoDetailController.cid.value);
+    });
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+    bangumiIntroController.bangumiDetail.listen((value) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          value, videoDetailController.cid.value);
+    });
+    videoDetailController.cid.listen((p0) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          bangumiIntroController.bangumiDetail.value, p0);
+    });
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -154,6 +167,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (videoDetailController.floating != null) {
       videoDetailController.floating!.dispose();
     }
+    videoPlayerServiceHandler.onVideoDetailDispose();
     WidgetsBinding.instance.removeObserver(this);
     floating.dispose();
     super.dispose();
