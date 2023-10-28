@@ -5,7 +5,6 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:audio_session/audio_session.dart';
 
 Future<VideoPlayerServiceHandler> initAudioService() async {
   return await AudioService.init(
@@ -27,49 +26,9 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
   Box setting = GStrorage.setting;
   bool enableBackgroundPlay = false;
-  late AudioSession session;
-  bool _playInterrupted = false; // 暂时无用
 
   VideoPlayerServiceHandler() {
     revalidateSetting();
-    initSession();
-  }
-
-  Future<void> initSession() async {
-    session = await AudioSession.instance;
-    session.configure(const AudioSessionConfiguration.speech());
-
-    session.interruptionEventStream.listen((event) {
-      if (event.begin) {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-          // duck or pause
-          // break;
-          case AudioInterruptionType.pause:
-          case AudioInterruptionType.unknown:
-            pause();
-            _playInterrupted = true;
-            break;
-        }
-      } else {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-          // unduck
-          // break;
-          case AudioInterruptionType.pause:
-            if (_playInterrupted) play();
-            break;
-          case AudioInterruptionType.unknown:
-            break;
-        }
-        _playInterrupted = false;
-      }
-    });
-
-    // 耳机拔出暂停
-    session.becomingNoisyEventStream.listen((_) {
-      pause();
-    });
   }
 
   revalidateSetting() {
@@ -105,12 +64,6 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
     final AudioProcessingState processingState;
     final playing = status == PlayerStatus.playing;
-    if (playing) {
-      _playInterrupted = false;
-      session.setActive(true);
-    } else {
-      session.setActive(false);
-    }
     if (status == PlayerStatus.completed) {
       processingState = AudioProcessingState.completed;
     } else if (isBuffering) {
