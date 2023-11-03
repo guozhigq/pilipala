@@ -303,4 +303,7 @@ class Api {
   static const String onlineTotal = '/x/player/online/total';
 
   static const String webDanmaku = '/x/v2/dm/web/seg.so';
+
+  // 搜索历史记录
+  static const String searchHistory = '/x/web-goblin/history/search';
 }

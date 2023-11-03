@@ -86,6 +86,10 @@ class _HistoryPageState extends State<HistoryPage> {
             //   },
             //   child: const Text('多选'),
             // ),
+            IconButton(
+              onPressed: () => Get.toNamed('/historySearch'),
+              icon: const Icon(Icons.search_outlined),
+            ),
             PopupMenuButton<String>(
               onSelected: (String type) {
                 // 处理菜单项选择的逻辑

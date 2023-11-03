@@ -36,6 +36,8 @@ import 'package:pilipala/pages/setting/index.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../pages/history_search/index.dart';
+
 Box setting = GStrorage.setting;
 bool iosTransition =
     setting.get(SettingBoxKey.iosTransition, defaultValue: false);
@@ -112,6 +114,9 @@ class Routes {
     CustomGetPage(name: '/about', page: () => const AboutPage()),
     //
     CustomGetPage(name: '/htmlRender', page: () => const HtmlRenderPage()),
+    // 历史记录搜索
+    CustomGetPage(
+        name: '/historySearch', page: () => const HistorySearchPage()),
   ];
 }
 
