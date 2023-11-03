@@ -249,30 +249,30 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        SizedBox(
-                          width: 34,
-                          height: 34,
-                          child: IconButton(
-                            style: ButtonStyle(
-                              padding:
-                                  MaterialStateProperty.all(EdgeInsets.zero),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith((states) {
-                                return t.highlightColor.withOpacity(0.2);
-                              }),
-                            ),
-                            onPressed: showIntroDetail,
-                            icon: Icon(
-                              Icons.more_horiz,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                        ),
+                        // const SizedBox(width: 20),
+                        // SizedBox(
+                        //   width: 34,
+                        //   height: 34,
+                        //   child: IconButton(
+                        //     style: ButtonStyle(
+                        //       padding:
+                        //           MaterialStateProperty.all(EdgeInsets.zero),
+                        //       backgroundColor:
+                        //           MaterialStateProperty.resolveWith((states) {
+                        //         return t.highlightColor.withOpacity(0.2);
+                        //       }),
+                        //     ),
+                        //     onPressed: showIntroDetail,
+                        //     icon: Icon(
+                        //       Icons.more_horiz,
+                        //       color: Theme.of(context).colorScheme.primary,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -325,7 +325,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   // const SizedBox(height: 7),
                   // 点赞收藏转发 布局样式1
                   SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 7, bottom: 7),
+                    padding: const EdgeInsets.only(top: 10, bottom: 7),
                     scrollDirection: Axis.horizontal,
                     child: actionRow(
                       context,
