@@ -650,9 +650,14 @@ class PlPlayerController {
   }
 
   /// 暂停播放
-  Future<void> pause({bool notify = true}) async {
+  Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
     await _videoPlayerController?.pause();
     playerStatus.status.value = PlayerStatus.paused;
+
+    // 主动暂停时让出音频焦点
+    if (!isInterrupt) {
+      audioSessionHandler.setActive(false);
+    }
   }
 
   /// 更改播放状态

@@ -26,7 +26,7 @@ class AudioSessionHandler {
             break;
           case AudioInterruptionType.pause:
           case AudioInterruptionType.unknown:
-            player.pause();
+            player.pause(isInterrupt: true);
             _playInterrupted = true;
             break;
         }
