@@ -270,14 +270,6 @@ class PlPlayerController {
   // 获取实例 传参
   static PlPlayerController getInstance({
     String videoType = 'archive',
-    List<BoxFit> fits = const [
-      BoxFit.contain,
-      BoxFit.cover,
-      BoxFit.fill,
-      BoxFit.fitHeight,
-      BoxFit.fitWidth,
-      BoxFit.scaleDown
-    ],
   }) {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
@@ -766,26 +758,46 @@ class PlPlayerController {
 
   /// Toggle Change the videofit accordingly
   void toggleVideoFit() {
-    videoFitChangedTimer?.cancel();
-    videoFitChanged.value = true;
-    // 范围内
-    List attrs = videoFitType.map((e) => e['attr']).toList();
-    if (attrs.indexOf(_videoFit.value) < attrs.length - 1) {
-      int index = attrs.indexOf(_videoFit.value);
-      _videoFit.value = attrs[index + 1];
-      _videoFitDesc.value = videoFitType[index + 1]['desc'];
-      SmartDialog.showToast(videoFitType[index + 1]['desc']);
-    } else {
-      // 默认 contain
-      _videoFit.value = videoFitType.first['attr'];
-      _videoFitDesc.value = videoFitType.first['desc'];
-      SmartDialog.showToast(videoFitType.first['desc']);
-    }
-    videoFitChangedTimer = Timer(const Duration(seconds: 1), () {
-      videoFitChangedTimer = null;
-      videoFitChanged.value = false;
-    });
-    setVideoFit();
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('画面比例'),
+          content: StatefulBuilder(builder: (context, StateSetter setState) {
+            return Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 8,
+              runSpacing: 2,
+              children: [
+                for (var i in videoFitType) ...[
+                  if (_videoFit.value == i['attr']) ...[
+                    FilledButton(
+                      onPressed: () async {
+                        _videoFit.value = i['attr'];
+                        _videoFitDesc.value = i['desc'];
+                        setVideoFit();
+                        Get.back();
+                      },
+                      child: Text(i['desc']),
+                    ),
+                  ] else ...[
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        _videoFit.value = i['attr'];
+                        _videoFitDesc.value = i['desc'];
+                        setVideoFit();
+                        Get.back();
+                      },
+                      child: Text(i['desc']),
+                    ),
+                  ]
+                ]
+              ],
+            );
+          }),
+        );
+      },
+    );
   }
 
   /// 缓存fit

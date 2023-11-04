@@ -200,7 +200,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       onPressed: () async {
                         // setState(() => currentSpeed = i),
                         await widget.controller!.setPlaybackSpeed(i);
-                        SmartDialog.dismiss();
+                        Get.back();
                       },
                       child: Text(i.toString()),
                     ),
@@ -209,7 +209,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       onPressed: () async {
                         // setState(() => currentSpeed = i),
                         await widget.controller!.setPlaybackSpeed(i);
-                        SmartDialog.dismiss();
+                        Get.back();
                       },
                       child: Text(i.toString()),
                     ),
@@ -229,7 +229,7 @@ class _HeaderControlState extends State<HeaderControl> {
             TextButton(
               onPressed: () async {
                 await widget.controller!.setDefaultSpeed();
-                SmartDialog.dismiss();
+                Get.back();
               },
               child: const Text('默认速度'),
             ),
