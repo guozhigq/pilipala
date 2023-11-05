@@ -126,6 +126,7 @@ class SettingBoxKey {
   static const String enableSearchWord = 'enableSearchWord';
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
   static const String enableSaveLastData = 'enableSaveLastData';
+  static const String enableSystemProxy = 'enableSystemProxy';
 
   /// 外观
   static const String themeMode = 'themeMode';
@@ -155,6 +156,10 @@ class LocalCacheKey {
   static const String danmakuOpacity = 'danmakuOpacity';
   static const String danmakuFontScale = 'danmakuFontScale';
   static const String danmakuSpeed = 'danmakuSpeed';
+
+  // 代理host port
+  static const String systemProxyHost = 'systemProxyHost';
+  static const String systemProxyPort = 'systemProxyPort';
 }
 
 class VideoBoxKey {

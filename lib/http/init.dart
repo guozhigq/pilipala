@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/io.dart';
 import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -17,6 +18,11 @@ class Request {
   static late CookieManager cookieManager;
   static late final Dio dio;
   factory Request() => _instance;
+  Box setting = GStrorage.setting;
+  static Box localCache = GStrorage.localCache;
+  late dynamic enableSystemProxy;
+  late String systemProxyHost;
+  late String systemProxyPort;
 
   /// 设置cookie
   static setCookie() async {
@@ -92,6 +98,13 @@ class Request {
       headers: {},
     );
 
+    enableSystemProxy =
+        setting.get(SettingBoxKey.enableSystemProxy, defaultValue: false);
+    systemProxyHost =
+        localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
+    systemProxyPort =
+        localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
+
     dio = Dio(options)
 
       /// fix 第三方登录 302重定向 跟iOS代理问题冲突
@@ -100,6 +113,29 @@ class Request {
           idleTimeout: const Duration(milliseconds: 10000),
           onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
         ),
+      )
+
+      /// 设置代理
+      ..httpClientAdapter = IOHttpClientAdapter(
+        createHttpClient: () {
+          final client = HttpClient();
+          // Config the client.
+          client.findProxy = (uri) {
+            if (enableSystemProxy) {
+              print('🌹：$systemProxyHost');
+              print('🌹：$systemProxyPort');
+
+              // return 'PROXY host:port';
+              return 'PROXY $systemProxyHost:$systemProxyPort';
+            } else {
+              // 不设置代理
+              return 'DIRECT';
+            }
+          };
+          client.badCertificateCallback =
+              (X509Certificate cert, String host, int port) => true;
+          return client;
+        },
       );
 
     //添加拦截器
