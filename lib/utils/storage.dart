@@ -156,4 +156,6 @@ class VideoBoxKey {
   static const String videoBrightness = 'videoBrightness';
   // 倍速
   static const String videoSpeed = 'videoSpeed';
+  // 播放顺序
+  static const String playRepeat = 'playRepeat';
 }

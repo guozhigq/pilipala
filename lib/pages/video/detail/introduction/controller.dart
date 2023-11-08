@@ -11,6 +11,7 @@ import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -58,10 +59,14 @@ class VideoIntroController extends GetxController {
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
+  String heroTag = '';
 
   @override
   void onInit() {
     super.onInit();
+    try {
+      heroTag = Get.arguments['heroTag'];
+    } catch (_) {}
     userInfo = userInfoCache.get('userInfoCache');
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
@@ -485,5 +490,46 @@ class VideoIntroController extends GetxController {
       timer!.cancel(); // 销毁页面时取消定时器
     }
     super.onClose();
+  }
+
+  /// 列表循环或者顺序播放时，自动播放下一个
+  void nextPlay() {
+    late List episodes;
+    bool isPages = false;
+    if (videoDetail.value.ugcSeason != null) {
+      UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      List<SectionItem> sections = ugcSeason.sections!;
+      episodes = [];
+
+      for (int i = 0; i < sections.length; i++) {
+        List<EpisodeItem> episodesList = sections[i].episodes!;
+        episodes.addAll(episodesList);
+      }
+    } else if (videoDetail.value.pages != null) {
+      isPages = true;
+      List<Part> pages = videoDetail.value.pages!;
+      episodes = [];
+      episodes.addAll(pages);
+    }
+
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    int nextIndex = currentIndex + 1;
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    // 列表循环
+    if (nextIndex >= episodes.length) {
+      if (platRepeat == PlayRepeat.listCycle) {
+        nextIndex = 0;
+      }
+      if (platRepeat == PlayRepeat.listOrder) {
+        return;
+      }
+    }
+    int cid = episodes[nextIndex].cid!;
+    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    changeSeasonOrbangu(rBvid, cid, rAid);
   }
 }
