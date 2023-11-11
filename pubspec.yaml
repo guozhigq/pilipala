@@ -82,6 +82,7 @@ dependencies:
   custom_sliding_segmented_control: ^1.7.5
   # 加密
   crypto: ^3.0.3
+  encrypt: ^5.0.3
 
   # 视频播放器
   media_kit: ^1.1.10                              # Primary package.
@@ -124,6 +125,9 @@ dependencies:
   html: ^0.15.4
   # html渲染
   flutter_html: ^3.0.0-beta.2
+  # 极验
+  gt3_flutter_plugin: ^0.0.8
+  uuid: ^3.0.7
 
   
 dev_dependencies:
