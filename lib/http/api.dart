@@ -336,4 +336,40 @@ class Api {
   /// w_rid=1607c6c5a4a35a1297e31992220900ae&
   /// wts=1697033079
   static const String aiConclusion = '/x/web-interface/view/conclusion/get';
+
+  // captcha验证码
+  static const String getCaptcha =
+      'https://passport.bilibili.com/x/passport-login/captcha?source=main_web';
+
+  // web端短信验证码
+  static const String smsCode =
+      'https://passport.bilibili.com/x/passport-login/web/sms/send';
+
+  // web端验证码登录
+
+  // web端密码登录
+
+  // app端短信验证码
+  static const String appSmsCode =
+      'https://passport.bilibili.com/x/passport-login/sms/send';
+
+  // app端验证码登录
+
+  // 获取短信验证码
+  // static const String appSafeSmsCode =
+  //     'https://passport.bilibili.com/x/safecenter/common/sms/send';
+
+  /// app端密码登录
+  /// username
+  /// password
+  /// key
+  /// rhash
+  static const String loginInByPwdApi =
+      'https://passport.bilibili.com/x/passport-login/oauth2/login';
+
+  /// 密码加密密钥
+  /// disable_rcmd
+  /// local_id
+  static const getWebKey =
+      'https://passport.bilibili.com/x/passport-login/web/key';
 }

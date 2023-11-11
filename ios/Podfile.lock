@@ -12,6 +12,10 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - gt3_flutter_plugin (0.0.8):
+    - Flutter
+    - GT3Captcha-iOS
+  - GT3Captcha-iOS (0.15.8.3)
   - media_kit_libs_ios_video (1.0.4):
     - Flutter
   - media_kit_native_event_loop (1.0.0):
@@ -56,6 +60,7 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_volume_controller (from `.symlinks/plugins/flutter_volume_controller/ios`)
+  - gt3_flutter_plugin (from `.symlinks/plugins/gt3_flutter_plugin/ios`)
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
@@ -77,6 +82,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - FMDB
+    - GT3Captcha-iOS
     - ReachabilitySwift
 
 EXTERNAL SOURCES:
@@ -90,6 +96,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_volume_controller:
     :path: ".symlinks/plugins/flutter_volume_controller/ios"
+  gt3_flutter_plugin:
+    :path: ".symlinks/plugins/gt3_flutter_plugin/ios"
   media_kit_libs_ios_video:
     :path: ".symlinks/plugins/media_kit_libs_ios_video/ios"
   media_kit_native_event_loop:
@@ -132,6 +140,8 @@ SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  gt3_flutter_plugin: bfa1f26e9a09dc00401514be5ed437f964cabf23
+  GT3Captcha-iOS: 5e3b1077834d8a9d6f4d64a447a30af3e14affe6
   media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
   media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e

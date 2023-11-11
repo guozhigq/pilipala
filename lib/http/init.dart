@@ -47,8 +47,8 @@ class Request {
           log("setCookie, ${e.toString()}");
         }
       }
-      setOptionsHeaders(userInfo);
     }
+    setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
 
     if (cookie.isEmpty) {
       try {
@@ -73,8 +73,10 @@ class Request {
     return token;
   }
 
-  static setOptionsHeaders(userInfo) {
-    dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+  static setOptionsHeaders(userInfo, status) {
+    if (status) {
+      dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+    }
     dio.options.headers['env'] = 'prod';
     dio.options.headers['app-key'] = 'android64';
     dio.options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';

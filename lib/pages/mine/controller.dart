@@ -41,6 +41,7 @@ class MineController extends GetxController {
           'pageTitle': '登录bilibili',
         },
       );
+      // Get.toNamed('/loginPage');
     } else {
       int mid = userInfo.value.mid!;
       String face = userInfo.value.face!;

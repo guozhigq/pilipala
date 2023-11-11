@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.2"
+  asn1lib:
+    dependency: transitive
+    description:
+      name: asn1lib
+      sha256: "21afe4333076c02877d14f4a89df111e658a6d466cbfc802eb705eb91bd5adfd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.0"
   async:
     dependency: transitive
     description:
@@ -401,6 +409,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  encrypt:
+    dependency: "direct main"
+    description:
+      name: encrypt
+      sha256: "62d9aa4670cc2a8798bab89b39fc71b6dfbacf615de6cf5001fb39f7e4a996a2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
   extended_image:
     dependency: "direct main"
     description:
@@ -613,6 +629,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+  gt3_flutter_plugin:
+    dependency: "direct main"
+    description:
+      name: gt3_flutter_plugin
+      sha256: f12bff2bfbcf27467833f8d564dcc24ee2f1b3254a7c7cf5eb2c4590baf11cc1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8"
   hive:
     dependency: "direct main"
     description:
@@ -1420,7 +1444,7 @@ packages:
     source: hosted
     version: "3.0.7"
   uuid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uuid
       sha256: "648e103079f7c64a36dc7d39369cabb358d377078a051d6ae2ad3aa539519313"
