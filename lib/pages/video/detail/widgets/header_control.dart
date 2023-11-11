@@ -89,7 +89,6 @@ class _HeaderControlState extends State<HeaderControl> {
               Expanded(
                   child: Material(
                 child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     ListTile(
                       onTap: () {},
