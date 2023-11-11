@@ -299,20 +299,24 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                 ),
               ),
             // if (_searchController.historyList.isNotEmpty)
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              direction: Axis.horizontal,
-              textDirection: TextDirection.ltr,
-              children: [
-                for (int i = 0; i < _searchController.historyList.length; i++)
-                  SearchText(
-                    searchText: _searchController.historyList[i],
-                    searchTextIdx: i,
-                    onSelect: (value) => _searchController.onSelect(value),
-                  )
-              ],
-            ),
+            Obx(() => Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  direction: Axis.horizontal,
+                  textDirection: TextDirection.ltr,
+                  children: [
+                    for (int i = 0;
+                        i < _searchController.historyList.length;
+                        i++)
+                      SearchText(
+                        searchText: _searchController.historyList[i],
+                        searchTextIdx: i,
+                        onSelect: (value) => _searchController.onSelect(value),
+                        onLongSelect: (value) =>
+                            _searchController.onLongSelect(value),
+                      )
+                  ],
+                )),
           ],
         ),
       ),
