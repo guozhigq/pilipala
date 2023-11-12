@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:easy_debounce/easy_throttle.dart';
@@ -380,8 +381,10 @@ class PlPlayerController {
     // 解除倍速限制
     await pp.setProperty("af", "scaletempo2=max-speed=8");
     //  音量不一致
-    await pp.setProperty("volume-max", "100");
-    await pp.setProperty("ao", "audiotrack,opensles");
+    if (Platform.isAndroid) {
+      await pp.setProperty("volume-max", "100");
+      await pp.setProperty("ao", "audiotrack,opensles");
+    }
 
     // 音轨
     if (dataSource.audioSource != '' && dataSource.audioSource != null) {
