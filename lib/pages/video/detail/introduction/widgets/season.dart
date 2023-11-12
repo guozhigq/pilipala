@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 
 class SeasonPanel extends StatefulWidget {
@@ -23,11 +24,16 @@ class SeasonPanel extends StatefulWidget {
 
 class _SeasonPanelState extends State<SeasonPanel> {
   late List<EpisodeItem> episodes;
+  late int cid;
   late int currentIndex;
+  String heroTag = Get.arguments['heroTag'];
+  late VideoDetailController _videoDetailController;
 
   @override
   void initState() {
     super.initState();
+    cid = widget.cid!;
+    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
 
     /// 根据 cid 找到对应集，找到对应 episodes
     /// 有多个episodes时，只显示其中一个
@@ -48,6 +54,11 @@ class _SeasonPanelState extends State<SeasonPanel> {
     //     .firstWhere((e) => e.seasonId == widget.ugcSeason.id)
     //     .episodes!;
     currentIndex = episodes.indexWhere((e) => e.cid == widget.cid);
+    _videoDetailController.cid.listen((p0) {
+      cid = p0;
+      setState(() {});
+      currentIndex = episodes.indexWhere((e) => e.cid == cid);
+    });
   }
 
   void changeFucCall(item, i) async {

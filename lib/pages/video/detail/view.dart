@@ -20,6 +20,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/app_bar.dart';
@@ -54,6 +55,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 自动退出全屏
   late bool autoExitFullcreen;
   Floating? floating;
+  late BangumiIntroController bangumiIntroController;
 
   @override
   void initState() {
@@ -61,6 +63,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -99,11 +102,31 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       if (autoExitFullcreen) {
         plPlayerController!.triggerFullScreen(status: false);
       }
-      // 播放完展示控制栏
-      PiPStatus currentStatus = await floating!.pipStatus;
-      if (currentStatus == PiPStatus.disabled) {
-        plPlayerController!.onLockControl(false);
+
+      /// 顺序播放 列表循环
+      if (plPlayerController!.playRepeat != PlayRepeat.pause &&
+          plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
+        if (videoDetailController.videoType == SearchType.video) {
+          videoIntroController.nextPlay();
+        }
+        if (videoDetailController.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.nextPlay();
+        }
       }
+
+      /// 单个循环
+      if (plPlayerController!.playRepeat == PlayRepeat.singleCycle) {
+        plPlayerController!.seekTo(Duration.zero);
+        plPlayerController!.play();
+      }
+      // 播放完展示控制栏
+      try {
+        PiPStatus currentStatus =
+            await videoDetailController.floating!.pipStatus;
+        if (currentStatus == PiPStatus.disabled) {
+          plPlayerController!.onLockControl(false);
+        }
+      } catch (_) {}
     }
   }
 

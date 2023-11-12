@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
+import 'package:pilipala/pages/video/detail/widgets/header_control.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -76,6 +79,8 @@ class VideoDetailController extends GetxController
   bool enableHeart = true;
   var userInfo;
   late bool isFirstTime = true;
+  Floating? floating;
+  late PreferredSizeWidget headerControl;
 
   @override
   void onInit() {
@@ -104,6 +109,14 @@ class VideoDetailController extends GetxController
       enableHeart = false;
     }
     danmakuCid.value = cid.value;
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+    );
   }
 
   showReplyReplyPanel() {
