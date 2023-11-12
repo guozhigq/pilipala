@@ -56,67 +56,72 @@ class _UpPanelState extends State<UpPanel> {
       floating: true,
       pinned: false,
       delegate: _SliverHeaderDelegate(
-        height: 90,
-        child: Container(
-            height: 90,
-            color: Theme.of(context).colorScheme.background,
-            child: Row(
-              children: [
-                Expanded(
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    controller: scrollController,
+          height: 126,
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(width: 10),
-                      if (liveList.isNotEmpty) ...[
-                        for (int i = 0; i < liveList.length; i++) ...[
-                          upItemBuild(liveList[i], i)
-                        ],
-                        VerticalDivider(
-                          indent: 20,
-                          endIndent: 40,
-                          width: 26,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5),
+                      const Text('最新关注'),
+                      GestureDetector(
+                        onTap: () {
+                          feedBack();
+                          Get.toNamed('/follow?mid=${userInfo.mid}');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 0, bottom: 4),
+                          child: Text(
+                            '查看全部',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.outline),
+                          ),
                         ),
-                      ],
-                      for (int i = 0; i < upList.length; i++) ...[
-                        upItemBuild(upList[i], i)
-                      ],
-                      const SizedBox(width: 10),
+                      ),
                     ],
                   ),
                 ),
-                Material(
-                  child: InkWell(
-                    onTap: () => {
-                      feedBack(),
-                      Get.toNamed('/follow?mid=${userInfo.mid}')
-                    },
-                    child: Container(
-                      height: 100,
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondaryContainer
-                          .withOpacity(0.3),
-                      child: Center(
-                        child: Text(
-                          '全部',
-                          style: TextStyle(
+              ),
+              Container(
+                height: 90,
+                color: Theme.of(context).colorScheme.background,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        controller: scrollController,
+                        children: [
+                          const SizedBox(width: 10),
+                          if (liveList.isNotEmpty) ...[
+                            for (int i = 0; i < liveList.length; i++) ...[
+                              upItemBuild(liveList[i], i)
+                            ],
+                            VerticalDivider(
+                              indent: 20,
+                              endIndent: 40,
+                              width: 26,
                               color: Theme.of(context)
                                   .colorScheme
-                                  .onSecondaryContainer),
-                        ),
+                                  .primary
+                                  .withOpacity(0.5),
+                            ),
+                          ],
+                          for (int i = 0; i < upList.length; i++) ...[
+                            upItemBuild(upList[i], i)
+                          ],
+                          const SizedBox(width: 10),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            )),
-      ),
+              ),
+            ],
+          )),
     );
   }
 
