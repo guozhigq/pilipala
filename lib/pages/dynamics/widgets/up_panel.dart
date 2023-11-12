@@ -56,33 +56,34 @@ class _UpPanelState extends State<UpPanel> {
       floating: true,
       pinned: false,
       delegate: _SliverHeaderDelegate(
-          height: 126,
+          height: 124,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text('最新关注'),
-                      GestureDetector(
-                        onTap: () {
-                          feedBack();
-                          Get.toNamed('/follow?mid=${userInfo.mid}');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.only(top: 0, bottom: 4),
-                          child: Text(
-                            '查看全部',
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.outline),
-                          ),
+              Container(
+                color: Theme.of(context).colorScheme.background,
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('最新关注'),
+                    GestureDetector(
+                      onTap: () {
+                        feedBack();
+                        Get.toNamed('/follow?mid=${userInfo.mid}');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          '查看全部',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               Container(
