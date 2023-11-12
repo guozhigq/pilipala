@@ -3,13 +3,18 @@
 </div>
 
 
+
 <div align="center">
     <h1>PiliPala</h1>
+<div align="center">
+    
+![GitHub repo size](https://img.shields.io/github/repo-size/guozhigq/pilipala) 
+![GitHub Repo stars](https://img.shields.io/github/stars/guozhigq/pilipala) 
+![GitHub all releases](https://img.shields.io/github/downloads/guozhigq/pilipala/total) 
+</div>
     <p>使用Flutter开发的BiliBili第三方客户端</p>
-    ![GitHub all releases](https://img.shields.io/github/downloads/guozhigq/pilipala/total)]
-
-    <br/>
-     <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/510shots_so.png" width="32%" alt="home" />
+    
+    <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/510shots_so.png" width="32%" alt="home" />
     <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/174shots_so.png" width="32%" alt="home" />
     <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/850shots_so.png" width="32%" alt="home" />
     <br/>
