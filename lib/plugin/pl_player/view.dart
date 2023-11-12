@@ -74,6 +74,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
   late bool enableBackgroundPlay;
+  late double screenWidth;
 
   void onDoubleTapSeekBackward() {
     _ctr.onDoubleTapSeekBackward();
@@ -116,6 +117,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void initState() {
     super.initState();
+    screenWidth = Get.size.width;
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
@@ -128,7 +130,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
     enableBackgroundPlay =
         setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
-
     Future.microtask(() async {
       try {
         FlutterVolumeController.showSystemUI = true;
@@ -217,6 +218,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             controller: videoController,
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
+            resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: SubtitleViewConfiguration(
               style: subTitleStyle,
               textAlign: TextAlign.center,
@@ -508,7 +510,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               }
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
-                final brightness = _ctr.brightnessValue.value - delta / 100.0;
+                double level = (_.isFullScreen.value
+                        ? Get.size.height
+                        : screenWidth * 9 / 16) *
+                    3;
+                final brightness = _ctr.brightnessValue.value - delta / level;
                 final result = brightness.clamp(0.0, 1.0);
                 setBrightness(result);
               } else if (tapPosition < sectionWidth * 2) {
@@ -531,7 +537,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 _distance = dy;
               } else {
                 // 右边区域 👈
-                final volume = _ctr.volumeValue.value - delta / 100.0;
+                double level = (_.isFullScreen.value
+                        ? Get.size.height
+                        : screenWidth * 9 / 16) *
+                    3;
+                final volume = _ctr.volumeValue.value - delta / level;
                 final result = volume.clamp(0.0, 1.0);
                 setVolume(result);
               }

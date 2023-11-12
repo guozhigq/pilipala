@@ -3,27 +3,24 @@ import 'dart:io';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/common/widgets/sliver_header.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/danmaku/view.dart';
-import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
-import 'widgets/app_bar.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
@@ -36,7 +33,7 @@ class VideoDetailPage extends StatefulWidget {
 }
 
 class _VideoDetailPageState extends State<VideoDetailPage>
-    with TickerProviderStateMixin, RouteAware {
+    with TickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
   late VideoDetailController videoDetailController;
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
@@ -56,6 +53,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 自动退出全屏
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
+  late bool autoPiP;
+  final floating = Floating();
 
   @override
   void initState() {
@@ -63,14 +62,29 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController.videoDetail.listen((value) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          value, videoDetailController.cid.value);
+    });
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+    bangumiIntroController.bangumiDetail.listen((value) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          value, videoDetailController.cid.value);
+    });
+    videoDetailController.cid.listen((p0) {
+      videoPlayerServiceHandler.onVideoDetailChange(
+          bangumiIntroController.bangumiDetail.value, p0);
+    });
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
     autoPlayEnable =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
+    autoPiP = setting.get(SettingBoxKey.autoPiP, defaultValue: false);
+
     videoSourceInit();
     appbarStreamListen();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   // 获取视频资源，初始化播放器
@@ -153,6 +167,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (videoDetailController.floating != null) {
       videoDetailController.floating!.dispose();
     }
+    videoPlayerServiceHandler.onVideoDetailDispose();
+    WidgetsBinding.instance.removeObserver(this);
+    floating.dispose();
     super.dispose();
   }
 
@@ -197,6 +214,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.didChangeDependencies();
     VideoDetailPage.routeObserver
         .subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    if (lifecycleState == AppLifecycleState.inactive && autoPiP) {
+      floating.enable(
+          aspectRatio: Rational(
+        videoDetailController.data.dash!.video!.first.width!,
+        videoDetailController.data.dash!.video!.first.height!,
+      ));
+    }
   }
 
   @override
@@ -497,6 +525,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       return PiPSwitcher(
         childWhenDisabled: childWhenDisabled,
         childWhenEnabled: childWhenEnabled,
+        floating: floating,
       );
     } else {
       return childWhenDisabled;

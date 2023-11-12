@@ -201,7 +201,7 @@ class _BangumiPageState extends State<BangumiPage>
               },
             ),
           ),
-          const LoadingMore()
+          LoadingMore()
         ],
       ),
     );

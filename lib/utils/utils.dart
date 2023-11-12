@@ -286,4 +286,15 @@ class Utils {
       );
     }
   }
+
+  // 时间戳转时间
+  static tampToSeektime(number) {
+    int hours = number ~/ 60;
+    int minutes = number % 60;
+
+    String formattedHours = hours.toString().padLeft(2, '0');
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+
+    return '$formattedHours:$formattedMinutes';
+  }
 }

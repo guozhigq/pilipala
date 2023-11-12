@@ -139,11 +139,14 @@ class LoadMoreListSource extends LoadingMoreBase<DynamicItemModel> {
     if (res['status']) {
       addAll(res['data'].items);
     }
-    if (res['data'].hasMore) {
-      isSuccess = true;
-    } else {
-      isSuccess = false;
-    }
+    try {
+      if (res['data'].hasMore) {
+        isSuccess = true;
+      } else {
+        isSuccess = false;
+      }
+    } catch (_) {}
+
     return isSuccess;
   }
 }

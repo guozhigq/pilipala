@@ -84,7 +84,10 @@ class _FollowListState extends State<FollowList> {
                               ),
                             );
                           } else {
-                            return FollowItem(item: list[index]);
+                            return FollowItem(
+                              item: list[index],
+                              ctr: widget.ctr,
+                            );
                           }
                         },
                       )

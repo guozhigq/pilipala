@@ -17,6 +17,10 @@ class AuthorPanel extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
+            // 番剧
+            if (item.modules.moduleAuthor.type == 'AUTHOR_TYPE_PGC') {
+              return;
+            }
             feedBack();
             Get.toNamed(
               '/member?mid=${item.modules.moduleAuthor.mid}',

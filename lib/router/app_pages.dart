@@ -19,6 +19,7 @@ import 'package:pilipala/pages/hot/index.dart';
 import 'package:pilipala/pages/html/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
+import 'package:pilipala/pages/login/index.dart';
 import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/pages/member_search/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
@@ -129,6 +130,8 @@ class Routes {
     // 私信详情
     CustomGetPage(
         name: '/whisperDetail', page: () => const WhisperDetailPage()),
+    // 登录页面
+    CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
   ];
 }
 

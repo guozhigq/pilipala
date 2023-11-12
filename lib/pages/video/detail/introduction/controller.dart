@@ -8,6 +8,7 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
@@ -61,12 +62,16 @@ class VideoIntroController extends GetxController {
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
-  String heroTag = Get.arguments['heroTag'];
+  String heroTag = '';
+  late ModelResult modelResult;
 
   @override
   void onInit() {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
+    try {
+      heroTag = Get.arguments['heroTag'];
+    } catch (_) {}
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
         preRender = true;
@@ -509,19 +514,7 @@ class VideoIntroController extends GetxController {
   /// 列表循环或者顺序播放时，自动播放下一个
   void nextPlay() {
     late List episodes;
-    // if (videoDetail.value.ugcSeason != null) {
-    //   UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
-    //   List<SectionItem> sections = ugcSeason.sections!;
-    //   for (int i = 0; i < sections.length; i++) {
-    //     List<EpisodeItem> episodesList = sections[i].episodes!;
-    //     for (int j = 0; j < episodesList.length; j++) {
-    //       if (episodesList[j].cid == lastPlayCid.value) {
-    //         episodes = episodesList;
-    //         continue;
-    //       }
-    //     }
-    //   }
-    // }
+    bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
       UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       List<SectionItem> sections = ugcSeason.sections!;
@@ -531,6 +524,11 @@ class VideoIntroController extends GetxController {
         List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
+    } else if (videoDetail.value.pages != null) {
+      isPages = true;
+      List<Part> pages = videoDetail.value.pages!;
+      episodes = [];
+      episodes.addAll(pages);
     }
 
     int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
@@ -549,9 +547,9 @@ class VideoIntroController extends GetxController {
       }
     }
     int cid = episodes[nextIndex].cid!;
-    String bvid = episodes[nextIndex].bvid!;
-    int aid = episodes[nextIndex].aid!;
-    changeSeasonOrbangu(bvid, cid, aid);
+    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    changeSeasonOrbangu(rBvid, cid, rAid);
   }
 
   // 设置关注分组
@@ -560,5 +558,26 @@ class VideoIntroController extends GetxController {
       GroupPanel(mid: videoDetail.value.owner!.mid!),
       isScrollControlled: true,
     );
+  }
+
+  // ai总结
+  Future aiConclusion() async {
+    SmartDialog.showLoading(msg: '正在生产ai总结');
+    var res = await VideoHttp.aiConclusion(
+      bvid: bvid,
+      cid: lastPlayCid.value,
+      upMid: videoDetail.value.owner!.mid!,
+    );
+    if (res['status']) {
+      if (res['data'].modelResult.resultType == 0) {
+        SmartDialog.showToast('该视频不支持ai总结');
+      }
+      if (res['data'].modelResult.resultType == 2 ||
+          res['data'].modelResult.resultType == 1) {
+        modelResult = res['data'].modelResult;
+      }
+    }
+    SmartDialog.dismiss();
+    return res;
   }
 }

@@ -10,6 +10,8 @@ class PlDanmakuController {
   // 按 6min 分段
   int segCount = 0;
   List<DmSegMobileReply> dmSegList = [];
+  // 已请求的段落标记
+  List<int> hasrequestSeg = [];
   int currentSegIndex = 1;
   int currentDmIndex = 0;
 

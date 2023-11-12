@@ -43,6 +43,7 @@ class _HeaderControlState extends State<HeaderControl> {
   Box localCache = GStrorage.localCache;
   Box videoStorage = GStrorage.video;
   late List speedsList;
+  double buttonSpace = 8;
 
   @override
   void initState() {
@@ -88,7 +89,6 @@ class _HeaderControlState extends State<HeaderControl> {
               Expanded(
                   child: Material(
                 child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     ListTile(
                       onTap: () {},
@@ -182,8 +182,8 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择倍速
   void showSetSpeedSheet() {
     double currentSpeed = widget.controller!.playbackSpeed;
-    SmartDialog.show(
-      animationType: SmartAnimationType.centerFade_otherSlide,
+    showDialog(
+      context: Get.context!,
       builder: (context) {
         return AlertDialog(
           title: const Text('播放速度'),
@@ -196,12 +196,20 @@ class _HeaderControlState extends State<HeaderControl> {
                 for (var i in speedsList) ...[
                   if (i == currentSpeed) ...[
                     FilledButton(
-                      onPressed: () => {setState(() => currentSpeed = i)},
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        Get.back();
+                      },
                       child: Text(i.toString()),
                     ),
                   ] else ...[
                     FilledButton.tonal(
-                      onPressed: () => {setState(() => currentSpeed = i)},
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        Get.back();
+                      },
                       child: Text(i.toString()),
                     ),
                   ]
@@ -219,10 +227,10 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             TextButton(
               onPressed: () async {
-                await SmartDialog.dismiss();
-                widget.controller!.setPlaybackSpeed(currentSpeed);
+                await widget.controller!.setDefaultSpeed();
+                Get.back();
               },
-              child: const Text('确定'),
+              child: const Text('默认速度'),
             ),
           ],
         );
@@ -276,7 +284,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('选择画质', style: titleStyle),
-                      const SizedBox(width: 4),
+                      SizedBox(width: buttonSpace),
                       Icon(
                         Icons.info_outline,
                         size: 16,
@@ -793,7 +801,7 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             fuc: () => Get.back(),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.house,
@@ -838,7 +846,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           if (Platform.isAndroid) ...[
             SizedBox(
               width: 34,
@@ -870,7 +878,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: buttonSpace),
           ],
           Obx(
             () => SizedBox(
@@ -888,7 +896,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.sliders,

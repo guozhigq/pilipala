@@ -105,6 +105,8 @@ class SettingBoxKey {
   static const String enableAutoEnter = 'enableAutoEnter';
   static const String enableAutoExit = 'enableAutoExit';
   static const String p1080 = 'p1080';
+  static const String enableCDN = 'enableCDN';
+  static const String autoPiP = 'autoPiP';
 
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
@@ -124,6 +126,7 @@ class SettingBoxKey {
   static const String enableSearchWord = 'enableSearchWord';
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
   static const String enableSaveLastData = 'enableSaveLastData';
+  static const String enableSystemProxy = 'enableSystemProxy';
 
   /// 外观
   static const String themeMode = 'themeMode';
@@ -134,6 +137,7 @@ class SettingBoxKey {
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
   static const String displayMode = 'displayMode';
   static const String customRows = 'customRows'; // 自定义列
+  static const String enableMYBar = 'enableMYBar';
 }
 
 class LocalCacheKey {
@@ -152,6 +156,10 @@ class LocalCacheKey {
   static const String danmakuOpacity = 'danmakuOpacity';
   static const String danmakuFontScale = 'danmakuFontScale';
   static const String danmakuSpeed = 'danmakuSpeed';
+
+  // 代理host port
+  static const String systemProxyHost = 'systemProxyHost';
+  static const String systemProxyPort = 'systemProxyPort';
 }
 
 class VideoBoxKey {
@@ -169,4 +177,6 @@ class VideoBoxKey {
   static const String longPressSpeedDefault = 'longPressSpeedDefault';
   // 自定义倍速集合
   static const String customSpeedsList = 'customSpeedsList';
+  // 画面填充比例
+  static const String cacheVideoFit = 'cacheVideoFit';
 }

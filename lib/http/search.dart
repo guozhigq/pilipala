@@ -39,16 +39,25 @@ class SearchHttp {
   static Future searchSuggest({required term}) async {
     var res = await Request().get(Api.serachSuggest,
         data: {'term': term, 'main_ver': 'v1', 'highlight': term});
-    if (res.data['code'] == 0) {
-      if (res.data['result'] is Map) {
-        res.data['result']['term'] = term;
+    if (res.data is String) {
+      Map<String, dynamic> resultMap = json.decode(res.data);
+      if (resultMap['code'] == 0) {
+        if (resultMap['result'] is Map) {
+          resultMap['result']['term'] = term;
+        }
+        return {
+          'status': true,
+          'data': resultMap['result'] is Map
+              ? SearchSuggestModel.fromJson(resultMap['result'])
+              : [],
+        };
+      } else {
+        return {
+          'status': false,
+          'data': [],
+          'msg': '请求错误 🙅',
+        };
       }
-      return {
-        'status': true,
-        'data': res.data['result'] is Map
-            ? SearchSuggestModel.fromJson(res.data['result'])
-            : [],
-      };
     } else {
       return {
         'status': false,
