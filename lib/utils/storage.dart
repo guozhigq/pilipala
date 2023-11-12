@@ -34,7 +34,12 @@ class GStrorage {
       },
     );
     // 本地缓存
-    localCache = await Hive.openBox('localCache');
+    localCache = await Hive.openBox(
+      'localCache',
+      compactionStrategy: (entries, deletedEntries) {
+        return deletedEntries > 4;
+      },
+    );
     // 设置
     setting = await Hive.openBox('setting');
     // 搜索历史
@@ -99,9 +104,14 @@ class SettingBoxKey {
   static const String enableAutoBrightness = 'enableAutoBrightness';
   static const String enableAutoEnter = 'enableAutoEnter';
   static const String enableAutoExit = 'enableAutoExit';
+  static const String p1080 = 'p1080';
+  static const String enableCDN = 'enableCDN';
+  static const String autoPiP = 'autoPiP';
+
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';
   static const String enableShowDanmaku = 'enableShowDanmaku';
+  static const String enableBackgroundPlay = 'enableBackgroundPlay';
 
   /// 隐私
   static const String blackMidsList = 'blackMidsList';
@@ -113,6 +123,10 @@ class SettingBoxKey {
   static const String enableHotKey = 'enableHotKey';
   static const String enableQuickFav = 'enableQuickFav';
   static const String enableWordRe = 'enableWordRe';
+  static const String enableSearchWord = 'enableSearchWord';
+  static const String enableRcmdDynamic = 'enableRcmdDynamic';
+  static const String enableSaveLastData = 'enableSaveLastData';
+  static const String enableSystemProxy = 'enableSystemProxy';
 
   /// 外观
   static const String themeMode = 'themeMode';
@@ -121,6 +135,9 @@ class SettingBoxKey {
   static const String customColor = 'customColor'; // 自定义主题色
   static const String iosTransition = 'iosTransition'; // ios路由
   static const String enableSingleRow = 'enableSingleRow'; // 首页单列
+  static const String displayMode = 'displayMode';
+  static const String customRows = 'customRows'; // 自定义列
+  static const String enableMYBar = 'enableMYBar';
 }
 
 class LocalCacheKey {
@@ -132,6 +149,17 @@ class LocalCacheKey {
   //
   static const String wbiKeys = 'wbiKeys';
   static const String timeStamp = 'timeStamp';
+
+  // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕速度
+  static const String danmakuBlockType = 'danmakuBlockType';
+  static const String danmakuShowArea = 'danmakuShowArea';
+  static const String danmakuOpacity = 'danmakuOpacity';
+  static const String danmakuFontScale = 'danmakuFontScale';
+  static const String danmakuSpeed = 'danmakuSpeed';
+
+  // 代理host port
+  static const String systemProxyHost = 'systemProxyHost';
+  static const String systemProxyPort = 'systemProxyPort';
 }
 
 class VideoBoxKey {
@@ -141,4 +169,14 @@ class VideoBoxKey {
   static const String videoBrightness = 'videoBrightness';
   // 倍速
   static const String videoSpeed = 'videoSpeed';
+  // 播放顺序
+  static const String playRepeat = 'playRepeat';
+  // 默认倍速
+  static const String playSpeedDefault = 'playSpeedDefault';
+  // 默认长按倍速
+  static const String longPressSpeedDefault = 'longPressSpeedDefault';
+  // 自定义倍速集合
+  static const String customSpeedsList = 'customSpeedsList';
+  // 画面填充比例
+  static const String cacheVideoFit = 'cacheVideoFit';
 }

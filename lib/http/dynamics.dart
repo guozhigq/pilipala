@@ -28,6 +28,7 @@ class DynamicsHttp {
           'data': DynamicsDataModel.fromJson(res.data['data']),
         };
       } catch (err) {
+        print(err);
         return {
           'status': false,
           'data': [],
@@ -77,6 +78,37 @@ class DynamicsHttp {
         'status': true,
         'data': res.data['data'],
       };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  //
+  static Future dynamicDetail({
+    String? id,
+  }) async {
+    var res = await Request().get(Api.dynamicDetail, data: {
+      'timezone_offset': -480,
+      'id': id,
+      'features': 'itemOpusStyle',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': DynamicItemModel.fromJson(res.data['data']['item']),
+        };
+      } catch (err) {
+        return {
+          'status': false,
+          'data': [],
+          'msg': err.toString(),
+        };
+      }
     } else {
       return {
         'status': false,

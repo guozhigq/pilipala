@@ -20,14 +20,14 @@ class LiveController extends GetxController {
   void onInit() {
     super.onInit();
     crossAxisCount.value =
-        setting.get(SettingBoxKey.enableSingleRow, defaultValue: false) ? 1 : 2;
+        setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
 
   // 获取推荐
   Future queryLiveList(type) async {
-    if (type == 'init') {
-      _currentPage = 1;
-    }
+    // if (type == 'init') {
+    //   _currentPage = 1;
+    // }
     var res = await LiveHttp.liveList(
       pn: _currentPage,
     );

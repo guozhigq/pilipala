@@ -10,6 +10,7 @@ import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/pages/rcmd/index.dart';
 
 import 'controller.dart';
 import 'widgets/live_item.dart';
@@ -21,10 +22,14 @@ class LivePage extends StatefulWidget {
   State<LivePage> createState() => _LivePageState();
 }
 
-class _LivePageState extends State<LivePage> {
+class _LivePageState extends State<LivePage>
+    with AutomaticKeepAliveClientMixin {
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -37,7 +42,7 @@ class _LivePageState extends State<LivePage> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
+          EasyThrottle.throttle('liveList', const Duration(seconds: 1), () {
             _liveController.isLoadingMore = true;
             _liveController.onLoad();
           });
@@ -84,6 +89,9 @@ class _LivePageState extends State<LivePage> {
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == null) {
+                      return const SliverToBoxAdapter(child: SizedBox());
+                    }
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       return SliverLayoutBuilder(
@@ -111,7 +119,7 @@ class _LivePageState extends State<LivePage> {
                 },
               ),
             ),
-            const LoadingMore()
+            LoadingMore(ctr: _liveController)
           ],
         ),
       ),
@@ -141,9 +149,9 @@ class _LivePageState extends State<LivePage> {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace + 4,
+        mainAxisSpacing: StyleString.safeSpace,
         // 列间距
-        crossAxisSpacing: StyleString.cardSpace + 4,
+        crossAxisSpacing: StyleString.safeSpace,
         // 列数
         crossAxisCount: crossAxisCount,
         mainAxisExtent:
@@ -169,27 +177,6 @@ class _LivePageState extends State<LivePage> {
               : const VideoCardVSkeleton();
         },
         childCount: liveList!.isNotEmpty ? liveList!.length : 10,
-      ),
-    );
-  }
-}
-
-class LoadingMore extends StatelessWidget {
-  const LoadingMore({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        height: MediaQuery.of(context).padding.bottom + 80,
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-        child: Center(
-          child: Text(
-            '加载中...',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.outline, fontSize: 13),
-          ),
-        ),
       ),
     );
   }

@@ -16,8 +16,12 @@ class ExtraSetting extends StatefulWidget {
 
 class _ExtraSettingState extends State<ExtraSetting> {
   Box setting = GStrorage.setting;
+  static Box localCache = GStrorage.localCache;
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;
+  late dynamic enableSystemProxy;
+  late String defaultSystemProxyHost;
+  late String defaultSystemProxyPort;
 
   @override
   void initState() {
@@ -28,6 +32,86 @@ class _ExtraSettingState extends State<ExtraSetting> {
     // 优先展示全部动态 all
     defaultDynamicType =
         setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
+    enableSystemProxy =
+        setting.get(SettingBoxKey.enableSystemProxy, defaultValue: false);
+    defaultSystemProxyHost =
+        localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
+    defaultSystemProxyPort =
+        localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
+  }
+
+  // 设置代理
+  void twoFADialog() {
+    var systemProxyHost = '';
+    var systemProxyPort = '';
+
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('设置代理'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 6),
+              TextField(
+                decoration: InputDecoration(
+                  isDense: true,
+                  labelText: defaultSystemProxyHost != ''
+                      ? defaultSystemProxyHost
+                      : '请输入Host，使用 . 分割',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  hintText: defaultSystemProxyHost,
+                ),
+                onChanged: (e) {
+                  systemProxyHost = e;
+                },
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  isDense: true,
+                  labelText: defaultSystemProxyPort != ''
+                      ? defaultSystemProxyPort
+                      : '请输入Port',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  hintText: defaultSystemProxyPort,
+                ),
+                onChanged: (e) {
+                  systemProxyPort = e;
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                SmartDialog.dismiss();
+              },
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                localCache.put(LocalCacheKey.systemProxyHost, systemProxyHost);
+                localCache.put(LocalCacheKey.systemProxyPort, systemProxyPort);
+                SmartDialog.dismiss();
+                // Request.dio;
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -56,6 +140,18 @@ class _ExtraSettingState extends State<ExtraSetting> {
             callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
           const SetSwitchItem(
+            title: '搜索默认词',
+            subTitle: '是否展示搜索框默认词',
+            setKey: SettingBoxKey.enableSearchWord,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '推荐动态',
+            subTitle: '是否在推荐内容中展示动态',
+            setKey: SettingBoxKey.enableRcmdDynamic,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
             title: '快速收藏',
             subTitle: '点按收藏至默认，长按选择文件夹',
             setKey: SettingBoxKey.enableQuickFav,
@@ -65,6 +161,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             title: '评论区搜索关键词',
             subTitle: '展示评论区搜索关键词',
             setKey: SettingBoxKey.enableWordRe,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
+            title: '首页推荐刷新',
+            subTitle: '下拉刷新时保留上次内容',
+            setKey: SettingBoxKey.enableSaveLastData,
             defaultVal: false,
           ),
           ListTile(
@@ -115,6 +217,33 @@ class _ExtraSettingState extends State<ExtraSetting> {
                   ),
                 ]
               ],
+            ),
+          ),
+          ListTile(
+            enableFeedback: true,
+            onTap: () => twoFADialog(),
+            title: Text('设置代理', style: titleStyle),
+            subtitle: Text('设置代理 host:port', style: subTitleStyle),
+            trailing: Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                    (Set<MaterialState> states) {
+                  if (states.isNotEmpty &&
+                      states.first == MaterialState.selected) {
+                    return const Icon(Icons.done);
+                  }
+                  return null; // All other states will use the default thumbIcon.
+                }),
+                value: enableSystemProxy,
+                onChanged: (val) {
+                  setting.put(
+                      SettingBoxKey.enableSystemProxy, !enableSystemProxy);
+                  setState(() {
+                    enableSystemProxy = !enableSystemProxy;
+                  });
+                },
+              ),
             ),
           ),
           const SetSwitchItem(

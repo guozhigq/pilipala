@@ -4,8 +4,14 @@ class SearchText extends StatelessWidget {
   final String? searchText;
   final Function? onSelect;
   final int? searchTextIdx;
-  const SearchText(
-      {super.key, this.searchText, this.onSelect, this.searchTextIdx});
+  final Function? onLongSelect;
+  const SearchText({
+    super.key,
+    this.searchText,
+    this.onSelect,
+    this.searchTextIdx,
+    this.onLongSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +23,9 @@ class SearchText extends StatelessWidget {
         child: InkWell(
           onTap: () {
             onSelect!(searchText);
+          },
+          onLongPress: () {
+            onLongSelect!(searchText);
           },
           borderRadius: BorderRadius.circular(6),
           child: Padding(

@@ -39,10 +39,11 @@ class DynamicPanel extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                child: author(item, context),
+                child: AuthorPanel(item: item),
               ),
-              if (item!.modules!.moduleDynamic!.desc != null)
-                content(item, context, source),
+              if (item!.modules!.moduleDynamic!.desc != null ||
+                  item!.modules!.moduleDynamic!.major != null)
+                Content(item: item, source: source),
               forWard(item, context, _dynamicsController, source),
               const SizedBox(height: 2),
               if (source == null) ActionPanel(item: item),

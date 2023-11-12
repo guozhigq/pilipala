@@ -6,6 +6,7 @@ class SearchVideoModel {
   List<SearchVideoItemModel>? list;
   SearchVideoModel.fromJson(Map<String, dynamic> json) {
     list = json['result']
+        .where((e) => e['available'] == true)
         .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
         .toList();
   }
@@ -17,7 +18,7 @@ class SearchVideoItemModel {
     this.id,
     this.cid,
     // this.author,
-    // this.mid,
+    this.mid,
     // this.typeid,
     // this.typename,
     this.arcurl,
@@ -47,7 +48,7 @@ class SearchVideoItemModel {
   int? id;
   int? cid;
   // String? author;
-  // String? mid;
+  int? mid;
   // String? typeid;
   // String? typename;
   String? arcurl;
@@ -80,6 +81,7 @@ class SearchVideoItemModel {
     arcurl = json['arcurl'];
     aid = json['aid'];
     bvid = json['bvid'];
+    mid = json['mid'];
     // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     title = Em.regTitle(json['title']);
     description = json['description'];
@@ -374,5 +376,77 @@ class SearchMBangumiItemModel {
     mediaMode = json['media_mode'];
     mediaScore = json['media_score'];
     indexShow = json['index_show'];
+  }
+}
+
+class SearchArticleModel {
+  SearchArticleModel({this.list});
+
+  List<SearchArticleItemModel>? list;
+
+  SearchArticleModel.fromJson(Map<String, dynamic> json) {
+    list = json['result'] != null
+        ? json['result']
+            .map<SearchArticleItemModel>(
+                (e) => SearchArticleItemModel.fromJson(e))
+            .toList()
+        : [];
+  }
+}
+
+class SearchArticleItemModel {
+  SearchArticleItemModel({
+    this.pubTime,
+    this.like,
+    this.title,
+    this.subTitle,
+    this.rankOffset,
+    this.mid,
+    this.imageUrls,
+    this.id,
+    this.categoryId,
+    this.view,
+    this.reply,
+    this.desc,
+    this.rankScore,
+    this.type,
+    this.templateId,
+    this.categoryName,
+  });
+
+  int? pubTime;
+  int? like;
+  List? title;
+  String? subTitle;
+  int? rankOffset;
+  int? mid;
+  List? imageUrls;
+  int? id;
+  int? categoryId;
+  int? view;
+  int? reply;
+  String? desc;
+  int? rankScore;
+  String? type;
+  int? templateId;
+  String? categoryName;
+
+  SearchArticleItemModel.fromJson(Map<String, dynamic> json) {
+    pubTime = json['pub_time'];
+    like = json['like'];
+    title = Em.regTitle(json['title']);
+    subTitle = json['title'].replaceAll(RegExp(r'<[^>]*>'), '');
+    rankOffset = json['rank_offset'];
+    mid = json['mid'];
+    imageUrls = json['image_urls'];
+    id = json['id'];
+    categoryId = json['category_id'];
+    view = json['view'];
+    reply = json['reply'];
+    desc = json['desc'];
+    rankScore = json['rank_score'];
+    type = json['type'];
+    templateId = json['templateId'];
+    categoryName = json['category_name'];
   }
 }

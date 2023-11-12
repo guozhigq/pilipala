@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -14,13 +16,16 @@ import 'package:pilipala/pages/video/detail/replyReply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+
+import 'widgets/header_control.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
   /// 路由传参
   String bvid = Get.parameters['bvid']!;
-  int cid = int.parse(Get.parameters['cid']!);
+  RxInt cid = int.parse(Get.parameters['cid']!).obs;
   RxInt danmakuCid = 0.obs;
   String heroTag = Get.arguments['heroTag'];
   // 视频详情
@@ -76,6 +81,13 @@ class VideoDetailController extends GetxController
   bool enableHeart = true;
   var userInfo;
   late bool isFirstTime = true;
+  Floating? floating;
+  late PreferredSizeWidget headerControl;
+
+  late bool enableCDN;
+  late int? cacheVideoQa;
+  late String cacheDecode;
+  late int cacheAudioQa;
 
   @override
   void onInit() {
@@ -103,7 +115,26 @@ class VideoDetailController extends GetxController
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
     }
-    danmakuCid.value = cid;
+    danmakuCid.value = cid.value;
+
+    ///
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+    );
+    // CDN优化
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    // 预设的画质
+    cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa);
+    // 预设的解码格式
+    cacheDecode = setting.get(SettingBoxKey.defaultDecode,
+        defaultValue: VideoDecodeFormats.values.last.code);
+    cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
+        defaultValue: AudioQuality.hiRes.code);
   }
 
   showReplyReplyPanel() {
@@ -167,7 +198,13 @@ class VideoDetailController extends GetxController
     playerInit();
   }
 
-  Future playerInit({video, audio, seekToTime, duration}) async {
+  Future playerInit({
+    video,
+    audio,
+    seekToTime,
+    duration,
+    bool autoplay = true,
+  }) async {
     /// 设置/恢复 屏幕亮度
     if (brightness != null) {
       ScreenBrightness().setScreenBrightness(brightness!);
@@ -193,36 +230,35 @@ class VideoDetailController extends GetxController
       direction: (firstVideo.width! - firstVideo.height!) > 0
           ? 'horizontal'
           : 'vertical',
-      // 默认1倍速
-      speed: 1.0,
       bvid: bvid,
-      cid: cid,
+      cid: cid.value,
       enableHeart: enableHeart,
       isFirstTime: isFirstTime,
+      autoplay: autoplay,
     );
+
+    /// 开启自动全屏时，在player初始化完成后立即传入headerControl
+    plPlayerController.headerControl = headerControl;
   }
 
   // 视频链接
   Future queryVideoUrl() async {
-    var result = await VideoHttp.videoUrl(cid: cid, bvid: bvid);
+    var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
-
       List<VideoItem> allVideosList = data.dash!.video!;
-
       try {
         // 当前可播放的最高质量视频
         int currentHighVideoQa = allVideosList.first.quality!.code;
-        // 使用预设的画质 ｜ 当前可用的最高质量
-        int cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa,
-            defaultValue: currentHighVideoQa);
+        // 预设的画质为null，则当前可用的最高质量
+        cacheVideoQa ??= currentHighVideoQa;
         int resVideoQa = currentHighVideoQa;
-        if (cacheVideoQa <= currentHighVideoQa) {
+        if (cacheVideoQa! <= currentHighVideoQa) {
           // 如果预设的画质低于当前最高
           List<int> numbers = data.acceptQuality!
               .where((e) => e <= currentHighVideoQa)
               .toList();
-          resVideoQa = Utils.findClosestNumber(cacheVideoQa, numbers);
+          resVideoQa = Utils.findClosestNumber(cacheVideoQa!, numbers);
         }
         currentVideoQa = VideoQualityCode.fromCode(resVideoQa)!;
 
@@ -236,9 +272,7 @@ class VideoDetailController extends GetxController
         List supportDecodeFormats =
             supportFormats.firstWhere((e) => e.quality == resVideoQa).codecs!;
         // 默认从设置中取AVC
-        currentDecodeFormats = VideoDecodeFormatsCode.fromString(setting.get(
-            SettingBoxKey.defaultDecode,
-            defaultValue: VideoDecodeFormats.values.last.code))!;
+        currentDecodeFormats = VideoDecodeFormatsCode.fromString(cacheDecode)!;
         try {
           // 当前视频没有对应格式返回第一个
           bool flag = false;
@@ -250,8 +284,8 @@ class VideoDetailController extends GetxController
           currentDecodeFormats = flag
               ? currentDecodeFormats
               : VideoDecodeFormatsCode.fromString(supportDecodeFormats.first)!;
-        } catch (e) {
-          print(e);
+        } catch (err) {
+          SmartDialog.showToast('DecodeFormats error: $err');
         }
 
         /// 取出符合当前解码格式的videoItem
@@ -261,9 +295,11 @@ class VideoDetailController extends GetxController
         } catch (_) {
           firstVideo = videosList.first;
         }
-        videoUrl = firstVideo.baseUrl!;
+        videoUrl = enableCDN
+            ? VideoUtils.getCdnUrl(firstVideo)
+            : (firstVideo.backupUrl ?? firstVideo.baseUrl!);
       } catch (err) {
-        print(err);
+        SmartDialog.showToast('firstVideo error: $err');
       }
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
@@ -271,9 +307,6 @@ class VideoDetailController extends GetxController
       List<AudioItem> audiosList = data.dash!.audio!;
 
       try {
-        int resultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
-            defaultValue: AudioQuality.hiRes.code);
-
         if (data.dash!.dolby?.audio?.isNotEmpty == true) {
           // 杜比
           audiosList.insert(0, data.dash!.dolby!.audio!.first);
@@ -286,14 +319,23 @@ class VideoDetailController extends GetxController
 
         if (audiosList.isNotEmpty) {
           List<int> numbers = audiosList.map((map) => map.id!).toList();
-          int closestNumber = Utils.findClosestNumber(resultAudioQa, numbers);
+          int closestNumber = Utils.findClosestNumber(cacheAudioQa, numbers);
+          if (!numbers.contains(cacheAudioQa) &&
+              numbers.any((e) => e > cacheAudioQa)) {
+            closestNumber = 30280;
+          }
           firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
+        } else {
+          firstAudio = AudioItem();
         }
-      } catch (e) {
-        print(e);
+      } catch (err) {
+        firstAudio = audiosList.isNotEmpty ? audiosList.first : AudioItem();
+        SmartDialog.showToast('firstAudio error: $err');
       }
 
-      audioUrl = firstAudio!.baseUrl ?? '';
+      audioUrl = enableCDN
+          ? VideoUtils.getCdnUrl(firstAudio)
+          : (firstAudio.backupUrl ?? firstAudio.baseUrl!);
       //
       if (firstAudio.id != null) {
         currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;

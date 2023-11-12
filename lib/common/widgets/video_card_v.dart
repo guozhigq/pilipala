@@ -5,6 +5,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -26,6 +27,11 @@ class VideoCardV extends StatelessWidget {
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
+
+  bool isStringNumeric(String str) {
+    RegExp numericRegex = RegExp(r'^\d+$');
+    return numericRegex.hasMatch(str);
+  }
 
   void onPushDetail(heroTag) async {
     String goto = videoItem.goto;
@@ -61,6 +67,47 @@ class VideoCardV extends StatelessWidget {
           'pic': videoItem.pic,
           'heroTag': heroTag,
         });
+        break;
+      // 动态
+      case 'picture':
+        try {
+          String dynamicType = 'picture';
+          String uri = videoItem.uri;
+          String id = '';
+          if (videoItem.uri.startsWith('bilibili://article/')) {
+            // https://www.bilibili.com/read/cv27063554
+            dynamicType = 'read';
+            RegExp regex = RegExp(r'\d+');
+            Match match = regex.firstMatch(videoItem.uri)!;
+            String matchedNumber = match.group(0)!;
+            videoItem.param = int.parse(matchedNumber);
+            id = 'cv${videoItem.param}';
+          }
+          if (uri.startsWith('http')) {
+            String path = Uri.parse(uri).path;
+            if (isStringNumeric(path.split('/')[1])) {
+              // 请求接口
+              var res =
+                  await DynamicsHttp.dynamicDetail(id: path.split('/')[1]);
+              if (res['status']) {
+                Get.toNamed('/dynamicDetail', arguments: {
+                  'item': res['data'],
+                  'floor': 1,
+                  'action': 'detail'
+                });
+              }
+              return;
+            }
+          }
+          Get.toNamed('/htmlRender', parameters: {
+            'url': uri,
+            'title': videoItem.title,
+            'id': id,
+            'dynamicType': dynamicType
+          });
+        } catch (err) {
+          SmartDialog.showToast(err.toString());
+        }
         break;
       default:
         SmartDialog.showToast(videoItem.goto);
@@ -112,12 +159,22 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (crossAxisCount == 1 && videoItem.duration != null)
-                        PBadge(
-                          bottom: 10,
-                          right: 10,
-                          text: videoItem.duration,
-                        )
+                      if (videoItem.duration != null)
+                        if (crossAxisCount == 1) ...[
+                          PBadge(
+                            bottom: 10,
+                            right: 10,
+                            text: videoItem.duration,
+                          )
+                        ] else ...[
+                          PBadge(
+                            bottom: 6,
+                            right: 7,
+                            size: 'small',
+                            type: 'gray',
+                            text: videoItem.duration,
+                          )
+                        ],
                     ],
                   );
                 }),
@@ -174,7 +231,7 @@ class VideoContent extends StatelessWidget {
               ],
             ),
             if (crossAxisCount > 1) ...[
-              const SizedBox(height: 3),
+              const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
               ),
@@ -247,7 +304,7 @@ class VideoContent extends StatelessWidget {
                     },
                   ),
                 ] else ...[
-                  const SizedBox(height: 26)
+                  const SizedBox(height: 24)
                 ]
               ],
             ),
@@ -268,23 +325,18 @@ class VideoStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          '${videoItem.stat.view}观看',
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: Theme.of(context).colorScheme.outline,
-          ),
+    return RichText(
+      maxLines: 1,
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+          color: Theme.of(context).colorScheme.outline,
         ),
-        Text(
-          ' • ${videoItem.stat.danmu}弹幕',
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-      ],
+        children: [
+          TextSpan(text: '${videoItem.stat.view}观看'),
+          TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
+        ],
+      ),
     );
   }
 }

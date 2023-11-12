@@ -103,7 +103,10 @@
 				</array>
 			</dict>
 		</array>
+<<<<<<< HEAD
 		<!-- audio service配置 -->
+=======
+>>>>>>> main
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>audio</string>

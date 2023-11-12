@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class SetDiaplayMode extends StatefulWidget {
   const SetDiaplayMode({super.key});
@@ -14,6 +16,7 @@ class _SetDiaplayModeState extends State<SetDiaplayMode> {
   List<DisplayMode> modes = <DisplayMode>[];
   DisplayMode? active;
   DisplayMode? preferred;
+  Box setting = GStrorage.setting;
 
   final ValueNotifier<int> page = ValueNotifier<int>(0);
   late final PageController controller = PageController()
@@ -29,22 +32,34 @@ class _SetDiaplayModeState extends State<SetDiaplayMode> {
     });
   }
 
+  // 获取所有的mode
   Future<void> fetchAll() async {
     preferred = await FlutterDisplayMode.preferred;
     active = await FlutterDisplayMode.active;
-    // GStorage().setDisplayModeType(preferred!);
+    await setting.put(SettingBoxKey.displayMode, preferred.toString());
     setState(() {});
   }
 
+  // 初始化mode/手动设置
   Future<void> init() async {
     try {
       modes = await FlutterDisplayMode.supported;
     } on PlatformException catch (e) {
       print(e);
     }
-    // var res = await GStorage().getDisplayModeType();
-    // preferred = modes.toList().firstWhere((el) => el == res);
+    var res = await getDisplayModeType(modes);
+
+    preferred = modes.toList().firstWhere((el) => el == res);
     FlutterDisplayMode.setPreferredMode(preferred!);
+  }
+
+  Future<DisplayMode> getDisplayModeType(modes) async {
+    var value = setting.get(SettingBoxKey.displayMode);
+    DisplayMode f = DisplayMode.auto;
+    if (value != null) {
+      f = modes.firstWhere((e) => e.toString() == value);
+    }
+    return f;
   }
 
   @override

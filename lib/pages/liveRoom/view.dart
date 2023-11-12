@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
 import 'controller.dart';
+import 'widgets/bottom_control.dart';
 
 class LiveRoomPage extends StatefulWidget {
   const LiveRoomPage({super.key});
@@ -18,6 +22,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   bool isShowCover = true;
   bool isPlay = true;
+  Floating? floating;
 
   @override
   void initState() {
@@ -31,19 +36,24 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
         }
       },
     );
+    if (Platform.isAndroid) {
+      floating = Floating();
+    }
   }
 
   @override
   void dispose() {
     plPlayerController!.dispose();
+    if (floating != null) {
+      floating!.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
-
-    return Scaffold(
+    Widget childWhenDisabled = Scaffold(
       primary: true,
       appBar: AppBar(
         centerTitle: false,
@@ -87,98 +97,61 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       ),
       body: Column(
         children: [
-          Hero(
-            tag: _liveRoomController.heroTag,
-            child: Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: plPlayerController!.videoPlayerController != null
-                      ? PLVideoPlayer(controller: plPlayerController!)
-                      : const SizedBox(),
-                ),
-                // if (_liveRoomController.liveItem != null &&
-                //     _liveRoomController.liveItem.cover != null)
-                //   Visibility(
-                //     visible: isShowCover,
-                //     child: Positioned(
-                //       top: 0,
-                //       left: 0,
-                //       right: 0,
-                //       child: NetworkImgLayer(
-                //         type: 'emote',
-                //         src: _liveRoomController.liveItem.cover,
-                //         width: Get.size.width,
-                //         height: videoHeight,
-                //       ),
-                //     ),
-                //   ),
-              ],
-            ),
+          Stack(
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: plPlayerController!.videoPlayerController != null
+                    ? PLVideoPlayer(
+                        controller: plPlayerController!,
+                        bottomControl: BottomControl(
+                          controller: plPlayerController,
+                          liveRoomCtr: _liveRoomController,
+                          floating: floating,
+                        ),
+                      )
+                    : const SizedBox(),
+              ),
+              // if (_liveRoomController.liveItem != null &&
+              //     _liveRoomController.liveItem.cover != null)
+              //   Visibility(
+              //     visible: isShowCover,
+              //     child: Positioned(
+              //       top: 0,
+              //       left: 0,
+              //       right: 0,
+              //       child: NetworkImgLayer(
+              //         type: 'emote',
+              //         src: _liveRoomController.liveItem.cover,
+              //         width: Get.size.width,
+              //         height: videoHeight,
+              //       ),
+              //     ),
+              //   ),
+            ],
           ),
-          // Container(
-          //   height: 45,
-          //   padding: const EdgeInsets.only(left: 12, right: 12),
-          //   decoration: BoxDecoration(
-          //     color: Theme.of(context).colorScheme.background,
-          //     border: Border(
-          //       bottom: BorderSide(
-          //           color: Theme.of(context).dividerColor.withOpacity(0.1)),
-          //     ),
-          //   ),
-          //   child: Row(children: <Widget>[
-          //     SizedBox(
-          //       width: 38,
-          //       height: 38,
-          //       child: IconButton(
-          //         onPressed: () {},
-          //         icon: const Icon(
-          //           Icons.subtitles_outlined,
-          //           size: 21,
-          //         ),
-          //       ),
-          //     ),
-          //     const Spacer(),
-          //     SizedBox(
-          //       width: 38,
-          //       height: 38,
-          //       child: IconButton(
-          //         onPressed: () {},
-          //         icon: const Icon(
-          //           Icons.hd_outlined,
-          //           size: 20,
-          //         ),
-          //       ),
-          //     ),
-          //     SizedBox(
-          //       width: 38,
-          //       height: 38,
-          //       child: IconButton(
-          //         onPressed: () => _liveRoomController
-          //             .setVolumn(plPlayerController!.volume.value),
-          //         icon: Obx(() => Icon(
-          //               _liveRoomController.volumeOff.value
-          //                   ? Icons.volume_off_outlined
-          //                   : Icons.volume_up_outlined,
-          //               size: 21,
-          //             )),
-          //       ),
-          //     ),
-          //     SizedBox(
-          //       width: 38,
-          //       height: 38,
-          //       child: IconButton(
-          //         onPressed: () => {},
-          //         // plPlayerController!.goToFullscreen(context),
-          //         icon: const Icon(
-          //           Icons.fullscreen,
-          //         ),
-          //       ),
-          //     ),
-          //   ]),
-          // ),
         ],
       ),
     );
+    Widget childWhenEnabled = AspectRatio(
+      aspectRatio: 16 / 9,
+      child: plPlayerController!.videoPlayerController != null
+          ? PLVideoPlayer(
+              controller: plPlayerController!,
+              bottomControl: BottomControl(
+                controller: plPlayerController,
+                liveRoomCtr: _liveRoomController,
+              ),
+            )
+          : const SizedBox(),
+    );
+    if (Platform.isAndroid) {
+      return PiPSwitcher(
+        childWhenDisabled: childWhenDisabled,
+        childWhenEnabled: childWhenEnabled,
+      );
+    } else {
+      return childWhenDisabled;
+    }
   }
 }

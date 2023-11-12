@@ -3,17 +3,23 @@ class HistoryData {
     this.cursor,
     this.tab,
     this.list,
+    this.page,
   });
 
   Cursor? cursor;
   List<HisTabItem>? tab;
   List<HisListItem>? list;
+  Map? page;
 
   HistoryData.fromJson(Map<String, dynamic> json) {
-    cursor = Cursor.fromJson(json['cursor']);
-    tab = json['tab'].map<HisTabItem>((e) => HisTabItem.fromJson(e)).toList();
-    list =
-        json['list'].map<HisListItem>((e) => HisListItem.fromJson(e)).toList();
+    cursor = json['cursor'] != null ? Cursor.fromJson(json['cursor']) : null;
+    tab = json['tab'] != null
+        ? json['tab'].map<HisTabItem>((e) => HisTabItem.fromJson(e)).toList()
+        : [];
+    list = json['list'] != null
+        ? json['list'].map<HisListItem>((e) => HisListItem.fromJson(e)).toList()
+        : [];
+    page = json['page'];
   }
 }
 
@@ -79,6 +85,7 @@ class HisListItem {
     this.kid,
     this.tagName,
     this.liveStatus,
+    this.checked,
   });
 
   String? title;
@@ -105,6 +112,7 @@ class HisListItem {
   int? kid;
   String? tagName;
   int? liveStatus;
+  bool? checked;
 
   HisListItem.fromJson(Map<String, dynamic> json) {
     title = json['title'];
@@ -131,6 +139,7 @@ class HisListItem {
     kid = json['kid'];
     tagName = json['tag_name'];
     liveStatus = json['live_status'];
+    checked = false;
   }
 }
 

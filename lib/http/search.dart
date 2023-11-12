@@ -1,37 +1,63 @@
+import 'dart:convert';
+
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/result.dart';
 import 'package:pilipala/models/search/suggest.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class SearchHttp {
+  static Box setting = GStrorage.setting;
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
-    if (res.data['code'] == 0) {
+    if (res.data is String) {
+      Map<String, dynamic> resultMap = json.decode(res.data);
+      if (resultMap['code'] == 0) {
+        return {
+          'status': true,
+          'data': HotSearchModel.fromJson(resultMap),
+        };
+      }
+    } else if (res.data is Map<String, dynamic> && res.data['code'] == 0) {
       return {
         'status': true,
         'data': HotSearchModel.fromJson(res.data),
       };
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': '请求错误 🙅',
-      };
     }
+
+    return {
+      'status': false,
+      'data': [],
+      'msg': '请求错误 🙅',
+    };
   }
 
   // 获取搜索建议
   static Future searchSuggest({required term}) async {
     var res = await Request().get(Api.serachSuggest,
         data: {'term': term, 'main_ver': 'v1', 'highlight': term});
-    if (res.data['code'] == 0) {
-      res.data['result']['term'] = term;
-      return {
-        'status': true,
-        'data': SearchSuggestModel.fromJson(res.data['result']),
-      };
+    if (res.data is String) {
+      Map<String, dynamic> resultMap = json.decode(res.data);
+      if (resultMap['code'] == 0) {
+        if (resultMap['result'] is Map) {
+          resultMap['result']['term'] = term;
+        }
+        return {
+          'status': true,
+          'data': resultMap['result'] is Map
+              ? SearchSuggestModel.fromJson(resultMap['result'])
+              : [],
+        };
+      } else {
+        return {
+          'status': false,
+          'data': [],
+          'msg': '请求错误 🙅',
+        };
+      }
     } else {
       return {
         'status': false,
@@ -61,29 +87,44 @@ class SearchHttp {
     var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
       Object data;
-      switch (searchType) {
-        case SearchType.video:
-          data = SearchVideoModel.fromJson(res.data['data']);
-          break;
-        case SearchType.live_room:
-          data = SearchLiveModel.fromJson(res.data['data']);
-          break;
-        case SearchType.bili_user:
-          data = SearchUserModel.fromJson(res.data['data']);
-          break;
-        case SearchType.media_bangumi:
-          data = SearchMBangumiModel.fromJson(res.data['data']);
-          break;
+      try {
+        switch (searchType) {
+          case SearchType.video:
+            List<int> blackMidsList =
+                setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+            for (var i in res.data['data']['result']) {
+              // 屏蔽推广和拉黑用户
+              i['available'] = !blackMidsList.contains(i['mid']);
+            }
+            data = SearchVideoModel.fromJson(res.data['data']);
+            break;
+          case SearchType.live_room:
+            data = SearchLiveModel.fromJson(res.data['data']);
+            break;
+          case SearchType.bili_user:
+            data = SearchUserModel.fromJson(res.data['data']);
+            break;
+          case SearchType.media_bangumi:
+            data = SearchMBangumiModel.fromJson(res.data['data']);
+            break;
+          case SearchType.article:
+            data = SearchArticleModel.fromJson(res.data['data']);
+            break;
+        }
+        return {
+          'status': true,
+          'data': data,
+        };
+      } catch (err) {
+        print(err);
       }
-      return {
-        'status': true,
-        'data': data,
-      };
     } else {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['data']['numPages'] == 0 ? '没有相关数据' : '请求错误 🙅',
+        'msg': res.data['data'] != null && res.data['data']['numPages'] == 0
+            ? '没有相关数据'
+            : res.data['message'],
       };
     }
   }

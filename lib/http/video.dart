@@ -9,9 +9,11 @@ import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
 /// res.data['data'] 为结果
@@ -20,6 +22,9 @@ import 'package:pilipala/utils/storage.dart';
 class VideoHttp {
   static Box localCache = GStrorage.localCache;
   static Box setting = GStrorage.setting;
+  static bool enableRcmdDynamic =
+      setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
+  static Box userInfoCache = GStrorage.userInfo;
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
@@ -73,6 +78,7 @@ class VideoHttp {
         for (var i in res.data['data']['items']) {
           // 屏蔽推广和拉黑用户
           if (i['card_goto'] != 'ad_av' &&
+              (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
             list.add(RecVideoItemAppModel.fromJson(i));
@@ -130,6 +136,11 @@ class VideoHttp {
       // 'platform': '',
       // 'high_quality': ''
     };
+    // 免登录查看1080p
+    if (userInfoCache.get('userInfoCache') == null &&
+        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
+      data['try_look'] = 1;
+    }
     try {
       var res = await Request().get(Api.videoUrl, data: data);
       if (res.data['code'] == 0) {
@@ -409,6 +420,25 @@ class VideoHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    }
+  }
+
+  static Future aiConclusion({
+    String? bvid,
+    int? cid,
+    int? upMid,
+  }) async {
+    Map params = await WbiSign().makSign({
+      'bvid': bvid,
+      'cid': cid,
+      'up_mid': upMid,
+    });
+    var res = await Request().get(Api.aiConclusion, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': AiConclusionModel.fromJson(res.data['data']),
+      };
     }
   }
 }

@@ -244,7 +244,9 @@ class Vote {
     choiceCnt = json['choice_cnt'];
     share = json['share'];
     defaultShare = json['default_share'];
-    endTime = json['end_time'];
+    endTime = json['end_time'] is int
+        ? json['end_time']
+        : int.parse(json['end_time']);
     joinNum = json['join_num'];
     status = json['status'];
     type = json['type'];

@@ -97,6 +97,9 @@ class Api {
   // 操作用户关系
   static const String relationMod = '/x/relation/modify';
 
+  // 相互关系查询
+  static const String relationSearch = '/x/space/wbi/acc/relation';
+
   // 评论列表
   // https://api.bilibili.com/x/v2/reply/main?csrf=6e22efc1a47225ea25f901f922b5cfdd&mode=3&oid=254175381&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=0&type=11
   static const String replyList = '/x/v2/reply';
@@ -126,12 +129,14 @@ class Api {
   static const String userFavFolder = '/x/v3/fav/folder/created/list';
 
   /// 收藏夹 详情
-  /// media_id int 收藏夹id
+  /// media_id  当前收藏夹id 搜索全部时为默认收藏夹id
   /// pn int 当前页
   /// ps int pageSize
   /// keyword String 搜索词
   /// order String 排序方式 view 最多播放 mtime 最近收藏 pubtime 最近投稿
   /// tid int 分区id
+  /// platform web
+  /// type 0 当前收藏夹 1 全部收藏夹
   // https://api.bilibili.com/x/v3/fav/resource/list?media_id=76614671&pn=1&ps=20&keyword=&order=mtime&type=0&tid=0
   static const String userFavFolderDetail = '/x/v3/fav/resource/list';
 
@@ -163,6 +168,12 @@ class Api {
 
   // 清空历史记录
   static const String clearHistory = '/x/v2/history/clear';
+
+  // 删除某条历史记录
+  static const String delHistory = '/x/v2/history/delete';
+
+  // 搜索历史记录
+  static const String searchHistory = '/x/web-goblin/history/search';
 
   // 热搜
   static const String hotSearchList =
@@ -239,6 +250,9 @@ class Api {
   // wts=1689767832
   static const String memberArchive = '/x/space/wbi/arc/search';
 
+  // 用户动态搜索
+  static const String memberDynamicSearch = '/x/space/dynamic/search';
+
   // 用户动态
   static const String memberDynamic = '/x/polymer/web-dynamic/v1/feed/space';
 
@@ -285,6 +299,9 @@ class Api {
   // 黑名单
   static const String blackLst = '/x/relation/blacks';
 
+  // 移除黑名单
+  static const String removeBlack = '/x/relation/modify';
+
   // github 获取最新版
   static const String latestApp =
       'https://api.github.com/repos/guozhigq/pilipala/releases/latest';
@@ -294,4 +311,65 @@ class Api {
   static const String onlineTotal = '/x/player/online/total';
 
   static const String webDanmaku = '/x/v2/dm/web/seg.so';
+
+  // up主分组
+  static const String followUpTag = '/x/relation/tags';
+
+  // 设置Up主分组
+  // 0 添加至默认分组  否则使用,分割tagid
+  static const String addUsers = '/x/relation/tags/addUsers';
+
+  // 获取指定分组下的up
+  static const String followUpGroup = '/x/relation/tag';
+
+  // 获取某个动态详情
+  // timezone_offset=-480
+  // id=849312409672744983
+  // features=itemOpusStyle
+  static const String dynamicDetail = '/x/polymer/web-dynamic/v1/detail';
+
+  // AI总结
+  /// https://api.bilibili.com/x/web-interface/view/conclusion/get?
+  /// bvid=BV1ju4y1s7kn&
+  /// cid=1296086601&
+  /// up_mid=4641697&
+  /// w_rid=1607c6c5a4a35a1297e31992220900ae&
+  /// wts=1697033079
+  static const String aiConclusion = '/x/web-interface/view/conclusion/get';
+
+  // captcha验证码
+  static const String getCaptcha =
+      'https://passport.bilibili.com/x/passport-login/captcha?source=main_web';
+
+  // web端短信验证码
+  static const String smsCode =
+      'https://passport.bilibili.com/x/passport-login/web/sms/send';
+
+  // web端验证码登录
+
+  // web端密码登录
+
+  // app端短信验证码
+  static const String appSmsCode =
+      'https://passport.bilibili.com/x/passport-login/sms/send';
+
+  // app端验证码登录
+
+  // 获取短信验证码
+  // static const String appSafeSmsCode =
+  //     'https://passport.bilibili.com/x/safecenter/common/sms/send';
+
+  /// app端密码登录
+  /// username
+  /// password
+  /// key
+  /// rhash
+  static const String loginInByPwdApi =
+      'https://passport.bilibili.com/x/passport-login/oauth2/login';
+
+  /// 密码加密密钥
+  /// disable_rcmd
+  /// local_id
+  static const getWebKey =
+      'https://passport.bilibili.com/x/passport-login/web/key';
 }

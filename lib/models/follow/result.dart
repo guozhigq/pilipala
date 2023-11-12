@@ -8,7 +8,7 @@ class FollowDataModel {
   List<FollowItemModel>? list;
 
   FollowDataModel.fromJson(Map<String, dynamic> json) {
-    total = json['total'];
+    total = json['total'] ?? 0;
     list = json['list']
         .map<FollowItemModel>((e) => FollowItemModel.fromJson(e))
         .toList();
@@ -19,7 +19,7 @@ class FollowItemModel {
   FollowItemModel({
     this.mid,
     this.attribute,
-    this.mtime,
+    // this.mtime,
     this.tag,
     this.special,
     this.uname,
@@ -30,7 +30,7 @@ class FollowItemModel {
 
   int? mid;
   int? attribute;
-  int? mtime;
+  // int? mtime;
   List? tag;
   int? special;
   String? uname;
@@ -41,7 +41,7 @@ class FollowItemModel {
   FollowItemModel.fromJson(Map<String, dynamic> json) {
     mid = json['mid'];
     attribute = json['attribute'];
-    mtime = json['mtime'];
+    // mtime = json['mtime'];
     tag = json['tag'];
     special = json['special'];
     uname = json['uname'];

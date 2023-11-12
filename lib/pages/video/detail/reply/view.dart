@@ -39,6 +39,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   Future? _futureBuilderFuture;
   bool _isFabVisible = true;
   String replyLevel = '1';
+  late String heroTag;
 
   // 添加页面缓存
   @override
@@ -46,22 +47,29 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   void initState() {
-    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     super.initState();
+    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
+    heroTag = Get.arguments['heroTag'];
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
       _videoReplyController = Get.put(
           VideoReplyController(oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
     } else {
-      _videoReplyController = Get.put(VideoReplyController(oid, '', replyLevel),
-          tag: Get.arguments['heroTag']);
+      _videoReplyController =
+          Get.put(VideoReplyController(oid, '', replyLevel), tag: heroTag);
     }
 
     fabAnimationCtr = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
+
+    fabAnimationCtr.forward();
+    scrollListener();
+  }
+
+  void scrollListener() {
     scrollController = _videoReplyController.scrollController;
     scrollController.addListener(
       () {
@@ -81,7 +89,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         }
       },
     );
-    fabAnimationCtr.forward();
   }
 
   void _showFab() {
@@ -101,7 +108,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   // 展示二级回复
   void replyReply(replyItem) {
     VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+        Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
       videoDetailCtr.oid = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
@@ -112,9 +119,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   void dispose() {
-    super.dispose();
+    scrollController.removeListener(() {});
     fabAnimationCtr.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,7 +136,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       child: Stack(
         children: [
           CustomScrollView(
-            controller: _videoReplyController.scrollController,
+            controller: scrollController,
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(
@@ -187,7 +195,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
+                    var data = snapshot.data;
                     if (data['status']) {
                       // 请求成功
                       return Obx(

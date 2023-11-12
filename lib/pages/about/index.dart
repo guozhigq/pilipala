@@ -184,7 +184,7 @@ class AboutController extends GetxController {
 
   // 获取远程版本
   Future getRemoteApp() async {
-    var result = await Request().get(Api.latestApp);
+    var result = await Request().get(Api.latestApp, extra: {'ua': 'pc'});
     data = LatestDataModel.fromJson(result.data);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;

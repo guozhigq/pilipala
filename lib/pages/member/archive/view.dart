@@ -5,10 +5,12 @@ import 'package:loading_more_list/loading_more_list.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/pages/member/archive/index.dart';
+import 'package:pilipala/utils/utils.dart';
 import 'package:pull_to_refresh_notification/pull_to_refresh_notification.dart';
 
 class ArchivePanel extends StatefulWidget {
-  const ArchivePanel({super.key});
+  final int? mid;
+  const ArchivePanel({super.key, this.mid});
 
   @override
   State<ArchivePanel> createState() => _ArchivePanelState();
@@ -17,10 +19,20 @@ class ArchivePanel extends StatefulWidget {
 class _ArchivePanelState extends State<ArchivePanel>
     with AutomaticKeepAliveClientMixin {
   DateTime lastRefreshTime = DateTime.now();
-  late final LoadMoreListSource source = LoadMoreListSource();
+  late final LoadMoreListSource source;
+  late final ArchiveController _archiveController;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    print('🐶🐶： ${widget.mid}');
+    _archiveController = Get.put(ArchiveController(widget.mid),
+        tag: Utils.makeHeroTag(widget.mid));
+    source = LoadMoreListSource(_archiveController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +52,63 @@ class _ArchivePanelState extends State<ArchivePanel>
             //     return PullToRefreshHeader(info, lastRefreshTime);
             //   },
             // ),
-            const SizedBox(height: 4),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 14, top: 8, bottom: 8, right: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('排序方式'),
+                  SizedBox(
+                    height: 35,
+                    width: 85,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () {
+                        // _archiveController.order = 'click';
+                        // _archiveController.pn = 1;
+                        _archiveController.toggleSort();
+                        source.refresh(true);
+                        // LoadMoreListSource().loadData();
+                      },
+                      child: Obx(
+                        () => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                            _archiveController.currentOrder['label']!,
+                            key: ValueKey<String>(
+                                _archiveController.currentOrder['label']!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: LoadingMoreList<VListItemModel>(
                 ListConfig<VListItemModel>(
                   sourceList: source,
                   itemBuilder:
                       (BuildContext c, VListItemModel item, int index) {
-                    return VideoCardH(videoItem: item);
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          VideoCardH(videoItem: item)
+                        ],
+                      );
+                    } else {
+                      return VideoCardH(videoItem: item);
+                    }
                   },
                   indicatorBuilder: _buildIndicator,
                 ),
@@ -142,14 +203,18 @@ class _ArchivePanelState extends State<ArchivePanel>
 }
 
 class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
-  final ArchiveController _archiveController =
-      Get.put(ArchiveController(), tag: Get.arguments['heroTag']);
+  late ArchiveController ctr;
+  LoadMoreListSource(this.ctr);
+  bool forceRefresh = false;
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
     bool isSuccess = false;
-    var res = await _archiveController.getMemberArchive();
+    var res = await ctr.getMemberArchive();
     if (res['status']) {
+      if (ctr.pn == 2) {
+        clear();
+      }
       addAll(res['data'].list.vlist);
     }
     if (length < res['data'].page['count']) {
@@ -158,5 +223,18 @@ class LoadMoreListSource extends LoadingMoreBase<VListItemModel> {
       isSuccess = false;
     }
     return isSuccess;
+  }
+
+  @override
+  Future<bool> refresh([bool clearBeforeRequest = false]) async {
+    // _hasMore = true;
+    // pageindex = 1;
+    // //force to refresh list when you don't want clear list before request
+    // //for the case, if your list already has 20 items.
+    forceRefresh = !clearBeforeRequest;
+    var result = await super.refresh(clearBeforeRequest);
+
+    forceRefresh = false;
+    return result;
   }
 }

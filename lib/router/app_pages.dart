@@ -11,13 +11,18 @@ import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/fan/index.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/favDetail/index.dart';
+import 'package:pilipala/pages/fav_search/index.dart';
 import 'package:pilipala/pages/follow/index.dart';
 import 'package:pilipala/pages/history/index.dart';
+import 'package:pilipala/pages/history_search/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/index.dart';
+import 'package:pilipala/pages/html/index.dart';
 import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
+import 'package:pilipala/pages/login/index.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/pages/member_search/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
@@ -25,6 +30,7 @@ import 'package:pilipala/pages/setting/extra_setting.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/pages/display_mode.dart';
 import 'package:pilipala/pages/setting/pages/font_size_select.dart';
+import 'package:pilipala/pages/setting/pages/play_speed_set.dart';
 import 'package:pilipala/pages/setting/play_setting.dart';
 import 'package:pilipala/pages/setting/privacy_setting.dart';
 import 'package:pilipala/pages/setting/style_setting.dart';
@@ -48,13 +54,13 @@ class Routes {
     // 视频详情
     CustomGetPage(name: '/video', page: () => const VideoDetailPage()),
     // 图片预览
-    GetPage(
-      name: '/preview',
-      page: () => const ImagePreview(),
-      transition: Transition.fade,
-      transitionDuration: const Duration(milliseconds: 300),
-      showCupertinoParallax: false,
-    ),
+    // GetPage(
+    //   name: '/preview',
+    //   page: () => const ImagePreview(),
+    //   transition: Transition.fade,
+    //   transitionDuration: const Duration(milliseconds: 300),
+    //   showCupertinoParallax: false,
+    // ),
     //
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
@@ -86,6 +92,7 @@ class Routes {
     CustomGetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
     // 用户中心
     CustomGetPage(name: '/member', page: () => const MemberPage()),
+    CustomGetPage(name: '/memberSearch', page: () => const MemberSearchPage()),
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
@@ -108,8 +115,22 @@ class Routes {
         name: '/displayModeSetting', page: () => const SetDiaplayMode()),
     // 关于
     CustomGetPage(name: '/about', page: () => const AboutPage()),
+<<<<<<< HEAD
     // 音频播放
     CustomGetPage(name: '/audioPlayer', page: () => const AudioPlayerPage()),
+=======
+    //
+    CustomGetPage(name: '/htmlRender', page: () => const HtmlRenderPage()),
+    // 历史记录搜索
+    CustomGetPage(
+        name: '/historySearch', page: () => const HistorySearchPage()),
+
+    CustomGetPage(name: '/playSpeedSet', page: () => const PlaySpeedPage()),
+    // 收藏搜索
+    CustomGetPage(name: '/favSearch', page: () => const FavSearchPage()),
+    // 登录页面
+    CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
+>>>>>>> main
   ];
 }
 

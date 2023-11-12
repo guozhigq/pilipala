@@ -16,13 +16,16 @@ class FansPage extends StatefulWidget {
 }
 
 class _FansPageState extends State<FansPage> {
-  final FansController _fansController = Get.put(FansController());
+  late String mid;
+  late FansController _fansController;
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
+    mid = Get.parameters['mid']!;
+    _fansController = Get.put(FansController(), tag: mid);
     _futureBuilderFuture = _fansController.queryFans('init');
     scrollController.addListener(
       () async {

@@ -91,7 +91,10 @@ class _UpPanelState extends State<UpPanel> {
                 ),
                 Material(
                   child: InkWell(
-                    onTap: () => {feedBack(), Get.toNamed('/follow')},
+                    onTap: () => {
+                      feedBack(),
+                      Get.toNamed('/follow?mid=${userInfo.mid}')
+                    },
                     child: Container(
                       height: 100,
                       padding: const EdgeInsets.only(left: 10, right: 10),

@@ -149,10 +149,30 @@ class DynamicsController extends GetxController {
       case 'DYNAMIC_TYPE_ARTICLE':
         String title = item.modules.moduleDynamic.major.opus.title;
         String url = item.modules.moduleDynamic.major.opus.jumpUrl;
-        Get.toNamed(
-          '/webview',
-          parameters: {'url': 'https:$url', 'type': 'note', 'pageTitle': title},
-        );
+        if (url.contains('opus') || url.contains('read')) {
+          RegExp digitRegExp = RegExp(r'\d+');
+          Iterable<Match> matches = digitRegExp.allMatches(url);
+          String number = matches.first.group(0)!;
+          if (url.contains('read')) {
+            number = 'cv$number';
+          }
+          Get.toNamed('/htmlRender', parameters: {
+            'url': url.startsWith('//') ? url.split('//').last : url,
+            'title': title,
+            'id': number,
+            'dynamicType': url.split('//').last.split('/')[1]
+          });
+        } else {
+          Get.toNamed(
+            '/webview',
+            parameters: {
+              'url': 'https:$url',
+              'type': 'note',
+              'pageTitle': title
+            },
+          );
+        }
+
         break;
       case 'DYNAMIC_TYPE_PGC':
         print('番剧');

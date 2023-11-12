@@ -12,7 +12,7 @@ class SSearchController extends GetxController {
   final FocusNode searchFocusNode = FocusNode();
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
-  RxList<HotSearchItem> hotSearchList = [HotSearchItem()].obs;
+  RxList<HotSearchItem> hotSearchList = <HotSearchItem>[].obs;
   Box histiryWord = GStrorage.historyword;
   List historyCacheList = [];
   RxList historyList = [].obs;
@@ -27,7 +27,9 @@ class SSearchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    searchDefault();
+    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
+      searchDefault();
+    }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {
@@ -83,7 +85,9 @@ class SSearchController extends GetxController {
   // 获取热搜关键词
   Future queryHotSearchList() async {
     var result = await SearchHttp.hotSearchList();
-    hotSearchList.value = result['data'].list;
+    if (result['status']) {
+      hotSearchList.value = result['data'].list;
+    }
     return result;
   }
 
@@ -101,7 +105,9 @@ class SSearchController extends GetxController {
   Future querySearchSuggest(String value) async {
     var result = await SearchHttp.searchSuggest(term: value);
     if (result['status']) {
-      searchSuggestList.value = result['data'].tag;
+      if (result['data'] is SearchSuggestModel) {
+        searchSuggestList.value = result['data'].tag;
+      }
     }
   }
 
@@ -109,6 +115,13 @@ class SSearchController extends GetxController {
     searchKeyWord.value = word;
     controller.value.text = word;
     submit();
+  }
+
+  onLongSelect(word) {
+    int index = historyList.indexOf(word);
+    historyList.value = historyList.removeAt(index);
+    historyList.refresh();
+    histiryWord.put('cacheList', historyList);
   }
 
   onClearHis() {

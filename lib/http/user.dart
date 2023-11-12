@@ -8,6 +8,7 @@ import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/user/history.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
 
 class UserHttp {
   static Future<dynamic> userStat({required int mid}) async {
@@ -70,14 +71,15 @@ class UserHttp {
       required int pn,
       required int ps,
       String keyword = '',
-      String order = 'mtime'}) async {
+      String order = 'mtime',
+      int type = 0}) async {
     var res = await Request().get(Api.userFavFolderDetail, data: {
       'media_id': mediaId,
       'pn': pn,
       'ps': ps,
       'keyword': keyword,
       'order': order,
-      'type': 0,
+      'type': type,
       'tid': 0,
       'platform': 'web'
     });
@@ -227,6 +229,66 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': '操作完成'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 删除历史记录
+  static Future delHistory(kid) async {
+    var res = await Request().post(
+      Api.delHistory,
+      queryParameters: {
+        'kid': kid,
+        'jsonp': 'jsonp',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '已删除'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 相互关系查询
+  static Future relationSearch(int mid) async {
+    Map params = await WbiSign().makSign({
+      'mid': mid,
+      'token': '',
+      'platform': 'web',
+      'web_location': 1550101,
+    });
+    var res = await Request().get(
+      Api.relationSearch,
+      data: {
+        'mid': mid,
+        'w_rid': params['w_rid'],
+        'wts': params['wts'],
+      },
+    );
+    if (res.data['code'] == 0) {
+      // relation 主动状态
+      // 被动状态
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 搜索历史记录
+  static Future searchHistory(
+      {required int pn, required String keyword}) async {
+    var res = await Request().get(
+      Api.searchHistory,
+      data: {
+        'pn': pn,
+        'keyword': keyword,
+        'business': 'all',
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

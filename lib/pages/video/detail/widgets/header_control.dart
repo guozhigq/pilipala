@@ -1,18 +1,29 @@
+import 'dart:io';
+
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
+import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
+  final Floating? floating;
   const HeaderControl({
     this.controller,
     this.videoDetailCtr,
+    this.floating,
     Key? key,
   }) : super(key: key);
 
@@ -29,11 +40,16 @@ class _HeaderControlState extends State<HeaderControl> {
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
+  Box localCache = GStrorage.localCache;
+  Box videoStorage = GStrorage.video;
+  late List speedsList;
+  double buttonSpace = 8;
 
   @override
   void initState() {
     super.initState();
     videoInfo = widget.videoDetailCtr!.data;
+    speedsList = widget.controller!.speedsList;
   }
 
   /// 设置面板
@@ -45,7 +61,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (_) {
         return Container(
           width: double.infinity,
-          height: 400,
+          height: 440,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
@@ -73,7 +89,6 @@ class _HeaderControlState extends State<HeaderControl> {
               Expanded(
                   child: Material(
                 child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     ListTile(
                       onTap: () {},
@@ -138,17 +153,17 @@ class _HeaderControlState extends State<HeaderControl> {
                           '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
                           style: subTitleStyle),
                     ),
-                    // ListTile(
-                    //   onTap: () {},
-                    //   dense: true,
-                    //   enabled: false,
-                    //   leading: const Icon(Icons.play_circle_outline, size: 20),
-                    //   title: Text('播放设置', style: titleStyle),
-                    // ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
-                      enabled: false,
+                      leading: const Icon(Icons.repeat, size: 20),
+                      title: Text('播放顺序', style: titleStyle),
+                      subtitle: Text(widget.controller!.playRepeat.description,
+                          style: subTitleStyle),
+                    ),
+                    ListTile(
+                      onTap: () => {Get.back(), showSetDanmaku()},
+                      dense: true,
                       leading: const Icon(Icons.subtitles_outlined, size: 20),
                       title: Text('弹幕设置', style: titleStyle),
                     ),
@@ -167,26 +182,38 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择倍速
   void showSetSpeedSheet() {
     double currentSpeed = widget.controller!.playbackSpeed;
-    SmartDialog.show(
-      animationType: SmartAnimationType.centerFade_otherSlide,
+    showDialog(
+      context: Get.context!,
       builder: (context) {
         return AlertDialog(
           title: const Text('播放速度'),
-          contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           content: StatefulBuilder(builder: (context, StateSetter setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
+            return Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 8,
+              runSpacing: 2,
               children: [
-                Text('$currentSpeed倍'),
-                Slider(
-                  min: PlaySpeed.values.first.value,
-                  max: PlaySpeed.values.last.value,
-                  value: currentSpeed,
-                  divisions: PlaySpeed.values.length - 1,
-                  label: '${currentSpeed}x',
-                  onChanged: (double val) =>
-                      {setState(() => currentSpeed = val)},
-                )
+                for (var i in speedsList) ...[
+                  if (i == currentSpeed) ...[
+                    FilledButton(
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        Get.back();
+                      },
+                      child: Text(i.toString()),
+                    ),
+                  ] else ...[
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        // setState(() => currentSpeed = i),
+                        await widget.controller!.setPlaybackSpeed(i);
+                        Get.back();
+                      },
+                      child: Text(i.toString()),
+                    ),
+                  ]
+                ]
               ],
             );
           }),
@@ -200,10 +227,10 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             TextButton(
               onPressed: () async {
-                await SmartDialog.dismiss();
-                widget.controller!.setPlaybackSpeed(currentSpeed);
+                await widget.controller!.setDefaultSpeed();
+                Get.back();
               },
-              child: const Text('确定'),
+              child: const Text('默认速度'),
             ),
           ],
         );
@@ -257,7 +284,7 @@ class _HeaderControlState extends State<HeaderControl> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('选择画质', style: titleStyle),
-                      const SizedBox(width: 4),
+                      SizedBox(width: buttonSpace),
                       Icon(
                         Icons.info_outline,
                         size: 16,
@@ -454,6 +481,300 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  /// 弹幕功能
+  void showSetDanmaku() async {
+    // 屏蔽类型
+    List<Map<String, dynamic>> blockTypesList = [
+      {'value': 5, 'label': '顶部'},
+      {'value': 2, 'label': '滚动'},
+      {'value': 4, 'label': '底部'},
+      {'value': 6, 'label': '彩色'},
+    ];
+    List blockTypes = widget.controller!.blockTypes;
+    // 显示区域
+    List<Map<String, dynamic>> showAreas = [
+      {'value': 0.25, 'label': '1/4屏'},
+      {'value': 0.5, 'label': '半屏'},
+      {'value': 0.75, 'label': '3/4屏'},
+      {'value': 1.0, 'label': '满屏'},
+    ];
+    double showArea = widget.controller!.showArea;
+    // 不透明度
+    double opacityVal = widget.controller!.opacityVal;
+    // 字体大小
+    double fontSizeVal = widget.controller!.fontSizeVal;
+    // 弹幕速度
+    double danmakuSpeedVal = widget.controller!.danmakuSpeedVal;
+
+    DanmakuController danmakuController = widget.controller!.danmakuController!;
+    await showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, StateSetter setState) {
+          return Container(
+            width: double.infinity,
+            height: 580,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.only(left: 14, right: 14),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 45,
+                    child: Center(child: Text('弹幕设置', style: titleStyle)),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('按类型屏蔽'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 18),
+                    child: Row(
+                      children: [
+                        for (var i in blockTypesList) ...[
+                          ActionRowLineItem(
+                            onTap: () async {
+                              bool isChoose = blockTypes.contains(i['value']);
+                              if (isChoose) {
+                                blockTypes.remove(i['value']);
+                              } else {
+                                blockTypes.add(i['value']);
+                              }
+                              widget.controller!.blockTypes = blockTypes;
+                              setState(() {});
+                              try {
+                                DanmakuOption currentOption =
+                                    danmakuController.option;
+                                DanmakuOption updatedOption =
+                                    currentOption.copyWith(
+                                  hideTop: blockTypes.contains(5),
+                                  hideBottom: blockTypes.contains(4),
+                                  hideScroll: blockTypes.contains(2),
+                                  // 添加或修改其他需要修改的选项属性
+                                );
+                                danmakuController.updateOption(updatedOption);
+                              } catch (_) {}
+                            },
+                            text: i['label'],
+                            selectStatus: blockTypes.contains(i['value']),
+                          ),
+                          const SizedBox(width: 10),
+                        ]
+                      ],
+                    ),
+                  ),
+                  const Text('显示区域'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 18),
+                    child: Row(
+                      children: [
+                        for (var i in showAreas) ...[
+                          ActionRowLineItem(
+                            onTap: () {
+                              showArea = i['value'];
+                              widget.controller!.showArea = showArea;
+                              setState(() {});
+                              try {
+                                DanmakuOption currentOption =
+                                    danmakuController.option;
+                                DanmakuOption updatedOption =
+                                    currentOption.copyWith(area: i['value']);
+                                danmakuController.updateOption(updatedOption);
+                              } catch (_) {}
+                            },
+                            text: i['label'],
+                            selectStatus: showArea == i['value'],
+                          ),
+                          const SizedBox(width: 10),
+                        ]
+                      ],
+                    ),
+                  ),
+                  Text('不透明度 ${opacityVal * 100}%'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: 1,
+                        value: opacityVal,
+                        divisions: 10,
+                        label: '${opacityVal * 100}%',
+                        onChanged: (double val) {
+                          opacityVal = val;
+                          widget.controller!.opacityVal = opacityVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(opacity: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('字体大小 ${(fontSizeVal * 100).toStringAsFixed(1)}%'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0.5,
+                        max: 2.5,
+                        value: fontSizeVal,
+                        divisions: 20,
+                        label: '${(fontSizeVal * 100).toStringAsFixed(1)}%',
+                        onChanged: (double val) {
+                          fontSizeVal = val;
+                          widget.controller!.fontSizeVal = fontSizeVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(
+                              fontSize: (15 * fontSizeVal).toDouble(),
+                            );
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('弹幕时长 ${danmakuSpeedVal.toString()}'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 1,
+                        max: 8,
+                        value: danmakuSpeedVal,
+                        divisions: 14,
+                        label: danmakuSpeedVal.toString(),
+                        onChanged: (double val) {
+                          danmakuSpeedVal = val;
+                          widget.controller!.danmakuSpeedVal = danmakuSpeedVal;
+                          setState(() {});
+                          try {
+                            DanmakuOption currentOption =
+                                danmakuController.option;
+                            DanmakuOption updatedOption =
+                                currentOption.copyWith(duration: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  /// 播放顺序
+  void showSetRepeat() async {
+    showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          width: double.infinity,
+          height: 250,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.background,
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+          margin: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              SizedBox(
+                  height: 45,
+                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              Expanded(
+                child: Material(
+                  child: ListView(
+                    children: [
+                      for (var i in PlayRepeat.values) ...[
+                        ListTile(
+                          onTap: () {
+                            widget.controller!.setPlayRepeat(i);
+                            Get.back();
+                          },
+                          dense: true,
+                          contentPadding:
+                              const EdgeInsets.only(left: 20, right: 20),
+                          title: Text(i.description),
+                          trailing: widget.controller!.playRepeat == i
+                              ? Icon(
+                                  Icons.done,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              : const SizedBox(),
+                        )
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final _ = widget.controller!;
@@ -480,7 +801,7 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             fuc: () => Get.back(),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.house,
@@ -525,7 +846,40 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
+          if (Platform.isAndroid) ...[
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: IconButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                ),
+                onPressed: () async {
+                  bool canUsePiP = false;
+                  widget.controller!.hiddenControls(false);
+                  try {
+                    canUsePiP = await widget.floating!.isPipAvailable;
+                  } on PlatformException catch (_) {
+                    canUsePiP = false;
+                  }
+                  if (canUsePiP) {
+                    final aspectRatio = Rational(
+                      widget.videoDetailCtr!.data.dash!.video!.first.width!,
+                      widget.videoDetailCtr!.data.dash!.video!.first.height!,
+                    );
+                    await widget.floating!.enable(aspectRatio: aspectRatio);
+                  } else {}
+                },
+                icon: const Icon(
+                  Icons.picture_in_picture_outlined,
+                  size: 19,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(width: buttonSpace),
+          ],
           Obx(
             () => SizedBox(
               width: 45,
@@ -542,7 +896,7 @@ class _HeaderControlState extends State<HeaderControl> {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               FontAwesomeIcons.sliders,
@@ -554,5 +908,23 @@ class _HeaderControlState extends State<HeaderControl> {
         ],
       ),
     );
+  }
+}
+
+class MSliderTrackShape extends RoundedRectSliderTrackShape {
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    SliderThemeData? sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    const double trackHeight = 3;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2 + 4;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

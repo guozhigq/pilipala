@@ -7,9 +7,11 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
+import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -666,46 +668,71 @@ InlineSpan buildContent(
       // 匹配 jumpUrl
       String matchUrl = matchMember;
       if (content.jumpUrl.isNotEmpty && hasMatchMember) {
-        List urlKeys = content.jumpUrl.keys.toList();
+        List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
+        for (var index = 0; index < urlKeys.length; index++) {
+          var i = urlKeys[index];
+          if (i.contains('?')) {
+            urlKeys[index] = i.replaceAll('?', '\\?');
+          }
+        }
         matchUrl = matchMember.splitMapJoin(
           /// RegExp.escape() 转义特殊字符
-          RegExp(RegExp.escape(urlKeys.join("|"))),
+          RegExp(urlKeys.map((key) => key).join("|")),
+          // RegExp('What does the fox say\\?'),
           onMatch: (Match match) {
             String matchStr = match[0]!;
-            String appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+            String appUrlSchema = '';
+            if (content.jumpUrl[matchStr] != null) {
+              appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+            }
             // 默认不显示关键词
             bool enableWordRe =
                 setting.get(SettingBoxKey.enableWordRe, defaultValue: false);
-            spanChilds.add(
-              TextSpan(
-                text: content.jumpUrl[matchStr]['title'],
-                style: TextStyle(
-                  color: enableWordRe
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    if (appUrlSchema == '') {
-                      Get.toNamed(
-                        '/webview',
-                        parameters: {
-                          'url': matchStr,
-                          'type': 'url',
-                          'pageTitle': ''
-                        },
-                      );
-                    } else {
-                      if (appUrlSchema.startsWith('bilibili://search') &&
-                          enableWordRe) {
-                        Get.toNamed('/searchResult', parameters: {
-                          'keyword': content.jumpUrl[matchStr]['title']
-                        });
+            if (content.jumpUrl[matchStr] != null) {
+              spanChilds.add(
+                TextSpan(
+                  text: content.jumpUrl[matchStr]['title'],
+                  style: TextStyle(
+                    color: enableWordRe
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      if (appUrlSchema == '') {
+                        String str = Uri.parse(matchStr).pathSegments[0];
+                        Map matchRes = IdUtils.matchAvorBv(input: str);
+                        List matchKeys = matchRes.keys.toList();
+                        if (matchKeys.isNotEmpty) {
+                          if (matchKeys.first == 'BV') {
+                            Get.toNamed(
+                              '/searchResult',
+                              parameters: {'keyword': matchRes['BV']},
+                            );
+                          }
+                        } else {
+                          Get.toNamed(
+                            '/webview',
+                            parameters: {
+                              'url': matchStr,
+                              'type': 'url',
+                              'pageTitle': ''
+                            },
+                          );
+                        }
+                      } else {
+                        if (appUrlSchema.startsWith('bilibili://search') &&
+                            enableWordRe) {
+                          Get.toNamed('/searchResult', parameters: {
+                            'keyword': content.jumpUrl[matchStr]['title']
+                          });
+                        }
                       }
-                    }
-                  },
-              ),
-            );
+                    },
+                ),
+              );
+            }
+
             if (appUrlSchema.startsWith('bilibili://search') && enableWordRe) {
               spanChilds.add(
                 WidgetSpan(
@@ -743,11 +770,14 @@ InlineSpan buildContent(
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   // 跳转到指定位置
-                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-                      .plPlayerController
-                      .seekTo(
-                        Duration(seconds: Utils.duration(matchStr)),
-                      );
+                  try {
+                    Get.find<VideoDetailController>(
+                            tag: Get.arguments['heroTag'])
+                        .plPlayerController
+                        .seekTo(
+                          Duration(seconds: Utils.duration(matchStr)),
+                        );
+                  } catch (_) {}
                 },
             ),
           );
@@ -773,7 +803,7 @@ InlineSpan buildContent(
 
   // 图片渲染
   if (content.pictures.isNotEmpty) {
-    List picList = [];
+    List<String> picList = [];
     int len = content.pictures.length;
     if (len == 1) {
       Map pictureItem = content.pictures.first;
@@ -785,8 +815,13 @@ InlineSpan buildContent(
             builder: (context, BoxConstraints box) {
               return GestureDetector(
                 onTap: () {
-                  Get.toNamed('/preview',
-                      arguments: {'initialPage': 0, 'imgList': picList});
+                  showDialog(
+                    useSafeArea: false,
+                    context: context,
+                    builder: (context) {
+                      return ImagePreview(initialPage: 0, imgList: picList);
+                    },
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -814,8 +849,13 @@ InlineSpan buildContent(
             builder: (context, BoxConstraints box) {
               return GestureDetector(
                 onTap: () {
-                  Get.toNamed('/preview',
-                      arguments: {'initialPage': i, 'imgList': picList});
+                  showDialog(
+                    useSafeArea: false,
+                    context: context,
+                    builder: (context) {
+                      return ImagePreview(initialPage: i, imgList: picList);
+                    },
+                  );
                 },
                 child: NetworkImgLayer(
                   src: content.pictures[i]['img_src'],

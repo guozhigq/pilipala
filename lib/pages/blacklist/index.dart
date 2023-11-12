@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -60,7 +61,7 @@ class _BlackListPageState extends State<BlackListPage> {
         centerTitle: false,
         title: Obx(
           () => Text(
-            '黑名单管理 （${_blackListController.blackList.length} / 5000）',
+            '黑名单管理 - ${_blackListController.total.value}',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -104,10 +105,11 @@ class _BlackListPageState extends State<BlackListPage> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               dense: true,
-                              // trailing: TextButton(
-                              //   onPressed: () {},
-                              //   child: const Text('移除'),
-                              // ),
+                              trailing: TextButton(
+                                onPressed: () => _blackListController
+                                    .removeBlack(list[index].mid),
+                                child: const Text('移除'),
+                              ),
                             );
                           },
                         ),
@@ -136,6 +138,7 @@ class _BlackListPageState extends State<BlackListPage> {
 class BlackListController extends GetxController {
   int currentPage = 1;
   int pageSize = 50;
+  RxInt total = 0.obs;
   RxList<BlackListItem> blackList = [BlackListItem()].obs;
 
   Future queryBlacklist({type = 'init'}) async {
@@ -146,6 +149,7 @@ class BlackListController extends GetxController {
     if (result['status']) {
       if (type == 'init') {
         blackList.value = result['data'].list;
+        total.value = result['data'].total;
       } else {
         blackList.addAll(result['data'].list);
       }
@@ -153,5 +157,14 @@ class BlackListController extends GetxController {
       currentPage += 1;
     }
     return result;
+  }
+
+  Future removeBlack(mid) async {
+    var result = await BlackHttp.removeBlack(fid: mid);
+    if (result['status']) {
+      blackList.removeWhere((e) => e.mid == mid);
+      total.value = total.value - 1;
+      SmartDialog.showToast(result['msg']);
+    }
   }
 }

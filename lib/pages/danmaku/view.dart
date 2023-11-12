@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -29,6 +30,11 @@ class _PlDanmakuState extends State<PlDanmaku> {
   bool danmuPlayStatus = true;
   Box setting = GStrorage.setting;
   late bool enableShowDanmaku;
+  late List blockTypes;
+  late double showArea;
+  late double opacityVal;
+  late double fontSizeVal;
+  late double danmakuSpeedVal;
 
   @override
   void initState() {
@@ -58,6 +64,11 @@ class _PlDanmakuState extends State<PlDanmaku> {
         }
       }
     });
+    blockTypes = playerController.blockTypes;
+    showArea = playerController.showArea;
+    opacityVal = playerController.opacityVal;
+    fontSizeVal = playerController.fontSizeVal;
+    danmakuSpeedVal = playerController.danmakuSpeedVal;
   }
 
   // 播放器状态监听
@@ -75,11 +86,22 @@ class _PlDanmakuState extends State<PlDanmaku> {
       _controller!.onResume();
       danmuPlayStatus = true;
     }
-    PlDanmakuController ctr = _plDanmakuController;
-    int currentPosition = position.inMilliseconds;
-
     if (!playerController.isOpenDanmu.value) {
       return;
+    }
+    PlDanmakuController ctr = _plDanmakuController;
+    int currentPosition = position.inMilliseconds;
+    blockTypes = playerController.blockTypes;
+    // 根据position判断是否有已缓存弹幕。没有则请求对应段
+    int segIndex = (currentPosition / (6 * 60 * 1000)).ceil();
+    segIndex = segIndex < 1 ? 1 : segIndex;
+    if (ctr.dmSegList[segIndex - 1].elems.isEmpty &&
+        !ctr.hasrequestSeg.contains(segIndex - 1)) {
+      ctr.hasrequestSeg.add(segIndex - 1);
+      ctr.currentSegIndex = segIndex;
+      EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
+        ctr.queryDanmaku();
+      });
     }
     // 超出分段数返回
     if (ctr.currentSegIndex >= ctr.dmSegList.length) {
@@ -99,14 +121,17 @@ class _PlDanmakuState extends State<PlDanmaku> {
     var delta = currentPosition - element.progress;
 
     if (delta >= 0 && delta < 200) {
-      _controller!.addItems([
-        DanmakuItem(
-          element.content,
-          color: DmUtils.decimalToColor(element.color),
-          time: element.progress,
-          type: DmUtils.getPosition(element.mode),
-        )
-      ]);
+      // 屏蔽彩色弹幕
+      if (blockTypes.contains(6) ? element.color == 16777215 : true) {
+        _controller!.addItems([
+          DanmakuItem(
+            element.content,
+            color: DmUtils.decimalToColor(element.color),
+            time: element.progress,
+            type: DmUtils.getPosition(element.mode),
+          )
+        ]);
+      }
       ctr.currentDmIndex++;
     } else {
       if (!playerController.isOpenDanmu.value) {
@@ -126,22 +151,30 @@ class _PlDanmakuState extends State<PlDanmaku> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => AnimatedOpacity(
-        opacity: playerController.isOpenDanmu.value ? 1 : 0,
-        duration: const Duration(milliseconds: 100),
-        child: DanmakuView(
-          createdController: (DanmakuController e) async {
-            widget.playerController.danmakuController = _controller = e;
-          },
-          option: DanmakuOption(
-            fontSize: 15,
-            area: 0.5,
-            duration: 5,
+    return LayoutBuilder(builder: (context, box) {
+      double initDuration = box.maxWidth / 12;
+      return Obx(
+        () => AnimatedOpacity(
+          opacity: playerController.isOpenDanmu.value ? 1 : 0,
+          duration: const Duration(milliseconds: 100),
+          child: DanmakuView(
+            createdController: (DanmakuController e) async {
+              widget.playerController.danmakuController = _controller = e;
+            },
+            option: DanmakuOption(
+              fontSize: 15 * fontSizeVal,
+              area: showArea,
+              opacity: opacityVal,
+              hideTop: blockTypes.contains(5),
+              hideScroll: blockTypes.contains(2),
+              hideBottom: blockTypes.contains(4),
+              duration: initDuration /
+                  (danmakuSpeedVal * widget.playerController.playbackSpeed),
+            ),
+            statusChanged: (isPlaying) {},
           ),
-          statusChanged: (isPlaying) {},
         ),
-      ),
-    );
+      );
+    });
   }
 }

@@ -16,10 +16,15 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
-  - image_gallery_saver (2.0.2):
+  - gt3_flutter_plugin (0.0.8):
     - Flutter
+<<<<<<< HEAD
   - just_audio (0.0.1):
     - Flutter
+=======
+    - GT3Captcha-iOS
+  - GT3Captcha-iOS (0.15.8.3)
+>>>>>>> main
   - media_kit_libs_ios_video (1.0.4):
     - Flutter
   - media_kit_native_event_loop (1.0.0):
@@ -34,6 +39,8 @@ PODS:
   - permission_handler_apple (9.1.1):
     - Flutter
   - ReachabilitySwift (5.0.0)
+  - saver_gallery (0.0.1):
+    - Flutter
   - screen_brightness_ios (0.1.0):
     - Flutter
   - share_plus (0.0.1):
@@ -42,6 +49,8 @@ PODS:
     - Flutter
     - FMDB (>= 2.7.5)
   - status_bar_control (3.2.1):
+    - Flutter
+  - system_proxy (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
@@ -62,18 +71,24 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_volume_controller (from `.symlinks/plugins/flutter_volume_controller/ios`)
+<<<<<<< HEAD
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
+=======
+  - gt3_flutter_plugin (from `.symlinks/plugins/gt3_flutter_plugin/ios`)
+>>>>>>> main
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - saver_gallery (from `.symlinks/plugins/saver_gallery/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - status_bar_control (from `.symlinks/plugins/status_bar_control/ios`)
+  - system_proxy (from `.symlinks/plugins/system_proxy/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
@@ -83,6 +98,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - FMDB
+    - GT3Captcha-iOS
     - ReachabilitySwift
 
 EXTERNAL SOURCES:
@@ -100,10 +116,15 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_volume_controller:
     :path: ".symlinks/plugins/flutter_volume_controller/ios"
+<<<<<<< HEAD
   image_gallery_saver:
     :path: ".symlinks/plugins/image_gallery_saver/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
+=======
+  gt3_flutter_plugin:
+    :path: ".symlinks/plugins/gt3_flutter_plugin/ios"
+>>>>>>> main
   media_kit_libs_ios_video:
     :path: ".symlinks/plugins/media_kit_libs_ios_video/ios"
   media_kit_native_event_loop:
@@ -116,6 +137,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  saver_gallery:
+    :path: ".symlinks/plugins/saver_gallery/ios"
   screen_brightness_ios:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
   share_plus:
@@ -124,6 +147,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite/ios"
   status_bar_control:
     :path: ".symlinks/plugins/status_bar_control/ios"
+  system_proxy:
+    :path: ".symlinks/plugins/system_proxy/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   volume_controller:
@@ -144,8 +169,13 @@ SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+<<<<<<< HEAD
   image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
+=======
+  gt3_flutter_plugin: bfa1f26e9a09dc00401514be5ed437f964cabf23
+  GT3Captcha-iOS: 5e3b1077834d8a9d6f4d64a447a30af3e14affe6
+>>>>>>> main
   media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
   media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
@@ -153,10 +183,12 @@ SPEC CHECKSUMS:
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
+  saver_gallery: 2b4e584106fde2407ab51560f3851564963e6b78
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   share_plus: 599aa54e4ea31d4b4c0e9c911bcc26c55e791028
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   status_bar_control: 7c84146799e6a076315cc1550f78ef53aae3e446
+  system_proxy: bec1a5c5af67dd3e3ebf43979400a8756c04cc44
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 
 class PagesPanel extends StatefulWidget {
   final List<Part> pages;
@@ -22,13 +23,23 @@ class PagesPanel extends StatefulWidget {
 
 class _PagesPanelState extends State<PagesPanel> {
   late List<Part> episodes;
+  late int cid;
   late int currentIndex;
+  String heroTag = Get.arguments['heroTag'];
+  late VideoDetailController _videoDetailController;
 
   @override
   void initState() {
     super.initState();
+    cid = widget.cid!;
     episodes = widget.pages;
-    currentIndex = episodes.indexWhere((e) => e.cid == widget.cid);
+    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
+    currentIndex = episodes.indexWhere((e) => e.cid == cid);
+    _videoDetailController.cid.listen((p0) {
+      cid = p0;
+      setState(() {});
+      currentIndex = episodes.indexWhere((e) => e.cid == cid);
+    });
   }
 
   void changeFucCall(item, i) async {

@@ -8,13 +8,17 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
+import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
+
+import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
   // 视频bvid
@@ -58,11 +62,16 @@ class VideoIntroController extends GetxController {
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
+  String heroTag = '';
+  late ModelResult modelResult;
 
   @override
   void onInit() {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
+    try {
+      heroTag = Get.arguments['heroTag'];
+    } catch (_) {}
     if (Get.arguments.isNotEmpty) {
       if (Get.arguments.containsKey('videoItem')) {
         preRender = true;
@@ -102,9 +111,10 @@ class VideoIntroController extends GetxController {
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
-      Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-          .tabs
-          .value = ['简介', '评论 ${result['data']!.stat!.reply}'];
+      // Get.find<VideoDetailController>(tag: heroTag).tabs.value = [
+      //   '简介',
+      //   '评论 ${result['data']!.stat!.reply}'
+      // ];
       // 获取到粉丝数再返回
       await queryUserStat();
     }
@@ -330,7 +340,8 @@ class VideoIntroController extends GetxController {
 
   // 分享视频
   Future actionShareVideo() async {
-    var result = await Share.share('${HttpString.baseUrl}/video/$bvid')
+    var result = await Share.share(
+            '${videoDetail.value.title} - ${HttpString.baseUrl}/video/$bvid')
         .whenComplete(() {});
     return result;
   }
@@ -424,6 +435,20 @@ class VideoIntroController extends GetxController {
                   }
                   followStatus['attribute'] = actionStatus;
                   followStatus.refresh();
+                  if (actionStatus == 2) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('关注成功'),
+                          duration: const Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: '设置分组',
+                            onPressed: setFollowGroup,
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 }
                 SmartDialog.dismiss();
               },
@@ -439,16 +464,16 @@ class VideoIntroController extends GetxController {
   Future changeSeasonOrbangu(bvid, cid, aid) async {
     // 重新获取视频资源
     VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+        Get.find<VideoDetailController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
-    videoDetailCtr.cid = cid;
+    videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
       VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
+          Get.find<VideoReplyController>(tag: heroTag);
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
@@ -484,5 +509,75 @@ class VideoIntroController extends GetxController {
       timer!.cancel(); // 销毁页面时取消定时器
     }
     super.onClose();
+  }
+
+  /// 列表循环或者顺序播放时，自动播放下一个
+  void nextPlay() {
+    late List episodes;
+    bool isPages = false;
+    if (videoDetail.value.ugcSeason != null) {
+      UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      List<SectionItem> sections = ugcSeason.sections!;
+      episodes = [];
+
+      for (int i = 0; i < sections.length; i++) {
+        List<EpisodeItem> episodesList = sections[i].episodes!;
+        episodes.addAll(episodesList);
+      }
+    } else if (videoDetail.value.pages != null) {
+      isPages = true;
+      List<Part> pages = videoDetail.value.pages!;
+      episodes = [];
+      episodes.addAll(pages);
+    }
+
+    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    int nextIndex = currentIndex + 1;
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    // 列表循环
+    if (nextIndex >= episodes.length) {
+      if (platRepeat == PlayRepeat.listCycle) {
+        nextIndex = 0;
+      }
+      if (platRepeat == PlayRepeat.listOrder) {
+        return;
+      }
+    }
+    int cid = episodes[nextIndex].cid!;
+    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    changeSeasonOrbangu(rBvid, cid, rAid);
+  }
+
+  // 设置关注分组
+  void setFollowGroup() {
+    Get.bottomSheet(
+      GroupPanel(mid: videoDetail.value.owner!.mid!),
+      isScrollControlled: true,
+    );
+  }
+
+  // ai总结
+  Future aiConclusion() async {
+    SmartDialog.showLoading(msg: '正在生产ai总结');
+    var res = await VideoHttp.aiConclusion(
+      bvid: bvid,
+      cid: lastPlayCid.value,
+      upMid: videoDetail.value.owner!.mid!,
+    );
+    if (res['status']) {
+      if (res['data'].modelResult.resultType == 0) {
+        SmartDialog.showToast('该视频不支持ai总结');
+      }
+      if (res['data'].modelResult.resultType == 2 ||
+          res['data'].modelResult.resultType == 1) {
+        modelResult = res['data'].modelResult;
+      }
+    }
+    SmartDialog.dismiss();
+    return res;
   }
 }

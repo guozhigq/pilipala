@@ -29,11 +29,13 @@ import 'widgets/forward_seek.dart';
 class PLVideoPlayer extends StatefulWidget {
   final PlPlayerController controller;
   final PreferredSizeWidget? headerControl;
+  final PreferredSizeWidget? bottomControl;
   final Widget? danmuWidget;
 
   const PLVideoPlayer({
     required this.controller,
     this.headerControl,
+    this.bottomControl,
     this.danmuWidget,
     super.key,
   });
@@ -46,48 +48,47 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     with TickerProviderStateMixin {
   late AnimationController animationController;
   late VideoController videoController;
+  final PLVideoPlayerController _ctr = Get.put(PLVideoPlayerController());
 
-  bool _mountSeekBackwardButton = false;
-  bool _mountSeekForwardButton = false;
-  bool _hideSeekBackwardButton = false;
-  bool _hideSeekForwardButton = false;
+  // bool _mountSeekBackwardButton = false;
+  // bool _mountSeekForwardButton = false;
+  // bool _hideSeekBackwardButton = false;
+  // bool _hideSeekForwardButton = false;
 
-  double _brightnessValue = 0.0;
-  bool _brightnessIndicator = false;
+  // double _brightnessValue = 0.0;
+  // bool _brightnessIndicator = false;
   Timer? _brightnessTimer;
 
-  double _volumeValue = 0.0;
-  bool _volumeIndicator = false;
+  // double _volumeValue = 0.0;
+  // bool _volumeIndicator = false;
   Timer? _volumeTimer;
 
   double _distance = 0.0;
   // 初始手指落下位置
   double _initTapPositoin = 0.0;
 
-  bool _volumeInterceptEventStream = false;
+  // bool _volumeInterceptEventStream = false;
 
   Box setting = GStrorage.setting;
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
+  late bool enableBackgroundPlay;
+  late double screenWidth;
 
   void onDoubleTapSeekBackward() {
-    setState(() {
-      _mountSeekBackwardButton = true;
-    });
+    _ctr.onDoubleTapSeekBackward();
   }
 
   void onDoubleTapSeekForward() {
-    setState(() {
-      _mountSeekForwardButton = true;
-    });
+    _ctr.onDoubleTapSeekForward();
   }
 
   // 双击播放、暂停
   void onDoubleTapCenter() {
     final _ = widget.controller;
-    if (_.playerStatus.status.value == PlayerStatus.playing) {
-      _.togglePlay();
+    if (_.videoPlayerController!.state.playing) {
+      _.pause();
     } else {
       _.play();
     }
@@ -116,25 +117,26 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void initState() {
     super.initState();
+    screenWidth = Get.size.width;
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
+    widget.controller.bottomControl = widget.bottomControl;
     widget.controller.danmuWidget = widget.danmuWidget;
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
     enableQuickDouble =
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
-
+    enableBackgroundPlay =
+        setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     Future.microtask(() async {
       try {
         FlutterVolumeController.showSystemUI = true;
-        _volumeValue = (await FlutterVolumeController.getVolume())!;
+        _ctr.volumeValue.value = (await FlutterVolumeController.getVolume())!;
         FlutterVolumeController.addListener((value) {
-          if (mounted && !_volumeInterceptEventStream) {
-            setState(() {
-              _volumeValue = value;
-            });
+          if (mounted && !_ctr.volumeInterceptEventStream.value) {
+            _ctr.volumeValue.value = value;
           }
         });
       } catch (_) {}
@@ -142,12 +144,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
     Future.microtask(() async {
       try {
-        _brightnessValue = await ScreenBrightness().current;
+        _ctr.brightnessValue.value = await ScreenBrightness().current;
         ScreenBrightness().onCurrentBrightnessChanged.listen((value) {
           if (mounted) {
-            setState(() {
-              _brightnessValue = value;
-            });
+            _ctr.brightnessValue.value = value;
           }
         });
       } catch (_) {}
@@ -159,18 +159,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       FlutterVolumeController.showSystemUI = false;
       await FlutterVolumeController.setVolume(value);
     } catch (_) {}
-    setState(() {
-      _volumeValue = value;
-      _volumeIndicator = true;
-      _volumeInterceptEventStream = true;
-    });
+    _ctr.volumeValue.value = value;
+    _ctr.volumeIndicator.value = true;
+    _ctr.volumeInterceptEventStream.value = true;
     _volumeTimer?.cancel();
     _volumeTimer = Timer(const Duration(milliseconds: 200), () {
       if (mounted) {
-        setState(() {
-          _volumeIndicator = false;
-          _volumeInterceptEventStream = false;
-        });
+        _ctr.volumeIndicator.value = false;
+        _ctr.volumeInterceptEventStream.value = false;
       }
     });
   }
@@ -179,15 +175,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     try {
       await ScreenBrightness().setScreenBrightness(value);
     } catch (_) {}
-    setState(() {
-      _brightnessIndicator = true;
-    });
+    _ctr.brightnessIndicator.value = true;
     _brightnessTimer?.cancel();
     _brightnessTimer = Timer(const Duration(milliseconds: 200), () {
       if (mounted) {
-        setState(() {
-          _brightnessIndicator = false;
-        });
+        _ctr.brightnessIndicator.value = false;
       }
     });
     widget.controller.brightness.value = value;
@@ -225,6 +217,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           () => Video(
             controller: videoController,
             controls: NoVideoControls,
+            pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
+            resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: SubtitleViewConfiguration(
               style: subTitleStyle,
               textAlign: TextAlign.center,
@@ -239,35 +233,25 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           () => Align(
             alignment: Alignment.topCenter,
             child: FractionalTranslation(
-              translation: const Offset(0.0, 1), // 上下偏移量（负数向上偏移）
+              translation: const Offset(0.0, 0.3), // 上下偏移量（负数向上偏移）
               child: AnimatedOpacity(
                 curve: Curves.easeInOut,
                 opacity: _.doubleSpeedStatus.value ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 150),
                 child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0x88000000),
-                    borderRadius: BorderRadius.circular(64.0),
-                  ),
-                  height: 34.0,
-                  width: 86.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 3),
-                      Image.asset(
-                        'assets/images/run-pokemon.gif',
-                        height: 20,
-                      ),
-                      const Text(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0x88000000),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    height: 32.0,
+                    width: 70.0,
+                    child: const Center(
+                      child: Text(
                         '倍速中',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: Colors.white, fontSize: 13),
                       ),
-                      const SizedBox(width: 4),
-                    ],
-                  ),
-                ),
+                    )),
               ),
             ),
           ),
@@ -325,125 +309,129 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         /// 音量🔊 控制条展示
-        Align(
-          alignment: Alignment.center,
-          child: AnimatedOpacity(
-            curve: Curves.easeInOut,
-            opacity: _volumeIndicator ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 150),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0x88000000),
-                borderRadius: BorderRadius.circular(64.0),
-              ),
-              height: 34.0,
-              width: 70.0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 34.0,
-                    width: 28.0,
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      _volumeValue == 0.0
-                          ? Icons.volume_off
-                          : _volumeValue < 0.5
-                              ? Icons.volume_down
-                              : Icons.volume_up,
-                      color: const Color(0xFFFFFFFF),
-                      size: 20.0,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '${(_volumeValue * 100.0).round()}%',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 13.0,
-                        color: Color(0xFFFFFFFF),
+        Obx(
+          () => Align(
+            alignment: Alignment.center,
+            child: AnimatedOpacity(
+              curve: Curves.easeInOut,
+              opacity: _ctr.volumeIndicator.value ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0x88000000),
+                  borderRadius: BorderRadius.circular(64.0),
+                ),
+                height: 34.0,
+                width: 70.0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 34.0,
+                      width: 28.0,
+                      alignment: Alignment.centerRight,
+                      child: Icon(
+                        _ctr.volumeValue.value == 0.0
+                            ? Icons.volume_off
+                            : _ctr.volumeValue.value < 0.5
+                                ? Icons.volume_down
+                                : Icons.volume_up,
+                        color: const Color(0xFFFFFFFF),
+                        size: 20.0,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 6.0),
-                ],
+                    Expanded(
+                      child: Text(
+                        '${(_ctr.volumeValue.value * 100.0).round()}%',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 13.0,
+                          color: Color(0xFFFFFFFF),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6.0),
+                  ],
+                ),
               ),
             ),
           ),
         ),
 
         /// 亮度🌞 控制条展示
-        Align(
-          alignment: Alignment.center,
-          child: AnimatedOpacity(
-            curve: Curves.easeInOut,
-            opacity: _brightnessIndicator ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 150),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0x88000000),
-                borderRadius: BorderRadius.circular(64.0),
-              ),
-              height: 34.0,
-              width: 70.0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 30.0,
-                    width: 28.0,
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      _brightnessValue < 1.0 / 3.0
-                          ? Icons.brightness_low
-                          : _brightnessValue < 2.0 / 3.0
-                              ? Icons.brightness_medium
-                              : Icons.brightness_high,
-                      color: const Color(0xFFFFFFFF),
-                      size: 18.0,
-                    ),
-                  ),
-                  const SizedBox(width: 2.0),
-                  Expanded(
-                    child: Text(
-                      '${(_brightnessValue * 100.0).round()}%',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 13.0,
-                        color: Color(0xFFFFFFFF),
+        Obx(
+          () => Align(
+            alignment: Alignment.center,
+            child: AnimatedOpacity(
+              curve: Curves.easeInOut,
+              opacity: _ctr.brightnessIndicator.value ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0x88000000),
+                  borderRadius: BorderRadius.circular(64.0),
+                ),
+                height: 34.0,
+                width: 70.0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 30.0,
+                      width: 28.0,
+                      alignment: Alignment.centerRight,
+                      child: Icon(
+                        _ctr.brightnessValue.value < 1.0 / 3.0
+                            ? Icons.brightness_low
+                            : _ctr.brightnessValue.value < 2.0 / 3.0
+                                ? Icons.brightness_medium
+                                : Icons.brightness_high,
+                        color: const Color(0xFFFFFFFF),
+                        size: 18.0,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 6.0),
-                ],
+                    const SizedBox(width: 2.0),
+                    Expanded(
+                      child: Text(
+                        '${(_ctr.brightnessValue.value * 100.0).round()}%',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 13.0,
+                          color: Color(0xFFFFFFFF),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6.0),
+                  ],
+                ),
               ),
             ),
           ),
         ),
 
-        Obx(() {
-          if (_.buffered.value == Duration.zero) {
-            return Positioned.fill(
-              child: Container(
-                color: Colors.black,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/loading.gif',
-                    height: 25,
-                  ),
-                ),
-              ),
-            );
-          } else {
-            return Container();
-          }
-        }),
+        // Obx(() {
+        //   if (_.buffered.value == Duration.zero) {
+        //     return Positioned.fill(
+        //       child: Container(
+        //         color: Colors.black,
+        //         child: Center(
+        //           child: Image.asset(
+        //             'assets/images/loading.gif',
+        //             height: 25,
+        //           ),
+        //         ),
+        //       ),
+        //     );
+        //   } else {
+        //     return Container();
+        //   }
+        // }),
 
         /// 弹幕面板
         if (widget.danmuWidget != null)
@@ -492,19 +480,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 return;
               }
               final tapPosition = details.localPosition.dx;
-              int curSliderPosition = _.sliderPosition.value.inSeconds;
-              late int result;
-              if (tapPosition - _initTapPositoin > 0) {
-                // 快进
-                /// TODO  优化屏幕越小效果越明显
-                result = (curSliderPosition + 1)
-                    .clamp(0, _.duration.value.inSeconds);
-              } else {
-                // 快退
-                result = (curSliderPosition - 1)
-                    .clamp(0, _.duration.value.inSeconds);
-              }
-              _.onUodatedSliderProgress(Duration(seconds: result));
+              int curSliderPosition = _.sliderPosition.value.inMilliseconds;
+              double scale = 90000 / MediaQuery.of(context).size.width;
+              Duration pos = Duration(
+                  milliseconds:
+                      curSliderPosition + (details.delta.dx * scale).round());
+              Duration result = pos.clamp(Duration.zero, _.duration.value);
+              _.onUodatedSliderProgress(result);
               _.onChangedSliderStart();
               _initTapPositoin = tapPosition;
             },
@@ -528,7 +510,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               }
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
-                final brightness = _brightnessValue - delta / 100.0;
+                double level = (_.isFullScreen.value
+                        ? Get.size.height
+                        : screenWidth * 9 / 16) *
+                    3;
+                final brightness = _ctr.brightnessValue.value - delta / level;
                 final result = brightness.clamp(0.0, 1.0);
                 setBrightness(result);
               } else if (tapPosition < sectionWidth * 2) {
@@ -551,7 +537,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 _distance = dy;
               } else {
                 // 右边区域 👈
-                final volume = _volumeValue - delta / 100.0;
+                double level = (_.isFullScreen.value
+                        ? Get.size.height
+                        : screenWidth * 9 / 16) *
+                    3;
+                final volume = _ctr.volumeValue.value - delta / level;
                 final result = volume.clamp(0.0, 1.0);
                 setVolume(result);
               }
@@ -561,19 +551,20 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        Obx(
-          () => Visibility(
-            visible: _.videoType.value != 'live',
-            child: Column(
+        SafeArea(
+          top: false,
+          bottom: false,
+          child: Obx(
+            () => Column(
               children: [
-                if (widget.headerControl != null)
+                if (widget.headerControl != null || _.headerControl != null)
                   ClipRect(
                     clipBehavior: Clip.hardEdge,
                     child: AppBarAni(
                       controller: animationController,
                       visible: !_.controlsLock.value && _.showControls.value,
                       position: 'top',
-                      child: widget.headerControl!,
+                      child: widget.headerControl ?? _.headerControl!,
                     ),
                   ),
                 const Spacer(),
@@ -583,9 +574,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
                     position: 'bottom',
-                    child: BottomControl(
-                        controller: widget.controller,
-                        triggerFullScreen: widget.controller.triggerFullScreen),
+                    child: widget.bottomControl ??
+                        BottomControl(
+                            controller: widget.controller,
+                            triggerFullScreen:
+                                widget.controller.triggerFullScreen),
                   ),
                 ),
               ],
@@ -606,6 +599,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             if (defaultBtmProgressBehavior ==
                     BtmProgresBehavior.onlyShowFullScreen.code &&
                 !_.isFullScreen.value) {
+              return Container();
+            }
+
+            if (_.videoType.value == 'live') {
               return Container();
             }
             if (value > max || max <= 0) {
@@ -704,103 +701,129 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         }),
 
         /// 点击 快进/快退
-        if (_mountSeekBackwardButton || _mountSeekForwardButton)
-          Positioned.fill(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _mountSeekBackwardButton
-                      ? TweenAnimationBuilder<double>(
-                          tween: Tween<double>(
-                            begin: 0.0,
-                            end: _hideSeekBackwardButton ? 0.0 : 1.0,
-                          ),
-                          duration: const Duration(milliseconds: 500),
-                          builder: (context, value, child) => Opacity(
-                            opacity: value,
-                            child: child,
-                          ),
-                          onEnd: () {
-                            if (_hideSeekBackwardButton) {
-                              setState(() {
-                                _hideSeekBackwardButton = false;
-                                _mountSeekBackwardButton = false;
-                              });
-                            }
-                          },
-                          child: BackwardSeekIndicator(
-                            onChanged: (value) {
-                              // _seekBarDeltaValueNotifier.value = -value;
+        Obx(
+          () => Visibility(
+            visible: _ctr.mountSeekBackwardButton.value ||
+                _ctr.mountSeekForwardButton.value,
+            child: Positioned.fill(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _ctr.mountSeekBackwardButton.value
+                        ? TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              begin: 0.0,
+                              end:
+                                  _ctr.hideSeekBackwardButton.value ? 0.0 : 1.0,
+                            ),
+                            duration: const Duration(milliseconds: 500),
+                            builder: (context, value, child) => Opacity(
+                              opacity: value,
+                              child: child,
+                            ),
+                            onEnd: () {
+                              if (_ctr.hideSeekBackwardButton.value) {
+                                _ctr.hideSeekBackwardButton.value = false;
+                                _ctr.mountSeekBackwardButton.value = false;
+                              }
                             },
-                            onSubmitted: (value) {
-                              setState(() {
-                                _hideSeekBackwardButton = true;
-                              });
-                              Player player =
-                                  widget.controller.videoPlayerController!;
-                              var result = player.state.position - value;
-                              result = result.clamp(
-                                Duration.zero,
-                                player.state.duration,
-                              );
-                              player.seek(result);
-                              widget.controller.play();
-                            },
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
-                Expanded(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width / 4,
+                            child: BackwardSeekIndicator(
+                              onChanged: (value) {
+                                // _seekBarDeltaValueNotifier.value = -value;
+                              },
+                              onSubmitted: (value) {
+                                _ctr.hideSeekBackwardButton.value = true;
+                                Player player =
+                                    widget.controller.videoPlayerController!;
+                                var result = player.state.position - value;
+                                result = result.clamp(
+                                  Duration.zero,
+                                  player.state.duration,
+                                );
+                                player.seek(result);
+                                widget.controller.play();
+                              },
+                            ),
+                          )
+                        : const SizedBox(),
                   ),
-                ),
-                Expanded(
-                  child: _mountSeekForwardButton
-                      ? TweenAnimationBuilder<double>(
-                          tween: Tween<double>(
-                            begin: 0.0,
-                            end: _hideSeekForwardButton ? 0.0 : 1.0,
-                          ),
-                          duration: const Duration(milliseconds: 500),
-                          builder: (context, value, child) => Opacity(
-                            opacity: value,
-                            child: child,
-                          ),
-                          onEnd: () {
-                            if (_hideSeekForwardButton) {
-                              setState(() {
-                                _hideSeekForwardButton = false;
-                                _mountSeekForwardButton = false;
-                              });
-                            }
-                          },
-                          child: ForwardSeekIndicator(
-                            onChanged: (value) {
-                              // _seekBarDeltaValueNotifier.value = value;
+                  Expanded(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width / 4,
+                    ),
+                  ),
+                  Expanded(
+                    child: _ctr.mountSeekForwardButton.value
+                        ? TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              begin: 0.0,
+                              end: _ctr.hideSeekForwardButton.value ? 0.0 : 1.0,
+                            ),
+                            duration: const Duration(milliseconds: 500),
+                            builder: (context, value, child) => Opacity(
+                              opacity: value,
+                              child: child,
+                            ),
+                            onEnd: () {
+                              if (_ctr.hideSeekForwardButton.value) {
+                                _ctr.hideSeekForwardButton.value = false;
+                                _ctr.mountSeekForwardButton.value = false;
+                              }
                             },
-                            onSubmitted: (value) {
-                              setState(() {
-                                _hideSeekForwardButton = true;
-                              });
-                              Player player =
-                                  widget.controller.videoPlayerController!;
-                              var result = player.state.position + value;
-                              result = result.clamp(
-                                Duration.zero,
-                                player.state.duration,
-                              );
-                              player.seek(result);
-                              widget.controller.play();
-                            },
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
-              ],
+                            child: ForwardSeekIndicator(
+                              onChanged: (value) {
+                                // _seekBarDeltaValueNotifier.value = value;
+                              },
+                              onSubmitted: (value) {
+                                _ctr.hideSeekForwardButton.value = true;
+                                Player player =
+                                    widget.controller.videoPlayerController!;
+                                var result = player.state.position + value;
+                                result = result.clamp(
+                                  Duration.zero,
+                                  player.state.duration,
+                                );
+                                player.seek(result);
+                                widget.controller.play();
+                              },
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ],
+              ),
             ),
           ),
+        ),
       ],
     );
+  }
+}
+
+class PLVideoPlayerController extends GetxController {
+  RxBool mountSeekBackwardButton = false.obs;
+  RxBool mountSeekForwardButton = false.obs;
+  RxBool hideSeekBackwardButton = false.obs;
+  RxBool hideSeekForwardButton = false.obs;
+
+  RxDouble brightnessValue = 0.0.obs;
+  RxBool brightnessIndicator = false.obs;
+
+  RxDouble volumeValue = 0.0.obs;
+  RxBool volumeIndicator = false.obs;
+
+  RxDouble distance = 0.0.obs;
+  // 初始手指落下位置
+  RxDouble initTapPositoin = 0.0.obs;
+
+  RxBool volumeInterceptEventStream = false.obs;
+
+  // 双击快进 展示样式
+  void onDoubleTapSeekForward() {
+    mountSeekForwardButton.value = true;
+  }
+
+  void onDoubleTapSeekBackward() {
+    mountSeekBackwardButton.value = true;
   }
 }

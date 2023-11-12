@@ -206,7 +206,7 @@ class Utils {
   static Future<bool> checkUpdata() async {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
-    var result = await Request().get(Api.latestApp);
+    var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
@@ -285,5 +285,16 @@ class Utils {
         mode: LaunchMode.externalApplication,
       );
     }
+  }
+
+  // 时间戳转时间
+  static tampToSeektime(number) {
+    int hours = number ~/ 60;
+    int minutes = number % 60;
+
+    String formattedHours = hours.toString().padLeft(2, '0');
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+
+    return '$formattedHours:$formattedMinutes';
   }
 }

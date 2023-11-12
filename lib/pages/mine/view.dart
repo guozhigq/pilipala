@@ -85,6 +85,9 @@ class _MinePageState extends State<MinePage> {
                     future: _futureBuilderFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == null) {
+                          return const SizedBox();
+                        }
                         if (snapshot.data['status']) {
                           return Obx(
                               () => userInfoBuild(mineController, context));
@@ -261,7 +264,7 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => Get.toNamed('/follow'),
+                      onTap: () => _mineController.pushFollow(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -291,7 +294,7 @@ class _MinePageState extends State<MinePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => Get.toNamed('/fan'),
+                      onTap: () => _mineController.pushFans(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

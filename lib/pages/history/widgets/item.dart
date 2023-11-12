@@ -11,12 +11,24 @@ import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/pages/history/index.dart';
+import 'package:pilipala/pages/history_search/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
   final dynamic videoItem;
-  const HistoryItem({super.key, required this.videoItem});
+  final dynamic ctr;
+  final Function? onChoose;
+  final Function? onUpdateMultiple;
+  const HistoryItem({
+    super.key,
+    required this.videoItem,
+    this.ctr,
+    this.onChoose,
+    this.onUpdateMultiple,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +37,11 @@ class HistoryItem extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(aid);
     return InkWell(
       onTap: () async {
+        if (ctr!.enableMultiple.value) {
+          feedBack();
+          onChoose!();
+          return;
+        }
         if (videoItem.history.business.contains('article')) {
           int cid = videoItem.history.cid ??
               // videoItem.history.oid ??
@@ -115,6 +132,17 @@ class HistoryItem extends StatelessWidget {
               arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
         }
       },
+      onLongPress: () {
+        if (ctr is HistorySearchController) {
+          return;
+        }
+        if (!ctr!.enableMultiple.value) {
+          feedBack();
+          ctr!.enableMultiple.value = true;
+          onChoose!();
+          onUpdateMultiple!();
+        }
+      },
       child: Column(
         children: [
           Padding(
@@ -130,53 +158,110 @@ class HistoryItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AspectRatio(
-                        aspectRatio: StyleString.aspectRatio,
-                        child: LayoutBuilder(
-                          builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            return Stack(
-                              children: [
-                                Hero(
-                                  tag: heroTag,
-                                  child: NetworkImgLayer(
-                                    src: (videoItem.cover != ''
-                                        ? videoItem.cover
-                                        : videoItem.covers.first),
-                                    width: maxWidth,
-                                    height: maxHeight,
+                      Stack(
+                        children: [
+                          AspectRatio(
+                            aspectRatio: StyleString.aspectRatio,
+                            child: LayoutBuilder(
+                              builder: (context, boxConstraints) {
+                                double maxWidth = boxConstraints.maxWidth;
+                                double maxHeight = boxConstraints.maxHeight;
+                                return Stack(
+                                  children: [
+                                    Hero(
+                                      tag: heroTag,
+                                      child: NetworkImgLayer(
+                                        src: (videoItem.cover != ''
+                                            ? videoItem.cover
+                                            : videoItem.covers.first),
+                                        width: maxWidth,
+                                        height: maxHeight,
+                                      ),
+                                    ),
+                                    if (!BusinessType
+                                        .hiddenDurationType.hiddenDurationType
+                                        .contains(videoItem.history.business))
+                                      PBadge(
+                                        text: videoItem.progress == -1
+                                            ? '已看完'
+                                            : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
+                                        right: 6.0,
+                                        bottom: 6.0,
+                                        type: 'gray',
+                                      ),
+                                    // 右上角
+                                    if (BusinessType.showBadge.showBadge
+                                            .contains(
+                                                videoItem.history.business) ||
+                                        videoItem.history.business ==
+                                            BusinessType.live.type)
+                                      PBadge(
+                                        text: videoItem.badge,
+                                        top: 6.0,
+                                        right: 6.0,
+                                        bottom: null,
+                                        left: null,
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          Obx(
+                            () => Positioned.fill(
+                              child: AnimatedOpacity(
+                                opacity: ctr!.enableMultiple.value ? 1 : 0,
+                                duration: const Duration(milliseconds: 200),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.black.withOpacity(
+                                        ctr!.enableMultiple.value &&
+                                                videoItem.checked
+                                            ? 0.6
+                                            : 0),
+                                  ),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 34,
+                                      height: 34,
+                                      child: AnimatedScale(
+                                        scale: videoItem.checked ? 1 : 0,
+                                        duration:
+                                            const Duration(milliseconds: 250),
+                                        curve: Curves.easeInOut,
+                                        child: IconButton(
+                                          style: ButtonStyle(
+                                            padding: MaterialStateProperty.all(
+                                                EdgeInsets.zero),
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith(
+                                              (states) {
+                                                return Colors.white
+                                                    .withOpacity(0.8);
+                                              },
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            feedBack();
+                                            onChoose!();
+                                          },
+                                          icon: Icon(Icons.done_all_outlined,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                if (!BusinessType
-                                    .hiddenDurationType.hiddenDurationType
-                                    .contains(videoItem.history.business))
-                                  PBadge(
-                                    text: videoItem.progress == -1
-                                        ? '已看完'
-                                        : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
-                                    right: 6.0,
-                                    bottom: 6.0,
-                                    type: 'gray',
-                                  ),
-                                // 右上角
-                                if (BusinessType.showBadge.showBadge
-                                        .contains(videoItem.history.business) ||
-                                    videoItem.history.business ==
-                                        BusinessType.live.type)
-                                  PBadge(
-                                    text: videoItem.badge,
-                                    top: 6.0,
-                                    right: 6.0,
-                                    bottom: null,
-                                    left: null,
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      VideoContent(videoItem: videoItem)
+                      VideoContent(videoItem: videoItem, ctr: ctr)
                     ],
                   ),
                 );
@@ -191,7 +276,8 @@ class HistoryItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  const VideoContent({super.key, required this.videoItem});
+  final dynamic ctr;
+  const VideoContent({super.key, required this.videoItem, this.ctr});
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +297,8 @@ class VideoContent extends StatelessWidget {
               maxLines: videoItem.videos > 1 ? 1 : 2,
               overflow: TextOverflow.ellipsis,
             ),
-            if (videoItem.showTitle != null)
+            if (videoItem.showTitle != null) ...[
+              const SizedBox(height: 2),
               Text(
                 videoItem.showTitle,
                 textAlign: TextAlign.start,
@@ -219,21 +306,24 @@ class VideoContent extends StatelessWidget {
                     fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                     fontWeight: FontWeight.w400,
                     color: Theme.of(context).colorScheme.outline),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
             const Spacer(),
-            Row(
-              children: [
-                Text(
-                  videoItem.authorName,
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    color: Theme.of(context).colorScheme.outline,
+            if (videoItem.authorName != '')
+              Row(
+                children: [
+                  Text(
+                    videoItem.authorName,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -244,26 +334,26 @@ class VideoContent extends StatelessWidget {
                           Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline),
                 ),
-                if (videoItem.badge != '番剧' &&
-                    !videoItem.tagName.contains('动画') &&
-                    videoItem.history.business != 'live' &&
-                    !videoItem.history.business.contains('article'))
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      tooltip: '稍后再看',
-                      icon: Icon(
-                        Icons.more_vert_outlined,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 14,
-                      ),
-                      position: PopupMenuPosition.under,
-                      // constraints: const BoxConstraints(maxHeight: 35),
-                      onSelected: (String type) {},
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    tooltip: '功能菜单',
+                    icon: Icon(
+                      Icons.more_vert_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 14,
+                    ),
+                    position: PopupMenuPosition.under,
+                    // constraints: const BoxConstraints(maxHeight: 35),
+                    onSelected: (String type) {},
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      if (videoItem.badge != '番剧' &&
+                          !videoItem.tagName.contains('动画') &&
+                          videoItem.history.business != 'live' &&
+                          !videoItem.history.business.contains('article'))
                         PopupMenuItem<String>(
                           onTap: () async {
                             var res = await UserHttp.toViewLater(
@@ -280,9 +370,22 @@ class VideoContent extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      PopupMenuItem<String>(
+                        onTap: () => ctr!.delHistory(
+                            videoItem.kid, videoItem.history.business),
+                        value: 'pause',
+                        height: 35,
+                        child: const Row(
+                          children: [
+                            Icon(Icons.close_outlined, size: 16),
+                            SizedBox(width: 6),
+                            Text('删除记录', style: TextStyle(fontSize: 13))
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ),
           ],

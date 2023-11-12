@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -37,6 +39,14 @@ class _PlaySettingState extends State<PlaySetting> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+
+    // 重新验证媒体通知后台播放设置
+    videoPlayerServiceHandler.revalidateSetting();
+  }
+
+  @override
   Widget build(BuildContext context) {
     TextStyle titleStyle = Theme.of(context).textTheme.titleMedium!;
     TextStyle subTitleStyle = Theme.of(context)
@@ -54,11 +64,41 @@ class _PlaySettingState extends State<PlaySetting> {
       ),
       body: ListView(
         children: [
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/playSpeedSet'),
+            title: Text('倍速设置', style: titleStyle),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+          ),
+          const SetSwitchItem(
+            title: '开启1080P',
+            subTitle: '免登录查看1080P视频',
+            setKey: SettingBoxKey.p1080,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: 'CDN优化',
+            subTitle: '使用优质CDN线路',
+            setKey: SettingBoxKey.enableCDN,
+            defaultVal: true,
+          ),
           const SetSwitchItem(
             title: '自动播放',
             subTitle: '进入详情页自动播放',
             setKey: SettingBoxKey.autoPlayEnable,
             defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '后台播放',
+            subTitle: '进入后台时继续播放',
+            setKey: SettingBoxKey.enableBackgroundPlay,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
+            title: '自动PiP播放',
+            subTitle: 'app切换至后台时画中画播放',
+            setKey: SettingBoxKey.autoPiP,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '自动全屏',

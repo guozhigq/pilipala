@@ -39,45 +39,47 @@ class _MediaPageState extends State<MediaPage>
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(toolbarHeight: 30),
-      body: Column(
-        children: [
-          ListTile(
-            leading: null,
-            title: Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text(
-                '媒体库',
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          for (var i in mediaController.list) ...[
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
             ListTile(
-              onTap: () => i['onTap'](),
-              dense: true,
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Icon(
-                  i['icon'],
-                  color: primary,
+              leading: null,
+              title: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(
+                  '媒体库',
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              contentPadding:
-                  const EdgeInsets.only(left: 15, top: 2, bottom: 2),
-              minLeadingWidth: 0,
-              title: Text(
-                i['title'],
-                style: const TextStyle(fontSize: 15),
-              ),
             ),
+            for (var i in mediaController.list) ...[
+              ListTile(
+                onTap: () => i['onTap'](),
+                dense: true,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Icon(
+                    i['icon'],
+                    color: primary,
+                  ),
+                ),
+                contentPadding:
+                    const EdgeInsets.only(left: 15, top: 2, bottom: 2),
+                minLeadingWidth: 0,
+                title: Text(
+                  i['title'],
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ),
+            ],
+            Obx(() => mediaController.userLogin.value
+                ? favFolder(mediaController, context)
+                : const SizedBox())
           ],
-          Obx(() => mediaController.userLogin.value
-              ? favFolder(mediaController, context)
-              : const SizedBox())
-        ],
+        ),
       ),
     );
   }
@@ -136,11 +138,14 @@ class _MediaPageState extends State<MediaPage>
         // const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
-          height: 170 * MediaQuery.of(context).textScaleFactor,
+          height: 200 * MediaQuery.of(context).textScaleFactor,
           child: FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
                   Map data = snapshot.data as Map;
                   if (data['status']) {
                     List favFolderList =

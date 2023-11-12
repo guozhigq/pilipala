@@ -212,6 +212,9 @@ class _DynamicsPageState extends State<DynamicsPage>
               future: _futureBuilderFutureUp,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SliverToBoxAdapter(child: SizedBox());
+                  }
                   Map data = snapshot.data;
                   if (data['status']) {
                     return Obx(() => UpPanel(_dynamicsController.upData.value));
@@ -232,6 +235,9 @@ class _DynamicsPageState extends State<DynamicsPage>
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SliverToBoxAdapter(child: SizedBox());
+                  }
                   Map data = snapshot.data;
                   if (data['status']) {
                     List<DynamicItemModel> list =
