@@ -5,6 +5,8 @@
 
 <div align="center">
     <h1>PiliPala</h1>
+    [![GitHub all releases](https://img.shields.io/github/downloads/guozhigq/pilipala/total)](https://github.com/guozhigq/pilipala/releases)
+    <br/>
     <p>使用Flutter开发的BiliBili第三方客户端</p>
     <br/>
      <img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/510shots_so.png" width="32%" alt="home" />
