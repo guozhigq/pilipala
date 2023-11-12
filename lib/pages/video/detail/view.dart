@@ -218,7 +218,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
-    if (lifecycleState == AppLifecycleState.inactive && autoPiP) {
+    var routePath = Get.currentRoute;
+    if (lifecycleState == AppLifecycleState.inactive &&
+        autoPiP &&
+        routePath.startsWith('/video')) {
       floating.enable(
           aspectRatio: Rational(
         videoDetailController.data.dash!.video!.first.width!,
