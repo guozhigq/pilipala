@@ -443,10 +443,14 @@ class PlPlayerController {
     Duration seekTo = Duration.zero,
   }) async {
     // 设置倍速
-    if (_playbackSpeed.value != 1.0) {
-      await setPlaybackSpeed(_playbackSpeed.value);
-    } else {
+    if (videoType.value == 'live') {
       await setPlaybackSpeed(1.0);
+    } else {
+      if (_playbackSpeed.value != 1.0) {
+        await setPlaybackSpeed(_playbackSpeed.value);
+      } else {
+        await setPlaybackSpeed(1.0);
+      }
     }
     getVideoFit();
     // if (_looping) {
