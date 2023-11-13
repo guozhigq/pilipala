@@ -115,30 +115,24 @@ class Request {
           idleTimeout: const Duration(milliseconds: 10000),
           onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
         ),
-      )
+      );
 
-      /// 设置代理
-      ..httpClientAdapter = IOHttpClientAdapter(
+    /// 设置代理
+    if (enableSystemProxy) {
+      dio.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
           final client = HttpClient();
           // Config the client.
           client.findProxy = (uri) {
-            if (enableSystemProxy) {
-              print('🌹：$systemProxyHost');
-              print('🌹：$systemProxyPort');
-
-              // return 'PROXY host:port';
-              return 'PROXY $systemProxyHost:$systemProxyPort';
-            } else {
-              // 不设置代理
-              return 'DIRECT';
-            }
+            // return 'PROXY host:port';
+            return 'PROXY $systemProxyHost:$systemProxyPort';
           };
           client.badCertificateCallback =
               (X509Certificate cert, String host, int port) => true;
           return client;
         },
       );
+    }
 
     //添加拦截器
     dio.interceptors.add(ApiInterceptor());
