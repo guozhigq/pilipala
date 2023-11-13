@@ -338,7 +338,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo);
+      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -444,6 +444,7 @@ class PlPlayerController {
   // 开始播放
   Future _initializePlayer({
     Duration seekTo = Duration.zero,
+    Duration? duration,
   }) async {
     // 设置倍速
     if (videoType.value == 'live') {
@@ -467,7 +468,7 @@ class PlPlayerController {
 
     // 自动播放
     if (_autoPlay) {
-      await play();
+      await play(duration: duration);
     }
   }
 
@@ -596,6 +597,7 @@ class PlPlayerController {
 
   /// 设置倍速
   Future<void> setPlaybackSpeed(double speed) async {
+    /// TODO  _duration.value丢失
     await _videoPlayerController?.setRate(speed);
     try {
       DanmakuOption currentOption = danmakuController!.option;
@@ -631,7 +633,9 @@ class PlPlayerController {
   // }
 
   /// 播放视频
-  Future<void> play({bool repeat = false, bool hideControls = true}) async {
+  /// TODO  _duration.value丢失
+  Future<void> play(
+      {bool repeat = false, bool hideControls = true, dynamic duration}) async {
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
@@ -645,6 +649,9 @@ class PlPlayerController {
 
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
+
+    /// 临时fix _duration.value丢失
+    _duration.value = duration;
     audioSessionHandler.setActive(true);
   }
 
