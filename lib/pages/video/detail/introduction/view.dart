@@ -247,7 +247,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
       sliver: SliverToBoxAdapter(
-        child: !loadingStatus || videoItem.isNotEmpty
+        child: !loadingStatus
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -277,7 +277,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             children: [
                               StatView(
                                 theme: 'gray',
-                                view: !widget.loadingStatus
+                                view: !loadingStatus
                                     ? widget.videoDetail!.stat!.view
                                     : videoItem['stat'].view,
                                 size: 'medium',
@@ -285,7 +285,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               const SizedBox(width: 10),
                               StatDanMu(
                                 theme: 'gray',
-                                danmu: !widget.loadingStatus
+                                danmu: !loadingStatus
                                     ? widget.videoDetail!.stat!.danmaku
                                     : videoItem['stat'].danmaku,
                                 size: 'medium',
@@ -293,7 +293,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               const SizedBox(width: 10),
                               Text(
                                 Utils.dateFormat(
-                                    !widget.loadingStatus
+                                    !loadingStatus
                                         ? widget.videoDetail!.pubdate
                                         : videoItem['pubdate'],
                                     formatType: 'detail'),

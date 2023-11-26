@@ -215,7 +215,7 @@ class Api {
   // 粉丝
   // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
   // order_type 排序规则 最近访问传空，最常访问传 attention
-  static const String fans = 'https://api.bilibili.com/x/relation/fans';
+  static const String fans = '/x/relation/fans';
 
   // 直播
   // ?page=1&page_size=30&platform=web
@@ -372,4 +372,36 @@ class Api {
   /// local_id
   static const getWebKey =
       'https://passport.bilibili.com/x/passport-login/web/key';
+
+  /// 置顶视频
+  static const getTopVideoApi = '/x/space/top/arc';
+
+  /// 主页 - 最近投币的视频
+  /// vmid
+  /// gaia_source = main_web
+  /// web_location
+  /// w_rid
+  /// wts
+  static const getRecentCoinVideoApi = '/x/space/coin/video';
+
+  /// 最近点赞的视频
+  static const getRecentLikeVideoApi = '/x/space/like/video';
+
+  /// 最近追番
+  static const getRecentBangumiApi = '/x/space/bangumi/follow/list';
+
+  /// 用户专栏
+  static const getMemberSeasonsApi = '/x/polymer/web-space/home/seasons_series';
+
+  /// 获赞数 播放数
+  static const getMemberViewApi = '/x/space/upstat';
+
+  /// 查询某个专栏
+  /// mid
+  /// season_id
+  /// sort_reverse
+  /// page_num
+  /// page_size
+  static const getSeasonDetailApi =
+      '/x/polymer/web-space/seasons_archives_list';
 }

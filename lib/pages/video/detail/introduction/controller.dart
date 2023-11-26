@@ -76,6 +76,7 @@ class VideoIntroController extends GetxController {
       if (Get.arguments.containsKey('videoItem')) {
         preRender = true;
         var args = Get.arguments['videoItem'];
+        var keys = Get.arguments.keys.toList();
         videoItem!['pic'] = args.pic;
         if (args.title is String) {
           videoItem!['title'] = args.title;
@@ -86,11 +87,9 @@ class VideoIntroController extends GetxController {
           }
           videoItem!['title'] = str;
         }
-        if (args.stat != null) {
-          videoItem!['stat'] = args.stat;
-        }
-        videoItem!['pubdate'] = args.pubdate;
-        videoItem!['owner'] = args.owner;
+        videoItem!['stat'] = keys.contains('stat') && args.stat;
+        videoItem!['pubdate'] = keys.contains('pubdate') && args.pubdate;
+        videoItem!['owner'] = keys.contains('owner') && args.owner;
       }
     }
     userLogin = userInfo != null;

@@ -146,7 +146,7 @@ class Utils {
         int.parse(MM) == DateTime.now().month) {
       // 当天
       if (int.parse(DD) == DateTime.now().day) {
-        return date.split(' ')[1];
+        return '今天';
       }
     }
     return date;
