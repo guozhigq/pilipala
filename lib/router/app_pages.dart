@@ -21,7 +21,12 @@ import 'package:pilipala/pages/later/index.dart';
 import 'package:pilipala/pages/liveRoom/view.dart';
 import 'package:pilipala/pages/login/index.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/pages/member_archive/index.dart';
+import 'package:pilipala/pages/member_coin/index.dart';
+import 'package:pilipala/pages/member_dynamics/index.dart';
+import 'package:pilipala/pages/member_like/index.dart';
 import 'package:pilipala/pages/member_search/index.dart';
+import 'package:pilipala/pages/member_seasons/index.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
@@ -125,6 +130,19 @@ class Routes {
     CustomGetPage(name: '/favSearch', page: () => const FavSearchPage()),
     // 登录页面
     CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
+    // 用户动态
+    CustomGetPage(
+        name: '/memberDynamics', page: () => const MemberDynamicsPage()),
+    // 用户投稿
+    CustomGetPage(
+        name: '/memberArchive', page: () => const MemberArchivePage()),
+    // 用户最近投币
+    CustomGetPage(name: '/memberCoin', page: () => const MemberCoinPage()),
+    // 用户最近喜欢
+    CustomGetPage(name: '/memberLike', page: () => const MemberLikePage()),
+    // 用户专栏
+    CustomGetPage(
+        name: '/memberSeasons', page: () => const MemberSeasonsPage()),
   ];
 }
 

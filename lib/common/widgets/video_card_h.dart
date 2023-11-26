@@ -17,6 +17,10 @@ class VideoCardH extends StatelessWidget {
   final Function()? longPress;
   final Function()? longPressEnd;
   final String source;
+  final bool showOwner;
+  final bool showView;
+  final bool showDanmaku;
+  final bool showPubdate;
 
   const VideoCardH({
     Key? key,
@@ -24,6 +28,10 @@ class VideoCardH extends StatelessWidget {
     this.longPress,
     this.longPressEnd,
     this.source = 'normal',
+    this.showOwner = true,
+    this.showView = true,
+    this.showDanmaku = true,
+    this.showPubdate = false,
   }) : super(key: key);
 
   @override
@@ -103,7 +111,14 @@ class VideoCardH extends StatelessWidget {
                         },
                       ),
                     ),
-                    VideoContent(videoItem: videoItem, source: source)
+                    VideoContent(
+                      videoItem: videoItem,
+                      source: source,
+                      showOwner: showOwner,
+                      showView: showView,
+                      showDanmaku: showDanmaku,
+                      showPubdate: showPubdate,
+                    )
                   ],
                 ),
               );
@@ -119,8 +134,20 @@ class VideoContent extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   final String source;
-  const VideoContent(
-      {super.key, required this.videoItem, this.source = 'normal'});
+  final bool showOwner;
+  final bool showView;
+  final bool showDanmaku;
+  final bool showPubdate;
+
+  const VideoContent({
+    super.key,
+    required this.videoItem,
+    this.source = 'normal',
+    this.showOwner = true,
+    this.showView = true,
+    this.showDanmaku = true,
+    this.showPubdate = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -179,34 +206,40 @@ class VideoContent extends StatelessWidget {
             //     ),
             //   ),
             // const SizedBox(height: 4),
-            Row(
-              children: [
-                Text(
-                  videoItem.owner.name,
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    color: Theme.of(context).colorScheme.outline,
+            if (showPubdate)
+              Text(
+                Utils.dateFormat(videoItem.pubdate!),
+                style: TextStyle(
+                    fontSize: 11, color: Theme.of(context).colorScheme.outline),
+              ),
+            if (showOwner)
+              Row(
+                children: [
+                  Text(
+                    videoItem.owner.name,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             Row(
               children: [
-                StatView(
-                  theme: 'gray',
-                  view: videoItem.stat.view,
-                ),
-                const SizedBox(width: 8),
-                StatDanMu(
-                  theme: 'gray',
-                  danmu: videoItem.stat.danmaku,
-                ),
-                // Text(
-                //   Utils.dateFormat(videoItem.pubdate!),
-                //   style: TextStyle(
-                //       fontSize: 11,
-                //       color: Theme.of(context).colorScheme.outline),
-                // )
+                if (showView) ...[
+                  StatView(
+                    theme: 'gray',
+                    view: videoItem.stat.view,
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (showDanmaku)
+                  StatDanMu(
+                    theme: 'gray',
+                    danmu: videoItem.stat.danmaku,
+                  ),
+
                 const Spacer(),
                 // SizedBox(
                 //   width: 20,
