@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/member.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class PrivacySetting extends StatefulWidget {
@@ -52,6 +53,16 @@ class _PrivacySettingState extends State<PrivacySetting> {
             dense: false,
             title: Text('黑名单管理', style: titleStyle),
             subtitle: Text('已拉黑用户', style: subTitleStyle),
+          ),
+          ListTile(
+            onTap: () {
+              if (!userLogin) {
+                SmartDialog.showToast('请先登录');
+              }
+              MemberHttp.cookieToKey();
+            },
+            dense: false,
+            title: Text('刷新access_key', style: titleStyle),
           ),
         ],
       ),

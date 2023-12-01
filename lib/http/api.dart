@@ -373,6 +373,18 @@ class Api {
   static const getWebKey =
       'https://passport.bilibili.com/x/passport-login/web/key';
 
+  /// cookie转access_key
+  static const cookieToKey =
+      'https://passport.bilibili.com/x/passport-tv-login/h5/qrcode/confirm';
+
+  /// 申请二维码(TV端)
+  static const getTVCode =
+      'https://passport.snm0516.aisee.tv/x/passport-tv-login/qrcode/auth_code';
+
+  ///扫码登录（TV端）
+  static const qrcodePoll =
+      'https://passport.bilibili.com/x/passport-tv-login/qrcode/poll';
+
   /// 置顶视频
   static const getTopVideoApi = '/x/space/top/arc';
 
