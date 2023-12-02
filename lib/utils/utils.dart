@@ -2,8 +2,10 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -296,5 +298,19 @@ class Utils {
     String formattedMinutes = minutes.toString().padLeft(2, '0');
 
     return '$formattedHours:$formattedMinutes';
+  }
+
+  static String appSign(
+      Map<String, dynamic> params, String appkey, String appsec) {
+    params['appkey'] = appkey;
+    var searchParams = Uri(queryParameters: params).query;
+    var sortedParams = searchParams.split('&')..sort();
+    var sortedQueryString = sortedParams.join('&');
+
+    var appsecString = sortedQueryString + appsec;
+    var md5Digest = md5.convert(utf8.encode(appsecString));
+    var md5String = md5Digest.toString(); // 获取MD5哈希值
+
+    return md5String;
   }
 }
