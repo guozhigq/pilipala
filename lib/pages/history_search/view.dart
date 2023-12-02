@@ -131,7 +131,6 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
                                             onChoose: null,
                                             onUpdateMultiple: () => null,
                                           );
-                                          ;
                                         }
                                       },
                                     )

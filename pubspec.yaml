@@ -49,8 +49,8 @@ dependencies:
 
   # 图片
   cached_network_image: ^3.3.0
-  extended_image: ^8.0.2
-  saver_gallery: ^2.0.1
+  extended_image: ^8.2.0
+  saver_gallery: ^3.0.1
   
   # 存储
   path_provider: ^2.1.1
@@ -94,7 +94,7 @@ dependencies:
   audio_session: ^0.1.16
   
   # 音量、亮度、屏幕控制
-  flutter_volume_controller: ^1.3.0
+  flutter_volume_controller: ^1.3.1
   screen_brightness: ^0.2.2+1
   wakelock_plus: ^1.1.1
   universal_platform: ^1.0.0+1
