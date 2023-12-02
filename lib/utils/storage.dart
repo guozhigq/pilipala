@@ -127,6 +127,7 @@ class SettingBoxKey {
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
   static const String enableSaveLastData = 'enableSaveLastData';
   static const String enableSystemProxy = 'enableSystemProxy';
+  static const String enableAi = 'enableAi';
 
   /// 外观
   static const String themeMode = 'themeMode';
