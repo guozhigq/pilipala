@@ -118,7 +118,7 @@ class RcmdStat {
 
   RcmdStat.fromJson(Map<String, dynamic> json) {
     view = json["cover_left_text_1"];
-    danmu = json['cover_left_text_2'];
+    danmu = json['cover_left_text_2'] ?? '-';
   }
 }
 
