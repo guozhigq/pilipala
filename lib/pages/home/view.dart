@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -18,10 +20,16 @@ class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final HomeController _homeController = Get.put(HomeController());
   List videoList = [];
-  Stream<bool> stream = Get.find<MainController>().bottomBarStream.stream;
+  late Stream<bool> stream;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    stream = _homeController.searchBarStream.stream;
+  }
 
   showUserBottonSheet() {
     feedBack();
@@ -46,7 +54,9 @@ class _HomePageState extends State<HomePage>
       body: Column(
         children: [
           CustomAppBar(
-            stream: stream,
+            stream: _homeController.hideSearchBar
+                ? stream
+                : StreamController<bool>.broadcast().stream,
             ctr: _homeController,
             callback: showUserBottonSheet,
           ),
@@ -118,7 +128,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             duration: const Duration(milliseconds: 500),
             height: snapshot.data
                 ? MediaQuery.of(context).padding.top + 52
-                : MediaQuery.of(context).padding.top,
+                : MediaQuery.of(context).padding.top - 10,
             child: Container(
               padding: EdgeInsets.only(
                 left: 20,

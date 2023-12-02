@@ -11,6 +11,7 @@ import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
+import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
 
 import 'controller.dart';
@@ -37,6 +38,8 @@ class _RcmdPageState extends State<RcmdPage>
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
+    StreamController<bool> searchBarStream =
+        Get.find<HomeController>().searchBarStream;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -52,8 +55,10 @@ class _RcmdPageState extends State<RcmdPage>
             scrollController.position.userScrollDirection;
         if (direction == ScrollDirection.forward) {
           mainStream.add(true);
+          searchBarStream.add(true);
         } else if (direction == ScrollDirection.reverse) {
           mainStream.add(false);
+          searchBarStream.add(false);
         }
       },
     );

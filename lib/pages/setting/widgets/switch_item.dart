@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -9,6 +10,7 @@ class SetSwitchItem extends StatefulWidget {
   final String? setKey;
   final bool? defaultVal;
   final Function? callFn;
+  final bool? needReboot;
 
   const SetSwitchItem({
     this.title,
@@ -16,6 +18,7 @@ class SetSwitchItem extends StatefulWidget {
     this.setKey,
     this.defaultVal,
     this.callFn,
+    this.needReboot,
     Key? key,
   }) : super(key: key);
 
@@ -42,6 +45,9 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
     }
     if (widget.callFn != null) {
       widget.callFn!.call(val);
+    }
+    if (widget.needReboot != null && widget.needReboot!) {
+      SmartDialog.showToast('重启生效');
     }
     setState(() {});
   }

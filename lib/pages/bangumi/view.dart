@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/rcmd/view.dart';
 
@@ -35,6 +36,8 @@ class _BangumiPageState extends State<BangumiPage>
     scrollController = _bangumidController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
+    StreamController<bool> searchBarStream =
+        Get.find<HomeController>().searchBarStream;
     _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
     _futureBuilderFutureFollow = _bangumidController.queryBangumiFollow();
     scrollController.addListener(
@@ -51,8 +54,10 @@ class _BangumiPageState extends State<BangumiPage>
             scrollController.position.userScrollDirection;
         if (direction == ScrollDirection.forward) {
           mainStream.add(true);
+          searchBarStream.add(true);
         } else if (direction == ScrollDirection.reverse) {
           mainStream.add(false);
+          searchBarStream.add(false);
         }
       },
     );

@@ -83,13 +83,20 @@ class _StyleSettingState extends State<StyleSetting> {
             setKey: SettingBoxKey.enableMYBar,
             defaultVal: true,
           ),
-          // SetSwitchItem(
-          //   title: '首页单列',
-          //   subTitle: '每行展示一个内容卡片',
-          //   setKey: SettingBoxKey.enableSingleRow,
-          //   defaultVal: false,
-          //   callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
-          // ),
+          const SetSwitchItem(
+            title: '首页顶栏收起',
+            subTitle: '首页列表滑动时，收起顶栏',
+            setKey: SettingBoxKey.hideSearchBar,
+            defaultVal: true,
+            needReboot: true,
+          ),
+          const SetSwitchItem(
+            title: '首页底栏收起',
+            subTitle: '首页列表滑动时，收起底栏',
+            setKey: SettingBoxKey.hideTabBar,
+            defaultVal: true,
+            needReboot: true,
+          ),
           ListTile(
             dense: false,
             title: Text('自定义列数', style: titleStyle),

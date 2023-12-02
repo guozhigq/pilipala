@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -15,6 +17,10 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   RxBool userLogin = false.obs;
   RxString userFace = ''.obs;
   var userInfo;
+  Box setting = GStrorage.setting;
+  late final StreamController<bool> searchBarStream =
+      StreamController<bool>.broadcast();
+  late bool hideSearchBar;
 
   @override
   void onInit() {
@@ -33,6 +39,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       length: tabs.length,
       vsync: this,
     );
+    hideSearchBar =
+        setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
   }
 
   void onRefresh() {
