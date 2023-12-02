@@ -568,13 +568,7 @@ class VideoIntroController extends GetxController {
       upMid: videoDetail.value.owner!.mid!,
     );
     if (res['status']) {
-      if (res['data'].modelResult.resultType == 0) {
-        SmartDialog.showToast('该视频不支持ai总结');
-      }
-      if (res['data'].modelResult.resultType == 2 ||
-          res['data'].modelResult.resultType == 1) {
-        modelResult = res['data'].modelResult;
-      }
+      modelResult = res['data'].modelResult;
     }
     SmartDialog.dismiss();
     return res;

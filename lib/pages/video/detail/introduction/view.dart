@@ -134,6 +134,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final dynamic followStatus;
   late int mid;
   late String memberHeroTag;
+  late bool enableAi;
 
   @override
   void initState() {
@@ -150,6 +151,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         ? '-'
         : Utils.numFormat(videoIntroController.userStat['follower']);
     followStatus = videoIntroController.followStatus;
+    enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
   }
 
   // 收藏
@@ -317,23 +319,22 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      Positioned(
-                        right: 10,
-                        top: 6,
-                        child: GestureDetector(
-                          onTap: () async {
-                            var res = await videoIntroController.aiConclusion();
-                            if (res['status']) {
-                              if (res['data'].modelResult.resultType == 2 ||
-                                  res['data'].modelResult.resultType == 1) {
+                      if (enableAi)
+                        Positioned(
+                          right: 10,
+                          top: 6,
+                          child: GestureDetector(
+                            onTap: () async {
+                              var res =
+                                  await videoIntroController.aiConclusion();
+                              if (res['status']) {
                                 showAiBottomSheet();
                               }
-                            }
-                          },
-                          child:
-                              Image.asset('assets/images/ai.png', height: 22),
-                        ),
-                      )
+                            },
+                            child:
+                                Image.asset('assets/images/ai.png', height: 22),
+                          ),
+                        )
                     ],
                   ),
                   // 点赞收藏转发 布局样式1
