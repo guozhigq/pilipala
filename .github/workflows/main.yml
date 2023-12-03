@@ -74,11 +74,8 @@ jobs:
                 done
 
             - name: 构建和发布release
-              uses: ncipollo/release-action@v1
+              uses: softprops/action-gh-release@v1
               with:
-                  # release title
-                  name: v${{ steps.version.outputs.version }}
-                  artifacts: "build/app/outputs/flutter-apk/Pili-*.apk"
-                  bodyFile: "change_log/${{steps.version.outputs.version}}.md"
-                  token: ${{ secrets.GIT_TOKEN }}
-                  allowUpdates: true
+                body: Bump Version
+                files: |
+                  build/app/outputs/flutter-apk/Pili-*.apk
