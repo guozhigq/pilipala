@@ -82,6 +82,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                 labelStyle: const TextStyle(fontSize: 13),
                 dividerColor: Colors.transparent,
                 unselectedLabelColor: Theme.of(context).colorScheme.outline,
+                tabAlignment: TabAlignment.start,
                 onTap: (index) {
                   if (index == _searchResultController!.tabIndex) {
                     Get.find<SearchPanelController>(

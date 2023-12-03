@@ -196,8 +196,8 @@ class _RcmdPageState extends State<RcmdPage>
 }
 
 class LoadingMore extends StatelessWidget {
-  dynamic ctr;
-  LoadingMore({super.key, this.ctr});
+  final dynamic ctr;
+  const LoadingMore({super.key, this.ctr});
 
   @override
   Widget build(BuildContext context) {

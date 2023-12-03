@@ -9,7 +9,6 @@ import 'package:pilipala/common/widgets/html_render.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
 import 'package:pilipala/pages/video/detail/replyNew/index.dart';
 import 'package:pilipala/pages/video/detail/replyReply/index.dart';
