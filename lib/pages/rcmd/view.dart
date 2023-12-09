@@ -75,7 +75,7 @@ class _RcmdPageState extends State<RcmdPage>
     super.build(context);
     return Container(
       clipBehavior: Clip.none,
-      color: Colors.grey.shade50,
+      color: Colors.black54.withOpacity(0.02),
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace),
       child: RefreshIndicator(
@@ -159,7 +159,7 @@ class _RcmdPageState extends State<RcmdPage>
         (Get.size.width / crossAxisCount / StyleString.aspectRatio) +
             (crossAxisCount == 1
                 ? 68
-                : 87 * MediaQuery.of(context).textScaleFactor);
+                : 88 * MediaQuery.of(context).textScaleFactor);
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
