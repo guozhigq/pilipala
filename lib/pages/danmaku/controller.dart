@@ -29,6 +29,25 @@ class PlDanmakuController {
     } catch (_) {}
   }
 
+  Future<List<DmSegMobileReply>> queryAllDanmaku() async {
+    for (int i = 0; i < segCount; i++) {
+      if (!hasrequestSeg.contains(i)) {
+        DmSegMobileReply result =
+            await DanmakaHttp.queryDanmaku(cid: cid, segmentIndex: i + 1);
+        if (result.elems.isNotEmpty) {
+          result.elems.sort((a, b) => (a.progress).compareTo(b.progress));
+          dmSegList[i] = result;
+          hasrequestSeg.add(i);
+          print("queryAllDanmaku:" + i.toString());
+        }
+      }
+    }
+    if (dmSegList.isNotEmpty) {
+      findClosestPositionIndex(playerController.position.value.inMilliseconds);
+    }
+    return dmSegList;
+  }
+  
   Future<List<DmSegMobileReply>> queryDanmaku() async {
     // dmSegList.clear();
     DmSegMobileReply result =
