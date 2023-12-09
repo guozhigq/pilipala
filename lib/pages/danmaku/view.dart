@@ -49,7 +49,8 @@ class _PlDanmakuState extends State<PlDanmaku> {
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
         _plDanmakuController
           ..calcSegment()
-          ..queryDanmaku();
+          ..queryAllDanmaku();
+          // ..queryDanmaku();
       }
       playerController
         ..addStatusLister(playerListener)
@@ -60,7 +61,8 @@ class _PlDanmakuState extends State<PlDanmaku> {
         if (_plDanmakuController.dmSegList.isEmpty) {
           _plDanmakuController
             ..calcSegment()
-            ..queryDanmaku();
+            ..queryAllDanmaku();
+            // ..queryDanmaku();
         }
       }
     });
