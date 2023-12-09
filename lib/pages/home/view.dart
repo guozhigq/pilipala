@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage>
                 isScrollable: true,
                 dividerColor: Colors.transparent,
                 enableFeedback: true,
-                splashBorderRadius: BorderRadius.circular(10),
+                splashBorderRadius: BorderRadius.circular(5),
                 onTap: (value) {
                   feedBack();
                   if (_homeController.initialIndex == value) {

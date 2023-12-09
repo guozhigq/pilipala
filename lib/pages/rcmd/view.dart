@@ -74,12 +74,10 @@ class _RcmdPageState extends State<RcmdPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.only(
+      clipBehavior: Clip.none,
+      color: Colors.grey.shade50,
+      padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(StyleString.imgRadius),
-      ),
       child: RefreshIndicator(
         onRefresh: () async {
           await _rcmdController.onRefresh();
@@ -161,7 +159,7 @@ class _RcmdPageState extends State<RcmdPage>
         (Get.size.width / crossAxisCount / StyleString.aspectRatio) +
             (crossAxisCount == 1
                 ? 68
-                : 86 * MediaQuery.of(context).textScaleFactor);
+                : 87 * MediaQuery.of(context).textScaleFactor);
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距

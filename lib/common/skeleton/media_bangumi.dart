@@ -63,7 +63,7 @@ class _MediaBangumiSkeletonState extends State<MediaBangumiSkeleton> {
                       height: 35,
                       decoration: BoxDecoration(
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
+                            const BorderRadius.all(Radius.circular(5)),
                         color: Theme.of(context).colorScheme.onInverseSurface,
                       ),
                     ),

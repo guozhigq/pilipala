@@ -126,9 +126,14 @@ class VideoCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return Card(
-      elevation: 0,
-      clipBehavior: Clip.hardEdge,
+      elevation: 3,
+      clipBehavior: Clip.none,
       margin: EdgeInsets.zero,
+      surfaceTintColor: Colors.white,
+      shadowColor: Colors.black38,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(StyleString.imgRadius.x),
+      ),
       child: GestureDetector(
         onLongPress: () {
           if (longPress != null) {
@@ -201,7 +206,7 @@ class VideoContent extends StatelessWidget {
       child: Padding(
         padding: crossAxisCount == 1
             ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
-            : const EdgeInsets.fromLTRB(5, 8, 5, 4),
+            : const EdgeInsets.fromLTRB(8, 8, 8, 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -210,7 +215,7 @@ class VideoContent extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    videoItem.title,
+                    videoItem.title + '\n',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -219,7 +224,7 @@ class VideoContent extends StatelessWidget {
                   const SizedBox(width: 10),
                   WatchLater(
                     size: 32,
-                    iconSize: 18,
+                    iconSize: 22,
                     callFn: () async {
                       int aid = videoItem.param;
                       var res =
@@ -231,12 +236,12 @@ class VideoContent extends StatelessWidget {
               ],
             ),
             if (crossAxisCount > 1) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               VideoStat(
                 videoItem: videoItem,
               ),
             ],
-            if (crossAxisCount == 1) const SizedBox(height: 4),
+            if (crossAxisCount == 1) const SizedBox(height: 0),
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
