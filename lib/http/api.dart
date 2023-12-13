@@ -312,6 +312,10 @@ class Api {
 
   static const String webDanmaku = '/x/v2/dm/web/seg.so';
 
+  //发送视频弹幕
+  //https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/danmaku/action.md
+  static const String shootDanmaku = '/x/v2/dm/post';
+
   // up主分组
   static const String followUpTag = '/x/relation/tags';
 
