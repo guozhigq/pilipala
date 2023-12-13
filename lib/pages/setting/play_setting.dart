@@ -96,7 +96,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           const SetSwitchItem(
             title: '自动PiP播放',
-            subTitle: 'app切换至后台时画中画播放',
+            subTitle: '进入后台时画中画播放',
             setKey: SettingBoxKey.autoPiP,
             defaultVal: false,
           ),
