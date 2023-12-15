@@ -44,12 +44,10 @@ class _FontSizeSelectPageState extends State<FontSizeSelectPage> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Center(
-                child: Text(
-                  '当前字体大小:${currentSize == 1.0 ? '默认' : currentSize}',
-                  style: TextStyle(fontSize: 14 * currentSize),
-                ),
+            child: Center(
+              child: Text(
+                '当前字体大小:${currentSize == 1.0 ? '默认' : currentSize}',
+                style: TextStyle(fontSize: 14 * currentSize),
               ),
             ),
           ),

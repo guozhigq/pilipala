@@ -67,6 +67,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
           ? Text(widget.subTitle!, style: subTitleStyle)
           : null,
       trailing: Transform.scale(
+        alignment: Alignment.centerRight, // 缩放Switch的大小后保持右侧对齐, 避免右侧空隙过大
         scale: 0.8,
         child: Switch(
           thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
