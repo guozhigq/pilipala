@@ -34,11 +34,6 @@ class _AboutPageState extends State<AboutPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Divider(
-              thickness: 8,
-              height: 10,
-              color: Theme.of(context).colorScheme.onInverseSurface,
-            ),
             Image.asset(
               'assets/images/logo/logo_android_2.png',
               width: 150,
@@ -83,9 +78,9 @@ class _AboutPageState extends State<AboutPage> {
             //   ),
             // ),
             Divider(
-              thickness: 8,
+              thickness: 1,
               height: 30,
-              color: Theme.of(context).colorScheme.onInverseSurface,
+              color: Theme.of(context).colorScheme.outlineVariant,
             ),
             ListTile(
               onTap: () => _aboutController.githubUrl(),
@@ -133,11 +128,6 @@ class _AboutPageState extends State<AboutPage> {
               onTap: () => _aboutController.aPay(),
               title: const Text('赞助'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
-            ),
-            Divider(
-              thickness: 8,
-              height: 30,
-              color: Theme.of(context).colorScheme.onInverseSurface,
             ),
           ],
         ),

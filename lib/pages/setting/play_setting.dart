@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
+import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -68,7 +69,7 @@ class _PlaySettingState extends State<PlaySetting> {
             dense: false,
             onTap: () => Get.toNamed('/playSpeedSet'),
             title: Text('倍速设置', style: titleStyle),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 17),
+            subtitle: Text('设置视频播放速度', style: subTitleStyle),
           ),
           const SetSwitchItem(
             title: '开启1080P',
@@ -96,7 +97,7 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           const SetSwitchItem(
             title: '自动PiP播放',
-            subTitle: 'app切换至后台时画中画播放',
+            subTitle: '进入后台时画中画播放',
             setKey: SettingBoxKey.autoPiP,
             defaultVal: false,
           ),
@@ -149,23 +150,21 @@ class _PlaySettingState extends State<PlaySetting> {
               '当前画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultVideoQa,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultVideoQa = item;
-                setting.put(SettingBoxKey.defaultVideoQa, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '默认画质', value: defaultVideoQa, values: VideoQuality.values.reversed.map((e) {
+                    return {'title': e.description, 'value': e.code};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultVideoQa = result;
+                setting.put(SettingBoxKey.defaultVideoQa, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in VideoQuality.values.reversed) ...[
-                  PopupMenuItem(
-                    value: i.code,
-                    child: Text(i.description),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             dense: false,
@@ -174,23 +173,21 @@ class _PlaySettingState extends State<PlaySetting> {
               '当前音质${AudioQualityCode.fromCode(defaultAudioQa)!.description!}',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultAudioQa,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultAudioQa = item;
-                setting.put(SettingBoxKey.defaultAudioQa, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '默认音质', value: defaultAudioQa, values: AudioQuality.values.reversed.map((e) {
+                    return {'title': e.description, 'value': e.code};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultAudioQa = result;
+                setting.put(SettingBoxKey.defaultAudioQa, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in AudioQuality.values.reversed) ...[
-                  PopupMenuItem(
-                    value: i.code,
-                    child: Text(i.description),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             dense: false,
@@ -199,23 +196,21 @@ class _PlaySettingState extends State<PlaySetting> {
               '当前解码格式${VideoDecodeFormatsCode.fromCode(defaultDecode)!.description!}',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultDecode,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultDecode = item;
-                setting.put(SettingBoxKey.defaultDecode, item);
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(title: '默认解码格式', value: defaultDecode, values: VideoDecodeFormats.values.map((e) {
+                    return {'title': e.description, 'value': e.code};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultDecode = result;
+                setting.put(SettingBoxKey.defaultDecode, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in VideoDecodeFormats.values) ...[
-                  PopupMenuItem(
-                    value: i.code,
-                    child: Text(i.description),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             dense: false,
@@ -224,23 +219,21 @@ class _PlaySettingState extends State<PlaySetting> {
               '当前全屏方式：${FullScreenModeCode.fromCode(defaultFullScreenMode)!.description}',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultFullScreenMode,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultFullScreenMode = item;
-                setting.put(SettingBoxKey.fullScreenMode, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '默认全屏方式', value: defaultFullScreenMode, values: FullScreenMode.values.map((e) {
+                    return {'title': e.description, 'value': e.code};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultFullScreenMode = result;
+                setting.put(SettingBoxKey.fullScreenMode, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in FullScreenMode.values) ...[
-                  PopupMenuItem(
-                    value: i.code,
-                    child: Text(i.description),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             dense: false,
@@ -249,23 +242,21 @@ class _PlaySettingState extends State<PlaySetting> {
               '当前展示方式：${BtmProgresBehaviorCode.fromCode(defaultBtmProgressBehavior)!.description}',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultBtmProgressBehavior,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultBtmProgressBehavior = item;
-                setting.put(SettingBoxKey.btmProgressBehavior, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '底部进度条展示', value: defaultBtmProgressBehavior, values: BtmProgresBehavior.values.map((e) {
+                    return {'title': e.description, 'value': e.code};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultBtmProgressBehavior = result;
+                setting.put(SettingBoxKey.btmProgressBehavior, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in BtmProgresBehavior.values) ...[
-                  PopupMenuItem(
-                    value: i.code,
-                    child: Text(i.description),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
         ],
       ),

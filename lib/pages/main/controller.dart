@@ -55,6 +55,7 @@ class MainController extends GetxController {
       StreamController<bool>.broadcast();
   Box setting = GStrorage.setting;
   DateTime? _lastPressedAt;
+  late bool hideTabBar;
 
   @override
   void onInit() {
@@ -62,6 +63,7 @@ class MainController extends GetxController {
     if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
       Utils.checkUpdata();
     }
+    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
   }
 
   Future<bool> onBackPressed(BuildContext context) {
