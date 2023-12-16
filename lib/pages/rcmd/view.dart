@@ -50,7 +50,6 @@ class _RcmdPageState extends State<RcmdPage>
             _rcmdController.onLoad();
           });
         }
-
         final ScrollDirection direction =
             scrollController.position.userScrollDirection;
         if (direction == ScrollDirection.forward) {
@@ -208,12 +207,13 @@ class LoadingMore extends StatelessWidget {
         child: GestureDetector(
           onTap: () {
             if (ctr != null) {
+              ctr!.isLoadingMore = true;
               ctr!.onLoad();
             }
           },
           child: Center(
             child: Text(
-              '加载更多 👇',
+              '点击加载更多 👇',
               style: TextStyle(
                   color: Theme.of(context).colorScheme.outline, fontSize: 13),
             ),
