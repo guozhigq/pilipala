@@ -447,4 +447,18 @@ class MemberHttp {
       };
     }
   }
+
+  // 获取up播放数、点赞数
+  static Future memberView({required int mid}) async {
+    var res = await Request().get(Api.getMemberViewApi, data: {'mid': mid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

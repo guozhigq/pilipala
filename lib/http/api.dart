@@ -410,6 +410,7 @@ class Api {
   static const getMemberSeasonsApi = '/x/polymer/web-space/home/seasons_series';
 
   /// 获赞数 播放数
+  /// mid
   static const getMemberViewApi = '/x/space/upstat';
 
   /// 查询某个专栏

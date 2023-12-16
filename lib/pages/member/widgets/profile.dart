@@ -137,8 +137,14 @@ Widget profile(ctr, {loadingStatus = false}) {
                         ),
                         Column(
                           children: [
-                            const Text('-',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(
+                                !loadingStatus
+                                    ? Utils.numFormat(
+                                        ctr.userStat!['likes'],
+                                      )
+                                    : '-',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text(
                               '获赞',
                               style: TextStyle(
