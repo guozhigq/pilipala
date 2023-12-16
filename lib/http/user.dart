@@ -199,7 +199,7 @@ class UserHttp {
     }
   }
 
-  // 获取用户凭证
+  // 获取用户凭证 失效
   static Future thirdLogin() async {
     var res = await Request().get(
       'https://passport.bilibili.com/login/app/third',

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -113,8 +115,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         MediaQuery.of(context).size.width * 9 / 16;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
-    return WillPopScope(
-      onWillPop: () => _mainController.onBackPressed(context),
+    return PopScope(
+      onPopInvoked: (bool status) => _mainController.onBackPressed(context),
       child: Scaffold(
         extendBody: true,
         body: FadeTransition(
@@ -142,7 +144,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
         ),
         bottomNavigationBar: StreamBuilder(
-          stream: _mainController.bottomBarStream.stream,
+          stream: _mainController.hideTabBar
+              ? _mainController.bottomBarStream.stream
+              : StreamController<bool>.broadcast().stream,
           initialData: true,
           builder: (context, AsyncSnapshot snapshot) {
             return AnimatedSlide(

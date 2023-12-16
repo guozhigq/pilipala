@@ -231,6 +231,15 @@ class _DynamicsPageState extends State<DynamicsPage>
                 }
               },
             ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 6,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onInverseSurface
+                    .withOpacity(0.5),
+              ),
+            ),
             FutureBuilder(
               future: _futureBuilderFuture,
               builder: (context, snapshot) {

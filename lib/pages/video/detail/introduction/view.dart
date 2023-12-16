@@ -12,7 +12,6 @@ import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
-import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -134,6 +133,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final dynamic followStatus;
   late int mid;
   late String memberHeroTag;
+  late bool enableAi;
 
   @override
   void initState() {
@@ -150,6 +150,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         ? '-'
         : Utils.numFormat(videoIntroController.userStat['follower']);
     followStatus = videoIntroController.followStatus;
+    enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
   }
 
   // 收藏
@@ -247,7 +248,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
       sliver: SliverToBoxAdapter(
-        child: !loadingStatus || videoItem.isNotEmpty
+        child: !loadingStatus
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -277,7 +278,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             children: [
                               StatView(
                                 theme: 'gray',
-                                view: !widget.loadingStatus
+                                view: !loadingStatus
                                     ? widget.videoDetail!.stat!.view
                                     : videoItem['stat'].view,
                                 size: 'medium',
@@ -285,7 +286,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               const SizedBox(width: 10),
                               StatDanMu(
                                 theme: 'gray',
-                                danmu: !widget.loadingStatus
+                                danmu: !loadingStatus
                                     ? widget.videoDetail!.stat!.danmaku
                                     : videoItem['stat'].danmaku,
                                 size: 'medium',
@@ -293,7 +294,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                               const SizedBox(width: 10),
                               Text(
                                 Utils.dateFormat(
-                                    !widget.loadingStatus
+                                    !loadingStatus
                                         ? widget.videoDetail!.pubdate
                                         : videoItem['pubdate'],
                                     formatType: 'detail'),
@@ -317,23 +318,22 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      Positioned(
-                        right: 10,
-                        top: 6,
-                        child: GestureDetector(
-                          onTap: () async {
-                            var res = await videoIntroController.aiConclusion();
-                            if (res['status']) {
-                              if (res['data'].modelResult.resultType == 2 ||
-                                  res['data'].modelResult.resultType == 1) {
+                      if (enableAi)
+                        Positioned(
+                          right: 10,
+                          top: 6,
+                          child: GestureDetector(
+                            onTap: () async {
+                              var res =
+                                  await videoIntroController.aiConclusion();
+                              if (res['status']) {
                                 showAiBottomSheet();
                               }
-                            }
-                          },
-                          child:
-                              Image.asset('assets/images/ai.png', height: 22),
-                        ),
-                      )
+                            },
+                            child:
+                                Image.asset('assets/images/ai.png', height: 22),
+                          ),
+                        )
                     ],
                   ),
                   // 点赞收藏转发 布局样式1

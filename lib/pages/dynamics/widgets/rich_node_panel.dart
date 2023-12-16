@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/pages/preview/index.dart';
 
 // 富文本
 InlineSpan richNode(item, context) {
@@ -11,13 +9,11 @@ InlineSpan richNode(item, context) {
     TextStyle authorStyle =
         TextStyle(color: Theme.of(context).colorScheme.primary);
     List<InlineSpan> spanChilds = [];
-    String contentType = 'desc';
 
     dynamic richTextNodes;
     if (item.modules.moduleDynamic.desc != null) {
       richTextNodes = item.modules.moduleDynamic.desc.richTextNodes;
     } else if (item.modules.moduleDynamic.major != null) {
-      contentType = 'major';
       // 动态页面 richTextNodes 层级可能与主页动态层级不同
       richTextNodes =
           item.modules.moduleDynamic.major.opus.summary.richTextNodes;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -9,6 +10,7 @@ class SetSwitchItem extends StatefulWidget {
   final String? setKey;
   final bool? defaultVal;
   final Function? callFn;
+  final bool? needReboot;
 
   const SetSwitchItem({
     this.title,
@@ -16,6 +18,7 @@ class SetSwitchItem extends StatefulWidget {
     this.setKey,
     this.defaultVal,
     this.callFn,
+    this.needReboot,
     Key? key,
   }) : super(key: key);
 
@@ -43,6 +46,9 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
     if (widget.callFn != null) {
       widget.callFn!.call(val);
     }
+    if (widget.needReboot != null && widget.needReboot!) {
+      SmartDialog.showToast('重启生效');
+    }
     setState(() {});
   }
 
@@ -61,6 +67,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
           ? Text(widget.subTitle!, style: subTitleStyle)
           : null,
       trailing: Transform.scale(
+        alignment: Alignment.centerRight, // 缩放Switch的大小后保持右侧对齐, 避免右侧空隙过大
         scale: 0.8,
         child: Switch(
           thumbIcon: MaterialStateProperty.resolveWith<Icon?>(

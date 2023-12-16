@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -337,7 +337,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo);
+      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -380,8 +380,10 @@ class PlPlayerController {
     // 解除倍速限制
     await pp.setProperty("af", "scaletempo2=max-speed=8");
     //  音量不一致
-    await pp.setProperty("volume-max", "100");
-    await pp.setProperty("ao", "audiotrack,opensles");
+    if (Platform.isAndroid) {
+      await pp.setProperty("volume-max", "100");
+      await pp.setProperty("ao", "audiotrack,opensles");
+    }
 
     // 音轨
     if (dataSource.audioSource != '' && dataSource.audioSource != null) {
@@ -441,12 +443,17 @@ class PlPlayerController {
   // 开始播放
   Future _initializePlayer({
     Duration seekTo = Duration.zero,
+    Duration? duration,
   }) async {
     // 设置倍速
-    if (_playbackSpeed.value != 1.0) {
-      await setPlaybackSpeed(_playbackSpeed.value);
-    } else {
+    if (videoType.value == 'live') {
       await setPlaybackSpeed(1.0);
+    } else {
+      if (_playbackSpeed.value != 1.0) {
+        await setPlaybackSpeed(_playbackSpeed.value);
+      } else {
+        await setPlaybackSpeed(1.0);
+      }
     }
     getVideoFit();
     // if (_looping) {
@@ -460,7 +467,7 @@ class PlPlayerController {
 
     // 自动播放
     if (_autoPlay) {
-      await play();
+      await play(duration: duration);
     }
   }
 
@@ -589,6 +596,7 @@ class PlPlayerController {
 
   /// 设置倍速
   Future<void> setPlaybackSpeed(double speed) async {
+    /// TODO  _duration.value丢失
     await _videoPlayerController?.setRate(speed);
     try {
       DanmakuOption currentOption = danmakuController!.option;
@@ -624,7 +632,9 @@ class PlPlayerController {
   // }
 
   /// 播放视频
-  Future<void> play({bool repeat = false, bool hideControls = true}) async {
+  /// TODO  _duration.value丢失
+  Future<void> play(
+      {bool repeat = false, bool hideControls = true, dynamic duration}) async {
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
@@ -638,6 +648,11 @@ class PlPlayerController {
 
     playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
+
+    /// 临时fix _duration.value丢失
+    if (duration != null) {
+      _duration.value = duration;
+    }
     audioSessionHandler.setActive(true);
   }
 

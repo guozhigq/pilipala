@@ -1,9 +1,16 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/follow/result.dart';
 import 'package:pilipala/models/member/archive.dart';
+import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
+import 'package:pilipala/models/member/seasons.dart';
 import 'package:pilipala/models/member/tags.dart';
+import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/wbi_sign.dart';
 
 class MemberHttp {
@@ -207,6 +214,245 @@ class MemberHttp {
             .map<FollowItemModel>((e) => FollowItemModel.fromJson(e))
             .toList()
       };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取up置顶
+  static Future getTopVideo(String? vmid) async {
+    var res = await Request().get(Api.getTopVideoApi);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data']
+            .map<MemberTagItemModel>((e) => MemberTagItemModel.fromJson(e))
+            .toList()
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取uo专栏
+  static Future getMemberSeasons(int? mid, int? pn, int? ps) async {
+    var res = await Request().get(Api.getMemberSeasonsApi, data: {
+      'mid': mid,
+      'page_num': pn,
+      'page_size': ps,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 最近投币
+  static Future getRecentCoinVideo({required int mid}) async {
+    Map params = await WbiSign().makSign({
+      'mid': mid,
+      'gaia_source': 'main_web',
+      'web_location': 333.999,
+    });
+    var res = await Request().get(
+      Api.getRecentCoinVideoApi,
+      data: {
+        'vmid': mid,
+        'gaia_source': 'main_web',
+        'web_location': 333.999,
+        'w_rid': params['w_rid'],
+        'wts': params['wts'],
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data']
+            .map<MemberCoinsDataModel>((e) => MemberCoinsDataModel.fromJson(e))
+            .toList(),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 最近点赞
+  static Future getRecentLikeVideo({required int mid}) async {
+    Map params = await WbiSign().makSign({
+      'mid': mid,
+      'gaia_source': 'main_web',
+      'web_location': 333.999,
+    });
+    var res = await Request().get(
+      Api.getRecentLikeVideoApi,
+      data: {
+        'vmid': mid,
+        'gaia_source': 'main_web',
+        'web_location': 333.999,
+        'w_rid': params['w_rid'],
+        'wts': params['wts'],
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 查看某个专栏
+  static Future getSeasonDetail({
+    required int mid,
+    required int seasonId,
+    bool sortReverse = false,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(
+      Api.getSeasonDetailApi,
+      data: {
+        'mid': mid,
+        'season_id': seasonId,
+        'sort_reverse': sortReverse,
+        'page_num': pn,
+        'page_size': ps,
+      },
+    );
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MemberSeasonsList.fromJson(res.data['data'])
+        };
+      } catch (err) {
+        print(err);
+      }
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取TV authCode
+  static Future getTVCode() async {
+    SmartDialog.showLoading();
+    var params = {
+      'appkey': Constants.appKey,
+      'local_id': '0',
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+    };
+    String sign = Utils.appSign(
+      params,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    var res = await Request()
+        .post(Api.getTVCode, queryParameters: {...params, 'sign': sign});
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data']['auth_code'],
+        'msg': '操作成功'
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取access_key
+  static Future cookieToKey() async {
+    var authCodeRes = await getTVCode();
+    if (authCodeRes['status']) {
+      var res = await Request().post(Api.cookieToKey, queryParameters: {
+        'auth_code': authCodeRes['data'],
+        'build': 708200,
+        'csrf': await Request.getCsrf(),
+      });
+      await Future.delayed(const Duration(milliseconds: 300));
+      await qrcodePoll(authCodeRes['data']);
+      if (res.data['code'] == 0) {
+        return {'status': true, 'data': [], 'msg': '操作成功'};
+      } else {
+        return {
+          'status': false,
+          'data': [],
+          'msg': res.data['message'],
+        };
+      }
+    }
+  }
+
+  static Future qrcodePoll(authCode) async {
+    var params = {
+      'appkey': Constants.appKey,
+      'auth_code': authCode.toString(),
+      'local_id': '0',
+      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
+    };
+    String sign = Utils.appSign(
+      params,
+      Constants.appKey,
+      Constants.appSec,
+    );
+    var res = await Request()
+        .post(Api.qrcodePoll, queryParameters: {...params, 'sign': sign});
+    SmartDialog.dismiss();
+    if (res.data['code'] == 0) {
+      String accessKey = res.data['data']['access_token'];
+      Box localCache = GStrorage.localCache;
+      Box userInfoCache = GStrorage.userInfo;
+      var userInfo = userInfoCache.get('userInfoCache');
+      localCache.put(
+          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
+      return {'status': true, 'data': [], 'msg': '操作成功'};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取up播放数、点赞数
+  static Future memberView({required int mid}) async {
+    var res = await Request().get(Api.getMemberViewApi, data: {'mid': mid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
     } else {
       return {
         'status': false,

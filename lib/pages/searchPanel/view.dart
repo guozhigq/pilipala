@@ -83,6 +83,7 @@ class _SearchPanelState extends State<SearchPanel>
                   case SearchType.video:
                     return SearchVideoPanel(
                       ctr: _searchPanelController,
+                      // ignore: invalid_use_of_protected_member
                       list: list.value,
                     );
                   case SearchType.media_bangumi:

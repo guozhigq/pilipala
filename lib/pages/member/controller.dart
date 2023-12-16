@@ -6,6 +6,7 @@ import 'package:pilipala/http/member.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/member/archive.dart';
+import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,16 +14,17 @@ import 'package:share_plus/share_plus.dart';
 class MemberController extends GetxController {
   late int mid;
   Rx<MemberInfoModel> memberInfo = MemberInfoModel().obs;
-  Map? userStat;
+  late Map userStat;
   RxString face = ''.obs;
   String? heroTag;
   Box userInfoCache = GStrorage.userInfo;
   late int ownerMid;
   // 投稿列表
   RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
-  var userInfo;
+  dynamic userInfo;
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
+  RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
 
   @override
   void onInit() {
@@ -38,6 +40,7 @@ class MemberController extends GetxController {
   // 获取用户信息
   Future<Map<String, dynamic>> getInfo() async {
     await getMemberStat();
+    await getMemberView();
     var res = await MemberHttp.memberInfo(mid: mid);
     if (res['status']) {
       memberInfo.value = res['data'];
@@ -55,13 +58,14 @@ class MemberController extends GetxController {
     return res;
   }
 
-  // Future getMemberCardInfo() async {
-  //   var res = await MemberHttp.memberCardInfo(mid: mid);
-  //   if (res['status']) {
-  //     print(userStat);
-  //   }
-  //   return res;
-  // }
+  // 获取用户播放数 获赞数
+  Future<Map<String, dynamic>> getMemberView() async {
+    var res = await MemberHttp.memberView(mid: mid);
+    if (res['status']) {
+      userStat.addAll(res['data']);
+    }
+    return res;
+  }
 
   // 关注/取关up
   Future actionRelationMod() async {
@@ -172,5 +176,36 @@ class MemberController extends GetxController {
 
   void shareUser() {
     Share.share('${memberInfo.value.name} - https://space.bilibili.com/$mid');
+  }
+
+  // 请求专栏
+  Future getMemberSeasons() async {
+    if (userInfo == null) return;
+    var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
+    if (!res['status']) {
+      SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
+    }
+    return res;
+  }
+
+  // 请求投币视频
+  Future getRecentCoinVideo() async {
+    if (userInfo == null) return;
+    var res = await MemberHttp.getRecentCoinVideo(mid: mid);
+    recentCoinsList.value = res['data'];
+    return res;
+  }
+
+  // 跳转查看动态
+  void pushDynamicsPage() => Get.toNamed('/memberDynamics?mid=$mid');
+
+  // 跳转查看投稿
+  void pushArchivesPage() => Get.toNamed('/memberArchive?mid=$mid');
+
+  // 跳转查看专栏
+  void pushSeasonsPage() {}
+  // 跳转查看最近投币
+  void pushRecentCoinsPage() async {
+    if (recentCoinsList.isNotEmpty) {}
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
+import 'package:pilipala/http/member.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
@@ -102,7 +103,6 @@ class WebviewController extends GetxController {
     try {
       await SetCookie.onSet();
       var result = await UserHttp.userInfo();
-      UserHttp.thirdLogin();
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
         try {
@@ -115,6 +115,7 @@ class WebviewController extends GetxController {
           MediaController mediaCtr = Get.find<MediaController>();
           mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
+          MemberHttp.cookieToKey();
         } catch (err) {
           SmartDialog.show(builder: (context) {
             return AlertDialog(

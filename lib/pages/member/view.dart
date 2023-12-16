@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/member/archive/view.dart';
-import 'package:pilipala/pages/member/dynamic/index.dart';
 import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import 'widgets/conis.dart';
 import 'widgets/profile.dart';
+import 'widgets/seasons.dart';
 
 class MemberPage extends StatefulWidget {
   const MemberPage({super.key});
@@ -23,9 +23,10 @@ class _MemberPageState extends State<MemberPage>
     with SingleTickerProviderStateMixin {
   late String heroTag;
   late MemberController _memberController;
-  Future? _futureBuilderFuture;
+  late Future _futureBuilderFuture;
+  late Future _memberSeasonsFuture;
+  late Future _memberCoinsFuture;
   final ScrollController _extendNestCtr = ScrollController();
-  late TabController _tabController;
   final StreamController<bool> appbarStream = StreamController<bool>();
   late int mid;
 
@@ -35,12 +36,13 @@ class _MemberPageState extends State<MemberPage>
     mid = int.parse(Get.parameters['mid']!);
     heroTag = Get.arguments['heroTag'] ?? Utils.makeHeroTag(mid);
     _memberController = Get.put(MemberController(), tag: heroTag);
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _futureBuilderFuture = _memberController.getInfo();
+    _memberSeasonsFuture = _memberController.getMemberSeasons();
+    _memberCoinsFuture = _memberController.getRecentCoinVideo();
     _extendNestCtr.addListener(
       () {
         double offset = _extendNestCtr.position.pixels;
-        if (offset > 230) {
+        if (offset > 100) {
           appbarStream.add(true);
         } else {
           appbarStream.add(false);
@@ -59,183 +61,222 @@ class _MemberPageState extends State<MemberPage>
   Widget build(BuildContext context) {
     return Scaffold(
       primary: true,
-      body: ExtendedNestedScrollView(
-        controller: _extendNestCtr,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              pinned: false,
-              primary: true,
-              elevation: 0,
-              scrolledUnderElevation: 1,
-              forceElevated: innerBoxIsScrolled,
-              expandedHeight: 290,
-              titleSpacing: 0,
-              title: StreamBuilder(
-                stream: appbarStream.stream,
-                initialData: false,
-                builder: (context, AsyncSnapshot snapshot) {
-                  return AnimatedOpacity(
-                    opacity: snapshot.data ? 1 : 0,
-                    curve: Curves.easeOut,
-                    duration: const Duration(milliseconds: 500),
-                    child: Row(
-                      children: [
-                        Row(
-                          children: [
-                            Obx(
-                              () => NetworkImgLayer(
-                                width: 35,
-                                height: 35,
-                                type: 'avatar',
-                                src: _memberController.face.value,
-                              ),
+      body: Column(
+        children: [
+          AppBar(
+            title: StreamBuilder(
+              stream: appbarStream.stream,
+              initialData: false,
+              builder: (context, AsyncSnapshot snapshot) {
+                return AnimatedOpacity(
+                  opacity: snapshot.data ? 1 : 0,
+                  curve: Curves.easeOut,
+                  duration: const Duration(milliseconds: 500),
+                  child: Row(
+                    children: [
+                      Row(
+                        children: [
+                          Obx(
+                            () => NetworkImgLayer(
+                              width: 35,
+                              height: 35,
+                              type: 'avatar',
+                              src: _memberController.face.value,
                             ),
-                            const SizedBox(width: 10),
-                            Obx(
-                              () => Text(
-                                _memberController.memberInfo.value.name ?? '',
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
-                                    fontSize: 14),
-                              ),
+                          ),
+                          const SizedBox(width: 10),
+                          Obx(
+                            () => Text(
+                              _memberController.memberInfo.value.name ?? '',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground,
+                                  fontSize: 14),
                             ),
-                          ],
-                        )
-                      ],
-                    ),
-                  );
-                },
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () => Get.toNamed(
-                      '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
-                  icon: const Icon(Icons.search_outlined),
-                ),
-                PopupMenuButton(
-                  icon: const Icon(Icons.more_vert),
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                    if (_memberController.ownerMid !=
-                        _memberController.mid) ...[
-                      PopupMenuItem(
-                        onTap: () => _memberController.blockUser(),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.block, size: 19),
-                            const SizedBox(width: 10),
-                            Text(_memberController.attribute.value != 128
-                                ? '加入黑名单'
-                                : '移除黑名单'),
-                          ],
-                        ),
+                          ),
+                        ],
                       )
                     ],
+                  ),
+                );
+              },
+            ),
+            actions: [
+              IconButton(
+                onPressed: () => Get.toNamed(
+                    '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
+                icon: const Icon(Icons.search_outlined),
+              ),
+              PopupMenuButton(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                  if (_memberController.ownerMid != _memberController.mid) ...[
                     PopupMenuItem(
-                      onTap: () => _memberController.shareUser(),
+                      onTap: () => _memberController.blockUser(),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.share_outlined, size: 19),
+                          const Icon(Icons.block, size: 19),
                           const SizedBox(width: 10),
-                          Text(_memberController.ownerMid !=
-                                  _memberController.mid
-                              ? '分享UP主'
-                              : '分享我的主页'),
+                          Text(_memberController.attribute.value != 128
+                              ? '加入黑名单'
+                              : '移除黑名单'),
                         ],
                       ),
-                    ),
+                    )
                   ],
+                  PopupMenuItem(
+                    onTap: () => _memberController.shareUser(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.share_outlined, size: 19),
+                        const SizedBox(width: 10),
+                        Text(_memberController.ownerMid != _memberController.mid
+                            ? '分享UP主'
+                            : '分享我的主页'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 4),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _extendNestCtr,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 20,
                 ),
-                const SizedBox(width: 4),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
+                child: Column(
                   children: [
+                    profileWidget(),
+
+                    /// 动态链接
+                    ListTile(
+                      onTap: _memberController.pushDynamicsPage,
+                      title: const Text('Ta的动态'),
+                      trailing:
+                          const Icon(Icons.arrow_forward_outlined, size: 19),
+                    ),
+
+                    /// 视频
+                    ListTile(
+                      onTap: _memberController.pushArchivesPage,
+                      title: const Text('Ta的投稿'),
+                      trailing:
+                          const Icon(Icons.arrow_forward_outlined, size: 19),
+                    ),
+
+                    /// 专栏
+                    ListTile(
+                      onTap: () {},
+                      title: const Text('Ta的专栏'),
+                    ),
+                    MediaQuery.removePadding(
+                      removeTop: true,
+                      removeBottom: true,
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: StyleString.safeSpace,
+                          right: StyleString.safeSpace,
+                        ),
+                        child: FutureBuilder(
+                          future: _memberSeasonsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data == null) {
+                                return const SizedBox();
+                              }
+                              if (snapshot.data['status']) {
+                                Map data = snapshot.data as Map;
+                                if (data['data'].seasonsList.isEmpty) {
+                                  return commenWidget('用户没有设置专栏');
+                                } else {
+                                  return MemberSeasonsPanel(data: data['data']);
+                                }
+                              } else {
+                                // 请求错误
+                                return const SizedBox();
+                              }
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+
+                    /// 收藏
+
+                    /// 追番
+                    /// 最近投币
                     Obx(
-                      () => _memberController.face.value != ''
-                          ? Positioned.fill(
-                              bottom: 10,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    fit: BoxFit.fitWidth,
-                                    image: NetworkImage(
-                                        _memberController.face.value),
-                                    alignment: Alignment.topCenter,
-                                    isAntiAlias: true,
-                                  ),
-                                ),
-                                foregroundDecoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Theme.of(context)
-                                          .colorScheme
-                                          .background
-                                          .withOpacity(0.44),
-                                      Theme.of(context).colorScheme.background,
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    stops: const [0.0, 0.46],
-                                  ),
-                                ),
-                              ),
+                      () => _memberController.recentCoinsList.isNotEmpty
+                          ? ListTile(
+                              onTap: () {},
+                              title: const Text('最近投币的视频'),
+                              // trailing: const Icon(Icons.arrow_forward_outlined,
+                              //     size: 19),
                             )
                           : const SizedBox(),
                     ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      height: 20,
-                      child: Container(
-                        color: Theme.of(context).colorScheme.background,
+                    MediaQuery.removePadding(
+                      removeTop: true,
+                      removeBottom: true,
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: StyleString.safeSpace,
+                          right: StyleString.safeSpace,
+                        ),
+                        child: FutureBuilder(
+                          future: _memberCoinsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data == null) {
+                                return const SizedBox();
+                              }
+                              if (snapshot.data['status']) {
+                                Map data = snapshot.data as Map;
+                                return MemberCoinsPanel(data: data['data']);
+                              } else {
+                                // 请求错误
+                                return const SizedBox();
+                              }
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        ),
                       ),
                     ),
-                    profileWidget(),
+                    // 最近点赞
+                    // ListTile(
+                    //   onTap: () {},
+                    //   title: const Text('最近点赞的视频'),
+                    //   trailing:
+                    //       const Icon(Icons.arrow_forward_outlined, size: 19),
+                    // ),
                   ],
                 ),
               ),
             ),
-          ];
-        },
-        pinnedHeaderSliverHeightBuilder: () {
-          return MediaQuery.of(context).padding.top + kToolbarHeight;
-        },
-        onlyOneScrollInBody: true,
-        body: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: TabBar(controller: _tabController, tabs: const [
-                Tab(text: '主页'),
-                Tab(text: '动态'),
-                Tab(text: '投稿'),
-              ]),
-            ),
-            Expanded(
-                child: TabBarView(
-              controller: _tabController,
-              children: [
-                const Text('主页'),
-                MemberDynamicPanel(mid: mid),
-                ArchivePanel(mid: mid),
-              ],
-            ))
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget profileWidget() {
     return Padding(
-      padding: const EdgeInsets.only(left: 18, right: 18),
+      padding: const EdgeInsets.only(left: 18, right: 18, bottom: 20),
       child: FutureBuilder(
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
@@ -250,7 +291,7 @@ class _MemberPageState extends State<MemberPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         profile(_memberController),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 20),
                         Row(
                           children: [
                             Flexible(
@@ -260,7 +301,7 @@ class _MemberPageState extends State<MemberPage>
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyLarge!
+                                  .titleMedium!
                                   .copyWith(fontWeight: FontWeight.bold),
                             )),
                             const SizedBox(width: 2),
@@ -332,29 +373,11 @@ class _MemberPageState extends State<MemberPage>
                             softWrap: true,
                           ),
                         ],
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         if (_memberController.memberInfo.value.sign != '')
                           SelectableText(
                             _memberController.memberInfo.value.sign!,
-                            maxLines: _memberController
-                                        .memberInfo.value.official!['title'] !=
-                                    ''
-                                ? 1
-                                : 2,
-                            style: const TextStyle(
-                                overflow: TextOverflow.ellipsis),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    content: SelectableText(_memberController
-                                        .memberInfo.value.sign!),
-                                  );
-                                },
-                              );
-                            },
-                          )
+                          ),
                       ],
                     ),
                   ],
@@ -368,6 +391,24 @@ class _MemberPageState extends State<MemberPage>
             return profile(_memberController, loadingStatus: true);
           }
         },
+      ),
+    );
+  }
+
+  Widget commenWidget(msg) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 20,
+        bottom: 30,
+      ),
+      child: Center(
+        child: Text(
+          msg,
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium!
+              .copyWith(color: Theme.of(context).colorScheme.outline),
+        ),
       ),
     );
   }

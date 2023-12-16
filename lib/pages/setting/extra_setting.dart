@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
+import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -169,6 +170,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableSaveLastData,
             defaultVal: false,
           ),
+          const SetSwitchItem(
+            title: '启用ai总结',
+            subTitle: '视频详情页开启ai总结',
+            setKey: SettingBoxKey.enableAi,
+            defaultVal: true,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),
@@ -176,23 +183,21 @@ class _ExtraSettingState extends State<ExtraSetting> {
               '当前优先展示「${ReplySortType.values[defaultReplySort].titles}」',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultReplySort,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultReplySort = item;
-                setting.put(SettingBoxKey.replySortType, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '评论展示', value: defaultReplySort, values: ReplySortType.values.map((e) {
+                    return {'title': e.titles, 'value': e.index};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultReplySort = result;
+                setting.put(SettingBoxKey.replySortType, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in ReplySortType.values) ...[
-                  PopupMenuItem(
-                    value: i.index,
-                    child: Text(i.titles),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             dense: false,
@@ -201,23 +206,21 @@ class _ExtraSettingState extends State<ExtraSetting> {
               '当前优先展示「${DynamicsType.values[defaultDynamicType].labels}」',
               style: subTitleStyle,
             ),
-            trailing: PopupMenuButton(
-              initialValue: defaultDynamicType,
-              icon: const Icon(Icons.more_vert_outlined, size: 22),
-              onSelected: (item) {
-                defaultDynamicType = item;
-                setting.put(SettingBoxKey.defaultDynamicType, item);
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(title: '动态展示', value: defaultDynamicType, values: DynamicsType.values.map((e) {
+                    return {'title': e.labels, 'value': e.index};
+                  }).toList());
+                },
+              );
+              if (result != null) {
+                defaultDynamicType = result;
+                setting.put(SettingBoxKey.defaultDynamicType, result);
                 setState(() {});
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                for (var i in DynamicsType.values) ...[
-                  PopupMenuItem(
-                    value: i.index,
-                    child: Text(i.labels),
-                  ),
-                ]
-              ],
-            ),
+              }
+            },
           ),
           ListTile(
             enableFeedback: true,
@@ -225,6 +228,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
             title: Text('设置代理', style: titleStyle),
             subtitle: Text('设置代理 host:port', style: subTitleStyle),
             trailing: Transform.scale(
+              alignment: Alignment.centerRight,
               scale: 0.8,
               child: Switch(
                 thumbIcon: MaterialStateProperty.resolveWith<Icon?>(

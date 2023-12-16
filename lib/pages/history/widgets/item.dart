@@ -11,7 +11,6 @@ import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/pages/history/index.dart';
 import 'package:pilipala/pages/history_search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';

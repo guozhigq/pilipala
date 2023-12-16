@@ -127,6 +127,7 @@ class SettingBoxKey {
   static const String enableRcmdDynamic = 'enableRcmdDynamic';
   static const String enableSaveLastData = 'enableSaveLastData';
   static const String enableSystemProxy = 'enableSystemProxy';
+  static const String enableAi = 'enableAi';
 
   /// 外观
   static const String themeMode = 'themeMode';
@@ -138,6 +139,8 @@ class SettingBoxKey {
   static const String displayMode = 'displayMode';
   static const String customRows = 'customRows'; // 自定义列
   static const String enableMYBar = 'enableMYBar';
+  static const String hideSearchBar = 'hideSearchBar'; // 收起顶栏
+  static const String hideTabBar = 'hideTabBar'; // 收起底栏
 }
 
 class LocalCacheKey {

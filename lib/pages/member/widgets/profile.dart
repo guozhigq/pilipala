@@ -11,7 +11,7 @@ Widget profile(ctr, {loadingStatus = false}) {
   return Builder(
     builder: ((context) {
       return Padding(
-        padding: EdgeInsets.only(top: 3 * MediaQuery.of(context).padding.top),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top - 20),
         child: Row(
           children: [
             Hero(
@@ -78,7 +78,8 @@ Widget profile(ctr, {loadingStatus = false}) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    padding:
+                        const EdgeInsets.only(top: 10, left: 10, right: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -136,8 +137,14 @@ Widget profile(ctr, {loadingStatus = false}) {
                         ),
                         Column(
                           children: [
-                            const Text('-',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(
+                                !loadingStatus
+                                    ? Utils.numFormat(
+                                        ctr.userStat!['likes'],
+                                      )
+                                    : '-',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text(
                               '获赞',
                               style: TextStyle(
