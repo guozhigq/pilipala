@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:pilipala/models/video/play/quality.dart';
 
 class PlayUrlModel {

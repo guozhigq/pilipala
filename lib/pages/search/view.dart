@@ -160,25 +160,25 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   }
 
   Widget _searchSuggest() {
-    SSearchController _ssCtr = _searchController;
+    SSearchController ssCtr = _searchController;
     return Obx(
-      () => _ssCtr.searchSuggestList.isNotEmpty &&
-              _ssCtr.searchSuggestList.first.term != null &&
-              _ssCtr.controller.value.text != ''
+      () => ssCtr.searchSuggestList.isNotEmpty &&
+              ssCtr.searchSuggestList.first.term != null &&
+              ssCtr.controller.value.text != ''
           ? ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: _ssCtr.searchSuggestList.length,
+              itemCount: ssCtr.searchSuggestList.length,
               itemBuilder: (context, index) {
                 return InkWell(
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  onTap: () => _ssCtr
-                      .onClickKeyword(_ssCtr.searchSuggestList[index].term!),
+                  onTap: () => ssCtr
+                      .onClickKeyword(ssCtr.searchSuggestList[index].term!),
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20, top: 9, bottom: 9),
-                    child: _ssCtr.searchSuggestList[index].textRich,
+                    child: ssCtr.searchSuggestList[index].textRich,
                   ),
                 );
               },
@@ -235,6 +235,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                       return Obx(
                         () => HotKeyword(
                           width: width,
+                          // ignore: invalid_use_of_protected_member
                           hotSearchList: _searchController.hotSearchList.value,
                           onClick: (keyword) async {
                             _searchController.searchFocusNode.unfocus();

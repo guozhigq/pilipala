@@ -27,7 +27,6 @@ import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/pages/member_like/index.dart';
 import 'package:pilipala/pages/member_search/index.dart';
 import 'package:pilipala/pages/member_seasons/index.dart';
-import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/searchResult/index.dart';
 import 'package:pilipala/pages/setting/extra_setting.dart';

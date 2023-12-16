@@ -72,6 +72,7 @@ class _LivePageState extends State<LivePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(

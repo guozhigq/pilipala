@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/liveRoom/index.dart';
@@ -43,10 +42,6 @@ class _BottomControlState extends State<BottomControl> {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(
-      color: Colors.white,
-      fontSize: 12,
-    );
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -75,6 +74,7 @@ class _HomePageState extends State<HomePage>
                 dividerColor: Colors.transparent,
                 enableFeedback: true,
                 splashBorderRadius: BorderRadius.circular(10),
+                tabAlignment: TabAlignment.center,
                 onTap: (value) {
                   feedBack();
                   if (_homeController.initialIndex == value) {

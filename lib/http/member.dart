@@ -403,7 +403,7 @@ class MemberHttp {
         'csrf': await Request.getCsrf(),
       });
       await Future.delayed(const Duration(milliseconds: 300));
-      qrcodePoll(authCodeRes['data']);
+      await qrcodePoll(authCodeRes['data']);
       if (res.data['code'] == 0) {
         return {'status': true, 'data': [], 'msg': '操作成功'};
       } else {

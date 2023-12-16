@@ -52,7 +52,6 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
     Widget childWhenDisabled = Scaffold(
       primary: true,
       appBar: AppBar(

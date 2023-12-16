@@ -333,8 +333,10 @@ class VideoStat extends StatelessWidget {
           color: Theme.of(context).colorScheme.outline,
         ),
         children: [
-          TextSpan(text: '${videoItem.stat.view}观看'),
-          TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
+          if (videoItem.stat.view != '-')
+            TextSpan(text: '${videoItem.stat.view}观看'),
+          if (videoItem.stat.danmu != '-')
+            TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
         ],
       ),
     );
