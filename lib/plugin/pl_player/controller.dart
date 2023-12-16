@@ -651,7 +651,9 @@ class PlPlayerController {
     // screenManager.setOverlays(false);
 
     /// 临时fix _duration.value丢失
-    _duration.value = duration;
+    if (duration != null) {
+      _duration.value = duration;
+    }
     audioSessionHandler.setActive(true);
   }
 
