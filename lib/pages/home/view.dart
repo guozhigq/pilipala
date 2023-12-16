@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage>
                 dividerColor: Colors.transparent,
                 enableFeedback: true,
                 splashBorderRadius: BorderRadius.circular(10),
+                tabAlignment: TabAlignment.center,
                 onTap: (value) {
                   feedBack();
                   if (_homeController.initialIndex == value) {
