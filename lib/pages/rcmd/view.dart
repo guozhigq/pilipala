@@ -87,6 +87,7 @@ class _RcmdPageState extends State<RcmdPage>
         },
         child: CustomScrollView(
           controller: _rcmdController.scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverPadding(
               padding:
@@ -157,11 +158,10 @@ class _RcmdPageState extends State<RcmdPage>
     //   crossAxisCount = 1;
     // }
     int crossAxisCount = ctr.crossAxisCount.value;
-    double mainAxisExtent =
-        (Get.size.width / crossAxisCount / StyleString.aspectRatio) +
-            (crossAxisCount == 1
-                ? 68
-                : 86 * MediaQuery.of(context).textScaleFactor);
+    double mainAxisExtent = (Get.size.width /
+            crossAxisCount /
+            StyleString.aspectRatio) +
+        (crossAxisCount == 1 ? 68 : MediaQuery.textScalerOf(context).scale(86));
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         // 行间距
