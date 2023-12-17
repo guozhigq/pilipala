@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
@@ -91,41 +92,41 @@ class _HeaderControlState extends State<HeaderControl> {
                   child: Material(
                 child: ListView(
                   children: [
-                    ListTile(
-                      onTap: () {},
-                      dense: true,
-                      enabled: false,
-                      leading:
-                          const Icon(Icons.network_cell_outlined, size: 20),
-                      title: Text('省流模式', style: titleStyle),
-                      subtitle: Text('低画质 ｜ 减少视频缓存', style: subTitleStyle),
-                      trailing: Transform.scale(
-                        scale: 0.75,
-                        child: Switch(
-                          thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                              (Set<MaterialState> states) {
-                            if (states.isNotEmpty &&
-                                states.first == MaterialState.selected) {
-                              return const Icon(Icons.done);
-                            }
-                            return null; // All other states will use the default thumbIcon.
-                          }),
-                          value: false,
-                          onChanged: (value) => {},
-                        ),
-                      ),
-                    ),
-                    // Obx(
-                    //   () => ListTile(
-                    //     onTap: () => {Get.back(), showSetSpeedSheet()},
-                    //     dense: true,
-                    //     leading: const Icon(Icons.speed_outlined, size: 20),
-                    //     title: Text('播放速度', style: titleStyle),
-                    //     subtitle: Text(
-                    //         '当前倍速 x${widget.controller!.playbackSpeed}',
-                    //         style: subTitleStyle),
+                    // ListTile(
+                    //   onTap: () {},
+                    //   dense: true,
+                    //   enabled: false,
+                    //   leading:
+                    //       const Icon(Icons.network_cell_outlined, size: 20),
+                    //   title: Text('省流模式', style: titleStyle),
+                    //   subtitle: Text('低画质 ｜ 减少视频缓存', style: subTitleStyle),
+                    //   trailing: Transform.scale(
+                    //     scale: 0.75,
+                    //     child: Switch(
+                    //       thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                    //           (Set<MaterialState> states) {
+                    //         if (states.isNotEmpty &&
+                    //             states.first == MaterialState.selected) {
+                    //           return const Icon(Icons.done);
+                    //         }
+                    //         return null; // All other states will use the default thumbIcon.
+                    //       }),
+                    //       value: false,
+                    //       onChanged: (value) => {},
+                    //     ),
                     //   ),
                     // ),
+                    ListTile(
+                      onTap: () async {
+                        var res = await UserHttp.toViewLater(
+                            bvid: widget.videoDetailCtr!.bvid);
+                        SmartDialog.showToast(res['msg']);
+                        Get.back();
+                      },
+                      dense: true,
+                      leading: const Icon(Icons.watch_later_outlined, size: 20),
+                      title: Text('添加至「稍后再看」', style: titleStyle),
+                    ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
                       dense: true,
@@ -240,7 +241,8 @@ class _HeaderControlState extends State<HeaderControl> {
                             DanmakuItem(
                               msg,
                               color: Colors.white,
-                              time: widget.controller!.position.value.inMilliseconds,
+                              time: widget
+                                  .controller!.position.value.inMilliseconds,
                               type: DanmakuItemType.scroll,
                             )
                           ]);
@@ -992,8 +994,8 @@ class _HeaderControlState extends State<HeaderControl> {
           SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
-              FontAwesomeIcons.sliders,
-              size: 15,
+              Icons.more_vert_outlined,
+              size: 18,
               color: Colors.white,
             ),
             fuc: () => showSettingSheet(),
