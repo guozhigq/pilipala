@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/setting/widgets/switch_item.dart';
+import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_speed.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -13,9 +15,11 @@ class PlaySpeedPage extends StatefulWidget {
 
 class _PlaySpeedPageState extends State<PlaySpeedPage> {
   Box videoStorage = GStrorage.video;
+  Box settingStorage = GStrorage.setting;
   late double playSpeedDefault;
   late double longPressSpeedDefault;
   late List customSpeedsList;
+  late bool enableAutoLongPressSpeed;
   List<Map<dynamic, dynamic>> sheetMenu = [
     {
       'id': 1,
@@ -24,6 +28,7 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
         Icons.speed,
         size: 21,
       ),
+      'show': true,
     },
     {
       'id': 2,
@@ -32,6 +37,7 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
         Icons.speed_sharp,
         size: 21,
       ),
+      'show': true,
     },
     {
       'id': -1,
@@ -40,6 +46,7 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
         Icons.delete_outline,
         size: 21,
       ),
+      'show': true,
     },
   ];
 
@@ -55,6 +62,15 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
     // 自定义倍速
     customSpeedsList =
         videoStorage.get(VideoBoxKey.customSpeedsList, defaultValue: []);
+    enableAutoLongPressSpeed = settingStorage
+        .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
+    if (enableAutoLongPressSpeed) {
+      Map newItem = sheetMenu[1];
+      newItem['show'] = false;
+      setState(() {
+        sheetMenu[1] = newItem;
+      });
+    }
   }
 
   // 添加自定义倍速
@@ -120,19 +136,21 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
             //重要
             itemCount: sheetMenu.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () {
-                  Navigator.pop(context);
-                  menuAction(type, i, sheetMenu[index]['id']);
-                },
-                minLeadingWidth: 0,
-                iconColor: Theme.of(context).colorScheme.onSurface,
-                leading: sheetMenu[index]['leading'],
-                title: Text(
-                  sheetMenu[index]['title'],
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              );
+              return sheetMenu[index]['show']
+                  ? ListTile(
+                      onTap: () {
+                        Navigator.pop(context);
+                        menuAction(type, i, sheetMenu[index]['id']);
+                      },
+                      minLeadingWidth: 0,
+                      iconColor: Theme.of(context).colorScheme.onSurface,
+                      leading: sheetMenu[index]['leading'],
+                      title: Text(
+                        sheetMenu[index]['title'],
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    )
+                  : const SizedBox();
             },
           ),
         );
@@ -210,11 +228,27 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
               title: const Text('默认倍速'),
               subtitle: Text(playSpeedDefault.toString()),
             ),
-            ListTile(
-              dense: false,
-              title: const Text('默认长按倍速'),
-              subtitle: Text(longPressSpeedDefault.toString()),
+            SetSwitchItem(
+              title: '动态长按倍速',
+              subTitle: '根据默认倍速长按时自动双倍',
+              setKey: SettingBoxKey.enableAutoLongPressSpeed,
+              defaultVal: enableAutoLongPressSpeed,
+              callFn: (val) {
+                Map newItem = sheetMenu[1];
+                val ? newItem['show'] = false : newItem['show'] = true;
+                setState(() {
+                  sheetMenu[1] = newItem;
+                  enableAutoLongPressSpeed = val;
+                });
+              },
             ),
+            !enableAutoLongPressSpeed
+                ? ListTile(
+                    dense: false,
+                    title: const Text('默认长按倍速'),
+                    subtitle: Text(longPressSpeedDefault.toString()),
+                  )
+                : const SizedBox(),
             Padding(
               padding: const EdgeInsets.only(
                 left: 14,

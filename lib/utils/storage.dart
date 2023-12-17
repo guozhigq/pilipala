@@ -107,6 +107,7 @@ class SettingBoxKey {
   static const String p1080 = 'p1080';
   static const String enableCDN = 'enableCDN';
   static const String autoPiP = 'autoPiP';
+  static const String enableAutoLongPressSpeed = 'enableAutoLongPressSpeed';
 
   // youtube 双击快进快退
   static const String enableQuickDouble = 'enableQuickDouble';

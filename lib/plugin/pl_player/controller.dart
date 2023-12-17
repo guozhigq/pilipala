@@ -220,6 +220,7 @@ class PlPlayerController {
   late List speedsList;
   // 缓存
   double? defaultDuration;
+  late bool enableAutoLongPressSpeed = false;
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
@@ -249,8 +250,12 @@ class PlPlayerController {
         );
     _playbackSpeed.value =
         videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
-    _longPressSpeed.value =
-        videoStorage.get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
+    enableAutoLongPressSpeed = setting
+        .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
+    if (!enableAutoLongPressSpeed) {
+      _longPressSpeed.value = videoStorage
+          .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
+    }
     List speedsListTemp =
         videoStorage.get(VideoBoxKey.customSpeedsList, defaultValue: []);
     speedsList = List.from(speedsListTemp);
@@ -858,7 +863,8 @@ class PlPlayerController {
     }
     _doubleSpeedStatus.value = val;
     if (val) {
-      setPlaybackSpeed(longPressSpeed);
+      setPlaybackSpeed(
+          enableAutoLongPressSpeed ? playbackSpeed * 2 : longPressSpeed);
     } else {
       print(playbackSpeed);
       setPlaybackSpeed(playbackSpeed);
