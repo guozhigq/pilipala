@@ -27,6 +27,7 @@ class _PagesPanelState extends State<PagesPanel> {
   late int currentIndex;
   String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -48,6 +49,12 @@ class _PagesPanelState extends State<PagesPanel> {
     );
     currentIndex = i;
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -80,73 +87,92 @@ class _PagesPanelState extends State<PagesPanel> {
                   onPressed: () {
                     showBottomSheet(
                       context: context,
-                      builder: (_) => Container(
-                        height: widget.sheetHeight,
-                        color: Theme.of(context).colorScheme.background,
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 45,
-                              padding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '合集（${episodes.length}）',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(builder:
+                            (BuildContext context, StateSetter setState) {
+                          WidgetsBinding.instance
+                              .addPostFrameCallback((_) async {
+                            await Future.delayed(
+                                const Duration(milliseconds: 200));
+                            _scrollController.jumpTo(currentIndex * 56);
+                          });
+                          return Container(
+                            height: widget.sheetHeight,
+                            color: Theme.of(context).colorScheme.background,
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 45,
+                                  padding: const EdgeInsets.only(
+                                      left: 14, right: 14),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '合集（${episodes.length}）',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Divider(
-                              height: 1,
-                              color: Theme.of(context)
-                                  .dividerColor
-                                  .withOpacity(0.1),
-                            ),
-                            Expanded(
-                              child: Material(
-                                child: ListView.builder(
-                                  itemCount: episodes.length,
-                                  itemBuilder: (context, index) {
-                                    return InkWell(
-                                      onTap: () {
-                                        changeFucCall(episodes[index], index);
-                                        Get.back();
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10,
-                                            bottom: 10,
-                                            left: 15,
-                                            right: 15),
-                                        child: Text(
-                                          episodes[index].pagePart!,
-                                          style: TextStyle(
+                                ),
+                                Divider(
+                                  height: 1,
+                                  color: Theme.of(context)
+                                      .dividerColor
+                                      .withOpacity(0.1),
+                                ),
+                                Expanded(
+                                  child: Material(
+                                    child: ListView.builder(
+                                      controller: _scrollController,
+                                      itemCount: episodes.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          onTap: () {
+                                            changeFucCall(
+                                                episodes[index], index);
+                                            Get.back();
+                                          },
+                                          dense: false,
+                                          leading: index == currentIndex
+                                              ? Image.asset(
+                                                  'assets/images/live.gif',
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  height: 12,
+                                                )
+                                              : null,
+                                          title: Text(
+                                            episodes[index].pagePart!,
+                                            style: TextStyle(
+                                              fontSize: 14,
                                               color: index == currentIndex
                                                   ? Theme.of(context)
                                                       .colorScheme
                                                       .primary
                                                   : Theme.of(context)
                                                       .colorScheme
-                                                      .onSurface),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                                      .onSurface,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          );
+                        });
+                      },
                     );
                   },
                   child: Text(

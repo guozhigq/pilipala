@@ -14,7 +14,7 @@ import 'package:share_plus/share_plus.dart';
 class MemberController extends GetxController {
   late int mid;
   Rx<MemberInfoModel> memberInfo = MemberInfoModel().obs;
-  Map? userStat;
+  late Map userStat;
   RxString face = ''.obs;
   String? heroTag;
   Box userInfoCache = GStrorage.userInfo;
@@ -40,6 +40,7 @@ class MemberController extends GetxController {
   // 获取用户信息
   Future<Map<String, dynamic>> getInfo() async {
     await getMemberStat();
+    await getMemberView();
     var res = await MemberHttp.memberInfo(mid: mid);
     if (res['status']) {
       memberInfo.value = res['data'];
@@ -53,6 +54,15 @@ class MemberController extends GetxController {
     var res = await MemberHttp.memberStat(mid: mid);
     if (res['status']) {
       userStat = res['data'];
+    }
+    return res;
+  }
+
+  // 获取用户播放数 获赞数
+  Future<Map<String, dynamic>> getMemberView() async {
+    var res = await MemberHttp.memberView(mid: mid);
+    if (res['status']) {
+      userStat.addAll(res['data']);
     }
     return res;
   }

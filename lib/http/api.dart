@@ -326,6 +326,51 @@ class Api {
   // 获取指定分组下的up
   static const String followUpGroup = '/x/relation/tag';
 
+  /// 私聊
+  ///  'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions?
+  /// session_type=1&
+  /// group_fold=1&
+  /// unfollow_fold=0&
+  /// sort_rule=2&
+  /// build=0&
+  /// mobi_app=web&
+  /// w_rid=8641d157fb9a9255eb2159f316ee39e2&
+  /// wts=1697305010
+
+  static const String sessionList =
+      'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions';
+
+  /// 私聊用户信息
+  /// uids
+  /// build=0&mobi_app=web
+  static const String sessionAccountList =
+      'https://api.vc.bilibili.com/account/v1/user/cards';
+
+  /// https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs?
+  /// talker_id=400787461&
+  /// session_type=1&
+  /// size=20&
+  /// sender_device_id=1&
+  /// build=0&
+  /// mobi_app=web&
+  /// web_location=333.1296&
+  /// w_rid=cfe3bf58c9fe181bbf4dd6c75175e6b0&
+  /// wts=1697350697
+
+  static const String sessionMsg =
+      'https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs';
+
+  /// 标记已读 POST
+  /// talker_id:
+  /// session_type: 1
+  /// ack_seqno: 920224140918926
+  /// build: 0
+  /// mobi_app: web
+  /// csrf_token:
+  /// csrf:
+  static const String updateAck =
+      'https://api.vc.bilibili.com/session_svr/v1/session_svr/update_ack';
+
   // 获取某个动态详情
   // timezone_offset=-480
   // id=849312409672744983
@@ -410,6 +455,7 @@ class Api {
   static const getMemberSeasonsApi = '/x/polymer/web-space/home/seasons_series';
 
   /// 获赞数 播放数
+  /// mid
   static const getMemberViewApi = '/x/space/upstat';
 
   /// 查询某个专栏

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -140,7 +139,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Row(
                 children: [
                   const Expanded(child: SearchPage()),
-                  const SizedBox(width: 10),
+                  if (ctr!.userLogin.value) ...[
+                    const SizedBox(width: 6),
+                    IconButton(
+                        onPressed: () => Get.toNamed('/whisper'),
+                        icon: const Icon(Icons.notifications_none))
+                  ],
+                  const SizedBox(width: 6),
                   Obx(
                     () => ctr!.userLogin.value
                         ? Stack(

@@ -403,7 +403,7 @@ class MemberHttp {
         'csrf': await Request.getCsrf(),
       });
       await Future.delayed(const Duration(milliseconds: 300));
-      qrcodePoll(authCodeRes['data']);
+      await qrcodePoll(authCodeRes['data']);
       if (res.data['code'] == 0) {
         return {'status': true, 'data': [], 'msg': '操作成功'};
       } else {
@@ -439,6 +439,20 @@ class MemberHttp {
       localCache.put(
           LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
       return {'status': true, 'data': [], 'msg': '操作成功'};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 获取up播放数、点赞数
+  static Future memberView({required int mid}) async {
+    var res = await Request().get(Api.getMemberViewApi, data: {'mid': mid});
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
     } else {
       return {
         'status': false,
