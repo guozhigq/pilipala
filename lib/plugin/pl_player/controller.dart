@@ -375,9 +375,10 @@ class PlPlayerController {
     }
     Player player = _videoPlayerController ??
         Player(
-          configuration: const PlayerConfiguration(
+          configuration: PlayerConfiguration(
             // 默认缓存 5M 大小
-            bufferSize: 5 * 1024 * 1024,
+            bufferSize:
+                videoType.value == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
           ),
         );
 
@@ -390,6 +391,10 @@ class PlPlayerController {
       await pp.setProperty("ao", "audiotrack,opensles");
     }
 
+    await player.setAudioTrack(
+      AudioTrack.auto(),
+    );
+
     // 音轨
     if (dataSource.audioSource != '' && dataSource.audioSource != null) {
       await pp.setProperty(
@@ -397,6 +402,11 @@ class PlPlayerController {
         UniversalPlatform.isWindows
             ? dataSource.audioSource!.replaceAll(';', '\\;')
             : dataSource.audioSource!.replaceAll(':', '\\:'),
+      );
+    } else {
+      await pp.setProperty(
+        'audio-files',
+        '',
       );
     }
 
