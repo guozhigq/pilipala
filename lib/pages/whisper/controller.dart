@@ -6,10 +6,13 @@ import 'package:pilipala/models/msg/session.dart';
 class WhisperController extends GetxController {
   RxList<SessionList> sessionList = <SessionList>[].obs;
   RxList<AccountListModel> accountList = <AccountListModel>[].obs;
+  bool isLoading = false;
 
-  Future querySessionList() async {
-    var res = await MsgHttp.sessionList();
-    if (res['data'].sessionList.isNotEmpty) {
+  Future querySessionList(String? type) async {
+    if (isLoading) return;
+    var res = await MsgHttp.sessionList(
+        endTs: type == 'onLoad' ? sessionList.last.sessionTs : null);
+    if (res['data'].sessionList != null && res['data'].sessionList.isNotEmpty) {
       await queryAccountList(res['data'].sessionList);
       // 将 accountList 转换为 Map 结构
       Map<int, dynamic> accountMap = {};
@@ -32,10 +35,14 @@ class WhisperController extends GetxController {
         }
       }
     }
-    if (res['status']) {
-      sessionList.value = res['data'].sessionList;
+    if (res['status'] && res['data'].sessionList != null) {
+      if (type == 'onLoad') {
+        sessionList.addAll(res['data'].sessionList);
+      } else {
+        sessionList.value = res['data'].sessionList;
+      }
     }
-
+    isLoading = false;
     return res;
   }
 
@@ -46,5 +53,13 @@ class WhisperController extends GetxController {
       accountList.value = res['data'];
     }
     return res;
+  }
+
+  Future onLoad() async {
+    querySessionList('onLoad');
+  }
+
+  Future onRefresh() async {
+    querySessionList('onRefresh');
   }
 }

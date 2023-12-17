@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/whisperDetail/controller.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 import 'widget/chat_item.dart';
 
@@ -27,7 +29,6 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        scrolledUnderElevation: 0,
         title: SizedBox(
           width: double.infinity,
           height: 50,
@@ -52,14 +53,35 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
                   icon: Icon(
                     Icons.arrow_back_outlined,
                     size: 18,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                 ),
               ),
-              Obx(
-                () => Text(
-                  _whisperDetailController.name.value,
-                  style: Theme.of(context).textTheme.titleMedium,
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  Get.toNamed(
+                    '/member?mid=${_whisperDetailController.mid}',
+                    arguments: {
+                      'face': _whisperDetailController.face,
+                      'heroTag': null
+                    },
+                  );
+                },
+                child: Row(
+                  children: [
+                    NetworkImgLayer(
+                      width: 34,
+                      height: 34,
+                      type: 'avatar',
+                      src: _whisperDetailController.face,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _whisperDetailController.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 36, height: 36),
@@ -105,12 +127,14 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
           }
         },
       ),
+      // resizeToAvoidBottomInset: true,
       bottomNavigationBar: Container(
         width: double.infinity,
         height: MediaQuery.of(context).padding.bottom + 70,
         padding: EdgeInsets.only(
           left: 8,
           right: 12,
+          top: 12,
           bottom: MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
@@ -124,6 +148,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // IconButton(
             //   onPressed: () {},
@@ -139,25 +164,26 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
                 color: Theme.of(context).colorScheme.outline,
               ),
             ),
-            // Expanded(
-            //   child: Container(
-            //     height: 42,
-            //     decoration: BoxDecoration(
-            //       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(40.0),
-            //     ),
-            //     child: TextField(
-            //       readOnly: true,
-            //       style: Theme.of(context).textTheme.titleMedium,
-            //       decoration: const InputDecoration(
-            //         border: InputBorder.none, // 移除默认边框
-            //         hintText: '请输入内容', // 提示文本
-            //         contentPadding: EdgeInsets.symmetric(
-            //             horizontal: 12.0, vertical: 12.0), // 内边距
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            Expanded(
+              child: Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color:
+                      Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(40.0),
+                ),
+                child: TextField(
+                  readOnly: true,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none, // 移除默认边框
+                    hintText: '开发中 ...', // 提示文本
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0), // 内边距
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(width: 16),
           ],
         ),

@@ -17,6 +17,9 @@ class ChatItem extends StatelessWidget {
     bool isOwner = item.senderUid == 17340771;
     bool isPic = item.msgType == 2;
     bool isText = item.msgType == 1;
+    bool isAchive = item.msgType == 11;
+    bool isArticle = item.msgType == 12;
+
     bool isSystem =
         item.msgType == 18 || item.msgType == 10 || item.msgType == 13;
     int msgType = item.msgType;
@@ -115,7 +118,10 @@ class SystemNotice extends StatelessWidget {
             maxWidth: 300.0, // 设置最大宽度为200.0
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryContainer,
+            color: Theme.of(context)
+                .colorScheme
+                .secondaryContainer
+                .withOpacity(0.4),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
@@ -128,25 +134,20 @@ class SystemNotice extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(content['title'],
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium!
-                          .copyWith(fontWeight: FontWeight.bold)),
-                  Text(
-                    Utils.dateFormat(item.timestamp),
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelSmall!
-                        .copyWith(color: Theme.of(context).colorScheme.outline),
-                  )
-                ],
+              Text(content['title'],
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                Utils.dateFormat(item.timestamp),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall!
+                    .copyWith(color: Theme.of(context).colorScheme.outline),
               ),
               Divider(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               ),
               Text(
                 content['text'],

@@ -359,6 +359,18 @@ class Api {
 
   static const String sessionMsg =
       'https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs';
+
+  /// 标记已读 POST
+  /// talker_id:
+  /// session_type: 1
+  /// ack_seqno: 920224140918926
+  /// build: 0
+  /// mobi_app: web
+  /// csrf_token:
+  /// csrf:
+  static const String updateAck =
+      'https://api.vc.bilibili.com/session_svr/v1/session_svr/update_ack';
+
   // 获取某个动态详情
   // timezone_offset=-480
   // id=849312409672744983

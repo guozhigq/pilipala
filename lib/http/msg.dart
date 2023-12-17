@@ -6,16 +6,21 @@ import 'package:pilipala/utils/wbi_sign.dart';
 
 class MsgHttp {
   // 会话列表
-  static Future sessionList() async {
-    Map params = await WbiSign().makSign({
+  static Future sessionList({int? endTs}) async {
+    Map<String, dynamic> params = {
       'session_type': 1,
       'group_fold': 1,
       'unfollow_fold': 0,
       'sort_rule': 2,
       'build': 0,
       'mobi_app': 'web',
-    });
-    var res = await Request().get(Api.sessionList, data: params);
+    };
+    if (endTs != null) {
+      params['end_ts'] = endTs;
+    }
+
+    Map signParams = await WbiSign().makSign(params);
+    var res = await Request().get(Api.sessionList, data: signParams);
     if (res.data['code'] == 0) {
       return {
         'status': true,
