@@ -899,6 +899,7 @@ class PlPlayerController {
     await StatusBarControl.setHidden(true, animation: StatusBarAnimation.FADE);
     if (!isFullScreen.value && status) {
       /// 按照视频宽高比决定全屏方向
+      toggleFullScreen(true);
       switch (mode) {
         case FullScreenMode.auto:
           if (direction.value == 'horizontal') {
@@ -927,41 +928,40 @@ class PlPlayerController {
           break;
       }
 
-      toggleFullScreen(true);
-      bool isValid =
-          direction.value == 'vertical' || mode == FullScreenMode.vertical
-              ? true
-              : false;
-      var result = await showDialog(
-        context: Get.context!,
-        useSafeArea: false,
-        builder: (context) => Dialog.fullscreen(
-          backgroundColor: Colors.black,
-          child: SafeArea(
-            // 忽略手机安全区域
-            top: isValid,
-            left: false,
-            right: false,
-            bottom: isValid,
-            child: PLVideoPlayer(
-              controller: this,
-              headerControl: headerControl,
-              bottomControl: bottomControl,
-              danmuWidget: danmuWidget,
-            ),
-          ),
-        ),
-      );
-      if (result == null) {
-        // 退出全屏
-        StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-        exitFullScreen();
-        await verticalScreen();
-        toggleFullScreen(false);
-      }
+      // bool isValid =
+      //     direction.value == 'vertical' || mode == FullScreenMode.vertical
+      //         ? true
+      //         : false;
+      // var result = await showDialog(
+      //   context: Get.context!,
+      //   useSafeArea: false,
+      //   builder: (context) => Dialog.fullscreen(
+      //     backgroundColor: Colors.black,
+      //     child: SafeArea(
+      //       // 忽略手机安全区域
+      //       top: isValid,
+      //       left: false,
+      //       right: false,
+      //       bottom: isValid,
+      //       child: PLVideoPlayer(
+      //         controller: this,
+      //         headerControl: headerControl,
+      //         bottomControl: bottomControl,
+      //         danmuWidget: danmuWidget,
+      //       ),
+      //     ),
+      //   ),
+      // );
+      // if (result == null) {
+      //   // 退出全屏
+      //   StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
+      //   exitFullScreen();
+      //   await verticalScreen();
+      //   toggleFullScreen(false);
+      // }
     } else if (isFullScreen.value) {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      Get.back();
+      // Get.back();
       exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);

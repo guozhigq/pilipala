@@ -21,6 +21,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
@@ -233,268 +234,298 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   Widget build(BuildContext context) {
     final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
-    final double pinnedHeaderHeight =
-        statusBarHeight + kToolbarHeight + videoHeight;
-    Widget childWhenDisabled = SafeArea(
-      top: false,
-      bottom: false,
-      child: Stack(
-        children: [
-          Scaffold(
-            resizeToAvoidBottomInset: false,
-            key: videoDetailController.scaffoldKey,
-            backgroundColor: Colors.black,
-            body: ExtendedNestedScrollView(
-              controller: _extendNestCtr,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return <Widget>[
-                  SliverAppBar(
-                    automaticallyImplyLeading: false,
-                    pinned: false,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    forceElevated: innerBoxIsScrolled,
-                    expandedHeight: videoHeight,
-                    backgroundColor: Colors.black,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Padding(
-                        padding: EdgeInsets.only(top: statusBarHeight),
-                        child: LayoutBuilder(
-                          builder: (context, boxConstraints) {
-                            double maxWidth = boxConstraints.maxWidth;
-                            double maxHeight = boxConstraints.maxHeight;
-                            return Stack(
-                              children: [
-                                FutureBuilder(
-                                  future: _futureBuilderFuture,
-                                  builder: ((context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data['status']) {
-                                      return Obx(
-                                        () => !videoDetailController
-                                                .autoPlay.value
-                                            ? const SizedBox()
-                                            : PLVideoPlayer(
-                                                controller: plPlayerController!,
-                                                headerControl:
-                                                    videoDetailController
-                                                        .headerControl,
-                                                danmuWidget: Obx(
-                                                  () => PlDanmaku(
-                                                    key: Key(
-                                                        videoDetailController
-                                                            .danmakuCid.value
-                                                            .toString()),
-                                                    cid: videoDetailController
-                                                        .danmakuCid.value,
-                                                    playerController:
-                                                        plPlayerController!,
-                                                  ),
-                                                ),
-                                              ),
-                                      );
-                                    } else {
-                                      return const SizedBox();
-                                    }
-                                  }),
-                                ),
-
-                                Obx(
-                                  () => Visibility(
-                                    visible:
-                                        videoDetailController.isShowCover.value,
-                                    child: Positioned(
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: NetworkImgLayer(
-                                        type: 'emote',
-                                        src: videoDetailController
-                                            .videoItem['pic'],
-                                        width: maxWidth,
-                                        height: maxHeight,
+    // final double pinnedHeaderHeight =
+    //     statusBarHeight + kToolbarHeight + videoHeight;
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      enterFullScreen();
+    } else {
+      exitFullScreen();
+    }
+    Widget childWhenDisabled = PopScope(
+        canPop: !plPlayerController!.isFullScreen.value,
+        onPopInvoked: (bool didPop) {
+          if (plPlayerController!.isFullScreen.value) {
+            plPlayerController!.triggerFullScreen(status: false);
+          }
+          if (MediaQuery.of(context).orientation == Orientation.landscape) {
+            verticalScreen();
+          }
+        },
+        child: SafeArea(
+          top: MediaQuery.of(context).orientation == Orientation.portrait,
+          bottom: MediaQuery.of(context).orientation == Orientation.portrait,
+          left: !plPlayerController!.isFullScreen.value,
+          right: !plPlayerController!.isFullScreen.value,
+          child: Stack(
+            children: [
+              Scaffold(
+                resizeToAvoidBottomInset: false,
+                key: videoDetailController.scaffoldKey,
+                backgroundColor: Colors.black,
+                body: ExtendedNestedScrollView(
+                  controller: _extendNestCtr,
+                  headerSliverBuilder:
+                      (BuildContext context, bool innerBoxIsScrolled) {
+                    return <Widget>[
+                      Obx(
+                        () => SliverAppBar(
+                            automaticallyImplyLeading: false,
+                            pinned: false,
+                            elevation: 0,
+                            scrolledUnderElevation: 0,
+                            forceElevated: innerBoxIsScrolled,
+                            expandedHeight:
+                                plPlayerController!.isFullScreen.value ||
+                                        MediaQuery.of(context).orientation ==
+                                            Orientation.landscape
+                                    ? MediaQuery.of(context).size.height
+                                    : videoHeight,
+                            backgroundColor: Colors.black,
+                            flexibleSpace: FlexibleSpaceBar(
+                              background: LayoutBuilder(
+                                builder: (context, boxConstraints) {
+                                  double maxWidth = boxConstraints.maxWidth;
+                                  double maxHeight = boxConstraints.maxHeight;
+                                  return Stack(
+                                    children: [
+                                      FutureBuilder(
+                                        future: _futureBuilderFuture,
+                                        builder: ((context, snapshot) {
+                                          if (snapshot.hasData &&
+                                              snapshot.data['status']) {
+                                            return Obx(
+                                              () => !videoDetailController
+                                                      .autoPlay.value
+                                                  ? const SizedBox()
+                                                  : PLVideoPlayer(
+                                                      controller:
+                                                          plPlayerController!,
+                                                      headerControl:
+                                                          videoDetailController
+                                                              .headerControl,
+                                                      danmuWidget: Obx(
+                                                        () => PlDanmaku(
+                                                          key: Key(
+                                                              videoDetailController
+                                                                  .danmakuCid
+                                                                  .value
+                                                                  .toString()),
+                                                          cid:
+                                                              videoDetailController
+                                                                  .danmakuCid
+                                                                  .value,
+                                                          playerController:
+                                                              plPlayerController!,
+                                                        ),
+                                                      ),
+                                                    ),
+                                            );
+                                          } else {
+                                            return const SizedBox();
+                                          }
+                                        }),
                                       ),
-                                    ),
-                                  ),
-                                ),
 
-                                /// 关闭自动播放时 手动播放
-                                Obx(
-                                  () => Visibility(
-                                      visible: videoDetailController
-                                              .isShowCover.value &&
-                                          videoDetailController
-                                              .isEffective.value &&
-                                          !videoDetailController.autoPlay.value,
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
+                                      Obx(
+                                        () => Visibility(
+                                          visible: videoDetailController
+                                              .isShowCover.value,
+                                          child: Positioned(
                                             top: 0,
                                             left: 0,
                                             right: 0,
-                                            child: AppBar(
-                                              primary: false,
-                                              foregroundColor: Colors.white,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              actions: [
-                                                IconButton(
-                                                  tooltip: '稍后再看',
-                                                  onPressed: () async {
-                                                    var res = await UserHttp
-                                                        .toViewLater(
-                                                            bvid:
-                                                                videoDetailController
-                                                                    .bvid);
-                                                    SmartDialog.showToast(
-                                                        res['msg']);
-                                                  },
-                                                  icon: const Icon(
-                                                      Icons.history_outlined),
+                                            child: NetworkImgLayer(
+                                              type: 'emote',
+                                              src: videoDetailController
+                                                  .videoItem['pic'],
+                                              width: maxWidth,
+                                              height: maxHeight,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      /// 关闭自动播放时 手动播放
+                                      Obx(
+                                        () => Visibility(
+                                            visible: videoDetailController
+                                                    .isShowCover.value &&
+                                                videoDetailController
+                                                    .isEffective.value &&
+                                                !videoDetailController
+                                                    .autoPlay.value,
+                                            child: Stack(
+                                              children: [
+                                                Positioned(
+                                                  top: 0,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: AppBar(
+                                                    primary: false,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    actions: [
+                                                      IconButton(
+                                                        tooltip: '稍后再看',
+                                                        onPressed: () async {
+                                                          var res = await UserHttp
+                                                              .toViewLater(
+                                                                  bvid:
+                                                                      videoDetailController
+                                                                          .bvid);
+                                                          SmartDialog.showToast(
+                                                              res['msg']);
+                                                        },
+                                                        icon: const Icon(Icons
+                                                            .history_outlined),
+                                                      ),
+                                                      const SizedBox(width: 14)
+                                                    ],
+                                                  ),
                                                 ),
-                                                const SizedBox(width: 14)
+                                                Positioned(
+                                                  right: 12,
+                                                  bottom: 10,
+                                                  child: TextButton.icon(
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .resolveWith(
+                                                                  (states) {
+                                                        return Theme.of(context)
+                                                            .colorScheme
+                                                            .primaryContainer;
+                                                      }),
+                                                    ),
+                                                    onPressed: () =>
+                                                        handlePlay(),
+                                                    icon: const Icon(
+                                                      Icons.play_circle_outline,
+                                                      size: 20,
+                                                    ),
+                                                    label: const Text('Play'),
+                                                  ),
+                                                ),
                                               ],
-                                            ),
-                                          ),
-                                          Positioned(
-                                            right: 12,
-                                            bottom: 10,
-                                            child: TextButton.icon(
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith((states) {
-                                                  return Theme.of(context)
-                                                      .colorScheme
-                                                      .primaryContainer;
-                                                }),
-                                              ),
-                                              onPressed: () => handlePlay(),
-                                              icon: const Icon(
-                                                Icons.play_circle_outline,
-                                                size: 20,
-                                              ),
-                                              label: const Text('Play'),
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                                            )),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            )),
                       ),
+                    ];
+                  },
+                  // pinnedHeaderSliverHeightBuilder: () {
+                  //   return playerStatus != PlayerStatus.playing
+                  //       ? statusBarHeight + kToolbarHeight
+                  //       : pinnedHeaderHeight;
+                  // },
+                  /// 不收回
+                  // pinnedHeaderSliverHeightBuilder: () {
+                  //   return pinnedHeaderHeight;
+                  // },
+                  onlyOneScrollInBody: true,
+                  body: Container(
+                    key: Key(heroTag),
+                    color: Theme.of(context).colorScheme.background,
+                    child: Column(
+                      children: [
+                        Opacity(
+                          opacity: 0,
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 0,
+                            child: Obx(
+                              () => TabBar(
+                                controller: videoDetailController.tabCtr,
+                                dividerColor: Colors.transparent,
+                                indicatorColor:
+                                    Theme.of(context).colorScheme.background,
+                                tabs: videoDetailController.tabs
+                                    .map((String name) => Tab(text: name))
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            controller: videoDetailController.tabCtr,
+                            children: [
+                              Builder(
+                                builder: (context) {
+                                  return CustomScrollView(
+                                    key: const PageStorageKey<String>('简介'),
+                                    slivers: <Widget>[
+                                      if (videoDetailController.videoType ==
+                                          SearchType.video) ...[
+                                        const VideoIntroPanel(),
+                                      ] else if (videoDetailController
+                                              .videoType ==
+                                          SearchType.media_bangumi) ...[
+                                        Obx(() => BangumiIntroPanel(
+                                            cid: videoDetailController
+                                                .cid.value)),
+                                      ],
+                                      // if (videoDetailController.videoType ==
+                                      //     SearchType.video) ...[
+                                      //   SliverPersistentHeader(
+                                      //     floating: true,
+                                      //     pinned: true,
+                                      //     delegate: SliverHeaderDelegate(
+                                      //       height: 50,
+                                      //       child:
+                                      //           const MenuRow(loadingStatus: false),
+                                      //     ),
+                                      //   ),
+                                      // ],
+                                      SliverToBoxAdapter(
+                                        child: Divider(
+                                          indent: 12,
+                                          endIndent: 12,
+                                          color: Theme.of(context)
+                                              .dividerColor
+                                              .withOpacity(0.06),
+                                        ),
+                                      ),
+                                      const RelatedVideoPanel(),
+                                    ],
+                                  );
+                                },
+                              ),
+                              VideoReplyPanel(
+                                bvid: videoDetailController.bvid,
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ];
-              },
-              // pinnedHeaderSliverHeightBuilder: () {
-              //   return playerStatus != PlayerStatus.playing
-              //       ? statusBarHeight + kToolbarHeight
-              //       : pinnedHeaderHeight;
-              // },
-              /// 不收回
-              pinnedHeaderSliverHeightBuilder: () {
-                return pinnedHeaderHeight;
-              },
-              onlyOneScrollInBody: true,
-              body: Container(
-                key: Key(heroTag),
-                color: Theme.of(context).colorScheme.background,
-                child: Column(
-                  children: [
-                    Opacity(
-                      opacity: 0,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 0,
-                        child: Obx(
-                          () => TabBar(
-                            controller: videoDetailController.tabCtr,
-                            dividerColor: Colors.transparent,
-                            indicatorColor:
-                                Theme.of(context).colorScheme.background,
-                            tabs: videoDetailController.tabs
-                                .map((String name) => Tab(text: name))
-                                .toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: videoDetailController.tabCtr,
-                        children: [
-                          Builder(
-                            builder: (context) {
-                              return CustomScrollView(
-                                key: const PageStorageKey<String>('简介'),
-                                slivers: <Widget>[
-                                  if (videoDetailController.videoType ==
-                                      SearchType.video) ...[
-                                    const VideoIntroPanel(),
-                                  ] else if (videoDetailController.videoType ==
-                                      SearchType.media_bangumi) ...[
-                                    Obx(() => BangumiIntroPanel(
-                                        cid: videoDetailController.cid.value)),
-                                  ],
-                                  // if (videoDetailController.videoType ==
-                                  //     SearchType.video) ...[
-                                  //   SliverPersistentHeader(
-                                  //     floating: true,
-                                  //     pinned: true,
-                                  //     delegate: SliverHeaderDelegate(
-                                  //       height: 50,
-                                  //       child:
-                                  //           const MenuRow(loadingStatus: false),
-                                  //     ),
-                                  //   ),
-                                  // ],
-                                  SliverToBoxAdapter(
-                                    child: Divider(
-                                      indent: 12,
-                                      endIndent: 12,
-                                      color: Theme.of(context)
-                                          .dividerColor
-                                          .withOpacity(0.06),
-                                    ),
-                                  ),
-                                  const RelatedVideoPanel(),
-                                ],
-                              );
-                            },
-                          ),
-                          VideoReplyPanel(
-                            bvid: videoDetailController.bvid,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ),
 
-          /// 重新进入会刷新
-          // 播放完成/暂停播放
-          // StreamBuilder(
-          //   stream: appbarStream.stream,
-          //   initialData: 0,
-          //   builder: ((context, snapshot) {
-          //     return ScrollAppBar(
-          //       snapshot.data!.toDouble(),
-          //       () => continuePlay(),
-          //       playerStatus,
-          //       null,
-          //     );
-          //   }),
-          // )
-        ],
-      ),
-    );
+              /// 重新进入会刷新
+              // 播放完成/暂停播放
+              // StreamBuilder(
+              //   stream: appbarStream.stream,
+              //   initialData: 0,
+              //   builder: ((context, snapshot) {
+              //     return ScrollAppBar(
+              //       snapshot.data!.toDouble(),
+              //       () => continuePlay(),
+              //       playerStatus,
+              //       null,
+              //     );
+              //   }),
+              // )
+            ],
+          ),
+        ));
     Widget childWhenEnabled = FutureBuilder(
       key: Key(heroTag),
       future: _futureBuilderFuture,
