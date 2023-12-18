@@ -444,6 +444,7 @@ class VideoIntroController extends GetxController {
                             label: '设置分组',
                             onPressed: setFollowGroup,
                           ),
+                          showCloseIcon: true,
                         ),
                       );
                     }
