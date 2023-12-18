@@ -70,10 +70,14 @@ class MsgHttp {
     });
     var res = await Request().get(Api.sessionMsg, data: params);
     if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': SessionMsgDataModel.fromJson(res.data['data']),
-      };
+      try {
+        return {
+          'status': true,
+          'data': SessionMsgDataModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        print(err);
+      }
     } else {
       return {
         'status': false,

@@ -199,7 +199,7 @@ class MessageItem {
   int? receiverType;
   int? receiverId;
   int? msgType;
-  Map? content;
+  dynamic content;
   int? msgSeqno;
   int? timestamp;
   List? atUids;
@@ -212,7 +212,7 @@ class MessageItem {
     senderUid = json['sender_uid'];
     receiverType = json['receiver_type'];
     receiverId = json['receiver_id'];
-    // 1 文本 2 图片 18 系统提示 10 系统通知
+    // 1 文本 2 图片 18 系统提示 10 系统通知  5 撤回的消息
     msgType = json['msg_type'];
     content = jsonDecode(json['content']);
     msgSeqno = json['msg_seqno'];

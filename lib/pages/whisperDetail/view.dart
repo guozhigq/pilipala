@@ -93,6 +93,9 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == null) {
+              return const SizedBox();
+            }
             Map data = snapshot.data as Map;
             if (data['status']) {
               List messageList = _whisperDetailController.messageList;
@@ -138,7 +141,6 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
           bottom: MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
           border: Border(
             top: BorderSide(
               width: 4,
