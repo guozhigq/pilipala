@@ -20,9 +20,14 @@ class Em {
     }, onNonMatch: (String str) {
       if (str != '') {
         str = str
+            .replaceAll('&lt;', '<')
             .replaceAll('&gt;', '>')
             .replaceAll('&#34;', '"')
-            .replaceAll('&#39;', "'");
+            .replaceAll('&#39;', "'")
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&nbsp;', " ")
+            .replaceAll('&amp;', "&");
         Map map = {'type': 'text', 'text': str};
         res.add(map);
       }
