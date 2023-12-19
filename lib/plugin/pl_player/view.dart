@@ -25,6 +25,7 @@ import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
 import 'widgets/forward_seek.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class PLVideoPlayer extends StatefulWidget {
   final PlPlayerController controller;
@@ -75,6 +76,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late bool enableQuickDouble;
   late bool enableBackgroundPlay;
   late double screenWidth;
+
+  // 用于记录上一次全屏切换手势触发时间，避免误触
+  DateTime? lastFullScreenToggleTime;
 
   void onDoubleTapSeekBackward() {
     _ctr.onDoubleTapSeekBackward();
@@ -503,9 +507,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               final tapPosition = details.localPosition.dx;
               final sectionWidth = totalWidth / 3;
               final delta = details.delta.dy;
-
               /// 锁定时禁用
               if (_.controlsLock.value) {
+                return;
+              }
+              if (lastFullScreenToggleTime != null &&
+                  DateTime.now().difference(lastFullScreenToggleTime!) <
+                      const Duration(milliseconds: 500)) {
                 return;
               }
               if (tapPosition < sectionWidth) {
@@ -523,12 +531,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 const double threshold = 7.0; // 滑动阈值
                 if (dy > _distance && dy > threshold) {
                   if (_.isFullScreen.value) {
+                    lastFullScreenToggleTime = DateTime.now();
                     // 下滑退出全屏
                     await widget.controller.triggerFullScreen(status: false);
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
                   if (!_.isFullScreen.value) {
+                    lastFullScreenToggleTime = DateTime.now();
                     // 上滑进入全屏
                     await widget.controller.triggerFullScreen();
                   }

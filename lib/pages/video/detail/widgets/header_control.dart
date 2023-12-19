@@ -880,7 +880,18 @@ class _HeaderControlState extends State<HeaderControl> {
               size: 15,
               color: Colors.white,
             ),
-            fuc: () => Get.back(),
+            fuc: () => {
+              if (widget.controller!.isFullScreen.value){
+                widget.controller!.triggerFullScreen(status: false)
+              } else {
+                if (MediaQuery.of(context).orientation == Orientation.landscape){
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.portraitUp,
+                  ])
+                },
+                Get.back()
+              }
+            },
           ),
           SizedBox(width: buttonSpace),
           ComBtn(

@@ -138,8 +138,8 @@ class VideoDetailController extends GetxController
   }
 
   showReplyReplyPanel() {
-    PersistentBottomSheetController<void>? ctr =
-        scaffoldKey.currentState?.showBottomSheet<void>((BuildContext context) {
+    PersistentBottomSheetController? ctr =
+        scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
         oid: oid,
         rpid: fRpid,
