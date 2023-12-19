@@ -290,7 +290,7 @@ class _MemberPageState extends State<MemberPage>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        profile(_memberController),
+                        ProfilePanel(ctr: _memberController),
                         const SizedBox(height: 20),
                         Row(
                           children: [
@@ -388,7 +388,7 @@ class _MemberPageState extends State<MemberPage>
             }
           } else {
             // 骨架屏
-            return profile(_memberController, loadingStatus: true);
+            return ProfilePanel(ctr: _memberController, loadingStatus: true);
           }
         },
       ),
