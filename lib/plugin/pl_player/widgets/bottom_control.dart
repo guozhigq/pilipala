@@ -33,9 +33,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Obx(
             () {
-              final int value = _.sliderPosition.value.inSeconds;
-              final int max = _.duration.value.inSeconds;
-              final int buffer = _.buffered.value.inSeconds;
+              final int value = _.sliderPositionSeconds.value;
+              final int max = _.durationSeconds.value;
+              final int buffer = _.bufferedSeconds.value;
               if (value > max || max <= 0) {
                 return Container();
               }
@@ -57,7 +57,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                     _.onChangedSliderStart();
                   },
                   onDragUpdate: (duration) {
-                    _.onUodatedSliderProgress(duration.timeStamp);
+                    _.onUpdatedSliderProgress(duration.timeStamp);
                   },
                   onSeek: (duration) {
                     _.onChangedSliderEnd();
@@ -78,9 +78,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               // 播放时间
               Obx(() {
                 return Text(
-                  _.duration.value.inMinutes >= 60
-                      ? printDurationWithHours(_.position.value)
-                      : printDuration(_.position.value),
+                  _.durationSeconds.value >= 3600
+                      ? printDurationWithHours(Duration(seconds: _.positionSeconds.value))
+                      : printDuration(Duration(seconds: _.positionSeconds.value)),
                   style: textStyle,
                 );
               }),
@@ -89,9 +89,9 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(width: 2),
               Obx(
                 () => Text(
-                  _.duration.value.inMinutes >= 60
-                      ? printDurationWithHours(_.duration.value)
-                      : printDuration(_.duration.value),
+                  _.durationSeconds.value >= 3600
+                      ? printDurationWithHours(Duration(seconds: _.durationSeconds.value))
+                      : printDuration(Duration(seconds: _.durationSeconds.value)),
                   style: textStyle,
                 ),
               ),

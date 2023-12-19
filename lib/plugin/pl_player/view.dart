@@ -486,7 +486,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   milliseconds:
                       curSliderPosition + (details.delta.dx * scale).round());
               Duration result = pos.clamp(Duration.zero, _.duration.value);
-              _.onUodatedSliderProgress(result);
+              _.onUpdatedSliderProgress(result);
               _.onChangedSliderStart();
               _initTapPositoin = tapPosition;
             },
@@ -589,9 +589,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         /// 进度条 live模式下禁用
         Obx(
           () {
-            final int value = _.sliderPosition.value.inSeconds;
-            final int max = _.duration.value.inSeconds;
-            final int buffer = _.buffered.value.inSeconds;
+            final int value = _.sliderPositionSeconds.value;
+            final int max = _.durationSeconds.value;
+            final int buffer = _.bufferedSeconds.value;
             if (defaultBtmProgressBehavior ==
                 BtmProgresBehavior.alwaysHide.code) {
               return Container();
@@ -612,41 +612,42 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               bottom: -3.5,
               left: 0,
               right: 0,
-              child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset.zero,
-                    end: const Offset(0, -1),
-                  ).animate(CurvedAnimation(
-                    parent: animationController,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: ProgressBar(
-                    progress: Duration(seconds: value),
-                    buffered: Duration(seconds: buffer),
-                    total: Duration(seconds: max),
-                    progressBarColor: colorTheme,
-                    baseBarColor: Colors.white.withOpacity(0.2),
-                    bufferedBarColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.4),
-                    timeLabelLocation: TimeLabelLocation.none,
-                    thumbColor: colorTheme,
-                    barHeight: 2,
-                    thumbRadius: 0.0,
-                    // onDragStart: (duration) {
-                    //   _.onChangedSliderStart();
-                    // },
-                    // onDragEnd: () {
-                    //   _.onChangedSliderEnd();
-                    // },
-                    // onDragUpdate: (details) {
-                    //   print(details);
-                    // },
-                    // onSeek: (duration) {
-                    //   feedBack();
-                    //   _.onChangedSlider(duration.inSeconds.toDouble());
-                    //   _.seekTo(duration);
-                    // },
-                  )),
+              child: ProgressBar(
+                progress: Duration(seconds: value),
+                buffered: Duration(seconds: buffer),
+                total: Duration(seconds: max),
+                progressBarColor: colorTheme,
+                baseBarColor: Colors.white.withOpacity(0.2),
+                bufferedBarColor:
+                Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                timeLabelLocation: TimeLabelLocation.none,
+                thumbColor: colorTheme,
+                barHeight: 2,
+                thumbRadius: 0.0,
+                // onDragStart: (duration) {
+                //   _.onChangedSliderStart();
+                // },
+                // onDragEnd: () {
+                //   _.onChangedSliderEnd();
+                // },
+                // onDragUpdate: (details) {
+                //   print(details);
+                // },
+                // onSeek: (duration) {
+                //   feedBack();
+                //   _.onChangedSlider(duration.inSeconds.toDouble());
+                //   _.seekTo(duration);
+                // },
+              ),
+              // SlideTransition(
+              //     position: Tween<Offset>(
+              //       begin: Offset.zero,
+              //       end: const Offset(0, -1),
+              //     ).animate(CurvedAnimation(
+              //       parent: animationController,
+              //       curve: Curves.easeInOut,
+              //     )),
+              //     child: ),
             );
           },
         ),
