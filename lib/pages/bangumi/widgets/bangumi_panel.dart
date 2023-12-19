@@ -236,7 +236,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                               children: [
                                 if (i == currentIndex) ...[
                                   Image.asset(
-                                    'assets/images/live.gif',
+                                    'assets/images/live.png',
                                     color:
                                         Theme.of(context).colorScheme.primary,
                                     height: 12,

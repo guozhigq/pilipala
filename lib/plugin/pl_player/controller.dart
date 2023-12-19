@@ -46,13 +46,18 @@ class PlPlayerController {
   // bool controlsEnabled = false;
 
   /// 响应数据
+  /// 带有Seconds的变量只在秒数更新时更新，以避免频繁触发重绘
   // 播放位置
   final Rx<Duration> _position = Rx(Duration.zero);
+  final RxInt positionSeconds = 0.obs;
   final Rx<Duration> _sliderPosition = Rx(Duration.zero);
+  final RxInt sliderPositionSeconds = 0.obs;
   // 展示使用
   final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
   final Rx<Duration> _duration = Rx(Duration.zero);
+  final RxInt durationSeconds = 0.obs;
   final Rx<Duration> _buffered = Rx(Duration.zero);
+  final RxInt bufferedSeconds = 0.obs;
 
   final Rx<int> _playerCount = Rx(0);
 
@@ -225,6 +230,30 @@ class PlPlayerController {
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
 
+  void updateSliderPositionSecond() {
+    int newSecond = _sliderPosition.value.inSeconds;
+    if (sliderPositionSeconds.value != newSecond) {
+      sliderPositionSeconds.value = newSecond;
+    }
+  }
+  void updatePositionSecond() {
+    int newSecond = _position.value.inSeconds;
+    if (positionSeconds.value != newSecond) {
+      positionSeconds.value = newSecond;
+    }
+  }
+  void updateDurationSecond() {
+    int newSecond = _duration.value.inSeconds;
+    if (durationSeconds.value != newSecond) {
+      durationSeconds.value = newSecond;
+    }
+  }
+  void updateBufferedSecond() {
+    int newSecond = _buffered.value.inSeconds;
+    if (bufferedSeconds.value != newSecond) {
+      bufferedSeconds.value = newSecond;
+    }
+  }
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
@@ -335,6 +364,7 @@ class PlPlayerController {
           dataSource, _looping, enableHA, width, height);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
+      updateDurationSecond();
       // 数据加载完成
       dataStatus.status.value = DataStatus.loaded;
 
@@ -506,7 +536,7 @@ class PlPlayerController {
             element(event ? PlayerStatus.playing : PlayerStatus.paused);
           }
           if (videoPlayerController!.state.position.inSeconds != 0) {
-            makeHeartBeat(_position.value.inSeconds, type: 'status');
+            makeHeartBeat(positionSeconds.value, type: 'status');
           }
         }),
         videoPlayerController!.stream.completed.listen((event) {
@@ -520,12 +550,14 @@ class PlPlayerController {
           } else {
             // playerStatus.status.value = PlayerStatus.playing;
           }
-          makeHeartBeat(_position.value.inSeconds, type: 'status');
+          makeHeartBeat(positionSeconds.value, type: 'status');
         }),
         videoPlayerController!.stream.position.listen((event) {
           _position.value = event;
+          updatePositionSecond();
           if (!isSliderMoving.value) {
             _sliderPosition.value = event;
+            updateSliderPositionSecond();
           }
 
           /// 触发回调事件
@@ -539,6 +571,7 @@ class PlPlayerController {
         }),
         videoPlayerController!.stream.buffer.listen((event) {
           _buffered.value = event;
+          updateBufferedSecond();
         }),
         videoPlayerController!.stream.buffering.listen((event) {
           isBuffering.value = event;
@@ -580,6 +613,7 @@ class PlPlayerController {
       position = Duration.zero;
     }
     _position.value = position;
+    updatePositionSecond();
     _heartDuration = position.inSeconds;
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
@@ -667,6 +701,7 @@ class PlPlayerController {
     /// 临时fix _duration.value丢失
     if (duration != null) {
       _duration.value = duration;
+      updateDurationSecond();
     }
     audioSessionHandler.setActive(true);
   }
@@ -705,15 +740,17 @@ class PlPlayerController {
   /// 调整播放时间
   onChangedSlider(double v) {
     _sliderPosition.value = Duration(seconds: v.floor());
+    updateSliderPositionSecond();
   }
 
   void onChangedSliderStart() {
     _isSliderMoving.value = true;
   }
 
-  void onUodatedSliderProgress(Duration value) {
+  void onUpdatedSliderProgress(Duration value) {
     _sliderTempPosition.value = value;
     _sliderPosition.value = value;
+    updateSliderPositionSecond();
   }
 
   void onChangedSliderEnd() {
