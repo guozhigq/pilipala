@@ -244,7 +244,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait,
-      bottom: MediaQuery.of(context).orientation == Orientation.portrait,
+      bottom: MediaQuery.of(context).orientation == Orientation.portrait
+          && plPlayerController!.isFullScreen.value,
       left: !plPlayerController!.isFullScreen.value,
       right: !plPlayerController!.isFullScreen.value,
       child: Stack(
