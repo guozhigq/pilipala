@@ -585,7 +585,7 @@ class _HeaderControlState extends State<HeaderControl> {
     // 字体大小
     double fontSizeVal = widget.controller!.fontSizeVal;
     // 弹幕速度
-    double danmakuSpeedVal = widget.controller!.danmakuSpeedVal;
+    double danmakuDurationVal = widget.controller!.danmakuDurationVal;
 
     DanmakuController danmakuController = widget.controller!.danmakuController!;
     await showModalBottomSheet(
@@ -755,7 +755,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       ),
                     ),
                   ),
-                  Text('弹幕时长 ${danmakuSpeedVal.toString()}'),
+                  Text('弹幕时长 ${danmakuDurationVal.toString()}'),
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 0,
@@ -773,14 +773,14 @@ class _HeaderControlState extends State<HeaderControl> {
                             enabledThumbRadius: 6.0),
                       ),
                       child: Slider(
-                        min: 1,
-                        max: 8,
-                        value: danmakuSpeedVal,
-                        divisions: 14,
-                        label: danmakuSpeedVal.toString(),
+                        min: 2,
+                        max: 16,
+                        value: danmakuDurationVal,
+                        divisions: 28,
+                        label: danmakuDurationVal.toString(),
                         onChanged: (double val) {
-                          danmakuSpeedVal = val;
-                          widget.controller!.danmakuSpeedVal = danmakuSpeedVal;
+                          danmakuDurationVal = val;
+                          widget.controller!.danmakuDurationVal = danmakuDurationVal;
                           setState(() {});
                           try {
                             DanmakuOption currentOption =
