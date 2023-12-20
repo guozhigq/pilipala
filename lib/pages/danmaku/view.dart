@@ -34,7 +34,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late double showArea;
   late double opacityVal;
   late double fontSizeVal;
-  late double danmakuSpeedVal;
+  late double danmakuDurationVal;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     showArea = playerController.showArea;
     opacityVal = playerController.opacityVal;
     fontSizeVal = playerController.fontSizeVal;
-    danmakuSpeedVal = playerController.danmakuSpeedVal;
+    danmakuDurationVal = playerController.danmakuDurationVal;
   }
 
   // 播放器状态监听
@@ -156,7 +156,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, box) {
-      double initDuration = box.maxWidth / 12;
+      // double initDuration = box.maxWidth / 12;
       return Obx(
         () => AnimatedOpacity(
           opacity: playerController.isOpenDanmu.value ? 1 : 0,
@@ -172,8 +172,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideTop: blockTypes.contains(5),
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
-              duration: initDuration /
-                  (danmakuSpeedVal * widget.playerController.playbackSpeed),
+              duration: danmakuDurationVal / widget.playerController.playbackSpeed,
+              // initDuration /
+              //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
             ),
             statusChanged: (isPlaying) {},
           ),

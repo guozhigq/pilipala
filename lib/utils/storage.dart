@@ -154,12 +154,12 @@ class LocalCacheKey {
   static const String wbiKeys = 'wbiKeys';
   static const String timeStamp = 'timeStamp';
 
-  // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕速度
+  // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间
   static const String danmakuBlockType = 'danmakuBlockType';
   static const String danmakuShowArea = 'danmakuShowArea';
   static const String danmakuOpacity = 'danmakuOpacity';
   static const String danmakuFontScale = 'danmakuFontScale';
-  static const String danmakuSpeed = 'danmakuSpeed';
+  static const String danmakuDuration = 'danmakuDuration';
 
   // 代理host port
   static const String systemProxyHost = 'systemProxyHost';
