@@ -755,7 +755,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       ),
                     ),
                   ),
-                  Text('弹幕时长 ${danmakuDurationVal.toString()}'),
+                  Text('弹幕时长 ${danmakuDurationVal.toString()} 秒'),
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 0,
@@ -786,7 +786,8 @@ class _HeaderControlState extends State<HeaderControl> {
                             DanmakuOption currentOption =
                                 danmakuController.option;
                             DanmakuOption updatedOption =
-                                currentOption.copyWith(duration: val);
+                                currentOption.copyWith(duration:
+                                  val/widget.controller!.playbackSpeed);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
