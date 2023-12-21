@@ -2,6 +2,8 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/member_dynamics/index.dart';
+import 'package:pilipala/utils/utils.dart';
+import 'package:protobuf/protobuf.dart';
 
 import '../dynamics/widgets/dynamic_panel.dart';
 
@@ -13,14 +15,18 @@ class MemberDynamicsPage extends StatefulWidget {
 }
 
 class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
-  final MemberDynamicsController _memberDynamicController =
-      Get.put(MemberDynamicsController());
+  late MemberDynamicsController _memberDynamicController;
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
+  late int mid;
 
   @override
   void initState() {
     super.initState();
+    mid = int.parse(Get.parameters['mid']!);
+    final String heroTag = Utils.makeHeroTag(mid);
+    _memberDynamicController =
+        Get.put(MemberDynamicsController(), tag: heroTag);
     _futureBuilderFuture =
         _memberDynamicController.getMemberDynamic('onRefresh');
     scrollController = _memberDynamicController.scrollController;
@@ -56,21 +62,25 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data as Map;
-                List list = _memberDynamicController.dynamicsList;
-                if (data['status']) {
-                  return Obx(
-                    () => list.isNotEmpty
-                        ? SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                return DynamicPanel(item: list[index]);
-                              },
-                              childCount: list.length,
-                            ),
-                          )
-                        : const SliverToBoxAdapter(),
-                  );
+                if (snapshot.data != null) {
+                  Map data = snapshot.data as Map;
+                  List list = _memberDynamicController.dynamicsList;
+                  if (data['status']) {
+                    return Obx(
+                      () => list.isNotEmpty
+                          ? SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  return DynamicPanel(item: list[index]);
+                                },
+                                childCount: list.length,
+                              ),
+                            )
+                          : const SliverToBoxAdapter(),
+                    );
+                  } else {
+                    return const SliverToBoxAdapter();
+                  }
                 } else {
                   return const SliverToBoxAdapter();
                 }
