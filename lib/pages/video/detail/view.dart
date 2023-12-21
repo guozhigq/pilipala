@@ -433,7 +433,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               // },
               /// 不收回
               pinnedHeaderSliverHeightBuilder: () {
-                return pinnedHeaderHeight;
+                return plPlayerController!.isFullScreen.value ?
+                MediaQuery.of(context).size.height: pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
               body: Container(
