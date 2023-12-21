@@ -255,9 +255,7 @@ class UserHttp {
   static Future relationSearch(int mid) async {
     Map params = await WbiSign().makSign({
       'mid': mid,
-      'token': '',
-      'platform': 'web',
-      'web_location': 1550101,
+      'web_location': 333.999,
     });
     var res = await Request().get(
       Api.relationSearch,
@@ -265,6 +263,7 @@ class UserHttp {
         'mid': mid,
         'w_rid': params['w_rid'],
         'wts': params['wts'],
+        'web_location': 333.999,
       },
     );
     if (res.data['code'] == 0) {
