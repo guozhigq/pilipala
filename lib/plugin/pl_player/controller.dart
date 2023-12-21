@@ -937,32 +937,13 @@ class PlPlayerController {
     if (!isFullScreen.value && status) {
       /// 按照视频宽高比决定全屏方向
       toggleFullScreen(true);
-      switch (mode) {
-        case FullScreenMode.auto:
-          if (direction.value == 'horizontal') {
-            /// 进入全屏
-            await enterFullScreen();
-            // 横屏
-            await landScape();
-          } else {
-            // 竖屏
-            await verticalScreen();
-          }
-          break;
-        case FullScreenMode.vertical:
-
-          /// 进入全屏
-          await enterFullScreen();
-          // 竖屏
-          await verticalScreen();
-          break;
-        case FullScreenMode.horizontal:
-
-          /// 进入全屏
-          await enterFullScreen();
-          // 横屏
-          await landScape();
-          break;
+      /// 进入全屏
+      await enterFullScreen();
+      if(mode == FullScreenMode.vertical ||
+          (mode == FullScreenMode.auto && direction.value == 'vertical')) {
+        await verticalScreen();
+      } else {
+        await landScape();
       }
 
       // bool isValid =
