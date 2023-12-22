@@ -22,7 +22,7 @@ class ZanButton extends StatefulWidget {
 
 class _ZanButtonState extends State<ZanButton> {
   // 评论点赞
-  onLikeReply() async {
+  Future onLikeReply() async {
     feedBack();
     // SmartDialog.showLoading(msg: 'pilipala ...');
     ReplyItemModel replyItem = widget.replyItem!;
@@ -47,6 +47,16 @@ class _ZanButtonState extends State<ZanButton> {
       SmartDialog.showToast(res['msg']);
     }
   }
+  bool isProcessing = false;
+  VoidCallback handleState(Future Function() action) {
+    return () async {
+      if (!isProcessing) {
+        setState(() => isProcessing = true);
+        await action();
+        setState(() => isProcessing = false);
+      }
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +65,7 @@ class _ZanButtonState extends State<ZanButton> {
     return SizedBox(
       height: 32,
       child: TextButton(
+        onPressed: handleState(onLikeReply),
         child: Row(
           children: [
             Icon(
@@ -79,7 +90,6 @@ class _ZanButtonState extends State<ZanButton> {
             ),
           ],
         ),
-        onPressed: () => onLikeReply(),
       ),
     );
   }

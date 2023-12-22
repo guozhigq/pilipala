@@ -23,7 +23,16 @@ class ActionPanel extends StatefulWidget {
 class _ActionPanelState extends State<ActionPanel> {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
   late ModuleStatModel stat;
-
+  bool isProcessing = false;
+  VoidCallback handleState(Future Function() action) {
+    return () async {
+      if (!isProcessing) {
+        setState(() => isProcessing = true);
+        await action();
+        setState(() => isProcessing = false);
+      }
+    };
+  }
   @override
   void initState() {
     super.initState();
@@ -31,7 +40,7 @@ class _ActionPanelState extends State<ActionPanel> {
   }
 
   // 动态点赞
-  onLikeDynamic() async {
+  Future onLikeDynamic() async {
     feedBack();
     var item = widget.item!;
     String dynamicId = item.idStr!;
@@ -101,7 +110,7 @@ class _ActionPanelState extends State<ActionPanel> {
         Expanded(
           flex: 1,
           child: TextButton.icon(
-            onPressed: () => onLikeDynamic(),
+            onPressed: handleState(onLikeDynamic),
             icon: Icon(
               stat.like!.status!
                   ? FontAwesomeIcons.solidThumbsUp

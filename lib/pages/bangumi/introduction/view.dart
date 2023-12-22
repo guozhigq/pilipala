@@ -121,7 +121,16 @@ class _BangumiInfoState extends State<BangumiInfo> {
   late final BangumiInfoModel? bangumiItem;
   late double sheetHeight;
   int? cid;
-
+  bool isProcessing = false;
+  VoidCallback handleState(Future Function() action) {
+    return () async {
+      if (!isProcessing) {
+        setState(() => isProcessing = true);
+        await action();
+        setState(() => isProcessing = false);
+      }
+    };
+  }
   @override
   void initState() {
     super.initState();
@@ -395,7 +404,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.thumbsUp),
                       selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
-                      onTap: () => bangumiIntroController.actionLikeVideo(),
+                      onTap: handleState(bangumiIntroController.actionLikeVideo),
                       selectStatus: bangumiIntroController.hasLike.value,
                       loadingStatus: false,
                       text: !widget.loadingStatus
@@ -406,7 +415,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.b),
                       selectIcon: const Icon(FontAwesomeIcons.b),
-                      onTap: () => bangumiIntroController.actionCoinVideo(),
+                      onTap: handleState(bangumiIntroController.actionCoinVideo),
                       selectStatus: bangumiIntroController.hasCoin.value,
                       loadingStatus: false,
                       text: !widget.loadingStatus
@@ -455,7 +464,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
       Obx(
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.thumbsUp),
-          onTap: () => videoIntroController.actionLikeVideo(),
+          onTap: handleState(videoIntroController.actionLikeVideo),
           selectStatus: videoIntroController.hasLike.value,
           loadingStatus: widget.loadingStatus,
           text: !widget.loadingStatus
@@ -467,7 +476,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
       Obx(
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.b),
-          onTap: () => videoIntroController.actionCoinVideo(),
+          onTap: handleState(videoIntroController.actionCoinVideo),
           selectStatus: videoIntroController.hasCoin.value,
           loadingStatus: widget.loadingStatus,
           text: !widget.loadingStatus
