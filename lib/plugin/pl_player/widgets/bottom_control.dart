@@ -26,8 +26,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
 
     return Container(
       color: Colors.transparent,
-      height: 85,
-      padding: const EdgeInsets.only(left: 14, right: 14),
+      height: 90,
+      padding: const EdgeInsets.only(left: 18, right: 18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -50,8 +50,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                   bufferedBarColor: colorTheme.withOpacity(0.4),
                   timeLabelLocation: TimeLabelLocation.none,
                   thumbColor: colorTheme,
-                  barHeight: 3.0,
-                  thumbRadius: 5.5,
+                  barHeight: 3.5,
+                  thumbRadius: 7,
                   onDragStart: (duration) {
                     feedBack();
                     _.onChangedSliderStart();
