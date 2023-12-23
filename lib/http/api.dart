@@ -97,8 +97,8 @@ class Api {
   // 操作用户关系
   static const String relationMod = '/x/relation/modify';
 
-  // 相互关系查询
-  static const String relationSearch = '/x/space/wbi/acc/relation';
+  // 相互关系查询 // 失效
+  // static const String relationSearch = '/x/space/wbi/acc/relation';
 
   // 评论列表
   // https://api.bilibili.com/x/v2/reply/main?csrf=6e22efc1a47225ea25f901f922b5cfdd&mode=3&oid=254175381&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=0&type=11

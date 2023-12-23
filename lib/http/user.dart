@@ -250,31 +250,43 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
-
-  // 相互关系查询
-  static Future relationSearch(int mid) async {
-    Map params = await WbiSign().makSign({
-      'mid': mid,
-      'token': '',
-      'platform': 'web',
-      'web_location': 1550101,
-    });
+  static Future hasFollow(int mid) async {
     var res = await Request().get(
-      Api.relationSearch,
+      Api.hasFollow,
       data: {
-        'mid': mid,
-        'w_rid': params['w_rid'],
-        'wts': params['wts'],
+        'fid': mid,
       },
     );
     if (res.data['code'] == 0) {
-      // relation 主动状态
-      // 被动状态
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+  // // 相互关系查询
+  // static Future relationSearch(int mid) async {
+  //   Map params = await WbiSign().makSign({
+  //     'mid': mid,
+  //     'token': '',
+  //     'platform': 'web',
+  //     'web_location': 1550101,
+  //   });
+  //   var res = await Request().get(
+  //     Api.relationSearch,
+  //     data: {
+  //       'mid': mid,
+  //       'w_rid': params['w_rid'],
+  //       'wts': params['wts'],
+  //     },
+  //   );
+  //   if (res.data['code'] == 0) {
+  //     // relation 主动状态
+  //     // 被动状态
+  //     return {'status': true, 'data': res.data['data']};
+  //   } else {
+  //     return {'status': false, 'msg': res.data['message']};
+  //   }
+  // }
 
   // 搜索历史记录
   static Future searchHistory(

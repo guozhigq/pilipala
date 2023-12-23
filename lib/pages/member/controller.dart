@@ -116,16 +116,28 @@ class MemberController extends GetxController {
   Future relationSearch() async {
     if (userInfo == null) return;
     if (mid == ownerMid) return;
-    var res = await UserHttp.relationSearch(mid);
+    var res = await UserHttp.hasFollow(mid);
     if (res['status']) {
-      attribute.value = res['data']['relation']['attribute'];
-      attributeText.value = attribute.value == 0
-          ? '关注'
-          : attribute.value == 2
-              ? '已关注'
-              : attribute.value == 6
-                  ? '已互粉'
-                  : '已拉黑';
+      attribute.value = res['data']['attribute'];
+      switch (attribute.value) {
+        case 1:
+          attributeText.value = '悄悄关注';
+          break;
+        case 2:
+          attributeText.value = '已关注';
+          break;
+        case 6:
+          attributeText.value = '已互关';
+          break;
+        case 128:
+          attributeText.value = '已拉黑';
+          break;
+        default:
+          attributeText.value = '关注';
+      }
+      if (res['data']['special'] == 1) {
+        attributeText.value += 'SP';
+      }
     }
   }
 
