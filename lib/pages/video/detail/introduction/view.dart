@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -135,13 +137,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String memberHeroTag;
   late bool enableAi;
   bool isProcessing = false;
-  VoidCallback handleState(Future Function() action) {
-    return () async {
-      if (!isProcessing) {
-        setState(() => isProcessing = true);
-        await action();
-        setState(() => isProcessing = false);
-      }
+  void Function()? handleState(Future Function() action) {
+    return isProcessing ? null : () async {
+      setState(() => isProcessing = true);
+      await action();
+      setState(() => isProcessing = false);
     };
   }
   @override

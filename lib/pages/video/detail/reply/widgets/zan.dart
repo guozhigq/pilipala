@@ -48,13 +48,11 @@ class _ZanButtonState extends State<ZanButton> {
     }
   }
   bool isProcessing = false;
-  VoidCallback handleState(Future Function() action) {
-    return () async {
-      if (!isProcessing) {
-        setState(() => isProcessing = true);
-        await action();
-        setState(() => isProcessing = false);
-      }
+  void Function()? handleState(Future Function() action) {
+    return isProcessing ? null : () async {
+      setState(() => isProcessing = true);
+      await action();
+      setState(() => isProcessing = false);
     };
   }
 

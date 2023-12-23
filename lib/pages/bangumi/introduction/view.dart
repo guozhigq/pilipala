@@ -122,13 +122,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
   late double sheetHeight;
   int? cid;
   bool isProcessing = false;
-  VoidCallback handleState(Future Function() action) {
-    return () async {
-      if (!isProcessing) {
-        setState(() => isProcessing = true);
-        await action();
-        setState(() => isProcessing = false);
-      }
+  void Function()? handleState(Future Function() action) {
+    return isProcessing ? null : () async {
+      setState(() => isProcessing = true);
+      await action();
+      setState(() => isProcessing = false);
     };
   }
   @override
