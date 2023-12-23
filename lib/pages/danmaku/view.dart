@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:pilipala/models/danmaku/dm.pb.dart';
 import 'package:pilipala/pages/danmaku/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/danmaku.dart';
@@ -27,7 +28,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late PlPlayerController playerController;
   late PlDanmakuController _plDanmakuController;
   DanmakuController? _controller;
-  bool danmuPlayStatus = true;
+  // bool danmuPlayStatus = true;
   Box setting = GStrorage.setting;
   late bool enableShowDanmaku;
   late List blockTypes;
@@ -35,6 +36,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late double opacityVal;
   late double fontSizeVal;
   late double danmakuDurationVal;
+  int latestAddedPosition = -1;
 
   @override
   void initState() {
@@ -42,26 +44,24 @@ class _PlDanmakuState extends State<PlDanmaku> {
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     _plDanmakuController =
-        PlDanmakuController(widget.cid, widget.playerController);
+        PlDanmakuController(widget.cid);
     if (mounted) {
       playerController = widget.playerController;
       _plDanmakuController.videoDuration = playerController.duration.value;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
-        _plDanmakuController
-          ..calcSegment()
-          ..queryDanmaku();
+        _plDanmakuController.initiate(
+            playerController.position.value.inMilliseconds
+        );
       }
       playerController
         ..addStatusLister(playerListener)
         ..addPositionListener(videoPositionListen);
     }
     playerController.isOpenDanmu.listen((p0) {
-      if (p0) {
-        if (_plDanmakuController.dmSegList.isEmpty) {
-          _plDanmakuController
-            ..calcSegment()
-            ..queryDanmaku();
-        }
+      if (p0 && !_plDanmakuController.initiated) {
+        _plDanmakuController.initiate(
+            playerController.position.value.inMilliseconds
+        );
       }
     });
     blockTypes = playerController.blockTypes;
@@ -82,68 +82,32 @@ class _PlDanmakuState extends State<PlDanmaku> {
   }
 
   void videoPositionListen(Duration position) {
-    if (!danmuPlayStatus) {
-      _controller!.onResume();
-      danmuPlayStatus = true;
-    }
     if (!playerController.isOpenDanmu.value) {
       return;
     }
-    PlDanmakuController ctr = _plDanmakuController;
     int currentPosition = position.inMilliseconds;
-    blockTypes = playerController.blockTypes;
-    // 根据position判断是否有已缓存弹幕。没有则请求对应段
-    int segIndex = (currentPosition / (6 * 60 * 1000)).ceil();
-    segIndex = segIndex < 1 ? 1 : segIndex;
-    // print('🌹🌹： ${segIndex}');
-    // print('🌹🌹： ${ctr.dmSegList.length}');
-    // print('🌹🌹： ${ctr.hasrequestSeg.contains(segIndex - 1)}');
-    if (segIndex - 1 >= ctr.dmSegList.length ||
-        (ctr.dmSegList[segIndex - 1].elems.isEmpty &&
-            !ctr.hasrequestSeg.contains(segIndex - 1))) {
-      ctr.hasrequestSeg.add(segIndex - 1);
-      ctr.currentSegIndex = segIndex;
-      EasyThrottle.throttle('follow', const Duration(seconds: 1), () {
-        ctr.queryDanmaku();
-      });
-    }
-    // 超出分段数返回
-    if (ctr.currentSegIndex >= ctr.dmSegList.length) {
-      return;
-    }
-    if (ctr.dmSegList.isEmpty ||
-        ctr.dmSegList[ctr.currentSegIndex].elems.isEmpty) {
-      return;
-    }
-    // 超出当前分段的弹幕总数返回
-    if (ctr.currentDmIndex >= ctr.dmSegList[ctr.currentSegIndex].elems.length) {
-      ctr.currentDmIndex = 0;
-      ctr.currentSegIndex++;
-      return;
-    }
-    var element = ctr.dmSegList[ctr.currentSegIndex].elems[ctr.currentDmIndex];
-    var delta = currentPosition - element.progress;
+    currentPosition -= currentPosition % 100;//取整百的毫秒数
 
-    if (delta >= 0 && delta < 200) {
-      // 屏蔽彩色弹幕
-      if (blockTypes.contains(6) ? element.color == 16777215 : true) {
-        _controller!.addItems([
-          DanmakuItem(
-            element.content,
-            color: DmUtils.decimalToColor(element.color),
-            time: element.progress,
-            type: DmUtils.getPosition(element.mode),
-          )
-        ]);
-      }
-      ctr.currentDmIndex++;
-    } else {
-      if (!playerController.isOpenDanmu.value) {
-        _controller!.pause();
-        danmuPlayStatus = false;
-        return;
-      }
-      ctr.findClosestPositionIndex(position.inMilliseconds);
+    if (currentPosition == latestAddedPosition) {
+      return;
+    }
+    latestAddedPosition = currentPosition;
+
+    List<DanmakuElem>? currentDanmakuList =
+        _plDanmakuController.getCurrentDanmaku(currentPosition);
+
+    if (currentDanmakuList != null) {
+      Color? defaultColor = playerController.blockTypes.contains(6) ?
+        DmUtils.decimalToColor(16777215) : null;
+
+      _controller!.addItems(
+        currentDanmakuList.map((e) => DanmakuItem(
+          e.content,
+          color: defaultColor ?? DmUtils.decimalToColor(e.color),
+          time: e.progress,
+          type: DmUtils.getPosition(e.mode),
+        )).toList()
+      );
     }
   }
 
