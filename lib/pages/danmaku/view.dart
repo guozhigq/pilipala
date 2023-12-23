@@ -47,9 +47,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
         PlDanmakuController(widget.cid);
     if (mounted) {
       playerController = widget.playerController;
-      _plDanmakuController.videoDuration = playerController.duration.value;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
         _plDanmakuController.initiate(
+            playerController.duration.value.inMilliseconds,
             playerController.position.value.inMilliseconds
         );
       }
@@ -60,6 +60,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     playerController.isOpenDanmu.listen((p0) {
       if (p0 && !_plDanmakuController.initiated) {
         _plDanmakuController.initiate(
+            playerController.duration.value.inMilliseconds,
             playerController.position.value.inMilliseconds
         );
       }

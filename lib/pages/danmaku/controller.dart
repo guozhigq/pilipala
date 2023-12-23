@@ -5,7 +5,6 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 class PlDanmakuController {
   PlDanmakuController(this.cid);
   final int cid;
-  late Duration videoDuration;
   Map<int,List<DanmakuElem>> dmSegMap = {};
   // 已请求的段落标记
   List<bool> requestedSeg = [];
@@ -14,9 +13,9 @@ class PlDanmakuController {
 
   static int SEGMENT_LENGTH = 60 * 6 * 1000;
 
-  void initiate(int progress) {
+  void initiate(int videoDuration, int progress) {
     if (requestedSeg.isEmpty) {
-      int segCount = (videoDuration.inSeconds / (60 * 6)).ceil();
+      int segCount = (videoDuration / SEGMENT_LENGTH).ceil();
       requestedSeg = List<bool>.generate(segCount, (index) => false);
     }
     queryDanmaku(
