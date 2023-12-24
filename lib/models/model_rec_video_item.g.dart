@@ -24,7 +24,7 @@ class RecVideoItemModelAdapter extends TypeAdapter<RecVideoItemModel> {
       uri: fields[4] as String?,
       pic: fields[5] as String?,
       title: fields[6] as String?,
-      duration: fields[7] as int?,
+      duration: fields[7] as String?,
       pubdate: fields[8] as int?,
       owner: fields[9] as Owner?,
       stat: fields[10] as Stat?,
@@ -89,7 +89,7 @@ class StatAdapter extends TypeAdapter<Stat> {
     return Stat(
       view: fields[0] as int?,
       like: fields[1] as int?,
-      danmaku: fields[2] as int?,
+      danmu: fields[2] as int?,
     );
   }
 
@@ -102,7 +102,7 @@ class StatAdapter extends TypeAdapter<Stat> {
       ..writeByte(1)
       ..write(obj.like)
       ..writeByte(2)
-      ..write(obj.danmaku);
+      ..write(obj.danmu);
   }
 
   @override

@@ -36,7 +36,7 @@ class RecVideoItemModel {
   @HiveField(6)
   String? title = '';
   @HiveField(7)
-  int? duration = -1;
+  String? duration = '';
   @HiveField(8)
   int? pubdate = -1;
   @HiveField(9)
@@ -56,7 +56,7 @@ class RecVideoItemModel {
     uri = json["uri"];
     pic = json["pic"];
     title = json["title"];
-    duration = json["duration"];
+    duration = json["duration"].toString();
     pubdate = json["pubdate"];
     owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);
@@ -72,19 +72,19 @@ class Stat {
   Stat({
     this.view,
     this.like,
-    this.danmaku,
+    this.danmu,
   });
   @HiveField(0)
   int? view;
   @HiveField(1)
   int? like;
   @HiveField(2)
-  int? danmaku;
+  int? danmu;
 
   Stat.fromJson(Map<String, dynamic> json) {
     view = json["view"];
     like = json["like"];
-    danmaku = json['danmaku'];
+    danmu = json['danmaku'];
   }
 }
 
