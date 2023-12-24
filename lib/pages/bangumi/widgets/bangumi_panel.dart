@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BangumiPanel extends StatefulWidget {
   final List<EpisodeItem> pages;
@@ -35,6 +36,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   late int cid;
   String heroTag = Get.arguments['heroTag'];
   late final VideoDetailController videoDetailCtr;
+  final ItemScrollController itemScrollController = ItemScrollController();
 
   @override
   void initState() {
@@ -70,10 +72,11 @@ class _BangumiPanelState extends State<BangumiPanel> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             WidgetsBinding.instance.addPostFrameCallback((_) async {
-              await Future.delayed(const Duration(milliseconds: 200));
-              listViewScrollCtr_2.animateTo(currentIndex * 56,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut);
+              // await Future.delayed(const Duration(milliseconds: 200));
+              // listViewScrollCtr_2.animateTo(currentIndex * 56,
+              //     duration: const Duration(milliseconds: 500),
+              //     curve: Curves.easeInOut);
+              itemScrollController.jumpTo(index: currentIndex);
             });
             // 在这里使用 setState 更新状态
             return Container(
@@ -101,42 +104,39 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   ),
                   Expanded(
                     child: Material(
-                      child: ListView.builder(
-                        controller: listViewScrollCtr_2,
+                      child: ScrollablePositionedList.builder(
                         itemCount: widget.pages.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              setState(() {
-                                changeFucCall(widget.pages[index], index);
-                              });
-                            },
-                            dense: false,
-                            leading: index == currentIndex
-                                ? Image.asset(
-                                    'assets/images/live.gif',
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    height: 12,
-                                  )
-                                : null,
-                            title: Text(
-                              '第${index + 1}话  ${widget.pages[index].longTitle!}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: index == currentIndex
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                        itemBuilder: (context, index) => ListTile(
+                          onTap: () {
+                            setState(() {
+                              changeFucCall(widget.pages[index], index);
+                            });
+                          },
+                          dense: false,
+                          leading: index == currentIndex
+                              ? Image.asset(
+                                  'assets/images/live.gif',
+                                  color: Theme.of(context).colorScheme.primary,
+                                  height: 12,
+                                )
+                              : null,
+                          title: Text(
+                            '第${index + 1}话  ${widget.pages[index].longTitle!}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: index == currentIndex
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
-                            trailing: widget.pages[index].badge != null
-                                ? Image.asset(
-                                    'assets/images/big-vip.png',
-                                    height: 20,
-                                  )
-                                : const SizedBox(),
-                          );
-                        },
+                          ),
+                          trailing: widget.pages[index].badge != null
+                              ? Image.asset(
+                                  'assets/images/big-vip.png',
+                                  height: 20,
+                                )
+                              : const SizedBox(),
+                        ),
+                        itemScrollController: itemScrollController,
                       ),
                     ),
                   ),

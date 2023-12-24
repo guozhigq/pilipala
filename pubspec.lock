@@ -1198,6 +1198,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.1.3"
+  scrollable_positioned_list:
+    dependency: "direct main"
+    description:
+      name: scrollable_positioned_list
+      sha256: "1b54d5f1329a1e263269abc9e2543d90806131aa14fe7c6062a8054d57249287"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.3.8"
   share_plus:
     dependency: "direct main"
     description:

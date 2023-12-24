@@ -250,6 +250,7 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+
   static Future hasFollow(int mid) async {
     var res = await Request().get(
       Api.hasFollow,

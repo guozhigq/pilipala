@@ -132,6 +132,7 @@ dependencies:
   # 极验
   gt3_flutter_plugin: ^0.0.8
   uuid: ^3.0.7
+  scrollable_positioned_list: ^0.3.8
 
   
 dev_dependencies:

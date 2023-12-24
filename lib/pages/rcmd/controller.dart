@@ -3,12 +3,14 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/home/rcmd/result.dart';
+// import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
   int _currentPage = 0;
   RxList<RecVideoItemAppModel> videoList = <RecVideoItemAppModel>[].obs;
+  // RxList<RecVideoItemModel> videoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
@@ -21,6 +23,7 @@ class RcmdController extends GetxController {
     super.onInit();
     crossAxisCount.value =
         setting.get(SettingBoxKey.customRows, defaultValue: 2);
+    // 读取app端缓存内容
     if (recVideo.get('cacheList') != null &&
         recVideo.get('cacheList').isNotEmpty) {
       List<RecVideoItemAppModel> list = [];
@@ -35,6 +38,11 @@ class RcmdController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
+    return await queryRcmdFeedApp(type);
+  }
+
+  // 获取app端推荐
+  Future queryRcmdFeedApp(type) async {
     if (isLoadingMore == false) {
       return;
     }
@@ -61,6 +69,40 @@ class RcmdController extends GetxController {
         videoList.addAll(res['data']);
       }
       recVideo.put('cacheList', res['data']);
+      _currentPage += 1;
+    }
+    isLoadingMore = false;
+    return res;
+  }
+
+  // 获取web端推荐
+  Future queryRcmdFeedWeb(type) async {
+    if (isLoadingMore == false) {
+      return;
+    }
+    if (type == 'onRefresh') {
+      _currentPage = 0;
+    }
+    var res = await VideoHttp.rcmdVideoList(
+      ps: 20,
+      freshIdx: _currentPage,
+    );
+    if (res['status']) {
+      if (type == 'init') {
+        if (videoList.isNotEmpty) {
+          videoList.addAll(res['data']);
+        } else {
+          videoList.value = res['data'];
+        }
+      } else if (type == 'onRefresh') {
+        if (enableSaveLastData) {
+          videoList.insertAll(0, res['data']);
+        } else {
+          videoList.value = res['data'];
+        }
+      } else if (type == 'onLoad') {
+        videoList.addAll(res['data']);
+      }
       _currentPage += 1;
     }
     isLoadingMore = false;
