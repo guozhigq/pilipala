@@ -237,17 +237,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight;
     if (MediaQuery.of(context).orientation == Orientation.landscape ||
-        plPlayerController!.isFullScreen.value) {
+        plPlayerController?.isFullScreen.value == true) {
       enterFullScreen();
     } else {
       exitFullScreen();
     }
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait,
-      bottom: MediaQuery.of(context).orientation == Orientation.portrait
-          && plPlayerController!.isFullScreen.value,
-      left: !plPlayerController!.isFullScreen.value,
-      right: !plPlayerController!.isFullScreen.value,
+      bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
+          plPlayerController?.isFullScreen.value == true,
+      left: plPlayerController?.isFullScreen.value != true,
+      right: plPlayerController?.isFullScreen.value != true,
       child: Stack(
         children: [
           Scaffold(
@@ -259,169 +259,168 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
-                  Obx(() => PopScope(
-                        canPop: !plPlayerController!.isFullScreen.value,
-                        onPopInvoked: (bool didPop) {
-                          if (plPlayerController!.isFullScreen.value) {
-                            plPlayerController!
-                                .triggerFullScreen(status: false);
-                          }
-                          if (MediaQuery.of(context).orientation ==
-                              Orientation.landscape) {
-                            verticalScreen();
-                          }
-                        },
-                        child: SliverAppBar(
-                            automaticallyImplyLeading: false,
-                            pinned: false,
-                            elevation: 0,
-                            scrolledUnderElevation: 0,
-                            forceElevated: innerBoxIsScrolled,
-                            expandedHeight:
-                                plPlayerController!.isFullScreen.value ||
-                                        MediaQuery.of(context).orientation ==
-                                            Orientation.landscape
-                                    ? MediaQuery.of(context).size.height -
-                                        (MediaQuery.of(context).orientation ==
-                                                Orientation.landscape
-                                            ? 0
-                                            : statusBarHeight)
-                                    : videoHeight,
-                            backgroundColor: Colors.black,
-                            flexibleSpace: FlexibleSpaceBar(
-                              background: LayoutBuilder(
-                                builder: (context, boxConstraints) {
-                                  double maxWidth = boxConstraints.maxWidth;
-                                  double maxHeight = boxConstraints.maxHeight;
-                                  return Stack(
-                                    children: [
-                                      FutureBuilder(
-                                        future: _futureBuilderFuture,
-                                        builder: ((context, snapshot) {
-                                          if (snapshot.hasData &&
-                                              snapshot.data['status']) {
-                                            return Obx(
-                                              () => !videoDetailController
-                                                      .autoPlay.value
-                                                  ? const SizedBox()
-                                                  : PLVideoPlayer(
-                                                      controller:
-                                                          plPlayerController!,
-                                                      headerControl:
-                                                          videoDetailController
-                                                              .headerControl,
-                                                      danmuWidget: Obx(
-                                                        () => PlDanmaku(
-                                                          key: Key(
-                                                              videoDetailController
-                                                                  .danmakuCid
-                                                                  .value
-                                                                  .toString()),
-                                                          cid:
-                                                              videoDetailController
-                                                                  .danmakuCid
-                                                                  .value,
-                                                          playerController:
-                                                              plPlayerController!,
-                                                        ),
+                  SliverAppBar(
+                      automaticallyImplyLeading: false,
+                      pinned: false,
+                      elevation: 0,
+                      scrolledUnderElevation: 0,
+                      forceElevated: innerBoxIsScrolled,
+                      expandedHeight:
+                          plPlayerController?.isFullScreen.value == true ||
+                                  MediaQuery.of(context).orientation ==
+                                      Orientation.landscape
+                              ? MediaQuery.of(context).size.height -
+                                  (MediaQuery.of(context).orientation ==
+                                          Orientation.landscape
+                                      ? 0
+                                      : statusBarHeight)
+                              : videoHeight,
+                      backgroundColor: Colors.black,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: PopScope(
+                            canPop:
+                                plPlayerController?.isFullScreen.value != true,
+                            onPopInvoked: (bool didPop) {
+                              if (plPlayerController?.isFullScreen.value ==
+                                  true) {
+                                plPlayerController!
+                                    .triggerFullScreen(status: false);
+                              }
+                              if (MediaQuery.of(context).orientation ==
+                                  Orientation.landscape) {
+                                verticalScreen();
+                              }
+                            },
+                            child: LayoutBuilder(
+                              builder: (context, boxConstraints) {
+                                double maxWidth = boxConstraints.maxWidth;
+                                double maxHeight = boxConstraints.maxHeight;
+                                return Stack(
+                                  children: [
+                                    FutureBuilder(
+                                      future: _futureBuilderFuture,
+                                      builder: ((context, snapshot) {
+                                        if (snapshot.hasData &&
+                                            snapshot.data['status']) {
+                                          return Obx(
+                                            () => !videoDetailController
+                                                    .autoPlay.value
+                                                ? const SizedBox()
+                                                : PLVideoPlayer(
+                                                    controller:
+                                                        plPlayerController!,
+                                                    headerControl:
+                                                        videoDetailController
+                                                            .headerControl,
+                                                    danmuWidget: Obx(
+                                                      () => PlDanmaku(
+                                                        key: Key(
+                                                            videoDetailController
+                                                                .danmakuCid
+                                                                .value
+                                                                .toString()),
+                                                        cid:
+                                                            videoDetailController
+                                                                .danmakuCid
+                                                                .value,
+                                                        playerController:
+                                                            plPlayerController!,
                                                       ),
                                                     ),
-                                            );
-                                          } else {
-                                            return const SizedBox();
-                                          }
-                                        }),
-                                      ),
+                                                  ),
+                                          );
+                                        } else {
+                                          return const SizedBox();
+                                        }
+                                      }),
+                                    ),
 
-                                      Obx(
-                                        () => Visibility(
-                                          visible: videoDetailController
-                                              .isShowCover.value,
-                                          child: Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: NetworkImgLayer(
-                                              type: 'emote',
-                                              src: videoDetailController
-                                                  .videoItem['pic'],
-                                              width: maxWidth,
-                                              height: maxHeight,
-                                            ),
+                                    Obx(
+                                      () => Visibility(
+                                        visible: videoDetailController
+                                            .isShowCover.value,
+                                        child: Positioned(
+                                          top: 0,
+                                          left: 0,
+                                          right: 0,
+                                          child: NetworkImgLayer(
+                                            type: 'emote',
+                                            src: videoDetailController
+                                                .videoItem['pic'],
+                                            width: maxWidth,
+                                            height: maxHeight,
                                           ),
                                         ),
                                       ),
+                                    ),
 
-                                      /// 关闭自动播放时 手动播放
-                                      Obx(
-                                        () => Visibility(
-                                            visible: videoDetailController
-                                                    .isShowCover.value &&
-                                                videoDetailController
-                                                    .isEffective.value &&
-                                                !videoDetailController
-                                                    .autoPlay.value,
-                                            child: Stack(
-                                              children: [
-                                                Positioned(
-                                                  top: 0,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: AppBar(
-                                                    primary: false,
-                                                    foregroundColor:
-                                                        Colors.white,
+                                    /// 关闭自动播放时 手动播放
+                                    Obx(
+                                      () => Visibility(
+                                          visible: videoDetailController
+                                                  .isShowCover.value &&
+                                              videoDetailController
+                                                  .isEffective.value &&
+                                              !videoDetailController
+                                                  .autoPlay.value,
+                                          child: Stack(
+                                            children: [
+                                              Positioned(
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                child: AppBar(
+                                                  primary: false,
+                                                  foregroundColor: Colors.white,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  actions: [
+                                                    IconButton(
+                                                      tooltip: '稍后再看',
+                                                      onPressed: () async {
+                                                        var res = await UserHttp
+                                                            .toViewLater(
+                                                                bvid:
+                                                                    videoDetailController
+                                                                        .bvid);
+                                                        SmartDialog.showToast(
+                                                            res['msg']);
+                                                      },
+                                                      icon: const Icon(Icons
+                                                          .history_outlined),
+                                                    ),
+                                                    const SizedBox(width: 14)
+                                                  ],
+                                                ),
+                                              ),
+                                              Positioned(
+                                                right: 12,
+                                                bottom: 10,
+                                                child: TextButton.icon(
+                                                  style: ButtonStyle(
                                                     backgroundColor:
-                                                        Colors.transparent,
-                                                    actions: [
-                                                      IconButton(
-                                                        tooltip: '稍后再看',
-                                                        onPressed: () async {
-                                                          var res = await UserHttp
-                                                              .toViewLater(
-                                                                  bvid:
-                                                                      videoDetailController
-                                                                          .bvid);
-                                                          SmartDialog.showToast(
-                                                              res['msg']);
-                                                        },
-                                                        icon: const Icon(Icons
-                                                            .history_outlined),
-                                                      ),
-                                                      const SizedBox(width: 14)
-                                                    ],
+                                                        MaterialStateProperty
+                                                            .resolveWith(
+                                                                (states) {
+                                                      return Theme.of(context)
+                                                          .colorScheme
+                                                          .primaryContainer;
+                                                    }),
                                                   ),
-                                                ),
-                                                Positioned(
-                                                  right: 12,
-                                                  bottom: 10,
-                                                  child: TextButton.icon(
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .resolveWith(
-                                                                  (states) {
-                                                        return Theme.of(context)
-                                                            .colorScheme
-                                                            .primaryContainer;
-                                                      }),
-                                                    ),
-                                                    onPressed: () =>
-                                                        handlePlay(),
-                                                    icon: const Icon(
-                                                      Icons.play_circle_outline,
-                                                      size: 20,
-                                                    ),
-                                                    label: const Text('Play'),
+                                                  onPressed: () => handlePlay(),
+                                                  icon: const Icon(
+                                                    Icons.play_circle_outline,
+                                                    size: 20,
                                                   ),
+                                                  label: const Text('Play'),
                                                 ),
-                                              ],
-                                            )),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                  ],
+                                );
+                              },
                             )),
                       )),
                 ];
@@ -433,8 +432,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               // },
               /// 不收回
               pinnedHeaderSliverHeightBuilder: () {
-                return plPlayerController!.isFullScreen.value ?
-                MediaQuery.of(context).size.height: pinnedHeaderHeight;
+                return plPlayerController?.isFullScreen.value == true
+                    ? MediaQuery.of(context).size.height
+                    : pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
               body: Container(

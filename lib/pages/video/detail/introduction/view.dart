@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -134,7 +136,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
-
+  bool isProcessing = false;
+  void Function()? handleState(Future Function() action) {
+    return isProcessing ? null : () async {
+      setState(() => isProcessing = true);
+      await action();
+      setState(() => isProcessing = false);
+    };
+  }
   @override
   void initState() {
     super.initState();
@@ -477,7 +486,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               () => ActionItem(
                   icon: const Icon(FontAwesomeIcons.thumbsUp),
                   selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
-                  onTap: () => videoIntroController.actionLikeVideo(),
+                  onTap: handleState(videoIntroController.actionLikeVideo),
                   selectStatus: videoIntroController.hasLike.value,
                   loadingStatus: loadingStatus,
                   text: !loadingStatus
@@ -494,7 +503,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               () => ActionItem(
                   icon: const Icon(FontAwesomeIcons.b),
                   selectIcon: const Icon(FontAwesomeIcons.b),
-                  onTap: () => videoIntroController.actionCoinVideo(),
+                  onTap: handleState(videoIntroController.actionCoinVideo),
                   selectStatus: videoIntroController.hasCoin.value,
                   loadingStatus: loadingStatus,
                   text: !loadingStatus
@@ -538,7 +547,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       Obx(
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.thumbsUp),
-          onTap: () => videoIntroController.actionLikeVideo(),
+          onTap: handleState(videoIntroController.actionLikeVideo),
           selectStatus: videoIntroController.hasLike.value,
           loadingStatus: loadingStatus,
           text:
@@ -549,7 +558,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       Obx(
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.b),
-          onTap: () => videoIntroController.actionCoinVideo(),
+          onTap: handleState(videoIntroController.actionCoinVideo),
           selectStatus: videoIntroController.hasCoin.value,
           loadingStatus: loadingStatus,
           text:
