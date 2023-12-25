@@ -619,7 +619,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               return Container();
             }
             return Positioned(
-              bottom: -3.5,
+              bottom: -1.5,
               left: 0,
               right: 0,
               child: ProgressBar(
@@ -632,7 +632,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 Theme.of(context).colorScheme.primary.withOpacity(0.4),
                 timeLabelLocation: TimeLabelLocation.none,
                 thumbColor: colorTheme,
-                barHeight: 2,
+                barHeight: 3,
                 thumbRadius: 0.0,
                 // onDragStart: (duration) {
                 //   _.onChangedSliderStart();
