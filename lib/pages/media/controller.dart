@@ -36,6 +36,7 @@ class MediaController extends GetxController {
   ];
   var userInfo;
   int? mid;
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {

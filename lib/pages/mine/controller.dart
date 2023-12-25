@@ -129,4 +129,12 @@ class MineController extends GetxController {
     }
     Get.toNamed('/fan?mid=${userInfo.value.mid}');
   }
+
+  pushDynamic() {
+    if (!userLogin.value) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    Get.toNamed('/memberDynamics?mid=${userInfo.value.mid}');
+  }
 }

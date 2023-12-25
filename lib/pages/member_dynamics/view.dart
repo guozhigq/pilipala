@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
-import 'package:protobuf/protobuf.dart';
 
 import '../dynamics/widgets/dynamic_panel.dart';
 
@@ -35,7 +34,7 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           EasyThrottle.throttle(
-              'member_dynamics', const Duration(milliseconds: 500), () {
+              'member_dynamics', const Duration(milliseconds: 1000), () {
             _memberDynamicController.onLoad();
           });
         }
