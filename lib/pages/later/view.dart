@@ -32,7 +32,7 @@ class _LaterPageState extends State<LaterPage> {
         title: Obx(
           () => _laterController.laterList.isNotEmpty
               ? Text(
-                  '稍后再看 (${_laterController.laterList.length}/100)',
+                  '稍后再看 (${_laterController.laterList.length})',
                   style: Theme.of(context).textTheme.titleMedium,
                 )
               : Text(
