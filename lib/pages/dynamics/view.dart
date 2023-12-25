@@ -127,55 +127,64 @@ class _DynamicsPageState extends State<DynamicsPage>
                     () => _dynamicsController.userLogin.value
                         ? Visibility(
                             visible: _dynamicsController.mid.value == -1,
-                            child: CustomSlidingSegmentedControl<int>(
-                              initialValue:
-                                  _dynamicsController.initialValue.value,
-                              children: {
-                                0: Text(
-                                  '全部',
-                                  style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium!
-                                          .fontSize),
+                            child: Theme(
+                              data: ThemeData(
+                                splashColor:
+                                    Colors.transparent, // 点击时的水波纹颜色设置为透明
+                                highlightColor:
+                                    Colors.transparent, // 点击时的背景高亮颜色设置为透明
+                              ),
+                              child: CustomSlidingSegmentedControl<int>(
+                                initialValue:
+                                    _dynamicsController.initialValue.value,
+                                children: {
+                                  0: Text(
+                                    '全部',
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize),
+                                  ),
+                                  1: Text('投稿',
+                                      style: TextStyle(
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .fontSize)),
+                                  2: Text('番剧',
+                                      style: TextStyle(
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .fontSize)),
+                                  3: Text('专栏',
+                                      style: TextStyle(
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium!
+                                              .fontSize)),
+                                },
+                                padding: 13.0,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceVariant
+                                      .withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                1: Text('投稿',
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium!
-                                            .fontSize)),
-                                2: Text('番剧',
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium!
-                                            .fontSize)),
-                                3: Text('专栏',
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium!
-                                            .fontSize)),
-                              },
-                              padding: 13.0,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceVariant
-                                    .withOpacity(0.7),
-                                borderRadius: BorderRadius.circular(20),
+                                thumbDecoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).colorScheme.background,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                onValueChanged: (v) {
+                                  feedBack();
+                                  _dynamicsController.onSelectType(v);
+                                },
                               ),
-                              thumbDecoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.background,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                              onValueChanged: (v) {
-                                feedBack();
-                                _dynamicsController.onSelectType(v);
-                              },
                             ),
                           )
                         : Text('动态',
