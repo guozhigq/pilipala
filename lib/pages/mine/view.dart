@@ -234,7 +234,7 @@ class _MinePageState extends State<MinePage> {
                   childAspectRatio: 1.67,
                   children: <Widget>[
                     InkWell(
-                      onTap: () {},
+                      onTap: () => _mineController.pushDynamic(),
                       borderRadius: StyleString.mdRadius,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

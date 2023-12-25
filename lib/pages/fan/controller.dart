@@ -15,6 +15,7 @@ class FansController extends GetxController {
   late String name;
   var userInfo;
   RxString loadingText = '加载中...'.obs;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
@@ -23,6 +24,7 @@ class FansController extends GetxController {
     mid = Get.parameters['mid'] != null
         ? int.parse(Get.parameters['mid']!)
         : userInfo.mid;
+    isOwner.value = mid == userInfo.mid;
     name = Get.parameters['name'] ?? userInfo.uname;
   }
 
