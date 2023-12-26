@@ -259,22 +259,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
-                  SliverAppBar(
+                  Obx(() => SliverAppBar(
                       automaticallyImplyLeading: false,
                       pinned: false,
                       elevation: 0,
                       scrolledUnderElevation: 0,
                       forceElevated: innerBoxIsScrolled,
-                      expandedHeight:
-                          plPlayerController?.isFullScreen.value == true ||
-                                  MediaQuery.of(context).orientation ==
+                      expandedHeight: MediaQuery.of(context).orientation ==
+                                  Orientation.landscape ||
+                              plPlayerController?.isFullScreen.value == true
+                          ? MediaQuery.of(context).size.height -
+                              (MediaQuery.of(context).orientation ==
                                       Orientation.landscape
-                              ? MediaQuery.of(context).size.height -
-                                  (MediaQuery.of(context).orientation ==
-                                          Orientation.landscape
-                                      ? 0
-                                      : statusBarHeight)
-                              : videoHeight,
+                                  ? 0
+                                  : statusBarHeight)
+                          : videoHeight,
                       backgroundColor: Colors.black,
                       flexibleSpace: FlexibleSpaceBar(
                         background: PopScope(
@@ -422,7 +421,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 );
                               },
                             )),
-                      )),
+                      ))),
                 ];
               },
               // pinnedHeaderSliverHeightBuilder: () {
