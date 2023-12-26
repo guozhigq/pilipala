@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage>
     stream = _homeController.searchBarStream.stream;
   }
 
-  showUserBottonSheet() {
+  showUserBottomSheet() {
     feedBack();
     showModalBottomSheet(
       context: context,
@@ -49,47 +49,47 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(toolbarHeight: 0, elevation: 0),
-      body: Column(
+      body: Stack(
         children: [
-          CustomAppBar(
-            stream: _homeController.hideSearchBar
-                ? stream
-                : StreamController<bool>.broadcast().stream,
-            ctr: _homeController,
-            callback: showUserBottonSheet,
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            height: 42,
-            child: Align(
-              alignment: Alignment.center,
-              child: TabBar(
-                controller: _homeController.tabController,
-                tabs: [
-                  for (var i in _homeController.tabs) Tab(text: i['label'])
-                ],
-                isScrollable: true,
-                dividerColor: Colors.transparent,
-                enableFeedback: true,
-                splashBorderRadius: BorderRadius.circular(10),
-                tabAlignment: TabAlignment.center,
-                onTap: (value) {
-                  feedBack();
-                  if (_homeController.initialIndex == value) {
-                    _homeController.tabsCtrList[value]().animateToTop();
-                  }
-                  _homeController.initialIndex = value;
-                },
+          // gradient background
+          Align(
+            alignment: Alignment.topLeft,
+            child: Opacity(
+              opacity: 0.6,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                        Theme.of(context).colorScheme.surface
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: const [0, 0.0034, 0.34]),
+                ),
               ),
             ),
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _homeController.tabController,
-              children: _homeController.tabsPageList,
-            ),
+          Column(
+            children: [
+              CustomAppBar(
+                stream: _homeController.hideSearchBar
+                    ? stream
+                    : StreamController<bool>.broadcast().stream,
+                ctr: _homeController,
+                callback: showUserBottomSheet,
+              ),
+              const CustomTabs(),
+              Expanded(
+                child: TabBarView(
+                  controller: _homeController.tabController,
+                  children: _homeController.tabsPageList,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -128,24 +128,33 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             duration: const Duration(milliseconds: 500),
             height: snapshot.data
                 ? MediaQuery.of(context).padding.top + 52
-                : MediaQuery.of(context).padding.top - 10,
+                : MediaQuery.of(context).padding.top + 5,
             child: Container(
               padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
+                left: 8,
+                right: 8,
                 bottom: 0,
                 top: MediaQuery.of(context).padding.top + 4,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Expanded(child: SearchPage()),
+                  Expanded(
+                      child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/logo/logo_android_2.png',
+                        height: 48,
+                      ),
+                    ],
+                  )),
+                  const SearchPage(),
                   if (ctr!.userLogin.value) ...[
-                    const SizedBox(width: 6),
                     IconButton(
                         onPressed: () => Get.toNamed('/whisper'),
                         icon: const Icon(Icons.notifications_none))
                   ],
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Obx(
                     () => ctr!.userLogin.value
                         ? Stack(
@@ -191,7 +200,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                               ),
                               onPressed: () => callback!(),
                               icon: Icon(
-                                Icons.person_rounded,
+                                Icons.account_circle,
                                 size: 22,
                                 color: Theme.of(context).colorScheme.primary,
                               ),
@@ -204,6 +213,111 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CustomTabs extends StatefulWidget {
+  const CustomTabs({super.key});
+
+  @override
+  State<CustomTabs> createState() => _CustomTabsState();
+}
+
+class _CustomTabsState extends State<CustomTabs> {
+  final HomeController _homeController = Get.put(HomeController());
+  int currentTabIndex = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _homeController.tabController.addListener(listen);
+    currentTabIndex = _homeController.tabController.index;
+  }
+
+  void listen() {
+    setState(() {
+      currentTabIndex = _homeController.tabController.index;
+    });
+  }
+
+  void onTap(int index) {
+    feedBack();
+    if (_homeController.initialIndex == index) {
+      _homeController.tabsCtrList[index]().animateToTop();
+    }
+    _homeController.initialIndex = index;
+    setState(() {
+      _homeController.tabController.index = index;
+      currentTabIndex = index;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _homeController.tabController.removeListener(listen);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 56,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        scrollDirection: Axis.horizontal,
+        itemCount: _homeController.tabs.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(width: 8.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          bool selected = index == currentTabIndex;
+          String label = _homeController.tabs[index]['label'];
+          // add margins to first and last tab;
+          return CustomChip(
+              onTap: () {
+                onTap(index);
+              },
+              label: label,
+              selected: selected);
+        },
+      ),
+    );
+  }
+}
+
+class CustomChip extends StatelessWidget {
+  final Function onTap;
+  final String label;
+  final bool selected;
+  const CustomChip(
+      {super.key,
+      required this.onTap,
+      required this.label,
+      required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle? chipTextStyle =
+        selected ? const TextStyle(fontWeight: FontWeight.bold) : null;
+
+    return InputChip(
+      side: const BorderSide(color: Colors.transparent),
+      color: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected)) {
+          return Theme.of(context).colorScheme.tertiaryContainer; // 当按钮被按下时的颜色
+        }
+        return Theme.of(context).colorScheme.surfaceVariant; // 默认颜色
+      }),
+      label: Text(
+        label,
+        style: chipTextStyle,
+      ),
+      onPressed: () {
+        onTap();
+      },
+      selected: selected,
+      showCheckmark: false,
     );
   }
 }
