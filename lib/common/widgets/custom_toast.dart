@@ -11,7 +11,7 @@ class CustomToast extends StatelessWidget {
           EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 30),
       padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.8),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
