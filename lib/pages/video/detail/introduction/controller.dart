@@ -340,7 +340,7 @@ class VideoIntroController extends GetxController {
   // 分享视频
   Future actionShareVideo() async {
     var result = await Share.share(
-            '${videoDetail.value.title} - ${HttpString.baseUrl}/video/$bvid')
+            '${videoDetail.value.title} UP主: ${videoDetail.value.owner!.name!} - ${HttpString.baseUrl}/video/$bvid')
         .whenComplete(() {});
     return result;
   }
