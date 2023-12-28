@@ -98,6 +98,7 @@ class SettingBoxKey {
   static const String fullScreenMode = 'fullScreenMode';
   static const String defaultDecode = 'defaultDecode';
   static const String danmakuEnable = 'danmakuEnable';
+  static const String defaultToastOp = 'defaultToastOp';
   static const String defaultPicQa = 'defaultPicQa';
   static const String enableHA = 'enableHA';
   static const String enableOnlineTotal = 'enableOnlineTotal';
