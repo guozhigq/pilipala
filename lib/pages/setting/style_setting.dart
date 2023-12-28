@@ -24,6 +24,7 @@ class _StyleSettingState extends State<StyleSetting> {
 
   Box setting = GStrorage.setting;
   late int picQuality;
+  late double toastOpacity;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;
 
@@ -31,6 +32,7 @@ class _StyleSettingState extends State<StyleSetting> {
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+    toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 0.8);
     _tempThemeValue = settingController.themeType.value;
     defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
@@ -184,6 +186,71 @@ class _StyleSettingState extends State<StyleSetting> {
               child: Obx(
                 () => Text(
                   '${settingController.picQuality.value}%',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+            ),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return StatefulBuilder(
+                    builder: (context, StateSetter setState) {
+                      final SettingController settingController =
+                          Get.put(SettingController());
+                      return AlertDialog(
+                        title: const Text('Toast不透明度'),
+                        contentPadding: const EdgeInsets.only(
+                            top: 20, left: 8, right: 8, bottom: 8),
+                        content: SizedBox(
+                          height: 40,
+                          child: Slider(
+                            value: toastOpacity,
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 10,
+                            label: '$toastOpacity%',
+                            onChanged: (double val) {
+                              toastOpacity = val;
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Get.back(),
+                              child: Text('取消',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline))),
+                          TextButton(
+                            onPressed: () {
+                              setting.put(
+                                  SettingBoxKey.defaultToastOp, toastOpacity);
+                              Get.back();
+                              settingController.toastOpacity.value =
+                                  toastOpacity;
+                            },
+                            child: const Text('确定'),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
+            title: Text('Toast不透明度', style: titleStyle),
+            subtitle: Text('自定义Toast不透明度', style: subTitleStyle),
+            trailing: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Obx(
+                () => Text(
+                  '${settingController.toastOpacity.value}',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),

@@ -15,6 +15,7 @@ class SettingController extends GetxController {
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
+  RxDouble toastOpacity = (0.8).obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   var userInfo;
@@ -26,6 +27,8 @@ class SettingController extends GetxController {
     userLogin.value = userInfo != null;
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
+    toastOpacity.value =
+        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 0.8);
     picQuality.value =
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
