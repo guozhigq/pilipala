@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
+import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
@@ -32,7 +33,7 @@ class _StyleSettingState extends State<StyleSetting> {
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
-    toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 0.8);
+    toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     _tempThemeValue = settingController.themeType.value;
     defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
@@ -193,56 +194,23 @@ class _StyleSettingState extends State<StyleSetting> {
           ),
           ListTile(
             dense: false,
-            onTap: () {
-              showDialog(
+            onTap: () async {
+              double? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return StatefulBuilder(
-                    builder: (context, StateSetter setState) {
-                      final SettingController settingController =
-                          Get.put(SettingController());
-                      return AlertDialog(
-                        title: const Text('Toast不透明度'),
-                        contentPadding: const EdgeInsets.only(
-                            top: 20, left: 8, right: 8, bottom: 8),
-                        content: SizedBox(
-                          height: 40,
-                          child: Slider(
-                            value: toastOpacity,
-                            min: 0.0,
-                            max: 1.0,
-                            divisions: 10,
-                            label: '$toastOpacity%',
-                            onChanged: (double val) {
-                              toastOpacity = val;
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Get.back(),
-                              child: Text('取消',
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline))),
-                          TextButton(
-                            onPressed: () {
-                              setting.put(
-                                  SettingBoxKey.defaultToastOp, toastOpacity);
-                              Get.back();
-                              settingController.toastOpacity.value =
-                                  toastOpacity;
-                            },
-                            child: const Text('确定'),
-                          )
-                        ],
-                      );
-                    },
-                  );
+                  return SlideDialog<double>(
+                      title: 'Toast透明度',
+                      value: toastOpacity,
+                      min: 0.0,
+                      max: 1.0,
+                      divisions: 10);
                 },
               );
+              if (result != null) {
+                toastOpacity = result;
+                setting.put(SettingBoxKey.defaultToastOp, result);
+                setState(() {});
+              }
             },
             title: Text('Toast不透明度', style: titleStyle),
             subtitle: Text('自定义Toast不透明度', style: subTitleStyle),

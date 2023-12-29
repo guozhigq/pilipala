@@ -11,7 +11,7 @@ class CustomToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double toastOpacity =
-        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 0.8);
+        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     return Container(
       margin:
           EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 30),
