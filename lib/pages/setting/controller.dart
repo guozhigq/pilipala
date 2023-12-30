@@ -15,7 +15,7 @@ class SettingController extends GetxController {
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
-  RxDouble toastOpacity = (0.8).obs;
+  RxDouble toastOpacity = (1.0).obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   var userInfo;

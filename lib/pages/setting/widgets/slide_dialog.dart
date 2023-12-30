@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 // import 'package:pilipala/models/common/theme_type.dart';
 
-class SlideDialog<T extends num> extends StatefulWidget {
-  final T value;
+class SlideDialog<T extends double> extends StatefulWidget {
+  final double value;
   final String title;
   final double min;
   final double max;
-  final int divisions;
+  final int? divisions;
   final String? suffix;
+
   const SlideDialog({
     super.key,
     required this.value,
+    required this.title,
     required this.min,
     required this.max,
-    required this.divisions,
-    required this.title,
+    this.divisions,
     this.suffix,
   });
 
@@ -22,8 +23,8 @@ class SlideDialog<T extends num> extends StatefulWidget {
   _SlideDialogState<T> createState() => _SlideDialogState<T>();
 }
 
-class _SlideDialogState<T extends num> extends State<SlideDialog<T>> {
-  late T _tempValue;
+class _SlideDialogState<T extends double> extends State<SlideDialog<T>> {
+  late double _tempValue;
 
   @override
   void initState() {
@@ -40,29 +41,30 @@ class _SlideDialogState<T extends num> extends State<SlideDialog<T>> {
       content: SizedBox(
         height: 40,
         child: Slider(
-          value: widget.value.toDouble(),
+          value: _tempValue,
           min: widget.min,
           max: widget.max,
-          divisions: widget.divisions,
-          label: '${widget.value}${widget.suffix}',
+          divisions: widget.divisions ?? 10,
+          label: '$_tempValue${widget.suffix ?? ''}',
           onChanged: (double value) {
-            print(value);
             setState(() {
-              _tempValue = value as T;
+              _tempValue = value;
             });
           },
         ),
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '取消',
-              style: TextStyle(color: Theme.of(context).colorScheme.outline),
-            )),
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            '取消',
+            style: TextStyle(color: Theme.of(context).colorScheme.outline),
+          ),
+        ),
         TextButton(
-            onPressed: () => Navigator.pop(context, _tempValue),
-            child: const Text('确定'))
+          onPressed: () => Navigator.pop(context, _tempValue),
+          child: const Text('确定'),
+        )
       ],
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
@@ -21,7 +22,8 @@ class StyleSetting extends StatefulWidget {
 
 class _StyleSettingState extends State<StyleSetting> {
   final SettingController settingController = Get.put(SettingController());
-  final ColorSelectController colorSelectController = Get.put(ColorSelectController());
+  final ColorSelectController colorSelectController =
+      Get.put(ColorSelectController());
 
   Box setting = GStrorage.setting;
   late int picQuality;
@@ -110,9 +112,12 @@ class _StyleSettingState extends State<StyleSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '自定义列数', value: defaultCustomRows, values: [1, 2, 3, 4, 5].map((e) {
-                    return {'title': '$e 列', 'value': e};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '自定义列数',
+                      value: defaultCustomRows,
+                      values: [1, 2, 3, 4, 5].map((e) {
+                        return {'title': '$e 列', 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -199,17 +204,18 @@ class _StyleSettingState extends State<StyleSetting> {
                 context: context,
                 builder: (context) {
                   return SlideDialog<double>(
-                      title: 'Toast透明度',
-                      value: toastOpacity,
-                      min: 0.0,
-                      max: 1.0,
-                      divisions: 10);
+                    title: 'Toast不透明度',
+                    value: settingController.toastOpacity.value,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                  );
                 },
               );
               if (result != null) {
-                toastOpacity = result;
+                settingController.toastOpacity.value = result;
+                SmartDialog.showToast('设置成功');
                 setting.put(SettingBoxKey.defaultToastOp, result);
-                setState(() {});
               }
             },
             title: Text('Toast不透明度', style: titleStyle),
@@ -230,16 +236,18 @@ class _StyleSettingState extends State<StyleSetting> {
               ThemeType? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<ThemeType>(title: '主题模式', value: _tempThemeValue, values: ThemeType.values.map((e) {
-                    return {'title': e.description, 'value': e};
-                  }).toList());
+                  return SelectDialog<ThemeType>(
+                      title: '主题模式',
+                      value: _tempThemeValue,
+                      values: ThemeType.values.map((e) {
+                        return {'title': e.description, 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
                 _tempThemeValue = result;
                 settingController.themeType.value = result;
-                setting.put(
-                    SettingBoxKey.themeMode, result.code);
+                setting.put(SettingBoxKey.themeMode, result.code);
                 Get.forceAppUpdate();
               }
             },
@@ -253,7 +261,7 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/colorSetting'),
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
-                '当前主题：${colorSelectController.type.value == 0 ? '动态取色': '指定颜色'}',
+                '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
                 style: subTitleStyle)),
           ),
           ListTile(
