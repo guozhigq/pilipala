@@ -26,13 +26,15 @@
 Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 ```bash
-[✓] Flutter (Channel stable, 3.10.6, on macOS 12.1 21C52 darwin-arm64, locale
+[✓] Flutter (Channel stable, 3.16.4, on macOS 14.1.2 23B92 darwin-arm64, locale
     zh-Hans-CN)
-[✓] Android toolchain - develop for Android devices (Android SDK version 33.0.2)
-[✓] Xcode - develop for iOS and macOS (Xcode 13.4)
+[✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+[✓] Xcode - develop for iOS and macOS (Xcode 15.1)
 [✓] Chrome - develop for the web
-[✓] Android Studio (version 2022.2)
-[✓] VS Code (version 1.77.3)
+[✓] Android Studio (version 2022.3)
+[✓] VS Code (version 1.85.1)
+[✓] Connected device (3 available)
+[✓] Network resources
 
 ```
 
@@ -42,6 +44,7 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 ## 技术交流
 
 Telegram: https://t.me/+lm_oOVmF0RJiODk1
+QQ频道: https://pd.qq.com/s/365esodk3
 
 
 <br/>
@@ -87,7 +90,7 @@ Telegram: https://t.me/+lm_oOVmF0RJiODk1
   - [x] 画质选择（高清画质未解锁）
   - [x] 音质选择（视视频而定）
   - [x] 解码格式选择（视视频而定）
-  - [ ] 弹幕
+  - [x] 弹幕
   - [ ] 字幕
   - [x] 记忆播放
   - [x] 视频比例：高度/宽度适应、填充、包含等
