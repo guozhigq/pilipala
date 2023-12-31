@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/dynamics/deatil/index.dart';
 import 'package:pilipala/pages/dynamics/widgets/author_panel.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
@@ -35,39 +36,17 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   bool _visibleTitle = false;
   String? action;
   // 回复类型
-  late int type;
+  late int replyType;
   bool _isFabVisible = true;
+  int oid = 0;
+  int? opusId;
+  bool isOpusId = false;
 
   @override
   void initState() {
     super.initState();
-    int oid = 0;
     // floor 1原创 2转发
-    if (Get.arguments['floor'] == 1) {
-      oid = int.parse(Get.arguments['item'].basic!['comment_id_str']);
-      print(oid);
-    } else {
-      try {
-        String type = Get.arguments['item'].modules.moduleDynamic.major.type;
-
-        /// TODO
-        if (type == 'MAJOR_TYPE_OPUS') {
-        } else {
-          oid = Get.arguments['item'].modules.moduleDynamic.major.draw.id;
-        }
-      } catch (_) {}
-    }
-    int commentType = 11;
-    try {
-      commentType = Get.arguments['item'].basic!['comment_type'];
-    } catch (_) {}
-    type = (commentType == 0) ? 11 : commentType;
-
-    action =
-        Get.arguments.containsKey('action') ? Get.arguments['action'] : null;
-    _dynamicDetailController =
-        Get.put(DynamicDetailController(oid, type), tag: oid.toString());
-    _futureBuilderFuture = _dynamicDetailController.queryReplyList();
+    init();
     titleStreamC = StreamController<bool>();
     if (action == 'comment') {
       _visibleTitle = true;
@@ -83,6 +62,49 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     scrollListener();
   }
 
+  // 页面初始化
+  void init() async {
+    Map args = Get.arguments;
+    // 楼层
+    int floor = args['floor'];
+    // 从action栏点击进入
+    action = args.containsKey('action') ? args['action'] : null;
+    // 评论类型
+    int commentType = args['item'].basic!['comment_type'] ?? 11;
+    replyType = (commentType == 0) ? 11 : commentType;
+
+    if (floor == 1) {
+      oid = int.parse(args['item'].basic!['comment_id_str']);
+    } else {
+      try {
+        ModuleDynamicModel moduleDynamic = args['item'].modules.moduleDynamic;
+        String majorType = moduleDynamic.major!.type!;
+
+        if (majorType == 'MAJOR_TYPE_OPUS') {
+          // 转发的动态
+          String jumpUrl = moduleDynamic.major!.opus!.jumpUrl!;
+          opusId = int.parse(jumpUrl.split('/').last);
+          if (opusId != null) {
+            isOpusId = true;
+            _dynamicDetailController = Get.put(
+                DynamicDetailController(oid, replyType),
+                tag: opusId.toString());
+            await _dynamicDetailController.reqHtmlByOpusId(opusId!);
+            setState(() {});
+          }
+        } else {
+          oid = moduleDynamic.major!.draw!.id!;
+        }
+      } catch (_) {}
+    }
+    if (!isOpusId) {
+      _dynamicDetailController =
+          Get.put(DynamicDetailController(oid, replyType), tag: oid.toString());
+    }
+    _futureBuilderFuture = _dynamicDetailController.queryReplyList();
+  }
+
+  // 查看二级评论
   void replyReply(replyItem) {
     int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
@@ -100,13 +122,14 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
           oid: oid,
           rpid: rpid,
           source: 'dynamic',
-          replyType: ReplyType.values[type],
+          replyType: ReplyType.values[replyType],
           firstFloor: replyItem,
         ),
       ),
     );
   }
 
+  // 滑动事件监听
   void scrollListener() {
     scrollController = _dynamicDetailController.scrollController;
     scrollController.addListener(
@@ -307,7 +330,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                           replyLevel: '1',
                                           replyReply: (replyItem) =>
                                               replyReply(replyItem),
-                                          replyType: ReplyType.values[type],
+                                          replyType:
+                                              ReplyType.values[replyType],
                                           addReply: (replyItem) {
                                             _dynamicDetailController
                                                 .replyList[index].replies!
@@ -365,7 +389,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                               IdUtils.bv2av(Get.parameters['bvid']!),
                           root: 0,
                           parent: 0,
-                          replyType: ReplyType.values[type],
+                          replyType: ReplyType.values[replyType],
                         );
                       },
                     ).then(

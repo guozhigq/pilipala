@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -44,15 +45,27 @@ class AuthorPanel extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              item.modules.moduleAuthor.name,
-              style: TextStyle(
-                color: item.modules.moduleAuthor!.vip != null &&
-                        item.modules.moduleAuthor!.vip['status'] > 0
-                    ? const Color.fromARGB(255, 251, 100, 163)
-                    : Theme.of(context).colorScheme.onBackground,
-                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-              ),
+            Row(
+              children: [
+                Text(
+                  item.modules.moduleAuthor.name,
+                  style: TextStyle(
+                    color: item.modules.moduleAuthor!.vip != null &&
+                            item.modules.moduleAuthor!.vip['status'] > 0
+                        ? const Color.fromARGB(255, 251, 100, 163)
+                        : Theme.of(context).colorScheme.onBackground,
+                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                  ),
+                ),
+                if (item.modules.moduleTag != null) ...[
+                  const SizedBox(width: 6),
+                  PBadge(
+                    bottom: 10,
+                    right: 10,
+                    text: item.modules.moduleTag['text'],
+                  )
+                ]
+              ],
             ),
             DefaultTextStyle.merge(
               style: TextStyle(
