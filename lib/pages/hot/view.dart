@@ -94,6 +94,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                               SliverChildBuilderDelegate((context, index) {
                             return VideoCardH(
                               videoItem: _hotController.videoList[index],
+                              showPubdate: true,
                               longPress: () {
                                 _hotController.popupDialog = _createPopupDialog(
                                     _hotController.videoList[index]);

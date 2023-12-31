@@ -36,6 +36,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
                 return Material(
                   child: VideoCardH(
                     videoItem: snapshot.data['data'][index],
+                    showPubdate: true,
                     longPress: () {
                       try {
                         _releatedController.popupDialog =
