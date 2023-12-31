@@ -40,9 +40,13 @@ class HtmlHttp {
       //
       String opusContent =
           opusDetail.querySelector('.opus-module-content')!.innerHtml;
-      String test = opusDetail
-          .querySelector('.horizontal-scroll-album__pic__img')!
-          .innerHtml;
+      String? test;
+      try {
+        test = opusDetail
+            .querySelector('.horizontal-scroll-album__pic__img')!
+            .innerHtml;
+      } catch (_) {}
+
       String commentId = opusDetail
           .querySelector('.bili-comment-container')!
           .className
@@ -54,7 +58,7 @@ class HtmlHttp {
         'avatar': avatar,
         'uname': uname,
         'updateTime': updateTime,
-        'content': test + opusContent,
+        'content': (test ?? '') + opusContent,
         'commentId': int.parse(commentId)
       };
     } catch (err) {

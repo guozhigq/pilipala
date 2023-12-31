@@ -276,7 +276,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       exitFullScreen();
     }
     Widget childWhenDisabled = SafeArea(
-      top: MediaQuery.of(context).orientation == Orientation.portrait,
+      top: MediaQuery.of(context).orientation == Orientation.portrait &&
+          plPlayerController?.isFullScreen.value == true,
       bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
       left: plPlayerController?.isFullScreen.value != true,
@@ -287,10 +288,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             resizeToAvoidBottomInset: false,
             key: videoDetailController.scaffoldKey,
             backgroundColor: Colors.black,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(0),
+              child: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.background,
+                elevation: 0,
+              ),
+            ),
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+                  (BuildContext _context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(() => SliverAppBar(
                       automaticallyImplyLeading: false,
@@ -305,7 +313,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               (MediaQuery.of(context).orientation ==
                                       Orientation.landscape
                                   ? 0
-                                  : statusBarHeight)
+                                  : MediaQuery.of(context).padding.top)
                           : videoHeight,
                       backgroundColor: Colors.black,
                       flexibleSpace: FlexibleSpaceBar(

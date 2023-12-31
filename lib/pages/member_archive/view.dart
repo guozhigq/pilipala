@@ -45,7 +45,9 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('他的投稿'),
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text('他的投稿', style: Theme.of(context).textTheme.titleMedium),
         // actions: [
         //   Obx(
         //     () => PopupMenuButton<String>(
