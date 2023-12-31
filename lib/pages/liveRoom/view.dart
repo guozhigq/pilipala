@@ -54,62 +54,83 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   Widget build(BuildContext context) {
     Widget childWhenDisabled = Scaffold(
       primary: true,
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: _liveRoomController.liveItem != null
-            ? Row(
-                children: [
-                  NetworkImgLayer(
-                    width: 34,
-                    height: 34,
-                    type: 'avatar',
-                    src: _liveRoomController.liveItem.face,
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _liveRoomController.liveItem.uname,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 1),
-                      if (_liveRoomController.liveItem.watchedShow != null)
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).orientation == Orientation.portrait ? 56 : 0,
+        ),
+        child: AppBar(
+          centerTitle: false,
+          titleSpacing: 0,
+          title: _liveRoomController.liveItem != null
+              ? Row(
+                  children: [
+                    NetworkImgLayer(
+                      width: 34,
+                      height: 34,
+                      type: 'avatar',
+                      src: _liveRoomController.liveItem.face,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                            _liveRoomController
-                                    .liveItem.watchedShow['text_large'] ??
-                                '',
-                            style: const TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                ],
-              )
-            : const SizedBox(),
-        // actions: [
-        //   SizedBox(
-        //     height: 34,
-        //     child: ElevatedButton(onPressed: () {}, child: const Text('关注')),
-        //   ),
-        //   const SizedBox(width: 12),
-        // ],
+                          _liveRoomController.liveItem.uname,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 1),
+                        if (_liveRoomController.liveItem.watchedShow != null)
+                          Text(
+                              _liveRoomController
+                                      .liveItem.watchedShow['text_large'] ??
+                                  '',
+                              style: const TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ],
+                )
+              : const SizedBox(),
+          // actions: [
+          //   SizedBox(
+          //     height: 34,
+          //     child: ElevatedButton(onPressed: () {}, child: const Text('关注')),
+          //   ),
+          //   const SizedBox(width: 12),
+          // ],
+        ),
       ),
       body: Column(
         children: [
           Stack(
             children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: plPlayerController!.videoPlayerController != null
-                    ? PLVideoPlayer(
-                        controller: plPlayerController!,
-                        bottomControl: BottomControl(
-                          controller: plPlayerController,
-                          liveRoomCtr: _liveRoomController,
-                          floating: floating,
-                        ),
-                      )
-                    : const SizedBox(),
+              PopScope(
+                canPop: plPlayerController?.isFullScreen.value != true,
+                onPopInvoked: (bool didPop) {
+                  if (plPlayerController?.isFullScreen.value == true) {
+                    plPlayerController!.triggerFullScreen(status: false);
+                  }
+                  if (MediaQuery.of(context).orientation ==
+                      Orientation.landscape) {
+                    verticalScreen();
+                  }
+                },
+                child: SizedBox(
+                  width: Get.size.width,
+                  height: MediaQuery.of(context).orientation ==
+                          Orientation.landscape
+                      ? Get.size.height
+                      : Get.size.width * 9 / 16,
+                  child: plPlayerController!.videoPlayerController != null
+                      ? PLVideoPlayer(
+                          controller: plPlayerController!,
+                          bottomControl: BottomControl(
+                            controller: plPlayerController,
+                            liveRoomCtr: _liveRoomController,
+                            floating: floating,
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
               ),
               // if (_liveRoomController.liveItem != null &&
               //     _liveRoomController.liveItem.cover != null)
