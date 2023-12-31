@@ -25,10 +25,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MediaController _mediaController = Get.put(MediaController());
 
   PageController? _pageController;
-
-  late AnimationController? _animationController;
-  late Animation<double>? _fadeAnimation;
-  late Animation<double>? _slideAnimation;
   int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
@@ -37,16 +33,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      reverseDuration: const Duration(milliseconds: 0),
-      value: 1,
-      vsync: this,
-    );
-    _fadeAnimation =
-        Tween<double>(begin: 0.8, end: 1.0).animate(_animationController!);
-    _slideAnimation =
-        Tween(begin: 0.8, end: 1.0).animate(_animationController!);
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
     _pageController = PageController(initialPage: selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
@@ -54,14 +40,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   void setIndex(int value) async {
     feedBack();
-    if (selectedIndex != value) {
-      selectedIndex = value;
-      _animationController!.reverse().then((_) {
-        selectedIndex = value;
-        _animationController!.forward();
-      });
-      setState(() {});
-    }
     _pageController!.jumpToPage(value);
     var currentPage = _mainController.pages[value];
     if (currentPage is HomePage) {
@@ -119,29 +97,14 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       onPopInvoked: (bool status) => _mainController.onBackPressed(context),
       child: Scaffold(
         extendBody: true,
-        body: FadeTransition(
-          opacity: _fadeAnimation!,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.5),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(
-                parent: _slideAnimation!,
-                curve: Curves.fastOutSlowIn,
-                reverseCurve: Curves.linear,
-              ),
-            ),
-            child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _pageController,
-              onPageChanged: (index) {
-                selectedIndex = index;
-                setState(() {});
-              },
-              children: _mainController.pages,
-            ),
-          ),
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          onPageChanged: (index) {
+            selectedIndex = index;
+            setState(() {});
+          },
+          children: _mainController.pages,
         ),
         bottomNavigationBar: StreamBuilder(
           stream: _mainController.hideTabBar
