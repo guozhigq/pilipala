@@ -20,7 +20,8 @@ class StyleSetting extends StatefulWidget {
 
 class _StyleSettingState extends State<StyleSetting> {
   final SettingController settingController = Get.put(SettingController());
-  final ColorSelectController colorSelectController = Get.put(ColorSelectController());
+  final ColorSelectController colorSelectController =
+      Get.put(ColorSelectController());
 
   Box setting = GStrorage.setting;
   late int picQuality;
@@ -77,12 +78,6 @@ class _StyleSettingState extends State<StyleSetting> {
             ),
           ),
           const SetSwitchItem(
-            title: 'iOS路由切换',
-            subTitle: 'iOS路由切换样式，需重启',
-            setKey: SettingBoxKey.iosTransition,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: 'MD3样式底栏',
             subTitle: '符合Material You设计规范的底栏',
             setKey: SettingBoxKey.enableMYBar,
@@ -107,9 +102,12 @@ class _StyleSettingState extends State<StyleSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '自定义列数', value: defaultCustomRows, values: [1, 2, 3, 4, 5].map((e) {
-                    return {'title': '$e 列', 'value': e};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '自定义列数',
+                      value: defaultCustomRows,
+                      values: [1, 2, 3, 4, 5].map((e) {
+                        return {'title': '$e 列', 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -195,16 +193,18 @@ class _StyleSettingState extends State<StyleSetting> {
               ThemeType? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<ThemeType>(title: '主题模式', value: _tempThemeValue, values: ThemeType.values.map((e) {
-                    return {'title': e.description, 'value': e};
-                  }).toList());
+                  return SelectDialog<ThemeType>(
+                      title: '主题模式',
+                      value: _tempThemeValue,
+                      values: ThemeType.values.map((e) {
+                        return {'title': e.description, 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
                 _tempThemeValue = result;
                 settingController.themeType.value = result;
-                setting.put(
-                    SettingBoxKey.themeMode, result.code);
+                setting.put(SettingBoxKey.themeMode, result.code);
                 Get.forceAppUpdate();
               }
             },
@@ -218,7 +218,7 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/colorSetting'),
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
-                '当前主题：${colorSelectController.type.value == 0 ? '动态取色': '指定颜色'}',
+                '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
                 style: subTitleStyle)),
           ),
           ListTile(
