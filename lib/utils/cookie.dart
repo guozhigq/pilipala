@@ -11,9 +11,9 @@ class SetCookie {
         cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
     Request.dio.options.headers['cookie'] = cookieString;
 
-    cookies = await WebviewCookieManager().getCookies(HttpString.baseApiUrl);
+    cookies = await WebviewCookieManager().getCookies(HttpString.apiBaseUrl);
     await Request.cookieManager.cookieJar
-        .saveFromResponse(Uri.parse(HttpString.baseApiUrl), cookies);
+        .saveFromResponse(Uri.parse(HttpString.apiBaseUrl), cookies);
 
     cookies = await WebviewCookieManager().getCookies(HttpString.tUrl);
     await Request.cookieManager.cookieJar

@@ -98,12 +98,22 @@ class _RcmdPageState extends State<RcmdPage>
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       return Platform.isAndroid || Platform.isIOS
-                          ? Obx(() => contentGrid(
-                              _rcmdController, _rcmdController.videoList))
+                          ? Obx(
+                              () => contentGrid(
+                                  _rcmdController,
+                                  _rcmdController.defaultRcmdType == 'web'
+                                      ? _rcmdController.webVideoList
+                                      : _rcmdController.appVideoList),
+                            )
                           : SliverLayoutBuilder(
                               builder: (context, boxConstraints) {
-                              return Obx(() => contentGrid(
-                                  _rcmdController, _rcmdController.videoList));
+                              return Obx(
+                                () => contentGrid(
+                                    _rcmdController,
+                                    _rcmdController.defaultRcmdType == 'web'
+                                        ? _rcmdController.webVideoList
+                                        : _rcmdController.appVideoList),
+                              );
                             });
                     } else {
                       return HttpError(
@@ -118,14 +128,14 @@ class _RcmdPageState extends State<RcmdPage>
                     }
                   } else {
                     // 缓存数据
-                    if (_rcmdController.videoList.isNotEmpty) {
-                      return contentGrid(
-                          _rcmdController, _rcmdController.videoList);
-                    }
-                    // 骨架屏
-                    else {
-                      return contentGrid(_rcmdController, []);
-                    }
+                    // if (_rcmdController.videoList.isNotEmpty) {
+                    //   return contentGrid(
+                    //       _rcmdController, _rcmdController.videoList);
+                    // }
+                    // // 骨架屏
+                    // else {
+                    return contentGrid(_rcmdController, []);
+                    // }
                   }
                 },
               ),

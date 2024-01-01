@@ -3,20 +3,21 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/home/rcmd/result.dart';
-// import 'package:pilipala/models/model_rec_video_item.dart';
+import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
   int _currentPage = 0;
-  RxList<RecVideoItemAppModel> videoList = <RecVideoItemAppModel>[].obs;
-  // RxList<RecVideoItemModel> videoList = <RecVideoItemModel>[].obs;
+  RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
+  RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
   Box setting = GStrorage.setting;
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;
+  late String defaultRcmdType = 'web';
 
   @override
   void onInit() {
@@ -24,21 +25,29 @@ class RcmdController extends GetxController {
     crossAxisCount.value =
         setting.get(SettingBoxKey.customRows, defaultValue: 2);
     // 读取app端缓存内容
-    if (recVideo.get('cacheList') != null &&
-        recVideo.get('cacheList').isNotEmpty) {
-      List<RecVideoItemAppModel> list = [];
-      for (var i in recVideo.get('cacheList')) {
-        list.add(i);
-      }
-      videoList.value = list;
-    }
+    // if (recVideo.get('cacheList') != null &&
+    //     recVideo.get('cacheList').isNotEmpty) {
+    //   List<RecVideoItemAppModel> list = [];
+    //   for (var i in recVideo.get('cacheList')) {
+    //     list.add(i);
+    //   }
+    //   videoList.value = list;
+    // }
     enableSaveLastData =
         setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
+    defaultRcmdType =
+        setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web');
   }
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    return await queryRcmdFeedApp(type);
+    print(defaultRcmdType);
+    if (defaultRcmdType == 'app') {
+      return await queryRcmdFeedApp(type);
+    }
+    if (defaultRcmdType == 'web') {
+      return await queryRcmdFeedWeb(type);
+    }
   }
 
   // 获取app端推荐
@@ -54,19 +63,19 @@ class RcmdController extends GetxController {
     );
     if (res['status']) {
       if (type == 'init') {
-        if (videoList.isNotEmpty) {
-          videoList.addAll(res['data']);
+        if (appVideoList.isNotEmpty) {
+          appVideoList.addAll(res['data']);
         } else {
-          videoList.value = res['data'];
+          appVideoList.value = res['data'];
         }
       } else if (type == 'onRefresh') {
         if (enableSaveLastData) {
-          videoList.insertAll(0, res['data']);
+          appVideoList.insertAll(0, res['data']);
         } else {
-          videoList.value = res['data'];
+          appVideoList.value = res['data'];
         }
       } else if (type == 'onLoad') {
-        videoList.addAll(res['data']);
+        appVideoList.addAll(res['data']);
       }
       recVideo.put('cacheList', res['data']);
       _currentPage += 1;
@@ -89,19 +98,19 @@ class RcmdController extends GetxController {
     );
     if (res['status']) {
       if (type == 'init') {
-        if (videoList.isNotEmpty) {
-          videoList.addAll(res['data']);
+        if (webVideoList.isNotEmpty) {
+          webVideoList.addAll(res['data']);
         } else {
-          videoList.value = res['data'];
+          webVideoList.value = res['data'];
         }
       } else if (type == 'onRefresh') {
         if (enableSaveLastData) {
-          videoList.insertAll(0, res['data']);
+          webVideoList.insertAll(0, res['data']);
         } else {
-          videoList.value = res['data'];
+          webVideoList.value = res['data'];
         }
       } else if (type == 'onLoad') {
-        videoList.addAll(res['data']);
+        webVideoList.addAll(res['data']);
       }
       _currentPage += 1;
     }

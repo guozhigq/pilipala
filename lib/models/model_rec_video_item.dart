@@ -1,3 +1,5 @@
+import 'package:pilipala/utils/utils.dart';
+
 import './model_owner.dart';
 import 'package:hive/hive.dart';
 
@@ -56,7 +58,7 @@ class RecVideoItemModel {
     uri = json["uri"];
     pic = json["pic"];
     title = json["title"];
-    duration = json["duration"].toString();
+    duration = Utils.tampToSeektime(json["duration"]);
     pubdate = json["pubdate"];
     owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);

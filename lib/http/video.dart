@@ -30,7 +30,7 @@ class VideoHttp {
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
     try {
       var res = await Request().get(
-        Api.recommendList,
+        Api.recommendListWeb,
         data: {
           'version': 1,
           'feed_version': 'V3',

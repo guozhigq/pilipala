@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
+import 'package:pilipala/models/common/rcmd_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -18,15 +20,23 @@ class ExtraSetting extends StatefulWidget {
 class _ExtraSettingState extends State<ExtraSetting> {
   Box setting = GStrorage.setting;
   static Box localCache = GStrorage.localCache;
+  late dynamic defaultRcmdType;
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;
   late dynamic enableSystemProxy;
   late String defaultSystemProxyHost;
   late String defaultSystemProxyPort;
+  Box userInfoCache = GStrorage.userInfo;
+  var userInfo;
+  bool userLogin = false;
+  var accessKeyInfo;
 
   @override
   void initState() {
     super.initState();
+    // 首页默认推荐类型
+    defaultRcmdType =
+        setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web');
     // 默认优先显示最新评论
     defaultReplySort =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
@@ -39,6 +49,9 @@ class _ExtraSettingState extends State<ExtraSetting> {
         localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
     defaultSystemProxyPort =
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
+    userInfo = userInfoCache.get('userInfoCache');
+    userLogin = userInfo != null;
+    accessKeyInfo = localCache.get(LocalCacheKey.accessKey, defaultValue: null);
   }
 
   // 设置代理
@@ -170,6 +183,44 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableSaveLastData,
             defaultVal: false,
           ),
+          ListTile(
+            dense: false,
+            title: Text('首页推荐类型', style: titleStyle),
+            subtitle: Text(
+              '当前使用「$defaultRcmdType端」推荐',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(
+                    title: '推荐类型',
+                    value: defaultRcmdType,
+                    values: RcmdType.values.map((e) {
+                      return {'title': e.labels, 'value': e.values};
+                    }).toList(),
+                  );
+                },
+              );
+              if (result != null) {
+                if (result == 'app') {
+                  // app端推荐需要access_key
+                  if (accessKeyInfo == null) {
+                    if (!userLogin) {
+                      SmartDialog.showToast('请先登录');
+                      return;
+                    }
+                    await MemberHttp.cookieToKey();
+                  }
+                }
+                defaultRcmdType = result;
+                setting.put(SettingBoxKey.defaultRcmdType, result);
+                SmartDialog.showToast('下次启动时生效');
+                setState(() {});
+              }
+            },
+          ),
           const SetSwitchItem(
             title: '启用ai总结',
             subTitle: '视频详情页开启ai总结',
@@ -187,9 +238,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '评论展示', value: defaultReplySort, values: ReplySortType.values.map((e) {
-                    return {'title': e.titles, 'value': e.index};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '评论展示',
+                      value: defaultReplySort,
+                      values: ReplySortType.values.map((e) {
+                        return {'title': e.titles, 'value': e.index};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -210,9 +264,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '动态展示', value: defaultDynamicType, values: DynamicsType.values.map((e) {
-                    return {'title': e.labels, 'value': e.index};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '动态展示',
+                      value: defaultDynamicType,
+                      values: DynamicsType.values.map((e) {
+                        return {'title': e.labels, 'value': e.index};
+                      }).toList());
                 },
               );
               if (result != null) {

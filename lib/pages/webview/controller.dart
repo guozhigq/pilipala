@@ -115,7 +115,6 @@ class WebviewController extends GetxController {
           MediaController mediaCtr = Get.find<MediaController>();
           mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
-          MemberHttp.cookieToKey();
         } catch (err) {
           SmartDialog.show(builder: (context) {
             return AlertDialog(
