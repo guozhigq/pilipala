@@ -122,27 +122,33 @@ class VideoHttp {
   static Future videoUrl(
       {int? avid, String? bvid, required int cid, int? qn}) async {
     Map<String, dynamic> data = {
-      // 'avid': avid,
-      'bvid': bvid,
       'cid': cid,
-      // 'qn': qn ?? 80,
+      'qn': qn ?? 80,
       // 获取所有格式的视频
       'fnval': 4048,
-      // 'fnver': '',
-      'fourk': 1,
-      // 'session': '',
-      // 'otype': '',
-      // 'type': '',
-      // 'platform': '',
-      // 'high_quality': ''
     };
+    if (avid != null) {
+      data['avid'] = avid;
+    }
+    if (bvid != null) {
+      data['bvid'] = bvid;
+    }
+
+    Map params = await WbiSign().makSign({
+      ...data,
+      'fourk': 1,
+      'voice_balance': 1,
+      'gaia_source': 'pre-load',
+      'web_location': 1550101,
+    });
+
     // 免登录查看1080p
     if (userInfoCache.get('userInfoCache') == null &&
         setting.get(SettingBoxKey.p1080, defaultValue: true)) {
       data['try_look'] = 1;
     }
     try {
-      var res = await Request().get(Api.videoUrl, data: data);
+      var res = await Request().get(Api.videoUrl, data: params);
       if (res.data['code'] == 0) {
         return {
           'status': true,

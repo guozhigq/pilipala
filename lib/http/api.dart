@@ -11,7 +11,7 @@ class Api {
 
   // 视频流
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
-  static const String videoUrl = '/x/player/playurl';
+  static const String videoUrl = '/x/player/wbi/playurl';
 
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
