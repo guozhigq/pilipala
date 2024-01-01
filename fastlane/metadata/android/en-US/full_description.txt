@@ -1,0 +1,9 @@
+PiliPala is a third-party Bilibili client developed in Flutter.
+
+Top Features:
+
+* List of recommended videos
+* List of hottest videos
+* Popular live streams
+* List of bangumis
+* Block videos from blacklisted users
