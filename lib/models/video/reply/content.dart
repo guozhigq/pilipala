@@ -2,7 +2,7 @@ class ReplyContent {
   ReplyContent({
     this.message,
     this.atNameToMid, // @的用户的mid null
-    this.memebers, // 被@的用户List 如果有的话 []
+    this.members, // 被@的用户List 如果有的话 []
     this.emote, // 表情包 如果有的话 null
     this.jumpUrl, // {}
     this.pictures, // {}
@@ -13,7 +13,7 @@ class ReplyContent {
 
   String? message;
   Map? atNameToMid;
-  List? memebers;
+  List<MemberItemModel>? members;
   Map? emote;
   Map? jumpUrl;
   List? pictures;
@@ -27,7 +27,11 @@ class ReplyContent {
         .replaceAll('&#34;', '"')
         .replaceAll('&#39;', "'");
     atNameToMid = json['at_name_to_mid'] ?? {};
-    memebers = json['memebers'] ?? [];
+    members = json['members'] != null
+        ? json['members']
+            .map<MemberItemModel>((e) => MemberItemModel.fromJson(e))
+            .toList()
+        : [];
     emote = json['emote'] ?? {};
     jumpUrl = json['jump_url'] ?? {};
     pictures = json['pictures'] ?? [];
@@ -35,5 +39,20 @@ class ReplyContent {
     richText = json['rich_text'] ?? {};
     // 不包含@ 笔记 图片的时候，文字可折叠
     isText = atNameToMid!.isEmpty && vote!.isEmpty && pictures!.isEmpty;
+  }
+}
+
+class MemberItemModel {
+  MemberItemModel({
+    required this.mid,
+    required this.uname,
+  });
+
+  late String mid;
+  late String uname;
+
+  MemberItemModel.fromJson(Map<String, dynamic> json) {
+    mid = json['mid'];
+    uname = json['uname'];
   }
 }

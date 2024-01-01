@@ -628,8 +628,13 @@ InlineSpan buildContent(
       // 匹配@用户
       String matchMember = str;
       if (content.atNameToMid.isNotEmpty) {
+        RegExp reg = RegExp(r"@.*( |:)");
+        if (content.atNameToMid.length == 1 &&
+            content.message == '@${content.members.first.uname}') {
+          reg = RegExp(r"@.*( |:|$)");
+        }
         matchMember = str.splitMapJoin(
-          RegExp(r"@.*( |:)"),
+          reg,
           onMatch: (Match match) {
             if (match[0] != null) {
               hasMatchMember = false;
@@ -657,7 +662,9 @@ InlineSpan buildContent(
             return '';
           },
           onNonMatch: (String str) {
-            spanChilds.add(TextSpan(text: str));
+            if (!str.contains('@')) {
+              spanChilds.add(TextSpan(text: str));
+            }
             return str;
           },
         );
