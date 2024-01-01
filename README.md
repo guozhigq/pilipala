@@ -14,11 +14,11 @@
 </div>
     <p>使用Flutter开发的BiliBili第三方客户端</p>
     
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/510shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/174shots_so.png" width="32%" alt="home" />
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/850shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/510shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/174shots_so.png" width="32%" alt="home" />
+<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/850shots_so.png" width="32%" alt="home" />
 <br/>
-<img src="https://github.com/guozhigq/pilipala/blob/main/assets/sreenshot/main_screen.png" width="96%" alt="home" />
+<img src="https://github.com/guozhigq/pilipala/blob/main/assets/screenshots/main_screen.png" width="96%" alt="home" />
 <br/>
 </div>
 
