@@ -266,6 +266,14 @@ class VideoContent extends StatelessWidget {
                     fs: 9,
                   )
                 ],
+                if (videoItem.isFollowed == 1) ...[
+                  const PBadge(
+                    text: '已关注',
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'color',
+                  )
+                ],
                 Expanded(
                   flex: crossAxisCount == 1 ? 0 : 1,
                   child: Text(
