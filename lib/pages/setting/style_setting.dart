@@ -220,15 +220,6 @@ class _StyleSettingState extends State<StyleSetting> {
             },
             title: Text('Toast不透明度', style: titleStyle),
             subtitle: Text('自定义Toast不透明度', style: subTitleStyle),
-            trailing: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Obx(
-                () => Text(
-                  '${settingController.toastOpacity.value}',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-            ),
           ),
           ListTile(
             dense: false,

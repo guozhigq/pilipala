@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 // import 'package:pilipala/models/common/theme_type.dart';
 
-class SlideDialog<T extends double> extends StatefulWidget {
-  final double value;
+class SlideDialog<T extends num> extends StatefulWidget {
+  final T value;
   final String title;
   final double min;
   final double max;
@@ -23,13 +23,13 @@ class SlideDialog<T extends double> extends StatefulWidget {
   _SlideDialogState<T> createState() => _SlideDialogState<T>();
 }
 
-class _SlideDialogState<T extends double> extends State<SlideDialog<T>> {
+class _SlideDialogState<T extends num> extends State<SlideDialog<T>> {
   late double _tempValue;
 
   @override
   void initState() {
     super.initState();
-    _tempValue = widget.value;
+    _tempValue = widget.value.toDouble();
   }
 
   @override
@@ -62,7 +62,7 @@ class _SlideDialogState<T extends double> extends State<SlideDialog<T>> {
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, _tempValue),
+          onPressed: () => Navigator.pop(context, _tempValue as T),
           child: const Text('确定'),
         )
       ],
