@@ -143,6 +143,11 @@ class VideoContent extends StatelessWidget {
             ),
             const Spacer(),
             Text(
+              Utils.dateFormat(videoItem.ctime!),
+              style: TextStyle(
+                  fontSize: 11, color: Theme.of(context).colorScheme.outline),
+            ),
+            Text(
               videoItem.owner.name,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

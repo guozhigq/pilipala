@@ -52,6 +52,7 @@ class _FollowPageState extends State<FollowPage> {
                           TabBar(
                               controller: _followController.tabController,
                               isScrollable: true,
+                              tabAlignment: TabAlignment.start,
                               tabs: [
                                 for (var i in data['data']) ...[
                                   Tab(text: i.name),

@@ -88,100 +88,100 @@ class GStrorage {
 
 class SettingBoxKey {
   /// 播放器
-  static const String btmProgressBehavior = 'btmProgressBehavior';
-  static const String defaultVideoSpeed = 'defaultVideoSpeed';
-  static const String autoUpgradeEnable = 'autoUpgradeEnable';
-  static const String feedBackEnable = 'feedBackEnable';
-  static const String defaultVideoQa = 'defaultVideoQa';
-  static const String defaultAudioQa = 'defaultAudioQa';
-  static const String autoPlayEnable = 'autoPlayEnable';
-  static const String fullScreenMode = 'fullScreenMode';
-  static const String defaultDecode = 'defaultDecode';
-  static const String danmakuEnable = 'danmakuEnable';
-  static const String defaultToastOp = 'defaultToastOp';
-  static const String defaultPicQa = 'defaultPicQa';
-  static const String enableHA = 'enableHA';
-  static const String enableOnlineTotal = 'enableOnlineTotal';
-  static const String enableAutoBrightness = 'enableAutoBrightness';
-  static const String enableAutoEnter = 'enableAutoEnter';
-  static const String enableAutoExit = 'enableAutoExit';
-  static const String p1080 = 'p1080';
-  static const String enableCDN = 'enableCDN';
-  static const String autoPiP = 'autoPiP';
-  static const String enableAutoLongPressSpeed = 'enableAutoLongPressSpeed';
+  static const btmProgressBehavior = 'btmProgressBehavior',
+      defaultVideoSpeed = 'defaultVideoSpeed',
+      autoUpgradeEnable = 'autoUpgradeEnable',
+      feedBackEnable = 'feedBackEnable',
+      defaultVideoQa = 'defaultVideoQa',
+      defaultAudioQa = 'defaultAudioQa',
+      autoPlayEnable = 'autoPlayEnable',
+      fullScreenMode = 'fullScreenMode',
+      defaultDecode = 'defaultDecode',
+      danmakuEnable = 'danmakuEnable',
+      defaultToastOp = 'defaultToastOp',
+      defaultPicQa = 'defaultPicQa',
+      enableHA = 'enableHA',
+      enableOnlineTotal = 'enableOnlineTotal',
+      enableAutoBrightness = 'enableAutoBrightness',
+      enableAutoEnter = 'enableAutoEnter',
+      enableAutoExit = 'enableAutoExit',
+      p1080 = 'p1080',
+      enableCDN = 'enableCDN',
+      autoPiP = 'autoPiP',
+      enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
 
-  // youtube 双击快进快退
-  static const String enableQuickDouble = 'enableQuickDouble';
-  static const String enableShowDanmaku = 'enableShowDanmaku';
-  static const String enableBackgroundPlay = 'enableBackgroundPlay';
+      // youtube 双击快进快退
+      enableQuickDouble = 'enableQuickDouble',
+      enableShowDanmaku = 'enableShowDanmaku',
+      enableBackgroundPlay = 'enableBackgroundPlay',
 
-  /// 隐私
-  static const String blackMidsList = 'blackMidsList';
+      /// 隐私
+      blackMidsList = 'blackMidsList',
 
-  /// 其他
-  static const String autoUpdate = 'autoUpdate';
-  static const String replySortType = 'replySortType';
-  static const String defaultDynamicType = 'defaultDynamicType';
-  static const String enableHotKey = 'enableHotKey';
-  static const String enableQuickFav = 'enableQuickFav';
-  static const String enableWordRe = 'enableWordRe';
-  static const String enableSearchWord = 'enableSearchWord';
-  static const String enableRcmdDynamic = 'enableRcmdDynamic';
-  static const String enableSaveLastData = 'enableSaveLastData';
-  static const String enableSystemProxy = 'enableSystemProxy';
-  static const String enableAi = 'enableAi';
+      /// 其他
+      autoUpdate = 'autoUpdate',
+      defaultRcmdType = 'defaultRcmdType',
+      replySortType = 'replySortType',
+      defaultDynamicType = 'defaultDynamicType',
+      enableHotKey = 'enableHotKey',
+      enableQuickFav = 'enableQuickFav',
+      enableWordRe = 'enableWordRe',
+      enableSearchWord = 'enableSearchWord',
+      enableRcmdDynamic = 'enableRcmdDynamic',
+      enableSaveLastData = 'enableSaveLastData',
+      enableSystemProxy = 'enableSystemProxy',
+      enableAi = 'enableAi';
 
   /// 外观
-  static const String themeMode = 'themeMode';
-  static const String defaultTextScale = 'textScale';
-  static const String dynamicColor = 'dynamicColor'; // bool
-  static const String customColor = 'customColor'; // 自定义主题色
-  static const String iosTransition = 'iosTransition'; // ios路由
-  static const String enableSingleRow = 'enableSingleRow'; // 首页单列
-  static const String displayMode = 'displayMode';
-  static const String customRows = 'customRows'; // 自定义列
-  static const String enableMYBar = 'enableMYBar';
-  static const String hideSearchBar = 'hideSearchBar'; // 收起顶栏
-  static const String hideTabBar = 'hideTabBar'; // 收起底栏
+  static const String themeMode = 'themeMode',
+      defaultTextScale = 'textScale',
+      dynamicColor = 'dynamicColor', // bool
+      customColor = 'customColor', // 自定义主题色
+      enableSingleRow = 'enableSingleRow', // 首页单列
+      displayMode = 'displayMode',
+      customRows = 'customRows', // 自定义列
+      enableMYBar = 'enableMYBar',
+      hideSearchBar = 'hideSearchBar', // 收起顶栏
+      hideTabBar = 'hideTabBar'; // 收起底栏
 }
 
 class LocalCacheKey {
   // 历史记录暂停状态 默认false 记录
-  static const String historyPause = 'historyPause';
-  // access_key
-  static const String accessKey = 'accessKey';
+  static const String historyPause = 'historyPause',
+      // access_key
+      accessKey = 'accessKey',
 
-  //
-  static const String wbiKeys = 'wbiKeys';
-  static const String timeStamp = 'timeStamp';
+      //
+      wbiKeys = 'wbiKeys',
+      timeStamp = 'timeStamp',
 
-  // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间
-  static const String danmakuBlockType = 'danmakuBlockType';
-  static const String danmakuShowArea = 'danmakuShowArea';
-  static const String danmakuOpacity = 'danmakuOpacity';
-  static const String danmakuFontScale = 'danmakuFontScale';
-  static const String danmakuDuration = 'danmakuDuration';
+      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间
+      danmakuBlockType = 'danmakuBlockType',
+      danmakuShowArea = 'danmakuShowArea',
+      danmakuOpacity = 'danmakuOpacity',
+      danmakuFontScale = 'danmakuFontScale',
+      danmakuDuration = 'danmakuDuration',
 
-  // 代理host port
-  static const String systemProxyHost = 'systemProxyHost';
-  static const String systemProxyPort = 'systemProxyPort';
+      // 代理host port
+      systemProxyHost = 'systemProxyHost',
+      systemProxyPort = 'systemProxyPort';
 }
 
 class VideoBoxKey {
   // 视频比例
-  static const String videoFit = 'videoFit';
-  // 亮度
-  static const String videoBrightness = 'videoBrightness';
-  // 倍速
-  static const String videoSpeed = 'videoSpeed';
-  // 播放顺序
-  static const String playRepeat = 'playRepeat';
-  // 默认倍速
-  static const String playSpeedDefault = 'playSpeedDefault';
-  // 默认长按倍速
-  static const String longPressSpeedDefault = 'longPressSpeedDefault';
-  // 自定义倍速集合
-  static const String customSpeedsList = 'customSpeedsList';
-  // 画面填充比例
-  static const String cacheVideoFit = 'cacheVideoFit';
+  static const String videoFit = 'videoFit',
+      // 亮度
+      videoBrightness = 'videoBrightness',
+      // 倍速
+      videoSpeed = 'videoSpeed',
+      // 播放顺序
+      playRepeat = 'playRepeat',
+      // 默认倍速
+      playSpeedDefault = 'playSpeedDefault',
+      // 默认长按倍速
+      longPressSpeedDefault = 'longPressSpeedDefault',
+      // 自定义倍速集合
+      customSpeedsList = 'customSpeedsList',
+      // 画面填充比例
+      cacheVideoFit = 'cacheVideoFit';
 }

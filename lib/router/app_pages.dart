@@ -47,8 +47,6 @@ import 'package:pilipala/pages/whisperDetail/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 Box setting = GStrorage.setting;
-bool iosTransition =
-    setting.get(SettingBoxKey.iosTransition, defaultValue: false);
 
 class Routes {
   static final List<GetPage> getPages = [
@@ -164,7 +162,7 @@ class CustomGetPage extends GetPage {
           name: name,
           page: page,
           curve: Curves.linear,
-          transition: iosTransition ? Transition.cupertino : Transition.native,
+          transition: Transition.native,
           showCupertinoParallax: false,
           popGesture: false,
           transitionDuration: transitionDuration,

@@ -41,7 +41,9 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('他的专栏'),
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text('他的专栏', style: Theme.of(context).textTheme.titleMedium),
       ),
       body: Padding(
         padding: const EdgeInsets.only(

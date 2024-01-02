@@ -82,12 +82,6 @@ class _StyleSettingState extends State<StyleSetting> {
             ),
           ),
           const SetSwitchItem(
-            title: 'iOS路由切换',
-            subTitle: 'iOS路由切换样式，需重启',
-            setKey: SettingBoxKey.iosTransition,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: 'MD3样式底栏',
             subTitle: '符合Material You设计规范的底栏',
             setKey: SettingBoxKey.enableMYBar,

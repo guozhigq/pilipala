@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
@@ -34,7 +35,7 @@ class VideoDetailPage extends StatefulWidget {
 }
 
 class _VideoDetailPageState extends State<VideoDetailPage>
-    with TickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
+    with TickerProviderStateMixin, RouteAware {
   late VideoDetailController videoDetailController;
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
@@ -56,6 +57,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoPlayEnable;
   late bool autoPiP;
   final floating = Floating();
+  // 生命周期监听
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
@@ -85,7 +88,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    WidgetsBinding.instance.addObserver(this);
+    lifecycleListener();
   }
 
   // 获取视频资源，初始化播放器
@@ -159,6 +162,27 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoDetailController.isShowCover.value = false;
   }
 
+  // 生命周期监听
+  void lifecycleListener() {
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () => _handleTransition('resume'),
+      // 后台
+      onInactive: () => _handleTransition('inactive'),
+      // 在Android和iOS端不生效
+      onHide: () => _handleTransition('hide'),
+      onShow: () => _handleTransition('show'),
+      onPause: () => _handleTransition('pause'),
+      onRestart: () => _handleTransition('restart'),
+      onDetach: () => _handleTransition('detach'),
+      // 只作用于桌面端
+      onExitRequested: () {
+        ScaffoldMessenger.maybeOf(context)
+            ?.showSnackBar(const SnackBar(content: Text("拦截应用退出")));
+        return Future.value(AppExitResponse.cancel);
+      },
+    );
+  }
+
   @override
   void dispose() {
     if (plPlayerController != null) {
@@ -169,8 +193,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoDetailController.floating!.dispose();
     }
     videoPlayerServiceHandler.onVideoDetailDispose();
-    WidgetsBinding.instance.removeObserver(this);
     floating.dispose();
+    _lifecycleListener.dispose();
     super.dispose();
   }
 
@@ -217,12 +241,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         .subscribe(this, ModalRoute.of(context) as PageRoute);
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+  void _handleTransition(String name) {
+    switch (name) {
+      case 'inactive':
+        autoEnterPip();
+        break;
+    }
+  }
+
+  void autoEnterPip() {
     var routePath = Get.currentRoute;
-    if (lifecycleState == AppLifecycleState.inactive &&
-        autoPiP &&
-        routePath.startsWith('/video')) {
+    bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    /// TODO 横屏全屏状态下误触pip
+    if (autoPiP && routePath.startsWith('/video') && isPortrait) {
       floating.enable(
           aspectRatio: Rational(
         videoDetailController.data.dash!.video!.first.width!,
@@ -243,7 +276,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       exitFullScreen();
     }
     Widget childWhenDisabled = SafeArea(
-      top: MediaQuery.of(context).orientation == Orientation.portrait,
+      top: MediaQuery.of(context).orientation == Orientation.portrait &&
+          plPlayerController?.isFullScreen.value == true,
       bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
       left: plPlayerController?.isFullScreen.value != true,
@@ -254,10 +288,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             resizeToAvoidBottomInset: false,
             key: videoDetailController.scaffoldKey,
             backgroundColor: Colors.black,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(0),
+              child: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.background,
+                elevation: 0,
+              ),
+            ),
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+                  (BuildContext _context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(() => SliverAppBar(
                       automaticallyImplyLeading: false,
@@ -272,7 +313,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               (MediaQuery.of(context).orientation ==
                                       Orientation.landscape
                                   ? 0
-                                  : statusBarHeight)
+                                  : MediaQuery.of(context).padding.top)
                           : videoHeight,
                       backgroundColor: Colors.black,
                       flexibleSpace: FlexibleSpaceBar(

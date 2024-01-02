@@ -78,12 +78,14 @@ class ItemModulesModel {
     this.moduleDynamic,
     // this.moduleInter,
     this.moduleStat,
+    this.moduleTag,
   });
 
   ModuleAuthorModel? moduleAuthor;
   ModuleDynamicModel? moduleDynamic;
   // ModuleInterModel? moduleInter;
   ModuleStatModel? moduleStat;
+  Map? moduleTag;
 
   ItemModulesModel.fromJson(Map<String, dynamic> json) {
     moduleAuthor = json['module_author'] != null
@@ -96,6 +98,7 @@ class ItemModulesModel {
     moduleStat = json['module_stat'] != null
         ? ModuleStatModel.fromJson(json['module_stat'])
         : null;
+    moduleTag = json['module_tag'];
   }
 }
 

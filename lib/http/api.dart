@@ -1,15 +1,17 @@
+import 'constants.dart';
+
 class Api {
   // 推荐视频
   static const String recommendListApp =
-      'https://app.bilibili.com/x/v2/feed/index';
-  static const String recommendList = '/x/web-interface/index/top/feed/rcmd';
+      '${HttpString.appBaseUrl}/x/v2/feed/index';
+  static const String recommendListWeb = '/x/web-interface/index/top/feed/rcmd';
 
   // 热门视频
   static const String hotList = '/x/web-interface/popular';
 
   // 视频流
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
-  static const String videoUrl = '/x/player/playurl';
+  static const String videoUrl = '/x/player/wbi/playurl';
 
   // 视频详情
   // 竖屏 https://api.bilibili.com/x/web-interface/view?aid=527403921
@@ -152,7 +154,7 @@ class Api {
 
   // 动态点赞
   static const String likeDynamic =
-      'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/thumb';
+      '${HttpString.tUrl}/dynamic_like/v1/dynamic_like/thumb';
 
   // 获取稍后再看
   static const String seeYouLater = '/x/v2/history/toview';
@@ -220,13 +222,13 @@ class Api {
   // 直播
   // ?page=1&page_size=30&platform=web
   static const String liveList =
-      'https://api.live.bilibili.com/xlive/web-interface/v1/second/getUserRecommend';
+      '${HttpString.liveBaseUrl}/xlive/web-interface/v1/second/getUserRecommend';
 
   // 直播间详情
   // cid roomId
   // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
   static const String liveRoomInfo =
-      'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo';
+      '${HttpString.liveBaseUrl}/xlive/web-room/v2/index/getRoomPlayInfo';
 
   // 用户信息 需要Wbi签名
   // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
@@ -338,13 +340,13 @@ class Api {
   /// wts=1697305010
 
   static const String sessionList =
-      'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions';
+      '${HttpString.tUrl}/session_svr/v1/session_svr/get_sessions';
 
   /// 私聊用户信息
   /// uids
   /// build=0&mobi_app=web
   static const String sessionAccountList =
-      'https://api.vc.bilibili.com/account/v1/user/cards';
+      '${HttpString.tUrl}/account/v1/user/cards';
 
   /// https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs?
   /// talker_id=400787461&
@@ -358,7 +360,7 @@ class Api {
   /// wts=1697350697
 
   static const String sessionMsg =
-      'https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs';
+      '${HttpString.tUrl}/svr_sync/v1/svr_sync/fetch_session_msgs';
 
   /// 标记已读 POST
   /// talker_id:
@@ -369,7 +371,7 @@ class Api {
   /// csrf_token:
   /// csrf:
   static const String updateAck =
-      'https://api.vc.bilibili.com/session_svr/v1/session_svr/update_ack';
+      '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
 
   // 获取某个动态详情
   // timezone_offset=-480
@@ -388,11 +390,11 @@ class Api {
 
   // captcha验证码
   static const String getCaptcha =
-      'https://passport.bilibili.com/x/passport-login/captcha?source=main_web';
+      '${HttpString.passBaseUrl}/x/passport-login/captcha?source=main_web';
 
   // web端短信验证码
   static const String smsCode =
-      'https://passport.bilibili.com/x/passport-login/web/sms/send';
+      '${HttpString.passBaseUrl}/x/passport-login/web/sms/send';
 
   // web端验证码登录
 
@@ -400,7 +402,7 @@ class Api {
 
   // app端短信验证码
   static const String appSmsCode =
-      'https://passport.bilibili.com/x/passport-login/sms/send';
+      '${HttpString.passBaseUrl}/x/passport-login/sms/send';
 
   // app端验证码登录
 
@@ -414,17 +416,16 @@ class Api {
   /// key
   /// rhash
   static const String loginInByPwdApi =
-      'https://passport.bilibili.com/x/passport-login/oauth2/login';
+      '${HttpString.passBaseUrl}/x/passport-login/oauth2/login';
 
   /// 密码加密密钥
   /// disable_rcmd
   /// local_id
-  static const getWebKey =
-      'https://passport.bilibili.com/x/passport-login/web/key';
+  static const getWebKey = '${HttpString.passBaseUrl}/x/passport-login/web/key';
 
   /// cookie转access_key
   static const cookieToKey =
-      'https://passport.bilibili.com/x/passport-tv-login/h5/qrcode/confirm';
+      '${HttpString.passBaseUrl}/x/passport-tv-login/h5/qrcode/confirm';
 
   /// 申请二维码(TV端)
   static const getTVCode =
@@ -432,7 +433,7 @@ class Api {
 
   ///扫码登录（TV端）
   static const qrcodePoll =
-      'https://passport.bilibili.com/x/passport-tv-login/qrcode/poll';
+      '${HttpString.passBaseUrl}/x/passport-tv-login/qrcode/poll';
 
   /// 置顶视频
   static const getTopVideoApi = '/x/space/top/arc';

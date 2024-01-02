@@ -65,7 +65,7 @@ class Request {
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
     var cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.baseApiUrl));
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
     String token = '';
     if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
@@ -91,7 +91,7 @@ class Request {
     //BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
     BaseOptions options = BaseOptions(
       //请求基地址,可以包含子路径
-      baseUrl: HttpString.baseApiUrl,
+      baseUrl: HttpString.apiBaseUrl,
       //连接服务器超时时间，单位是毫秒.
       connectTimeout: const Duration(milliseconds: 12000),
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
