@@ -57,14 +57,6 @@ class AuthorPanel extends StatelessWidget {
                     fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                   ),
                 ),
-                if (item.modules.moduleTag != null) ...[
-                  const SizedBox(width: 6),
-                  PBadge(
-                    bottom: 10,
-                    right: 10,
-                    text: item.modules.moduleTag['text'],
-                  )
-                ]
               ],
             ),
             DefaultTextStyle.merge(
