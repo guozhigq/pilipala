@@ -244,7 +244,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void _handleTransition(String name) {
     switch (name) {
       case 'inactive':
-        autoEnterPip();
+        if (plPlayerController != null &&
+            playerStatus == PlayerStatus.playing) {
+          autoEnterPip();
+        }
         break;
     }
   }
