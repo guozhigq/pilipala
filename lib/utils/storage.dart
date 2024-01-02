@@ -98,6 +98,7 @@ class SettingBoxKey {
       fullScreenMode = 'fullScreenMode',
       defaultDecode = 'defaultDecode',
       danmakuEnable = 'danmakuEnable',
+      defaultToastOp = 'defaultToastOp',
       defaultPicQa = 'defaultPicQa',
       enableHA = 'enableHA',
       enableOnlineTotal = 'enableOnlineTotal',

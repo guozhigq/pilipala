@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
+import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
@@ -25,6 +27,7 @@ class _StyleSettingState extends State<StyleSetting> {
 
   Box setting = GStrorage.setting;
   late int picQuality;
+  late double toastOpacity;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;
 
@@ -32,6 +35,7 @@ class _StyleSettingState extends State<StyleSetting> {
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+    toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     _tempThemeValue = settingController.themeType.value;
     defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
@@ -186,6 +190,30 @@ class _StyleSettingState extends State<StyleSetting> {
                 ),
               ),
             ),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () async {
+              double? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SlideDialog<double>(
+                    title: 'Toast不透明度',
+                    value: settingController.toastOpacity.value,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                  );
+                },
+              );
+              if (result != null) {
+                settingController.toastOpacity.value = result;
+                SmartDialog.showToast('设置成功');
+                setting.put(SettingBoxKey.defaultToastOp, result);
+              }
+            },
+            title: Text('Toast不透明度', style: titleStyle),
+            subtitle: Text('自定义Toast不透明度', style: subTitleStyle),
           ),
           ListTile(
             dense: false,
