@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -95,12 +97,13 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableBackgroundPlay,
             defaultVal: false,
           ),
-          const SetSwitchItem(
-            title: '自动PiP播放',
-            subTitle: '进入后台时画中画播放',
-            setKey: SettingBoxKey.autoPiP,
-            defaultVal: false,
-          ),
+          if (Platform.isAndroid)
+            const SetSwitchItem(
+              title: '自动PiP播放',
+              subTitle: '进入后台时画中画播放',
+              setKey: SettingBoxKey.autoPiP,
+              defaultVal: false,
+            ),
           const SetSwitchItem(
             title: '自动全屏',
             subTitle: '视频开始播放时进入全屏',
@@ -154,9 +157,12 @@ class _PlaySettingState extends State<PlaySetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '默认画质', value: defaultVideoQa, values: VideoQuality.values.reversed.map((e) {
-                    return {'title': e.description, 'value': e.code};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '默认画质',
+                      value: defaultVideoQa,
+                      values: VideoQuality.values.reversed.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -177,9 +183,12 @@ class _PlaySettingState extends State<PlaySetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '默认音质', value: defaultAudioQa, values: AudioQuality.values.reversed.map((e) {
-                    return {'title': e.description, 'value': e.code};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '默认音质',
+                      value: defaultAudioQa,
+                      values: AudioQuality.values.reversed.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -200,9 +209,12 @@ class _PlaySettingState extends State<PlaySetting> {
               String? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<String>(title: '默认解码格式', value: defaultDecode, values: VideoDecodeFormats.values.map((e) {
-                    return {'title': e.description, 'value': e.code};
-                  }).toList());
+                  return SelectDialog<String>(
+                      title: '默认解码格式',
+                      value: defaultDecode,
+                      values: VideoDecodeFormats.values.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -223,9 +235,12 @@ class _PlaySettingState extends State<PlaySetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '默认全屏方式', value: defaultFullScreenMode, values: FullScreenMode.values.map((e) {
-                    return {'title': e.description, 'value': e.code};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '默认全屏方式',
+                      value: defaultFullScreenMode,
+                      values: FullScreenMode.values.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -246,9 +261,12 @@ class _PlaySettingState extends State<PlaySetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '底部进度条展示', value: defaultBtmProgressBehavior, values: BtmProgresBehavior.values.map((e) {
-                    return {'title': e.description, 'value': e.code};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '底部进度条展示',
+                      value: defaultBtmProgressBehavior,
+                      values: BtmProgresBehavior.values.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
                 },
               );
               if (result != null) {
