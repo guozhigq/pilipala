@@ -302,7 +302,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 return <Widget>[
                   Obx(() => SliverAppBar(
                       automaticallyImplyLeading: false,
-                      pinned: false,
+                      // 假装使用一个非空变量，避免Obx检测不到而罢工
+                      pinned: videoDetailController
+                          .autoPlay.value ^ false ^ videoDetailController
+                          .autoPlay.value,
                       elevation: 0,
                       scrolledUnderElevation: 0,
                       forceElevated: innerBoxIsScrolled,
