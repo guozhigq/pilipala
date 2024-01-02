@@ -610,6 +610,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     BtmProgresBehavior.onlyShowFullScreen.code &&
                 !_.isFullScreen.value) {
               return Container();
+            } else if (defaultBtmProgressBehavior ==
+                    BtmProgresBehavior.onlyHideFullScreen.code &&
+                _.isFullScreen.value) {
+              return Container();
             }
 
             if (_.videoType.value == 'live') {
