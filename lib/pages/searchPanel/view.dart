@@ -74,36 +74,48 @@ class _SearchPanelState extends State<SearchPanel>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data;
-            var ctr = _searchPanelController;
-            RxList list = ctr.resultList;
-            if (data['status']) {
-              return Obx(() {
-                switch (widget.searchType) {
-                  case SearchType.video:
-                    return SearchVideoPanel(
-                      ctr: _searchPanelController,
-                      // ignore: invalid_use_of_protected_member
-                      list: list.value,
-                    );
-                  case SearchType.media_bangumi:
-                    return searchMbangumiPanel(context, ctr, list);
-                  case SearchType.bili_user:
-                    return searchUserPanel(context, ctr, list);
-                  case SearchType.live_room:
-                    return searchLivePanel(context, ctr, list);
-                  case SearchType.article:
-                    return searchArticlePanel(context, ctr, list);
-                  default:
-                    return const SizedBox();
-                }
-              });
+            if (snapshot.data != null) {
+              Map data = snapshot.data;
+              var ctr = _searchPanelController;
+              RxList list = ctr.resultList;
+              if (data['status']) {
+                return Obx(() {
+                  switch (widget.searchType) {
+                    case SearchType.video:
+                      return SearchVideoPanel(
+                        ctr: _searchPanelController,
+                        // ignore: invalid_use_of_protected_member
+                        list: list.value,
+                      );
+                    case SearchType.media_bangumi:
+                      return searchMbangumiPanel(context, ctr, list);
+                    case SearchType.bili_user:
+                      return searchUserPanel(context, ctr, list);
+                    case SearchType.live_room:
+                      return searchLivePanel(context, ctr, list);
+                    case SearchType.article:
+                      return searchArticlePanel(context, ctr, list);
+                    default:
+                      return const SizedBox();
+                  }
+                });
+              } else {
+                return CustomScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  slivers: [
+                    HttpError(
+                      errMsg: data['msg'],
+                      fn: () => setState(() {}),
+                    ),
+                  ],
+                );
+              }
             } else {
               return CustomScrollView(
                 physics: const NeverScrollableScrollPhysics(),
                 slivers: [
                   HttpError(
-                    errMsg: data['msg'],
+                    errMsg: '没有相关数据',
                     fn: () => setState(() {}),
                   ),
                 ],
