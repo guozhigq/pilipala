@@ -87,7 +87,7 @@ class StatAdapter extends TypeAdapter<Stat> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Stat(
-      view: fields[0] as int?,
+      view: fields[0] as String?,
       like: fields[1] as int?,
       danmu: fields[2] as int?,
     );
