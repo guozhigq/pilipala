@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/search.dart';
 
 // 富文本
 InlineSpan richNode(item, context) {
@@ -183,6 +185,39 @@ InlineSpan richNode(item, context) {
               alignment: PlaceholderAlignment.middle,
               child: GestureDetector(
                 onTap: () {},
+                child: Text(
+                  '${i.text} ',
+                  style: authorStyle,
+                ),
+              ),
+            ),
+          );
+        }
+        // 投稿
+        if (i.type == 'RICH_TEXT_NODE_TYPE_BV') {
+          spanChilds.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Icon(
+                Icons.play_circle_outline_outlined,
+                size: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          );
+          spanChilds.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: GestureDetector(
+                onTap: () async {
+                  try {
+                    int cid = await SearchHttp.ab2c(bvid: i.rid);
+                    Get.toNamed('/video?bvid=${i.rid}&cid=$cid',
+                        arguments: {'pic': null, 'heroTag': i.rid});
+                  } catch (err) {
+                    SmartDialog.showToast(err.toString());
+                  }
+                },
                 child: Text(
                   '${i.text} ',
                   style: authorStyle,

@@ -77,14 +77,14 @@ class Stat {
     this.danmu,
   });
   @HiveField(0)
-  int? view;
+  String? view;
   @HiveField(1)
   int? like;
   @HiveField(2)
   int? danmu;
 
   Stat.fromJson(Map<String, dynamic> json) {
-    view = json["view"];
+    view = Utils.numFormat(json["view"]);
     like = json["like"];
     danmu = json['danmaku'];
   }
