@@ -681,6 +681,12 @@ InlineSpan buildContent(
           if (i.contains('?')) {
             urlKeys[index] = i.replaceAll('?', '\\?');
           }
+          if (i.contains('+')) {
+            urlKeys[index] = i.replaceAll('+', '\\+');
+          }
+          if (i.contains('*')) {
+            urlKeys[index] = i.replaceAll('*', '\\*');
+          }
         }
         matchUrl = matchMember.splitMapJoin(
           /// RegExp.escape() 转义特殊字符
