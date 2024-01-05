@@ -291,7 +291,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
               child: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Colors.transparent,
                 elevation: 0,
               ),
             ),
