@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class ChatItem extends StatelessWidget {
   dynamic item;
@@ -14,7 +15,7 @@ class ChatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isOwner = item.senderUid == 17340771;
+    bool isOwner = item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
     bool isPic = item.msgType == 2; // 图片
     bool isText = item.msgType == 1; // 文本
     bool isAchive = item.msgType == 11; // 投稿
