@@ -438,8 +438,15 @@ class VideoIntroController extends GetxController {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('关注成功'),
+                          content: Text(
+                            '关注成功',
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground),
+                          ),
                           duration: const Duration(seconds: 2),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.background,
                           action: SnackBarAction(
                             label: '设置分组',
                             onPressed: setFollowGroup,
