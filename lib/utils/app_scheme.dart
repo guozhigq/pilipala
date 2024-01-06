@@ -12,7 +12,7 @@ class PiliSchame {
   static AppScheme appScheme = AppSchemeImpl.getInstance() as AppScheme;
   static void init() async {
     ///
-    SchemeEntity? value = await appScheme.getInitScheme();
+    final SchemeEntity? value = await appScheme.getInitScheme();
     if (value != null) {
       _routePush(value);
     }
@@ -34,9 +34,9 @@ class PiliSchame {
 
   /// 路由跳转
   static void _routePush(value) async {
-    String scheme = value.scheme;
-    String host = value.host;
-    String path = value.path;
+    final String scheme = value.scheme;
+    final String host = value.host;
+    final String path = value.path;
 
     if (scheme == 'bilibili') {
       // bilibili://root
@@ -55,9 +55,19 @@ class PiliSchame {
 
       // bilibili://video/{aid}
       else if (host == 'video') {
-        var pathQuery = path.split('/').last;
-        int aid = int.parse(pathQuery);
-        _videoPush(aid, null);
+        String pathQuery = path.split('/').last;
+        final numericRegex = RegExp(r'^[0-9]+$');
+        if (numericRegex.hasMatch(pathQuery)) {
+          pathQuery = 'AV$pathQuery';
+        }
+        Map map = IdUtils.matchAvorBv(input: pathQuery);
+        if (map.containsKey('AV')) {
+          _videoPush(map['AV'], null);
+        } else if (map.containsKey('BV')) {
+          _videoPush(null, map['BV']);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
+        }
       }
 
       // bilibili://live/{roomid}
@@ -73,6 +83,22 @@ class PiliSchame {
           var seasonId = path.split('/').last;
           _bangumiPush(int.parse(seasonId));
         }
+      }
+      // 专栏 bilibili://opus/detail/883089655985078289
+      else if (host == 'opus') {
+        if (path.startsWith('/detail')) {
+          var opusId = path.split('/').last;
+          Get.toNamed(
+            '/webview',
+            parameters: {
+              'url': 'https://www.bilibili.com/opus/$opusId',
+              'type': 'url',
+              'pageTitle': '',
+            },
+          );
+        }
+      } else if (host == 'search') {
+        Get.toNamed('/searchResult', parameters: {'keyword': ''});
       }
     }
   }
@@ -109,9 +135,9 @@ class PiliSchame {
       var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: null);
       if (result['status']) {
         var bangumiDetail = result['data'];
-        int cid = bangumiDetail.episodes!.first.cid;
-        String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-        String heroTag = Utils.makeHeroTag(cid);
+        final int cid = bangumiDetail.episodes!.first.cid;
+        final String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
+        final String heroTag = Utils.makeHeroTag(cid);
         var epId = bangumiDetail.episodes!.first.id;
         SmartDialog.dismiss().then(
           (e) => Get.toNamed(
@@ -132,9 +158,9 @@ class PiliSchame {
   static void _fullPathPush(value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
-    String scheme = value.scheme!;
-    String host = value.host!;
-    String? path = value.path;
+    final String scheme = value.scheme!;
+    final String host = value.host!;
+    final String? path = value.path;
     // Map<String, String> query = value.query!;
     if (host.startsWith('live.bilibili')) {
       int roomId = int.parse(path!.split('/').last);
@@ -148,11 +174,11 @@ class PiliSchame {
       return;
     }
     if (path != null) {
-      String area = path.split('/')[1];
+      final String area = path.split('/')[1];
       switch (area) {
         case 'bangumi':
           // print('番剧');
-          String seasonId = path.split('/').last;
+          final String seasonId = path.split('/').last;
           _bangumiPush(matchNum(seasonId).first);
           break;
         case 'video':
@@ -177,9 +203,9 @@ class PiliSchame {
   }
 
   static List<int> matchNum(String str) {
-    RegExp regExp = RegExp(r'\d+');
-    Iterable<Match> matches = regExp.allMatches(str);
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
 
-    return matches.map((match) => int.parse(match.group(0)!)).toList();
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
   }
 }

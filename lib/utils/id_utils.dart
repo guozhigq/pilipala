@@ -66,7 +66,7 @@ class IdUtils {
       result['BV'] = bvs[0].substring(0, 2).toUpperCase() + bvs[0].substring(2);
     }
     if (avs.isNotEmpty) {
-      result['AV'] = avs[0].substring(2);
+      result['AV'] = int.parse(avs[0].substring(2));
     }
     return result;
   }
