@@ -628,9 +628,16 @@ InlineSpan buildContent(
       // 匹配@用户
       String matchMember = str;
       if (content.atNameToMid.isNotEmpty) {
-        RegExp reg = RegExp(r"@.*( |:)");
-        if (content.atNameToMid.length == 1 &&
-            content.message == '@${content.members.first.uname}') {
+        List atNameToMidKeys = content.atNameToMid.keys.toList();
+        RegExp reg = RegExp(atNameToMidKeys.map((key) => key).join('|'));
+        // if (!content.message.contains(':')) {
+        //   reg = RegExp(r"@.*( |:)");
+        // }
+
+        // 只@用户没有内容
+        if (!content.message.contains(':') ||
+            (content.atNameToMid.length == 1 &&
+                content.message == '@${content.members.first.uname}')) {
           reg = RegExp(r"@.*( |:|$)");
         }
         matchMember = str.splitMapJoin(
@@ -639,9 +646,20 @@ InlineSpan buildContent(
             if (match[0] != null) {
               hasMatchMember = false;
               content.atNameToMid.forEach((key, value) {
+                if (str.contains('回复')) {
+                  spanChilds.add(
+                    TextSpan(
+                      text: '回复 ',
+                      style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.titleSmall!.fontSize,
+                      ),
+                    ),
+                  );
+                }
                 spanChilds.add(
                   TextSpan(
-                    text: '@$key ',
+                    text: '@$key',
                     style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.titleSmall!.fontSize,
