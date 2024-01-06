@@ -126,6 +126,12 @@ class MyApp extends StatelessWidget {
                 ? lightColorScheme
                 : darkColorScheme,
             useMaterial3: true,
+            snackBarTheme: const SnackBarThemeData(
+              actionTextColor: Colors.white,
+              backgroundColor: Colors.black,
+              contentTextStyle: TextStyle(color: Colors.white),
+              elevation: 20,
+            ),
           ),
           localizationsDelegates: const [
             GlobalCupertinoLocalizations.delegate,

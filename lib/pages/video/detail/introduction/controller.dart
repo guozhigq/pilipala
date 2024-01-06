@@ -411,8 +411,12 @@ class VideoIntroController extends GetxController {
           content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
             TextButton(
               onPressed: () async {
                 var result = await VideoHttp.relationMod(
@@ -438,15 +442,8 @@ class VideoIntroController extends GetxController {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            '关注成功',
-                            style: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground),
-                          ),
+                          content: const Text('关注成功'),
                           duration: const Duration(seconds: 2),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.background,
                           action: SnackBarAction(
                             label: '设置分组',
                             onPressed: setFollowGroup,
