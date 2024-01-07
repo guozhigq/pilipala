@@ -119,100 +119,116 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return StreamBuilder(
       stream: stream,
       initialData: true,
-      builder: (context, AsyncSnapshot snapshot) {
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        final RxBool isUserLoggedIn = ctr!.userLogin;
+        final double top = MediaQuery.of(context).padding.top;
         return AnimatedOpacity(
           opacity: snapshot.data ? 1 : 0,
           duration: const Duration(milliseconds: 300),
           child: AnimatedContainer(
             curve: Curves.easeInOutCubicEmphasized,
             duration: const Duration(milliseconds: 500),
-            height: snapshot.data
-                ? MediaQuery.of(context).padding.top + 52
-                : MediaQuery.of(context).padding.top + 5,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 8,
-                right: 8,
-                bottom: 0,
-                top: MediaQuery.of(context).padding.top + 4,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Expanded(
-                      child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/logo/logo_android_2.png',
-                        height: 48,
-                      ),
-                    ],
-                  )),
-                  const SearchPage(),
-                  if (ctr!.userLogin.value) ...[
-                    IconButton(
-                        onPressed: () => Get.toNamed('/whisper'),
-                        icon: const Icon(Icons.notifications_none))
-                  ],
-                  const SizedBox(width: 8),
-                  Obx(
-                    () => ctr!.userLogin.value
-                        ? Stack(
-                            children: [
-                              Obx(
-                                () => NetworkImgLayer(
-                                  type: 'avatar',
-                                  width: 34,
-                                  height: 34,
-                                  src: ctr!.userFace.value,
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () => callback!(),
-                                    splashColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer
-                                        .withOpacity(0.3),
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(50),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : SizedBox(
-                            width: 38,
-                            height: 38,
-                            child: IconButton(
-                              style: ButtonStyle(
-                                padding:
-                                    MaterialStateProperty.all(EdgeInsets.zero),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith((states) {
-                                  return Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface;
-                                }),
-                              ),
-                              onPressed: () => callback!(),
-                              icon: Icon(
-                                Icons.account_circle,
-                                size: 22,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                  ),
-                ],
-              ),
+            height: snapshot.data ? top + 52 : top,
+            padding: EdgeInsets.fromLTRB(14, top, 14, 0),
+            child: UserInfoWidget(
+              top: top,
+              userLogin: isUserLoggedIn,
+              userFace: ctr?.userFace.value,
+              callback: () => callback!(),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class UserInfoWidget extends StatelessWidget {
+  const UserInfoWidget({
+    Key? key,
+    required this.top,
+    required this.userLogin,
+    required this.userFace,
+    required this.callback,
+  }) : super(key: key);
+
+  final double top;
+  final RxBool userLogin;
+  final String? userFace;
+  final VoidCallback? callback;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(child: SearchPage()),
+        if (userLogin.value) ...[
+          const SizedBox(width: 4),
+          ClipRect(
+            child: IconButton(
+              onPressed: () => Get.toNamed('/whisper'),
+              icon: const Icon(Icons.notifications_none),
+            ),
+          )
+        ],
+        const SizedBox(width: 8),
+        Obx(
+          () => userLogin.value
+              ? Stack(
+                  children: [
+                    NetworkImgLayer(
+                      type: 'avatar',
+                      width: 34,
+                      height: 34,
+                      src: userFace,
+                    ),
+                    Positioned.fill(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => callback?.call(),
+                          splashColor: Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withOpacity(0.3),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(50),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              : DefaultUser(callback: () => callback),
+        ),
+      ],
+    );
+  }
+}
+
+class DefaultUser extends StatelessWidget {
+  const DefaultUser({super.key, this.callback});
+  final Function? callback;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 38,
+      height: 38,
+      child: IconButton(
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
+            return Theme.of(context).colorScheme.onInverseSurface;
+          }),
+        ),
+        onPressed: () => callback?.call(),
+        icon: Icon(
+          Icons.person_rounded,
+          size: 22,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
     );
   }
 }
@@ -232,25 +248,19 @@ class _CustomTabsState extends State<CustomTabs> {
   void initState() {
     super.initState();
     _homeController.tabController.addListener(listen);
-    currentTabIndex = _homeController.tabController.index;
   }
 
   void listen() {
-    setState(() {
-      currentTabIndex = _homeController.tabController.index;
-    });
+    _homeController.initialIndex.value = _homeController.tabController.index;
   }
 
   void onTap(int index) {
     feedBack();
-    if (_homeController.initialIndex == index) {
+    if (_homeController.initialIndex.value == index) {
       _homeController.tabsCtrList[index]().animateToTop();
     }
-    _homeController.initialIndex = index;
-    setState(() {
-      _homeController.tabController.index = index;
-      currentTabIndex = index;
-    });
+    _homeController.initialIndex.value = index;
+    _homeController.tabController.index = index;
   }
 
   @override
@@ -261,25 +271,25 @@ class _CustomTabsState extends State<CustomTabs> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
+    return Container(
+      height: 44,
+      margin: const EdgeInsets.only(top: 4),
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0),
         scrollDirection: Axis.horizontal,
         itemCount: _homeController.tabs.length,
         separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 8.0);
+          return const SizedBox(width: 10);
         },
         itemBuilder: (BuildContext context, int index) {
-          bool selected = index == currentTabIndex;
           String label = _homeController.tabs[index]['label'];
-          // add margins to first and last tab;
-          return CustomChip(
-              onTap: () {
-                onTap(index);
-              },
+          return Obx(
+            () => CustomChip(
+              onTap: () => onTap(index),
               label: label,
-              selected: selected);
+              selected: index == _homeController.initialIndex.value,
+            ),
+          );
         },
       ),
     );
@@ -290,34 +300,39 @@ class CustomChip extends StatelessWidget {
   final Function onTap;
   final String label;
   final bool selected;
-  const CustomChip(
-      {super.key,
-      required this.onTap,
-      required this.label,
-      required this.selected});
+  const CustomChip({
+    super.key,
+    required this.onTap,
+    required this.label,
+    required this.selected,
+  });
 
   @override
   Widget build(BuildContext context) {
-    TextStyle? chipTextStyle =
-        selected ? const TextStyle(fontWeight: FontWeight.bold) : null;
-
+    final ColorScheme colorTheme = Theme.of(context).colorScheme;
+    final Color secondaryContainer = colorTheme.secondaryContainer;
+    final TextStyle chipTextStyle = selected
+        ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)
+        : const TextStyle(fontSize: 13);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    const VisualDensity visualDensity =
+        VisualDensity(horizontal: -4.0, vertical: -2.0);
     return InputChip(
-      side: const BorderSide(color: Colors.transparent),
-      color: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-        if (states.contains(MaterialState.selected)) {
-          return Theme.of(context).colorScheme.tertiaryContainer; // 当按钮被按下时的颜色
-        }
-        return Theme.of(context).colorScheme.surfaceVariant; // 默认颜色
-      }),
-      label: Text(
-        label,
-        style: chipTextStyle,
+      side: BorderSide(
+        color: selected
+            ? colorScheme.onSecondaryContainer.withOpacity(0.2)
+            : Colors.transparent,
       ),
-      onPressed: () {
-        onTap();
-      },
+      backgroundColor: secondaryContainer,
+      selectedColor: secondaryContainer,
+      color: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
+      padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
+      label: Text(label, style: chipTextStyle),
+      onPressed: () => onTap(),
       selected: selected,
       showCheckmark: false,
+      visualDensity: visualDensity,
     );
   }
 }

@@ -9,7 +9,7 @@ import 'package:pilipala/utils/storage.dart';
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
   late List tabs;
-  int initialIndex = 1;
+  RxInt initialIndex = 1.obs;
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
@@ -35,7 +35,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     tabsPageList = tabsConfig.map<Widget>((e) => e['page']).toList();
 
     tabController = TabController(
-      initialIndex: initialIndex,
+      initialIndex: initialIndex.value,
       length: tabs.length,
       vsync: this,
     );
