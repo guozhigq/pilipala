@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
 class MenuRow extends StatelessWidget {
-  final bool? loadingStatus;
   const MenuRow({
-    Key? key,
+    super.key,
     this.loadingStatus,
-  }) : super(key: key);
+  });
+  final bool? loadingStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class MenuRow extends StatelessWidget {
   }
 
   Widget actionRowLineItem(
-      context, Function? onTap, bool? loadingStatus, String? text,
+      BuildContext context, Function? onTap, bool? loadingStatus, String? text,
       {bool selectStatus = false}) {
     return Material(
       color: selectStatus
@@ -97,17 +97,17 @@ class MenuRow extends StatelessWidget {
 }
 
 class ActionRowLineItem extends StatelessWidget {
+  const ActionRowLineItem({
+    super.key,
+    this.selectStatus,
+    this.onTap,
+    this.text,
+    this.loadingStatus = false,
+  });
   final bool? selectStatus;
   final Function? onTap;
   final bool? loadingStatus;
   final String? text;
-
-  const ActionRowLineItem(
-      {super.key,
-      this.selectStatus,
-      this.onTap,
-      this.text,
-      this.loadingStatus = false});
 
   @override
   Widget build(BuildContext context) {

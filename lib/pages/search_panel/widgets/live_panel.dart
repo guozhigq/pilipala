@@ -16,7 +16,7 @@ Widget searchLivePanel(BuildContext context, ctr, list) {
           crossAxisSpacing: StyleString.cardSpace + 2,
           mainAxisSpacing: StyleString.cardSpace + 3,
           mainAxisExtent:
-              MediaQuery.of(context).size.width / 2 / StyleString.aspectRatio +
+              MediaQuery.sizeOf(context).width / 2 / StyleString.aspectRatio +
                   66 * MediaQuery.of(context).textScaleFactor),
       itemCount: list.length,
       itemBuilder: (context, index) {

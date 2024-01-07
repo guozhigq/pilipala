@@ -1,4 +1,3 @@
-import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -43,15 +42,13 @@ class _PlDanmakuState extends State<PlDanmaku> {
     super.initState();
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    _plDanmakuController =
-        PlDanmakuController(widget.cid);
+    _plDanmakuController = PlDanmakuController(widget.cid);
     if (mounted) {
       playerController = widget.playerController;
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
         _plDanmakuController.initiate(
             playerController.duration.value.inMilliseconds,
-            playerController.position.value.inMilliseconds
-        );
+            playerController.position.value.inMilliseconds);
       }
       playerController
         ..addStatusLister(playerListener)
@@ -61,8 +58,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
       if (p0 && !_plDanmakuController.initiated) {
         _plDanmakuController.initiate(
             playerController.duration.value.inMilliseconds,
-            playerController.position.value.inMilliseconds
-        );
+            playerController.position.value.inMilliseconds);
       }
     });
     blockTypes = playerController.blockTypes;
@@ -87,7 +83,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
       return;
     }
     int currentPosition = position.inMilliseconds;
-    currentPosition -= currentPosition % 100;//取整百的毫秒数
+    currentPosition -= currentPosition % 100; //取整百的毫秒数
 
     if (currentPosition == latestAddedPosition) {
       return;
@@ -98,17 +94,18 @@ class _PlDanmakuState extends State<PlDanmaku> {
         _plDanmakuController.getCurrentDanmaku(currentPosition);
 
     if (currentDanmakuList != null) {
-      Color? defaultColor = playerController.blockTypes.contains(6) ?
-        DmUtils.decimalToColor(16777215) : null;
+      Color? defaultColor = playerController.blockTypes.contains(6)
+          ? DmUtils.decimalToColor(16777215)
+          : null;
 
-      _controller!.addItems(
-        currentDanmakuList.map((e) => DanmakuItem(
-          e.content,
-          color: defaultColor ?? DmUtils.decimalToColor(e.color),
-          time: e.progress,
-          type: DmUtils.getPosition(e.mode),
-        )).toList()
-      );
+      _controller!.addItems(currentDanmakuList
+          .map((e) => DanmakuItem(
+                e.content,
+                color: defaultColor ?? DmUtils.decimalToColor(e.color),
+                time: e.progress,
+                type: DmUtils.getPosition(e.mode),
+              ))
+          .toList());
     }
   }
 
@@ -137,7 +134,8 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideTop: blockTypes.contains(5),
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
-              duration: danmakuDurationVal / widget.playerController.playbackSpeed,
+              duration:
+                  danmakuDurationVal / widget.playerController.playbackSpeed,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
             ),

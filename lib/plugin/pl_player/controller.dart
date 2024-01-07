@@ -222,7 +222,7 @@ class PlPlayerController {
   late double opacityVal;
   late double fontSizeVal;
   late double danmakuDurationVal;
-  late List speedsList;
+  late List<double> speedsList;
   // 缓存
   double? defaultDuration;
   late bool enableAutoLongPressSpeed = false;
@@ -236,24 +236,28 @@ class PlPlayerController {
       sliderPositionSeconds.value = newSecond;
     }
   }
+
   void updatePositionSecond() {
     int newSecond = _position.value.inSeconds;
     if (positionSeconds.value != newSecond) {
       positionSeconds.value = newSecond;
     }
   }
+
   void updateDurationSecond() {
     int newSecond = _duration.value.inSeconds;
     if (durationSeconds.value != newSecond) {
       durationSeconds.value = newSecond;
     }
   }
+
   void updateBufferedSecond() {
     int newSecond = _buffered.value.inSeconds;
     if (bufferedSeconds.value != newSecond) {
       bufferedSeconds.value = newSecond;
     }
   }
+
   // 添加一个私有构造函数
   PlPlayerController._() {
     _videoType = videoType;
@@ -285,10 +289,10 @@ class PlPlayerController {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
     }
-    List speedsListTemp =
-        videoStorage.get(VideoBoxKey.customSpeedsList, defaultValue: []);
-    speedsList = List.from(speedsListTemp);
-    for (var i in PlaySpeed.values) {
+    final List<double> speedsListTemp = videoStorage
+        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]);
+    speedsList = List<double>.from(speedsListTemp);
+    for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }
 
@@ -937,9 +941,10 @@ class PlPlayerController {
     if (!isFullScreen.value && status) {
       /// 按照视频宽高比决定全屏方向
       toggleFullScreen(true);
+
       /// 进入全屏
       await enterFullScreen();
-      if(mode == FullScreenMode.vertical ||
+      if (mode == FullScreenMode.vertical ||
           (mode == FullScreenMode.auto && direction.value == 'vertical')) {
         await verticalScreen();
       } else {

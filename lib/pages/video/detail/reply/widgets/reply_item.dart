@@ -9,7 +9,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -27,8 +27,8 @@ class ReplyItem extends StatelessWidget {
     this.showReplyRow = true,
     this.replyReply,
     this.replyType,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final ReplyItemModel? replyItem;
   final Function? addReply;
   final String? replyLevel;
@@ -68,7 +68,7 @@ class ReplyItem extends StatelessWidget {
     );
   }
 
-  Widget lfAvtar(context, heroTag) {
+  Widget lfAvtar(BuildContext context, String heroTag) {
     return Stack(
       children: [
         Hero(
@@ -117,8 +117,8 @@ class ReplyItem extends StatelessWidget {
     );
   }
 
-  Widget content(context) {
-    String heroTag = Utils.makeHeroTag(replyItem!.mid);
+  Widget content(BuildContext context) {
+    final String heroTag = Utils.makeHeroTag(replyItem!.mid);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -260,7 +260,7 @@ class ReplyItem extends StatelessWidget {
                     ],
                   ),
                   Row(
-                    children: [
+                    children: <Widget>[
                       Text(
                         Utils.dateFormat(replyItem!.ctime),
                         style: TextStyle(
@@ -291,7 +291,6 @@ class ReplyItem extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
           child: SelectableRegion(
-            magnifierConfiguration: const TextMagnifierConfiguration(),
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
             child: Text.rich(
@@ -340,9 +339,9 @@ class ReplyItem extends StatelessWidget {
   }
 
   // 感谢、回复、复制
-  Widget bottonAction(context, replyControl) {
+  Widget bottonAction(BuildContext context, replyControl) {
     return Row(
-      children: [
+      children: <Widget>[
         const SizedBox(width: 32),
         SizedBox(
           height: 32,
@@ -422,7 +421,7 @@ class ReplyItemRow extends StatelessWidget {
     this.replyItem,
     this.replyReply,
   });
-  List? replies;
+  final List? replies;
   ReplyControl? replyControl;
   // int? f_rpid;
   ReplyItemModel? replyItem;
@@ -430,8 +429,8 @@ class ReplyItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isShow = replyControl!.isShow!;
-    int extraRow = replyControl != null && isShow ? 1 : 0;
+    final bool isShow = replyControl!.isShow!;
+    final int extraRow = replyControl != null && isShow ? 1 : 0;
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
@@ -443,7 +442,7 @@ class ReplyItemRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (replies!.isNotEmpty)
-              for (var i = 0; i < replies!.length; i++) ...[
+              for (int i = 0; i < replies!.length; i++) ...[
                 InkWell(
                   // 一楼点击评论展开评论详情
                   onTap: () => replyReply!(replyItem),
@@ -472,7 +471,7 @@ class ReplyItemRow extends StatelessWidget {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 feedBack();
-                                String heroTag =
+                                final String heroTag =
                                     Utils.makeHeroTag(replies![i].member.mid);
                                 Get.toNamed(
                                     '/member?mid=${replies![i].member.mid}',
@@ -539,7 +538,7 @@ InlineSpan buildContent(
   // replyItem 当前回复内容
   // replyReply 查看二楼回复（回复详情）回调
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
-  var content = replyItem.content;
+  final content = replyItem.content;
   if (content.emote.isEmpty &&
       content.atNameToMid.isEmpty &&
       content.jumpUrl.isEmpty &&
@@ -552,7 +551,7 @@ InlineSpan buildContent(
             () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem),
     );
   }
-  List<InlineSpan> spanChilds = [];
+  final List<InlineSpan> spanChilds = <InlineSpan>[];
   bool hasMatchMember = true;
 
   // 投票
@@ -590,11 +589,11 @@ InlineSpan buildContent(
   content.message.splitMapJoin(
     RegExp(r"\[.*?\]"),
     onMatch: (Match match) {
-      String matchStr = match[0]!;
+      final String matchStr = match[0]!;
       if (content.emote.isNotEmpty &&
           matchStr.indexOf('[') == matchStr.lastIndexOf('[') &&
           matchStr.indexOf(']') == matchStr.lastIndexOf(']')) {
-        int size = content.emote[matchStr]['meta']['size'];
+        final int size = content.emote[matchStr]['meta']['size'];
         if (content.emote.keys.contains(matchStr)) {
           spanChilds.add(
             WidgetSpan(
@@ -628,7 +627,7 @@ InlineSpan buildContent(
       // 匹配@用户
       String matchMember = str;
       if (content.atNameToMid.isNotEmpty) {
-        List atNameToMidKeys = content.atNameToMid.keys.toList();
+        final List atNameToMidKeys = content.atNameToMid.keys.toList();
         RegExp reg = RegExp(atNameToMidKeys.map((key) => key).join('|'));
         // if (!content.message.contains(':')) {
         //   reg = RegExp(r"@.*( |:)");
@@ -667,7 +666,7 @@ InlineSpan buildContent(
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        String heroTag = Utils.makeHeroTag(value);
+                        final String heroTag = Utils.makeHeroTag(value);
                         Get.toNamed(
                           '/member?mid=$value',
                           arguments: {'face': '', 'heroTag': heroTag},
@@ -693,8 +692,8 @@ InlineSpan buildContent(
       // 匹配 jumpUrl
       String matchUrl = matchMember;
       if (content.jumpUrl.isNotEmpty && hasMatchMember) {
-        List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
-        for (var index = 0; index < urlKeys.length; index++) {
+        final List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
+        for (int index = 0; index < urlKeys.length; index++) {
           var i = urlKeys[index];
           if (i.contains('?')) {
             urlKeys[index] = i.replaceAll('?', '\\?');
@@ -711,14 +710,14 @@ InlineSpan buildContent(
           RegExp(urlKeys.map((key) => key).join("|")),
           // RegExp('What does the fox say\\?'),
           onMatch: (Match match) {
-            String matchStr = match[0]!;
+            final String matchStr = match[0]!;
             String appUrlSchema = '';
             if (content.jumpUrl[matchStr] != null) {
               appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
             }
             // 默认不显示关键词
-            bool enableWordRe =
-                setting.get(SettingBoxKey.enableWordRe, defaultValue: false);
+            final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
+                defaultValue: false) as bool;
             if (content.jumpUrl[matchStr] != null) {
               spanChilds.add(
                 TextSpan(
@@ -731,9 +730,9 @@ InlineSpan buildContent(
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       if (appUrlSchema == '') {
-                        String str = Uri.parse(matchStr).pathSegments[0];
-                        Map matchRes = IdUtils.matchAvorBv(input: str);
-                        List matchKeys = matchRes.keys.toList();
+                        final String str = Uri.parse(matchStr).pathSegments[0];
+                        final Map matchRes = IdUtils.matchAvorBv(input: str);
+                        final List matchKeys = matchRes.keys.toList();
                         if (matchKeys.isNotEmpty) {
                           if (matchKeys.first == 'BV') {
                             Get.toNamed(
@@ -834,8 +833,8 @@ InlineSpan buildContent(
 
   // 图片渲染
   if (content.pictures.isNotEmpty) {
-    List<String> picList = [];
-    int len = content.pictures.length;
+    final List<String> picList = <String>[];
+    final int len = content.pictures.length;
     if (len == 1) {
       Map pictureItem = content.pictures.first;
       picList.add(pictureItem['img_src']);
@@ -843,13 +842,13 @@ InlineSpan buildContent(
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
-            builder: (context, BoxConstraints box) {
+            builder: (BuildContext context, BoxConstraints box) {
               return GestureDetector(
                 onTap: () {
                   showDialog(
                     useSafeArea: false,
                     context: context,
-                    builder: (context) {
+                    builder: (BuildContext context) {
                       return ImagePreview(initialPage: 0, imgList: picList);
                     },
                   );

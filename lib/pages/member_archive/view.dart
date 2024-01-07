@@ -87,7 +87,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
         slivers: [
           FutureBuilder(
             future: _futureBuilderFuture,
-            builder: (context, snapshot) {
+            builder: (BuildContext context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
                   Map data = snapshot.data as Map;
@@ -97,7 +97,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                       () => list.isNotEmpty
                           ? SliverList(
                               delegate: SliverChildBuilderDelegate(
-                                (context, index) {
+                                (BuildContext context, index) {
                                   return VideoCardH(
                                     videoItem: list[index],
                                     showOwner: false,

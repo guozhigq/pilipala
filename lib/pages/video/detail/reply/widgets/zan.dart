@@ -25,12 +25,12 @@ class _ZanButtonState extends State<ZanButton> {
   Future onLikeReply() async {
     feedBack();
     // SmartDialog.showLoading(msg: 'pilipala ...');
-    ReplyItemModel replyItem = widget.replyItem!;
-    int oid = replyItem.oid!;
-    int rpid = replyItem.rpid!;
+    final ReplyItemModel replyItem = widget.replyItem!;
+    final int oid = replyItem.oid!;
+    final int rpid = replyItem.rpid!;
     // 1 已点赞 2 不喜欢 0 未操作
-    int action = replyItem.action == 0 ? 1 : 0;
-    var res = await ReplyHttp.likeReply(
+    final int action = replyItem.action == 0 ? 1 : 0;
+    final res = await ReplyHttp.likeReply(
         type: widget.replyType!.index, oid: oid, rpid: rpid, action: action);
     // SmartDialog.dismiss();
     if (res['status']) {
@@ -47,19 +47,23 @@ class _ZanButtonState extends State<ZanButton> {
       SmartDialog.showToast(res['msg']);
     }
   }
+
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
-    return isProcessing ? null : () async {
-      setState(() => isProcessing = true);
-      await action();
-      setState(() => isProcessing = false);
-    };
+    return isProcessing
+        ? null
+        : () async {
+            setState(() => isProcessing = true);
+            await action();
+            setState(() => isProcessing = false);
+          };
   }
 
   @override
   Widget build(BuildContext context) {
-    var color = Theme.of(context).colorScheme.outline;
-    var primary = Theme.of(context).colorScheme.primary;
+    final ThemeData t = Theme.of(context);
+    final Color color = t.colorScheme.outline;
+    final Color primary = t.colorScheme.primary;
     return SizedBox(
       height: 32,
       child: TextButton(
@@ -79,12 +83,14 @@ class _ZanButtonState extends State<ZanButton> {
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(scale: animation, child: child);
               },
-              child: Text(widget.replyItem!.like.toString(),
-                  key: ValueKey<int>(widget.replyItem!.like!),
-                  style: TextStyle(
-                      color: widget.replyItem!.action == 1 ? primary : color,
-                      fontSize:
-                          Theme.of(context).textTheme.labelSmall!.fontSize)),
+              child: Text(
+                widget.replyItem!.like.toString(),
+                key: ValueKey<int>(widget.replyItem!.like!),
+                style: TextStyle(
+                  color: widget.replyItem!.action == 1 ? primary : color,
+                  fontSize: t.textTheme.labelSmall!.fontSize,
+                ),
+              ),
             ),
           ],
         ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
-import 'package:pilipala/pages/favDetail/widget/fav_video_card.dart';
+import 'package:pilipala/pages/fav_detail/widget/fav_video_card.dart';
 
 import 'controller.dart';
 

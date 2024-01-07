@@ -1,7 +1,7 @@
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/models/live/room_info.dart';
+import '../models/live/item.dart';
+import '../models/live/room_info.dart';
+import 'api.dart';
+import 'init.dart';
 
 class LiveHttp {
   static Future liveList(

@@ -12,16 +12,16 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/github/latest.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../http/index.dart';
+import '../models/github/latest.dart';
 
 class Utils {
   static Future<String> getCookiePath() async {
-    Directory tempDir = await getApplicationSupportDirectory();
-    String tempPath = "${tempDir.path}/.plpl/";
-    Directory dir = Directory(tempPath);
-    bool b = await dir.exists();
+    final Directory tempDir = await getApplicationSupportDirectory();
+    final String tempPath = "${tempDir.path}/.plpl/";
+    final Directory dir = Directory(tempPath);
+    final bool b = await dir.exists();
     if (!b) {
       dir.createSync(recursive: true);
     }
@@ -29,7 +29,7 @@ class Utils {
   }
 
   static String numFormat(int number) {
-    String res = (number / 10000).toString();
+    final String res = (number / 10000).toString();
     if (int.parse(res.split('.')[0]) >= 1) {
       return '${(number / 10000).toPrecision(1)}万';
     } else {
@@ -43,16 +43,16 @@ class Utils {
       return time;
     }
     if (time < 3600) {
-      int minute = time ~/ 60;
-      double res = time / 60;
+      final int minute = time ~/ 60;
+      final double res = time / 60;
       if (minute != res) {
         return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
       } else {
         return '$minute:00';
       }
     } else {
-      int hour = time ~/ 3600;
-      String hourStr = hour < 10 ? '0$hour' : hour.toString();
+      final int hour = time ~/ 3600;
+      final String hourStr = hour < 10 ? '0$hour' : hour.toString();
       var a = timeFormat(time - hour * 3600);
       return '$hourStr:$a';
     }

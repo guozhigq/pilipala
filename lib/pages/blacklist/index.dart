@@ -70,7 +70,7 @@ class _BlackListPageState extends State<BlackListPage> {
         onRefresh: () async => await _blackListController.queryBlacklist(),
         child: FutureBuilder(
           future: _futureBuilderFuture,
-          builder: (context, snapshot) {
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               var data = snapshot.data;
               if (data['status']) {

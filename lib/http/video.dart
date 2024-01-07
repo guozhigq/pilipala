@@ -1,19 +1,18 @@
 import 'dart:developer';
-
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/common/reply_type.dart';
-import 'package:pilipala/models/home/rcmd/result.dart';
-import 'package:pilipala/models/model_hot_video_item.dart';
-import 'package:pilipala/models/model_rec_video_item.dart';
-import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/models/video/ai.dart';
-import 'package:pilipala/models/video/play/url.dart';
-import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../common/constants.dart';
+import '../models/common/reply_type.dart';
+import '../models/home/rcmd/result.dart';
+import '../models/model_hot_video_item.dart';
+import '../models/model_rec_video_item.dart';
+import '../models/user/fav_folder.dart';
+import '../models/video/ai.dart';
+import '../models/video/play/url.dart';
+import '../models/video_detail_res.dart';
+import '../utils/storage.dart';
+import '../utils/wbi_sign.dart';
+import 'api.dart';
+import 'init.dart';
 
 /// res.data['code'] == 0 请求正常返回结果
 /// res.data['data'] 为结果

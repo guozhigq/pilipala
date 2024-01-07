@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -26,7 +24,7 @@ import 'widgets/page.dart';
 import 'widgets/season.dart';
 
 class VideoIntroPanel extends StatefulWidget {
-  const VideoIntroPanel({Key? key}) : super(key: key);
+  const VideoIntroPanel({super.key});
 
   @override
   State<VideoIntroPanel> createState() => _VideoIntroPanelState();
@@ -124,8 +122,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final VideoDetailController videoDetailCtr;
   late final Map<dynamic, dynamic> videoItem;
 
-  Box localCache = GStrorage.localCache;
-  Box setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> setting = GStrorage.setting;
   late double sheetHeight;
 
   late final bool loadingStatus; // 加载状态
@@ -138,12 +136,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late bool enableAi;
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
-    return isProcessing ? null : () async {
-      setState(() => isProcessing = true);
-      await action();
-      setState(() => isProcessing = false);
-    };
+    return isProcessing
+        ? null
+        : () async {
+            setState(() => isProcessing = true);
+            await action();
+            setState(() => isProcessing = false);
+          };
   }
+
   @override
   void initState() {
     super.initState();
@@ -168,7 +169,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    bool enableDragQuickFav =
+    final bool enableDragQuickFav =
         setting.get(SettingBoxKey.enableQuickFav, defaultValue: false);
     // 快速收藏 &
     // 点按 收藏至默认文件夹
@@ -182,7 +183,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             context: context,
             useRootNavigator: true,
             isScrollControlled: true,
-            builder: (context) {
+            builder: (BuildContext context) {
               return FavPanel(ctr: videoIntroController);
             },
           );
@@ -192,7 +193,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           context: context,
           useRootNavigator: true,
           isScrollControlled: true,
-          builder: (context) {
+          builder: (BuildContext context) {
             return FavPanel(ctr: videoIntroController);
           },
         );
@@ -202,7 +203,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         context: context,
         useRootNavigator: true,
         isScrollControlled: true,
-        builder: (context) {
+        builder: (BuildContext context) {
           return FavPanel(ctr: videoIntroController);
         },
       );
@@ -251,8 +252,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData t = Theme.of(context);
-    Color outline = t.colorScheme.outline;
+    final ThemeData t = Theme.of(context);
+    final Color outline = t.colorScheme.outline;
     return SliverPadding(
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
@@ -333,7 +334,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                           top: 6,
                           child: GestureDetector(
                             onTap: () async {
-                              var res =
+                              final res =
                                   await videoIntroController.aiConclusion();
                               if (res['status']) {
                                 showAiBottomSheet();
@@ -472,13 +473,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       return Container(
         margin: const EdgeInsets.only(top: 6, bottom: 4),
         height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
           primary: false,
-          padding: const EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           crossAxisCount: 5,
           childAspectRatio: 1.25,
           children: <Widget>[
@@ -543,7 +545,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionRow(BuildContext context, videoIntroController, videoDetailCtr) {
-    return Row(children: [
+    return Row(children: <Widget>[
       Obx(
         () => ActionRowItem(
           icon: const Icon(FontAwesomeIcons.thumbsUp),

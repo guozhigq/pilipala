@@ -8,7 +8,7 @@ import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'controller.dart';
@@ -107,7 +107,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   // 展示二级回复
   void replyReply(replyItem) {
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
       videoDetailCtr.oid = replyItem.oid;
@@ -193,7 +193,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               ),
               FutureBuilder(
                 future: _futureBuilderFuture,
-                builder: (context, snapshot) {
+                builder: (BuildContext context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
                     if (data['status']) {
@@ -203,13 +203,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                 _videoReplyController.replyList.isEmpty
                             ? SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                    (context, index) {
+                                    (BuildContext context, index) {
                                   return const VideoReplySkeleton();
                                 }, childCount: 5),
                               )
                             : SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
+                                  (BuildContext context, index) {
                                     double bottom =
                                         MediaQuery.of(context).padding.bottom;
                                     if (index ==
@@ -262,7 +262,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   } else {
                     // 骨架屏
                     return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
+                      delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, index) {
                         return const VideoReplySkeleton();
                       }, childCount: 5),
                     );
@@ -318,11 +319,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 }
 
 class _MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _MySliverPersistentHeaderDelegate({required this.child});
   final double _minExtent = 45;
   final double _maxExtent = 45;
   final Widget child;
-
-  _MySliverPersistentHeaderDelegate({required this.child});
 
   @override
   Widget build(

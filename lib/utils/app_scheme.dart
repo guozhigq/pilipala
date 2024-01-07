@@ -2,15 +2,14 @@ import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/common/search_type.dart';
-
+import '../http/search.dart';
+import '../models/common/search_type.dart';
 import 'id_utils.dart';
 import 'utils.dart';
 
 class PiliSchame {
-  static AppScheme appScheme = AppSchemeImpl.getInstance() as AppScheme;
-  static void init() async {
+  static AppScheme appScheme = AppSchemeImpl.getInstance()!;
+  static Future<void> init() async {
     ///
     final SchemeEntity? value = await appScheme.getInitScheme();
     if (value != null) {
@@ -18,14 +17,14 @@ class PiliSchame {
     }
 
     /// 完整链接进入 b23.无效
-    appScheme.getLatestScheme().then((value) {
+    appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
         _fullPathPush(value);
       }
     });
 
     /// 注册从外部打开的Scheme监听信息 #
-    appScheme.registerSchemeListener().listen((event) {
+    appScheme.registerSchemeListener().listen((SchemeEntity? event) {
       if (event != null) {
         _routePush(event);
       }
@@ -41,15 +40,16 @@ class PiliSchame {
     if (scheme == 'bilibili') {
       // bilibili://root
       if (host == 'root') {
-        Navigator.popUntil(Get.context!, (route) => route.isFirst);
+        Navigator.popUntil(
+            Get.context!, (Route<dynamic> route) => route.isFirst);
       }
 
       // bilibili://space/{uid}
       else if (host == 'space') {
-        var mid = path.split('/').last;
-        Get.toNamed(
+        final String mid = path.split('/').last;
+        Get.toNamed<dynamic>(
           '/member?mid=$mid',
-          arguments: {'face': null},
+          arguments: <String, dynamic>{'face': null},
         );
       }
 
@@ -72,15 +72,15 @@ class PiliSchame {
 
       // bilibili://live/{roomid}
       else if (host == 'live') {
-        var roomId = path.split('/').last;
-        Get.toNamed('/liveRoom?roomid=$roomId',
-            arguments: {'liveItem': null, 'heroTag': roomId.toString()});
+        final String roomId = path.split('/').last;
+        Get.toNamed<dynamic>('/liveRoom?roomid=$roomId',
+            arguments: <String, String?>{'liveItem': null, 'heroTag': roomId});
       }
 
       // bilibili://bangumi/season/${ssid}
       else if (host == 'bangumi') {
         if (path.startsWith('/season')) {
-          var seasonId = path.split('/').last;
+          final String seasonId = path.split('/').last;
           _bangumiPush(int.parse(seasonId));
         }
       }
@@ -104,8 +104,8 @@ class PiliSchame {
   }
 
   // 投稿跳转
-  static void _videoPush(int? aidVal, String? bvidVal) async {
-    SmartDialog.showLoading(msg: '获取中...');
+  static Future<void> _videoPush(int? aidVal, String? bvidVal) async {
+    SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       int? aid = aidVal;
       String? bvid = bvidVal;
@@ -115,22 +115,24 @@ class PiliSchame {
       if (bvidVal == null) {
         bvid = IdUtils.av2bv(aidVal!);
       }
-      int cid = await SearchHttp.ab2c(bvid: bvidVal, aid: aidVal);
-      String heroTag = Utils.makeHeroTag(aid);
-      SmartDialog.dismiss().then(
-        (e) => Get.toNamed('/video?bvid=$bvid&cid=$cid', arguments: {
-          'pic': null,
-          'heroTag': heroTag,
-        }),
+      final int cid = await SearchHttp.ab2c(bvid: bvidVal, aid: aidVal);
+      final String heroTag = Utils.makeHeroTag(aid);
+      SmartDialog.dismiss<dynamic>().then(
+        // ignore: always_specify_types
+        (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+            arguments: <String, String?>{
+              'pic': null,
+              'heroTag': heroTag,
+            }),
       );
     } catch (e) {
-      SmartDialog.showToast('video获取失败：${e.toString()}');
+      SmartDialog.showToast('video获取失败: $e');
     }
   }
 
   // 番剧跳转
-  static void _bangumiPush(int seasonId) async {
-    SmartDialog.showLoading(msg: '获取中...');
+  static Future<void> _bangumiPush(int seasonId) async {
+    SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: null);
       if (result['status']) {
@@ -142,7 +144,7 @@ class PiliSchame {
         SmartDialog.dismiss().then(
           (e) => Get.toNamed(
             '/video?bvid=$bvid&cid=$cid&epId=$epId',
-            arguments: {
+            arguments: <String, dynamic>{
               'pic': bangumiDetail.cover,
               'heroTag': heroTag,
               'videoType': SearchType.media_bangumi,
@@ -151,14 +153,14 @@ class PiliSchame {
         );
       }
     } catch (e) {
-      SmartDialog.showToast('番剧获取失败：${e.toString()}');
+      SmartDialog.showToast('番剧获取失败：$e');
     }
   }
 
-  static void _fullPathPush(value) async {
+  static Future<void> _fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
-    final String scheme = value.scheme!;
+    // final String scheme = value.scheme!;
     final String host = value.host!;
     final String? path = value.path;
     // Map<String, String> query = value.query!;
@@ -173,6 +175,7 @@ class PiliSchame {
       print('个人空间');
       return;
     }
+
     if (path != null) {
       final String area = path.split('/')[1];
       switch (area) {
@@ -183,11 +186,11 @@ class PiliSchame {
           break;
         case 'video':
           // print('投稿');
-          Map map = IdUtils.matchAvorBv(input: path);
+          final Map<String, dynamic> map = IdUtils.matchAvorBv(input: path);
           if (map.containsKey('AV')) {
-            _videoPush(map['AV'], null);
+            _videoPush(map['AV']! as int, null);
           } else if (map.containsKey('BV')) {
-            _videoPush(null, map['BV']);
+            _videoPush(null, map['BV'] as String);
           } else {
             SmartDialog.showToast('投稿匹配失败');
           }
