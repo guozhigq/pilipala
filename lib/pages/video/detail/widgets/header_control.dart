@@ -239,7 +239,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
                           widget.controller!.danmakuController!.addItems([
                             DanmakuItem(
-                              msg,
+                              "☞$msg",
                               color: Colors.white,
                               time: widget
                                   .controller!.position.value.inMilliseconds,
@@ -780,14 +780,16 @@ class _HeaderControlState extends State<HeaderControl> {
                         label: danmakuDurationVal.toString(),
                         onChanged: (double val) {
                           danmakuDurationVal = val;
-                          widget.controller!.danmakuDurationVal = danmakuDurationVal;
+                          widget.controller!.danmakuDurationVal =
+                              danmakuDurationVal;
                           setState(() {});
                           try {
                             DanmakuOption currentOption =
                                 danmakuController.option;
                             DanmakuOption updatedOption =
-                                currentOption.copyWith(duration:
-                                  val/widget.controller!.playbackSpeed);
+                                currentOption.copyWith(
+                                    duration:
+                                        val / widget.controller!.playbackSpeed);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
@@ -882,16 +884,19 @@ class _HeaderControlState extends State<HeaderControl> {
               color: Colors.white,
             ),
             fuc: () => {
-              if (widget.controller!.isFullScreen.value){
-                widget.controller!.triggerFullScreen(status: false)
-              } else {
-                if (MediaQuery.of(context).orientation == Orientation.landscape){
-                  SystemChrome.setPreferredOrientations([
-                    DeviceOrientation.portraitUp,
-                  ])
-                },
-                Get.back()
-              }
+              if (widget.controller!.isFullScreen.value)
+                {widget.controller!.triggerFullScreen(status: false)}
+              else
+                {
+                  if (MediaQuery.of(context).orientation ==
+                      Orientation.landscape)
+                    {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                      ])
+                    },
+                  Get.back()
+                }
             },
           ),
           SizedBox(width: buttonSpace),

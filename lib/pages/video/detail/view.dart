@@ -306,9 +306,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   Obx(() => SliverAppBar(
                       automaticallyImplyLeading: false,
                       // 假装使用一个非空变量，避免Obx检测不到而罢工
-                      pinned: videoDetailController
-                          .autoPlay.value ^ false ^ videoDetailController
-                          .autoPlay.value,
+                      pinned: videoDetailController.autoPlay.value ^
+                          false ^
+                          videoDetailController.autoPlay.value,
                       elevation: 0,
                       scrolledUnderElevation: 0,
                       forceElevated: innerBoxIsScrolled,
@@ -389,12 +389,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           top: 0,
                                           left: 0,
                                           right: 0,
-                                          child: NetworkImgLayer(
-                                            type: 'emote',
-                                            src: videoDetailController
-                                                .videoItem['pic'],
-                                            width: maxWidth,
-                                            height: maxHeight,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              handlePlay();
+                                            },
+                                            child: NetworkImgLayer(
+                                              type: 'emote',
+                                              src: videoDetailController
+                                                  .videoItem['pic'],
+                                              width: maxWidth,
+                                              height: maxHeight,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -444,13 +449,24 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 bottom: 10,
                                                 child: TextButton.icon(
                                                   style: ButtonStyle(
+                                                    side: MaterialStateProperty
+                                                        .resolveWith(
+                                                            (states) {
+                                                      return BorderSide(
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .primary
+                                                              .withOpacity(0.5),
+                                                          width: 1);
+                                                    }),
                                                     backgroundColor:
                                                         MaterialStateProperty
                                                             .resolveWith(
                                                                 (states) {
                                                       return Theme.of(context)
                                                           .colorScheme
-                                                          .primaryContainer;
+                                                          .background
+                                                          .withOpacity(0.6);
                                                     }),
                                                   ),
                                                   onPressed: () => handlePlay(),
@@ -458,7 +474,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                     Icons.play_circle_outline,
                                                     size: 20,
                                                   ),
-                                                  label: const Text('Play'),
+                                                  label: const Text('轻触封面播放'),
                                                 ),
                                               ),
                                             ],
