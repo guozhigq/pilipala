@@ -51,12 +51,11 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
     cid = widget.cid!;
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
-    bangumiIntroController.bangumiDetail.listen((value) {
+    bangumiIntroController.bangumiDetail.listen((BangumiInfoModel value) {
       bangumiDetail = value;
     });
     _futureBuilderFuture = bangumiIntroController.queryBangumiIntro();
-    videoDetailCtr.cid.listen((p0) {
-      print('🐶🐶$p0');
+    videoDetailCtr.cid.listen((int p0) {
       cid = p0;
       setState(() {});
     });
@@ -67,7 +66,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
     super.build(context);
     return FutureBuilder(
       future: _futureBuilderFuture,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data['status']) {
             // 请求成功
@@ -83,7 +82,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
             //   errMsg: snapshot.data['msg'],
             //   fn: () => Get.back(),
             // );
-            return SizedBox();
+            return const SizedBox();
           }
         } else {
           return BangumiInfo(
@@ -98,16 +97,16 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
 }
 
 class BangumiInfo extends StatefulWidget {
-  final bool loadingStatus;
-  final BangumiInfoModel? bangumiDetail;
-  final int? cid;
-
   const BangumiInfo({
-    Key? key,
+    super.key,
     this.loadingStatus = false,
     this.bangumiDetail,
     this.cid,
-  }) : super(key: key);
+  });
+
+  final bool loadingStatus;
+  final BangumiInfoModel? bangumiDetail;
+  final int? cid;
 
   @override
   State<BangumiInfo> createState() => _BangumiInfoState();
@@ -123,12 +122,15 @@ class _BangumiInfoState extends State<BangumiInfo> {
   int? cid;
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
-    return isProcessing ? null : () async {
-      setState(() => isProcessing = true);
-      await action();
-      setState(() => isProcessing = false);
-    };
+    return isProcessing
+        ? null
+        : () async {
+            setState(() => isProcessing = true);
+            await action();
+            setState(() => isProcessing = false);
+          };
   }
+
   @override
   void initState() {
     super.initState();
@@ -155,7 +157,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
-      builder: (context) {
+      builder: (BuildContext context) {
         return FavPanel(ctr: bangumiIntroController);
       },
     );
@@ -175,7 +177,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData t = Theme.of(context);
+    final ThemeData t = Theme.of(context);
     return SliverPadding(
       padding: const EdgeInsets.only(
           left: StyleString.safeSpace, right: StyleString.safeSpace, top: 20),
@@ -185,7 +187,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Stack(
@@ -244,7 +245,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                                               EdgeInsets.zero),
                                           backgroundColor:
                                               MaterialStateProperty.resolveWith(
-                                                  (states) {
+                                                  (Set<MaterialState> states) {
                                             return t
                                                 .colorScheme.primaryContainer
                                                 .withOpacity(0.7);
@@ -386,7 +387,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
   }
 
   Widget actionGrid(BuildContext context, bangumiIntroController) {
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       return Material(
         child: Padding(
           padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -394,7 +396,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
             height: constraints.maxWidth / 5 * 0.8,
             child: GridView.count(
               primary: false,
-              padding: const EdgeInsets.all(0),
+              padding: EdgeInsets.zero,
               crossAxisCount: 5,
               childAspectRatio: 1.25,
               children: <Widget>[
@@ -402,7 +404,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.thumbsUp),
                       selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
-                      onTap: handleState(bangumiIntroController.actionLikeVideo),
+                      onTap:
+                          handleState(bangumiIntroController.actionLikeVideo),
                       selectStatus: bangumiIntroController.hasLike.value,
                       loadingStatus: false,
                       text: !widget.loadingStatus
@@ -413,7 +416,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                   () => ActionItem(
                       icon: const Icon(FontAwesomeIcons.b),
                       selectIcon: const Icon(FontAwesomeIcons.b),
-                      onTap: handleState(bangumiIntroController.actionCoinVideo),
+                      onTap:
+                          handleState(bangumiIntroController.actionCoinVideo),
                       selectStatus: bangumiIntroController.hasCoin.value,
                       loadingStatus: false,
                       text: !widget.loadingStatus

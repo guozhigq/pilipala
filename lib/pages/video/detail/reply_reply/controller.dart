@@ -31,14 +31,14 @@ class VideoReplyReplyController extends GetxController {
       currentPage = 0;
     }
     isLoadingMore = true;
-    var res = await ReplyHttp.replyReplyList(
+    final res = await ReplyHttp.replyReplyList(
       oid: aid!,
       root: rpid!,
       pageNum: currentPage + 1,
       type: replyType.index,
     );
     if (res['status']) {
-      List<ReplyItemModel> replies = res['data'].replies;
+      final List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
         noMore.value = '加载中...';
         if (replyList.length == res['data'].page.count) {

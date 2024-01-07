@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/bangumi/info.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/models/search/hot.dart';
-import 'package:pilipala/models/search/result.dart';
-import 'package:pilipala/models/search/suggest.dart';
-import 'package:pilipala/utils/storage.dart';
+import '../models/bangumi/info.dart';
+import '../models/common/search_type.dart';
+import '../models/search/hot.dart';
+import '../models/search/result.dart';
+import '../models/search/suggest.dart';
+import '../utils/storage.dart';
+import 'index.dart';
 
 class SearchHttp {
   static Box setting = GStrorage.setting;
@@ -129,25 +128,28 @@ class SearchHttp {
     }
   }
 
-  static Future ab2c({int? aid, String? bvid}) async {
+  static Future<int> ab2c({int? aid, String? bvid}) async {
     Map<String, dynamic> data = {};
     if (aid != null) {
       data['aid'] = aid;
     } else if (bvid != null) {
       data['bvid'] = bvid;
     }
-    var res = await Request().get(Api.ab2c, data: {...data});
+    final dynamic res =
+        await Request().get(Api.ab2c, data: <String, dynamic>{...data});
     return res.data['data'].first['cid'];
   }
 
-  static Future bangumiInfo({int? seasonId, int? epId}) async {
-    Map<String, dynamic> data = {};
+  static Future<Map<String, dynamic>> bangumiInfo(
+      {int? seasonId, int? epId}) async {
+    final Map<String, dynamic> data = {};
     if (seasonId != null) {
       data['season_id'] = seasonId;
     } else if (epId != null) {
       data['ep_id'] = epId;
     }
-    var res = await Request().get(Api.bangumiInfo, data: {...data});
+    final dynamic res =
+        await Request().get(Api.bangumiInfo, data: <String, dynamic>{...data});
     if (res.data['code'] == 0) {
       return {
         'status': true,

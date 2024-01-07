@@ -389,7 +389,7 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    int currentStatus = followStatus['attribute'];
+    final int currentStatus = followStatus['attribute'];
     int actionStatus = 0;
     switch (currentStatus) {
       case 0:
@@ -467,7 +467,7 @@ class VideoIntroController extends GetxController {
   // 修改分P或番剧分集
   Future changeSeasonOrbangu(bvid, cid, aid) async {
     // 重新获取视频资源
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid.value = cid;
@@ -476,7 +476,7 @@ class VideoIntroController extends GetxController {
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
-      VideoReplyController videoReplyCtr =
+      final VideoReplyController videoReplyCtr =
           Get.find<VideoReplyController>(tag: heroTag);
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
@@ -517,29 +517,27 @@ class VideoIntroController extends GetxController {
 
   /// 列表循环或者顺序播放时，自动播放下一个
   void nextPlay() {
-    late List episodes;
+    final List episodes = [];
     bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
-      UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
-      List<SectionItem> sections = ugcSeason.sections!;
-      episodes = [];
-
+      final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
-        List<EpisodeItem> episodesList = sections[i].episodes!;
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
     } else if (videoDetail.value.pages != null) {
       isPages = true;
-      List<Part> pages = videoDetail.value.pages!;
-      episodes = [];
+      final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
 
-    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    final int currentIndex =
+        episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
 
     // 列表循环
     if (nextIndex >= episodes.length) {
@@ -550,9 +548,9 @@ class VideoIntroController extends GetxController {
         return;
       }
     }
-    int cid = episodes[nextIndex].cid!;
-    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
-    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    final int cid = episodes[nextIndex].cid!;
+    final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
   }
 
@@ -567,7 +565,7 @@ class VideoIntroController extends GetxController {
   // ai总结
   Future aiConclusion() async {
     SmartDialog.showLoading(msg: '正在生产ai总结');
-    var res = await VideoHttp.aiConclusion(
+    final res = await VideoHttp.aiConclusion(
       bvid: bvid,
       cid: lastPlayCid.value,
       upMid: videoDetail.value.owner!.mid!,

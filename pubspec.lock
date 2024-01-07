@@ -893,6 +893,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
+  nil:
+    dependency: "direct main"
+    description:
+      name: nil
+      sha256: ef05770c48942876d843bf6a4822d35e5da0ff893a61f1d5ad96d15c4a659136
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.1"
   nm:
     dependency: transitive
     description:

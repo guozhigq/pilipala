@@ -17,8 +17,8 @@ class PullToRefreshHeader extends StatelessWidget {
     this.info,
     this.lastRefreshTime, {
     this.color,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final PullToRefreshScrollNotificationInfo? info;
   final DateTime? lastRefreshTime;
@@ -28,7 +28,7 @@ class PullToRefreshHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final PullToRefreshScrollNotificationInfo? infos = info;
     if (infos == null) {
-      return Container();
+      return const SizedBox();
     }
     String text = '';
     if (infos.mode == PullToRefreshIndicatorMode.armed) {
@@ -65,7 +65,6 @@ class PullToRefreshHeader extends StatelessWidget {
             top: top,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Expanded(
                   child: Container(

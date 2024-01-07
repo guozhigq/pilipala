@@ -1,6 +1,6 @@
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/video/reply/data.dart';
+import '../models/video/reply/data.dart';
+import 'api.dart';
+import 'init.dart';
 
 class ReplyHttp {
   static Future replyList({

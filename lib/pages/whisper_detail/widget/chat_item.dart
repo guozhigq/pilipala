@@ -15,11 +15,12 @@ class ChatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isOwner = item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
+    bool isOwner =
+        item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
     bool isPic = item.msgType == 2; // 图片
     bool isText = item.msgType == 1; // 文本
-    bool isAchive = item.msgType == 11; // 投稿
-    bool isArticle = item.msgType == 12; // 专栏
+    // bool isAchive = item.msgType == 11; // 投稿
+    // bool isArticle = item.msgType == 12; // 专栏
     bool isRevoke = item.msgType == 5; // 撤回消息
 
     bool isSystem =

@@ -1,8 +1,8 @@
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/msg/account.dart';
-import 'package:pilipala/models/msg/session.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../models/msg/account.dart';
+import '../models/msg/session.dart';
+import '../utils/wbi_sign.dart';
+import 'api.dart';
+import 'init.dart';
 
 class MsgHttp {
   // 会话列表

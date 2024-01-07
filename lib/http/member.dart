@@ -1,17 +1,17 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/models/follow/result.dart';
-import 'package:pilipala/models/member/archive.dart';
-import 'package:pilipala/models/member/coin.dart';
-import 'package:pilipala/models/member/info.dart';
-import 'package:pilipala/models/member/seasons.dart';
-import 'package:pilipala/models/member/tags.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../common/constants.dart';
+import '../models/dynamics/result.dart';
+import '../models/follow/result.dart';
+import '../models/member/archive.dart';
+import '../models/member/coin.dart';
+import '../models/member/info.dart';
+import '../models/member/seasons.dart';
+import '../models/member/tags.dart';
+import '../utils/storage.dart';
+import '../utils/utils.dart';
+import '../utils/wbi_sign.dart';
+import 'index.dart';
 
 class MemberHttp {
   static Future memberInfo({

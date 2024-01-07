@@ -1,4 +1,6 @@
 // import 'package:hive/hive.dart';
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/models/home/rcmd/result.dart';
@@ -7,36 +9,36 @@ import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
 class GStrorage {
-  static late final Box recVideo;
-  static late final Box userInfo;
-  static late final Box historyword;
-  static late final Box localCache;
-  static late final Box setting;
-  static late final Box video;
+  static late final Box<dynamic> recVideo;
+  static late final Box<dynamic> userInfo;
+  static late final Box<dynamic> historyword;
+  static late final Box<dynamic> localCache;
+  static late final Box<dynamic> setting;
+  static late final Box<dynamic> video;
 
   static Future<void> init() async {
-    final dir = await getApplicationSupportDirectory();
-    final path = dir.path;
+    final Directory dir = await getApplicationSupportDirectory();
+    final String path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
     // 首页推荐视频
     recVideo = await Hive.openBox(
       'recVideo',
-      compactionStrategy: (entries, deletedEntries) {
+      compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 12;
       },
     );
     // 登录用户信息
     userInfo = await Hive.openBox(
       'userInfo',
-      compactionStrategy: (entries, deletedEntries) {
+      compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 2;
       },
     );
     // 本地缓存
     localCache = await Hive.openBox(
       'localCache',
-      compactionStrategy: (entries, deletedEntries) {
+      compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 4;
       },
     );
@@ -45,13 +47,13 @@ class GStrorage {
     // 搜索历史
     historyword = await Hive.openBox(
       'historyWord',
-      compactionStrategy: (entries, deletedEntries) {
+      compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 10;
       },
     );
   }
 
-  static regAdapter() {
+  static void regAdapter() {
     Hive.registerAdapter(RecVideoItemAppModelAdapter());
     Hive.registerAdapter(RcmdReasonAdapter());
     Hive.registerAdapter(RcmdStatAdapter());
@@ -88,7 +90,7 @@ class GStrorage {
 
 class SettingBoxKey {
   /// 播放器
-  static const btmProgressBehavior = 'btmProgressBehavior',
+  static const String btmProgressBehavior = 'btmProgressBehavior',
       defaultVideoSpeed = 'defaultVideoSpeed',
       autoUpgradeEnable = 'autoUpgradeEnable',
       feedBackEnable = 'feedBackEnable',

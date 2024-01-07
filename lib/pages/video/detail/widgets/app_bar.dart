@@ -16,7 +16,7 @@ class ScrollAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
-    final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
+    final videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
     return Positioned(
       top: -videoHeight + scrollVal + kToolbarHeight + 0.5,
       left: 0,

@@ -20,7 +20,7 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color outline = Theme.of(context).colorScheme.outline;
+    final Color outline = Theme.of(context).colorScheme.outline;
     TextStyle subTitleStyle =
         TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.outline);
     return Scaffold(
@@ -29,7 +29,6 @@ class _AboutPageState extends State<AboutPage> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
               'assets/images/logo/logo_android_2.png',
@@ -47,7 +46,7 @@ class _AboutPageState extends State<AboutPage> {
             const SizedBox(height: 20),
             Obx(
               () => ListTile(
-                title: const Text("当前版本"),
+                title: const Text('当前版本'),
                 trailing: Text(_aboutController.currentVersion.value,
                     style: subTitleStyle),
               ),

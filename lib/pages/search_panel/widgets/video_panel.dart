@@ -3,7 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/pages/searchPanel/index.dart';
+import 'package:pilipala/pages/search_panel/index.dart';
 
 class SearchVideoPanel extends StatelessWidget {
   SearchVideoPanel({

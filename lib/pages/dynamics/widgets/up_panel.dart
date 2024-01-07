@@ -139,7 +139,7 @@ class _UpPanelState extends State<UpPanel> {
           int liveLen = liveList.length;
           int upLen = upList.length;
           double itemWidth = contentWidth + itemPadding.horizontal;
-          double screenWidth = MediaQuery.of(context).size.width;
+          double screenWidth = MediaQuery.sizeOf(context).width;
           double moveDistance = 0.0;
           if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
           } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {

@@ -8,11 +8,6 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BangumiPanel extends StatefulWidget {
-  final List<EpisodeItem> pages;
-  final int? cid;
-  final double? sheetHeight;
-  final Function? changeFuc;
-
   const BangumiPanel({
     super.key,
     required this.pages,
@@ -20,6 +15,11 @@ class BangumiPanel extends StatefulWidget {
     this.sheetHeight,
     this.changeFuc,
   });
+
+  final List<EpisodeItem> pages;
+  final int? cid;
+  final double? sheetHeight;
+  final Function? changeFuc;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -50,10 +50,10 @@ class _BangumiPanelState extends State<BangumiPanel> {
     }
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
 
-    videoDetailCtr.cid.listen((p0) {
+    videoDetailCtr.cid.listen((int p0) {
       cid = p0;
       setState(() {});
-      currentIndex = widget.pages.indexWhere((e) => e.cid == cid);
+      currentIndex = widget.pages.indexWhere((EpisodeItem e) => e.cid == cid);
       scrollToIndex();
     });
   }
@@ -106,7 +106,8 @@ class _BangumiPanelState extends State<BangumiPanel> {
                     child: Material(
                       child: ScrollablePositionedList.builder(
                         itemCount: widget.pages.length,
-                        itemBuilder: (context, index) => ListTile(
+                        itemBuilder: (BuildContext context, int index) =>
+                            ListTile(
                           onTap: () {
                             setState(() {
                               changeFucCall(widget.pages[index], index);
@@ -212,78 +213,74 @@ class _BangumiPanelState extends State<BangumiPanel> {
         SizedBox(
           height: 60,
           child: ListView.builder(
-              controller: listViewScrollCtr,
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.pages.length,
-              itemExtent: 150,
-              itemBuilder: ((context, i) {
-                return Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Material(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    borderRadius: BorderRadius.circular(6),
-                    clipBehavior: Clip.hardEdge,
-                    child: InkWell(
-                      onTap: () => changeFucCall(widget.pages[i], i),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                if (i == currentIndex) ...[
-                                  Image.asset(
-                                    'assets/images/live.png',
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    height: 12,
-                                  ),
-                                  const SizedBox(width: 6)
-                                ],
-                                Text(
-                                  '第${i + 1}话',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: i == currentIndex
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
+            controller: listViewScrollCtr,
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.pages.length,
+            itemExtent: 150,
+            itemBuilder: (BuildContext context, int i) {
+              return Container(
+                width: 150,
+                margin: const EdgeInsets.only(right: 10),
+                child: Material(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  borderRadius: BorderRadius.circular(6),
+                  clipBehavior: Clip.hardEdge,
+                  child: InkWell(
+                    onTap: () => changeFucCall(widget.pages[i], i),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              if (i == currentIndex) ...<Widget>[
+                                Image.asset(
+                                  'assets/images/live.png',
+                                  color: Theme.of(context).colorScheme.primary,
+                                  height: 12,
                                 ),
-                                const SizedBox(width: 2),
-                                if (widget.pages[i].badge != null) ...[
-                                  Image.asset(
-                                    'assets/images/big-vip.png',
-                                    height: 16,
-                                  ),
-                                ],
+                                const SizedBox(width: 6)
                               ],
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              widget.pages[i].longTitle!,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: i == currentIndex
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
-                        ),
+                              Text(
+                                '第${i + 1}话',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: i == currentIndex
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                              ),
+                              const SizedBox(width: 2),
+                              if (widget.pages[i].badge != null) ...[
+                                Image.asset(
+                                  'assets/images/big-vip.png',
+                                  height: 16,
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            widget.pages[i].longTitle!,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: i == currentIndex
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurface),
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                );
-              })),
+                ),
+              );
+            },
+          ),
         )
       ],
     );

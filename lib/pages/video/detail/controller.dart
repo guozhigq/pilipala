@@ -12,7 +12,7 @@ import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/pages/video/detail/replyReply/index.dart';
+import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -92,7 +92,7 @@ class VideoDetailController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    Map argMap = Get.arguments;
+    final Map argMap = Get.arguments;
     userInfo = userInfoCache.get('userInfoCache');
     var keys = argMap.keys.toList();
     if (keys.isNotEmpty) {
@@ -188,8 +188,8 @@ class VideoDetailController extends GetxController
 
     /// 根据currentAudioQa 重新设置audioUrl
     if (currentAudioQa != null) {
-      AudioItem firstAudio = data.dash!.audio!.firstWhere(
-        (i) => i.id == currentAudioQa!.code,
+      final AudioItem firstAudio = data.dash!.audio!.firstWhere(
+        (AudioItem i) => i.id == currentAudioQa!.code,
         orElse: () => data.dash!.audio!.first,
       );
       audioUrl = firstAudio.baseUrl ?? '';
@@ -246,7 +246,7 @@ class VideoDetailController extends GetxController
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
-      List<VideoItem> allVideosList = data.dash!.video!;
+      final List<VideoItem> allVideosList = data.dash!.video!;
       try {
         // 当前可播放的最高质量视频
         int currentHighVideoQa = allVideosList.first.quality!.code;
@@ -255,7 +255,7 @@ class VideoDetailController extends GetxController
         int resVideoQa = currentHighVideoQa;
         if (cacheVideoQa! <= currentHighVideoQa) {
           // 如果预设的画质低于当前最高
-          List<int> numbers = data.acceptQuality!
+          final List<int> numbers = data.acceptQuality!
               .where((e) => e <= currentHighVideoQa)
               .toList();
           resVideoQa = Utils.findClosestNumber(cacheVideoQa!, numbers);
@@ -263,13 +263,13 @@ class VideoDetailController extends GetxController
         currentVideoQa = VideoQualityCode.fromCode(resVideoQa)!;
 
         /// 取出符合当前画质的videoList
-        List<VideoItem> videosList =
+        final List<VideoItem> videosList =
             allVideosList.where((e) => e.quality!.code == resVideoQa).toList();
 
         /// 优先顺序 设置中指定解码格式 -> 当前可选的首个解码格式
-        List<FormatItem> supportFormats = data.supportFormats!;
+        final List<FormatItem> supportFormats = data.supportFormats!;
         // 根据画质选编码格式
-        List supportDecodeFormats =
+        final List supportDecodeFormats =
             supportFormats.firstWhere((e) => e.quality == resVideoQa).codecs!;
         // 默认从设置中取AVC
         currentDecodeFormats = VideoDecodeFormatsCode.fromString(cacheDecode)!;
@@ -304,7 +304,7 @@ class VideoDetailController extends GetxController
 
       /// 优先顺序 设置中指定质量 -> 当前可选的最高质量
       late AudioItem? firstAudio;
-      List<AudioItem> audiosList = data.dash!.audio!;
+      final List<AudioItem> audiosList = data.dash!.audio!;
 
       try {
         if (data.dash!.dolby?.audio?.isNotEmpty == true) {
@@ -318,7 +318,7 @@ class VideoDetailController extends GetxController
         }
 
         if (audiosList.isNotEmpty) {
-          List<int> numbers = audiosList.map((map) => map.id!).toList();
+          final List<int> numbers = audiosList.map((map) => map.id!).toList();
           int closestNumber = Utils.findClosestNumber(cacheAudioQa, numbers);
           if (!numbers.contains(cacheAudioQa) &&
               numbers.any((e) => e > cacheAudioQa)) {

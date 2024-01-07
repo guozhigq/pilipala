@@ -1,5 +1,5 @@
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/bangumi/list.dart';
+import '../models/bangumi/list.dart';
+import 'index.dart';
 
 class BangumiHttp {
   static Future bangumiList({int? page}) async {

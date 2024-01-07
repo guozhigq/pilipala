@@ -1,5 +1,5 @@
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/follow/result.dart';
+import '../models/follow/result.dart';
+import 'index.dart';
 
 class FollowHttp {
   static Future followings(
