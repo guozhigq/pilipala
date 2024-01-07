@@ -6,7 +6,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
-import 'package:pilipala/http/member.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
@@ -53,9 +52,9 @@ class WebviewController extends GetxController {
             loadProgress.value = progress;
           },
           onPageStarted: (String url) {
-            String str = Uri.parse(url).pathSegments[0];
-            Map matchRes = IdUtils.matchAvorBv(input: str);
-            List matchKeys = matchRes.keys.toList();
+            final String str = Uri.parse(url).pathSegments[0];
+            final Map matchRes = IdUtils.matchAvorBv(input: str);
+            final List matchKeys = matchRes.keys.toList();
             if (matchKeys.isNotEmpty) {
               if (matchKeys.first == 'BV') {
                 Get.offAndToNamed(
@@ -102,21 +101,21 @@ class WebviewController extends GetxController {
     }
     try {
       await SetCookie.onSet();
-      var result = await UserHttp.userInfo();
+      final result = await UserHttp.userInfo();
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
         try {
           Box userInfoCache = GStrorage.userInfo;
           await userInfoCache.put('userInfoCache', result['data']);
 
-          HomeController homeCtr = Get.find<HomeController>();
+          final HomeController homeCtr = Get.find<HomeController>();
           homeCtr.updateLoginStatus(true);
           homeCtr.userFace.value = result['data'].face;
-          MediaController mediaCtr = Get.find<MediaController>();
+          final MediaController mediaCtr = Get.find<MediaController>();
           mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
         } catch (err) {
-          SmartDialog.show(builder: (context) {
+          SmartDialog.show(builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('登录遇到问题'),
               content: Text(err.toString()),

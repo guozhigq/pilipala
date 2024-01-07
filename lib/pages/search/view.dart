@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'controller.dart';
@@ -42,120 +41,62 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    return OpenContainer(
-      closedElevation: 0,
-      openElevation: 0,
-      onClosed: (_) => _searchController.onClear(),
-      openColor: Theme.of(context).colorScheme.background,
-      middleColor: Theme.of(context).colorScheme.background,
-      closedColor: Theme.of(context).colorScheme.background,
-      closedShape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(30.0))),
-      openShape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(30.0))),
-      closedBuilder: (BuildContext context, VoidCallback openContainer) {
-        return Container(
-          width: 250,
-          height: 44,
-          clipBehavior: Clip.hardEdge,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(25)),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        shape: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor.withOpacity(0.08),
+            width: 1,
           ),
-          child: Material(
-            color:
-                Theme.of(context).colorScheme.secondaryContainer.withAlpha(115),
-            child: InkWell(
-              splashColor: Theme.of(context)
-                  .colorScheme
-                  .primaryContainer
-                  .withOpacity(0.3),
-              onTap: openContainer,
-              child: Row(
-                children: [
-                  const SizedBox(width: 14),
-                  Icon(
-                    Icons.search_outlined,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Obx(
-                      () => Text(
-                        _searchController.defaultSearch.value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        ),
+        titleSpacing: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _searchController.submit(),
+            icon: const Icon(CupertinoIcons.search, size: 22),
           ),
-        );
-      },
-      openBuilder: (BuildContext context, VoidCallback _) {
-        return Scaffold(
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            shape: Border(
-              bottom: BorderSide(
-                color: Theme.of(context).dividerColor.withOpacity(0.08),
-                width: 1,
-              ),
-            ),
-            titleSpacing: 0,
-            actions: [
-              Hero(
-                tag: 'searchTag',
-                child: IconButton(
-                    onPressed: () => _searchController.submit(),
-                    icon: const Icon(CupertinoIcons.search, size: 22)),
-              ),
-              const SizedBox(width: 10)
-            ],
-            title: Obx(
-              () => TextField(
-                autofocus: true,
-                focusNode: _searchController.searchFocusNode,
-                controller: _searchController.controller.value,
-                textInputAction: TextInputAction.search,
-                onChanged: (value) => _searchController.onChange(value),
-                decoration: InputDecoration(
-                  hintText: _searchController.hintText,
-                  border: InputBorder.none,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      size: 22,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    onPressed: () => _searchController.onClear(),
-                  ),
+          const SizedBox(width: 10)
+        ],
+        title: Obx(
+          () => TextField(
+            autofocus: true,
+            focusNode: _searchController.searchFocusNode,
+            controller: _searchController.controller.value,
+            textInputAction: TextInputAction.search,
+            onChanged: (value) => _searchController.onChange(value),
+            decoration: InputDecoration(
+              hintText: _searchController.hintText,
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  size: 22,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
-                onSubmitted: (String value) => _searchController.submit(),
+                onPressed: () => _searchController.onClear(),
               ),
             ),
+            onSubmitted: (String value) => _searchController.submit(),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                // 搜索建议
-                _searchSuggest(),
-                // 热搜
-                Visibility(
-                    visible: _searchController.enableHotKey,
-                    child: hotSearch(_searchController)),
-                // 搜索历史
-                _history()
-              ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            // 搜索建议
+            _searchSuggest(),
+            // 热搜
+            Visibility(
+              visible: _searchController.enableHotKey,
+              child: hotSearch(_searchController),
             ),
-          ),
-        );
-      },
+            // 搜索历史
+            _history()
+          ],
+        ),
+      ),
     );
   }
 
@@ -299,25 +240,24 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   ],
                 ),
               ),
-            // if (_searchController.historyList.isNotEmpty)
-            Obx(() => Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  direction: Axis.horizontal,
-                  textDirection: TextDirection.ltr,
-                  children: [
-                    for (int i = 0;
-                        i < _searchController.historyList.length;
-                        i++)
-                      SearchText(
-                        searchText: _searchController.historyList[i],
-                        searchTextIdx: i,
-                        onSelect: (value) => _searchController.onSelect(value),
-                        onLongSelect: (value) =>
-                            _searchController.onLongSelect(value),
-                      )
-                  ],
-                )),
+            Obx(
+              () => Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                direction: Axis.horizontal,
+                textDirection: TextDirection.ltr,
+                children: [
+                  for (int i = 0; i < _searchController.historyList.length; i++)
+                    SearchText(
+                      searchText: _searchController.historyList[i],
+                      searchTextIdx: i,
+                      onSelect: (value) => _searchController.onSelect(value),
+                      onLongSelect: (value) =>
+                          _searchController.onLongSelect(value),
+                    )
+                ],
+              ),
+            ),
           ],
         ),
       ),

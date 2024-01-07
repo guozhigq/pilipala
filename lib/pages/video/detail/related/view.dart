@@ -7,13 +7,7 @@ import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import './controller.dart';
 
-class RelatedVideoPanel extends StatefulWidget {
-  const RelatedVideoPanel({super.key});
-  @override
-  State<RelatedVideoPanel> createState() => _RelatedVideoPanelState();
-}
-
-class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
+class RelatedVideoPanel extends StatelessWidget {
   final ReleatedController _releatedController =
       Get.put(ReleatedController(), tag: Get.arguments['heroTag']);
 
@@ -21,7 +15,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _releatedController.queryRelatedVideo(),
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) {
             return const SliverToBoxAdapter(child: SizedBox());
@@ -72,7 +66,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> {
 
   OverlayEntry _createPopupDialog(videoItem) {
     return OverlayEntry(
-      builder: (context) => AnimatedDialog(
+      builder: (BuildContext context) => AnimatedDialog(
         closeFn: _releatedController.popupDialog?.remove,
         child: OverlayPop(
             videoItem: videoItem,

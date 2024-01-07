@@ -41,7 +41,7 @@ class _MemberPageState extends State<MemberPage>
     _memberCoinsFuture = _memberController.getRecentCoinVideo();
     _extendNestCtr.addListener(
       () {
-        double offset = _extendNestCtr.position.pixels;
+        final double offset = _extendNestCtr.position.pixels;
         if (offset > 100) {
           appbarStream.add(true);
         } else {
@@ -67,7 +67,7 @@ class _MemberPageState extends State<MemberPage>
             title: StreamBuilder(
               stream: appbarStream.stream,
               initialData: false,
-              builder: (context, AsyncSnapshot snapshot) {
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
                   opacity: snapshot.data ? 1 : 0,
                   curve: Curves.easeOut,

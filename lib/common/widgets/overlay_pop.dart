@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/utils/download.dart';
+import '../../utils/download.dart';
+import '../constants.dart';
+import 'network_img_layer.dart';
 
 class OverlayPop extends StatelessWidget {
+  const OverlayPop({super.key, this.videoItem, this.closeFn});
+
   final dynamic videoItem;
   final Function? closeFn;
-  const OverlayPop({super.key, this.videoItem, this.closeFn});
 
   @override
   Widget build(BuildContext context) {
-    double imgWidth = MediaQuery.of(context).size.width - 8 * 2;
+    final double imgWidth = MediaQuery.sizeOf(context).width - 8 * 2;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -19,7 +20,6 @@ class OverlayPop extends StatelessWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
@@ -27,7 +27,7 @@ class OverlayPop extends StatelessWidget {
               NetworkImgLayer(
                 width: imgWidth,
                 height: imgWidth / StyleString.aspectRatio,
-                src: videoItem.pic!,
+                src: videoItem.pic! as String,
                 quality: 100,
               ),
               Positioned(
@@ -61,7 +61,7 @@ class OverlayPop extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      videoItem.title!,
+                      videoItem.title! as String,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -69,7 +69,10 @@ class OverlayPop extends StatelessWidget {
                     tooltip: '保存封面图',
                     onPressed: () async {
                       await DownloadUtils.downloadImg(
-                          videoItem.pic ?? videoItem.cover);
+                        videoItem.pic != null
+                            ? videoItem.pic as String
+                            : videoItem.cover as String,
+                      );
                       // closeFn!();
                     },
                     icon: const Icon(Icons.download, size: 20),

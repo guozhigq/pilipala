@@ -8,6 +8,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:nil/nil.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -47,16 +48,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   PlayerStatus playerStatus = PlayerStatus.playing;
   double doubleOffset = 0;
 
-  Box localCache = GStrorage.localCache;
-  Box setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> setting = GStrorage.setting;
   late double statusBarHeight;
-  final videoHeight = Get.size.width * 9 / 16;
+  final double videoHeight = Get.size.width * 9 / 16;
   late Future _futureBuilderFuture;
   // 自动退出全屏
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
   late bool autoPiP;
-  final floating = Floating();
+  final Floating floating = Floating();
   // 生命周期监听
   late final AppLifecycleListener _lifecycleListener;
 
@@ -105,7 +106,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStream = StreamController<double>();
     _extendNestCtr.addListener(
       () {
-        double offset = _extendNestCtr.position.pixels;
+        final double offset = _extendNestCtr.position.pixels;
         appbarStream.add(offset);
       },
     );
@@ -202,7 +203,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 离开当前页面时
   void didPushNext() async {
     /// 开启
-    if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)) {
+    if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
+        as bool) {
       videoDetailController.brightness = plPlayerController!.brightness.value;
     }
     if (plPlayerController != null) {
@@ -218,7 +220,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 返回当前页面时
   void didPopNext() async {
     videoDetailController.isFirstTime = false;
-    bool autoplay = autoPlayEnable;
+    final bool autoplay = autoPlayEnable;
     videoDetailController.playerInit(autoplay: autoplay);
 
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
@@ -238,7 +240,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     VideoDetailPage.routeObserver
-        .subscribe(this, ModalRoute.of(context) as PageRoute);
+        .subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
   void _handleTransition(String name) {
@@ -253,8 +255,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   void autoEnterPip() {
-    var routePath = Get.currentRoute;
-    bool isPortrait =
+    final String routePath = Get.currentRoute;
+    final bool isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     /// TODO 横屏全屏状态下误触pip
@@ -269,7 +271,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final videoHeight = MediaQuery.of(context).size.width * 9 / 16;
+    final double videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight;
     if (MediaQuery.of(context).orientation == Orientation.landscape ||
@@ -303,7 +305,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               headerSliverBuilder:
                   (BuildContext _context, bool innerBoxIsScrolled) {
                 return <Widget>[
-                  Obx(() => SliverAppBar(
+                  Obx(
+                    () => SliverAppBar(
                       automaticallyImplyLeading: false,
                       // 假装使用一个非空变量，避免Obx检测不到而罢工
                       pinned: videoDetailController.autoPlay.value ^
@@ -315,7 +318,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       expandedHeight: MediaQuery.of(context).orientation ==
                                   Orientation.landscape ||
                               plPlayerController?.isFullScreen.value == true
-                          ? MediaQuery.of(context).size.height -
+                          ? MediaQuery.sizeOf(context).height -
                               (MediaQuery.of(context).orientation ==
                                       Orientation.landscape
                                   ? 0
@@ -338,14 +341,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               }
                             },
                             child: LayoutBuilder(
-                              builder: (context, boxConstraints) {
-                                double maxWidth = boxConstraints.maxWidth;
-                                double maxHeight = boxConstraints.maxHeight;
+                              builder: (BuildContext context,
+                                  BoxConstraints boxConstraints) {
+                                final double maxWidth = boxConstraints.maxWidth;
+                                final double maxHeight =
+                                    boxConstraints.maxHeight;
                                 return Stack(
-                                  children: [
+                                  children: <Widget>[
                                     FutureBuilder(
                                       future: _futureBuilderFuture,
-                                      builder: ((context, snapshot) {
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot snapshot) {
                                         if (snapshot.hasData &&
                                             snapshot.data['status']) {
                                           return Obx(
@@ -378,7 +384,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                         } else {
                                           return const SizedBox();
                                         }
-                                      }),
+                                      },
                                     ),
 
                                     Obx(
@@ -423,6 +429,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 child: AppBar(
                                                   primary: false,
                                                   foregroundColor: Colors.white,
+                                                  elevation: 0,
+                                                  scrolledUnderElevation: 0,
                                                   backgroundColor:
                                                       Colors.transparent,
                                                   actions: [
@@ -484,7 +492,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 );
                               },
                             )),
-                      ))),
+                      ),
+                    ),
+                  ),
                 ];
               },
               // pinnedHeaderSliverHeightBuilder: () {
@@ -495,11 +505,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               /// 不收回
               pinnedHeaderSliverHeightBuilder: () {
                 return plPlayerController?.isFullScreen.value == true
-                    ? MediaQuery.of(context).size.height
+                    ? MediaQuery.sizeOf(context).height
                     : pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
-              body: Container(
+              body: ColoredBox(
                 key: Key(heroTag),
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
@@ -525,9 +535,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     Expanded(
                       child: TabBarView(
                         controller: videoDetailController.tabCtr,
-                        children: [
+                        children: <Widget>[
                           Builder(
-                            builder: (context) {
+                            builder: (BuildContext context) {
                               return CustomScrollView(
                                 key: const PageStorageKey<String>('简介'),
                                 slivers: <Widget>[
@@ -560,7 +570,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .withOpacity(0.06),
                                     ),
                                   ),
-                                  const RelatedVideoPanel(),
+                                  RelatedVideoPanel(),
                                 ],
                               );
                             },
@@ -597,7 +607,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     Widget childWhenEnabled = FutureBuilder(
       key: Key(heroTag),
       future: _futureBuilderFuture,
-      builder: ((context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData && snapshot.data['status']) {
           return Obx(
             () => !videoDetailController.autoPlay.value
@@ -619,9 +629,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   ),
           );
         } else {
-          return const SizedBox();
+          return nil;
         }
-      }),
+      },
     );
     if (Platform.isAndroid) {
       return PiPSwitcher(

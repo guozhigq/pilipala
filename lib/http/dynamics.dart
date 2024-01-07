@@ -1,6 +1,6 @@
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/models/dynamics/up.dart';
+import '../models/dynamics/result.dart';
+import '../models/dynamics/up.dart';
+import 'index.dart';
 
 class DynamicsHttp {
   static Future followDynamic({

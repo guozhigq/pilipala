@@ -1,17 +1,17 @@
 // ignore_for_file: avoid_print
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:async';
-import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/http/constants.dart';
-import 'package:pilipala/http/interceptor.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import '../utils/storage.dart';
+import '../utils/utils.dart';
+import 'constants.dart';
+import 'interceptor.dart';
 
 class Request {
   static final Request _instance = Request._internal();
@@ -20,25 +20,25 @@ class Request {
   factory Request() => _instance;
   Box setting = GStrorage.setting;
   static Box localCache = GStrorage.localCache;
-  late dynamic enableSystemProxy;
+  late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
 
   /// 设置cookie
   static setCookie() async {
     Box userInfoCache = GStrorage.userInfo;
-    var cookiePath = await Utils.getCookiePath();
-    var cookieJar = PersistCookieJar(
+    final String cookiePath = await Utils.getCookiePath();
+    final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
       storage: FileStorage(cookiePath),
     );
     cookieManager = CookieManager(cookieJar);
     dio.interceptors.add(cookieManager);
-    var cookie = await cookieManager.cookieJar
+    final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    var userInfo = userInfoCache.get('userInfoCache');
+    final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
-      var cookie2 = await cookieManager.cookieJar
+      final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
       if (cookie2.isEmpty) {
         try {
@@ -57,14 +57,15 @@ class Request {
         log("setCookie, ${e.toString()}");
       }
     }
-    var cookieString =
-        cookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    final String cookieString = cookie
+        .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
+        .join('; ');
     dio.options.headers['cookie'] = cookieString;
   }
 
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
-    var cookies = await cookieManager.cookieJar
+    List<Cookie> cookies = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
     String token = '';
     if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
@@ -73,7 +74,7 @@ class Request {
     return token;
   }
 
-  static setOptionsHeaders(userInfo, status) {
+  static setOptionsHeaders(userInfo, bool status) {
     if (status) {
       dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
     }
@@ -100,8 +101,8 @@ class Request {
       headers: {},
     );
 
-    enableSystemProxy =
-        setting.get(SettingBoxKey.enableSystemProxy, defaultValue: false);
+    enableSystemProxy = setting.get(SettingBoxKey.enableSystemProxy,
+        defaultValue: false) as bool;
     systemProxyHost =
         localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
     systemProxyPort =
@@ -113,7 +114,8 @@ class Request {
       ..httpClientAdapter = Http2Adapter(
         ConnectionManager(
           idleTimeout: const Duration(milliseconds: 10000),
-          onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
+          onClientCreate: (_, ClientSetting config) =>
+              config.onBadCertificate = (_) => true,
         ),
       );
 
@@ -121,9 +123,9 @@ class Request {
     if (enableSystemProxy) {
       dio.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
-          final client = HttpClient();
+          final HttpClient client = HttpClient();
           // Config the client.
-          client.findProxy = (uri) {
+          client.findProxy = (Uri uri) {
             // return 'PROXY host:port';
             return 'PROXY $systemProxyHost:$systemProxyPort';
           };
@@ -145,7 +147,7 @@ class Request {
     ));
 
     dio.transformer = BackgroundTransformer();
-    dio.options.validateStatus = (status) {
+    dio.options.validateStatus = (int? status) {
       return status! >= 200 && status < 300 ||
           HttpString.validateStatusCodes.contains(status);
     };
@@ -156,7 +158,7 @@ class Request {
    */
   get(url, {data, options, cancelToken, extra}) async {
     Response response;
-    Options options = Options();
+    final Options options = Options();
     ResponseType resType = ResponseType.json;
     if (extra != null) {
       resType = extra!['resType'] ?? ResponseType.json;

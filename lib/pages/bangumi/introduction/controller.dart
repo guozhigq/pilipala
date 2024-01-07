@@ -63,8 +63,8 @@ class BangumiIntroController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('bangumiItem')) {
+    if (Get.arguments.isNotEmpty as bool) {
+      if (Get.arguments.containsKey('bangumiItem') as bool) {
         preRender = true;
         bangumiItem = Get.arguments['bangumiItem'];
         // bangumiItem!['pic'] = args.pic;

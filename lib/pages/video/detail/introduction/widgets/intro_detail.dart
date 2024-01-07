@@ -12,12 +12,11 @@ Box localCache = GStrorage.localCache;
 late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {
-  final dynamic videoDetail;
-
   const IntroDetail({
-    Key? key,
+    super.key,
     this.videoDetail,
-  }) : super(key: key);
+  });
+  final dynamic videoDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -86,13 +85,11 @@ class IntroDetail extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: SelectableRegion(
-                        magnifierConfiguration:
-                            const TextMagnifierConfiguration(),
                         focusNode: FocusNode(),
                         selectionControls: MaterialTextSelectionControls(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          children: <Widget>[
                             Text(
                               videoDetail!.bvid!,
                               style: const TextStyle(fontSize: 13),
@@ -122,20 +119,21 @@ class IntroDetail extends StatelessWidget {
   }
 
   InlineSpan buildContent(BuildContext context, content) {
-    List descV2 = content.descV2;
+    final List descV2 = content.descV2;
     // type
     // 1 普通文本
     // 2 @用户
-    List<TextSpan> spanChilds = List.generate(descV2.length, (index) {
+    final List<TextSpan> spanChilds = List.generate(descV2.length, (index) {
       final currentDesc = descV2[index];
       switch (currentDesc.type) {
         case 1:
-          List<InlineSpan> spanChildren = [];
-          RegExp urlRegExp = RegExp(r'https?://\S+\b');
-          Iterable<Match> matches = urlRegExp.allMatches(currentDesc.rawText);
+          final List<InlineSpan> spanChildren = <InlineSpan>[];
+          final RegExp urlRegExp = RegExp(r'https?://\S+\b');
+          final Iterable<Match> matches =
+              urlRegExp.allMatches(currentDesc.rawText);
 
           int previousEndIndex = 0;
-          for (Match match in matches) {
+          for (final Match match in matches) {
             if (match.start > previousEndIndex) {
               spanChildren.add(TextSpan(
                   text: currentDesc.rawText
@@ -172,11 +170,12 @@ class IntroDetail extends StatelessWidget {
                 text: currentDesc.rawText.substring(previousEndIndex)));
           }
 
-          TextSpan result = TextSpan(children: spanChildren);
+          final TextSpan result = TextSpan(children: spanChildren);
           return result;
         case 2:
-          final colorSchemePrimary = Theme.of(context).colorScheme.primary;
-          final heroTag = Utils.makeHeroTag(currentDesc.bizId);
+          final Color colorSchemePrimary =
+              Theme.of(context).colorScheme.primary;
+          final String heroTag = Utils.makeHeroTag(currentDesc.bizId);
           return TextSpan(
             text: '@${currentDesc.rawText}',
             style: TextStyle(color: colorSchemePrimary),

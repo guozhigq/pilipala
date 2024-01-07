@@ -88,9 +88,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     Box localCache = GStrorage.localCache;
     double statusBarHeight = MediaQuery.of(context).padding.top;
-    double sheetHeight = MediaQuery.of(context).size.height -
+    double sheetHeight = MediaQuery.sizeOf(context).height -
         MediaQuery.of(context).padding.top -
-        MediaQuery.of(context).size.width * 9 / 16;
+        MediaQuery.sizeOf(context).width * 9 / 16;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
     return PopScope(

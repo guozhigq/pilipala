@@ -2,6 +2,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:nil/nil.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/widgets/play_pause_btn.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -37,7 +38,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               final int max = _.durationSeconds.value;
               final int buffer = _.bufferedSeconds.value;
               if (value > max || max <= 0) {
-                return Container();
+                return nil;
               }
               return Padding(
                 padding: const EdgeInsets.only(left: 7, right: 7, bottom: 6),
@@ -79,8 +80,10 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               Obx(() {
                 return Text(
                   _.durationSeconds.value >= 3600
-                      ? printDurationWithHours(Duration(seconds: _.positionSeconds.value))
-                      : printDuration(Duration(seconds: _.positionSeconds.value)),
+                      ? printDurationWithHours(
+                          Duration(seconds: _.positionSeconds.value))
+                      : printDuration(
+                          Duration(seconds: _.positionSeconds.value)),
                   style: textStyle,
                 );
               }),
@@ -90,8 +93,10 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               Obx(
                 () => Text(
                   _.durationSeconds.value >= 3600
-                      ? printDurationWithHours(Duration(seconds: _.durationSeconds.value))
-                      : printDuration(Duration(seconds: _.durationSeconds.value)),
+                      ? printDurationWithHours(
+                          Duration(seconds: _.durationSeconds.value))
+                      : printDuration(
+                          Duration(seconds: _.durationSeconds.value)),
                   style: textStyle,
                 ),
               ),

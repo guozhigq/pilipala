@@ -22,7 +22,7 @@ extension PlaySpeedExtension on PlaySpeed {
     '1.75',
     '2.0',
   ];
-  get description => _descList[index];
+  String get description => _descList[index];
 
   static final List<double> _valueList = [
     0.25,
@@ -34,6 +34,6 @@ extension PlaySpeedExtension on PlaySpeed {
     1.75,
     2.0,
   ];
-  get value => _valueList[index];
-  get defaultValue => _valueList[3];
+  double get value => _valueList[index];
+  double get defaultValue => _valueList[3];
 }

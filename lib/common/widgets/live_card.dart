@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/utils/utils.dart';
+import '../../utils/utils.dart';
+import '../constants.dart';
+import 'network_img_layer.dart';
 
 class LiveCard extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
-  final liveItem;
+  final dynamic liveItem;
 
   const LiveCard({
     Key? key,
@@ -14,7 +14,7 @@ class LiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String heroTag = Utils.makeHeroTag(liveItem.roomid);
+    final String heroTag = Utils.makeHeroTag(liveItem.roomid);
 
     return Card(
       elevation: 0,
@@ -23,7 +23,6 @@ class LiveCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(0),
         side: BorderSide(
           color: Theme.of(context).dividerColor.withOpacity(0.08),
-          width: 1,
         ),
       ),
       margin: EdgeInsets.zero,
@@ -33,15 +32,16 @@ class LiveCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: StyleString.aspectRatio,
-              child: LayoutBuilder(builder: (context, boxConstraints) {
-                double maxWidth = boxConstraints.maxWidth;
-                double maxHeight = boxConstraints.maxHeight;
+              child: LayoutBuilder(builder:
+                  (BuildContext context, BoxConstraints boxConstraints) {
+                final double maxWidth = boxConstraints.maxWidth;
+                final double maxHeight = boxConstraints.maxHeight;
                 return Stack(
                   children: [
                     Hero(
                       tag: heroTag,
                       child: NetworkImgLayer(
-                        src: liveItem.cover,
+                        src: liveItem.cover as String,
                         type: 'emote',
                         width: maxWidth,
                         height: maxHeight,
@@ -58,7 +58,7 @@ class LiveCard extends StatelessWidget {
                           // view: liveItem.stat.view,
                           // danmaku: liveItem.stat.danmaku,
                           // duration: liveItem.duration,
-                          online: liveItem.online,
+                          online: liveItem.online as int,
                         ),
                       ),
                     ),
@@ -90,7 +90,7 @@ class LiveContent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            liveItem.title,
+            liveItem.title as String,
             textAlign: TextAlign.start,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             maxLines: 2,
@@ -99,7 +99,7 @@ class LiveContent extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Text(
-              liveItem.uname,
+              liveItem.uname as String,
               maxLines: 1,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -114,9 +114,9 @@ class LiveContent extends StatelessWidget {
 }
 
 class LiveStat extends StatelessWidget {
-  final int? online;
+  const LiveStat({super.key, required this.online});
 
-  const LiveStat({Key? key, required this.online}) : super(key: key);
+  final int? online;
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +136,7 @@ class LiveStat extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        children: <Widget>[
           // Row(
           // children: [
           // StatView(

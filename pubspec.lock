@@ -893,6 +893,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
+  nil:
+    dependency: "direct main"
+    description:
+      name: nil
+      sha256: ef05770c48942876d843bf6a4822d35e5da0ff893a61f1d5ad96d15c4a659136
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.1"
   nm:
     dependency: transitive
     description:
@@ -906,8 +914,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "419a35a776f9784f07999c8f1f75eb26fd9fe90a"
-      url: "https://github.com/xiaoyaocz/flutter_ns_danmaku.git"
+      resolved-ref: d1cb3f0190ca67ec4d7fd372dac96f4f17a81a1a
+      url: "https://github.com/guozhigq/flutter_ns_danmaku.git"
     source: git
     version: "0.0.5"
   octo_image:

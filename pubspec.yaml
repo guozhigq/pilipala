@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.16
+version: 1.0.16+1016
 
 environment:
   sdk: ">=2.19.6 <3.0.0"
@@ -117,7 +117,7 @@ dependencies:
   # 弹幕
   ns_danmaku:
     git: 
-      url: https://github.com/xiaoyaocz/flutter_ns_danmaku.git
+      url: https://github.com/guozhigq/flutter_ns_danmaku.git
       ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1
@@ -133,6 +133,7 @@ dependencies:
   gt3_flutter_plugin: ^0.0.8
   uuid: ^3.0.7
   scrollable_positioned_list: ^0.3.8
+  nil: ^1.1.1
 
   
 dev_dependencies:

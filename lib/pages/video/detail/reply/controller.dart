@@ -41,8 +41,8 @@ class VideoReplyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    int deaultReplySortIndex =
-        setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    final int deaultReplySortIndex =
+        setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
     _sortType = ReplySortType.values[deaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
@@ -56,7 +56,7 @@ class VideoReplyController extends GetxController {
     if (noMore.value == '没有更多了') {
       return;
     }
-    var res = await ReplyHttp.replyList(
+    final res = await ReplyHttp.replyList(
       oid: aid!,
       pageNum: currentPage + 1,
       ps: ps,
@@ -64,7 +64,7 @@ class VideoReplyController extends GetxController {
       sort: _sortType.index,
     );
     if (res['status']) {
-      List<ReplyItemModel> replies = res['data'].replies;
+      final List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
         noMore.value = '加载中...';
 
@@ -84,9 +84,8 @@ class VideoReplyController extends GetxController {
       if (type == 'init') {
         // 添加置顶回复
         if (res['data'].upper.top != null) {
-          bool flag = res['data']
-              .topReplies
-              .any((reply) => reply.rpid == res['data'].upper.top.rpid);
+          final bool flag = res['data'].topReplies.any((ReplyItemModel reply) =>
+              reply.rpid == res['data'].upper.top.rpid) as bool;
           if (!flag) {
             replies.insert(0, res['data'].upper.top);
           }

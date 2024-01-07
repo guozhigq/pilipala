@@ -36,7 +36,7 @@ jobs:
               if: steps.cache-flutter.outputs.cache-hit != 'true'
               uses: subosito/flutter-action@v2
               with:
-                  flutter-version: 3.16.4
+                  flutter-version: 3.16.5
                   channel: any
 
             - name: 下载项目依赖

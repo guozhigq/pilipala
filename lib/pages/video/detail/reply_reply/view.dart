@@ -12,13 +12,6 @@ import 'package:pilipala/utils/storage.dart';
 import 'controller.dart';
 
 class VideoReplyReplyPanel extends StatefulWidget {
-  final int? oid;
-  final int? rpid;
-  final Function? closePanel;
-  final ReplyItemModel? firstFloor;
-  final String? source;
-  final ReplyType? replyType;
-
   const VideoReplyReplyPanel({
     this.oid,
     this.rpid,
@@ -28,6 +21,12 @@ class VideoReplyReplyPanel extends StatefulWidget {
     this.replyType,
     super.key,
   });
+  final int? oid;
+  final int? rpid;
+  final Function? closePanel;
+  final ReplyItemModel? firstFloor;
+  final String? source;
+  final ReplyType? replyType;
 
   @override
   State<VideoReplyReplyPanel> createState() => _VideoReplyReplyPanelState();
@@ -36,7 +35,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
 class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late VideoReplyReplyController _videoReplyReplyController;
   late AnimationController replyAnimationCtl;
-  Box localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStrorage.localCache;
   late double sheetHeight;
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
@@ -87,7 +86,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
               padding: const EdgeInsets.only(left: 12, right: 2),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: <Widget>[
                   const Text('评论详情'),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
@@ -138,15 +137,15 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                   ],
                   FutureBuilder(
                     future: _futureBuilderFuture,
-                    builder: (context, snapshot) {
+                    builder: (BuildContext context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
-                        Map data = snapshot.data as Map;
+                        final Map data = snapshot.data as Map;
                         if (data['status']) {
                           // 请求成功
                           return Obx(
                             () => SliverList(
                               delegate: SliverChildBuilderDelegate(
-                                (context, index) {
+                                (BuildContext context, int index) {
                                   if (index ==
                                       _videoReplyReplyController
                                           .replyList.length) {
@@ -204,8 +203,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                       } else {
                         // 骨架屏
                         return SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
+                          delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
                             return const VideoReplySkeleton();
                           }, childCount: 8),
                         );

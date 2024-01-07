@@ -1,5 +1,5 @@
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/fans/result.dart';
+import '../models/fans/result.dart';
+import 'index.dart';
 
 class FanHttp {
   static Future fans({int? vmid, int? pn, int? ps, String? orderType}) async {

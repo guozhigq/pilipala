@@ -1,14 +1,13 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/model_hot_video_item.dart';
-import 'package:pilipala/models/user/fav_detail.dart';
-import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/models/user/history.dart';
-import 'package:pilipala/models/user/info.dart';
-import 'package:pilipala/models/user/stat.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../common/constants.dart';
+import '../models/model_hot_video_item.dart';
+import '../models/user/fav_detail.dart';
+import '../models/user/fav_folder.dart';
+import '../models/user/history.dart';
+import '../models/user/info.dart';
+import '../models/user/stat.dart';
+import 'api.dart';
+import 'init.dart';
 
 class UserHttp {
   static Future<dynamic> userStat({required int mid}) async {

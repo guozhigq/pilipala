@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/whisperDetail/controller.dart';
+import 'package:pilipala/pages/whisper_detail/controller.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
 import 'widget/chat_item.dart';
@@ -41,8 +41,8 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
                 child: IconButton(
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) {
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                        (Set<MaterialState> states) {
                       return Theme.of(context)
                           .colorScheme
                           .primaryContainer
@@ -69,7 +69,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
                   );
                 },
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     NetworkImgLayer(
                       width: 34,
                       height: 34,
@@ -91,12 +91,12 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,
-        builder: (context, snapshot) {
+        builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.data == null) {
               return const SizedBox();
             }
-            Map data = snapshot.data as Map;
+            final Map data = snapshot.data as Map;
             if (data['status']) {
               List messageList = _whisperDetailController.messageList;
               return Obx(

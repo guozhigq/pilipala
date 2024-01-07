@@ -11,17 +11,16 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class BangumiCardV extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
-  final bangumiItem;
-  final Function()? longPress;
-  final Function()? longPressEnd;
-
   const BangumiCardV({
-    Key? key,
+    super.key,
     required this.bangumiItem,
     this.longPress,
     this.longPressEnd,
-  }) : super(key: key);
+  });
+
+  final bangumiItem;
+  final Function()? longPress;
+  final Function()? longPressEnd;
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +42,9 @@ class BangumiCardV extends StatelessWidget {
         // },
         child: InkWell(
           onTap: () async {
-            int seasonId = bangumiItem.seasonId;
+            final int seasonId = bangumiItem.seasonId;
             SmartDialog.showLoading(msg: '获取中...');
-            var res = await SearchHttp.bangumiInfo(seasonId: seasonId);
+            final res = await SearchHttp.bangumiInfo(seasonId: seasonId);
             SmartDialog.dismiss().then((value) {
               if (res['status']) {
                 if (res['data'].episodes.isEmpty) {
@@ -81,8 +80,8 @@ class BangumiCardV extends StatelessWidget {
                 child: AspectRatio(
                   aspectRatio: 0.65,
                   child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
+                    final double maxWidth = boxConstraints.maxWidth;
+                    final double maxHeight = boxConstraints.maxHeight;
                     return Stack(
                       children: [
                         Hero(
@@ -124,9 +123,9 @@ class BangumiCardV extends StatelessWidget {
 }
 
 class BangumiContent extends StatelessWidget {
+  const BangumiContent({super.key, required this.bangumiItem});
   // ignore: prefer_typing_uninitialized_variables
   final bangumiItem;
-  const BangumiContent({Key? key, required this.bangumiItem}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(

@@ -1,6 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:pilipala/http/index.dart';
+import 'index.dart';
 
 class HtmlHttp {
   // article
