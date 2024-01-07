@@ -70,68 +70,66 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          return await _hotController.onRefresh();
-        },
-        child: CustomScrollView(
-          controller: _hotController.scrollController,
-          slivers: [
-            SliverPadding(
-              // 单列布局 EdgeInsets.zero
-              padding:
-                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace - 5, 0, 0),
-              sliver: FutureBuilder(
-                future: _futureBuilderFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      return Obx(
-                        () => SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
-                            return VideoCardH(
-                              videoItem: _hotController.videoList[index],
-                              showPubdate: true,
-                              longPress: () {
-                                _hotController.popupDialog = _createPopupDialog(
-                                    _hotController.videoList[index]);
-                                Overlay.of(context)
-                                    .insert(_hotController.popupDialog!);
-                              },
-                              longPressEnd: () {
-                                _hotController.popupDialog?.remove();
-                              },
-                            );
-                          }, childCount: _hotController.videoList.length),
-                        ),
-                      );
-                    } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () => setState(() {}),
-                      );
-                    }
+    return RefreshIndicator(
+      onRefresh: () async {
+        return await _hotController.onRefresh();
+      },
+      child: CustomScrollView(
+        controller: _hotController.scrollController,
+        slivers: [
+          SliverPadding(
+            // 单列布局 EdgeInsets.zero
+            padding:
+                const EdgeInsets.fromLTRB(0, StyleString.safeSpace - 5, 0, 0),
+            sliver: FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data as Map;
+                  if (data['status']) {
+                    return Obx(
+                      () => SliverList(
+                        delegate:
+                            SliverChildBuilderDelegate((context, index) {
+                          return VideoCardH(
+                            videoItem: _hotController.videoList[index],
+                            showPubdate: true,
+                            longPress: () {
+                              _hotController.popupDialog = _createPopupDialog(
+                                  _hotController.videoList[index]);
+                              Overlay.of(context)
+                                  .insert(_hotController.popupDialog!);
+                            },
+                            longPressEnd: () {
+                              _hotController.popupDialog?.remove();
+                            },
+                          );
+                        }, childCount: _hotController.videoList.length),
+                      ),
+                    );
                   } else {
-                    // 骨架屏
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return const VideoCardHSkeleton();
-                      }, childCount: 10),
+                    return HttpError(
+                      errMsg: data['msg'],
+                      fn: () => setState(() {}),
                     );
                   }
-                },
-              ),
+                } else {
+                  // 骨架屏
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return const VideoCardHSkeleton();
+                    }, childCount: 10),
+                  );
+                }
+              },
             ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: MediaQuery.of(context).padding.bottom + 10,
-              ),
-            )
-          ],
-        ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.of(context).padding.bottom + 10,
+            ),
+          )
+        ],
       ),
     );
   }

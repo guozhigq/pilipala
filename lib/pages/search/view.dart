@@ -48,53 +48,54 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       onClosed: (_) => _searchController.onClear(),
       openColor: Theme.of(context).colorScheme.background,
       middleColor: Theme.of(context).colorScheme.background,
-      closedColor: Theme.of(context).colorScheme.background,
+      closedColor: Colors.transparent,
       closedShape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0))),
       openShape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0))),
       closedBuilder: (BuildContext context, VoidCallback openContainer) {
-        return Container(
-          width: 250,
-          height: 44,
-          clipBehavior: Clip.hardEdge,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-          ),
-          child: Material(
-            color:
-                Theme.of(context).colorScheme.secondaryContainer.withAlpha(115),
-            child: InkWell(
-              splashColor: Theme.of(context)
-                  .colorScheme
-                  .primaryContainer
-                  .withOpacity(0.3),
-              onTap: openContainer,
-              child: Row(
-                children: [
-                  const SizedBox(width: 14),
-                  Icon(
-                    Icons.search_outlined,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Obx(
-                      () => Text(
-                        _searchController.defaultSearch.value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+        return IconButton(onPressed: openContainer,  icon: Icon(Icons.search));
+        // return Container(
+        //   width: 250,
+        //   height: 44,
+        //   clipBehavior: Clip.hardEdge,
+        //   decoration: const BoxDecoration(
+        //     borderRadius: BorderRadius.all(Radius.circular(25)),
+        //   ),
+        //   child: Material(
+        //     color:
+        //         Theme.of(context).colorScheme.secondaryContainer.withAlpha(115),
+        //     child: InkWell(
+        //       splashColor: Theme.of(context)
+        //           .colorScheme
+        //           .primaryContainer
+        //           .withOpacity(0.3),
+        //       onTap: openContainer,
+        //       child: Row(
+        //         children: [
+        //           const SizedBox(width: 14),
+        //           Icon(
+        //             Icons.search_outlined,
+        //             color: Theme.of(context).colorScheme.onSecondaryContainer,
+        //           ),
+        //           const SizedBox(width: 10),
+        //           Expanded(
+        //             child: Obx(
+        //               () => Text(
+        //                 _searchController.defaultSearch.value,
+        //                 maxLines: 1,
+        //                 overflow: TextOverflow.ellipsis,
+        //                 style: TextStyle(
+        //                   color: Theme.of(context).colorScheme.outline,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // );
       },
       openBuilder: (BuildContext context, VoidCallback _) {
         return Scaffold(

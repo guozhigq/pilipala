@@ -19,11 +19,11 @@ class MainController extends GetxController {
   RxList navigationBars = [
     {
       'icon': const Icon(
-        Icons.favorite_outline,
+        Icons.home_outlined,
         size: 21,
       ),
       'selectIcon': const Icon(
-        Icons.favorite,
+        Icons.home,
         size: 21,
       ),
       'label': "首页",
@@ -41,11 +41,11 @@ class MainController extends GetxController {
     },
     {
       'icon': const Icon(
-        Icons.folder_outlined,
+        Icons.video_collection_outlined,
         size: 20,
       ),
       'selectIcon': const Icon(
-        Icons.folder,
+        Icons.video_collection,
         size: 21,
       ),
       'label': "媒体库",
