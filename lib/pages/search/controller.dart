@@ -20,7 +20,7 @@ class SSearchController extends GetxController {
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
-  RxString defaultSearch = '输入关键词搜索'.obs;
+  RxString defaultSearch = ''.obs;
   Box setting = GStrorage.setting;
   bool enableHotKey = true;
 

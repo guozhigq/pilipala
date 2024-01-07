@@ -161,7 +161,7 @@ class UserInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: SearchPage()),
+        const SearchBar(),
         if (userLogin.value) ...[
           const SizedBox(width: 4),
           ClipRect(
@@ -199,7 +199,7 @@ class UserInfoWidget extends StatelessWidget {
                     )
                   ],
                 )
-              : DefaultUser(callback: () => callback),
+              : DefaultUser(callback: () => callback!()),
         ),
       ],
     );
@@ -333,6 +333,53 @@ class CustomChip extends StatelessWidget {
       selected: selected,
       showCheckmark: false,
       visualDensity: visualDensity,
+    );
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  const SearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final SSearchController searchController = Get.put(SSearchController());
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Expanded(
+      child: Container(
+        width: 250,
+        height: 44,
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Material(
+          color: colorScheme.onSecondaryContainer.withOpacity(0.05),
+          child: InkWell(
+            splashColor: colorScheme.primaryContainer.withOpacity(0.3),
+            onTap: () => Get.toNamed('/search'),
+            child: Row(
+              children: [
+                const SizedBox(width: 14),
+                Icon(
+                  Icons.search_outlined,
+                  color: colorScheme.onSecondaryContainer,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Obx(
+                    () => Text(
+                      searchController.defaultSearch.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: colorScheme.outline),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
