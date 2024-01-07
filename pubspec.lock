@@ -914,8 +914,8 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "419a35a776f9784f07999c8f1f75eb26fd9fe90a"
-      url: "https://github.com/xiaoyaocz/flutter_ns_danmaku.git"
+      resolved-ref: d1cb3f0190ca67ec4d7fd372dac96f4f17a81a1a
+      url: "https://github.com/guozhigq/flutter_ns_danmaku.git"
     source: git
     version: "0.0.5"
   octo_image:

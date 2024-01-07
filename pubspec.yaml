@@ -117,7 +117,7 @@ dependencies:
   # 弹幕
   ns_danmaku:
     git: 
-      url: https://github.com/xiaoyaocz/flutter_ns_danmaku.git
+      url: https://github.com/guozhigq/flutter_ns_danmaku.git
       ref: master
   # 状态栏图标控制
   status_bar_control: ^3.2.1

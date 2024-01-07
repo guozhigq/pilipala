@@ -246,6 +246,7 @@ class _HeaderControlState extends State<HeaderControl> {
                               time: widget
                                   .controller!.position.value.inMilliseconds,
                               type: DanmakuItemType.scroll,
+                              isSend: true,
                             )
                           ]);
                           Get.back();
