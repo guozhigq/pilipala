@@ -596,6 +596,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             final int value = _.sliderPositionSeconds.value;
             final int max = _.durationSeconds.value;
             final int buffer = _.bufferedSeconds.value;
+            if (_.showControls.value) {
+              return Container();
+            }
             if (defaultBtmProgressBehavior ==
                 BtmProgresBehavior.alwaysHide.code) {
               return nil;
