@@ -159,6 +159,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Future<void> handlePlay() async {
     await videoDetailController.playerInit();
     plPlayerController = videoDetailController.plPlayerController;
+    plPlayerController!.addStatusLister(playerListener);
     videoDetailController.autoPlay.value = true;
     videoDetailController.isShowCover.value = false;
   }
