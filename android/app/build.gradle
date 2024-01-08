@@ -96,7 +96,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
-ext.abiCodes = ["arm64-v8a": 1, "x86_64": 2, "armeabi-v7a": 3]
+ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]
 import com.android.build.OutputFile
 android.applicationVariants.all { variant ->
   variant.outputs.each { output ->
