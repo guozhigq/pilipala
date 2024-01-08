@@ -30,6 +30,8 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     await setupServiceLocator();
+    Request();
+    await Request.setCookie();
     runApp(const MyApp());
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -38,7 +40,6 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
       statusBarColor: Colors.transparent,
     ));
-    await Request.setCookie();
     Data.init();
     GStrorage.lazyInit();
     PiliSchame.init();
