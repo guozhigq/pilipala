@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - '*'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '.github/**'
+      - '.vscode/**'
+      - '!.github/workflows/**'
   pull_request:
   workflow_dispatch:
 
@@ -73,6 +79,7 @@ jobs:
                     mv "$file" "$new_file_name"
                   fi
                 done
+
             - name: Upload ARM64
               uses: actions/upload-artifact@v3
               with:
