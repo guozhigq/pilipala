@@ -6,15 +6,20 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '.github/**'
+      - '.idea/**'
+      - '!.github/workflows/**'
 
 # 可以有多个jobs
 jobs:
     build_apk:
+        name: Build CI (Push)
         # 运行环境 ubuntu-latest window-latest mac-latest
         runs-on: ubuntu-latest
 
@@ -62,13 +67,13 @@ jobs:
 
             - name: 获取版本号
               id: version
-              run: echo "version=${GITHUB_REF#refs/tags/v}" >>$GITHUB_OUTPUT
+              run: echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
 
             # - name: 获取当前日期
             #   id: date
             #   run: echo "date=$(date +'%m%d')" >>$GITHUB_OUTPUT
 
-            - name: 重命名应用 Pili-arm64-v8a-*.*.*.0101.apk
+            - name: 重命名应用 Pili-arm64-v8a-*.apk
               run: |
                 # DATE=${{ steps.date.outputs.date }}
                 for file in build/app/outputs/flutter-apk/app-*-release.apk; do
@@ -77,13 +82,14 @@ jobs:
                     mv "$file" "$new_file_name"
                   fi
                 done
-
-            - name: 构建和发布release
-              uses: ncipollo/release-action@v1
+            - name: Upload ARM64
+              uses: actions/upload-artifact@v3
               with:
-                  # release title
-                  name: v${{ steps.version.outputs.version }}
-                  artifacts: "build/app/outputs/flutter-apk/Pili-*.apk"
-                  bodyFile: "change_log/${{steps.version.outputs.version}}.md"
-                  token: ${{ secrets.GIT_TOKEN }}
-                  allowUpdates: true
+                name: Pili-arm64-v8a-${{ steps.version.outputs.version }}
+                path: build/app/outputs/flutter-apk/Pili-arm64-v8a-*.apk
+
+            - name: Upload x86_64
+              uses: actions/upload-artifact@v3
+              with:
+                name: Pili-x86_64-${{ steps.version.outputs.version }}
+                path: build/app/outputs/flutter-apk/Pili-x86_64-*.apk
