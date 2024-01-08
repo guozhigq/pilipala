@@ -792,10 +792,8 @@ class _HeaderControlState extends State<HeaderControl> {
                               danmakuDurationVal;
                           setState(() {});
                           try {
-                            final DanmakuOption currentOption =
-                                danmakuController.option;
                             final DanmakuOption updatedOption =
-                                currentOption.copyWith(
+                                danmakuController.option.copyWith(
                                     duration:
                                         val / widget.controller!.playbackSpeed);
                             danmakuController.updateOption(updatedOption);
