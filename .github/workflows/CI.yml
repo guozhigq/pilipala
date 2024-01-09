@@ -8,7 +8,8 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches:
+      - '*'
     paths-ignore:
       - '**.md'
       - '**.txt'
