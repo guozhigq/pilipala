@@ -733,6 +733,9 @@ class PlPlayerController {
 
   /// 隐藏控制条
   void _hideTaskControls() {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
     _timer = Timer(const Duration(milliseconds: 3000), () {
       if (!isSliderMoving.value) {
         controls = false;
