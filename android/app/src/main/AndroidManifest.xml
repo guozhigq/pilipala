@@ -72,7 +72,6 @@
                 <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.LAUNCHER"/>
                 <data android:scheme="bilibili" android:host="forward" />
                 <data android:scheme="bilibili" android:host="comment"
                     android:pathPattern="/detail/.*/.*/.*" />
