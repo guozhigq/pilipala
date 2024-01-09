@@ -1,0 +1,96 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '.github/**'
+      - '.idea/**'
+      - '!.github/workflows/**'
+
+# 可以有多个jobs
+jobs:
+    build_apk:
+        name: Build CI (Push)
+        # 运行环境 ubuntu-latest window-latest mac-latest
+        runs-on: ubuntu-latest
+
+        # 每个jobs中可以有多个steps
+        steps:
+            - name: 代码迁出
+              uses: actions/checkout@v3
+
+            - name: 构建Java环境
+              uses: actions/setup-java@v3
+              with:
+                  distribution: "zulu"
+                  java-version: "17"
+                  token: ${{secrets.GIT_TOKEN}}
+
+            - name: 检查缓存
+              uses: actions/cache@v2
+              id: cache-flutter
+              with:
+                  path: /root/flutter-sdk # Flutter SDK 的路径
+                  key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+
+            - name: 安装Flutter
+              if: steps.cache-flutter.outputs.cache-hit != 'true'
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: 3.16.5
+                  channel: any
+
+            - name: 下载项目依赖
+              run: flutter pub get
+
+            - name: 解码生成 jks
+              run: echo $KEYSTORE_BASE64 | base64 -di > android/app/vvex.jks
+              env:
+                  KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
+            - name: flutter build apk
+              # 对应 android/app/build.gradle signingConfigs中的配置项
+              run: flutter build apk --release --split-per-abi
+              env:
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+
+            - name: 获取版本号
+              id: version
+              run: echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
+
+            # - name: 获取当前日期
+            #   id: date
+            #   run: echo "date=$(date +'%m%d')" >>$GITHUB_OUTPUT
+
+            - name: 重命名应用 Pili-arm64-v8a-*.apk
+              run: |
+                # DATE=${{ steps.date.outputs.date }}
+                for file in build/app/outputs/flutter-apk/app-*-release.apk; do
+                  if [[ $file =~ app-(.*)-release.apk ]]; then
+                    new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}-${{ steps.version.outputs.version }}.apk"
+                    mv "$file" "$new_file_name"
+                  fi
+                done
+            - name: Upload ARM64
+              uses: actions/upload-artifact@v3
+              with:
+                name: Pili-arm64-v8a-${{ steps.version.outputs.version }}
+                path: build/app/outputs/flutter-apk/Pili-arm64-v8a-*.apk
+
+            - name: Upload x86_64
+              uses: actions/upload-artifact@v3
+              with:
+                name: Pili-x86_64-${{ steps.version.outputs.version }}
+                path: build/app/outputs/flutter-apk/Pili-x86_64-*.apk
