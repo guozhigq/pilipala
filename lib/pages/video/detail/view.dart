@@ -213,6 +213,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      plPlayerController!.danmakuController?.pause();
+      plPlayerController!.danmakuController?.clear();
     }
     super.didPushNext();
   }
