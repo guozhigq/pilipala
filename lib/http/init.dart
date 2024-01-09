@@ -108,16 +108,16 @@ class Request {
     systemProxyPort =
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
 
-    dio = Dio(options)
+    dio = Dio(options);
 
-      /// fix 第三方登录 302重定向 跟iOS代理问题冲突
-      ..httpClientAdapter = Http2Adapter(
-        ConnectionManager(
-          idleTimeout: const Duration(milliseconds: 10000),
-          onClientCreate: (_, ClientSetting config) =>
-              config.onBadCertificate = (_) => true,
-        ),
-      );
+    /// fix 第三方登录 302重定向 跟iOS代理问题冲突
+    // ..httpClientAdapter = Http2Adapter(
+    //   ConnectionManager(
+    //     idleTimeout: const Duration(milliseconds: 10000),
+    //     onClientCreate: (_, ClientSetting config) =>
+    //         config.onBadCertificate = (_) => true,
+    //   ),
+    // );
 
     /// 设置代理
     if (enableSystemProxy) {

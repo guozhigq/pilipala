@@ -24,6 +24,7 @@ import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
+import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
@@ -120,7 +121,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       if (autoExitFullcreen) {
         plPlayerController!.triggerFullScreen(status: false);
       }
-
+      shutdownTimerService.handleWaitingFinished();
       /// 顺序播放 列表循环
       if (plPlayerController!.playRepeat != PlayRepeat.pause &&
           plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
@@ -187,6 +188,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    shutdownTimerService.handleWaitingFinished();
     if (plPlayerController != null) {
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.dispose();
