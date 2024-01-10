@@ -49,8 +49,8 @@ class IdUtils {
 
   // 匹配
   static Map<String, dynamic> matchAvorBv({String? input}) {
-    final Map<String, dynamic> result = {'': null};
-    if (input == null || input == '') {
+    final Map<String, dynamic> result = {};
+    if (input == null || input.isEmpty) {
       return result;
     }
     final RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}', caseSensitive: false);
