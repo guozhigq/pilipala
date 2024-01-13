@@ -552,7 +552,7 @@ InlineSpan buildContent(
     );
   }
   final List<InlineSpan> spanChilds = <InlineSpan>[];
-  bool hasMatchMember = true;
+  bool hasMatchMember = false;
 
   // 投票
   if (content.vote.isNotEmpty) {
@@ -643,7 +643,7 @@ InlineSpan buildContent(
           reg,
           onMatch: (Match match) {
             if (match[0] != null) {
-              hasMatchMember = false;
+              hasMatchMember = true;
               content.atNameToMid.forEach((key, value) {
                 if (str.contains('回复')) {
                   spanChilds.add(
@@ -682,6 +682,7 @@ InlineSpan buildContent(
             if (!str.contains('@')) {
               spanChilds.add(TextSpan(text: str));
             }
+            print(str);
             return str;
           },
         );
@@ -691,7 +692,7 @@ InlineSpan buildContent(
 
       // 匹配 jumpUrl
       String matchUrl = matchMember;
-      if (content.jumpUrl.isNotEmpty && hasMatchMember) {
+      if (content.jumpUrl.isNotEmpty) {
         final List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
         for (int index = 0; index < urlKeys.length; index++) {
           var i = urlKeys[index];
@@ -704,6 +705,11 @@ InlineSpan buildContent(
           if (i.contains('*')) {
             urlKeys[index] = i.replaceAll('*', '\\*');
           }
+        }
+        if (hasMatchMember) {
+          matchMember = matchMember.split('回复 @ :').length > 1
+              ? matchMember.split('回复 @ :')[1]
+              : matchMember;
         }
         matchUrl = matchMember.splitMapJoin(
           /// RegExp.escape() 转义特殊字符
