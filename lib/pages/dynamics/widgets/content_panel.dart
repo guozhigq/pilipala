@@ -1,5 +1,6 @@
 // 内容
 import 'package:flutter/material.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/preview/index.dart';
@@ -49,6 +50,12 @@ class _ContentState extends State<Content> {
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
               double maxWidth = box.maxWidth.truncateToDouble();
+              double maxHeight = box.maxWidth * 0.6; // 设置最大高度
+              double height = maxWidth *
+                  0.5 *
+                  (pictureItem.height != null && pictureItem.width != null
+                      ? pictureItem.height! / pictureItem.width!
+                      : 1);
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -59,18 +66,29 @@ class _ContentState extends State<Content> {
                     },
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: NetworkImgLayer(
-                    src: pictureItem.url,
-                    width: maxWidth / 2,
-                    height: maxWidth *
-                        0.5 *
-                        (pictureItem.height != null && pictureItem.width != null
-                            ? pictureItem.height! / pictureItem.width!
-                            : 1),
-                  ),
-                ),
+                child: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    constraints: BoxConstraints(maxHeight: maxHeight),
+                    width: box.maxWidth / 2,
+                    height: height,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: pictureItem.url,
+                            width: maxWidth / 2,
+                            height: height,
+                          ),
+                        ),
+                        height > maxHeight
+                            ? const PBadge(
+                                text: '长图',
+                                right: 8,
+                                bottom: 8,
+                              )
+                            : const SizedBox(),
+                      ],
+                    )),
               );
             },
           ),

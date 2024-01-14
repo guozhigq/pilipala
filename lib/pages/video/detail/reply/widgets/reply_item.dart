@@ -850,13 +850,12 @@ InlineSpan buildContent(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints box) {
               double maxHeight = box.maxWidth * 0.6; // 设置最大高度
-              double width = (box.maxWidth / 2).truncateToDouble();
+              // double width = (box.maxWidth / 2).truncateToDouble();
               double height = ((box.maxWidth /
                       2 *
                       pictureItem['img_height'] /
                       pictureItem['img_width']))
                   .truncateToDouble();
-              print('width: $width, height: $height');
               return GestureDetector(
                 onTap: () {
                   showDialog(
