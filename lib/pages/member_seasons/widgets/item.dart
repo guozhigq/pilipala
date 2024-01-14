@@ -25,7 +25,7 @@ class MemberSeasonsItem extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           int cid =
-              await SearchHttp.ab2c(aid: seasonItem.aid, bvid: seasonItem.bvid);
+          await SearchHttp.ab2c(aid: seasonItem.aid, bvid: seasonItem.bvid);
           Get.toNamed('/video?bvid=${seasonItem.bvid}&cid=$cid',
               arguments: {'videoItem': seasonItem, 'heroTag': heroTag});
         },
@@ -46,12 +46,13 @@ class MemberSeasonsItem extends StatelessWidget {
                         height: maxHeight,
                       ),
                     ),
-                    if (seasonItem.duration != null)
+                    if (seasonItem.pubdate != null)
                       PBadge(
                         bottom: 6,
                         right: 6,
                         type: 'gray',
-                        text: Utils.timeFormat(seasonItem.duration),
+                        text: Utils.CustomStamp_str(
+                            timestamp: seasonItem.pubdate, date: 'YY-MM-DD'),
                       )
                   ],
                 );
@@ -78,7 +79,7 @@ class MemberSeasonsItem extends StatelessWidget {
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(
-                            timestamp: seasonItem.pubdate, date: 'MM-DD'),
+                            timestamp: seasonItem.pubdate, date: 'YY-MM-DD'),
                         style: TextStyle(
                           fontSize: 11,
                           color: Theme.of(context).colorScheme.outline,
