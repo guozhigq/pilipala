@@ -48,6 +48,7 @@ class _ContentState extends State<Content> {
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
+              double maxWidth = box.maxWidth.truncateToDouble();
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -62,8 +63,8 @@ class _ContentState extends State<Content> {
                   padding: const EdgeInsets.only(top: 4),
                   child: NetworkImgLayer(
                     src: pictureItem.url,
-                    width: box.maxWidth / 2,
-                    height: box.maxWidth *
+                    width: maxWidth / 2,
+                    height: maxWidth *
                         0.5 *
                         (pictureItem.height != null && pictureItem.width != null
                             ? pictureItem.height! / pictureItem.width!
@@ -83,6 +84,7 @@ class _ContentState extends State<Content> {
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
+              double maxWidth = box.maxWidth.truncateToDouble();
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -95,8 +97,10 @@ class _ContentState extends State<Content> {
                 },
                 child: NetworkImgLayer(
                   src: pics[i].url,
-                  width: box.maxWidth,
-                  height: box.maxWidth,
+                  width: maxWidth,
+                  height: maxWidth,
+                  origAspectRatio:
+                      pics[i].width!.toInt() / pics[i].height!.toInt(),
                 ),
               );
             },
@@ -107,7 +111,7 @@ class _ContentState extends State<Content> {
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth;
+              double maxWidth = box.maxWidth.truncateToDouble();
               double crossCount = len < 3 ? 2 : 3;
               double height = maxWidth /
                       crossCount *

@@ -304,7 +304,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
-                  (BuildContext _context, bool innerBoxIsScrolled) {
+                  (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(
                     () => SliverAppBar(
@@ -459,10 +459,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                 child: TextButton.icon(
                                                   style: ButtonStyle(
                                                     side: MaterialStateProperty
-                                                        .resolveWith(
-                                                            (states) {
+                                                        .resolveWith((states) {
                                                       return BorderSide(
-                                                          color: Theme.of(context)
+                                                          color: Theme.of(
+                                                                  context)
                                                               .colorScheme
                                                               .primary
                                                               .withOpacity(0.5),
