@@ -34,7 +34,7 @@ class ContentContainer extends StatelessWidget {
                       child: contentWidget!,
                     )
                   else
-                    Spacer(),
+                    const Spacer(),
                   if (bottomWidget != null) bottomWidget!,
                 ],
               ),
