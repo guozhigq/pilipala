@@ -289,9 +289,8 @@ class PlPlayerController {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
     }
-    final List<double> speedsListTemp = videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]);
-    speedsList = List<double>.from(speedsListTemp);
+    speedsList = List<double>.from(videoStorage
+        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
     for (final PlaySpeed i in PlaySpeed.values) {
       speedsList.add(i.value);
     }

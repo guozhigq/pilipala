@@ -80,7 +80,7 @@ class WbiSign {
   String getMixinKey(String orig) {
     String temp = '';
     for (int i = 0; i < mixinKeyEncTab.length; i++) {
-      temp += orig.split('')[mixinKeyEncTab[i] as int];
+      temp += orig.split('')[mixinKeyEncTab[i]];
     }
     return temp.substring(0, 32);
   }
