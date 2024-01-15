@@ -41,12 +41,15 @@ class RcmdController extends GetxController {
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    print(defaultRcmdType);
-    if (defaultRcmdType == 'app') {
-      return await queryRcmdFeedApp(type);
-    }
-    if (defaultRcmdType == 'web') {
-      return await queryRcmdFeedWeb(type);
+    switch (defaultRcmdType) {
+      case 'app':
+        return await queryRcmdFeedApp(type);
+      // case 'web':
+      //   return await queryRcmdFeedWeb(type);
+      case 'notLogin':
+        return await queryRcmdFeedNotLogin(type);
+      default:
+        return await queryRcmdFeedWeb(type);
     }
   }
 
@@ -112,6 +115,40 @@ class RcmdController extends GetxController {
       } else if (type == 'onLoad') {
         webVideoList.addAll(res['data']);
       }
+      _currentPage += 1;
+    }
+    isLoadingMore = false;
+    return res;
+  }
+
+  // 获取未登录状态的推荐
+  Future queryRcmdFeedNotLogin(type) async {
+    if (isLoadingMore == false) {
+      return;
+    }
+    if (type == 'onRefresh') {
+      _currentPage = 0;
+    }
+    var res = await VideoHttp.rcmdVideoListNotLogin(
+      freshIdx: _currentPage,
+    );
+    if (res['status']) {
+      if (type == 'init') {
+        if (appVideoList.isNotEmpty) {
+          appVideoList.addAll(res['data']);
+        } else {
+          appVideoList.value = res['data'];
+        }
+      } else if (type == 'onRefresh') {
+        if (enableSaveLastData) {
+          appVideoList.insertAll(0, res['data']);
+        } else {
+          appVideoList.value = res['data'];
+        }
+      } else if (type == 'onLoad') {
+        appVideoList.addAll(res['data']);
+      }
+      recVideo.put('cacheList', res['data']);
       _currentPage += 1;
     }
     isLoadingMore = false;
