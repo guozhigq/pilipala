@@ -414,14 +414,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                             ),
                           ),
                           const Spacer(),
-                          AnimatedOpacity(
-                            opacity: loadingStatus ? 0 : 1,
-                            duration: const Duration(milliseconds: 150),
-                            child: SizedBox(
-                              height: 32,
-                              child: Obx(
-                                () =>
-                                    videoIntroController.followStatus.isNotEmpty
+                          Obx(() => AnimatedOpacity(
+                                opacity: loadingStatus ||
+                                        videoIntroController
+                                            .followStatus.isEmpty
+                                    ? 0
+                                    : 1,
+                                duration: const Duration(milliseconds: 50),
+                                child: SizedBox(
+                                  height: 32,
+                                  child: Obx(
+                                    () => videoIntroController
+                                            .followStatus.isNotEmpty
                                         ? TextButton(
                                             onPressed: videoIntroController
                                                 .actionRelationMod,
@@ -453,9 +457,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                                 .actionRelationMod,
                                             child: const Text('关注'),
                                           ),
-                              ),
-                            ),
-                          ),
+                                  ),
+                                ),
+                              )),
                         ],
                       ),
                     ),
