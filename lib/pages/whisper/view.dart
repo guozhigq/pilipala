@@ -210,11 +210,11 @@ class _WhisperPageState extends State<WhisperPage> {
                             );
                           } else {
                             // 请求错误
-                            return SizedBox();
+                            return const SizedBox();
                           }
                         } else {
                           // 骨架屏
-                          return SizedBox();
+                          return const SizedBox();
                         }
                       },
                     )

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
-import 'package:pilipala/models/common/rcmd_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -20,23 +18,16 @@ class ExtraSetting extends StatefulWidget {
 class _ExtraSettingState extends State<ExtraSetting> {
   Box setting = GStrorage.setting;
   static Box localCache = GStrorage.localCache;
-  late dynamic defaultRcmdType;
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;
   late dynamic enableSystemProxy;
   late String defaultSystemProxyHost;
   late String defaultSystemProxyPort;
-  Box userInfoCache = GStrorage.userInfo;
-  var userInfo;
   bool userLogin = false;
-  var accessKeyInfo;
 
   @override
   void initState() {
     super.initState();
-    // 首页默认推荐类型
-    defaultRcmdType =
-        setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web');
     // 默认优先显示最新评论
     defaultReplySort =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
@@ -49,9 +40,6 @@ class _ExtraSettingState extends State<ExtraSetting> {
         localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
     defaultSystemProxyPort =
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
-    userInfo = userInfoCache.get('userInfoCache');
-    userLogin = userInfo != null;
-    accessKeyInfo = localCache.get(LocalCacheKey.accessKey, defaultValue: null);
   }
 
   // 设置代理
@@ -160,12 +148,6 @@ class _ExtraSettingState extends State<ExtraSetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
-            title: '推荐动态',
-            subTitle: '是否在推荐内容中展示动态',
-            setKey: SettingBoxKey.enableRcmdDynamic,
-            defaultVal: true,
-          ),
-          const SetSwitchItem(
             title: '快速收藏',
             subTitle: '点按收藏至默认，长按选择文件夹',
             setKey: SettingBoxKey.enableQuickFav,
@@ -176,50 +158,6 @@ class _ExtraSettingState extends State<ExtraSetting> {
             subTitle: '展示评论区搜索关键词',
             setKey: SettingBoxKey.enableWordRe,
             defaultVal: false,
-          ),
-          const SetSwitchItem(
-            title: '首页推荐刷新',
-            subTitle: '下拉刷新时保留上次内容',
-            setKey: SettingBoxKey.enableSaveLastData,
-            defaultVal: false,
-          ),
-          ListTile(
-            dense: false,
-            title: Text('首页推荐类型', style: titleStyle),
-            subtitle: Text(
-              '当前使用「$defaultRcmdType端」推荐',
-              style: subTitleStyle,
-            ),
-            onTap: () async {
-              String? result = await showDialog(
-                context: context,
-                builder: (context) {
-                  return SelectDialog<String>(
-                    title: '推荐类型',
-                    value: defaultRcmdType,
-                    values: RcmdType.values.map((e) {
-                      return {'title': e.labels, 'value': e.values};
-                    }).toList(),
-                  );
-                },
-              );
-              if (result != null) {
-                if (result == 'app') {
-                  // app端推荐需要access_key
-                  if (accessKeyInfo == null) {
-                    if (!userLogin) {
-                      SmartDialog.showToast('请先登录');
-                      return;
-                    }
-                    await MemberHttp.cookieToKey();
-                  }
-                }
-                defaultRcmdType = result;
-                setting.put(SettingBoxKey.defaultRcmdType, result);
-                SmartDialog.showToast('下次启动时生效');
-                setState(() {});
-              }
-            },
           ),
           const SetSwitchItem(
             title: '启用ai总结',

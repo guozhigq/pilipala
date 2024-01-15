@@ -15,7 +15,7 @@ class HtmlHttp {
       Match match = regex.firstMatch(response.data)!;
       String matchedString = match.group(0)!;
       response = await Request().get(
-        'https:$matchedString' + '/',
+        'https:$matchedString/',
         extra: {'ua': 'pc'},
       );
     }

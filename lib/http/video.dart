@@ -99,6 +99,45 @@ class VideoHttp {
     }
   }
 
+  // 模拟未登录推荐
+  static Future rcmdVideoListNotLogin({required int freshIdx}) async {
+    try {
+      var res = await Request().get(
+        Api.recommendListApp,
+        data: {
+          'idx': freshIdx,
+          'flush': '5',
+          'column': '4',
+          'device': 'pad',
+          'device_type': 0,
+          'device_name': 'vivo',
+          'pull': freshIdx == 0 ? 'true' : 'false',
+          'appkey': Constants.appKey,
+          'access_key': ''
+        },
+      );
+      if (res.data['code'] == 0) {
+        List<RecVideoItemAppModel> list = [];
+        List<int> blackMidsList =
+        setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        for (var i in res.data['data']['items']) {
+          // 屏蔽推广和拉黑用户
+          if (i['card_goto'] != 'ad_av' &&
+              (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
+              (i['args'] != null &&
+                  !blackMidsList.contains(i['args']['up_mid']))) {
+            list.add(RecVideoItemAppModel.fromJson(i));
+          }
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': ''};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err.toString()};
+    }
+  }
+
   // 最热视频
   static Future hotVideoList({required int pn, required int ps}) async {
     try {

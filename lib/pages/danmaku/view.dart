@@ -125,7 +125,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
           duration: const Duration(milliseconds: 100),
           child: DanmakuView(
             createdController: (DanmakuController e) async {
-              widget.playerController.danmakuController = _controller = e;
+              playerController.danmakuController = _controller = e;
             },
             option: DanmakuOption(
               fontSize: 15 * fontSizeVal,
@@ -135,7 +135,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
               duration:
-                  danmakuDurationVal / widget.playerController.playbackSpeed,
+                  danmakuDurationVal / playerController.playbackSpeed,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
             ),

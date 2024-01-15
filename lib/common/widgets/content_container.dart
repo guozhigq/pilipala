@@ -20,7 +20,7 @@ class ContentContainer extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         return SingleChildScrollView(
           clipBehavior: childClipBehavior ?? Clip.hardEdge,
-          physics: isScrollable ? null : NeverScrollableScrollPhysics(),
+          physics: isScrollable ? null : const NeverScrollableScrollPhysics(),
           child: ConstrainedBox(
             constraints: constraints.copyWith(
               minHeight: constraints.maxHeight,
@@ -34,7 +34,7 @@ class ContentContainer extends StatelessWidget {
                       child: contentWidget!,
                     )
                   else
-                    Spacer(),
+                    const Spacer(),
                   if (bottomWidget != null) bottomWidget!,
                 ],
               ),
