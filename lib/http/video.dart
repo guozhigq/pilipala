@@ -32,20 +32,29 @@ class VideoHttp {
         Api.recommendListWeb,
         data: {
           'version': 1,
-          'feed_version': 'V3',
+          'feed_version': 'V8',
+          'homepage_ver': 1,
           'ps': ps,
           'fresh_idx': freshIdx,
-          'fresh_type': 999999
+          'brush': freshIdx,
+          'fresh_type': 4
         },
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
         for (var i in res.data['data']['item']) {
+          if (i['goto'] == 'ad' || i['is_ad'] == true){
+            continue;
+          }
+          if (i['id'] == 0) {
+            print(i);
+            continue;
+          }
           list.add(RecVideoItemModel.fromJson(i));
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': [], 'msg': ''};
+        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err.toString()};
