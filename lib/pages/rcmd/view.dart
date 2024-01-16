@@ -101,18 +101,14 @@ class _RcmdPageState extends State<RcmdPage>
                           ? Obx(
                               () => contentGrid(
                                   _rcmdController,
-                                  _rcmdController.defaultRcmdType == 'web'
-                                      ? _rcmdController.webVideoList
-                                      : _rcmdController.appVideoList),
+                                  _rcmdController.videoList),
                             )
                           : SliverLayoutBuilder(
                               builder: (context, boxConstraints) {
                               return Obx(
                                 () => contentGrid(
                                     _rcmdController,
-                                    _rcmdController.defaultRcmdType == 'web'
-                                        ? _rcmdController.webVideoList
-                                        : _rcmdController.appVideoList),
+                                    _rcmdController.videoList),
                               );
                             });
                     } else {
