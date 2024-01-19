@@ -140,6 +140,12 @@ class VideoHttp {
       data['bvid'] = bvid;
     }
 
+    // 免登录查看1080p
+    if (userInfoCache.get('userInfoCache') == null &&
+        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
+      data['try_look'] = 1;
+    }
+
     Map params = await WbiSign().makSign({
       ...data,
       'fourk': 1,
@@ -148,11 +154,6 @@ class VideoHttp {
       'web_location': 1550101,
     });
 
-    // 免登录查看1080p
-    if (userInfoCache.get('userInfoCache') == null &&
-        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
-      data['try_look'] = 1;
-    }
     try {
       var res = await Request().get(Api.videoUrl, data: params);
       if (res.data['code'] == 0) {
