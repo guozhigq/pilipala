@@ -24,6 +24,7 @@ import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
+import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
@@ -120,6 +121,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       if (autoExitFullcreen) {
         plPlayerController!.triggerFullScreen(status: false);
       }
+      shutdownTimerService.handleWaitingFinished();
 
       /// 顺序播放 列表循环
       if (plPlayerController!.playRepeat != PlayRepeat.pause &&
@@ -187,6 +189,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    shutdownTimerService.handleWaitingFinished();
     if (plPlayerController != null) {
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.dispose();
@@ -213,6 +216,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      plPlayerController!.danmakuController?.pause();
+      plPlayerController!.danmakuController?.clear();
     }
     super.didPushNext();
   }
@@ -388,107 +393,97 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       },
                                     ),
 
-                                    Obx(
-                                      () => Visibility(
-                                        visible: videoDetailController
-                                            .isShowCover.value,
-                                        child: Positioned(
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              handlePlay();
-                                            },
-                                            child: NetworkImgLayer(
-                                              type: 'emote',
-                                              src: videoDetailController
-                                                  .videoItem['pic'],
-                                              width: maxWidth,
-                                              height: maxHeight,
+                                    /// 关闭自动播放时 手动播放
+                                    if (!videoDetailController
+                                        .autoPlay.value) ...<Widget>[
+                                      Obx(
+                                        () => Visibility(
+                                          visible: videoDetailController
+                                              .isShowCover.value,
+                                          child: Positioned(
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                handlePlay();
+                                              },
+                                              child: NetworkImgLayer(
+                                                type: 'emote',
+                                                src: videoDetailController
+                                                    .videoItem['pic'],
+                                                width: maxWidth,
+                                                height: maxHeight,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-
-                                    /// 关闭自动播放时 手动播放
-                                    Obx(
-                                      () => Visibility(
-                                          visible: videoDetailController
-                                                  .isShowCover.value &&
-                                              videoDetailController
-                                                  .isEffective.value &&
-                                              !videoDetailController
-                                                  .autoPlay.value,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                child: AppBar(
-                                                  primary: false,
-                                                  foregroundColor: Colors.white,
-                                                  elevation: 0,
-                                                  scrolledUnderElevation: 0,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  actions: [
-                                                    IconButton(
-                                                      tooltip: '稍后再看',
-                                                      onPressed: () async {
-                                                        var res = await UserHttp
-                                                            .toViewLater(
-                                                                bvid:
-                                                                    videoDetailController
-                                                                        .bvid);
-                                                        SmartDialog.showToast(
-                                                            res['msg']);
-                                                      },
-                                                      icon: const Icon(Icons
-                                                          .history_outlined),
-                                                    ),
-                                                    const SizedBox(width: 14)
-                                                  ],
-                                                ),
-                                              ),
-                                              Positioned(
-                                                right: 12,
-                                                bottom: 10,
-                                                child: TextButton.icon(
-                                                  style: ButtonStyle(
-                                                    side: MaterialStateProperty
-                                                        .resolveWith((states) {
-                                                      return BorderSide(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .primary
-                                                              .withOpacity(0.5),
-                                                          width: 1);
-                                                    }),
+                                      Obx(
+                                        () => Visibility(
+                                            visible: videoDetailController
+                                                    .isShowCover.value &&
+                                                videoDetailController
+                                                    .isEffective.value,
+                                            child: Stack(
+                                              children: [
+                                                Positioned(
+                                                  top: 0,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: AppBar(
+                                                    primary: false,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    elevation: 0,
+                                                    scrolledUnderElevation: 0,
                                                     backgroundColor:
-                                                        MaterialStateProperty
-                                                            .resolveWith(
-                                                                (states) {
-                                                      return Theme.of(context)
-                                                          .colorScheme
-                                                          .background
-                                                          .withOpacity(0.6);
-                                                    }),
+                                                        Colors.transparent,
+                                                    actions: [
+                                                      IconButton(
+                                                        tooltip: '稍后再看',
+                                                        onPressed: () async {
+                                                          var res = await UserHttp
+                                                              .toViewLater(
+                                                                  bvid:
+                                                                      videoDetailController
+                                                                          .bvid);
+                                                          SmartDialog.showToast(
+                                                              res['msg']);
+                                                        },
+                                                        icon: const Icon(Icons
+                                                            .history_outlined),
+                                                      ),
+                                                      const SizedBox(width: 14)
+                                                    ],
                                                   ),
-                                                  onPressed: () => handlePlay(),
-                                                  icon: const Icon(
-                                                    Icons.play_circle_outline,
-                                                    size: 20,
-                                                  ),
-                                                  label: const Text('轻触封面播放'),
                                                 ),
-                                              ),
-                                            ],
-                                          )),
-                                    ),
+                                                Positioned(
+                                                  right: 12,
+                                                  bottom: 10,
+                                                  child: TextButton.icon(
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .resolveWith(
+                                                                  (states) {
+                                                        return Colors.white
+                                                            .withOpacity(0.8);
+                                                      }),
+                                                    ),
+                                                    onPressed: () =>
+                                                        handlePlay(),
+                                                    icon: const Icon(
+                                                      Icons.play_circle_outline,
+                                                      size: 20,
+                                                    ),
+                                                    label: const Text('轻触封面播放'),
+                                                  ),
+                                                ),
+                                              ],
+                                            )),
+                                      ),
+                                    ]
                                   ],
                                 );
                               },

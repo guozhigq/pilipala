@@ -113,6 +113,13 @@ class MyApp extends StatelessWidget {
                 ? darkColorScheme
                 : lightColorScheme,
             useMaterial3: true,
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: lightColorScheme.primary,
+              backgroundColor: lightColorScheme.secondaryContainer,
+              closeIconColor: lightColorScheme.secondary,
+              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
+              elevation: 20,
+            ),
             pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
                 TargetPlatform.android: ZoomPageTransitionsBuilder(
@@ -127,10 +134,11 @@ class MyApp extends StatelessWidget {
                 ? lightColorScheme
                 : darkColorScheme,
             useMaterial3: true,
-            snackBarTheme: const SnackBarThemeData(
-              actionTextColor: Colors.white,
-              backgroundColor: Colors.black,
-              contentTextStyle: TextStyle(color: Colors.white),
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: darkColorScheme.primary,
+              backgroundColor: darkColorScheme.secondaryContainer,
+              closeIconColor: darkColorScheme.secondary,
+              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
               elevation: 20,
             ),
           ),

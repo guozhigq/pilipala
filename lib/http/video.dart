@@ -32,20 +32,27 @@ class VideoHttp {
         Api.recommendListWeb,
         data: {
           'version': 1,
-          'feed_version': 'V3',
+          'feed_version': 'V8',
+          'homepage_ver': 1,
           'ps': ps,
           'fresh_idx': freshIdx,
-          'fresh_type': 999999
+          'brush': freshIdx,
+          'fresh_type': 4
         },
       );
       if (res.data['code'] == 0) {
         List<RecVideoItemModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['item']) {
-          list.add(RecVideoItemModel.fromJson(i));
+          //过滤掉live与ad，以及拉黑用户
+          if (i['goto'] == 'av' && !blackMidsList.contains(i['owner']['mid'])) {
+            list.add(RecVideoItemModel.fromJson(i));
+          }
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': [], 'msg': ''};
+        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err.toString()};
@@ -133,6 +140,12 @@ class VideoHttp {
       data['bvid'] = bvid;
     }
 
+    // 免登录查看1080p
+    if (userInfoCache.get('userInfoCache') == null &&
+        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
+      data['try_look'] = 1;
+    }
+
     Map params = await WbiSign().makSign({
       ...data,
       'fourk': 1,
@@ -141,11 +154,6 @@ class VideoHttp {
       'web_location': 1550101,
     });
 
-    // 免登录查看1080p
-    if (userInfoCache.get('userInfoCache') == null &&
-        setting.get(SettingBoxKey.p1080, defaultValue: true)) {
-      data['try_look'] = 1;
-    }
     try {
       var res = await Request().get(Api.videoUrl, data: params);
       if (res.data['code'] == 0) {
