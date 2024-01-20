@@ -34,8 +34,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   final TextEditingController _replyContentController = TextEditingController();
   final FocusNode replyContentFocusNode = FocusNode();
   final GlobalKey _formKey = GlobalKey<FormState>();
-  double _keyboardHeight = 0.0; // 键盘高度
-  final _debouncer = Debouncer(milliseconds: 100); // 设置延迟时间
   bool ableClean = false;
   Timer? timer;
   Box localCache = GStrorage.localCache;
@@ -91,24 +89,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   }
 
   @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 键盘高度
-      final viewInsets = EdgeInsets.fromViewPadding(
-          View.of(context).viewInsets, View.of(context).devicePixelRatio);
-      _debouncer.run(() {
-        if (mounted) {
-          setState(() {
-            _keyboardHeight =
-                _keyboardHeight == 0.0 ? viewInsets.bottom : _keyboardHeight;
-          });
-        }
-      });
-    });
-  }
-
-  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _replyContentController.dispose();
@@ -117,8 +97,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
+    double keyboardHeight = EdgeInsets.fromViewPadding(
+            View.of(context).viewInsets, View.of(context).devicePixelRatio)
+        .bottom;
     return Container(
-      height: 500,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
@@ -130,30 +112,32 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.only(
-                  top: 6, right: 15, left: 15, bottom: 10),
-              child: Form(
-                key: _formKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                child: TextField(
-                  controller: _replyContentController,
-                  minLines: 1,
-                  maxLines: null,
-                  autofocus: false,
-                  focusNode: replyContentFocusNode,
-                  decoration: const InputDecoration(
-                      hintText: "输入回复内容",
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                      )),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+          ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 200,
               ),
-            ),
-          ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(
+                    top: 6, right: 15, left: 15, bottom: 10),
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: TextField(
+                    controller: _replyContentController,
+                    minLines: 1,
+                    maxLines: null,
+                    autofocus: false,
+                    focusNode: replyContentFocusNode,
+                    decoration: const InputDecoration(
+                        hintText: "输入回复内容",
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                        )),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              )),
           Divider(
             height: 1,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
@@ -169,10 +153,17 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   height: 36,
                   child: IconButton(
                       onPressed: () {
-                        FocusScope.of(context)
-                            .requestFocus(replyContentFocusNode);
+                        if (keyboardHeight > 0) {
+                          FocusScope.of(context).unfocus();
+                        } else {
+                          FocusScope.of(context)
+                              .requestFocus(replyContentFocusNode);
+                        }
                       },
-                      icon: Icon(Icons.keyboard,
+                      icon: Icon(
+                          keyboardHeight > 0
+                              ? Icons.keyboard_hide
+                              : Icons.keyboard,
                           size: 22,
                           color: Theme.of(context).colorScheme.onBackground),
                       highlightColor:
@@ -181,7 +172,12 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                         padding: MaterialStateProperty.all(EdgeInsets.zero),
                         backgroundColor:
                             MaterialStateProperty.resolveWith((states) {
-                          return Theme.of(context).highlightColor;
+                          // 如果按钮被按下，返回高亮颜色
+                          if (states.contains(MaterialState.pressed)) {
+                            return Theme.of(context).highlightColor;
+                          }
+                          // 默认状态下，返回透明颜色
+                          return Colors.transparent;
                         }),
                       )),
                 ),
@@ -196,7 +192,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
             duration: const Duration(milliseconds: 300),
             child: SizedBox(
               width: double.infinity,
-              height: _keyboardHeight,
+              height: keyboardHeight,
             ),
           ),
         ],
