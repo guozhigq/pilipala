@@ -35,7 +35,7 @@ class SearchVideoPanel extends StatelessWidget {
                 padding: index == 0
                     ? const EdgeInsets.only(top: 2)
                     : EdgeInsets.zero,
-                child: VideoCardH(videoItem: i),
+                child: VideoCardH(videoItem: i, showPubdate: true),
               );
             },
           ),
@@ -70,7 +70,7 @@ class SearchVideoPanel extends StatelessWidget {
                               controller.selectedType.value = i['type'];
                               ctr!.order.value =
                                   i['type'].toString().split('.').last;
-                              SmartDialog.showLoading(msg: 'loooad');
+                              SmartDialog.showLoading(msg: 'loading');
                               await ctr!.onRefresh();
                               SmartDialog.dismiss();
                             },
@@ -201,7 +201,7 @@ class VideoPanelController extends GetxController {
                       SearchPanelController ctr =
                           Get.find<SearchPanelController>(tag: 'video');
                       ctr.duration.value = i['value'];
-                      SmartDialog.showLoading(msg: 'loooad');
+                      SmartDialog.showLoading(msg: 'loading');
                       await ctr.onRefresh();
                       SmartDialog.dismiss();
                     },

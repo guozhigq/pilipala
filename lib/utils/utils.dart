@@ -28,7 +28,13 @@ class Utils {
     return tempPath;
   }
 
-  static String numFormat(int number) {
+  static String numFormat(dynamic number) {
+    if (number == null) {
+      return '0';
+    }
+    if (number is String) {
+      return number;
+    }
     final String res = (number / 10000).toString();
     if (int.parse(res.split('.')[0]) >= 1) {
       return '${(number / 10000).toPrecision(1)}万';
@@ -55,6 +61,26 @@ class Utils {
       final String hourStr = hour < 10 ? '0$hour' : hour.toString();
       var a = timeFormat(time - hour * 3600);
       return '$hourStr:$a';
+    }
+  }
+
+  // 完全相对时间显示
+  static String formatTimestampToRelativeTime(timeStamp) {
+    var difference = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000));
+
+    if (difference.inDays > 365) {
+      return '${difference.inDays ~/ 365}年前';
+    } else if (difference.inDays > 30) {
+      return '${difference.inDays ~/ 30}个月前';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}天前';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}小时前';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}分钟前';
+    } else {
+      return '刚刚';
     }
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'stat/danmu.dart';
+import 'stat/view.dart';
 import '../../http/dynamics.dart';
 import '../../http/search.dart';
 import '../../http/user.dart';
@@ -322,21 +324,30 @@ class VideoStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 1,
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: MediaQuery.textScalerOf(context)
-              .scale(Theme.of(context).textTheme.labelSmall!.fontSize!),
-          color: Theme.of(context).colorScheme.outline,
+    return Row(
+      children: [
+        StatView(
+          theme: 'gray',
+          view: videoItem.stat.view as int,
         ),
-        children: [
-          if (videoItem.stat.view != '-')
-            TextSpan(text: '${videoItem.stat.view}观看'),
-          if (videoItem.stat.danmu != '-')
-            TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
-        ],
-      ),
+        const SizedBox(width: 8),
+        StatDanMu(
+          theme: 'gray',
+          danmu: videoItem.stat.danmu as int,
+        ),
+        const Spacer(),
+        RichText(
+          maxLines: 1,
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)
+          ),
+        ),
+        const SizedBox(width: 4),
+      ],
     );
   }
 }
