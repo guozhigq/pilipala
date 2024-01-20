@@ -55,12 +55,13 @@ class RcmdController extends GetxController {
     }
     late final Map<String,dynamic> res;
     switch (defaultRcmdType) {
-      case 'app': case 'notLogin':
-      res = await VideoHttp.rcmdVideoListApp(
-        loginStatus: defaultRcmdType != 'notLogin',
-        freshIdx: _currentPage,
-      );
-      break;
+      case 'app':
+      case 'notLogin':
+        res = await VideoHttp.rcmdVideoListApp(
+          loginStatus: defaultRcmdType != 'notLogin',
+          freshIdx: _currentPage,
+        );
+        break;
       default: //'web'
         res = await VideoHttp.rcmdVideoList(
           freshIdx: _currentPage,
@@ -83,10 +84,16 @@ class RcmdController extends GetxController {
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
       }
+      // 目前仅支持app端系列保存缓存
       if (defaultRcmdType != 'web') {
         recVideo.put('cacheList', res['data']);
       }
       _currentPage += 1;
+      // 若videoList数量太小，可能会影响翻页，此时再次请求
+      // 为避免请求到的数据太少时还在反复请求，要求本次返回数据大于1条才触发
+      if (res['data'].length > 1 && videoList.length < 10){
+        queryRcmdFeed('onLoad');
+      }
     } else {
       Get.snackbar('提示', res['msg']);
     }

@@ -9,7 +9,6 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get_utils/get_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,10 +27,16 @@ class Utils {
     return tempPath;
   }
 
-  static String numFormat(int number) {
+  static String numFormat(dynamic number) {
+    if (number == null){
+      return '0';
+    }
+    if (number is String) {
+      return number;
+    }
     final String res = (number / 10000).toString();
     if (int.parse(res.split('.')[0]) >= 1) {
-      return '${(number / 10000).toPrecision(1)}万';
+      return '${(number / 10000).toStringAsFixed(1)}万';
     } else {
       return number.toString();
     }

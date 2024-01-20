@@ -23,7 +23,7 @@ class RecVideoItemAppModelAdapter extends TypeAdapter<RecVideoItemAppModel> {
       cid: fields[3] as int?,
       pic: fields[4] as String?,
       stat: fields[5] as RcmdStat?,
-      duration: fields[6] as String?,
+      duration: fields[6] as int?,
       title: fields[7] as String?,
       isFollowed: fields[8] as int?,
       owner: fields[9] as RcmdOwner?,

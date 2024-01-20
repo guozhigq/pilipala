@@ -124,6 +124,11 @@ class SettingBoxKey {
       enableRcmdDynamic = 'enableRcmdDynamic',
       defaultRcmdType = 'defaultRcmdType',
       enableSaveLastData = 'enableSaveLastData',
+      minDurationForRcmd = 'minDurationForRcmd',
+      minLikeRatioForRecommend = 'minLikeRatioForRecommend',
+      exemptFilterForFollowed = 'exemptFilterForFollowed',
+      //filterUnfollowedRatio = 'filterUnfollowedRatio',
+      applyFilterToRelatedVideos = 'applyFilterToRelatedVideos',
 
       /// 其他
       autoUpdate = 'autoUpdate',

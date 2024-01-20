@@ -1,5 +1,3 @@
-import 'package:pilipala/utils/utils.dart';
-
 import './model_owner.dart';
 import 'package:hive/hive.dart';
 
@@ -38,7 +36,7 @@ class RecVideoItemModel {
   @HiveField(6)
   String? title = '';
   @HiveField(7)
-  String? duration = '';
+  int? duration = -1;
   @HiveField(8)
   int? pubdate = -1;
   @HiveField(9)
@@ -58,7 +56,7 @@ class RecVideoItemModel {
     uri = json["uri"];
     pic = json["pic"];
     title = json["title"];
-    duration = Utils.tampToSeektime(json["duration"]);
+    duration = json["duration"];
     pubdate = json["pubdate"];
     owner = Owner.fromJson(json["owner"]);
     stat = Stat.fromJson(json["stat"]);
@@ -77,14 +75,15 @@ class Stat {
     this.danmu,
   });
   @HiveField(0)
-  String? view;
+  int? view;
   @HiveField(1)
   int? like;
   @HiveField(2)
   int? danmu;
 
   Stat.fromJson(Map<String, dynamic> json) {
-    view = Utils.numFormat(json["view"]);
+    // 无需在model中转换以保留原始数据，在view层处理即可
+    view = json["view"];
     like = json["like"];
     danmu = json['danmaku'];
   }

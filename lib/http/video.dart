@@ -9,6 +9,7 @@ import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
 import '../models/video_detail_res.dart';
+import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
 import '../utils/wbi_sign.dart';
 import 'api.dart';
@@ -49,7 +50,10 @@ class VideoHttp {
           if (i['goto'] == 'av' &&
               (i['owner'] != null &&
                   !blackMidsList.contains(i['owner']['mid']))) {
-            list.add(RecVideoItemModel.fromJson(i));
+            RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)){
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
@@ -93,7 +97,10 @@ class VideoHttp {
               (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
-            list.add(RecVideoItemAppModel.fromJson(i));
+            RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)){
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
@@ -209,7 +216,10 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']) {
-        list.add(HotVideoItemModel.fromJson(i));
+        HotVideoItemModel videoItem = HotVideoItemModel.fromJson(i);
+        if (!RecommendFilter.filter(videoItem, relatedVideos: true)){
+          list.add(videoItem);
+        }
       }
       return {'status': true, 'data': list};
     } else {
