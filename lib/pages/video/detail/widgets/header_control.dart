@@ -17,6 +17,7 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/http/danmaku.dart';
+import 'package:pilipala/services/shutdown_timer_service.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   const HeaderControl({
@@ -39,14 +40,13 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
 class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
   List<PlaySpeed> playSpeed = PlaySpeed.values;
-  TextStyle subTitleStyle = const TextStyle(fontSize: 12);
-  TextStyle titleStyle = const TextStyle(fontSize: 14);
+  static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
+  static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
   final Box<dynamic> localCache = GStrorage.localCache;
   final Box<dynamic> videoStorage = GStrorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
-
   @override
   void initState() {
     super.initState();
@@ -63,7 +63,7 @@ class _HeaderControlState extends State<HeaderControl> {
       builder: (_) {
         return Container(
           width: double.infinity,
-          height: 440,
+          height: 460,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.background,
@@ -125,13 +125,20 @@ class _HeaderControlState extends State<HeaderControl> {
                       },
                       dense: true,
                       leading: const Icon(Icons.watch_later_outlined, size: 20),
-                      title: Text('添加至「稍后再看」', style: titleStyle),
+                      title: const Text('添加至「稍后再看」', style: titleStyle),
+                    ),
+                    ListTile(
+                      onTap: () => {Get.back(), scheduleExit()},
+                      dense: true,
+                      leading:
+                          const Icon(Icons.hourglass_top_outlined, size: 20),
+                      title: const Text('定时关闭（测试）', style: titleStyle),
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
                       dense: true,
                       leading: const Icon(Icons.play_circle_outline, size: 20),
-                      title: Text('选择画质', style: titleStyle),
+                      title: const Text('选择画质', style: titleStyle),
                       subtitle: Text(
                           '当前画质 ${widget.videoDetailCtr!.currentVideoQa.description}',
                           style: subTitleStyle),
@@ -141,7 +148,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         onTap: () => {Get.back(), showSetAudioQa()},
                         dense: true,
                         leading: const Icon(Icons.album_outlined, size: 20),
-                        title: Text('选择音质', style: titleStyle),
+                        title: const Text('选择音质', style: titleStyle),
                         subtitle: Text(
                             '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
                             style: subTitleStyle),
@@ -150,7 +157,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       onTap: () => {Get.back(), showSetDecodeFormats()},
                       dense: true,
                       leading: const Icon(Icons.av_timer_outlined, size: 20),
-                      title: Text('解码格式', style: titleStyle),
+                      title: const Text('解码格式', style: titleStyle),
                       subtitle: Text(
                           '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
                           style: subTitleStyle),
@@ -159,7 +166,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
                       leading: const Icon(Icons.repeat, size: 20),
-                      title: Text('播放顺序', style: titleStyle),
+                      title: const Text('播放顺序', style: titleStyle),
                       subtitle: Text(widget.controller!.playRepeat.description,
                           style: subTitleStyle),
                     ),
@@ -167,7 +174,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       onTap: () => {Get.back(), showSetDanmaku()},
                       dense: true,
                       leading: const Icon(Icons.subtitles_outlined, size: 20),
-                      title: Text('弹幕设置', style: titleStyle),
+                      title: const Text('弹幕设置', style: titleStyle),
                     ),
                   ],
                 ),
@@ -259,6 +266,133 @@ class _HeaderControlState extends State<HeaderControl> {
             })
           ],
         );
+      },
+    );
+  }
+
+  /// 定时关闭
+  void scheduleExit() async {
+    const List<int> scheduleTimeChoices = [
+      -1,
+      15,
+      30,
+      60,
+    ];
+    showModalBottomSheet(
+      context: context,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            width: double.infinity,
+            height: 500,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.only(left: 14, right: 14),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(height: 30),
+                      const Center(child: Text('定时关闭', style: titleStyle)),
+                      const SizedBox(height: 10),
+                      for (final int choice in scheduleTimeChoices) ...<Widget>[
+                        ListTile(
+                          onTap: () {
+                            shutdownTimerService.scheduledExitInMinutes =
+                                choice;
+                            shutdownTimerService.startShutdownTimer();
+                            Get.back();
+                          },
+                          contentPadding: const EdgeInsets.only(),
+                          dense: true,
+                          title: Text(choice == -1 ? "禁用" : "$choice分钟后"),
+                          trailing: shutdownTimerService
+                                      .scheduledExitInMinutes ==
+                                  choice
+                              ? Icon(
+                                  Icons.done,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              : const SizedBox(),
+                        )
+                      ],
+                      const SizedBox(height: 6),
+                      const Center(
+                          child: SizedBox(
+                        width: 100,
+                        child: Divider(height: 1),
+                      )),
+                      const SizedBox(height: 10),
+                      ListTile(
+                        onTap: () {
+                          shutdownTimerService.waitForPlayingCompleted =
+                              !shutdownTimerService.waitForPlayingCompleted;
+                          setState(() {});
+                        },
+                        dense: true,
+                        contentPadding: const EdgeInsets.only(),
+                        title:
+                            const Text("额外等待视频播放完毕", style: titleStyle),
+                        trailing: Switch(
+                          // thumb color (round icon)
+                          activeColor: Theme.of(context).colorScheme.primary,
+                          activeTrackColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          inactiveThumbColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          inactiveTrackColor:
+                              Theme.of(context).colorScheme.background,
+                          splashRadius: 10.0,
+                          // boolean variable value
+                          value: shutdownTimerService.waitForPlayingCompleted,
+                          // changes the state of the switch
+                          onChanged: (value) => setState(() =>
+                              shutdownTimerService.waitForPlayingCompleted =
+                                  value),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: <Widget>[
+                          const Text('倒计时结束:', style: titleStyle),
+                          const Spacer(),
+                          ActionRowLineItem(
+                            onTap: () {
+                              shutdownTimerService.exitApp = false;
+                              setState(() {});
+                              // Get.back();
+                            },
+                            text: " 暂停视频 ",
+                            selectStatus: !shutdownTimerService.exitApp,
+                          ),
+                          const Spacer(),
+                          // const SizedBox(width: 10),
+                          ActionRowLineItem(
+                            onTap: () {
+                              shutdownTimerService.exitApp = true;
+                              setState(() {});
+                              // Get.back();
+                            },
+                            text: " 退出APP ",
+                            selectStatus: shutdownTimerService.exitApp,
+                          )
+                        ],
+                      ),
+                    ]),
+              ),
+            ),
+          );
+        });
       },
     );
   }
@@ -367,7 +501,7 @@ class _HeaderControlState extends State<HeaderControl> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('选择画质', style: titleStyle),
+                      const Text('选择画质', style: titleStyle),
                       SizedBox(width: buttonSpace),
                       Icon(
                         Icons.info_outline,
@@ -448,7 +582,7 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: <Widget>[
-              SizedBox(
+              const SizedBox(
                   height: 45,
                   child: Center(child: Text('选择音质', style: titleStyle))),
               Expanded(
@@ -614,7 +748,7 @@ class _HeaderControlState extends State<HeaderControl> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 45,
                     child: Center(child: Text('弹幕设置', style: titleStyle)),
                   ),
