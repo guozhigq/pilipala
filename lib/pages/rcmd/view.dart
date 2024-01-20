@@ -91,54 +91,18 @@ class _RcmdPageState extends State<RcmdPage>
             SliverPadding(
               padding:
                   const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
-              sliver: FutureBuilder(
-                future: _futureBuilderFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      return Platform.isAndroid || Platform.isIOS
-                          ? Obx(
-                              () => contentGrid(
-                                  _rcmdController,
-                                  _rcmdController.defaultRcmdType == 'web'
-                                      ? _rcmdController.webVideoList
-                                      : _rcmdController.appVideoList),
-                            )
-                          : SliverLayoutBuilder(
-                              builder: (context, boxConstraints) {
-                              return Obx(
-                                () => contentGrid(
-                                    _rcmdController,
-                                    _rcmdController.defaultRcmdType == 'web'
-                                        ? _rcmdController.webVideoList
-                                        : _rcmdController.appVideoList),
-                              );
-                            });
-                    } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () {
-                          setState(() {
-                            _futureBuilderFuture =
-                                _rcmdController.queryRcmdFeed('init');
-                          });
-                        },
-                      );
-                    }
-                  } else {
-                    // 缓存数据
-                    // if (_rcmdController.videoList.isNotEmpty) {
-                    //   return contentGrid(
-                    //       _rcmdController, _rcmdController.videoList);
-                    // }
-                    // // 骨架屏
-                    // else {
-                    return contentGrid(_rcmdController, []);
-                    // }
-                  }
-                },
-              ),
+              sliver: Obx(() {
+                // 使用Obx来监听数据的变化
+                if (_rcmdController.isLoadingMore) {
+                  // 如果正在加载，则显示骨架屏
+                  return contentGrid(_rcmdController, []);
+                } else {
+                  // 显示视频列表
+                  return contentGrid(
+                      _rcmdController,
+                      _rcmdController.videoList);
+                }
+              }),
             ),
             LoadingMore(ctr: _rcmdController)
           ],

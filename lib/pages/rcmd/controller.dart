@@ -9,8 +9,8 @@ import 'package:pilipala/utils/storage.dart';
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
   int _currentPage = 0;
-  RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
-  RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
+  // RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
+  // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
   Box recVideo = GStrorage.recVideo;
@@ -18,6 +18,7 @@ class RcmdController extends GetxController {
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;
   late String defaultRcmdType = 'web';
+  late RxList<dynamic> videoList;
 
   @override
   void onInit() {
@@ -37,85 +38,59 @@ class RcmdController extends GetxController {
         setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
     defaultRcmdType =
         setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web');
+    if (defaultRcmdType == 'web'){
+      videoList = <RecVideoItemModel>[].obs;
+    } else {
+      videoList = <RecVideoItemAppModel>[].obs;
+    }
   }
 
   // 获取推荐
   Future queryRcmdFeed(type) async {
-    print(defaultRcmdType);
-    if (defaultRcmdType == 'app') {
-      return await queryRcmdFeedApp(type);
-    }
-    if (defaultRcmdType == 'web') {
-      return await queryRcmdFeedWeb(type);
-    }
-  }
-
-  // 获取app端推荐
-  Future queryRcmdFeedApp(type) async {
     if (isLoadingMore == false) {
       return;
     }
     if (type == 'onRefresh') {
       _currentPage = 0;
     }
-    var res = await VideoHttp.rcmdVideoListApp(
-      freshIdx: _currentPage,
-    );
+    late final Map<String,dynamic> res;
+    switch (defaultRcmdType) {
+      case 'app': case 'notLogin':
+      res = await VideoHttp.rcmdVideoListApp(
+        loginStatus: defaultRcmdType != 'notLogin',
+        freshIdx: _currentPage,
+      );
+      break;
+      default: //'web'
+        res = await VideoHttp.rcmdVideoList(
+          freshIdx: _currentPage,
+          ps: 20,
+        );
+    }
     if (res['status']) {
       if (type == 'init') {
-        if (appVideoList.isNotEmpty) {
-          appVideoList.addAll(res['data']);
+        if (videoList.isNotEmpty) {
+          videoList.addAll(res['data']);
         } else {
-          appVideoList.value = res['data'];
+          videoList.value = res['data'];
         }
       } else if (type == 'onRefresh') {
         if (enableSaveLastData) {
-          appVideoList.insertAll(0, res['data']);
+          videoList.insertAll(0, res['data']);
         } else {
-          appVideoList.value = res['data'];
+          videoList.value = res['data'];
         }
       } else if (type == 'onLoad') {
-        appVideoList.addAll(res['data']);
+        videoList.addAll(res['data']);
       }
-      recVideo.put('cacheList', res['data']);
-      _currentPage += 1;
-    }
-    isLoadingMore = false;
-    return res;
-  }
-
-  // 获取web端推荐
-  Future queryRcmdFeedWeb(type) async {
-    if (isLoadingMore == false) {
-      return;
-    }
-    if (type == 'onRefresh') {
-      _currentPage = 0;
-    }
-    var res = await VideoHttp.rcmdVideoList(
-      ps: 20,
-      freshIdx: _currentPage,
-    );
-    if (res['status']) {
-      if (type == 'init') {
-        if (webVideoList.isNotEmpty) {
-          webVideoList.addAll(res['data']);
-        } else {
-          webVideoList.value = res['data'];
-        }
-      } else if (type == 'onRefresh') {
-        if (enableSaveLastData) {
-          webVideoList.insertAll(0, res['data']);
-        } else {
-          webVideoList.value = res['data'];
-        }
-      } else if (type == 'onLoad') {
-        webVideoList.addAll(res['data']);
+      if (defaultRcmdType != 'web') {
+        recVideo.put('cacheList', res['data']);
       }
       _currentPage += 1;
+    } else {
+      Get.snackbar('提示', res['msg']);
     }
     isLoadingMore = false;
-    return res;
   }
 
   // 下拉刷新
@@ -129,7 +104,7 @@ class RcmdController extends GetxController {
     queryRcmdFeed('onLoad');
   }
 
-  // 返回顶部并刷新
+  // 返回顶部
   void animateToTop() async {
     if (scrollController.offset >=
         MediaQuery.of(Get.context!).size.height * 5) {
