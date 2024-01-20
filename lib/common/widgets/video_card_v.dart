@@ -158,12 +158,12 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (videoItem.duration != null)
+                      if (videoItem.duration > 0)
                         if (crossAxisCount == 1) ...[
                           PBadge(
                             bottom: 10,
                             right: 10,
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ] else ...[
                           PBadge(
@@ -171,7 +171,7 @@ class VideoCardV extends StatelessWidget {
                             right: 7,
                             size: 'small',
                             type: 'gray',
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ],
                     ],
@@ -330,10 +330,8 @@ class VideoStat extends StatelessWidget {
           color: Theme.of(context).colorScheme.outline,
         ),
         children: [
-          if (videoItem.stat.view != '-')
-            TextSpan(text: '${videoItem.stat.view}观看'),
-          if (videoItem.stat.danmu != '-')
-            TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
+          TextSpan(text: '${Utils.numFormat(videoItem.stat.view)}观看'),
+          TextSpan(text: ' • ${Utils.numFormat(videoItem.stat.danmu)}弹幕'),
         ],
       ),
     );

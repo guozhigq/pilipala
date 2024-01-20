@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
 import 'package:pilipala/common/widgets/animated_dialog.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
+// import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import 'package:pilipala/pages/home/index.dart';
@@ -26,7 +25,6 @@ class RcmdPage extends StatefulWidget {
 class _RcmdPageState extends State<RcmdPage>
     with AutomaticKeepAliveClientMixin {
   final RcmdController _rcmdController = Get.put(RcmdController());
-  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -34,7 +32,7 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
+    _rcmdController.queryRcmdFeed('init');
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -90,57 +88,21 @@ class _RcmdPageState extends State<RcmdPage>
           slivers: [
             SliverPadding(
               padding:
-                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
-              sliver: FutureBuilder(
-                future: _futureBuilderFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      return Platform.isAndroid || Platform.isIOS
-                          ? Obx(
-                              () => contentGrid(
-                                  _rcmdController,
-                                  _rcmdController.defaultRcmdType == 'web'
-                                      ? _rcmdController.webVideoList
-                                      : _rcmdController.appVideoList),
-                            )
-                          : SliverLayoutBuilder(
-                              builder: (context, boxConstraints) {
-                              return Obx(
-                                () => contentGrid(
-                                    _rcmdController,
-                                    _rcmdController.defaultRcmdType == 'web'
-                                        ? _rcmdController.webVideoList
-                                        : _rcmdController.appVideoList),
-                              );
-                            });
-                    } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () {
-                          setState(() {
-                            _futureBuilderFuture =
-                                _rcmdController.queryRcmdFeed('init');
-                          });
-                        },
-                      );
-                    }
-                  } else {
-                    // 缓存数据
-                    // if (_rcmdController.videoList.isNotEmpty) {
-                    //   return contentGrid(
-                    //       _rcmdController, _rcmdController.videoList);
-                    // }
-                    // // 骨架屏
-                    // else {
-                    return contentGrid(_rcmdController, []);
-                    // }
-                  }
-                },
-              ),
+              const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              sliver: Obx(() { // 使用Obx来监听数据的变化
+                if (_rcmdController.isLoadingMore && _rcmdController.videoList.isEmpty) {
+                  return contentGrid(_rcmdController, []);
+                  // 如果正在加载并且列表为空，则显示加载指示器
+                  // return const SliverToBoxAdapter(
+                  //   child: Center(child: CircularProgressIndicator()),
+                  // );
+                } else {
+                  // 显示视频列表
+                  return contentGrid(_rcmdController, _rcmdController.videoList);
+                }
+              }),
             ),
-            LoadingMore(ctr: _rcmdController)
+            LoadingMore(ctr: _rcmdController),
           ],
         ),
       ),
