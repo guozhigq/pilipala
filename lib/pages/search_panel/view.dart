@@ -43,7 +43,7 @@ class _SearchPanelState extends State<SearchPanel>
         keyword: widget.keyword,
         searchType: widget.searchType,
       ),
-      tag: widget.searchType!.type + widget.keyword!,
+      tag: widget.searchType!.type,
     );
     scrollController = _searchPanelController.scrollController;
     scrollController.addListener(() async {
