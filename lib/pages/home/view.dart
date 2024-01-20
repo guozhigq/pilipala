@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/index.dart';
@@ -46,6 +47,13 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
+    // 设置状态栏图标的亮度
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarIconBrightness: currentBrightness == Brightness.light
+          ? Brightness.dark
+          : Brightness.light,
+    ));
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -129,7 +137,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             curve: Curves.easeInOutCubicEmphasized,
             duration: const Duration(milliseconds: 500),
             height: snapshot.data ? top + 52 : top,
-            padding: EdgeInsets.fromLTRB(14, top, 14, 0),
+            padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
             child: UserInfoWidget(
               top: top,
               userLogin: isUserLoggedIn,
