@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import '../../models/model_rec_video_item.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
@@ -328,25 +329,26 @@ class VideoStat extends StatelessWidget {
       children: [
         StatView(
           theme: 'gray',
-          view: videoItem.stat.view as int,
+          view: videoItem.stat.view,
         ),
         const SizedBox(width: 8),
         StatDanMu(
           theme: 'gray',
-          danmu: videoItem.stat.danmu as int,
+          danmu: videoItem.stat.danmu,
         ),
-        const Spacer(),
-        RichText(
-          maxLines: 1,
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-              color: Theme.of(context).colorScheme.outline,
-            ),
-            text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)
+        if (videoItem is RecVideoItemModel) ...<Widget>[
+          const Spacer(),
+          RichText(
+            maxLines: 1,
+            text: TextSpan(
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
           ),
-        ),
-        const SizedBox(width: 4),
+          const SizedBox(width: 4),
+        ]
       ],
     );
   }
