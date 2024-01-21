@@ -94,7 +94,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
     return PopScope(
-      onPopInvoked: (bool status) => _mainController.onBackPressed(context),
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        _mainController.onBackPressed(context);
+      },
       child: Scaffold(
         extendBody: true,
         body: PageView(
