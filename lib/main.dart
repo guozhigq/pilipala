@@ -156,9 +156,8 @@ class MyApp extends StatelessWidget {
             return FlutterSmartDialog(
               toastBuilder: (String msg) => CustomToast(msg: msg),
               child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                    textScaleFactor:
-                        MediaQuery.of(context).textScaleFactor * textScale),
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
                 child: child!,
               ),
             );

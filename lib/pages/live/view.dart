@@ -162,8 +162,9 @@ class _LivePageState extends State<LivePage>
         crossAxisCount: crossAxisCount,
         mainAxisExtent:
             Get.size.width / crossAxisCount / StyleString.aspectRatio +
-                (crossAxisCount == 1 ? 48 : 68) *
-                    MediaQuery.of(context).textScaleFactor,
+                MediaQuery.textScalerOf(context).scale(
+                  (crossAxisCount == 1 ? 48 : 68),
+                ),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

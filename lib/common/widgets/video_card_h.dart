@@ -69,7 +69,7 @@ class VideoCardH extends StatelessWidget {
               final double width = (boxConstraints.maxWidth -
                       StyleString.cardSpace *
                           6 /
-                          MediaQuery.of(context).textScaleFactor) /
+                          MediaQuery.textScalerOf(context).scale(1.0)) /
                   2;
               return Container(
                 constraints: const BoxConstraints(minHeight: 88),

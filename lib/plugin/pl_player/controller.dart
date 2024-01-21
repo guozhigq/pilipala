@@ -786,7 +786,7 @@ class PlPlayerController {
     volume.value = volumeNew;
 
     try {
-      FlutterVolumeController.showSystemUI = false;
+      FlutterVolumeController.updateShowSystemUI(false);
       await FlutterVolumeController.setVolume(volumeNew);
     } catch (err) {
       print(err);
