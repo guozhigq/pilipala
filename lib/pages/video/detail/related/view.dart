@@ -9,7 +9,8 @@ import './controller.dart';
 
 class RelatedVideoPanel extends StatelessWidget {
   final ReleatedController _releatedController =
-      Get.put(ReleatedController(), tag: Get.arguments['heroTag']);
+      Get.put(ReleatedController(), tag: Get.arguments?['heroTag']);
+  RelatedVideoPanel({super.key});
 
   @override
   Widget build(BuildContext context) {

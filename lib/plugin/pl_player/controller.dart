@@ -621,7 +621,7 @@ class PlPlayerController {
     if (duration.value.inSeconds != 0) {
       if (type != 'slider') {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
-        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.stream.buffer.first;
       }
       await _videoPlayerController?.seek(position);
       // if (playerStatus.stopped) {
@@ -1086,12 +1086,13 @@ class PlPlayerController {
       localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
       localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
       localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
-
-      var pp = _videoPlayerController!.platform as NativePlayer;
-      await pp.setProperty('audio-files', '');
-      removeListeners();
-      await _videoPlayerController?.dispose();
-      _videoPlayerController = null;
+      if (_videoPlayerController != null) {
+        var pp = _videoPlayerController!.platform as NativePlayer;
+        await pp.setProperty('audio-files', '');
+        removeListeners();
+        await _videoPlayerController?.dispose();
+        _videoPlayerController = null;
+      }
       _instance = null;
       // 关闭所有视频页面恢复亮度
       resetBrightness();

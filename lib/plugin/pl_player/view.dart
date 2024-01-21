@@ -703,7 +703,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ),
             );
           } else {
-            return nil;
+            return const SizedBox();
           }
         }),
 
