@@ -57,6 +57,8 @@ class MainController extends GetxController {
   Box setting = GStrorage.setting;
   DateTime? _lastPressedAt;
   late bool hideTabBar;
+  late PageController pageController;
+  int selectedIndex = 0;
 
   @override
   void onInit() {
@@ -73,6 +75,9 @@ class MainController extends GetxController {
             const Duration(seconds: 2)) {
       // 两次点击时间间隔超过2秒，重新记录时间戳
       _lastPressedAt = DateTime.now();
+      if (selectedIndex != 0) {
+        pageController.jumpTo(0);
+      }
       SmartDialog.showToast("再按一次退出Pili");
       return; // 不退出应用
     }

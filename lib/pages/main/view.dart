@@ -24,8 +24,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final DynamicsController _dynamicController = Get.put(DynamicsController());
   final MediaController _mediaController = Get.put(MediaController());
 
-  PageController? _pageController;
-  int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
   late bool enableMYBar;
@@ -34,13 +32,14 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
-    _pageController = PageController(initialPage: selectedIndex);
+    _mainController.pageController =
+        PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
   }
 
   void setIndex(int value) async {
     feedBack();
-    _pageController!.jumpToPage(value);
+    _mainController.pageController!.jumpToPage(value);
     var currentPage = _mainController.pages[value];
     if (currentPage is HomePage) {
       if (_homeController.flag) {
@@ -102,9 +101,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         extendBody: true,
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
-          controller: _pageController,
+          controller: _mainController.pageController,
           onPageChanged: (index) {
-            selectedIndex = index;
+            _mainController.selectedIndex = index;
             setState(() {});
           },
           children: _mainController.pages,
@@ -122,7 +121,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               child: enableMYBar
                   ? NavigationBar(
                       onDestinationSelected: (value) => setIndex(value),
-                      selectedIndex: selectedIndex,
+                      selectedIndex: _mainController.selectedIndex,
                       destinations: <Widget>[
                         ..._mainController.navigationBars.map((e) {
                           return NavigationDestination(
@@ -134,7 +133,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                       ],
                     )
                   : BottomNavigationBar(
-                      currentIndex: selectedIndex,
+                      currentIndex: _mainController.selectedIndex,
                       onTap: (value) => setIndex(value),
                       iconSize: 16,
                       selectedFontSize: 12,
