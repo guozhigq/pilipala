@@ -24,8 +24,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final DynamicsController _dynamicController = Get.put(DynamicsController());
   final MediaController _mediaController = Get.put(MediaController());
 
-  PageController? _pageController;
-  int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
   late bool enableMYBar;
@@ -34,13 +32,14 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
-    _pageController = PageController(initialPage: selectedIndex);
+    _mainController.pageController =
+        PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
   }
 
   void setIndex(int value) async {
     feedBack();
-    _pageController!.jumpToPage(value);
+    _mainController.pageController.jumpToPage(value);
     var currentPage = _mainController.pages[value];
     if (currentPage is HomePage) {
       if (_homeController.flag) {
@@ -68,6 +67,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
       _dynamicController.flag = true;
+      _mainController.clearUnread();
     } else {
       _dynamicController.flag = false;
     }
@@ -94,14 +94,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
     return PopScope(
-      onPopInvoked: (bool status) => _mainController.onBackPressed(context),
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        _mainController.onBackPressed(context);
+      },
       child: Scaffold(
         extendBody: true,
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
-          controller: _pageController,
+          controller: _mainController.pageController,
           onPageChanged: (index) {
-            selectedIndex = index;
+            _mainController.selectedIndex = index;
             setState(() {});
           },
           children: _mainController.pages,
@@ -116,36 +119,48 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               curve: Curves.easeInOutCubicEmphasized,
               duration: const Duration(milliseconds: 500),
               offset: Offset(0, snapshot.data ? 0 : 1),
-              child: enableMYBar
-                  ? NavigationBar(
-                      onDestinationSelected: (value) => setIndex(value),
-                      selectedIndex: selectedIndex,
-                      destinations: <Widget>[
-                        ..._mainController.navigationBars.map((e) {
-                          return NavigationDestination(
-                            icon: e['icon'],
-                            selectedIcon: e['selectIcon'],
-                            label: e['label'],
-                          );
-                        }).toList(),
-                      ],
-                    )
-                  : BottomNavigationBar(
-                      currentIndex: selectedIndex,
-                      onTap: (value) => setIndex(value),
-                      iconSize: 16,
-                      selectedFontSize: 12,
-                      unselectedFontSize: 12,
-                      items: [
-                        ..._mainController.navigationBars.map((e) {
-                          return BottomNavigationBarItem(
-                            icon: e['icon'],
-                            activeIcon: e['selectIcon'],
-                            label: e['label'],
-                          );
-                        }).toList(),
-                      ],
-                    ),
+              child: Obx(
+                () => enableMYBar
+                    ? NavigationBar(
+                        onDestinationSelected: (value) => setIndex(value),
+                        selectedIndex: _mainController.selectedIndex,
+                        destinations: <Widget>[
+                          ..._mainController.navigationBars.map((e) {
+                            return NavigationDestination(
+                              icon: Badge(
+                                label: Text(e['count'].toString()),
+                                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                isLabelVisible: e['count'] > 0,
+                                child: e['icon'],
+                              ),
+                              selectedIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      )
+                    : BottomNavigationBar(
+                        currentIndex: _mainController.selectedIndex,
+                        onTap: (value) => setIndex(value),
+                        iconSize: 16,
+                        selectedFontSize: 12,
+                        unselectedFontSize: 12,
+                        items: [
+                          ..._mainController.navigationBars.map((e) {
+                            return BottomNavigationBarItem(
+                              icon: Badge(
+                                label: Text(e['count'].toString()),
+                                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                isLabelVisible: e['count'] > 0,
+                                child: e['icon'],
+                              ),
+                              activeIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      ),
+              ),
             );
           },
         ),

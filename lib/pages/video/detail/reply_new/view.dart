@@ -2,12 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
   final int? oid;
@@ -34,23 +32,16 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   final TextEditingController _replyContentController = TextEditingController();
   final FocusNode replyContentFocusNode = FocusNode();
   final GlobalKey _formKey = GlobalKey<FormState>();
-  bool ableClean = false;
-  Timer? timer;
-  Box localCache = GStrorage.localCache;
-  late double sheetHeight;
 
   @override
   void initState() {
     super.initState();
     // 监听输入框聚焦
     // replyContentFocusNode.addListener(_onFocus);
-    _replyContentController.addListener(_printLatestValue);
     // 界面观察者 必须
     WidgetsBinding.instance.addObserver(this);
     // 自动聚焦
     _autoFocus();
-
-    sheetHeight = localCache.get('sheetHeight');
   }
 
   _autoFocus() async {
@@ -58,12 +49,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     if (context.mounted) {
       FocusScope.of(context).requestFocus(replyContentFocusNode);
     }
-  }
-
-  _printLatestValue() {
-    setState(() {
-      ableClean = _replyContentController.text != '';
-    });
   }
 
   Future submitReplyAdd() async {
@@ -113,12 +98,14 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
         mainAxisSize: MainAxisSize.min,
         children: [
           ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 200,
-              ),
+            constraints: const BoxConstraints(
+              maxHeight: 200,
+              minHeight: 120,
+            ),
+            child: Container(
+              padding: const EdgeInsets.only(
+                  top: 12, right: 15, left: 15, bottom: 10),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(
-                    top: 6, right: 15, left: 15, bottom: 10),
                 child: Form(
                   key: _formKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -137,7 +124,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
-              )),
+              ),
+            ),
+          ),
           Divider(
             height: 1,
             color: Theme.of(context).dividerColor.withOpacity(0.1),
@@ -152,34 +141,23 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   width: 36,
                   height: 36,
                   child: IconButton(
-                      onPressed: () {
-                        if (keyboardHeight > 0) {
-                          FocusScope.of(context).unfocus();
-                        } else {
-                          FocusScope.of(context)
-                              .requestFocus(replyContentFocusNode);
-                        }
-                      },
-                      icon: Icon(
-                          keyboardHeight > 0
-                              ? Icons.keyboard_hide
-                              : Icons.keyboard,
-                          size: 22,
-                          color: Theme.of(context).colorScheme.onBackground),
-                      highlightColor:
-                          Theme.of(context).colorScheme.onInverseSurface,
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith((states) {
-                          // 如果按钮被按下，返回高亮颜色
-                          if (states.contains(MaterialState.pressed)) {
-                            return Theme.of(context).highlightColor;
-                          }
-                          // 默认状态下，返回透明颜色
-                          return Colors.transparent;
-                        }),
-                      )),
+                    onPressed: () {
+                      FocusScope.of(context)
+                          .requestFocus(replyContentFocusNode);
+                    },
+                    icon: Icon(Icons.keyboard,
+                        size: 22,
+                        color: Theme.of(context).colorScheme.onBackground),
+                    highlightColor:
+                        Theme.of(context).colorScheme.onInverseSurface,
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith((states) {
+                        return Theme.of(context).highlightColor;
+                      }),
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 TextButton(
@@ -198,24 +176,5 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
         ],
       ),
     );
-  }
-}
-
-typedef DebounceCallback = void Function();
-
-class Debouncer {
-  DebounceCallback? callback;
-  final int? milliseconds;
-  Timer? _timer;
-
-  Debouncer({this.milliseconds});
-
-  run(DebounceCallback callback) {
-    if (_timer != null) {
-      _timer!.cancel();
-    }
-    _timer = Timer(Duration(milliseconds: milliseconds!), () {
-      callback();
-    });
   }
 }

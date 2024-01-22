@@ -467,4 +467,7 @@ class Api {
   /// page_size
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
+
+  /// 获取未读动态数
+  static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
 }

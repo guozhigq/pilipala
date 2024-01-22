@@ -224,7 +224,7 @@ class _BangumiPageState extends State<BangumiPage>
         // 列数
         crossAxisCount: 3,
         mainAxisExtent: Get.size.width / 3 / 0.65 +
-            32 * MediaQuery.of(context).textScaleFactor,
+            MediaQuery.textScalerOf(context).scale(32.0),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
