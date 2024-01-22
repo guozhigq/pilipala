@@ -304,7 +304,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+                  (BuildContext context2, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(
                     () {
