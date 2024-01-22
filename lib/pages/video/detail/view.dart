@@ -61,6 +61,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   final Floating floating = Floating();
   // 生命周期监听
   late final AppLifecycleListener _lifecycleListener;
+  bool isShowing = true;
 
   @override
   void initState() {
@@ -216,15 +217,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
-      plPlayerController!.danmakuController?.pause();
-      plPlayerController!.danmakuController?.clear();
     }
+    setState(() => isShowing = false);
     super.didPushNext();
   }
 
   @override
   // 返回当前页面时
   void didPopNext() async {
+    setState(() => isShowing = true);
     videoDetailController.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
     videoDetailController.playerInit(autoplay: autoplay);
@@ -354,44 +355,45 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     boxConstraints.maxHeight;
                                 return Stack(
                                   children: <Widget>[
-                                    FutureBuilder(
-                                      future: _futureBuilderFuture,
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data['status']) {
-                                          return Obx(
-                                            () => !videoDetailController
-                                                    .autoPlay.value
-                                                ? const SizedBox()
-                                                : PLVideoPlayer(
-                                                    controller:
-                                                        plPlayerController!,
-                                                    headerControl:
-                                                        videoDetailController
-                                                            .headerControl,
-                                                    danmuWidget: Obx(
-                                                      () => PlDanmaku(
-                                                        key: Key(
-                                                            videoDetailController
-                                                                .danmakuCid
-                                                                .value
-                                                                .toString()),
-                                                        cid:
-                                                            videoDetailController
-                                                                .danmakuCid
-                                                                .value,
-                                                        playerController:
-                                                            plPlayerController!,
+                                    if (isShowing)
+                                      FutureBuilder(
+                                        future: _futureBuilderFuture,
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot snapshot) {
+                                          if (snapshot.hasData &&
+                                              snapshot.data['status']) {
+                                            return Obx(
+                                              () => !videoDetailController
+                                                      .autoPlay.value
+                                                  ? nil
+                                                  : PLVideoPlayer(
+                                                      controller:
+                                                          plPlayerController!,
+                                                      headerControl:
+                                                          videoDetailController
+                                                              .headerControl,
+                                                      danmuWidget: Obx(
+                                                        () => PlDanmaku(
+                                                          key: Key(
+                                                              videoDetailController
+                                                                  .danmakuCid
+                                                                  .value
+                                                                  .toString()),
+                                                          cid:
+                                                              videoDetailController
+                                                                  .danmakuCid
+                                                                  .value,
+                                                          playerController:
+                                                              plPlayerController!,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                          );
-                                        } else {
-                                          return const SizedBox();
-                                        }
-                                      },
-                                    ),
+                                            );
+                                          } else {
+                                            return const SizedBox();
+                                          }
+                                        },
+                                      ),
 
                                     /// 关闭自动播放时 手动播放
                                     if (!videoDetailController
