@@ -90,7 +90,11 @@ class _HomePageState extends State<HomePage>
                 ctr: _homeController,
                 callback: showUserBottomSheet,
               ),
-              const CustomTabs(),
+              if (_homeController.tabs.length > 1) ...[
+                const CustomTabs(),
+              ] else ...[
+                const SizedBox(height: 6),
+              ],
               Expanded(
                 child: TabBarView(
                   controller: _homeController.tabController,
@@ -250,17 +254,6 @@ class CustomTabs extends StatefulWidget {
 
 class _CustomTabsState extends State<CustomTabs> {
   final HomeController _homeController = Get.put(HomeController());
-  int currentTabIndex = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    _homeController.tabController.addListener(listen);
-  }
-
-  void listen() {
-    _homeController.initialIndex.value = _homeController.tabController.index;
-  }
 
   void onTap(int index) {
     feedBack();
@@ -272,33 +265,29 @@ class _CustomTabsState extends State<CustomTabs> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _homeController.tabController.removeListener(listen);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       height: 44,
       margin: const EdgeInsets.only(top: 4),
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-        scrollDirection: Axis.horizontal,
-        itemCount: _homeController.tabs.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 10);
-        },
-        itemBuilder: (BuildContext context, int index) {
-          String label = _homeController.tabs[index]['label'];
-          return Obx(
-            () => CustomChip(
-              onTap: () => onTap(index),
-              label: label,
-              selected: index == _homeController.initialIndex.value,
-            ),
-          );
-        },
+      child: Obx(
+        () => ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 14.0),
+          scrollDirection: Axis.horizontal,
+          itemCount: _homeController.tabs.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const SizedBox(width: 10);
+          },
+          itemBuilder: (BuildContext context, int index) {
+            String label = _homeController.tabs[index]['label'];
+            return Obx(
+              () => CustomChip(
+                onTap: () => onTap(index),
+                label: label,
+                selected: index == _homeController.initialIndex.value,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

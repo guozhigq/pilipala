@@ -254,6 +254,11 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/fontSizeSetting'),
             title: Text('字体大小', style: titleStyle),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/tabbarSetting'),
+            title: Text('首页tabbar', style: titleStyle),
+          ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -130,7 +129,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     Future.microtask(() async {
       try {
-        FlutterVolumeController.showSystemUI = true;
+        FlutterVolumeController.updateShowSystemUI(true);
         _ctr.volumeValue.value = (await FlutterVolumeController.getVolume())!;
         FlutterVolumeController.addListener((double value) {
           if (mounted && !_ctr.volumeInterceptEventStream.value) {
@@ -154,7 +153,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   Future<void> setVolume(double value) async {
     try {
-      FlutterVolumeController.showSystemUI = false;
+      FlutterVolumeController.updateShowSystemUI(false);
       await FlutterVolumeController.setVolume(value);
     } catch (_) {}
     _ctr.volumeValue.value = value;
@@ -703,7 +702,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               ),
             );
           } else {
-            return nil;
+            return const SizedBox();
           }
         }),
 

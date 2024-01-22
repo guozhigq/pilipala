@@ -26,10 +26,9 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
               StyleString.safeSpace, 5, StyleString.safeSpace, 5),
           child: LayoutBuilder(builder: (context, boxConstraints) {
             double width = (boxConstraints.maxWidth -
-                    StyleString.cardSpace *
-                        6 /
-                        MediaQuery.of(context).textScaleFactor) /
-                2;
+                StyleString.cardSpace *
+                    6 /
+                    MediaQuery.textScalerOf(context).scale(2.0));
             return Container(
               constraints: const BoxConstraints(minHeight: 88),
               height: width / StyleString.aspectRatio,
