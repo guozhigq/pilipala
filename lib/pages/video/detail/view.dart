@@ -292,8 +292,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           plPlayerController?.isFullScreen.value == true,
       bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
-      left: plPlayerController?.isFullScreen.value != true,
-      right: plPlayerController?.isFullScreen.value != true,
+      left: false,//plPlayerController?.isFullScreen.value != true,
+      right: false, //plPlayerController?.isFullScreen.value != true,
       child: Stack(
         children: [
           Scaffold(
