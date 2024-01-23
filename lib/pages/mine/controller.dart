@@ -89,16 +89,40 @@ class MineController extends GetxController {
     anonymity = false;
   }
 
-  static onChangeAnonymity() {
+  static onChangeAnonymity(BuildContext context) {
     anonymity = !anonymity;
-    SmartDialog.showToast(anonymity
-        ? '\n【已进入无痕模式】\n\n'
-            '搜索、观看视频或直播均不携带Cookie与CSRF\n'
-            '不产生查询或播放记录\n'
-            '点赞等其它操作不受影响\n\n'
-            '仅本次启动有效，可随时退出\n\n'
-            '*可在隐私设置了解更多\n'
-        : '【已退出无痕模式】');
+    if (anonymity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('\n已进入无痕模式\n\n'
+              '* 搜索、观看视频或直播均不携带Cookie与CSRF，'
+              '不产生查询或播放记录\n'
+              '点赞等其它操作不受影响\n\n'
+              '仅本次启动有效，可随时退出\n\n'
+              '*可在隐私设置了解更多'),
+          duration: const Duration(seconds: 1),
+          action: SnackBarAction(
+            label: '设为永久',
+            onPressed: () {
+              SmartDialog.showToast('暂不支持');
+            },
+          ),
+          showCloseIcon: true,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('【已退出无痕模式】'),
+          duration: Duration(seconds: 1),
+          // action: SnackBarAction(
+          //   label: '确认',
+          //   onPressed: () {},
+          // ),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   onChangeTheme() {

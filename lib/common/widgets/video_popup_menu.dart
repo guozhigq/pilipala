@@ -114,7 +114,7 @@ class VideoPopupMenu extends StatelessWidget {
           // ),
           PopupMenuItem<String>(
             onTap: () {
-              MineController.onChangeAnonymity();
+              MineController.onChangeAnonymity(context);
             },
             value: 'anonymous',
             height: menuItemHeight,
