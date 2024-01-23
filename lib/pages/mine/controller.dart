@@ -92,11 +92,13 @@ class MineController extends GetxController {
   static onChangeAnonymity() {
     anonymity = !anonymity;
     SmartDialog.showToast(anonymity
-        ? '已进入全局无痕模式\n\n'
-            '将模拟未登录用户搜索、观看视频或直播，不产生查询与播放记录\n\n'
+        ? '\n【已进入无痕模式】\n\n'
+            '搜索、观看视频或直播均不携带Cookie与CSRF\n'
+            '不产生查询或播放记录\n'
             '点赞等其它操作不受影响\n\n'
-            '仅本次启动有效，可随时退出'
-        : '已退出无痕模式');
+            '仅本次启动有效，可随时退出\n\n'
+            '*可在隐私设置了解更多\n'
+        : '【已退出无痕模式】');
   }
 
   onChangeTheme() {
