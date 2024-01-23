@@ -61,7 +61,7 @@ class _MinePageState extends State<MinePage> {
         actions: [
           IconButton(
             onPressed: () {
-              MineController.onChangeAnonymity();
+              MineController.onChangeAnonymity(context);
               setState(() {});
             },
             icon: Icon(
