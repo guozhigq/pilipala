@@ -17,6 +17,7 @@ class MineController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   Box setting = GStrorage.setting;
   Rx<ThemeType> themeType = ThemeType.system.obs;
+  static bool anonymity = false;
 
   @override
   onInit() {
@@ -85,6 +86,17 @@ class MineController extends GetxController {
     userStat.value = UserStat();
     userInfoCache.delete('userInfoCache');
     userLogin.value = false;
+    anonymity = false;
+  }
+
+  static onChangeAnonymity() {
+    anonymity = !anonymity;
+    SmartDialog.showToast(anonymity
+        ? '已进入全局无痕模式\n\n'
+            '将模拟未登录用户搜索、观看视频或直播，不产生查询与播放记录\n\n'
+            '点赞等其它操作不受影响\n\n'
+            '仅本次启动有效，可随时退出'
+        : '已退出无痕模式');
   }
 
   onChangeTheme() {

@@ -12,6 +12,7 @@ import '../utils/storage.dart';
 import '../utils/utils.dart';
 import 'constants.dart';
 import 'interceptor.dart';
+import 'interceptor_anonymity.dart';
 
 class Request {
   static final Request _instance = Request._internal();
@@ -34,6 +35,7 @@ class Request {
     );
     cookieManager = CookieManager(cookieJar);
     dio.interceptors.add(cookieManager);
+    dio.interceptors.add(AnonymityInterceptor());
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
     final userInfo = userInfoCache.get('userInfoCache');

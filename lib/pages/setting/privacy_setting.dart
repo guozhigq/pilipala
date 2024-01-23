@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/interceptor_anonymity.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -63,6 +64,29 @@ class _PrivacySettingState extends State<PrivacySetting> {
             },
             dense: false,
             title: Text('刷新access_key', style: titleStyle),
+          ),
+          ListTile(
+            onTap: () {
+              SmartDialog.show(
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('查看详情'),
+                    content: Text(AnonymityInterceptor.anonymityList.join('\n')),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          SmartDialog.dismiss();
+                        },
+                        child: const Text('确认'),
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+            dense: false,
+            title: Text('了解无痕模式', style: titleStyle),
+            subtitle: Text('查看无痕模式作用的API列表', style: subTitleStyle),
           ),
         ],
       ),

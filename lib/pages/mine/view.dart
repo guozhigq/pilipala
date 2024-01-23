@@ -55,6 +55,18 @@ class _MinePageState extends State<MinePage> {
         ),
         actions: [
           IconButton(
+            onPressed: () {
+              MineController.onChangeAnonymity();
+              setState(() {});
+            },
+            icon: Icon(
+              MineController.anonymity
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              size: 22,
+            ),
+          ),
+          IconButton(
             onPressed: () => mineController.onChangeTheme(),
             icon: Icon(
               mineController.themeType.value == ThemeType.dark
