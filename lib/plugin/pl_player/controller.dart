@@ -13,6 +13,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/pages/mine/controller.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
@@ -1020,7 +1021,7 @@ class PlPlayerController {
 
   // 记录播放记录
   Future makeHeartBeat(int progress, {type = 'playing'}) async {
-    if (!_enableHeart) {
+    if (!_enableHeart || MineController.anonymity) {
       return false;
     }
     if (videoType.value == 'live') {

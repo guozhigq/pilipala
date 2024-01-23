@@ -12,6 +12,7 @@ import '../models/video_detail_res.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
 import '../utils/wbi_sign.dart';
+import '../pages/mine/controller.dart';
 import 'api.dart';
 import 'init.dart';
 
@@ -154,7 +155,7 @@ class VideoHttp {
     }
 
     // 免登录查看1080p
-    if (userInfoCache.get('userInfoCache') == null &&
+    if ((userInfoCache.get('userInfoCache') == null || MineController.anonymity) &&
         setting.get(SettingBoxKey.p1080, defaultValue: true)) {
       data['try_look'] = 1;
     }
