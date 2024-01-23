@@ -44,14 +44,19 @@ class _MinePageState extends State<MinePage> {
         toolbarHeight: kTextTabBarHeight + 20,
         backgroundColor: Colors.transparent,
         centerTitle: false,
-        title: const Text(
-          'PLPL',
-          style: TextStyle(
-            height: 2.8,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Jura-Bold',
-          ),
+        title: //logo
+            Row(
+          children: [
+            Image.asset(
+              'assets/images/logo/logo_android_2.png',
+              width: 50,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'PiliPala',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -61,8 +66,8 @@ class _MinePageState extends State<MinePage> {
             },
             icon: Icon(
               MineController.anonymity
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
+                  ? Icons.visibility_off
+                  : Icons.visibility,
               size: 22,
             ),
           ),
@@ -70,15 +75,15 @@ class _MinePageState extends State<MinePage> {
             onPressed: () => mineController.onChangeTheme(),
             icon: Icon(
               mineController.themeType.value == ThemeType.dark
-                  ? CupertinoIcons.sun_max
-                  : CupertinoIcons.moon,
+                  ? Icons.light_mode
+                  : Icons.mode_night,
               size: 22,
             ),
           ),
           IconButton(
             onPressed: () => Get.toNamed('/setting'),
             icon: const Icon(
-              CupertinoIcons.slider_horizontal_3,
+              Icons.settings,
             ),
           ),
           const SizedBox(width: 10),
