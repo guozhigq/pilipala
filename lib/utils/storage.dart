@@ -119,6 +119,7 @@ class SettingBoxKey {
 
       /// 隐私
       blackMidsList = 'blackMidsList',
+      anonymity = 'anonymity',
 
       /// 推荐
       enableRcmdDynamic = 'enableRcmdDynamic',

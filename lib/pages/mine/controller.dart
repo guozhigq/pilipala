@@ -30,6 +30,7 @@ class MineController extends GetxController {
 
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
         defaultValue: ThemeType.system.code)];
+    anonymity = setting.get(SettingBoxKey.anonymity, defaultValue: false);
   }
 
   onLogin() async {
@@ -94,26 +95,61 @@ class MineController extends GetxController {
     if (anonymity) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('\n已进入无痕模式\n\n'
-              '* 搜索、观看视频或直播均不携带Cookie与CSRF，'
-              '不产生查询或播放记录\n'
-              '点赞等其它操作不受影响\n\n'
-              '仅本次启动有效，可随时退出\n\n'
-              '*可在隐私设置了解更多'),
-          duration: const Duration(seconds: 1),
-          action: SnackBarAction(
-            label: '设为永久',
-            onPressed: () {
-              SmartDialog.showToast('暂不支持');
-            },
-          ),
+          content: Column(children: <Widget>[
+            const Row(
+              children: <Widget>[
+                Icon(
+                  Icons.check,
+                  color: Colors.green,
+                ),
+                SizedBox(width: 10),
+                Text('已进入无痕模式', style: TextStyle(fontSize: 15, height: 1.5))
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+                '搜索、观看视频/直播不携带Cookie与CSRF\n'
+                '不产生查询或播放记录\n'
+                '点赞等其它操作不受影响\n'
+                '（前往隐私设置了解详情）',
+                style: TextStyle(fontSize: 12.5, height: 1.5)),
+            Row(children: [
+              TextButton(
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.resolveWith((states) {
+                      return Theme.of(context).snackBarTheme.actionTextColor;
+                    }),
+                  ),
+                  onPressed: () {
+                    GStrorage.setting.put(SettingBoxKey.anonymity, true);
+                    anonymity = true;
+                    SmartDialog.showToast('已设为永久无痕模式');
+                  },
+                  child: const Text('保存为永久')),
+              const SizedBox(width: 10),
+              TextButton(
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.resolveWith((states) {
+                      return Theme.of(context).snackBarTheme.actionTextColor;
+                    }),
+                  ),
+                  onPressed: () {
+                    GStrorage.setting.put(SettingBoxKey.anonymity, false);
+                    anonymity = true;
+                    SmartDialog.showToast('已设为临时无痕模式');
+                  },
+                  child: const Text('仅本次（默认）'))
+            ])
+          ]),
+          duration: const Duration(seconds: 2),
           showCloseIcon: true,
         ),
       );
     } else {
+      GStrorage.setting.put(SettingBoxKey.anonymity, false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('【已退出无痕模式】'),
+          content: Text('已退出无痕模式'),
           duration: Duration(seconds: 1),
           // action: SnackBarAction(
           //   label: '确认',
