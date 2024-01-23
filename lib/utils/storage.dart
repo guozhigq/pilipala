@@ -119,6 +119,7 @@ class SettingBoxKey {
 
       /// 隐私
       blackMidsList = 'blackMidsList',
+      anonymity = 'anonymity',
 
       /// 其他
       autoUpdate = 'autoUpdate',

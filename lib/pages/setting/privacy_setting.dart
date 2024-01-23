@@ -6,6 +6,8 @@ import 'package:pilipala/http/interceptor_anonymity.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../mine/controller.dart';
+
 class PrivacySetting extends StatefulWidget {
   const PrivacySetting({super.key});
 
@@ -66,12 +68,27 @@ class _PrivacySettingState extends State<PrivacySetting> {
             title: Text('刷新access_key', style: titleStyle),
           ),
           ListTile(
+              onTap: () {
+                MineController.onChangeAnonymity(context);
+                setState(() {});
+              },
+              dense: false,
+              title: Text(MineController.anonymity ? '退出无痕模式' : '进入无痕模式',
+                  style: titleStyle),
+              subtitle: Text(
+                MineController.anonymity
+                    ? '已进入无痕模式，搜索、观看视频/直播不携带Cookie与CSRF，其余操作不受影响'
+                    : '未开启无痕模式，将使用账户信息提供完整服务',
+                style: subTitleStyle,
+              )),
+          ListTile(
             onTap: () {
               SmartDialog.show(
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('查看详情'),
-                    content: Text(AnonymityInterceptor.anonymityList.join('\n')),
+                    content:
+                        Text(AnonymityInterceptor.anonymityList.join('\n')),
                     actions: [
                       TextButton(
                         onPressed: () async {
