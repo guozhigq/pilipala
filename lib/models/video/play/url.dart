@@ -52,7 +52,15 @@ class PlayUrlModel {
     videoCodecid = json['video_codecid'];
     seekParam = json['seek_param'];
     seekType = json['seek_type'];
-    dash = Dash.fromJson(json['dash']);
+    if (json['dash'] != null) {
+      dash = Dash.fromJson(json['dash']);
+    } else if (json['durl'] != null) {
+      //试看的充电包月视频可能出现没有dash只有durl的情况
+      var durlList = json['durl']
+          .map<Durl>((e) => Durl.fromJson(e))
+        .toList();
+      //TODO
+    }
     supportFormats = json['support_formats'] != null
         ? json['support_formats']
             .map<FormatItem>((e) => FormatItem.fromJson(e))
@@ -89,6 +97,40 @@ class Dash {
         : [];
     dolby = json['dolby'] != null ? Dolby.fromJson(json['dolby']) : null;
     flac = json['flac'] != null ? Flac.fromJson(json['flac']) : null;
+  }
+}
+
+class Durl {
+  int? order;
+  int? length;
+  int? size;
+  String? ahead;
+  String? vhead;
+  String? url;
+  List<String>? backupUrl;
+
+  Durl({
+    this.order,
+    this.length,
+    this.size,
+    this.ahead,
+    this.vhead,
+    this.url,
+    this.backupUrl,
+  });
+
+  factory Durl.fromJson(Map<String, dynamic> json) {
+    return Durl(
+      order: json['order'],
+      length: json['length'],
+      size: json['size'],
+      ahead: json['ahead'],
+      vhead: json['vhead'],
+      url: json['url'],
+      backupUrl: json['backup_url'] != null
+          ? List<String>.from(json['backup_url'])
+          : [],
+    );
   }
 }
 

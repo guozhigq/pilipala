@@ -246,6 +246,16 @@ class VideoDetailController extends GetxController
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
+      if (data.dash == null) {
+        // isEffective.value = false;
+        if (data.acceptDesc != null) {
+          SmartDialog.showToast('当前视频acceptDesc为：${data.acceptDesc}，不支持获取视频链接');
+        } else {
+          SmartDialog.showToast('当前视频未能获取视频链接');
+        }
+        result['status'] = false;
+        return result;
+      }
       final List<VideoItem> allVideosList = data.dash!.video!;
       try {
         // 当前可播放的最高质量视频
@@ -349,7 +359,11 @@ class VideoDetailController extends GetxController
       if (result['code'] == -404) {
         isShowCover.value = false;
       }
-      SmartDialog.showToast(result['msg'].toString());
+      if (result['code'] == 87008){
+        SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");
+      } else {
+        SmartDialog.showToast("错误（${result['code']}）：${result['msg']}");
+      }
     }
     return result;
   }
