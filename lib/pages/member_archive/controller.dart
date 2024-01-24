@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/archive.dart';
@@ -37,6 +38,8 @@ class MemberArchiveController extends GetxController {
       archivesList.addAll(res['data'].list.vlist);
       count = res['data'].page['count'];
       pn += 1;
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     return res;
   }

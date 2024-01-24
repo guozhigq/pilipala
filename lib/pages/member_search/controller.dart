@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/archive.dart';
@@ -75,6 +76,8 @@ class MemberSearchController extends GetxController {
       }
       archivePn += 1;
       hasRequest = true;
+    } else {
+      SmartDialog.showToast(res['msg']);
     }
     // loadingStatus.value = 'finish';
     return res;
