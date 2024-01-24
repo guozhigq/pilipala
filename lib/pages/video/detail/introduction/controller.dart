@@ -570,10 +570,12 @@ class VideoIntroController extends GetxController {
       cid: lastPlayCid.value,
       upMid: videoDetail.value.owner!.mid!,
     );
+    SmartDialog.dismiss();
     if (res['status']) {
       modelResult = res['data'].modelResult;
+    } else {
+      SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
     }
-    SmartDialog.dismiss();
     return res;
   }
 }
