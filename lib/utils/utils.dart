@@ -338,4 +338,17 @@ class Utils {
 
     return md5String;
   }
+
+  static String generateRandomString(int minLength, int maxLength) {
+    const String printable = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ';
+
+    var random = Random();
+    int length = minLength + random.nextInt(maxLength - minLength + 1);
+    return List<String>.generate(length, (index) => printable[random.nextInt(printable.length)]).join();
+  }
+
+  static String base64EncodeRandomString(int minLength, int maxLength) {
+    String randomString = generateRandomString(minLength, maxLength);
+    return base64.encode(utf8.encode(randomString));
+  }
 }
