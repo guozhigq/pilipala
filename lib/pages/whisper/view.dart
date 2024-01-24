@@ -140,14 +140,17 @@ class _WhisperPageState extends State<WhisperPage> {
                                             },
                                           ),
                                           leading: Badge(
-                                            isLabelVisible: false,
+                                            isLabelVisible:
+                                                sessionList[i].unreadCount > 0,
                                             backgroundColor: Theme.of(context)
                                                 .colorScheme
                                                 .primary,
-                                            label: Text(sessionList[i]
-                                                .unreadCount
-                                                .toString()),
-                                            alignment: Alignment.bottomRight,
+                                            textColor: Theme.of(context)
+                                                .colorScheme
+                                                .onInverseSurface,
+                                            label: Text(
+                                                " ${sessionList[i].unreadCount.toString()} "),
+                                            alignment: Alignment.topRight,
                                             child: NetworkImgLayer(
                                               width: 45,
                                               height: 45,
