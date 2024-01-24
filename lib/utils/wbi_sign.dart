@@ -80,7 +80,7 @@ class WbiSign {
   String getMixinKey(String orig) {
     String temp = '';
     for (int i = 0; i < mixinKeyEncTab.length; i++) {
-      temp += orig.split('')[mixinKeyEncTab[i]];
+      temp += orig[mixinKeyEncTab[i]];
     }
     return temp.substring(0, 32);
   }
@@ -104,7 +104,7 @@ class WbiSign {
     final String queryStr = query.join('&');
     final String wbiSign =
         md5.convert(utf8.encode(queryStr + mixinKey)).toString(); // 计算 w_rid
-    return {'wts': currTime.toString(), 'w_rid': wbiSign};
+    return {'w_rid': wbiSign,'wts': currTime.toString()};
   }
 
   // 获取最新的 img_key 和 sub_key 可以从缓存中获取
