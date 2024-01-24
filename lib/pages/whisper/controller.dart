@@ -1,12 +1,58 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/msg.dart';
 import 'package:pilipala/models/msg/account.dart';
 import 'package:pilipala/models/msg/session.dart';
 
+import '../../models/msg/msgfeed_unread.dart';
+
 class WhisperController extends GetxController {
   RxList<SessionList> sessionList = <SessionList>[].obs;
   RxList<AccountListModel> accountList = <AccountListModel>[].obs;
   bool isLoading = false;
+  Rx<MsgFeedUnread> msgFeedUnread = MsgFeedUnread().obs;
+  RxList msgFeedTop = [
+    {
+      "name":"回复我的",
+      "icon":Icons.message_outlined,
+      "route": "/",
+      "value": 0
+    },
+    {
+      "name":"@我",
+      "icon":Icons.alternate_email_outlined,
+      "route": "/",
+      "value": 0
+    },
+    {
+      "name":"收到的赞",
+      "icon":Icons.favorite_border_outlined,
+      "route": "/",
+      "value": 0
+    },
+    {
+      "name":"系统通知",
+      "icon":Icons.notifications_none_outlined,
+      "route": "/",
+      "value": 0
+    },
+  ].obs;
+
+  Future queryMsgFeedUnread() async {
+    var res = await MsgHttp.msgFeedUnread();
+    if (res['status']) {
+      msgFeedUnread.value = MsgFeedUnread.fromJson(res['data']);
+      msgFeedTop.value[0]["value"] = msgFeedUnread.value.reply;
+      msgFeedTop.value[1]["value"] = msgFeedUnread.value.at;
+      msgFeedTop.value[2]["value"] = msgFeedUnread.value.like;
+      msgFeedTop.value[3]["value"] = msgFeedUnread.value.sys_msg;
+      // 触发更新
+      msgFeedTop.refresh();
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
+  }
 
   Future querySessionList(String? type) async {
     if (isLoading) return;

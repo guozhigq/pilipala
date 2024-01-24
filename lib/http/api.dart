@@ -328,6 +328,8 @@ class Api {
   // 获取指定分组下的up
   static const String followUpGroup = '/x/relation/tag';
 
+  static const String msgFeedUnread = '/x/msgfeed/unread';
+
   /// 私聊
   ///  'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions?
   /// session_type=1&
