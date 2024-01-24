@@ -5,6 +5,22 @@ import 'api.dart';
 import 'init.dart';
 
 class MsgHttp {
+
+  static Future msgFeedUnread() async {
+    var res = await Request().get(Api.msgFeedUnread);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
   // 会话列表
   static Future sessionList({int? endTs}) async {
     Map<String, dynamic> params = {
