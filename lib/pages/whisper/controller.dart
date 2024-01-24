@@ -43,10 +43,10 @@ class WhisperController extends GetxController {
     var res = await MsgHttp.msgFeedUnread();
     if (res['status']) {
       msgFeedUnread.value = MsgFeedUnread.fromJson(res['data']);
-      msgFeedTop.value[0]["value"] = msgFeedUnread.value.reply;
-      msgFeedTop.value[1]["value"] = msgFeedUnread.value.at;
-      msgFeedTop.value[2]["value"] = msgFeedUnread.value.like;
-      msgFeedTop.value[3]["value"] = msgFeedUnread.value.sys_msg;
+      msgFeedTop[0]["value"] = msgFeedUnread.value.reply;
+      msgFeedTop[1]["value"] = msgFeedUnread.value.at;
+      msgFeedTop[2]["value"] = msgFeedUnread.value.like;
+      msgFeedTop[3]["value"] = msgFeedUnread.value.sys_msg;
       // 触发更新
       msgFeedTop.refresh();
     } else {

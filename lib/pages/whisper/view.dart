@@ -122,7 +122,8 @@ class _WhisperPageState extends State<WhisperPage> {
               FutureBuilder(
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.data != null) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
                       List sessionList = _whisperController.sessionList;
