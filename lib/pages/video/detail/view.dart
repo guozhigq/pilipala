@@ -466,26 +466,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                   Positioned(
                                                     right: 12,
                                                     bottom: 10,
-                                                    child: TextButton.icon(
-                                                      style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty
-                                                                .resolveWith(
-                                                                    (states) {
-                                                          return Colors.white
-                                                              .withOpacity(0.8);
-                                                        }),
-                                                      ),
-                                                      onPressed: () =>
-                                                          handlePlay(),
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .play_circle_outline,
-                                                        size: 20,
-                                                      ),
-                                                      label:
-                                                          const Text('轻触封面播放'),
-                                                    ),
+                                                    child: IconButton(
+                                                        tooltip: '播放',
+                                                        onPressed: () =>
+                                                            handlePlay(),
+                                                        icon: Image.asset(
+                                                          'assets/images/play.png',
+                                                          width: 60,
+                                                          height: 60,
+                                                        )),
                                                   ),
                                                 ],
                                               )),
