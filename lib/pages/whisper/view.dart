@@ -66,7 +66,7 @@ class _WhisperPageState extends State<WhisperPage> {
                         padding: const EdgeInsets.all(0),
                         childAspectRatio: 1.25,
                         children:
-                            _whisperController.msgFeedTop.value.map((item) {
+                            _whisperController.msgFeedTop.map((item) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
