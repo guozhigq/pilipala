@@ -1,38 +1,200 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../../http/search.dart';
+
+enum MsgType {
+  invalid(value: 0, label: "空空的~"),
+  text(value: 1, label: "文本消息"),
+  pic(value: 2, label: "图片消息"),
+  audio(value: 3, label: "语音消息"),
+  share(value: 4, label: "分享消息"),
+  revoke(value: 5, label: "撤回消息"),
+  custom_face(value: 6, label: "自定义表情"),
+  share_v2(value: 7, label: "分享v2消息"),
+  sys_cancel(value: 8, label: "系统撤销"),
+  mini_program(value: 9, label: "小程序"),
+  notify_msg(value: 10, label: "业务通知"),
+  archive_card(value: 11, label: "投稿卡片"),
+  article_card(value: 12, label: "专栏卡片"),
+  pic_card(value: 13, label: "图片卡片"),
+  common_share(value: 14, label: "异形卡片"),
+  notify_text(value: 18, label: "文本提示");
+
+  final int value;
+  final String label;
+  const MsgType({required this.value, required this.label});
+  static MsgType parse(int value) {
+    return MsgType.values
+        .firstWhere((e) => e.value == value, orElse: () => MsgType.invalid);
+  }
+}
+
 class ChatItem extends StatelessWidget {
   dynamic item;
+  List? e_infos;
 
   ChatItem({
     super.key,
     this.item,
+    this.e_infos,
   });
 
   @override
   Widget build(BuildContext context) {
     bool isOwner =
         item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
-    bool isPic = item.msgType == 2; // 图片
-    bool isText = item.msgType == 1; // 文本
-    // bool isAchive = item.msgType == 11; // 投稿
+    bool isPic = item.msgType == MsgType.pic; // 图片
+    bool isText = item.msgType == MsgType.text; // 文本
+    // bool isArchive = item.msgType == 11; // 投稿
     // bool isArticle = item.msgType == 12; // 专栏
-    bool isRevoke = item.msgType == 5; // 撤回消息
-
+    bool isRevoke = item.msgType == MsgType.revoke; // 撤回消息
+    bool isShareV2 = item.msgType == MsgType.share_v2;
     bool isSystem =
         item.msgType == 18 || item.msgType == 10 || item.msgType == 13;
-    int msgType = item.msgType;
     dynamic content = item.content ?? '';
+    Color textColor(BuildContext context) {
+      return isOwner
+          ? Theme.of(context).colorScheme.onPrimary
+          : Theme.of(context).colorScheme.onSecondaryContainer;
+    }
+
+    Widget richTextMessage(BuildContext context) {
+      var text = content['content'];
+      if (e_infos != null) {
+        final List<InlineSpan> children = [];
+        Map<String,String> emojiMap = {};
+        for (var e in e_infos!) {
+          emojiMap[e['text']] = e['url'];
+        }
+        text.splitMapJoin(
+          RegExp(r"\[.+?\]"),
+          onMatch: (Match match) {
+            final String emojiKey = match[0]!;
+            if (emojiMap.containsKey(emojiKey)) {
+              children.add(WidgetSpan(
+                child: NetworkImgLayer(
+                  width: 18, height: 18,
+                  src: emojiMap[emojiKey]!,),
+              ));
+            }
+            return '';
+          },
+          onNonMatch: (String text) {
+            children.add(TextSpan(text: text, style: TextStyle(
+              color: textColor(context),
+              letterSpacing: 0.6,
+              height: 1.5,
+            )));
+            return '';
+          },
+        );
+        return RichText(
+          text: TextSpan(
+            children: children,
+          ),
+        );
+      } else {
+        return Text(
+          text,
+          style: TextStyle(
+            letterSpacing: 0.6,
+            color: textColor(context),
+            height: 1.5,
+          ),
+        );
+      }
+    }
+
+    Widget messageContent(BuildContext context) {
+      switch (MsgType.parse(item.msgType)) {
+        case MsgType.notify_msg:
+          return SystemNotice(item: item);
+        case MsgType.pic_card:
+          return SystemNotice2(item: item);
+        case MsgType.notify_text:
+          return Text(
+            jsonDecode(content['content']).map((m) => m['text'] as String).join("\n"),
+            style: TextStyle(
+                letterSpacing: 0.6,
+                height: 5,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.8)
+            ),
+          );
+        case MsgType.text:
+          return richTextMessage(context);
+        case MsgType.pic:
+          return NetworkImgLayer(
+            width: 220,
+            height: 220 * content['height'] / content['width'],
+            src: content['url'],
+          );
+        case MsgType.share_v2:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  SmartDialog.showLoading();
+                  var bvid = content["bvid"];
+                  final int cid = await SearchHttp.ab2c(bvid: bvid);
+                  final String heroTag = Utils.makeHeroTag(bvid);
+                  SmartDialog.dismiss<dynamic>().then(
+                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                        arguments: <String, String?>{
+                          'pic': content['thumb'],
+                          'heroTag': heroTag,
+                        }),
+                  );
+                },
+                child: NetworkImgLayer(
+                  width: 220,
+                  height: 220 * 9 / 16,
+                  src: content['thumb'],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                content['title'],
+                style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context), fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                content['author'],
+                style: TextStyle(
+                  letterSpacing: 0.6,
+                  height: 1.5,
+                  color: textColor(context).withOpacity(0.6),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          );
+        default:
+          return Text(
+            content['content'] ?? content.toString(),
+            style: TextStyle(
+                letterSpacing: 0.6,
+                height: 1.5,
+                color: textColor(context), fontWeight: FontWeight.bold),
+          );
+      }
+    }
+
     return isSystem
-        ? (msgType == 10
-            ? SystemNotice(item: item)
-            : msgType == 13
-                ? SystemNotice2(item: item)
-                : const SizedBox())
+        ? messageContent(context)
         : isRevoke
             ? const SizedBox()
             : Row(
@@ -66,27 +228,7 @@ class ChatItem extends StatelessWidget {
                           ? CrossAxisAlignment.end
                           : CrossAxisAlignment.start,
                       children: [
-                        isText
-                            ? Text(
-                                content['content'],
-                                style: TextStyle(
-                                    color: isOwner
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSecondaryContainer),
-                              )
-                            : isPic
-                                ? NetworkImgLayer(
-                                    width: 220,
-                                    height: 220 *
-                                        content['height'] /
-                                        content['width'],
-                                    src: content['url'],
-                                  )
-                                : const SizedBox(),
+                        messageContent(context),
                         SizedBox(height: isPic ? 7 : 2),
                         Row(
                           mainAxisSize: MainAxisSize.min,
