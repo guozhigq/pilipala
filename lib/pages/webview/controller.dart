@@ -103,7 +103,9 @@ class WebviewController extends GetxController {
       await SetCookie.onSet();
       final result = await UserHttp.userInfo();
       if (result['status'] && result['data'].isLogin) {
-        SmartDialog.showToast('登录成功');
+        SmartDialog.showToast('登录成功，当前采用「'
+            '${GStrorage.setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web')}'
+            '端」推荐');
         try {
           Box userInfoCache = GStrorage.userInfo;
           await userInfoCache.put('userInfoCache', result['data']);
