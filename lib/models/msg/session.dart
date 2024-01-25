@@ -166,7 +166,7 @@ class SessionMsgDataModel {
   int? hasMore;
   int? minSeqno;
   int? maxSeqno;
-  List? eInfos;
+  List<dynamic>? eInfos;
 
   SessionMsgDataModel.fromJson(Map<String, dynamic> json) {
     messages = json['messages']
