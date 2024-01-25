@@ -341,8 +341,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         },
                         dense: true,
                         contentPadding: const EdgeInsets.only(),
-                        title:
-                            const Text("额外等待视频播放完毕", style: titleStyle),
+                        title: const Text("额外等待视频播放完毕", style: titleStyle),
                         trailing: Switch(
                           // thumb color (round icon)
                           activeColor: Theme.of(context).colorScheme.primary,
@@ -897,7 +896,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       ),
                     ),
                   ),
-                  Text('弹幕时长 ${danmakuDurationVal.toString()} 秒'),
+                  Text('弹幕时长 $danmakuDurationVal 秒'),
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 0,
@@ -915,21 +914,21 @@ class _HeaderControlState extends State<HeaderControl> {
                             enabledThumbRadius: 6.0),
                       ),
                       child: Slider(
-                        min: 2,
-                        max: 16,
-                        value: danmakuDurationVal,
-                        divisions: 28,
+                        min: 1,
+                        max: 6,
+                        value: sqrt(danmakuDurationVal),
+                        divisions: 50,
                         label: danmakuDurationVal.toString(),
                         onChanged: (double val) {
-                          danmakuDurationVal = val;
+                          danmakuDurationVal = (val * val).toPrecision(2);
                           widget.controller!.danmakuDurationVal =
                               danmakuDurationVal;
                           setState(() {});
                           try {
                             final DanmakuOption updatedOption =
                                 danmakuController.option.copyWith(
-                                    duration:
-                                        val / widget.controller!.playbackSpeed);
+                                    duration: danmakuDurationVal /
+                                        widget.controller!.playbackSpeed);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
@@ -963,7 +962,7 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                   height: 45,
                   child: Center(child: Text('选择播放顺序', style: titleStyle))),
               Expanded(
