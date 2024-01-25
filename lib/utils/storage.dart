@@ -158,12 +158,13 @@ class LocalCacheKey {
       wbiKeys = 'wbiKeys',
       timeStamp = 'timeStamp',
 
-      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间
+      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
       danmakuOpacity = 'danmakuOpacity',
       danmakuFontScale = 'danmakuFontScale',
       danmakuDuration = 'danmakuDuration',
+      strokeWidth = 'strokeWidth',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',
