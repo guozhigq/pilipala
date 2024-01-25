@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/msg.dart';
 import 'package:pilipala/models/msg/session.dart';
@@ -24,5 +25,20 @@ class WhisperDetailController extends GetxController {
       messageList.value = res['data'].messages;
     }
     return res;
+  }
+
+  Future ackSessionMsg() async {
+    if (messageList.isEmpty){
+      return;
+    }
+    var res = await MsgHttp.ackSessionMsg(
+      talkerId: talkerId,
+      ackSeqno: messageList.last.msgSeqno,
+    );
+    if (res['status']) {
+      SmartDialog.showToast("已读成功");
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
   }
 }

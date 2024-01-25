@@ -102,4 +102,35 @@ class MsgHttp {
       };
     }
   }
+
+  static Future ackSessionMsg({
+    int? talkerId,
+    int? ackSeqno,
+  }) async {
+    String csrf = await Request.getCsrf();
+    Map params = await WbiSign().makSign({
+      'talker_id': talkerId,
+      'session_type': 1,
+      'ack_seqno': ackSeqno,
+      'build': 0,
+      'mobi_app': 'web',
+      'csrf_token': csrf,
+      'csrf': csrf
+    });
+    var res = await Request().get(Api.ackSessionMsg, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': "message: ${res.data['message']},"
+            " msg: ${res.data['msg']},"
+            " code: ${res.data['code']}",
+      };
+    }
+  }
 }
