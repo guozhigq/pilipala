@@ -222,6 +222,7 @@ class PlPlayerController {
   late double showArea;
   late double opacityVal;
   late double fontSizeVal;
+  late double strokeWidth;
   late double danmakuDurationVal;
   late List<double> speedsList;
   // 缓存
@@ -276,6 +277,9 @@ class PlPlayerController {
     // 弹幕时间
     danmakuDurationVal =
         localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
+    // 描边粗细
+    strokeWidth =
+        localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -1087,6 +1091,7 @@ class PlPlayerController {
       localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
       localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
       localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
+      localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
       if (_videoPlayerController != null) {
         var pp = _videoPlayerController!.platform as NativePlayer;
         await pp.setProperty('audio-files', '');
