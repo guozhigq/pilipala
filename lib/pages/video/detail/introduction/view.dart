@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/pages/mine/controller.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -285,7 +286,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 7, bottom: 6),
                           child: Row(
-                            children: [
+                            children: <Widget>[
                               StatView(
                                 theme: 'gray',
                                 view: !loadingStatus
@@ -313,6 +314,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                   color: t.colorScheme.outline,
                                 ),
                               ),
+                              if (MineController.anonymity) ...<Widget>[
+                                const SizedBox(width: 10),
+                                Icon(
+                                  Icons.visibility_off_outlined,
+                                  size: 15,
+                                  color: t.colorScheme.outline,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '无痕模式',
+                                  style: TextStyle(fontSize: 12,color: t.colorScheme.outline),
+                                ),
+                              ],
                               const SizedBox(width: 10),
                               if (videoIntroController.isShowOnlineTotal)
                                 Obx(
