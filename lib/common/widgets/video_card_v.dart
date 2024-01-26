@@ -17,14 +17,12 @@ import 'video_popup_menu.dart';
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
-  final int crossAxisCount;
   final Function()? longPress;
   final Function()? longPressEnd;
 
   const VideoCardV({
     Key? key,
     required this.videoItem,
-    required this.crossAxisCount,
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
@@ -161,13 +159,6 @@ class VideoCardV extends StatelessWidget {
                         ),
                       ),
                       if (videoItem.duration > 0)
-                        if (crossAxisCount == 1) ...[
-                          PBadge(
-                            bottom: 10,
-                            right: 10,
-                            text: Utils.timeFormat(videoItem.duration),
-                          )
-                        ] else ...[
                           PBadge(
                             bottom: 6,
                             right: 7,
@@ -175,12 +166,11 @@ class VideoCardV extends StatelessWidget {
                             type: 'gray',
                             text: Utils.timeFormat(videoItem.duration),
                           )
-                        ],
                     ],
                   );
                 }),
               ),
-              VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
+              VideoContent(videoItem: videoItem)
             ],
           ),
         ),
@@ -191,18 +181,14 @@ class VideoCardV extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
-  final int crossAxisCount;
   const VideoContent(
-      {Key? key, required this.videoItem, required this.crossAxisCount})
+      {Key? key, required this.videoItem})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: crossAxisCount == 1 ? 0 : 1,
       child: Padding(
-        padding: crossAxisCount == 1
-            ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
-            : const EdgeInsets.fromLTRB(5, 8, 5, 4),
+        padding: const EdgeInsets.fromLTRB(5, 8, 5, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,23 +202,12 @@ class VideoContent extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (videoItem.goto == 'av' && crossAxisCount == 1) ...[
-                  const SizedBox(width: 10),
-                  VideoPopupMenu(
-                    size: 32,
-                    iconSize: 18,
-                    videoItem: videoItem,
-                  ),
-                ],
               ],
             ),
-            if (crossAxisCount > 1) ...[
               const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
               ),
-            ],
-            if (crossAxisCount == 1) const SizedBox(height: 4),
             Row(
               children: [
                 if (videoItem.goto == 'bangumi') ...[
@@ -271,7 +246,7 @@ class VideoContent extends StatelessWidget {
                   )
                 ],
                 Expanded(
-                  flex: crossAxisCount == 1 ? 0 : 1,
+                  flex: 1,
                   child: Text(
                     videoItem.owner.name,
                     maxLines: 1,
@@ -282,21 +257,7 @@ class VideoContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (crossAxisCount == 1) ...[
-                  Text(
-                    ' • ',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  VideoStat(
-                    videoItem: videoItem,
-                  ),
-                  const Spacer(),
-                ],
-                if (videoItem.goto == 'av' && crossAxisCount != 1) ...[
+                if (videoItem.goto == 'av') ...[
                   VideoPopupMenu(
                     size: 24,
                     iconSize: 14,

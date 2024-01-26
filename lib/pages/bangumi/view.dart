@@ -11,6 +11,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/rcmd/view.dart';
 
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/bangumu_card_v.dart';
 
@@ -215,16 +216,17 @@ class _BangumiPageState extends State<BangumiPage>
   }
 
   Widget contentGrid(ctr, bangumiList) {
+
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         // 行间距
-        mainAxisSpacing: StyleString.cardSpace - 2,
-        // 列间距
-        crossAxisSpacing: StyleString.cardSpace,
-        // 列数
-        crossAxisCount: 3,
-        mainAxisExtent: Get.size.width / 3 / 0.65 +
-            MediaQuery.textScalerOf(context).scale(32.0),
+          mainAxisSpacing: StyleString.cardSpace - 2,
+          // 列间距
+          crossAxisSpacing: StyleString.cardSpace,
+          // 最大宽度
+          maxCrossAxisExtent: Grid.maxRowWidth / 3 * 2,
+          mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth / 3 * 2, StyleString.safeSpace) / 0.65+
+              MediaQuery.textScalerOf(context).scale(60),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

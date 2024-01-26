@@ -149,7 +149,7 @@ class SettingBoxKey {
       customColor = 'customColor', // 自定义主题色
       enableSingleRow = 'enableSingleRow', // 首页单列
       displayMode = 'displayMode',
-      customRows = 'customRows', // 自定义列
+      maxRowWidth = 'maxRowWidth', // 首页列最大宽度（dp）
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏

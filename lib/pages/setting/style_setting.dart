@@ -29,7 +29,7 @@ class _StyleSettingState extends State<StyleSetting> {
   late int picQuality;
   late double toastOpacity;
   late ThemeType _tempThemeValue;
-  late dynamic defaultCustomRows;
+  late double maxRowWidth;
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _StyleSettingState extends State<StyleSetting> {
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     _tempThemeValue = settingController.themeType.value;
-    defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
+    maxRowWidth = setting.get(SettingBoxKey.maxRowWidth, defaultValue: 240.0) as double;
   }
 
   @override
@@ -83,7 +83,7 @@ class _StyleSettingState extends State<StyleSetting> {
           ),
           const SetSwitchItem(
             title: 'MD3样式底栏',
-            subTitle: '符合Material You设计规范的底栏',
+            subTitle: '符合Material You设计规范的底栏，关闭可使底栏变窄',
             setKey: SettingBoxKey.enableMYBar,
             defaultVal: true,
           ),
@@ -103,27 +103,30 @@ class _StyleSettingState extends State<StyleSetting> {
           ),
           ListTile(
             onTap: () async {
-              int? result = await showDialog(
+              double? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(
-                      title: '自定义列数',
-                      value: defaultCustomRows,
-                      values: [1, 2, 3, 4, 5].map((e) {
-                        return {'title': '$e 列', 'value': e};
-                      }).toList());
-                },
+                  return SlideDialog<double>(
+                    title: '最大列宽度（默认240dp）',
+                    value: maxRowWidth,
+                    min: 150.0,
+                    max: 500.0,
+                    divisions: 35,
+                    suffix: 'dp',
+                  );
+                }
               );
               if (result != null) {
-                defaultCustomRows = result;
-                setting.put(SettingBoxKey.customRows, result);
+                maxRowWidth = result;
+                setting.put(SettingBoxKey.maxRowWidth, result);
+                SmartDialog.showToast('重启生效');
                 setState(() {});
               }
             },
             dense: false,
-            title: Text('自定义列数', style: titleStyle),
+            title: Text('最大列宽度（dp）', style: titleStyle),
             subtitle: Text(
-              '当前列数 $defaultCustomRows 列',
+              '当前最大列宽度：${maxRowWidth.toInt()}dp，屏幕宽度：${MediaQuery.of(context).size.width.toPrecision(2)}dp，',
               style: subTitleStyle,
             ),
           ),

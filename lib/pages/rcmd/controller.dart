@@ -23,8 +23,6 @@ class RcmdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    crossAxisCount.value =
-        setting.get(SettingBoxKey.customRows, defaultValue: 2);
     // 读取app端缓存内容
     // if (recVideo.get('cacheList') != null &&
     //     recVideo.get('cacheList').isNotEmpty) {

@@ -8,14 +8,12 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
   final LiveItemModel liveItem;
-  final int crossAxisCount;
   final Function()? longPress;
   final Function()? longPressEnd;
 
   const LiveCardV({
     Key? key,
     required this.liveItem,
-    required this.crossAxisCount,
     this.longPress,
     this.longPressEnd,
   }) : super(key: key);
@@ -62,7 +60,6 @@ class LiveCardV extends StatelessWidget {
                             height: maxHeight,
                           ),
                         ),
-                        if (crossAxisCount != 1)
                           Positioned(
                             left: 0,
                             right: 0,
@@ -80,7 +77,7 @@ class LiveCardV extends StatelessWidget {
                   }),
                 ),
               ),
-              LiveContent(liveItem: liveItem, crossAxisCount: crossAxisCount)
+              LiveContent(liveItem: liveItem)
             ],
           ),
         ),
@@ -91,18 +88,15 @@ class LiveCardV extends StatelessWidget {
 
 class LiveContent extends StatelessWidget {
   final dynamic liveItem;
-  final int crossAxisCount;
   const LiveContent(
-      {Key? key, required this.liveItem, required this.crossAxisCount})
+      {Key? key, required this.liveItem})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: crossAxisCount == 1 ? 0 : 1,
+      flex: 1,
       child: Padding(
-        padding: crossAxisCount == 1
-            ? const EdgeInsets.fromLTRB(9, 9, 9, 4)
-            : const EdgeInsets.fromLTRB(5, 8, 5, 4),
+        padding: const EdgeInsets.fromLTRB(5, 8, 5, 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,10 +108,9 @@ class LiveContent extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
               ),
-              maxLines: crossAxisCount == 1 ? 1 : 2,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            if (crossAxisCount == 1) const SizedBox(height: 4),
             Row(
               children: [
                 Expanded(
@@ -133,24 +126,6 @@ class LiveContent extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (crossAxisCount == 1) ...[
-                  Text(
-                    ' • ${liveItem!.areaName!}',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  Text(
-                    ' • ${liveItem!.watchedShow!['text_small']}人观看',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                ]
               ],
             ),
           ],
