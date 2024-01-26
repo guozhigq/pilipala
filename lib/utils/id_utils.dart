@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -71,5 +72,20 @@ class IdUtils {
       result['AV'] = int.parse(avs[0].substring(2));
     }
     return result;
+  }
+
+  // eid生成
+  static String? genAuroraEid(int uid) {
+    if (uid == 0) {
+      return null;
+    }
+    String uidString = uid.toString();
+    List<int> resultBytes = List.generate(
+      uidString.length,
+      (i) => uidString.codeUnitAt(i) ^ "ad1va46a7lza".codeUnitAt(i % 12),
+    );
+    String auroraEid = base64Url.encode(resultBytes);
+    auroraEid = auroraEid.replaceAll(RegExp(r'=*$', multiLine: true), '');
+    return auroraEid;
   }
 }

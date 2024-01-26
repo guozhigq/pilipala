@@ -8,6 +8,7 @@ import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
 import 'constants.dart';
@@ -77,10 +78,11 @@ class Request {
   static setOptionsHeaders(userInfo, bool status) {
     if (status) {
       dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+      dio.options.headers['x-bili-aurora-eid'] =
+          IdUtils.genAuroraEid(userInfo.mid);
     }
     dio.options.headers['env'] = 'prod';
     dio.options.headers['app-key'] = 'android64';
-    dio.options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
     dio.options.headers['x-bili-aurora-zone'] = 'sh001';
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
   }
