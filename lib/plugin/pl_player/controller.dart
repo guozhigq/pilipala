@@ -275,6 +275,8 @@ class PlPlayerController {
     // 弹幕时间
     danmakuDurationVal =
         localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
+    // 描边粗细
+    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -947,7 +949,10 @@ class PlPlayerController {
       /// 进入全屏
       await enterFullScreen();
       if (mode == FullScreenMode.vertical ||
-          (mode == FullScreenMode.auto && direction.value == 'vertical')) {
+          (mode == FullScreenMode.auto && direction.value == 'vertical') ||
+          (mode == FullScreenMode.ratio &&
+              (Get.height / Get.width < 1.25 ||
+                  direction.value == 'vertical'))) {
         await verticalScreen();
       } else {
         await landScape();
