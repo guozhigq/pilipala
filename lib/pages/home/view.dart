@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
@@ -144,6 +143,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
             child: UserInfoWidget(
               top: top,
+              ctr: ctr,
               userLogin: isUserLoggedIn,
               userFace: ctr?.userFace.value,
               callback: () => callback!(),
@@ -162,18 +162,20 @@ class UserInfoWidget extends StatelessWidget {
     required this.userLogin,
     required this.userFace,
     required this.callback,
+    required this.ctr,
   }) : super(key: key);
 
   final double top;
   final RxBool userLogin;
   final String? userFace;
   final VoidCallback? callback;
+  final HomeController? ctr;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SearchBar(),
+        SearchBar(ctr: ctr),
         if (userLogin.value) ...[
           const SizedBox(width: 4),
           ClipRect(
@@ -335,11 +337,15 @@ class CustomChip extends StatelessWidget {
 }
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({super.key});
+  const SearchBar({
+    Key? key,
+    required this.ctr,
+  }) : super(key: key);
+
+  final HomeController? ctr;
 
   @override
   Widget build(BuildContext context) {
-    final SSearchController searchController = Get.put(SSearchController());
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: Container(
@@ -353,7 +359,10 @@ class SearchBar extends StatelessWidget {
           color: colorScheme.onSecondaryContainer.withOpacity(0.05),
           child: InkWell(
             splashColor: colorScheme.primaryContainer.withOpacity(0.3),
-            onTap: () => Get.toNamed('/search'),
+            onTap: () => Get.toNamed(
+              '/search',
+              parameters: {'hintText': ctr!.defaultSearch.value},
+            ),
             child: Row(
               children: [
                 const SizedBox(width: 14),
@@ -362,14 +371,12 @@ class SearchBar extends StatelessWidget {
                   color: colorScheme.onSecondaryContainer,
                 ),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Obx(
-                    () => Text(
-                      searchController.defaultSearch.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: colorScheme.outline),
-                    ),
+                Obx(
+                  () => Text(
+                    ctr!.defaultSearch.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: colorScheme.outline),
                   ),
                 ),
               ],

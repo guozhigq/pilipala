@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/index.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
@@ -27,9 +26,6 @@ class SSearchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
-      searchDefault();
-    }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {
@@ -129,13 +125,5 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     histiryWord.put('cacheList', []);
-  }
-
-  void searchDefault() async {
-    var res = await Request().get(Api.searchDefault);
-    if (res.data['code'] == 0) {
-      searchKeyWord.value =
-          hintText = defaultSearch.value = res.data['data']['name'];
-    }
   }
 }
