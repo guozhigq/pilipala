@@ -57,6 +57,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 自动退出全屏
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
+  late bool exitFullscreenAutoVertical;
   late bool autoPiP;
   final Floating floating = Floating();
   // 生命周期监听
@@ -85,6 +86,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
+    exitFullscreenAutoVertical = setting
+        .get(SettingBoxKey.exitFullscreenAutoVertical, defaultValue: true);
     autoPlayEnable =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     autoPiP = setting.get(SettingBoxKey.autoPiP, defaultValue: false);
@@ -345,7 +348,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                       .triggerFullScreen(status: false);
                                 }
                                 if (MediaQuery.of(context).orientation ==
-                                    Orientation.landscape) {
+                                        Orientation.landscape &&
+                                    exitFullscreenAutoVertical) {
                                   verticalScreen();
                                 }
                               },

@@ -995,7 +995,9 @@ class PlPlayerController {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
       // Get.back();
       exitFullScreen();
-      await verticalScreen();
+      if (setting.get(SettingBoxKey.exitFullscreenAutoVertical, defaultValue: true)) {
+        await verticalScreen();
+      }
       toggleFullScreen(false);
     }
   }
