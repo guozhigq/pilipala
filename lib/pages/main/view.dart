@@ -128,6 +128,11 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                           ..._mainController.navigationBars.map((e) {
                             return NavigationDestination(
                               icon: Badge(
+                                backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                                textColor: Theme.of(context)
+                                    .colorScheme
+                                    .onInverseSurface,
                                 label: Text(e['count'].toString()),
                                 padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
                                 isLabelVisible: e['count'] > 0,
@@ -149,6 +154,11 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                           ..._mainController.navigationBars.map((e) {
                             return BottomNavigationBarItem(
                               icon: Badge(
+                                backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                                textColor: Theme.of(context)
+                                    .colorScheme
+                                    .onInverseSurface,
                                 label: Text(e['count'].toString()),
                                 padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
                                 isLabelVisible: e['count'] > 0,
