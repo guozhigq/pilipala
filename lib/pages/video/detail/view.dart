@@ -57,6 +57,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 自动退出全屏
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
+  late bool exitFullscreenAutoVertical;
   late bool autoPiP;
   final Floating floating = Floating();
   // 生命周期监听
@@ -84,6 +85,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
+    exitFullscreenAutoVertical = setting
+        .get(SettingBoxKey.exitFullscreenAutoVertical, defaultValue: true);
     autoPlayEnable =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     autoPiP = setting.get(SettingBoxKey.autoPiP, defaultValue: false);
@@ -312,86 +315,96 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(
-                    () => SliverAppBar(
-                      automaticallyImplyLeading: false,
-                      // 假装使用一个非空变量，避免Obx检测不到而罢工
-                      pinned: videoDetailController.autoPlay.value ^
-                          false ^
-                          videoDetailController.autoPlay.value,
-                      elevation: 0,
-                      scrolledUnderElevation: 0,
-                      forceElevated: innerBoxIsScrolled,
-                      expandedHeight: MediaQuery.of(context).orientation ==
-                                  Orientation.landscape ||
-                              plPlayerController?.isFullScreen.value == true
-                          ? MediaQuery.sizeOf(context).height -
-                              (MediaQuery.of(context).orientation ==
-                                      Orientation.landscape
-                                  ? 0
-                                  : MediaQuery.of(context).padding.top)
-                          : videoHeight,
-                      backgroundColor: Colors.black,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: PopScope(
-                            canPop:
-                                plPlayerController?.isFullScreen.value != true,
-                            onPopInvoked: (bool didPop) {
-                              if (plPlayerController?.isFullScreen.value ==
-                                  true) {
-                                plPlayerController!
-                                    .triggerFullScreen(status: false);
-                              }
-                              if (MediaQuery.of(context).orientation ==
-                                  Orientation.landscape) {
-                                verticalScreen();
-                              }
-                            },
-                            child: LayoutBuilder(
-                              builder: (BuildContext context,
-                                  BoxConstraints boxConstraints) {
-                                final double maxWidth = boxConstraints.maxWidth;
-                                final double maxHeight =
-                                    boxConstraints.maxHeight;
-                                return Stack(
-                                  children: <Widget>[
-                                    FutureBuilder(
-                                      future: _futureBuilderFuture,
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data['status']) {
-                                          return Obx(
-                                            () => !videoDetailController
-                                                    .autoPlay.value
-                                                ? const SizedBox()
-                                                : PLVideoPlayer(
-                                                    controller:
-                                                        plPlayerController!,
-                                                    headerControl:
-                                                        videoDetailController
-                                                            .headerControl,
-                                                    danmuWidget: Obx(
-                                                      () => PlDanmaku(
-                                                        key: Key(
-                                                            videoDetailController
-                                                                .danmakuCid
-                                                                .value
-                                                                .toString()),
-                                                        cid:
-                                                            videoDetailController
-                                                                .danmakuCid
-                                                                .value,
-                                                        playerController:
-                                                            plPlayerController!,
-                                                      ),
-                                                    ),
-                                                  ),
-                                          );
-                                        } else {
-                                          return const SizedBox();
-                                        }
-                                      },
-                                    ),
+                    () {
+                      if (MediaQuery.of(context).orientation ==
+                              Orientation.landscape ||
+                          plPlayerController?.isFullScreen.value == true) {
+                        enterFullScreen();
+                      } else {
+                        exitFullScreen();
+                      }
+                      return SliverAppBar(
+                        automaticallyImplyLeading: false,
+                        // 假装使用一个非空变量，避免Obx检测不到而罢工
+                        pinned: videoDetailController.autoPlay.value ^
+                            false ^
+                            videoDetailController.autoPlay.value,
+                        elevation: 0,
+                        scrolledUnderElevation: 0,
+                        forceElevated: innerBoxIsScrolled,
+                        expandedHeight: MediaQuery.of(context).orientation ==
+                                    Orientation.landscape ||
+                                plPlayerController?.isFullScreen.value == true
+                            ? MediaQuery.sizeOf(context).height -
+                                (MediaQuery.of(context).orientation ==
+                                        Orientation.landscape
+                                    ? 0
+                                    : MediaQuery.of(context).padding.top)
+                            : videoHeight,
+                        backgroundColor: Colors.black,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: PopScope(
+                              canPop: plPlayerController?.isFullScreen.value !=
+                                  true,
+                              onPopInvoked: (bool didPop) {
+                                if (plPlayerController?.isFullScreen.value ==
+                                    true) {
+                                  plPlayerController!
+                                      .triggerFullScreen(status: false);
+                                }
+                                if (MediaQuery.of(context).orientation ==
+                                        Orientation.landscape &&
+                                    exitFullscreenAutoVertical) {
+                                  verticalScreen();
+                                }
+                              },
+                              child: LayoutBuilder(
+                                builder: (BuildContext context,
+                                    BoxConstraints boxConstraints) {
+                                  final double maxWidth =
+                                      boxConstraints.maxWidth;
+                                  final double maxHeight =
+                                      boxConstraints.maxHeight;
+                                  return Stack(
+                                    children: <Widget>[
+                                      if (isShowing)
+                                        FutureBuilder(
+                                          future: _futureBuilderFuture,
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot snapshot) {
+                                            if (snapshot.hasData &&
+                                                snapshot.data['status']) {
+                                              return Obx(
+                                                () =>
+                                                    !videoDetailController
+                                                            .autoPlay.value
+                                                        ? nil
+                                                        : PLVideoPlayer(
+                                                            controller:
+                                                                plPlayerController!,
+                                                            headerControl:
+                                                                videoDetailController
+                                                                    .headerControl,
+                                                            danmuWidget: Obx(
+                                                              () => PlDanmaku(
+                                                                key: Key(videoDetailController
+                                                                    .danmakuCid
+                                                                    .value
+                                                                    .toString()),
+                                                                cid: videoDetailController
+                                                                    .danmakuCid
+                                                                    .value,
+                                                                playerController:
+                                                                    plPlayerController!,
+                                                              ),
+                                                            ),
+                                                          ),
+                                              );
+                                            } else {
+                                              return const SizedBox();
+                                            }
+                                          },
+                                        ),
 
                                     /// 关闭自动播放时 手动播放
                                     if (!videoDetailController

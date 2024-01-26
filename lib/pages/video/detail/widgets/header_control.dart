@@ -1029,7 +1029,9 @@ class _HeaderControlState extends State<HeaderControl> {
               else
                 <void>{
                   if (MediaQuery.of(context).orientation ==
-                      Orientation.landscape)
+                          Orientation.landscape &&
+                      setting.get(SettingBoxKey.exitFullscreenAutoVertical,
+                          defaultValue: true))
                     {
                       SystemChrome.setPreferredOrientations([
                         DeviceOrientation.portraitUp,
