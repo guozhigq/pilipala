@@ -19,8 +19,6 @@ class LiveController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    crossAxisCount.value =
-        setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
 
   // 获取推荐

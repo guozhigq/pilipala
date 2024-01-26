@@ -13,6 +13,7 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/rcmd/index.dart';
 
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/live_item.dart';
 
@@ -143,35 +144,22 @@ class _LivePageState extends State<LivePage>
   }
 
   Widget contentGrid(ctr, liveList) {
-    // double maxWidth = Get.size.width;
-    // int baseWidth = 500;
-    // int step = 300;
-    // int crossAxisCount =
-    //     maxWidth > baseWidth ? 2 + ((maxWidth - baseWidth) / step).ceil() : 2;
-    // if (maxWidth < 300) {
-    //   crossAxisCount = 1;
-    // }
-    int crossAxisCount = ctr.crossAxisCount.value;
     return SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         // 行间距
         mainAxisSpacing: StyleString.safeSpace,
         // 列间距
         crossAxisSpacing: StyleString.safeSpace,
-        // 列数
-        crossAxisCount: crossAxisCount,
-        mainAxisExtent:
-            Get.size.width / crossAxisCount / StyleString.aspectRatio +
-                MediaQuery.textScalerOf(context).scale(
-                  (crossAxisCount == 1 ? 48 : 68),
-                ),
+        // 最大宽度
+        maxCrossAxisExtent: Grid.maxRowWidth,
+        mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth, StyleString.safeSpace) / StyleString.aspectRatio+
+                MediaQuery.textScalerOf(context).scale(80),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return liveList!.isNotEmpty
               ? LiveCardV(
                   liveItem: liveList[index],
-                  crossAxisCount: crossAxisCount,
                   longPress: () {
                     _liveController.popupDialog =
                         _createPopupDialog(liveList[index]);
