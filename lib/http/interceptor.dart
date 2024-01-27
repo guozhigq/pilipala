@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../utils/storage.dart';
-// import 'package:get/get.dart' hide Response;
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -71,35 +70,28 @@ class ApiInterceptor extends Interceptor {
         return '发送请求超时，请检查网络设置';
       case DioExceptionType.unknown:
         final String res = await checkConnect();
-        return '$res \n 网络异常，请稍后重试！';
-      // default:
-      //   return 'Dio异常';
+        return '$res，网络异常！';
     }
   }
 
   static Future<String> checkConnect() async {
     final ConnectivityResult connectivityResult =
         await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.mobile) {
-      return 'connected with mobile network';
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-      return 'connected with wifi network';
-    } else if (connectivityResult == ConnectivityResult.ethernet) {
-      // I am connected to a ethernet network.
-      return '';
-    } else if (connectivityResult == ConnectivityResult.vpn) {
-      // I am connected to a vpn network.
-      // Note for iOS and macOS:
-      // There is no separate network interface type for [vpn].
-      // It returns [other] on any device (also simulator)
-      return '';
-    } else if (connectivityResult == ConnectivityResult.other) {
-      // I am connected to a network which is not in the above mentioned networks.
-      return '';
-    } else if (connectivityResult == ConnectivityResult.none) {
-      return 'not connected to any network';
-    } else {
-      return '';
+    switch (connectivityResult) {
+      case ConnectivityResult.mobile:
+        return '正在使用移动流量';
+      case ConnectivityResult.wifi:
+        return '正在使用wifi';
+      case ConnectivityResult.ethernet:
+        return '正在使用局域网';
+      case ConnectivityResult.vpn:
+        return '正在使用代理网络';
+      case ConnectivityResult.other:
+        return '正在使用其他网络';
+      case ConnectivityResult.none:
+        return '未连接到任何网络';
+      default:
+        return '';
     }
   }
 }
