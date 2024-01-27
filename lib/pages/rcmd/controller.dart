@@ -13,7 +13,6 @@ class RcmdController extends GetxController {
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
-  Box recVideo = GStrorage.recVideo;
   Box setting = GStrorage.setting;
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;
@@ -23,15 +22,6 @@ class RcmdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // 读取app端缓存内容
-    // if (recVideo.get('cacheList') != null &&
-    //     recVideo.get('cacheList').isNotEmpty) {
-    //   List<RecVideoItemAppModel> list = [];
-    //   for (var i in recVideo.get('cacheList')) {
-    //     list.add(i);
-    //   }
-    //   videoList.value = list;
-    // }
     enableSaveLastData =
         setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
     defaultRcmdType =
@@ -81,10 +71,6 @@ class RcmdController extends GetxController {
         }
       } else if (type == 'onLoad') {
         videoList.addAll(res['data']);
-      }
-      // 目前仅支持app端系列保存缓存
-      if (defaultRcmdType != 'web') {
-        recVideo.put('cacheList', res['data']);
       }
       _currentPage += 1;
       // 若videoList数量太小，可能会影响翻页，此时再次请求

@@ -90,7 +90,7 @@ class SearchVideoPanel extends StatelessWidget {
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
-                  onPressed: () => controller.onShowFilterDialog(),
+                  onPressed: () => controller.onShowFilterDialog(ctr),
                   icon: Icon(
                     Icons.filter_list_outlined,
                     size: 18,
@@ -175,7 +175,7 @@ class VideoPanelController extends GetxController {
     super.onInit();
   }
 
-  onShowFilterDialog() {
+  onShowFilterDialog(searchPanelCtr) {
     SmartDialog.show(
       animationType: SmartAnimationType.centerFade_otherSlide,
       builder: (BuildContext context) {
@@ -199,7 +199,8 @@ class VideoPanelController extends GetxController {
                       SmartDialog.dismiss();
                       SmartDialog.showToast("「${i['label']}」的筛选结果");
                       SearchPanelController ctr =
-                          Get.find<SearchPanelController>(tag: 'video');
+                          Get.find<SearchPanelController>(
+                              tag: 'video${searchPanelCtr.keyword!}');
                       ctr.duration.value = i['value'];
                       SmartDialog.showLoading(msg: 'loading');
                       await ctr.onRefresh();

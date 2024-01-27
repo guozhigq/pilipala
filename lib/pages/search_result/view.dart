@@ -86,7 +86,8 @@ class _SearchResultPageState extends State<SearchResultPage>
                 onTap: (index) {
                   if (index == _searchResultController!.tabIndex) {
                     Get.find<SearchPanelController>(
-                            tag: SearchType.values[index].type)
+                            tag: SearchType.values[index].type +
+                                _searchResultController!.keyword!)
                         .animateToTop();
                   }
 

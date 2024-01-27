@@ -3,13 +3,11 @@ import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_owner.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
 class GStrorage {
-  static late final Box<dynamic> recVideo;
   static late final Box<dynamic> userInfo;
   static late final Box<dynamic> historyword;
   static late final Box<dynamic> localCache;
@@ -21,13 +19,6 @@ class GStrorage {
     final String path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
-    // 首页推荐视频
-    recVideo = await Hive.openBox(
-      'recVideo',
-      compactionStrategy: (int entries, int deletedEntries) {
-        return deletedEntries > 12;
-      },
-    );
     // 登录用户信息
     userInfo = await Hive.openBox(
       'userInfo',
@@ -54,10 +45,6 @@ class GStrorage {
   }
 
   static void regAdapter() {
-    Hive.registerAdapter(RecVideoItemAppModelAdapter());
-    Hive.registerAdapter(RcmdReasonAdapter());
-    Hive.registerAdapter(RcmdStatAdapter());
-    Hive.registerAdapter(RcmdOwnerAdapter());
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());
@@ -73,8 +60,6 @@ class GStrorage {
   static Future<void> close() async {
     // user.compact();
     // user.close();
-    recVideo.compact();
-    recVideo.close();
     userInfo.compact();
     userInfo.close();
     historyword.compact();

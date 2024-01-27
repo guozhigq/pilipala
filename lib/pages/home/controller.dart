@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/tab_type.dart';
 import 'package:pilipala/utils/storage.dart';
+import '../../http/index.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
@@ -24,6 +25,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late bool hideSearchBar;
   late List defaultTabs;
   late List<String> tabbarSort;
+  RxString defaultSearch = ''.obs;
 
   @override
   void onInit() {
@@ -35,6 +37,9 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     setTabConfig();
     hideSearchBar =
         setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
+    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
+      searchDefault();
+    }
   }
 
   void onRefresh() {
@@ -93,5 +98,12 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
         }
       }
     });
+  }
+
+  void searchDefault() async {
+    var res = await Request().get(Api.searchDefault);
+    if (res.data['code'] == 0) {
+      defaultSearch.value = res.data['data']['name'];
+    }
   }
 }
