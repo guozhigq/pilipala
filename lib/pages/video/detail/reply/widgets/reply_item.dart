@@ -880,7 +880,7 @@ InlineSpan buildContent(
                           height: height,
                         ),
                       ),
-                      height > maxHeight
+                      height > Get.size.height * 0.9
                           ? const PBadge(
                               text: '长图',
                               right: 8,
