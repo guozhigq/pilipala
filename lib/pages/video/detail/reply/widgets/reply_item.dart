@@ -593,10 +593,10 @@ InlineSpan buildContent(
     ...content.atNameToMid.keys.map((e) => '@$e'),
     ...content.jumpUrl.keys.map((e) =>
         e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
-    r'\b\d{2}:\d{2}\b'
   ];
 
-  final String patternStr = specialTokens.map(RegExp.escape).join('|');
+  final String patternStr =
+      specialTokens.map(RegExp.escape).join('|') + r'|\b[0-9]{1,2}:[0-9]{2}\b';
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   // 分割文本并处理每个部分
@@ -647,12 +647,15 @@ InlineSpan buildContent(
               ..onTap = () {
                 // 跳转到指定位置
                 try {
+                  SmartDialog.showToast('跳转至：$matchStr');
                   Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
                       .plPlayerController
                       .seekTo(
                         Duration(seconds: Utils.duration(matchStr)),
                       );
-                } catch (_) {}
+                } catch (e) {
+                  SmartDialog.showToast('跳转失败: $e');
+                }
               },
           ),
         );
@@ -661,7 +664,9 @@ InlineSpan buildContent(
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
-        if (enableWordRe && content.jumpUrl[matchStr] != null && !matchedStrs.contains(matchStr)) {
+        if (enableWordRe &&
+            content.jumpUrl[matchStr] != null &&
+            !matchedStrs.contains(matchStr)) {
           appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
           spanChilds.add(
             TextSpan(
