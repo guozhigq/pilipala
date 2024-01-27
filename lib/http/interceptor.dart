@@ -70,14 +70,14 @@ class ApiInterceptor extends Interceptor {
       case DioExceptionType.sendTimeout:
         return '发送请求超时，请检查网络设置';
       case DioExceptionType.unknown:
-        final String res = await checkConect();
+        final String res = await checkConnect();
         return '$res \n 网络异常，请稍后重试！';
       // default:
       //   return 'Dio异常';
     }
   }
 
-  static Future<String> checkConect() async {
+  static Future<String> checkConnect() async {
     final ConnectivityResult connectivityResult =
         await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.mobile) {

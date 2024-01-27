@@ -87,6 +87,14 @@ class _AboutPageState extends State<AboutPage> {
               ),
             ),
             ListTile(
+              onTap: () => _aboutController.webSiteUrl(),
+              title: const Text('访问官网'),
+              trailing: Text(
+                'https://pilipalanet.mysxl.cn',
+                style: subTitleStyle,
+              ),
+            ),
+            ListTile(
               onTap: () => _aboutController.panDownload(),
               title: const Text('网盘下载'),
               trailing: Text(
@@ -243,5 +251,13 @@ class AboutController extends GetxController {
     } catch (e) {
       print(e);
     }
+  }
+
+  // 官网
+  webSiteUrl() {
+    launchUrl(
+      Uri.parse('https://pilipalanet.mysxl.cn'),
+      mode: LaunchMode.externalApplication,
+    );
   }
 }

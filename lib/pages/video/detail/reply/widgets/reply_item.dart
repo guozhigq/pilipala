@@ -849,6 +849,13 @@ InlineSpan buildContent(
         WidgetSpan(
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints box) {
+              double maxHeight = box.maxWidth * 0.6; // 设置最大高度
+              // double width = (box.maxWidth / 2).truncateToDouble();
+              double height = ((box.maxWidth /
+                      2 *
+                      pictureItem['img_height'] /
+                      pictureItem['img_width']))
+                  .truncateToDouble();
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -859,15 +866,28 @@ InlineSpan buildContent(
                     },
                   );
                 },
-                child: Padding(
+                child: Container(
                   padding: const EdgeInsets.only(top: 4),
-                  child: NetworkImgLayer(
-                    src: pictureItem['img_src'],
-                    width: box.maxWidth / 2,
-                    height: box.maxWidth *
-                        0.5 *
-                        pictureItem['img_height'] /
-                        pictureItem['img_width'],
+                  constraints: BoxConstraints(maxHeight: maxHeight),
+                  width: box.maxWidth / 2,
+                  height: height,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: NetworkImgLayer(
+                          src: pictureItem['img_src'],
+                          width: box.maxWidth / 2,
+                          height: height,
+                        ),
+                      ),
+                      height > maxHeight
+                          ? const PBadge(
+                              text: '长图',
+                              right: 8,
+                              bottom: 8,
+                            )
+                          : const SizedBox(),
+                    ],
                   ),
                 ),
               );

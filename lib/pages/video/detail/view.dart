@@ -122,6 +122,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController!.triggerFullScreen(status: false);
       }
       shutdownTimerService.handleWaitingFinished();
+
       /// 顺序播放 列表循环
       if (plPlayerController!.playRepeat != PlayRepeat.pause &&
           plPlayerController!.playRepeat != PlayRepeat.singleCycle) {
@@ -234,7 +235,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController.isPaused = false;
     if (_extendNestCtr.position.pixels == 0 && autoplay) {
       await Future.delayed(const Duration(milliseconds: 300));
-      plPlayerController!.seekTo(videoDetailController.defaultST);
+      plPlayerController?.seekTo(videoDetailController.defaultST);
       plPlayerController?.play();
     }
     plPlayerController?.addStatusLister(playerListener);
@@ -308,7 +309,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
-                  (BuildContext _context, bool innerBoxIsScrolled) {
+                  (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   Obx(
                     () => SliverAppBar(
@@ -418,7 +419,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           ),
                                         ),
                                       ),
-
                                       Obx(
                                         () => Visibility(
                                             visible: videoDetailController
