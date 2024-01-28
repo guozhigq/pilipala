@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
 import '../pages/blacklist/index.dart';
@@ -151,6 +152,8 @@ class Routes {
     // 用户专栏
     CustomGetPage(
         name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    // 日志
+    CustomGetPage(name: '/logs', page: () => const LogsPage()),
   ];
 }
 
