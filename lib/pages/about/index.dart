@@ -133,6 +133,11 @@ class _AboutPageState extends State<AboutPage> {
               title: const Text('赞助'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
+            ListTile(
+              onTap: () => _aboutController.logs(),
+              title: const Text('错误日志'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+            ),
           ],
         ),
       ),
@@ -259,5 +264,10 @@ class AboutController extends GetxController {
       Uri.parse('https://pilipalanet.mysxl.cn'),
       mode: LaunchMode.externalApplication,
     );
+  }
+
+  // 日志
+  logs() {
+    Get.toNamed('/logs');
   }
 }

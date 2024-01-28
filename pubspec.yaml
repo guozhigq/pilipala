@@ -134,6 +134,9 @@ dependencies:
   uuid: ^3.0.7
   scrollable_positioned_list: ^0.3.8
   nil: ^1.1.1
+  catcher_2: ^1.1.0
+  logger: ^2.0.2+1
+  path: 1.8.3
 
   
 dev_dependencies:
