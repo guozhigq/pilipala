@@ -447,10 +447,15 @@ class VideoHttp {
       'up_mid': upMid,
     });
     var res = await Request().get(Api.aiConclusion, data: params);
-    if (res.data['code'] == 0) {
+    if (res.data['code'] == 0 && res.data['data']['code'] == 0) {
       return {
         'status': true,
         'data': AiConclusionModel.fromJson(res.data['data']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': []
       };
     }
   }
