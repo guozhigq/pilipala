@@ -266,7 +266,7 @@ class BangumiIntroController extends GetxController {
       /// 未渲染回复组件时可能异常
       VideoReplyController videoReplyCtr =
           Get.find<VideoReplyController>(tag: Get.arguments['heroTag']);
-      videoReplyCtr.aid = aid;
+      videoReplyCtr.oid = bvid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
   }

@@ -4,7 +4,7 @@ import 'init.dart';
 
 class ReplyHttp {
   static Future replyList({
-    required int oid,
+    required dynamic oid,
     required int pageNum,
     required int type,
     int? ps,
@@ -76,7 +76,7 @@ class ReplyHttp {
   // 评论点赞
   static Future likeReply({
     required int type,
-    required int oid,
+    required dynamic oid,
     required int rpid,
     required int action,
   }) async {

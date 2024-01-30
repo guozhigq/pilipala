@@ -8,7 +8,7 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
 class VideoReplyNewDialog extends StatefulWidget {
-  final int? oid;
+  final String? oid;
   final int? root;
   final int? parent;
   final ReplyType? replyType;
