@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -53,12 +52,13 @@ class ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isOwner =
         item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
-    bool isPic = item.msgType == MsgType.pic; // 图片
-    bool isText = item.msgType == MsgType.text; // 文本
+
+    bool isPic = item.msgType == MsgType.pic.value; // 图片
+    bool isText = item.msgType == MsgType.text.value; // 文本
     // bool isArchive = item.msgType == 11; // 投稿
     // bool isArticle = item.msgType == 12; // 专栏
-    bool isRevoke = item.msgType == MsgType.revoke; // 撤回消息
-    bool isShareV2 = item.msgType == MsgType.share_v2;
+    bool isRevoke = item.msgType == MsgType.revoke.value; // 撤回消息
+    bool isShareV2 = item.msgType == MsgType.share_v2.value;
     bool isSystem =
         item.msgType == 18 || item.msgType == 10 || item.msgType == 13;
     dynamic content = item.content ?? '';
@@ -72,7 +72,7 @@ class ChatItem extends StatelessWidget {
       var text = content['content'];
       if (e_infos != null) {
         final List<InlineSpan> children = [];
-        Map<String,String> emojiMap = {};
+        Map<String, String> emojiMap = {};
         for (var e in e_infos!) {
           emojiMap[e['text']] = e['url'];
         }
@@ -83,18 +83,22 @@ class ChatItem extends StatelessWidget {
             if (emojiMap.containsKey(emojiKey)) {
               children.add(WidgetSpan(
                 child: NetworkImgLayer(
-                  width: 18, height: 18,
-                  src: emojiMap[emojiKey]!,),
+                  width: 18,
+                  height: 18,
+                  src: emojiMap[emojiKey]!,
+                ),
               ));
             }
             return '';
           },
           onNonMatch: (String text) {
-            children.add(TextSpan(text: text, style: TextStyle(
-              color: textColor(context),
-              letterSpacing: 0.6,
-              height: 1.5,
-            )));
+            children.add(TextSpan(
+                text: text,
+                style: TextStyle(
+                  color: textColor(context),
+                  letterSpacing: 0.6,
+                  height: 1.5,
+                )));
             return '';
           },
         );
@@ -123,11 +127,13 @@ class ChatItem extends StatelessWidget {
           return SystemNotice2(item: item);
         case MsgType.notify_text:
           return Text(
-            jsonDecode(content['content']).map((m) => m['text'] as String).join("\n"),
+            jsonDecode(content['content'])
+                .map((m) => m['text'] as String)
+                .join("\n"),
             style: TextStyle(
-                letterSpacing: 0.6,
-                height: 5,
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.8)
+              letterSpacing: 0.6,
+              height: 5,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.8),
             ),
           );
         case MsgType.text:
@@ -166,9 +172,11 @@ class ChatItem extends StatelessWidget {
               Text(
                 content['title'],
                 style: TextStyle(
-                    letterSpacing: 0.6,
-                    height: 1.5,
-                    color: textColor(context), fontWeight: FontWeight.bold),
+                  letterSpacing: 0.6,
+                  height: 1.5,
+                  color: textColor(context),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 1),
               Text(
@@ -186,9 +194,11 @@ class ChatItem extends StatelessWidget {
           return Text(
             content['content'] ?? content.toString(),
             style: TextStyle(
-                letterSpacing: 0.6,
-                height: 1.5,
-                color: textColor(context), fontWeight: FontWeight.bold),
+              letterSpacing: 0.6,
+              height: 1.5,
+              color: textColor(context),
+              fontWeight: FontWeight.bold,
+            ),
           );
       }
     }
