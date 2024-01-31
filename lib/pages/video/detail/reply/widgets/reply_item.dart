@@ -353,7 +353,7 @@ class ReplyItem extends StatelessWidget {
                 isScrollControlled: true,
                 builder: (builder) {
                   return VideoReplyNewDialog(
-                    oid: IdUtils.av2bv(replyItem!.oid!),
+                    oid: replyItem!.oid,
                     root: replyItem!.rpid,
                     parent: replyItem!.rpid,
                     replyType: replyType,

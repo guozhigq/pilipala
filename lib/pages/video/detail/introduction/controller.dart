@@ -478,7 +478,7 @@ class VideoIntroController extends GetxController {
       /// 未渲染回复组件时可能异常
       final VideoReplyController videoReplyCtr =
           Get.find<VideoReplyController>(tag: heroTag);
-      videoReplyCtr.oid = bvid;
+      videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
     this.bvid = bvid;

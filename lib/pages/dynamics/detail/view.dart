@@ -385,8 +385,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                       isScrollControlled: true,
                       builder: (BuildContext context) {
                         return VideoReplyNewDialog(
-                          oid: _dynamicDetailController.oid?.toString() ??
-                              Get.parameters['bvid'],
+                          oid: _dynamicDetailController.oid ??
+                              IdUtils.bv2av(Get.parameters['bvid']!),
                           root: 0,
                           parent: 0,
                           replyType: ReplyType.values[replyType],

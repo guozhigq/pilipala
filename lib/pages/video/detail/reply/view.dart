@@ -40,7 +40,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   bool _isFabVisible = true;
   String replyLevel = '1';
   late String heroTag;
-  late String oid;
 
   // 添加页面缓存
   @override
@@ -49,7 +48,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   @override
   void initState() {
     super.initState();
-    oid = widget.bvid != null ? widget.bvid! : '0';
+    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     heroTag = Get.arguments['heroTag'];
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
@@ -298,8 +297,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                     isScrollControlled: true,
                     builder: (BuildContext context) {
                       return VideoReplyNewDialog(
-                        oid:
-                            _videoReplyController.oid ?? Get.parameters['bvid'],
+                        oid: _videoReplyController.aid ??
+                            IdUtils.bv2av(Get.parameters['bvid']!),
                         root: 0,
                         parent: 0,
                         replyType: ReplyType.video,

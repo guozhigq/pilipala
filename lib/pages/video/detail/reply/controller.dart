@@ -11,13 +11,13 @@ import 'package:pilipala/utils/storage.dart';
 
 class VideoReplyController extends GetxController {
   VideoReplyController(
-    this.oid,
+    this.aid,
     this.rpid,
     this.replyLevel,
   );
   final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
-  String? oid;
+  int? aid;
   // 层级 2为楼中楼
   String? replyLevel;
   // rpid 请求楼中楼回复
@@ -57,7 +57,7 @@ class VideoReplyController extends GetxController {
       return;
     }
     final res = await ReplyHttp.replyList(
-      oid: oid!,
+      oid: aid!,
       pageNum: currentPage + 1,
       ps: ps,
       type: ReplyType.video.index,
