@@ -110,12 +110,16 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
                           if (i == 0) {
                             return Column(
                               children: [
-                                ChatItem(item: messageList[i]),
+                                ChatItem(
+                                    item: messageList[i],
+                                    e_infos: _whisperDetailController.eInfos),
                                 const SizedBox(height: 12),
                               ],
                             );
                           } else {
-                            return ChatItem(item: messageList[i]);
+                            return ChatItem(
+                                item: messageList[i],
+                                e_infos: _whisperDetailController.eInfos);
                           }
                         },
                       ),
