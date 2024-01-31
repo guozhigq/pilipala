@@ -331,7 +331,7 @@ class VideoHttp {
   // plat	num	发送平台标识	非必要	1：web端 2：安卓客户端  3：ios客户端  4：wp客户端
   static Future replyAdd({
     required ReplyType type,
-    required dynamic oid,
+    required int oid,
     required String message,
     int? root,
     int? parent,

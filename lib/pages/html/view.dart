@@ -13,7 +13,6 @@ import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/id_utils.dart';
 
 import 'controller.dart';
 
@@ -428,7 +427,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                     isScrollControlled: true,
                     builder: (BuildContext context) {
                       return VideoReplyNewDialog(
-                        oid: IdUtils.av2bv(_htmlRenderCtr.oid.value),
+                        oid: _htmlRenderCtr.oid.value,
                         root: 0,
                         parent: 0,
                         replyType: ReplyType.values[type],
