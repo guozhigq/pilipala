@@ -13,7 +13,20 @@ class IdUtils {
 
   /// av转bv
   static String av2bv(int aid) {
-    List<String> bytes = List.filled(12, '0', growable: false);
+    List<String> bytes = [
+      'B',
+      'V',
+      '1',
+      '0',
+      '0',
+      '0',
+      '0',
+      '0',
+      '0',
+      '0',
+      '0',
+      '0'
+    ];
     int bvIndex = bytes.length - 1;
     BigInt tmp = (MAX_AID | BigInt.from(aid)) ^ XOR_CODE;
     while (tmp > BigInt.zero) {
@@ -21,13 +34,13 @@ class IdUtils {
       tmp = tmp ~/ BASE;
       bvIndex -= 1;
     }
-    final tmpValue = bytes[3];
+    String tmpSwap = bytes[3];
     bytes[3] = bytes[9];
-    bytes[9] = tmpValue;
+    bytes[9] = tmpSwap;
 
-    final tmpValue2 = bytes[4];
+    tmpSwap = bytes[4];
     bytes[4] = bytes[7];
-    bytes[7] = tmpValue2;
+    bytes[7] = tmpSwap;
 
     return bytes.join();
   }
