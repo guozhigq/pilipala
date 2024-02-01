@@ -540,20 +540,6 @@ InlineSpan buildContent(
   // replyReply 查看二楼回复（回复详情）回调
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
-  if (content.emote.isEmpty &&
-      content.atNameToMid.isEmpty &&
-      content.jumpUrl.isEmpty &&
-      content.vote.isEmpty &&
-      content.pictures.isEmpty &&
-      content.message.isNotEmpty &&
-      !RegExp(r'\b[0-9]{1,2}[:：][0-9]{2}\b').hasMatch(content.message)) {
-    return TextSpan(
-      text: content.message,
-      recognizer: TapGestureRecognizer()
-        ..onTap =
-            () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem),
-    );
-  }
   final List<InlineSpan> spanChilds = <InlineSpan>[];
   bool hasMatchMember = false;
 
@@ -585,10 +571,13 @@ InlineSpan buildContent(
     });
   }
   // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  if (content.message.contains('&amp;')) {
-    content.message = content.message.replaceAll('&amp;', '&');
-  }
-  print("content.jumpUrl.keys:" + content.jumpUrl.keys.toString());
+  content.message = content.message.replaceAll('&amp;', '&')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&apos;', "'")
+      .replaceAll('&nbsp;', ' ');
+  // print("content.jumpUrl.keys:" + content.jumpUrl.keys.toString());
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
@@ -674,7 +663,7 @@ InlineSpan buildContent(
           ),
         );
       } else {
-        print("matchStr=$matchStr");
+        // print("matchStr=$matchStr");
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
