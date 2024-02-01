@@ -544,7 +544,9 @@ InlineSpan buildContent(
       content.atNameToMid.isEmpty &&
       content.jumpUrl.isEmpty &&
       content.vote.isEmpty &&
-      content.pictures.isEmpty) {
+      content.pictures.isEmpty &&
+      content.message.isNotEmpty &&
+      !RegExp(r'\b[0-9]{1,2}[:：][0-9]{2}\b').hasMatch(content.message)) {
     return TextSpan(
       text: content.message,
       recognizer: TapGestureRecognizer()
