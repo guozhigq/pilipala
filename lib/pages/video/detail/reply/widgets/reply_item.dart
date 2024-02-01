@@ -595,10 +595,21 @@ InlineSpan buildContent(
         e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
   ];
 
-  final String patternStr =
-      specialTokens.map(RegExp.escape).join('|') + r'|\b[0-9]{1,2}:[0-9]{2}\b';
+  String patternStr =
+      specialTokens.map(RegExp.escape).join('|');
+  if (patternStr.isNotEmpty) {
+    patternStr += "|";
+  }
+  patternStr += r'(\b\d{1,2}[:：]\d{2}\b)';
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
+  void addPlainTextSpan(str){
+    spanChilds.add(TextSpan(
+        text: str,
+        recognizer: TapGestureRecognizer()
+          ..onTap = () =>
+              replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+  }
   // 分割文本并处理每个部分
   content.message.splitMapJoin(
     pattern,
@@ -636,7 +647,7 @@ InlineSpan buildContent(
               },
           ),
         );
-      } else if (matchStr.contains(':')) {
+      } else if (RegExp(r'^\b[0-9]{1,2}[:：][0-9]{2}\b$').hasMatch(matchStr)) {
         spanChilds.add(
           TextSpan(
             text: ' $matchStr ',
@@ -647,6 +658,7 @@ InlineSpan buildContent(
               ..onTap = () {
                 // 跳转到指定位置
                 try {
+                  matchStr = matchStr.replaceAll('：', ':');
                   SmartDialog.showToast('跳转至：$matchStr');
                   Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
                       .plPlayerController
@@ -664,10 +676,13 @@ InlineSpan buildContent(
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
-        if (enableWordRe &&
-            content.jumpUrl[matchStr] != null &&
+        if (content.jumpUrl[matchStr] != null &&
             !matchedStrs.contains(matchStr)) {
           appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+          if (appUrlSchema.startsWith('bilibili://search') && !enableWordRe) {
+            addPlainTextSpan(matchStr);
+            return "";
+          }
           spanChilds.add(
             TextSpan(
               text: content.jumpUrl[matchStr]['title'],
@@ -707,7 +722,7 @@ InlineSpan buildContent(
                 },
             ),
           );
-          if (appUrlSchema.startsWith('bilibili://search') && enableWordRe) {
+          if (appUrlSchema.startsWith('bilibili://search')) {
             spanChilds.add(
               WidgetSpan(
                 child: Icon(
@@ -722,21 +737,13 @@ InlineSpan buildContent(
           // 只显示一次
           matchedStrs.add(matchStr);
         } else {
-          spanChilds.add(TextSpan(
-              text: matchStr,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () =>
-                    replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+          addPlainTextSpan(matchStr);
         }
       }
       return '';
     },
     onNonMatch: (String nonMatchStr) {
-      spanChilds.add(TextSpan(
-          text: nonMatchStr,
-          recognizer: TapGestureRecognizer()
-            ..onTap = () =>
-                replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+      addPlainTextSpan(nonMatchStr);
       return nonMatchStr;
     },
   );
