@@ -256,7 +256,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                       // 请求错误
                       return HttpError(
                         errMsg: data['msg'],
-                        fn: () => setState(() {}),
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _videoReplyController.queryReplyList();
+                          });
+                        },
                       );
                     }
                   } else {

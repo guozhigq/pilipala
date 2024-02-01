@@ -181,8 +181,14 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      print('get error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 
@@ -203,8 +209,14 @@ class Request {
       // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
-      print('post error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 
