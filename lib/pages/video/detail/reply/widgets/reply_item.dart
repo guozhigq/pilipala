@@ -743,10 +743,10 @@ InlineSpan buildContent(
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
     final int len = content.pictures.length;
+    spanChilds.add(const TextSpan(text: '\n'));
     if (len == 1) {
       Map pictureItem = content.pictures.first;
       picList.add(pictureItem['img_src']);
-      spanChilds.add(const TextSpan(text: '\n'));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
