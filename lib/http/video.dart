@@ -450,6 +450,8 @@ class VideoHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': null, 'msg': res.data['message']};
     }
   }
 
