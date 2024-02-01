@@ -17,7 +17,8 @@ class MineController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   Box setting = GStrorage.setting;
   Rx<ThemeType> themeType = ThemeType.system.obs;
-  static bool anonymity = false;
+  static bool anonymity =
+      GStrorage.setting.get(SettingBoxKey.anonymity, defaultValue: false);
 
   @override
   onInit() {
@@ -30,7 +31,7 @@ class MineController extends GetxController {
 
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
         defaultValue: ThemeType.system.code)];
-    anonymity = setting.get(SettingBoxKey.anonymity, defaultValue: false);
+    // anonymity = setting.get(SettingBoxKey.anonymity, defaultValue: false);
   }
 
   onLogin() async {
