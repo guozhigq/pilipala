@@ -76,6 +76,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
+  // 记录上一次音量调整值作平均，避免音量调整抖动
+  double lastVolume = -1.0;
 
   void onDoubleTapSeekBackward() {
     _ctr.onDoubleTapSeekBackward();
@@ -541,9 +543,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 final double level = (_.isFullScreen.value
                         ? Get.size.height
                         : screenWidth * 9 / 16) *
-                    3;
-                final double volume = _ctr.volumeValue.value - delta / level;
+                    0.5;
+                if(lastVolume < 0) {
+                  lastVolume = _ctr.volumeValue.value;
+                }
+                final double volume = (lastVolume + _ctr.volumeValue.value - delta / level)/2;
                 final double result = volume.clamp(0.0, 1.0);
+                lastVolume = result;
                 setVolume(result);
               }
             },
