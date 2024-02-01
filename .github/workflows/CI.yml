@@ -1,8 +1,3 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: CI
 
 on:
@@ -17,80 +12,132 @@ on:
       - '.idea/**'
       - '!.github/workflows/**'
 
-# 可以有多个jobs
 jobs:
-    build_apk:
-        name: Build CI (Push)
-        # 运行环境 ubuntu-latest window-latest mac-latest
-        runs-on: ubuntu-latest
+  android:
+    name: Build CI (Android)
+    runs-on: ubuntu-latest
 
-        # 每个jobs中可以有多个steps
-        steps:
-            - name: 代码迁出
-              uses: actions/checkout@v3
+    steps:
+      - name: 代码迁出
+        uses: actions/checkout@v3
 
-            - name: 构建Java环境
-              uses: actions/setup-java@v3
-              with:
-                  distribution: "zulu"
-                  java-version: "17"
-                  token: ${{secrets.GIT_TOKEN}}
+      - name: 构建Java环境
+        uses: actions/setup-java@v3
+        with:
+            distribution: "zulu"
+            java-version: "17"
+            token: ${{secrets.GIT_TOKEN}}
 
-            - name: 检查缓存
-              uses: actions/cache@v2
-              id: cache-flutter
-              with:
-                  path: /root/flutter-sdk # Flutter SDK 的路径
-                  key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+      - name: 检查缓存
+        uses: actions/cache@v2
+        id: cache-flutter
+        with:
+            path: /root/flutter-sdk
+            key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
 
-            - name: 安装Flutter
-              if: steps.cache-flutter.outputs.cache-hit != 'true'
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: 3.16.5
-                  channel: any
+      - name: 安装Flutter
+        if: steps.cache-flutter.outputs.cache-hit != 'true'
+        uses: subosito/flutter-action@v2
+        with:
+            flutter-version: 3.16.5
+            channel: any
 
-            - name: 下载项目依赖
-              run: flutter pub get
+      - name: 下载项目依赖
+        run: flutter pub get
 
-            - name: 解码生成 jks
-              run: echo $KEYSTORE_BASE64 | base64 -di > android/app/vvex.jks
-              env:
-                  KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: 解码生成 jks
+        run: echo $KEYSTORE_BASE64 | base64 -di > android/app/vvex.jks
+        env:
+            KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-            - name: flutter build apk
-              # 对应 android/app/build.gradle signingConfigs中的配置项
-              run: flutter build apk --release --split-per-abi
-              env:
-                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+      - name: flutter build apk
+        run: flutter build apk --release --split-per-abi
+        env:
+            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+            KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+            KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
 
-            - name: 获取版本号
-              id: version
-              run: echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
+      - name: 获取版本号
+        id: version
+        run: echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
 
-            # - name: 获取当前日期
-            #   id: date
-            #   run: echo "date=$(date +'%m%d')" >>$GITHUB_OUTPUT
+      - name: 重命名应用
+        run: |
+          for file in build/app/outputs/flutter-apk/app-*.apk; do
+            if [[ $file =~ app-(.?*)release.apk ]]; then
+              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ steps.version.outputs.version }}.apk"
+              mv "$file" "$new_file_name"
+            fi
+          done
 
-            - name: 重命名应用 Pili-arm64-v8a-*.apk
-              run: |
-                # DATE=${{ steps.date.outputs.date }}
-                for file in build/app/outputs/flutter-apk/app-*-release.apk; do
-                  if [[ $file =~ app-(.*)-release.apk ]]; then
-                    new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}-${{ steps.version.outputs.version }}.apk"
-                    mv "$file" "$new_file_name"
-                  fi
-                done
-            - name: Upload ARM64
-              uses: actions/upload-artifact@v3
-              with:
-                name: Pili-arm64-v8a-${{ steps.version.outputs.version }}
-                path: build/app/outputs/flutter-apk/Pili-arm64-v8a-*.apk
+      - name: 上传
+        uses: actions/upload-artifact@v3
+        with:
+          name: Pilipala-CI
+          path: |
+            build/app/outputs/flutter-apk/Pili-*.apk
 
-            - name: Upload x86_64
-              uses: actions/upload-artifact@v3
-              with:
-                name: Pili-x86_64-${{ steps.version.outputs.version }}
-                path: build/app/outputs/flutter-apk/Pili-x86_64-*.apk
+  iOS:
+    name: Build CI (iOS)
+    runs-on: macos-latest
+
+    steps:
+      - name: 代码迁出
+        uses: actions/checkout@v4
+
+      - name: 安装Flutter
+        if: steps.cache-flutter.outputs.cache-hit != 'true'
+        uses: subosito/flutter-action@v2.10.0
+        with:
+          cache: true
+          flutter-version: 3.16.5
+
+      - name: flutter build ipa
+        run: |
+          flutter build ios --release --no-codesign 
+          ln -sf ./build/ios/iphoneos Payload
+          zip -r9 app.ipa Payload/runner.app
+
+      - name: 获取版本号
+        id: version
+        run:  echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
+
+      - name: 重命名应用
+        run: |
+          DATE=${{ steps.date.outputs.date }}
+          for file in app.ipa; do
+            new_file_name="build/Pili-${{ steps.version.outputs.version }}.ipa"
+            mv "$file" "$new_file_name"
+          done
+
+      - name: 上传
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: Pilipala-CI
+          path: |
+            build/Pili-*.ipa
+
+  upload:
+    runs-on: ubuntu-latest
+
+    needs:
+      - android
+      - iOS
+    steps:
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: Pilipala-CI
+          path: ./Pilipala-CI
+          
+      - name: Upload Pre-release
+        uses: ncipollo/release-action@v1
+        with:
+          name: v${{ github.run_number }}
+          token: ${{ secrets.GIT_TOKEN }}
+          commit: main
+          tag: v${{ github.run_number }}
+          prerelease: true
+          allowUpdates: true
+          artifacts: Pilipala-CI/*
