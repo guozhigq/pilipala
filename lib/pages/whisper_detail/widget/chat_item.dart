@@ -190,6 +190,52 @@ class ChatItem extends StatelessWidget {
               ),
             ],
           );
+        case MsgType.archive_card:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  SmartDialog.showLoading();
+                  var bvid = content["bvid"];
+                  final int cid = await SearchHttp.ab2c(bvid: bvid);
+                  final String heroTag = Utils.makeHeroTag(bvid);
+                  SmartDialog.dismiss<dynamic>().then(
+                        (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                        arguments: <String, String?>{
+                          'pic': content['thumb'],
+                          'heroTag': heroTag,
+                        }),
+                  );
+                },
+                child: NetworkImgLayer(
+                  width: 220,
+                  height: 220 * 9 / 16,
+                  src: content['cover'],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                content['title'],
+                style: TextStyle(
+                  letterSpacing: 0.6,
+                  height: 1.5,
+                  color: textColor(context),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                Utils.timeFormat(content['times']),
+                style: TextStyle(
+                  letterSpacing: 0.6,
+                  height: 1.5,
+                  color: textColor(context).withOpacity(0.6),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          );
         default:
           return Text(
             content['content'] ?? content.toString(),
