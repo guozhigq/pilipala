@@ -133,6 +133,7 @@ class ChatItem extends StatelessWidget {
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
+            textAlign: TextAlign.center,
             style: TextStyle(
               letterSpacing: 0.6,
               height: 5,

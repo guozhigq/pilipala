@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/msg_feed_top/at_me/view.dart';
+import 'package:pilipala/pages/msg_feed_top/reply_me/view.dart';
+import 'package:pilipala/pages/msg_feed_top/like_me/view.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -139,6 +142,14 @@ class Routes {
     // 私信详情
     CustomGetPage(
         name: '/whisperDetail', page: () => const WhisperDetailPage()),
+    // 回复我的
+    CustomGetPage(name: '/replyMe', page: () => const ReplyMePage()),
+    // @我的
+    CustomGetPage(name: '/atMe', page: () => const AtMePage()),
+    // 收到的赞
+    CustomGetPage(name: '/likeMe', page: () => const LikeMePage()),
+    // 系统消息
+    CustomGetPage(name: '/sysMsg', page: () => const WhisperPage()),
     // 登录页面
     CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
     // 用户动态

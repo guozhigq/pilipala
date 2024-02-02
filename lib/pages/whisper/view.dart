@@ -58,20 +58,20 @@ class _WhisperPageState extends State<WhisperPage> {
                 return Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: SizedBox(
-                    height: constraints.maxWidth / 5,
+                    height: constraints.maxWidth / 4,
                     child: Obx(
                       () => GridView.count(
                         primary: false,
                         crossAxisCount: 4,
                         padding: const EdgeInsets.all(0),
                         childAspectRatio: 1.25,
-                        children:
-                            _whisperController.msgFeedTop.map((item) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Badge(
+                        children: _whisperController.msgFeedTop.map((item) {
+                          return GestureDetector(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Badge(
                                   isLabelVisible: item['value'] > 0,
                                   backgroundColor:
                                       Theme.of(context).colorScheme.primary,
@@ -80,38 +80,25 @@ class _WhisperPageState extends State<WhisperPage> {
                                       .onInverseSurface,
                                   label: Text(" ${item['value']} "),
                                   alignment: Alignment.topRight,
-                                  child: SizedBox(
-                                    width: 36,
-                                    height: 36,
-                                    child: IconButton(
-                                      style: ButtonStyle(
-                                        padding: MaterialStateProperty.all(
-                                            EdgeInsets.zero),
-                                        backgroundColor:
-                                            MaterialStateProperty.resolveWith(
-                                                (states) {
-                                          return Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.1);
-                                        }),
-                                      ),
-                                      onPressed: () => Get.toNamed(
-                                        item['route'],
-                                      ),
-                                      icon: Icon(
-                                        item['icon'],
-                                        size: 18,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
+                                  child: CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .onInverseSurface,
+                                    child: Icon(
+                                      item['icon'],
+                                      size: 20,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
-                                  )),
-                              const SizedBox(height: 6),
-                              Text(item['name'],
-                                  style: const TextStyle(fontSize: 13))
-                            ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(item['name'],
+                                    style: const TextStyle(fontSize: 13))
+                              ],
+                            ),
+                            onTap: () => Get.toNamed(item['route']),
                           );
                         }).toList(),
                       ),

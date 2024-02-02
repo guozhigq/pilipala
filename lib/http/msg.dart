@@ -6,6 +6,100 @@ import 'init.dart';
 
 class MsgHttp {
 
+  static Future msgFeedReplyMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedReply, data: {
+      'id': cursor == -1 ? null : cursor,
+      'reply_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedAtMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedAt,data: {
+      'id': cursor == -1 ? null : cursor,
+      'at_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedLikeMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedLike,data: {
+      'id': cursor == -1 ? null : cursor,
+      'like_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedSysUserNotify() async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.msgSysUserNotify, data: {
+      'csrf': csrf,
+      'csrf': csrf,
+      'page_size': 20,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedSysUnifiedNotify() async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.msgSysUnifiedNotify, data: {
+      'csrf': csrf,
+      'csrf': csrf,
+      'page_size': 10,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
   static Future msgFeedUnread() async {
     var res = await Request().get(Api.msgFeedUnread);
     if (res.data['code'] == 0) {

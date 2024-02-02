@@ -16,25 +16,25 @@ class WhisperController extends GetxController {
     {
       "name":"回复我的",
       "icon":Icons.message_outlined,
-      "route": "/",
+      "route": "/replyMe",
       "value": 0
     },
     {
       "name":"@我",
       "icon":Icons.alternate_email_outlined,
-      "route": "/",
+      "route": "/atMe",
       "value": 0
     },
     {
       "name":"收到的赞",
       "icon":Icons.favorite_border_outlined,
-      "route": "/",
+      "route": "/likeMe",
       "value": 0
     },
     {
       "name":"系统通知",
       "icon":Icons.notifications_none_outlined,
-      "route": "/",
+      "route": "/sysMsg",
       "value": 0
     },
   ].obs;
