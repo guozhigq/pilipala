@@ -199,17 +199,22 @@ class ChatItem extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () async {
-                  SmartDialog.showLoading();
-                  var bvid = content["bvid"];
-                  final int cid = await SearchHttp.ab2c(bvid: bvid);
-                  final String heroTag = Utils.makeHeroTag(bvid);
-                  SmartDialog.dismiss<dynamic>().then(
-                        (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
-                        arguments: <String, String?>{
-                          'pic': content['thumb'],
-                          'heroTag': heroTag,
-                        }),
-                  );
+                  try {
+                    SmartDialog.showLoading();
+                    var bvid = content["bvid"];
+                    final int cid = await SearchHttp.ab2c(bvid: bvid);
+                    final String heroTag = Utils.makeHeroTag(bvid);
+                    SmartDialog.dismiss<dynamic>().then(
+                      (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                          arguments: <String, String?>{
+                            'pic': content['thumb'],
+                            'heroTag': heroTag,
+                          }),
+                    );
+                  } catch (err) {
+                    SmartDialog.dismiss();
+                    SmartDialog.showToast(err.toString());
+                  }
                 },
                 child: NetworkImgLayer(
                   width: 220,
