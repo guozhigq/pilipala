@@ -27,6 +27,7 @@ enum MsgType {
   article_card(value: 12, label: "专栏卡片"),
   pic_card(value: 13, label: "图片卡片"),
   common_share(value: 14, label: "异形卡片"),
+  auto_reply_push(value: 16, label: "自动回复推送"),
   notify_text(value: 18, label: "文本提示");
 
   final int value;
@@ -59,8 +60,10 @@ class ChatItem extends StatelessWidget {
     // bool isArticle = item.msgType == 12; // 专栏
     bool isRevoke = item.msgType == MsgType.revoke.value; // 撤回消息
     bool isShareV2 = item.msgType == MsgType.share_v2.value;
-    bool isSystem =
-        item.msgType == 18 || item.msgType == 10 || item.msgType == 13;
+    bool isSystem = item.msgType == MsgType.notify_text.value ||
+        item.msgType == MsgType.notify_msg.value ||
+        item.msgType == MsgType.pic_card.value ||
+        item.msgType == MsgType.auto_reply_push.value;
     dynamic content = item.content ?? '';
     Color textColor(BuildContext context) {
       return isOwner
@@ -236,6 +239,117 @@ class ChatItem extends StatelessWidget {
               ),
             ],
           );
+        case MsgType.auto_reply_push:
+          return Container(
+              constraints: const BoxConstraints(
+                maxWidth: 300.0, // 设置最大宽度为200.0
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .secondaryContainer
+                    .withOpacity(0.4),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(6),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    content['main_title'],
+                    style: TextStyle(
+                      letterSpacing: 0.6,
+                      height: 1.5,
+                      color: textColor(context),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  for (var i in content['sub_cards']) ...<Widget>[
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                        onTap: () async {
+                          RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}',
+                              caseSensitive: false);
+                          Iterable<Match> matches =
+                              bvRegex.allMatches(i['jump_url']);
+                          if (matches.isNotEmpty) {
+                            Match match = matches.first;
+                            String bvid = match.group(0)!;
+                            try {
+                              SmartDialog.showLoading();
+                              final int cid = await SearchHttp.ab2c(bvid: bvid);
+                              final String heroTag = Utils.makeHeroTag(bvid);
+                              SmartDialog.dismiss<dynamic>().then(
+                                (e) => Get.toNamed<dynamic>(
+                                    '/video?bvid=$bvid&cid=$cid',
+                                    arguments: <String, String?>{
+                                      'pic': i['cover_url'],
+                                      'heroTag': heroTag,
+                                    }),
+                              );
+                            } catch (err) {
+                              SmartDialog.dismiss();
+                              SmartDialog.showToast(err.toString());
+                            }
+                          } else {
+                            SmartDialog.showToast('未匹配到 BV 号');
+                            Get.toNamed('/webview',
+                                arguments: {'url': i['jump_url']});
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            NetworkImgLayer(
+                              width: 130,
+                              height: 130 * 9 / 16,
+                              src: i['cover_url'],
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  i['field1'],
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    letterSpacing: 0.6,
+                                    height: 1.5,
+                                    color: textColor(context),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  i['field2'],
+                                  style: TextStyle(
+                                    letterSpacing: 0.6,
+                                    height: 1.5,
+                                    color: textColor(context).withOpacity(0.6),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  Utils.timeFormat(int.parse(i['field3'])),
+                                  style: TextStyle(
+                                    letterSpacing: 0.6,
+                                    height: 1.5,
+                                    color: textColor(context).withOpacity(0.6),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            )),
+                          ],
+                        )),
+                  ],
+                ],
+              ));
         default:
           return Text(
             content['content'] ?? content.toString(),
