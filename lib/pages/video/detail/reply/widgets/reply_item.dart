@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -539,18 +540,6 @@ InlineSpan buildContent(
   // replyReply 查看二楼回复（回复详情）回调
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
-  if (content.emote.isEmpty &&
-      content.atNameToMid.isEmpty &&
-      content.jumpUrl.isEmpty &&
-      content.vote.isEmpty &&
-      content.pictures.isEmpty) {
-    return TextSpan(
-      text: content.message,
-      recognizer: TapGestureRecognizer()
-        ..onTap =
-            () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem),
-    );
-  }
   final List<InlineSpan> spanChilds = <InlineSpan>[];
   bool hasMatchMember = false;
 
@@ -582,258 +571,171 @@ InlineSpan buildContent(
     });
   }
   // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  if (content.message.contains('&amp;')) {
-    content.message = content.message.replaceAll('&amp;', '&');
+  content.message = content.message.replaceAll('&amp;', '&')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&apos;', "'")
+      .replaceAll('&nbsp;', ' ');
+  // print("content.jumpUrl.keys:" + content.jumpUrl.keys.toString());
+  // 构建正则表达式
+  final List<String> specialTokens = [
+    ...content.emote.keys,
+    ...content.atNameToMid.keys.map((e) => '@$e'),
+    ...content.jumpUrl.keys.map((e) =>
+        e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
+  ];
+
+  String patternStr =
+      specialTokens.map(RegExp.escape).join('|');
+  if (patternStr.isNotEmpty) {
+    patternStr += "|";
   }
-  // 匹配表情
+  patternStr += r'(\b\d{1,2}[:：]\d{2}\b)';
+  final RegExp pattern = RegExp(patternStr);
+  List<String> matchedStrs = [];
+  void addPlainTextSpan(str){
+    spanChilds.add(TextSpan(
+        text: str,
+        recognizer: TapGestureRecognizer()
+          ..onTap = () =>
+              replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+  }
+  // 分割文本并处理每个部分
   content.message.splitMapJoin(
-    RegExp(r"\[.*?\]"),
+    pattern,
     onMatch: (Match match) {
-      final String matchStr = match[0]!;
-      if (content.emote.isNotEmpty &&
-          matchStr.indexOf('[') == matchStr.lastIndexOf('[') &&
-          matchStr.indexOf(']') == matchStr.lastIndexOf(']')) {
+      String matchStr = match[0]!;
+      if (content.emote.containsKey(matchStr)) {
+        // 处理表情
         final int size = content.emote[matchStr]['meta']['size'];
-        if (content.emote.keys.contains(matchStr)) {
-          spanChilds.add(
-            WidgetSpan(
-              child: NetworkImgLayer(
-                src: content.emote[matchStr]['url'],
-                type: 'emote',
-                width: size * 20,
-                height: size * 20,
-              ),
-            ),
-          );
-        } else {
-          spanChilds.add(TextSpan(
-              text: matchStr,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () =>
-                    replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
-          return matchStr;
-        }
-      } else {
-        spanChilds.add(TextSpan(
+        spanChilds.add(WidgetSpan(
+          child: NetworkImgLayer(
+            src: content.emote[matchStr]['url'],
+            type: 'emote',
+            width: size * 20,
+            height: size * 20,
+          ),
+        ));
+      } else if (matchStr.startsWith("@") &&
+          content.atNameToMid.containsKey(matchStr.substring(1))) {
+        // 处理@用户
+        final String userName = matchStr.substring(1);
+        final int userId = content.atNameToMid[userName];
+        spanChilds.add(
+          TextSpan(
             text: matchStr,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             recognizer: TapGestureRecognizer()
-              ..onTap = () =>
-                  replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
-        return matchStr;
-      }
-      return '';
-    },
-    onNonMatch: (String str) {
-      // 匹配@用户
-      String matchMember = str;
-      if (content.atNameToMid.isNotEmpty) {
-        final List atNameToMidKeys = content.atNameToMid.keys.toList();
-        RegExp reg = RegExp(atNameToMidKeys.map((key) => key).join('|'));
-        // if (!content.message.contains(':')) {
-        //   reg = RegExp(r"@.*( |:)");
-        // }
-
-        // 只@用户没有内容
-        if (!content.message.contains(':') ||
-            (content.atNameToMid.length == 1 &&
-                content.message == '@${content.members.first.uname}')) {
-          reg = RegExp(r"@.*( |:|$)");
-        }
-        matchMember = str.splitMapJoin(
-          reg,
-          onMatch: (Match match) {
-            if (match[0] != null) {
-              hasMatchMember = true;
-              content.atNameToMid.forEach((key, value) {
-                if (str.contains('回复')) {
-                  spanChilds.add(
-                    TextSpan(
-                      text: '回复 ',
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.titleSmall!.fontSize,
-                      ),
-                    ),
-                  );
-                }
-                spanChilds.add(
-                  TextSpan(
-                    text: '@$key',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.titleSmall!.fontSize,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        final String heroTag = Utils.makeHeroTag(value);
-                        Get.toNamed(
-                          '/member?mid=$value',
-                          arguments: {'face': '', 'heroTag': heroTag},
-                        );
-                      },
-                  ),
+              ..onTap = () {
+                final String heroTag = Utils.makeHeroTag(userId);
+                Get.toNamed(
+                  '/member?mid=$userId',
+                  arguments: {'face': '', 'heroTag': heroTag},
                 );
-              });
-            }
-            return '';
-          },
-          onNonMatch: (String str) {
-            if (!str.contains('@')) {
-              spanChilds.add(TextSpan(text: str));
-            }
-            print(str);
-            return str;
-          },
+              },
+          ),
+        );
+      } else if (RegExp(r'^\b[0-9]{1,2}[:：][0-9]{2}\b$').hasMatch(matchStr)) {
+        spanChilds.add(
+          TextSpan(
+            text: ' $matchStr ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // 跳转到指定位置
+                try {
+                  matchStr = matchStr.replaceAll('：', ':');
+                  SmartDialog.showToast('跳转至：$matchStr');
+                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
+                      .plPlayerController
+                      .seekTo(
+                        Duration(seconds: Utils.duration(matchStr)),
+                      );
+                } catch (e) {
+                  SmartDialog.showToast('跳转失败: $e');
+                }
+              },
+          ),
         );
       } else {
-        matchMember = str;
-      }
-
-      // 匹配 jumpUrl
-      String matchUrl = matchMember;
-      if (content.jumpUrl.isNotEmpty) {
-        final List urlKeys = content.jumpUrl.keys.toList().reversed.toList();
-        for (int index = 0; index < urlKeys.length; index++) {
-          var i = urlKeys[index];
-          if (i.contains('?')) {
-            urlKeys[index] = i.replaceAll('?', '\\?');
+        // print("matchStr=$matchStr");
+        String appUrlSchema = '';
+        final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
+            defaultValue: false) as bool;
+        if (content.jumpUrl[matchStr] != null &&
+            !matchedStrs.contains(matchStr)) {
+          appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
+          if (appUrlSchema.startsWith('bilibili://search') && !enableWordRe) {
+            addPlainTextSpan(matchStr);
+            return "";
           }
-          if (i.contains('+')) {
-            urlKeys[index] = i.replaceAll('+', '\\+');
-          }
-          if (i.contains('*')) {
-            urlKeys[index] = i.replaceAll('*', '\\*');
-          }
-        }
-        if (hasMatchMember) {
-          matchMember = matchMember.split('回复 @ :').length > 1
-              ? matchMember.split('回复 @ :')[1]
-              : matchMember;
-        }
-        matchUrl = matchMember.splitMapJoin(
-          /// RegExp.escape() 转义特殊字符
-          RegExp(urlKeys.map((key) => key).join("|")),
-          // RegExp('What does the fox say\\?'),
-          onMatch: (Match match) {
-            final String matchStr = match[0]!;
-            String appUrlSchema = '';
-            if (content.jumpUrl[matchStr] != null) {
-              appUrlSchema = content.jumpUrl[matchStr]['app_url_schema'];
-            }
-            // 默认不显示关键词
-            final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
-                defaultValue: false) as bool;
-            if (content.jumpUrl[matchStr] != null) {
-              spanChilds.add(
-                TextSpan(
-                  text: content.jumpUrl[matchStr]['title'],
-                  style: TextStyle(
-                    color: enableWordRe
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      if (appUrlSchema == '') {
-                        final String str = Uri.parse(matchStr).pathSegments[0];
-                        final Map matchRes = IdUtils.matchAvorBv(input: str);
-                        final List matchKeys = matchRes.keys.toList();
-                        if (matchKeys.isNotEmpty) {
-                          if (matchKeys.first == 'BV') {
-                            Get.toNamed(
-                              '/searchResult',
-                              parameters: {'keyword': matchRes['BV']},
-                            );
-                          }
-                        } else {
-                          Get.toNamed(
-                            '/webview',
-                            parameters: {
-                              'url': matchStr,
-                              'type': 'url',
-                              'pageTitle': ''
-                            },
-                          );
-                        }
-                      } else {
-                        if (appUrlSchema.startsWith('bilibili://search') &&
-                            enableWordRe) {
-                          Get.toNamed('/searchResult', parameters: {
-                            'keyword': content.jumpUrl[matchStr]['title']
-                          });
-                        }
-                      }
-                    },
-                ),
-              );
-            }
-
-            if (appUrlSchema.startsWith('bilibili://search') && enableWordRe) {
-              spanChilds.add(
-                WidgetSpan(
-                  child: Icon(
-                    FontAwesomeIcons.magnifyingGlass,
-                    size: 9,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  alignment: PlaceholderAlignment.top,
-                ),
-              );
-            }
-            return '';
-          },
-          onNonMatch: (String str) {
-            spanChilds.add(TextSpan(
-                text: str,
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () => replyReply(
-                      replyItem.root == 0 ? replyItem : fReplyItem)));
-            return str;
-          },
-        );
-      }
-      str = matchUrl.splitMapJoin(
-        RegExp(r'\b\d{2}:\d{2}\b'),
-        onMatch: (Match match) {
-          String matchStr = match[0]!;
           spanChilds.add(
             TextSpan(
-              text: ' $matchStr ',
+              text: content.jumpUrl[matchStr]['title'],
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  // 跳转到指定位置
-                  try {
-                    Get.find<VideoDetailController>(
-                            tag: Get.arguments['heroTag'])
-                        .plPlayerController
-                        .seekTo(
-                          Duration(seconds: Utils.duration(matchStr)),
+                  if (appUrlSchema == '') {
+                    final String str = Uri.parse(matchStr).pathSegments[0];
+                    final Map matchRes = IdUtils.matchAvorBv(input: str);
+                    final List matchKeys = matchRes.keys.toList();
+                    if (matchKeys.isNotEmpty) {
+                      if (matchKeys.first == 'BV') {
+                        Get.toNamed(
+                          '/searchResult',
+                          parameters: {'keyword': matchRes['BV']},
                         );
-                  } catch (_) {}
+                      }
+                    } else {
+                      Get.toNamed(
+                        '/webview',
+                        parameters: {
+                          'url': matchStr,
+                          'type': 'url',
+                          'pageTitle': ''
+                        },
+                      );
+                    }
+                  } else {
+                    if (appUrlSchema.startsWith('bilibili://search')) {
+                      Get.toNamed('/searchResult', parameters: {
+                        'keyword': content.jumpUrl[matchStr]['title']
+                      });
+                    }
+                  }
                 },
             ),
           );
-          return '';
-        },
-        onNonMatch: (str) {
-          return str;
-        },
-      );
-
-      if (content.atNameToMid.isEmpty && content.jumpUrl.isEmpty) {
-        if (str != '') {
-          spanChilds.add(TextSpan(
-              text: str,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () =>
-                    replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+          if (appUrlSchema.startsWith('bilibili://search')) {
+            spanChilds.add(
+              WidgetSpan(
+                child: Icon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  size: 9,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                alignment: PlaceholderAlignment.top,
+              ),
+            );
+          }
+          // 只显示一次
+          matchedStrs.add(matchStr);
+        } else {
+          addPlainTextSpan(matchStr);
         }
       }
-      return str;
+      return '';
+    },
+    onNonMatch: (String nonMatchStr) {
+      addPlainTextSpan(nonMatchStr);
+      return nonMatchStr;
     },
   );
 
@@ -841,10 +743,10 @@ InlineSpan buildContent(
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
     final int len = content.pictures.length;
+    spanChilds.add(const TextSpan(text: '\n'));
     if (len == 1) {
       Map pictureItem = content.pictures.first;
       picList.add(pictureItem['img_src']);
-      spanChilds.add(const TextSpan(text: '\n'));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
