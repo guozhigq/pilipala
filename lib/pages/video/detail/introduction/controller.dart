@@ -210,6 +210,10 @@ class VideoIntroController extends GetxController {
 
   // （取消）点赞
   Future actionLikeVideo() async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
