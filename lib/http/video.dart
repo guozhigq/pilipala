@@ -361,7 +361,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -377,7 +377,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -455,10 +455,7 @@ class VideoHttp {
         'data': AiConclusionModel.fromJson(res.data['data']),
       };
     } else {
-      return {
-        'status': false,
-        'data': []
-      };
+      return {'status': false, 'data': []};
     }
   }
 }
