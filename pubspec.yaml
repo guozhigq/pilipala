@@ -85,9 +85,21 @@ dependencies:
   encrypt: ^5.0.3
 
   # 视频播放器
-  media_kit: ^1.1.10 # Primary package.
-  media_kit_video: ^1.2.4 # For video rendering.
-  media_kit_libs_video: ^1.0.4
+  media_kit:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./media_kit
+  media_kit_video:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./media_kit_video
+  media_kit_libs_video:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./libs/universal/media_kit_libs_video
 
   # 媒体通知
   audio_service: ^0.18.13
@@ -178,6 +190,23 @@ dependency_overrides:
     git:
       url: https://github.com/media-kit/media-kit
       path: libs/universal/media_kit_libs_video
+
+dependency_overrides:
+  media_kit:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./media_kit
+  media_kit_video:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./media_kit_video
+  media_kit_libs_video:
+    git:
+      url: https://github.com/media-kit/media-kit.git
+      ref: main
+      path: ./libs/universal/media_kit_libs_video
 
 flutter_launcher_icons:
   android: true
