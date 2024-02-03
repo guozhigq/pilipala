@@ -194,14 +194,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                     }
                   } else {
                     // 缓存数据
-                    if (_searchController.hotSearchList.isNotEmpty) {
-                      return HotKeyword(
-                        width: width,
-                        hotSearchList: _searchController.hotSearchList,
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
+                    return const SizedBox();
                   }
                 },
               );

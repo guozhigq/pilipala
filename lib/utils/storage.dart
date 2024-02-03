@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 
 class GStrorage {
@@ -48,8 +47,6 @@ class GStrorage {
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());
-    Hive.registerAdapter(HotSearchModelAdapter());
-    Hive.registerAdapter(HotSearchItemAdapter());
   }
 
   static Future<void> lazyInit() async {
