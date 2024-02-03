@@ -341,7 +341,7 @@ class ChatItem extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  Utils.timeFormat(int.parse(i['field3'])),
+                                  i['field3'],
                                   style: TextStyle(
                                     letterSpacing: 0.6,
                                     height: 1.5,
