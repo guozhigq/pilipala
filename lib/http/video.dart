@@ -224,10 +224,11 @@ class VideoHttp {
   // 获取投币状态
   static Future hasCoinVideo({required String bvid}) async {
     var res = await Request().get(Api.hasCoinVideo, data: {'bvid': bvid});
+    print('res: $res');
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -361,7 +362,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -377,7 +378,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -455,10 +456,7 @@ class VideoHttp {
         'data': AiConclusionModel.fromJson(res.data['data']),
       };
     } else {
-      return {
-        'status': false,
-        'data': []
-      };
+      return {'status': false, 'data': []};
     }
   }
 }

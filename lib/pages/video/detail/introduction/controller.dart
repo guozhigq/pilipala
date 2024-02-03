@@ -148,7 +148,9 @@ class VideoIntroController extends GetxController {
   // 获取投币状态
   Future queryHasCoinVideo() async {
     var result = await VideoHttp.hasCoinVideo(bvid: bvid);
-    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    if (result['status']) {
+      hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    }
   }
 
   // 获取收藏状态
@@ -208,6 +210,10 @@ class VideoIntroController extends GetxController {
 
   // （取消）点赞
   Future actionLikeVideo() async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
