@@ -29,7 +29,7 @@ class SSearchController extends GetxController {
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {
-        onClickKeyword(Get.parameters['keyword']!);
+        onClickKeyword(Get.parameters['keyword']!, null);
       }
       if (Get.parameters['hintText'] != null) {
         hintText = Get.parameters['hintText']!;
@@ -88,7 +88,12 @@ class SSearchController extends GetxController {
   }
 
   // 点击热搜关键词
-  void onClickKeyword(String keyword) {
+  void onClickKeyword(String keyword, item) {
+    if (item != null && item.wordType == 7) {
+      Get.toNamed('/liveRoom?roomid=${item.liveId.first}',
+          arguments: {'liveItem': null, 'heroTag': '${item.liveId.first}'});
+      return;
+    }
     searchKeyWord.value = keyword;
     controller.value.text = keyword;
     // 移动光标
