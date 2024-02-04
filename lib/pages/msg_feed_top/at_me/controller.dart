@@ -37,6 +37,7 @@ class AtMeController extends GetxController {
 
   Future onRefresh() async {
     cursor = -1;
+    cursorTime = -1;
     queryMsgFeedAtMe();
   }
 
