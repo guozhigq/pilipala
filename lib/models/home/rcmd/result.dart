@@ -28,7 +28,7 @@ class RecVideoItemAppModel {
   int? cid;
   String? pic;
   RcmdStat? stat;
-  String? duration;
+  int? duration;
   String? title;
   int? isFollowed;
   RcmdOwner? owner;
@@ -54,13 +54,27 @@ class RecVideoItemAppModel {
     cid = json['player_args'] != null ? json['player_args']['cid'] : -1;
     pic = json['cover'];
     stat = RcmdStat.fromJson(json);
-    duration = json['cover_right_text'];
+    // 改用player_args中的duration作为原始数据（秒数）
+    duration = json['player_args'] != null
+        ? json['player_args']['duration']
+        : -1;
+    //duration = json['cover_right_text'];
     title = json['title'];
-    isFollowed = 0;
     owner = RcmdOwner.fromJson(json);
     rcmdReason = json['rcmd_reason_style'] != null
         ? RcmdReason.fromJson(json['rcmd_reason_style'])
         : null;
+    // 由于app端api并不会直接返回与owner的关注状态
+    // 所以借用推荐原因是否为“已关注”、“新关注”等判别关注状态，从而与web端接口等效
+    isFollowed = rcmdReason != null &&
+            rcmdReason!.content != null &&
+            rcmdReason!.content!.contains('关注')
+        ? 1
+        : 0;
+    // 如果是，就无需再显示推荐原因，交由view统一处理即可
+    if (isFollowed == 1) {
+      rcmdReason = null;
+    }
     goto = json['goto'];
     param = int.parse(json['param']);
     uri = json['uri'];
