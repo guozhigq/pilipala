@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
 import 'package:pilipala/common/widgets/animated_dialog.dart';
-// import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import 'package:pilipala/pages/home/index.dart';
@@ -25,6 +25,7 @@ class RcmdPage extends StatefulWidget {
 class _RcmdPageState extends State<RcmdPage>
     with AutomaticKeepAliveClientMixin {
   final RcmdController _rcmdController = Get.put(RcmdController());
+  late Future _futureBuilderFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -32,7 +33,7 @@ class _RcmdPageState extends State<RcmdPage>
   @override
   void initState() {
     super.initState();
-    _rcmdController.queryRcmdFeed('init');
+    _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
     ScrollController scrollController = _rcmdController.scrollController;
     StreamController<bool> mainStream =
         Get.find<MainController>().bottomBarStream;
@@ -88,19 +89,41 @@ class _RcmdPageState extends State<RcmdPage>
           slivers: [
             SliverPadding(
               padding:
-              const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
-              sliver: Obx(() { // 使用Obx来监听数据的变化
-                if (_rcmdController.isLoadingMore && _rcmdController.videoList.isEmpty) {
-                  return contentGrid(_rcmdController, []);
-                  // 如果正在加载并且列表为空，则显示加载指示器
-                  // return const SliverToBoxAdapter(
-                  //   child: Center(child: CircularProgressIndicator()),
-                  // );
-                } else {
-                  // 显示视频列表
-                  return contentGrid(_rcmdController, _rcmdController.videoList);
-                }
-              }),
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(
+                        () {
+                          if (_rcmdController.isLoadingMore &&
+                              _rcmdController.videoList.isEmpty) {
+                            return contentGrid(_rcmdController, []);
+                          } else {
+                            // 显示视频列表
+                            return contentGrid(
+                                _rcmdController, _rcmdController.videoList);
+                          }
+                        },
+                      );
+                    } else {
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _rcmdController.queryRcmdFeed('init');
+                          });
+                        },
+                      );
+                    }
+                  } else {
+                    return contentGrid(_rcmdController, []);
+                  }
+                },
+              ),
             ),
             LoadingMore(ctr: _rcmdController),
           ],
