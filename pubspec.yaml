@@ -124,7 +124,10 @@ dependencies:
   # 代理
   system_proxy: ^0.1.0
   # pip
-  floating: ^2.0.1
+  floating:
+    git:
+      url: https://github.com/guozhigq/floating.git
+      ref: main
   # html解析
   html: ^0.15.4
   # html渲染

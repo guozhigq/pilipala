@@ -139,7 +139,8 @@ class SettingBoxKey {
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
-      tabbarSort = 'tabbarSort'; // 首页tabbar
+      tabbarSort = 'tabbarSort', // 首页tabbar
+      dynamicBadgeMode = 'dynamicBadgeMode';
 }
 
 class LocalCacheKey {

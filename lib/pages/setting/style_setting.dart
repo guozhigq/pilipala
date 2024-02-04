@@ -10,6 +10,7 @@ import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../models/common/dynamic_badge_mode.dart';
 import 'controller.dart';
 import 'widgets/switch_item.dart';
 
@@ -242,6 +243,14 @@ class _StyleSettingState extends State<StyleSetting> {
             title: Text('主题模式', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前模式：${settingController.themeType.value.description}',
+                style: subTitleStyle)),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => settingController.setDynamicBadgeMode(context),
+            title: Text('动态未读标记', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前标记样式：${settingController.dynamicBadgeType.value.description}',
                 style: subTitleStyle)),
           ),
           ListTile(

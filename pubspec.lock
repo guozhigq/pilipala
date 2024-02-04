@@ -500,10 +500,11 @@ packages:
   floating:
     dependency: "direct main"
     description:
-      name: floating
-      sha256: d9d563089e34fbd714ffdcdd2df447ec41b40c9226dacae6b4f78847aef8b991
-      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: d2d8421c4d80f6113f832404109853684721e11a
+      url: "https://github.com/guozhigq/floating.git"
+    source: git
     version: "2.0.1"
   flutter:
     dependency: "direct main"
