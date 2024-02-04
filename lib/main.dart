@@ -22,6 +22,9 @@ import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:pilipala/utils/recommend_filter.dart';
+import 'package:catcher_2/catcher_2.dart';
+import './services/loggeer.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +37,33 @@ void main() async {
     Request();
     await Request.setCookie();
     RecommendFilter();
-    runApp(const MyApp());
+
+    // 异常捕获 logo记录
+    final Catcher2Options debugConfig = Catcher2Options(
+      SilentReportMode(),
+      [
+        FileHandler(await getLogsPath()),
+        ConsoleHandler(
+          enableDeviceParameters: false,
+          enableApplicationParameters: false,
+        )
+      ],
+    );
+
+    final Catcher2Options releaseConfig = Catcher2Options(
+      SilentReportMode(),
+      [FileHandler(await getLogsPath())],
+    );
+
+    Catcher2(
+      debugConfig: debugConfig,
+      releaseConfig: releaseConfig,
+      runAppFunction: () {
+        runApp(const MyApp());
+      },
+    );
+
+
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

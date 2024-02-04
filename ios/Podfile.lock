@@ -13,8 +13,13 @@ PODS:
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_mailer (0.0.1):
+    - Flutter
   - flutter_volume_controller (0.0.1):
     - Flutter
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -49,6 +54,7 @@ PODS:
     - Flutter
   - system_proxy (0.0.1):
     - Flutter
+  - Toast (4.1.0)
   - url_launcher_ios (0.0.1):
     - Flutter
   - volume_controller (0.0.1):
@@ -68,7 +74,9 @@ DEPENDENCIES:
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
+  - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
   - flutter_volume_controller (from `.symlinks/plugins/flutter_volume_controller/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gt3_flutter_plugin (from `.symlinks/plugins/gt3_flutter_plugin/ios`)
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
@@ -93,6 +101,7 @@ SPEC REPOS:
     - FMDB
     - GT3Captcha-iOS
     - ReachabilitySwift
+    - Toast
 
 EXTERNAL SOURCES:
   appscheme:
@@ -109,8 +118,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
+  flutter_mailer:
+    :path: ".symlinks/plugins/flutter_mailer/ios"
   flutter_volume_controller:
     :path: ".symlinks/plugins/flutter_volume_controller/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
   gt3_flutter_plugin:
     :path: ".symlinks/plugins/gt3_flutter_plugin/ios"
   media_kit_libs_ios_video:
@@ -156,7 +169,9 @@ SPEC CHECKSUMS:
   connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
   flutter_volume_controller: e4d5832f08008180f76e30faf671ffd5a425e529
+  fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   gt3_flutter_plugin: bfa1f26e9a09dc00401514be5ed437f964cabf23
   GT3Captcha-iOS: 5e3b1077834d8a9d6f4d64a447a30af3e14affe6
@@ -173,6 +188,7 @@ SPEC CHECKSUMS:
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   status_bar_control: 7c84146799e6a076315cc1550f78ef53aae3e446
   system_proxy: bec1a5c5af67dd3e3ebf43979400a8756c04cc44
+  Toast: ec33c32b8688982cecc6348adeae667c1b9938da
   url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47

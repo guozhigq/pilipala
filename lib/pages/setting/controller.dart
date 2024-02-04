@@ -7,6 +7,9 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
+import '../../models/common/dynamic_badge_mode.dart';
+import '../main/index.dart';
+import 'widgets/select_dialog.dart';
 
 class SettingController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
@@ -19,6 +22,7 @@ class SettingController extends GetxController {
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   var userInfo;
+  Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
 
   @override
   void onInit() {
@@ -33,6 +37,9 @@ class SettingController extends GetxController {
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
         defaultValue: ThemeType.system.code)];
+    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+        SettingBoxKey.dynamicBadgeMode,
+        defaultValue: DynamicBadgeMode.number.code)];
   }
 
   loginOut() async {
@@ -75,5 +82,32 @@ class SettingController extends GetxController {
     feedBack();
     feedBackEnable.value = !feedBackEnable.value;
     setting.put(SettingBoxKey.feedBackEnable, feedBackEnable.value);
+  }
+
+  // 设置动态未读标记
+  setDynamicBadgeMode(BuildContext context) async {
+    DynamicBadgeMode? result = await showDialog(
+      context: context,
+      builder: (context) {
+        return SelectDialog<DynamicBadgeMode>(
+          title: '动态未读标记',
+          value: dynamicBadgeType.value,
+          values: DynamicBadgeMode.values.map((e) {
+            return {'title': e.description, 'value': e};
+          }).toList(),
+        );
+      },
+    );
+    if (result != null) {
+      dynamicBadgeType.value = result;
+      setting.put(SettingBoxKey.dynamicBadgeMode, result.code);
+      MainController mainController = Get.put(MainController());
+      mainController.dynamicBadgeType.value =
+          DynamicBadgeMode.values[result.code];
+      if (mainController.dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+        mainController.getUnreadDynamic();
+      }
+      SmartDialog.showToast('设置成功');
+    }
   }
 }
