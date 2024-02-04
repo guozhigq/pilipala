@@ -80,8 +80,6 @@ class RcmdController extends GetxController {
       if (res['data'].length > 1 && videoList.length < 10) {
         queryRcmdFeed('onLoad');
       }
-    } else {
-      Get.snackbar('提示', res['msg']);
     }
     isLoadingMore = false;
     return res;
