@@ -37,6 +37,10 @@ class DynamicDetailController extends GetxController {
     }
     int deaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    if (deaultReplySortIndex == 2) {
+      setting.put(SettingBoxKey.replySortType, 0);
+      deaultReplySortIndex = 0;
+    }
     _sortType = ReplySortType.values[deaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
@@ -92,9 +96,6 @@ class DynamicDetailController extends GetxController {
         _sortType = ReplySortType.like;
         break;
       case ReplySortType.like:
-        _sortType = ReplySortType.reply;
-        break;
-      case ReplySortType.reply:
         _sortType = ReplySortType.time;
         break;
       default:
