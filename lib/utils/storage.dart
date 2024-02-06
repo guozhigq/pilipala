@@ -105,17 +105,24 @@ class SettingBoxKey {
       /// 隐私
       blackMidsList = 'blackMidsList',
 
+      /// 推荐
+      enableRcmdDynamic = 'enableRcmdDynamic',
+      defaultRcmdType = 'defaultRcmdType',
+      enableSaveLastData = 'enableSaveLastData',
+      minDurationForRcmd = 'minDurationForRcmd',
+      minLikeRatioForRecommend = 'minLikeRatioForRecommend',
+      exemptFilterForFollowed = 'exemptFilterForFollowed',
+      //filterUnfollowedRatio = 'filterUnfollowedRatio',
+      applyFilterToRelatedVideos = 'applyFilterToRelatedVideos',
+
       /// 其他
       autoUpdate = 'autoUpdate',
-      defaultRcmdType = 'defaultRcmdType',
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
       enableQuickFav = 'enableQuickFav',
       enableWordRe = 'enableWordRe',
       enableSearchWord = 'enableSearchWord',
-      enableRcmdDynamic = 'enableRcmdDynamic',
-      enableSaveLastData = 'enableSaveLastData',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi';
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -97,24 +96,18 @@ class _RcmdPageState extends State<RcmdPage>
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return Platform.isAndroid || Platform.isIOS
-                          ? Obx(
-                              () => contentGrid(
-                                  _rcmdController,
-                                  _rcmdController.defaultRcmdType == 'web'
-                                      ? _rcmdController.webVideoList
-                                      : _rcmdController.appVideoList),
-                            )
-                          : SliverLayoutBuilder(
-                              builder: (context, boxConstraints) {
-                              return Obx(
-                                () => contentGrid(
-                                    _rcmdController,
-                                    _rcmdController.defaultRcmdType == 'web'
-                                        ? _rcmdController.webVideoList
-                                        : _rcmdController.appVideoList),
-                              );
-                            });
+                      return Obx(
+                        () {
+                          if (_rcmdController.isLoadingMore &&
+                              _rcmdController.videoList.isEmpty) {
+                            return contentGrid(_rcmdController, []);
+                          } else {
+                            // 显示视频列表
+                            return contentGrid(
+                                _rcmdController, _rcmdController.videoList);
+                          }
+                        },
+                      );
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
@@ -127,20 +120,12 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     }
                   } else {
-                    // 缓存数据
-                    // if (_rcmdController.videoList.isNotEmpty) {
-                    //   return contentGrid(
-                    //       _rcmdController, _rcmdController.videoList);
-                    // }
-                    // // 骨架屏
-                    // else {
                     return contentGrid(_rcmdController, []);
-                    // }
                   }
                 },
               ),
             ),
-            LoadingMore(ctr: _rcmdController)
+            LoadingMore(ctr: _rcmdController),
           ],
         ),
       ),

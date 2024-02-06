@@ -9,6 +9,7 @@ import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
 import '../models/video_detail_res.dart';
+import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
 import '../utils/wbi_sign.dart';
 import 'api.dart';
@@ -46,8 +47,13 @@ class VideoHttp {
             setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['item']) {
           //过滤掉live与ad，以及拉黑用户
-          if (i['goto'] == 'av' && !blackMidsList.contains(i['owner']['mid'])) {
-            list.add(RecVideoItemModel.fromJson(i));
+          if (i['goto'] == 'av' &&
+              (i['owner'] != null &&
+                  !blackMidsList.contains(i['owner']['mid']))) {
+            RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)){
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
@@ -59,7 +65,9 @@ class VideoHttp {
     }
   }
 
-  static Future rcmdVideoListApp({int? ps, required int freshIdx}) async {
+  // 添加额外的loginState变量模拟未登录状态
+  static Future rcmdVideoListApp(
+      {bool loginStatus = true, required int freshIdx}) async {
     try {
       var res = await Request().get(
         Api.recommendListApp,
@@ -72,9 +80,11 @@ class VideoHttp {
           'device_name': 'vivo',
           'pull': freshIdx == 0 ? 'true' : 'false',
           'appkey': Constants.appKey,
-          'access_key': localCache
-                  .get(LocalCacheKey.accessKey, defaultValue: {})['value'] ??
-              ''
+          'access_key': loginStatus
+              ? (localCache.get(LocalCacheKey.accessKey,
+                      defaultValue: {})['value'] ??
+                  '')
+              : ''
         },
       );
       if (res.data['code'] == 0) {
@@ -87,12 +97,15 @@ class VideoHttp {
               (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
-            list.add(RecVideoItemAppModel.fromJson(i));
+            RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)){
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': [], 'msg': ''};
+        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err.toString()};
@@ -203,7 +216,10 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']) {
-        list.add(HotVideoItemModel.fromJson(i));
+        HotVideoItemModel videoItem = HotVideoItemModel.fromJson(i);
+        if (!RecommendFilter.filter(videoItem, relatedVideos: true)){
+          list.add(videoItem);
+        }
       }
       return {'status': true, 'data': list};
     } else {

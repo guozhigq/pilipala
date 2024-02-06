@@ -39,6 +39,7 @@ import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
 import '../pages/setting/pages/home_tabbar_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
+import '../pages/setting/recommend_setting.dart';
 import '../pages/setting/play_setting.dart';
 import '../pages/setting/privacy_setting.dart';
 import '../pages/setting/style_setting.dart';
@@ -102,7 +103,8 @@ class Routes {
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
-
+    // 推荐设置
+    CustomGetPage(name: '/recommendSetting', page: () => const RecommendSetting()),
     // 播放设置
     CustomGetPage(name: '/playSetting', page: () => const PlaySetting()),
     // 外观设置
