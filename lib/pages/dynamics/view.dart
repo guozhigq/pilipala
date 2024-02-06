@@ -192,22 +192,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                   )
                 ],
               ),
-              // Obx(
-              //   () => Visibility(
-              //     visible: _dynamicsController.userLogin.value,
-              //     child: Positioned(
-              //       right: 4,
-              //       top: 0,
-              //       bottom: 0,
-              //       child: IconButton(
-              //         padding: EdgeInsets.zero,
-              //         onPressed: () =>
-              //             {feedBack(), _dynamicsController.resetSearch()},
-              //         icon: const Icon(Icons.history, size: 21),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -229,7 +213,8 @@ class _DynamicsPageState extends State<DynamicsPage>
                     return Obx(() => UpPanel(_dynamicsController.upData.value));
                   } else {
                     return const SliverToBoxAdapter(
-                        child: SizedBox(height: 80));
+                      child: SizedBox(height: 80),
+                    );
                   }
                 } else {
                   return const SliverToBoxAdapter(
@@ -239,15 +224,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                   ));
                 }
               },
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                height: 6,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onInverseSurface
-                    .withOpacity(0.5),
-              ),
             ),
             FutureBuilder(
               future: _futureBuilderFuture,
