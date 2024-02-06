@@ -27,7 +27,9 @@ class FavVideoCardH extends StatelessWidget {
       onTap: () async {
         // int? seasonId;
         String? epId;
-        if (videoItem.ogv != null && videoItem.ogv['type_name'] == '番剧') {
+        if (videoItem.ogv != null &&
+            (videoItem.ogv['type_name'] == '番剧' ||
+                videoItem.ogv['type_name'] == '国创')) {
           videoItem.cid = await SearchHttp.ab2c(bvid: bvid);
           // seasonId = videoItem.ogv['season_id'];
           epId = videoItem.epId;
