@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:waterfall_flow/waterfall_flow.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
@@ -14,6 +15,8 @@ import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../common/constants.dart';
+import '../../utils/grid.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
 import 'widgets/up_panel.dart';
@@ -269,14 +272,28 @@ class _DynamicsPageState extends State<DynamicsPage>
                             return const NoData();
                           }
                         } else {
-                          return SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                return DynamicPanel(item: list[index]);
-                              },
-                              childCount: list.length,
-                            ),
-                          );
+                          return SliverWaterfallFlow.extent(
+                              maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                              //cacheExtent: 0.0,
+                              crossAxisSpacing: StyleString.safeSpace,
+                              mainAxisSpacing: StyleString.safeSpace,
+
+                              /// follow max child trailing layout offset and layout with full cross axis extend
+                              /// last child as loadmore item/no more item in [GridView] and [WaterfallFlow]
+                              /// with full cross axis extend
+                              //  LastChildLayoutType.fullCrossAxisExtend,
+
+                              /// as foot at trailing and layout with full cross axis extend
+                              /// show no more item at trailing when children are not full of viewport
+                              /// if children is full of viewport, it's the same as fullCrossAxisExtend
+                              //  LastChildLayoutType.foot,
+                              lastChildLayoutTypeBuilder: (index) =>
+                                  index == list.length
+                                      ? LastChildLayoutType.foot
+                                      : LastChildLayoutType.none,
+                              children: [
+                                for (var i in list) DynamicPanel(item: i),
+                              ]);
                         }
                       },
                     );

@@ -140,6 +140,8 @@ dependencies:
   catcher_2: ^1.1.0
   logger: ^2.0.2+1
   path: 1.8.3
+  #瀑布流
+  waterfall_flow: ^3.0.3
 
 dev_dependencies:
   flutter_test:
