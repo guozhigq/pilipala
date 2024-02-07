@@ -4,7 +4,8 @@ import 'package:pilipala/http/msg.dart';
 import '../../../models/msg/msgfeed_like_me.dart';
 
 class LikeMeController extends GetxController {
-  RxList<LikeMeItems> msgFeedLikeMeList = <LikeMeItems>[].obs;
+  RxList<LikeMeItems> msgFeedLikeMeLatestList = <LikeMeItems>[].obs;
+  RxList<LikeMeItems> msgFeedLikeMeTotalList = <LikeMeItems>[].obs;
   bool isLoading = false;
   int cursor = -1;
   int cursorTime = -1;
@@ -19,9 +20,11 @@ class LikeMeController extends GetxController {
       MsgFeedLikeMe data = MsgFeedLikeMe.fromJson(res['data']);
       isEnd = data.total?.cursor?.isEnd ?? false;
       if (cursor == -1) {
-        msgFeedLikeMeList.assignAll(data.total!.items!);
+        msgFeedLikeMeLatestList.assignAll(data.latest?.items??[]);
+        msgFeedLikeMeTotalList.assignAll(data.total?.items??[]);
       } else {
-        msgFeedLikeMeList.addAll(data.total!.items!);
+        msgFeedLikeMeLatestList.addAll(data.latest?.items??[]);
+        msgFeedLikeMeTotalList.addAll(data.total?.items??[]);
       }
       cursor = data.total?.cursor?.id ?? -1;
       cursorTime = data.total?.cursor?.time ?? -1;
