@@ -27,119 +27,121 @@ class _AboutPageState extends State<AboutPage> {
       appBar: AppBar(
         title: Text('关于', style: Theme.of(context).textTheme.titleMedium),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+      body: ListView(
+        children: [
+          ConstrainedBox(constraints:
+          const BoxConstraints(
+              maxHeight: 150),
+            child:
             Image.asset(
               'assets/images/logo/logo_android_2.png',
-              width: 150,
             ),
-            Text(
-              'PiliPala',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 6),
-            Text(
+          ),
+          ListTile(
+            title: Text('PiliPala',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(height: 2)),
+            subtitle: Text(
               '使用Flutter开发的哔哩哔哩第三方客户端',
+              textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.outline),
             ),
-            const SizedBox(height: 20),
-            Obx(
-              () => ListTile(
-                title: const Text('当前版本'),
-                trailing: Text(_aboutController.currentVersion.value,
-                    style: subTitleStyle),
-              ),
+          ),
+          Obx(
+            () => ListTile(
+              title: const Text('当前版本'),
+              trailing: Text(_aboutController.currentVersion.value,
+                  style: subTitleStyle),
             ),
-            Obx(
-              () => ListTile(
-                onTap: () => _aboutController.onUpdate(),
-                title: const Text('最新版本'),
-                trailing: Text(
-                  _aboutController.isLoading.value
-                      ? '正在获取'
-                      : _aboutController.isUpdate.value
-                          ? '有新版本  ❤️${_aboutController.remoteVersion.value}'
-                          : '当前已是最新版',
-                  style: subTitleStyle,
-                ),
-              ),
-            ),
-            // ListTile(
-            //   onTap: () {},
-            //   title: const Text('更新日志'),
-            //   trailing: const Icon(
-            //     Icons.arrow_forward_ios,
-            //     size: 16,
-            //   ),
-            // ),
-            Divider(
-              thickness: 1,
-              height: 30,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-            ListTile(
-              onTap: () => _aboutController.githubUrl(),
-              title: const Text('Github'),
+          ),
+          Obx(
+            () => ListTile(
+              onTap: () => _aboutController.onUpdate(),
+              title: const Text('最新版本'),
               trailing: Text(
-                'github.com/guozhigq/pilipala',
+                _aboutController.isLoading.value
+                    ? '正在获取'
+                    : _aboutController.isUpdate.value
+                        ? '有新版本  ❤️${_aboutController.remoteVersion.value}'
+                        : '当前已是最新版',
                 style: subTitleStyle,
               ),
             ),
-            ListTile(
-              onTap: () => _aboutController.webSiteUrl(),
-              title: const Text('访问官网'),
-              trailing: Text(
-                'https://pilipalanet.mysxl.cn',
-                style: subTitleStyle,
+          ),
+          // ListTile(
+          //   onTap: () {},
+          //   title: const Text('更新日志'),
+          //   trailing: const Icon(
+          //     Icons.arrow_forward_ios,
+          //     size: 16,
+          //   ),
+          // ),
+          Divider(
+            thickness: 1,
+            height: 30,
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+          ListTile(
+            onTap: () => _aboutController.githubUrl(),
+            title: const Text('Github'),
+            trailing: Text(
+              'github.com/guozhigq/pilipala',
+              style: subTitleStyle,
+            ),
+          ),
+          ListTile(
+            onTap: () => _aboutController.webSiteUrl(),
+            title: const Text('访问官网'),
+            trailing: Text(
+              'https://pilipalanet.mysxl.cn',
+              style: subTitleStyle,
+            ),
+          ),
+          ListTile(
+            onTap: () => _aboutController.panDownload(),
+            title: const Text('网盘下载'),
+            trailing: Text(
+              '提取码：pili',
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.outline,
               ),
             ),
-            ListTile(
-              onTap: () => _aboutController.panDownload(),
-              title: const Text('网盘下载'),
-              trailing: Text(
-                '提取码：pili',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
+          ),
+          ListTile(
+            onTap: () => _aboutController.feedback(),
+            title: const Text('问题反馈'),
+            trailing: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: outline,
             ),
-            ListTile(
-              onTap: () => _aboutController.feedback(),
-              title: const Text('问题反馈'),
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: outline,
-              ),
+          ),
+          ListTile(
+            onTap: () => _aboutController.qqChanel(),
+            title: const Text('QQ群'),
+            trailing: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: outline,
             ),
-            ListTile(
-              onTap: () => _aboutController.qqChanel(),
-              title: const Text('QQ群'),
-              trailing: Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: outline,
-              ),
-            ),
-            ListTile(
-              onTap: () => _aboutController.tgChanel(),
-              title: const Text('TG频道'),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
-            ),
-            ListTile(
-              onTap: () => _aboutController.aPay(),
-              title: const Text('赞助'),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
-            ),
-            ListTile(
-              onTap: () => _aboutController.logs(),
-              title: const Text('错误日志'),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
-            ),
-          ],
-        ),
+          ),
+          ListTile(
+            onTap: () => _aboutController.tgChanel(),
+            title: const Text('TG频道'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+          ),
+          ListTile(
+            onTap: () => _aboutController.aPay(),
+            title: const Text('赞助'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+          ),
+          ListTile(
+            onTap: () => _aboutController.logs(),
+            title: const Text('错误日志'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+          ),
+        ],
       ),
     );
   }

@@ -131,6 +131,9 @@ class _SeasonPanelState extends State<SeasonPanel> {
                               Theme.of(context).dividerColor.withOpacity(0.1),
                         ),
                         Expanded(
+                            child: Padding(
+                          padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).padding.bottom),
                           child: Material(
                             child: ScrollablePositionedList.builder(
                               itemCount: episodes.length,
@@ -163,7 +166,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                               itemScrollController: itemScrollController,
                             ),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                   );
