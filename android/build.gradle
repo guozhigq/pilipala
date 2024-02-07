@@ -1,6 +1,13 @@
 buildscript {
     ext.kotlin_version = '1.9.22'
     repositories {
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "http://download.flutter.io"
+            allowInsecureProtocol = true
+        }
         google()
         mavenCentral()
     }
@@ -13,6 +20,13 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "http://download.flutter.io"
+            allowInsecureProtocol = true
+        }
         google()
         mavenCentral()
     }
