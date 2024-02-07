@@ -25,7 +25,6 @@ import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
@@ -62,7 +61,6 @@ void main() async {
         runApp(const MyApp());
       },
     );
-
 
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
