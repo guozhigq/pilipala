@@ -571,7 +571,8 @@ InlineSpan buildContent(
     });
   }
   // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  content.message = content.message.replaceAll('&amp;', '&')
+  content.message = content.message
+      .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')
       .replaceAll('&gt;', '>')
       .replaceAll('&quot;', '"')
@@ -586,21 +587,21 @@ InlineSpan buildContent(
         e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
   ];
 
-  String patternStr =
-      specialTokens.map(RegExp.escape).join('|');
+  String patternStr = specialTokens.map(RegExp.escape).join('|');
   if (patternStr.isNotEmpty) {
     patternStr += "|";
   }
   patternStr += r'(\b\d{1,2}[:：]\d{2}\b)';
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
-  void addPlainTextSpan(str){
+  void addPlainTextSpan(str) {
     spanChilds.add(TextSpan(
         text: str,
         recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+          ..onTap =
+              () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
   }
+
   // 分割文本并处理每个部分
   content.message.splitMapJoin(
     pattern,
@@ -674,57 +675,56 @@ InlineSpan buildContent(
             addPlainTextSpan(matchStr);
             return "";
           }
-          spanChilds.add(
-            TextSpan(
-              text: content.jumpUrl[matchStr]['title'],
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  if (appUrlSchema == '') {
-                    final String str = Uri.parse(matchStr).pathSegments[0];
-                    final Map matchRes = IdUtils.matchAvorBv(input: str);
-                    final List matchKeys = matchRes.keys.toList();
-                    if (matchKeys.isNotEmpty) {
-                      if (matchKeys.first == 'BV') {
+          spanChilds.addAll(
+            [
+              if (content.jumpUrl[matchStr]?['prefix_icon'] != null) ...[
+                WidgetSpan(
+                  child: Image.network(
+                    content.jumpUrl[matchStr]['prefix_icon'],
+                    height: 19,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              ],
+              TextSpan(
+                text: content.jumpUrl[matchStr]['title'],
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    if (appUrlSchema == '') {
+                      final String str = Uri.parse(matchStr).pathSegments[0];
+                      final Map matchRes = IdUtils.matchAvorBv(input: str);
+                      final List matchKeys = matchRes.keys.toList();
+                      if (matchKeys.isNotEmpty) {
+                        if (matchKeys.first == 'BV') {
+                          Get.toNamed(
+                            '/searchResult',
+                            parameters: {'keyword': matchRes['BV']},
+                          );
+                        }
+                      } else {
                         Get.toNamed(
-                          '/searchResult',
-                          parameters: {'keyword': matchRes['BV']},
+                          '/webview',
+                          parameters: {
+                            'url': matchStr,
+                            'type': 'url',
+                            'pageTitle': ''
+                          },
                         );
                       }
                     } else {
-                      Get.toNamed(
-                        '/webview',
-                        parameters: {
-                          'url': matchStr,
-                          'type': 'url',
-                          'pageTitle': ''
-                        },
-                      );
+                      if (appUrlSchema.startsWith('bilibili://search')) {
+                        Get.toNamed('/searchResult', parameters: {
+                          'keyword': content.jumpUrl[matchStr]['title']
+                        });
+                      }
                     }
-                  } else {
-                    if (appUrlSchema.startsWith('bilibili://search')) {
-                      Get.toNamed('/searchResult', parameters: {
-                        'keyword': content.jumpUrl[matchStr]['title']
-                      });
-                    }
-                  }
-                },
-            ),
+                  },
+              )
+            ],
           );
-          if (appUrlSchema.startsWith('bilibili://search')) {
-            spanChilds.add(
-              WidgetSpan(
-                child: Icon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  size: 9,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                alignment: PlaceholderAlignment.top,
-              ),
-            );
-          }
           // 只显示一次
           matchedStrs.add(matchStr);
         } else {

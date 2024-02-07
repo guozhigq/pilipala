@@ -26,7 +26,7 @@ class RcmdController extends GetxController {
         setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
     defaultRcmdType =
         setting.get(SettingBoxKey.defaultRcmdType, defaultValue: 'web');
-    if (defaultRcmdType == 'web'){
+    if (defaultRcmdType == 'web') {
       videoList = <RecVideoItemModel>[].obs;
     } else {
       videoList = <RecVideoItemAppModel>[].obs;
@@ -41,7 +41,7 @@ class RcmdController extends GetxController {
     if (type == 'onRefresh') {
       _currentPage = 0;
     }
-    late final Map<String,dynamic> res;
+    late final Map<String, dynamic> res;
     switch (defaultRcmdType) {
       case 'app':
       case 'notLogin':
@@ -75,13 +75,12 @@ class RcmdController extends GetxController {
       _currentPage += 1;
       // 若videoList数量太小，可能会影响翻页，此时再次请求
       // 为避免请求到的数据太少时还在反复请求，要求本次返回数据大于1条才触发
-      if (res['data'].length > 1 && videoList.length < 10){
+      if (res['data'].length > 1 && videoList.length < 10) {
         queryRcmdFeed('onLoad');
       }
-    } else {
-      Get.snackbar('提示', res['msg']);
     }
     isLoadingMore = false;
+    return res;
   }
 
   // 下拉刷新

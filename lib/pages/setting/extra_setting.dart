@@ -31,6 +31,10 @@ class _ExtraSettingState extends State<ExtraSetting> {
     // 默认优先显示最新评论
     defaultReplySort =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    if (defaultReplySort == 2) {
+      setting.put(SettingBoxKey.replySortType, 0);
+      defaultReplySort = 0;
+    }
     // 优先展示全部动态 all
     defaultDynamicType =
         setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
