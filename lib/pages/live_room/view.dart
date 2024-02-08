@@ -79,27 +79,40 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Obx(
-            () =>
-                _liveRoomController.roomInfoH5.value.roomInfo?.appBackground !=
-                        ''
-                    ? Positioned.fill(
-                        child: Opacity(
-                          opacity: 0.8,
-                          child: NetworkImgLayer(
-                            width: Get.width,
-                            height: Get.height,
-                            src: _liveRoomController
-                                    .roomInfoH5.value.roomInfo?.appBackground ??
-                                '',
-                          ),
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/images/live/default_bg.webp',
-                        width: Get.width,
-                        height: Get.height,
-                      ),
+          // Obx(
+          //   () => Positioned.fill(
+          //     child: Opacity(
+          //       opacity: 0.8,
+          //       child: _liveRoomController
+          //                       .roomInfoH5.value.roomInfo?.appBackground !=
+          //                   '' &&
+          //               _liveRoomController
+          //                       .roomInfoH5.value.roomInfo?.appBackground !=
+          //                   null
+          //           ? NetworkImgLayer(
+          //               width: Get.width,
+          //               height: Get.height,
+          //               src: _liveRoomController
+          //                       .roomInfoH5.value.roomInfo?.appBackground ??
+          //                   '',
+          //             )
+          //           : Image.asset(
+          //               'assets/images/live/default_bg.webp',
+          //               width: Get.width,
+          //               height: Get.height,
+          //             ),
+          //     ),
+          //   ),
+          // ),
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.8,
+              child: Image.asset(
+                'assets/images/live/default_bg.webp',
+                width: Get.width,
+                height: Get.height,
+              ),
+            ),
           ),
           Column(
             children: [
