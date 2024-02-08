@@ -10,12 +10,10 @@ class SeasonPanel extends StatefulWidget {
     super.key,
     required this.ugcSeason,
     this.cid,
-    this.sheetHeight,
     this.changeFuc,
   });
   final UgcSeason ugcSeason;
   final int? cid;
-  final double? sheetHeight;
   final Function? changeFuc;
 
   @override
@@ -104,7 +102,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                     itemScrollController.jumpTo(index: currentIndex);
                   });
                   return Container(
-                    height: widget.sheetHeight,
+                    height: context.height.abs() * 0.7,
                     color: Theme.of(context).colorScheme.background,
                     child: Column(
                       children: [

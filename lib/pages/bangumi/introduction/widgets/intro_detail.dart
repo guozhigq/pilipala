@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
-import 'package:pilipala/utils/storage.dart';
 
-Box localCache = GStrorage.localCache;
-late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {
   final dynamic bangumiDetail;
@@ -17,7 +14,6 @@ class IntroDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    sheetHeight = localCache.get('sheetHeight');
     TextStyle smallTitle = TextStyle(
       fontSize: 12,
       color: Theme.of(context).colorScheme.onBackground,
@@ -25,7 +21,7 @@ class IntroDetail extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: sheetHeight,
+      height: context.height.abs() * 0.7,
       child: Column(
         children: [
           Container(

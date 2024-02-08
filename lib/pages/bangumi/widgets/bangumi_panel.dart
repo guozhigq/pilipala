@@ -12,13 +12,11 @@ class BangumiPanel extends StatefulWidget {
     super.key,
     required this.pages,
     this.cid,
-    this.sheetHeight,
     this.changeFuc,
   });
 
   final List<EpisodeItem> pages;
   final int? cid;
-  final double? sheetHeight;
   final Function? changeFuc;
 
   @override
@@ -80,7 +78,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
             });
             // 在这里使用 setState 更新状态
             return Container(
-              height: widget.sheetHeight,
+              height: context.height.abs() * 0.7,
               color: Theme.of(context).colorScheme.background,
               child: Column(
                 children: [

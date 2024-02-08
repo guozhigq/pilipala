@@ -1,13 +1,11 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
-import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
 
@@ -35,8 +33,6 @@ class VideoReplyReplyPanel extends StatefulWidget {
 class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late VideoReplyReplyController _videoReplyReplyController;
   late AnimationController replyAnimationCtl;
-  final Box<dynamic> localCache = GStrorage.localCache;
-  late double sheetHeight;
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
 
@@ -61,7 +57,6 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       },
     );
 
-    sheetHeight = localCache.get('sheetHeight');
     _futureBuilderFuture = _videoReplyReplyController.queryReplyList();
   }
 
@@ -76,7 +71,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.source == 'videoDetail' ? sheetHeight : null,
+      height: widget.source == 'videoDetail' ? context.height.abs() * 0.7 : null,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

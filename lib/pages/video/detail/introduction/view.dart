@@ -123,9 +123,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final VideoDetailController videoDetailCtr;
   late final Map<dynamic, dynamic> videoItem;
 
-  final Box<dynamic> localCache = GStrorage.localCache;
   final Box<dynamic> setting = GStrorage.setting;
-  late double sheetHeight;
 
   late final bool loadingStatus; // 加载状态
 
@@ -153,7 +151,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     videoItem = videoIntroController.videoItem!;
-    sheetHeight = localCache.get('sheetHeight');
 
     loadingStatus = widget.loadingStatus;
     owner = loadingStatus ? videoItem['owner'] : widget.videoDetail!.owner;
@@ -381,7 +378,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         cid: videoIntroController.lastPlayCid.value != 0
                             ? videoIntroController.lastPlayCid.value
                             : widget.videoDetail!.pages!.first.cid,
-                        sheetHeight: sheetHeight,
                         changeFuc: (bvid, cid, aid) => videoIntroController
                             .changeSeasonOrbangu(bvid, cid, aid),
                       ),
@@ -393,7 +389,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     Obx(() => PagesPanel(
                           pages: widget.videoDetail!.pages!,
                           cid: videoIntroController.lastPlayCid.value,
-                          sheetHeight: sheetHeight,
                           changeFuc: (cid) =>
                               videoIntroController.changeSeasonOrbangu(
                                   videoIntroController.bvid, cid, null),

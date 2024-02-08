@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
   const FavPanel({super.key, this.ctr});
@@ -14,21 +12,18 @@ class FavPanel extends StatefulWidget {
 }
 
 class _FavPanelState extends State<FavPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
-  late double sheetHeight;
   late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
-    sheetHeight = localCache.get('sheetHeight');
     _futureBuilderFuture = widget.ctr!.queryVideoInFolder();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: sheetHeight,
+      height: context.height.abs() * 0.7,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

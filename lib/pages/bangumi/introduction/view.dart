@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -15,7 +14,6 @@ import 'package:pilipala/pages/video/detail/introduction/widgets/action_item.dar
 import 'package:pilipala/pages/video/detail/introduction/widgets/action_row_item.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/fav_panel.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
 
 import 'controller.dart';
 import 'widgets/intro_detail.dart';
@@ -116,9 +114,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   String heroTag = Get.arguments['heroTag'];
   late final BangumiIntroController bangumiIntroController;
   late final VideoDetailController videoDetailCtr;
-  Box localCache = GStrorage.localCache;
   late final BangumiInfoModel? bangumiItem;
-  late double sheetHeight;
   int? cid;
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
@@ -137,7 +133,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     bangumiItem = bangumiIntroController.bangumiItem;
-    sheetHeight = localCache.get('sheetHeight');
     cid = widget.cid!;
     print('cid:  $cid');
     videoDetailCtr.cid.listen((p0) {
@@ -369,7 +364,6 @@ class _BangumiInfoState extends State<BangumiInfo> {
                           (bangumiItem != null
                               ? bangumiItem!.episodes!.first.cid
                               : widget.bangumiDetail!.episodes!.first.cid),
-                      sheetHeight: sheetHeight,
                       changeFuc: (bvid, cid, aid) => bangumiIntroController
                           .changeSeasonOrbangu(bvid, cid, aid),
                     )

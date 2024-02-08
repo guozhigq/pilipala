@@ -241,6 +241,10 @@ class VideoDetailController extends GetxController
     plPlayerController.headerControl = headerControl;
   }
 
+  void setTriggerFullScreenCallback(void Function({bool? status}) callback) {
+    plPlayerController.setTriggerFullscreenCallback(callback);
+  }
+
   // 视频链接
   Future queryVideoUrl() async {
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
@@ -359,7 +363,7 @@ class VideoDetailController extends GetxController
       if (result['code'] == -404) {
         isShowCover.value = false;
       }
-      if (result['code'] == 87008){
+      if (result['code'] == 87008) {
         SmartDialog.showToast("当前视频可能是专属视频，可能需包月充电观看(${result['msg']})");
       } else {
         SmartDialog.showToast("错误（${result['code']}）：${result['msg']}");

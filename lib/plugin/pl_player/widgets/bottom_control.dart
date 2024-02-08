@@ -146,7 +146,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                     size: 15,
                     color: Colors.white,
                   ),
-                  fuc: () => triggerFullScreen!(),
+                  fuc: () => triggerFullScreen!(status: !_.isFullScreen.value),
                 ),
               ),
             ],

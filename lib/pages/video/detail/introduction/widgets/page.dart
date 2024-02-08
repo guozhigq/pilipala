@@ -8,12 +8,10 @@ class PagesPanel extends StatefulWidget {
     super.key,
     required this.pages,
     this.cid,
-    this.sheetHeight,
     this.changeFuc,
   });
   final List<Part> pages;
   final int? cid;
-  final double? sheetHeight;
   final Function? changeFuc;
 
   @override
@@ -96,7 +94,7 @@ class _PagesPanelState extends State<PagesPanel> {
                             _scrollController.jumpTo(currentIndex * 56);
                           });
                           return Container(
-                            height: widget.sheetHeight,
+                            height: context.height.abs() * 0.7,
                             color: Theme.of(context).colorScheme.background,
                             child: Column(
                               children: [

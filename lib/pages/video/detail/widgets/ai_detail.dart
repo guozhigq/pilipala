@@ -2,14 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
-Box localCache = GStrorage.localCache;
-late double sheetHeight;
 
 class AiDetail extends StatelessWidget {
   final ModelResult? modelResult;
@@ -21,11 +17,10 @@ class AiDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    sheetHeight = localCache.get('sheetHeight');
     return Container(
       color: Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: sheetHeight,
+      height: context.height.abs() * 0.7,
       child: Column(
         children: [
           InkWell(
