@@ -75,7 +75,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyController.onLoad();
           });
         }
