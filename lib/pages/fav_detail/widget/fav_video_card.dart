@@ -9,6 +9,7 @@ import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import '../../../common/widgets/badge.dart';
 
 // 收藏视频卡片 - 水平布局
 class FavVideoCardH extends StatelessWidget {
@@ -27,7 +28,9 @@ class FavVideoCardH extends StatelessWidget {
       onTap: () async {
         // int? seasonId;
         String? epId;
-        if (videoItem.ogv != null && videoItem.ogv['type_name'] == '番剧') {
+        if (videoItem.ogv != null &&
+            (videoItem.ogv['type_name'] == '番剧' ||
+                videoItem.ogv['type_name'] == '国创')) {
           videoItem.cid = await SearchHttp.ab2c(bvid: bvid);
           // seasonId = videoItem.ogv['season_id'];
           epId = videoItem.epId;
@@ -84,22 +87,21 @@ class FavVideoCardH extends StatelessWidget {
                                     height: maxHeight,
                                   ),
                                 ),
-                                Positioned(
-                                  right: 4,
-                                  bottom: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 1, horizontal: 6),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: Colors.black54.withOpacity(0.4)),
-                                    child: Text(
-                                      Utils.timeFormat(videoItem.duration!),
-                                      style: const TextStyle(
-                                          fontSize: 11, color: Colors.white),
-                                    ),
+                                PBadge(
+                                  text: Utils.timeFormat(videoItem.duration!),
+                                  right: 6.0,
+                                  bottom: 6.0,
+                                  type: 'gray',
+                                ),
+                                if (videoItem.ogv != null) ...[
+                                  PBadge(
+                                    text: videoItem.ogv['type_name'],
+                                    top: 6.0,
+                                    right: 6.0,
+                                    bottom: null,
+                                    left: null,
                                   ),
-                                )
+                                ],
                               ],
                             );
                           },
@@ -141,19 +143,30 @@ class VideoContent extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+            if (videoItem.ogv != null) ...[
+              Text(
+                videoItem.intro,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ],
             const Spacer(),
             Text(
-              Utils.dateFormat(videoItem.ctime!),
+              Utils.dateFormat(videoItem.favTime),
               style: TextStyle(
                   fontSize: 11, color: Theme.of(context).colorScheme.outline),
             ),
-            Text(
-              videoItem.owner.name,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
+            if (videoItem.owner.name != '') ...[
+              Text(
+                videoItem.owner.name,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
-            ),
+            ],
             Row(
               children: [
                 StatView(
