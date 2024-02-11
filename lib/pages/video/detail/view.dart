@@ -570,8 +570,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               );
                             },
                           ),
-                          VideoReplyPanel(
-                            bvid: videoDetailController.bvid,
+                          Obx(
+                            () => VideoReplyPanel(
+                              bvid: videoDetailController.bvid,
+                              oid: videoDetailController.oid.value,
+                            ),
                           )
                         ],
                       ),
