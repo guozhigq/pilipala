@@ -7,6 +7,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply/widgets/reply_item.dart';
 
+import '../../../../utils/utils.dart';
 import 'controller.dart';
 
 class VideoReplyReplyPanel extends StatefulWidget {
@@ -71,7 +72,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.source == 'videoDetail' ? context.height.abs() * 0.7 : null,
+      height: widget.source == 'videoDetail' ? Utils.getSheetHeight(context) : null,
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

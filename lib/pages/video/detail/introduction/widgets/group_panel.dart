@@ -6,6 +6,8 @@ import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/tags.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
+import '../../../../../utils/utils.dart';
+
 class GroupPanel extends StatefulWidget {
   final int? mid;
   const GroupPanel({super.key, this.mid});
@@ -51,7 +53,7 @@ class _GroupPanelState extends State<GroupPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: context.height.abs() * 0.7,
+      height: Utils.getSheetHeight(context),
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: <Widget>[

@@ -117,10 +117,10 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: false,
           ),
           const SetSwitchItem(
-            title: '恢复竖屏',
-            subTitle: '退出全屏视频时自动恢复竖屏，关闭可以保持横屏状态',
-            setKey: SettingBoxKey.exitFullscreenAutoVertical,
-            defaultVal: true,
+            title: '横屏适配（测试）',
+            subTitle: '开启该项在播放页启用横屏布局与逻辑',
+            setKey: SettingBoxKey.horizontalScreen,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '开启硬解',

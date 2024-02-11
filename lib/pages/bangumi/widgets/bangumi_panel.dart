@@ -7,6 +7,8 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../utils/utils.dart';
+
 class BangumiPanel extends StatefulWidget {
   const BangumiPanel({
     super.key,
@@ -78,7 +80,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
             });
             // 在这里使用 setState 更新状态
             return Container(
-              height: context.height.abs() * 0.7,
+              height: Utils.getSheetHeight(context),
               color: Theme.of(context).colorScheme.background,
               child: Column(
                 children: [

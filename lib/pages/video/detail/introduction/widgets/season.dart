@@ -5,6 +5,8 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../../../utils/utils.dart';
+
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({
     super.key,
@@ -102,7 +104,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                     itemScrollController.jumpTo(index: currentIndex);
                   });
                   return Container(
-                    height: context.height.abs() * 0.7,
+                    height: Utils.getSheetHeight(context),
                     color: Theme.of(context).colorScheme.background,
                     child: Column(
                       children: [

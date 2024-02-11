@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
+import '../../../../../utils/utils.dart';
+
 class FavPanel extends StatefulWidget {
   const FavPanel({super.key, this.ctr});
   final dynamic ctr;
@@ -23,7 +25,7 @@ class _FavPanelState extends State<FavPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: context.height.abs() * 0.7,
+      height: Utils.getSheetHeight(context),
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: [

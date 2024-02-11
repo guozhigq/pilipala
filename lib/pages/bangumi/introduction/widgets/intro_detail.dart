@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 
+import '../../../../utils/utils.dart';
+
 
 class IntroDetail extends StatelessWidget {
   final dynamic bangumiDetail;
@@ -21,7 +23,7 @@ class IntroDetail extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.only(left: 14, right: 14),
-      height: context.height.abs() * 0.7,
+      height: Utils.getSheetHeight(context),
       child: Column(
         children: [
           Container(

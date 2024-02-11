@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 
+import '../../../../../utils/utils.dart';
+
 class PagesPanel extends StatefulWidget {
   const PagesPanel({
     super.key,
@@ -94,7 +96,7 @@ class _PagesPanelState extends State<PagesPanel> {
                             _scrollController.jumpTo(currentIndex * 56);
                           });
                           return Container(
-                            height: context.height.abs() * 0.7,
+                            height: Utils.getSheetHeight(context),
                             color: Theme.of(context).colorScheme.background,
                             child: Column(
                               children: [

@@ -18,7 +18,7 @@ class IntroDetail extends StatelessWidget {
     return Container(
         color: Theme.of(context).colorScheme.background,
         padding: const EdgeInsets.only(left: 14, right: 14),
-        height: context.height.abs() * 0.7,
+        height: Utils.getSheetHeight(context),
         child: Column(
           children: [
             InkWell(

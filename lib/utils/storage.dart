@@ -92,7 +92,7 @@ class SettingBoxKey {
       enableAutoBrightness = 'enableAutoBrightness',
       enableAutoEnter = 'enableAutoEnter',
       enableAutoExit = 'enableAutoExit',
-      exitFullscreenAutoVertical = 'exitFullscreenAutoVertical',
+      horizontalScreen = 'horizontalScreen',
       p1080 = 'p1080',
       enableCDN = 'enableCDN',
       autoPiP = 'autoPiP',
