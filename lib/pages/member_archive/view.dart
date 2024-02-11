@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/utils/utils.dart';
-import '../../common/constants.dart';
 import 'controller.dart';
 
 class MemberArchivePage extends StatefulWidget {
@@ -26,8 +25,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
     final String heroTag = Utils.makeHeroTag(mid);
     _memberArchivesController =
         Get.put(MemberArchiveController(), tag: heroTag);
-    _futureBuilderFuture =
-        _memberArchivesController.getMemberArchive('onRefresh');
+    _futureBuilderFuture = _memberArchivesController.getMemberArchive('init');
     scrollController = _memberArchivesController.scrollController;
     scrollController.addListener(
       () {
