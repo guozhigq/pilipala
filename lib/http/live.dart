@@ -1,5 +1,6 @@
 import '../models/live/item.dart';
 import '../models/live/room_info.dart';
+import '../models/live/room_info_h5.dart';
 import 'api.dart';
 import 'init.dart';
 
@@ -38,6 +39,24 @@ class LiveHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': RoomInfoModel.fromJson(res.data['data'])};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future liveRoomInfoH5({roomId, qn}) async {
+    var res = await Request().get(Api.liveRoomInfoH5, data: {
+      'room_id': roomId,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': RoomInfoH5Model.fromJson(res.data['data'])
+      };
     } else {
       return {
         'status': false,
