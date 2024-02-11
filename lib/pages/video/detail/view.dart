@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
@@ -208,6 +209,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoPlayerServiceHandler.onVideoDetailDispose();
     floating.dispose();
     _lifecycleListener.dispose();
+    exitFullScreen();
     super.dispose();
   }
 
@@ -580,7 +582,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 ),
               ),
               body: Obx(() {
-                final double videoheight = Get.height * 0.32 + Get.width * 0.13;
+                // 系数是以下三个方程（分别代表特定平板、折叠屏内屏、普通手机横屏尺寸）的近似解
+                // 820x+1180y+983.67z=450
+                // 1812x+2176y+1985.68z=680
+                // 1080x+2340y+1589.72z=540
+                final double videoheight =
+                    sqrt(Get.height * Get.width) * 12.972 -
+                        Get.height * 7.928 -
+                        Get.width * 4.923;
                 final double videowidth = videoheight * 16 / 9;
                 return Row(
                   children: [
@@ -742,7 +751,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               : videowidth,
                           height: isFullScreen.value == true
                               ? 0
-                              : Get.height - videoheight,
+                              : Get.height -
+                                  videoheight -
+                                  MediaQuery.of(context).padding.top -
+                                  MediaQuery.of(context).padding.bottom,
                           child: (videoDetailController.videoType ==
                                   SearchType.video)
                               ? const CustomScrollView(
@@ -762,7 +774,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               MediaQuery.of(context).padding.left -
                               MediaQuery.of(context).padding.right -
                               videowidth),
-                      height: Get.height,
+                      height: Get.height -
+                          MediaQuery.of(context).padding.top -
+                          MediaQuery.of(context).padding.bottom,
                       child: TabBarView(
                         controller: videoDetailController.tabCtr,
                         children: <Widget>[
