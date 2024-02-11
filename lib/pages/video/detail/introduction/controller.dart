@@ -476,6 +476,7 @@ class VideoIntroController extends GetxController {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
+    videoDetailCtr.oid.value = aid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
