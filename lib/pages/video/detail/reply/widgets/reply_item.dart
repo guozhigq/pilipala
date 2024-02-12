@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
@@ -12,10 +11,9 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
-
 import 'zan.dart';
 
 Box setting = GStrorage.setting;
@@ -541,7 +539,6 @@ InlineSpan buildContent(
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
   final List<InlineSpan> spanChilds = <InlineSpan>[];
-  bool hasMatchMember = false;
 
   // 投票
   if (content.vote.isNotEmpty) {
@@ -639,7 +636,9 @@ InlineSpan buildContent(
               },
           ),
         );
+
       } else if (RegExp(r'^\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b$').hasMatch(matchStr)) {
+        matchStr = matchStr.replaceAll('：', ':');
         spanChilds.add(
           TextSpan(
             text: ' $matchStr ',
@@ -650,7 +649,6 @@ InlineSpan buildContent(
               ..onTap = () {
                 // 跳转到指定位置
                 try {
-                  matchStr = matchStr.replaceAll('：', ':');
                   SmartDialog.showToast('跳转至：$matchStr');
                   Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
                       .plPlayerController
@@ -692,16 +690,54 @@ InlineSpan buildContent(
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 recognizer: TapGestureRecognizer()
-                  ..onTap = () {
+                  ..onTap = () async {
+                    final String title = content.jumpUrl[matchStr]['title'];
                     if (appUrlSchema == '') {
-                      final String str = Uri.parse(matchStr).pathSegments[0];
-                      final Map matchRes = IdUtils.matchAvorBv(input: str);
-                      final List matchKeys = matchRes.keys.toList();
-                      if (matchKeys.isNotEmpty) {
-                        if (matchKeys.first == 'BV') {
+                      final String redirectUrl =
+                          await UrlUtils.parseRedirectUrl(matchStr);
+                      final String pathSegment = Uri.parse(redirectUrl).path;
+                      final String lastPathSegment =
+                          pathSegment.split('/').last;
+                      if (lastPathSegment.startsWith('BV')) {
+                        UrlUtils.matchUrlPush(
+                          lastPathSegment,
+                          title,
+                          redirectUrl,
+                        );
+                      } else {
+                        Get.toNamed(
+                          '/webview',
+                          parameters: {
+                            'url': redirectUrl,
+                            'type': 'url',
+                            'pageTitle': title
+                          },
+                        );
+                      }
+                    } else {
+                      if (appUrlSchema.startsWith('bilibili://search')) {
+                        Get.toNamed('/searchResult',
+                            parameters: {'keyword': title});
+                      } else if (matchStr.startsWith('https://b23.tv')) {
+                        final String redirectUrl =
+                            await UrlUtils.parseRedirectUrl(matchStr);
+                        final String pathSegment = Uri.parse(redirectUrl).path;
+                        final String lastPathSegment =
+                            pathSegment.split('/').last;
+                        if (lastPathSegment.startsWith('BV')) {
+                          UrlUtils.matchUrlPush(
+                            lastPathSegment,
+                            title,
+                            redirectUrl,
+                          );
+                        } else {
                           Get.toNamed(
-                            '/searchResult',
-                            parameters: {'keyword': matchRes['BV']},
+                            '/webview',
+                            parameters: {
+                              'url': redirectUrl,
+                              'type': 'url',
+                              'pageTitle': title
+                            },
                           );
                         }
                       } else {
@@ -710,15 +746,9 @@ InlineSpan buildContent(
                           parameters: {
                             'url': matchStr,
                             'type': 'url',
-                            'pageTitle': ''
+                            'pageTitle': title
                           },
                         );
-                      }
-                    } else {
-                      if (appUrlSchema.startsWith('bilibili://search')) {
-                        Get.toNamed('/searchResult', parameters: {
-                          'keyword': content.jumpUrl[matchStr]['title']
-                        });
                       }
                     }
                   },
