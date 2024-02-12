@@ -51,7 +51,7 @@ class VideoHttp {
               (i['owner'] != null &&
                   !blackMidsList.contains(i['owner']['mid']))) {
             RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
-            if (!RecommendFilter.filter(videoItem)){
+            if (!RecommendFilter.filter(videoItem)) {
               list.add(videoItem);
             }
           }
@@ -98,7 +98,7 @@ class VideoHttp {
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
             RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
-            if (!RecommendFilter.filter(videoItem)){
+            if (!RecommendFilter.filter(videoItem)) {
               list.add(videoItem);
             }
           }
@@ -217,7 +217,7 @@ class VideoHttp {
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']) {
         HotVideoItemModel videoItem = HotVideoItemModel.fromJson(i);
-        if (!RecommendFilter.filter(videoItem, relatedVideos: true)){
+        if (!RecommendFilter.filter(videoItem, relatedVideos: true)) {
           list.add(videoItem);
         }
       }
@@ -322,7 +322,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 

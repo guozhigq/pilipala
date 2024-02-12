@@ -130,96 +130,106 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Text(
-              videoItem.title,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (videoItem.ogv != null) ...[
-              Text(
-                videoItem.intro,
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-            ],
-            const Spacer(),
-            Text(
-              Utils.dateFormat(videoItem.favTime),
-              style: TextStyle(
-                  fontSize: 11, color: Theme.of(context).colorScheme.outline),
-            ),
-            if (videoItem.owner.name != '') ...[
-              Text(
-                videoItem.owner.name,
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-            ],
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StatView(
-                  theme: 'gray',
-                  view: videoItem.cntInfo['play'],
+                Text(
+                  videoItem.title,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 8),
-                StatDanMu(theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
-                const Spacer(),
-                SizedBox(
-                  width: 26,
-                  height: 26,
-                  child: IconButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: Get.context!,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('提示'),
-                            content: const Text('要取消收藏吗?'),
-                            actions: [
-                              TextButton(
-                                  onPressed: () => Get.back(),
-                                  child: Text(
-                                    '取消',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline),
-                                  )),
-                              TextButton(
-                                onPressed: () async {
-                                  await callFn!();
-                                  Get.back();
-                                },
-                                child: const Text('确定取消'),
-                              )
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    icon: Icon(
-                      Icons.clear_outlined,
+                if (videoItem.ogv != null) ...[
+                  Text(
+                    videoItem.intro,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline,
-                      size: 18,
                     ),
+                  ),
+                ],
+                const Spacer(),
+                Text(
+                  Utils.dateFormat(videoItem.favTime),
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.outline),
+                ),
+                if (videoItem.owner.name != '') ...[
+                  Text(
+                    videoItem.owner.name,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Row(
+                    children: [
+                      StatView(
+                        theme: 'gray',
+                        view: videoItem.cntInfo['play'],
+                      ),
+                      const SizedBox(width: 8),
+                      StatDanMu(
+                          theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
+                      const Spacer(),
+                    ],
                   ),
                 ),
               ],
+            ),
+            Positioned(
+              right: 0,
+              bottom: -4,
+              child: IconButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: Get.context!,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('提示'),
+                        content: const Text('要取消收藏吗?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Get.back(),
+                              child: Text(
+                                '取消',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                              )),
+                          TextButton(
+                            onPressed: () async {
+                              await callFn!();
+                              Get.back();
+                            },
+                            child: const Text('确定取消'),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(
+                  Icons.clear_outlined,
+                  color: Theme.of(context).colorScheme.outline,
+                  size: 18,
+                ),
+              ),
             ),
           ],
         ),

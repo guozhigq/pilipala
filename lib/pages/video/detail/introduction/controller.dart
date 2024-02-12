@@ -298,7 +298,6 @@ class VideoIntroController extends GetxController {
       await queryVideoInFolder();
       int defaultFolderId = favFolderData.value.list!.first.id!;
       int favStatus = favFolderData.value.list!.first.favState!;
-      print('favStatus: $favStatus');
       var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: favStatus == 0 ? '$defaultFolderId' : '',
@@ -310,6 +309,8 @@ class VideoIntroController extends GetxController {
           await queryHasFavVideo();
           SmartDialog.showToast('✅ 操作成功');
         }
+      } else {
+        SmartDialog.showToast(result['msg']);
       }
       return;
     }
@@ -340,6 +341,8 @@ class VideoIntroController extends GetxController {
         await queryHasFavVideo();
         SmartDialog.showToast('✅ 操作成功');
       }
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
   }
 
