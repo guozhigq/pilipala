@@ -54,13 +54,13 @@ void main() async {
       [FileHandler(await getLogsPath())],
     );
 
-    // Catcher2(
-    //   debugConfig: debugConfig,
-    //   releaseConfig: releaseConfig,
-    //   runAppFunction: () {
-    runApp(const MyApp());
-    //   },
-    // );
+    Catcher2(
+      debugConfig: debugConfig,
+      releaseConfig: releaseConfig,
+      runAppFunction: () {
+        runApp(const MyApp());
+      },
+    );
 
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -70,7 +70,6 @@ void main() async {
       statusBarColor: Colors.transparent,
     ));
     Data.init();
-    GStrorage.lazyInit();
     PiliSchame.init();
   });
 }

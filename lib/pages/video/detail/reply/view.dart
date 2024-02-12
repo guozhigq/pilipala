@@ -16,11 +16,13 @@ import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
   final String? bvid;
+  final int? oid;
   final int rpid;
   final String? replyLevel;
 
   const VideoReplyPanel({
     this.bvid,
+    this.oid,
     this.rpid = 0,
     this.replyLevel,
     super.key,
@@ -48,16 +50,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   @override
   void initState() {
     super.initState();
-    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
+    // int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     heroTag = Get.arguments['heroTag'];
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(oid, widget.rpid.toString(), replyLevel),
+          VideoReplyController(widget.oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
     } else {
-      _videoReplyController =
-          Get.put(VideoReplyController(oid, '', replyLevel), tag: heroTag);
+      _videoReplyController = Get.put(
+          VideoReplyController(widget.oid, '', replyLevel),
+          tag: heroTag);
     }
 
     fabAnimationCtr = AnimationController(
@@ -75,7 +78,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyController.onLoad();
           });
         }

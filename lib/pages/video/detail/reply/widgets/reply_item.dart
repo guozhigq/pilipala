@@ -797,8 +797,7 @@ InlineSpan buildContent(
           ),
         ),
       );
-    }
-    if (len > 1) {
+    } else if (len > 1) {
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
@@ -816,10 +815,11 @@ InlineSpan buildContent(
                   );
                 },
                 child: NetworkImgLayer(
-                  src: content.pictures[i]['img_src'],
-                  width: box.maxWidth,
-                  height: box.maxWidth,
-                ),
+                    src: content.pictures[i]['img_src'],
+                    width: box.maxWidth,
+                    height: box.maxWidth,
+                    origAspectRatio: content.pictures[i]['img_width'] /
+                        content.pictures[i]['img_height']),
               );
             },
           ),

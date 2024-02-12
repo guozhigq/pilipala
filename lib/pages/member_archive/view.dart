@@ -25,8 +25,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
     final String heroTag = Utils.makeHeroTag(mid);
     _memberArchivesController =
         Get.put(MemberArchiveController(), tag: heroTag);
-    _futureBuilderFuture =
-        _memberArchivesController.getMemberArchive('onRefresh');
+    _futureBuilderFuture = _memberArchivesController.getMemberArchive('init');
     scrollController = _memberArchivesController.scrollController;
     scrollController.addListener(
       () {
@@ -48,39 +47,16 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
         titleSpacing: 0,
         centerTitle: false,
         title: Text('他的投稿', style: Theme.of(context).textTheme.titleMedium),
-        // actions: [
-        //   Obx(
-        //     () => PopupMenuButton<String>(
-        //       padding: EdgeInsets.zero,
-        //       tooltip: '投稿排序',
-        //       icon: Icon(
-        //         Icons.more_vert_outlined,
-        //         color: Theme.of(context).colorScheme.outline,
-        //       ),
-        //       position: PopupMenuPosition.under,
-        //       onSelected: (String type) {},
-        //       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        //         for (var i in _memberArchivesController.orderList) ...[
-        //           PopupMenuItem<String>(
-        //             onTap: () {},
-        //             value: _memberArchivesController.currentOrder['label'],
-        //             child: Row(
-        //               mainAxisSize: MainAxisSize.min,
-        //               children: [
-        //                 Text(i['label']!),
-        //                 if (_memberArchivesController.currentOrder['label'] ==
-        //                     i['label']) ...[
-        //                   const SizedBox(width: 10),
-        //                   const Icon(Icons.done, size: 20),
-        //                 ],
-        //               ],
-        //             ),
-        //           ),
-        //         ]
-        //       ],
-        //     ),
-        //   ),
-        // ],
+        actions: [
+          Obx(
+            () => TextButton.icon(
+              icon: const Icon(Icons.sort, size: 20),
+              onPressed: _memberArchivesController.toggleSort,
+              label: Text(_memberArchivesController.currentOrder['label']!),
+            ),
+          ),
+          const SizedBox(width: 6),
+        ],
       ),
       body: CustomScrollView(
         controller: _memberArchivesController.scrollController,

@@ -42,7 +42,7 @@ class FollowItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       dense: true,
-      trailing: ctr!.isOwner.value
+      trailing: ctr != null && ctr!.isOwner.value
           ? SizedBox(
               height: 34,
               child: TextButton(
