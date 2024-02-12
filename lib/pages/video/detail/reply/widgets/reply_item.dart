@@ -739,6 +739,47 @@ InlineSpan buildContent(
     },
   );
 
+  if (content.jumpUrl.keys.isNotEmpty) {
+    List<String> unmatchedItems = content.jumpUrl.keys
+        .toList()
+        .where((item) => !content.message.contains(item))
+        .toList();
+    if (unmatchedItems.isNotEmpty) {
+      for (int i = 0; i < unmatchedItems.length; i++) {
+        String patternStr = unmatchedItems[i];
+        spanChilds.addAll(
+          [
+            if (content.jumpUrl[patternStr]?['prefix_icon'] != null) ...[
+              WidgetSpan(
+                child: Image.network(
+                  content.jumpUrl[patternStr]['prefix_icon'],
+                  height: 19,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              )
+            ],
+            TextSpan(
+              text: content.jumpUrl[patternStr]['title'],
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Get.toNamed(
+                    '/webview',
+                    parameters: {
+                      'url': patternStr,
+                      'type': 'url',
+                      'pageTitle': content.jumpUrl[patternStr]['title']
+                    },
+                  );
+                },
+            )
+          ],
+        );
+      }
+    }
+  }
   // 图片渲染
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
@@ -753,11 +794,15 @@ InlineSpan buildContent(
             builder: (BuildContext context, BoxConstraints box) {
               double maxHeight = box.maxWidth * 0.6; // 设置最大高度
               // double width = (box.maxWidth / 2).truncateToDouble();
-              double height = ((box.maxWidth /
-                      2 *
-                      pictureItem['img_height'] /
-                      pictureItem['img_width']))
-                  .truncateToDouble();
+              double height = 100;
+              try {
+                height = ((box.maxWidth /
+                        2 *
+                        pictureItem['img_height'] /
+                        pictureItem['img_width']))
+                    .truncateToDouble();
+              } catch (_) {}
+
               return GestureDetector(
                 onTap: () {
                   showDialog(
