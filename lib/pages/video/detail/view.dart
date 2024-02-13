@@ -491,8 +491,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         ? 0
                         : Get.height -
                             Get.width * 9 / 16 -
-                            MediaQuery.of(context).padding.top -
-                            MediaQuery.of(context).padding.bottom,
+                            MediaQuery.of(context).padding.top,
                     width: MediaQuery.of(context).size.width,
                     child: ColoredBox(
                       key: Key(heroTag),
