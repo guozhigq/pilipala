@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
@@ -116,11 +118,20 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableAutoExit,
             defaultVal: false,
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '横屏适配（测试）',
             subTitle: '开启该项在播放页启用横屏布局与逻辑',
             setKey: SettingBoxKey.horizontalScreen,
             defaultVal: false,
+            callFn: (value) {
+              if (value) {
+                autoScreen();
+                SmartDialog.showToast('已开启横屏适配');
+              } else {
+                AutoOrientation.portraitUpMode();
+                SmartDialog.showToast('已关闭横屏适配');
+              }
+            }
           ),
           const SetSwitchItem(
             title: '开启硬解',

@@ -28,57 +28,65 @@ import './services/loggeer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-    //支持竖屏与横屏
-    [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ],
-  ).then((_) async {
-    await GStrorage.init();
-    await setupServiceLocator();
-    Request();
-    await Request.setCookie();
-    RecommendFilter();
-
-    // 异常捕获 logo记录
-    final Catcher2Options debugConfig = Catcher2Options(
-      SilentReportMode(),
+  await GStrorage.init();
+  if (GStrorage.setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+    await SystemChrome.setPreferredOrientations(
+      //支持竖屏与横屏
       [
-        FileHandler(await getLogsPath()),
-        ConsoleHandler(
-          enableDeviceParameters: false,
-          enableApplicationParameters: false,
-        )
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
       ],
     );
-
-    final Catcher2Options releaseConfig = Catcher2Options(
-      SilentReportMode(),
-      [FileHandler(await getLogsPath())],
+  } else {
+    await SystemChrome.setPreferredOrientations(
+      //支持竖屏
+      [
+        DeviceOrientation.portraitUp,
+      ],
     );
+  }
+  await setupServiceLocator();
+  Request();
+  await Request.setCookie();
+  RecommendFilter();
 
-    Catcher2(
-      debugConfig: debugConfig,
-      releaseConfig: releaseConfig,
-      runAppFunction: () {
-        runApp(const MyApp());
-      },
-    );
+  // 异常捕获 logo记录
+  final Catcher2Options debugConfig = Catcher2Options(
+    SilentReportMode(),
+    [
+      FileHandler(await getLogsPath()),
+      ConsoleHandler(
+        enableDeviceParameters: false,
+        enableApplicationParameters: false,
+      )
+    ],
+  );
 
-    // 小白条、导航栏沉浸
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-      statusBarColor: Colors.transparent,
-    ));
-    Data.init();
-    GStrorage.lazyInit();
-    PiliSchame.init();
-  });
+  final Catcher2Options releaseConfig = Catcher2Options(
+    SilentReportMode(),
+    [FileHandler(await getLogsPath())],
+  );
+
+  Catcher2(
+    debugConfig: debugConfig,
+    releaseConfig: releaseConfig,
+    runAppFunction: () {
+      runApp(const MyApp());
+    },
+  );
+
+  // 小白条、导航栏沉浸
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+    statusBarColor: Colors.transparent,
+  ));
+  Data.init();
+  GStrorage.lazyInit();
+  PiliSchame.init();
 }
 
 class MyApp extends StatelessWidget {

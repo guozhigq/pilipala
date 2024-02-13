@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:auto_orientation/auto_orientation.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -198,6 +199,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   void dispose() {
+    if (!horizontalScreen) {
+      AutoOrientation.portraitUpMode();
+    }
     shutdownTimerService.handleWaitingFinished();
     if (plPlayerController != null) {
       plPlayerController!.removeStatusLister(playerListener);
