@@ -808,14 +808,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       controller: plPlayerController,
                       videoDetailCtr: videoDetailController,
                     ),
-                    danmuWidget: Obx(
-                      () => PlDanmaku(
-                        key: Key(
-                            videoDetailController.danmakuCid.value.toString()),
-                        cid: videoDetailController.danmakuCid.value,
-                        playerController: plPlayerController!,
-                      ),
-                    ),
+                    // danmuWidget: Obx(
+                    //   () => PlDanmaku(
+                    //     key: Key(
+                    //         videoDetailController.danmakuCid.value.toString()),
+                    //     cid: videoDetailController.danmakuCid.value,
+                    //     playerController: plPlayerController!,
+                    //   ),
+                    // ),
                   ),
           );
         } else {
