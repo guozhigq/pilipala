@@ -26,7 +26,7 @@ class MemberArchiveController extends GetxController {
 
   // 获取用户投稿
   Future getMemberArchive(type) async {
-    if (type == 'onRefresh') {
+    if (type == 'init') {
       pn = 1;
     }
     var res = await MemberHttp.memberArchive(
@@ -35,7 +35,12 @@ class MemberArchiveController extends GetxController {
       order: currentOrder['type']!,
     );
     if (res['status']) {
-      archivesList.addAll(res['data'].list.vlist);
+      if (type == 'init') {
+        archivesList.value = res['data'].list.vlist;
+      }
+      if (type == 'onLoad') {
+        archivesList.addAll(res['data'].list.vlist);
+      }
       count = res['data'].page['count'];
       pn += 1;
     } else {
@@ -45,13 +50,14 @@ class MemberArchiveController extends GetxController {
   }
 
   toggleSort() async {
-    pn = 1;
-    int index = orderList.indexOf(currentOrder);
+    List<String> typeList = orderList.map((e) => e['type']!).toList();
+    int index = typeList.indexOf(currentOrder['type']!);
     if (index == orderList.length - 1) {
       currentOrder.value = orderList.first;
     } else {
       currentOrder.value = orderList[index + 1];
     }
+    getMemberArchive('init');
   }
 
   // 上拉加载

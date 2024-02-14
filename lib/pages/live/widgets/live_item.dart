@@ -159,18 +159,32 @@ class VideoStat extends StatelessWidget {
           tileMode: TileMode.mirror,
         ),
       ),
-      child: RichText(
-        maxLines: 1,
-        textAlign: TextAlign.justify,
-        softWrap: false,
-        text: TextSpan(
-          style: const TextStyle(fontSize: 11, color: Colors.white),
-          children: [
-            TextSpan(text: liveItem!.areaName!),
-            TextSpan(text: liveItem!.watchedShow!['text_small']),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            liveItem!.areaName!,
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+          Text(
+            liveItem!.watchedShow!['text_small'],
+            style: const TextStyle(fontSize: 11, color: Colors.white),
+          ),
+        ],
       ),
+
+      // child: RichText(
+      //   maxLines: 1,
+      //   textAlign: TextAlign.justify,
+      //   softWrap: false,
+      //   text: TextSpan(
+      //     style: const TextStyle(fontSize: 11, color: Colors.white),
+      //     children: [
+      //       TextSpan(text: liveItem!.areaName!),
+      //       TextSpan(text: liveItem!.watchedShow!['text_small']),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

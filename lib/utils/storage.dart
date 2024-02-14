@@ -42,6 +42,8 @@ class GStrorage {
         return deletedEntries > 10;
       },
     );
+    // 视频设置
+    video = await Hive.openBox('video');
   }
 
   static void regAdapter() {
@@ -50,11 +52,6 @@ class GStrorage {
     Hive.registerAdapter(LevelInfoAdapter());
     Hive.registerAdapter(HotSearchModelAdapter());
     Hive.registerAdapter(HotSearchItemAdapter());
-  }
-
-  static Future<void> lazyInit() async {
-    // 视频设置
-    video = await Hive.openBox('video');
   }
 
   static Future<void> close() async {

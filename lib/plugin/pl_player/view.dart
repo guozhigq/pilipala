@@ -589,6 +589,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         /// 进度条 live模式下禁用
+
         Obx(
           () {
             final int value = _.sliderPositionSeconds.value;
@@ -612,7 +613,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             }
 
             if (_.videoType.value == 'live') {
-              return nil;
+              return const SizedBox();
             }
             if (value > max || max <= 0) {
               return nil;

@@ -7,6 +7,7 @@ import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/github/latest.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../utils/cache_manage.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -17,6 +18,19 @@ class AboutPage extends StatefulWidget {
 
 class _AboutPageState extends State<AboutPage> {
   final AboutController _aboutController = Get.put(AboutController());
+  String cacheSize = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // 读取缓存占用
+    getCacheSize();
+  }
+
+  Future<void> getCacheSize() async {
+    final res = await CacheManage().loadApplicationCache();
+    setState(() => cacheSize = res);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +43,19 @@ class _AboutPageState extends State<AboutPage> {
       ),
       body: ListView(
         children: [
-          ConstrainedBox(constraints:
-          const BoxConstraints(
-              maxHeight: 150),
-            child:
-            Image.asset(
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 150),
+            child: Image.asset(
               'assets/images/logo/logo_android_2.png',
             ),
           ),
           ListTile(
             title: Text('PiliPala',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(height: 2)),
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(height: 2)),
             subtitle: Text(
               '使用Flutter开发的哔哩哔哩第三方客户端',
               textAlign: TextAlign.center,
@@ -139,6 +154,17 @@ class _AboutPageState extends State<AboutPage> {
           ListTile(
             onTap: () => _aboutController.logs(),
             title: const Text('错误日志'),
+            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
+          ),
+          ListTile(
+            onTap: () async {
+              var cleanStatus = await CacheManage().clearCacheAll();
+              if (cleanStatus) {
+                getCacheSize();
+              }
+            },
+            title: const Text('清除缓存'),
+            subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
             trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
           ),
         ],

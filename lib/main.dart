@@ -85,7 +85,6 @@ void main() async {
     statusBarColor: Colors.transparent,
   ));
   Data.init();
-  GStrorage.lazyInit();
   PiliSchame.init();
 }
 
