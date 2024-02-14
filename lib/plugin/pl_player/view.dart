@@ -72,6 +72,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
+  late bool fullScreenGestureReverse;
   late bool enableBackgroundPlay;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
@@ -126,6 +127,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         defaultValue: BtmProgresBehavior.values.first.code);
     enableQuickDouble =
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
+    fullScreenGestureReverse = setting.get(SettingBoxKey.fullScreenGestureReverse,
+        defaultValue: false);
     enableBackgroundPlay =
         setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     Future.microtask(() async {
@@ -522,18 +525,20 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // 全屏
                 final double dy = details.delta.dy;
                 const double threshold = 7.0; // 滑动阈值
+                void fullScreenTrigger(bool status) async {
+                  lastFullScreenToggleTime = DateTime.now();
+                  await widget.controller.triggerFullScreen(status: status);
+                }
                 if (dy > _distance && dy > threshold) {
-                  if (_.isFullScreen.value) {
-                    lastFullScreenToggleTime = DateTime.now();
-                    // 下滑退出全屏
-                    await widget.controller.triggerFullScreen(status: false);
+                  // 下滑退出全屏/进入全屏
+                  if (_.isFullScreen.value ^ fullScreenGestureReverse) {
+                    fullScreenTrigger(fullScreenGestureReverse);
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
-                  if (!_.isFullScreen.value) {
-                    lastFullScreenToggleTime = DateTime.now();
-                    // 上滑进入全屏
-                    await widget.controller.triggerFullScreen();
+                  // 上划进入全屏/退出全屏
+                  if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
+                    fullScreenTrigger(!fullScreenGestureReverse);
                   }
                   _distance = 0.0;
                 }

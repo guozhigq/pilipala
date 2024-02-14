@@ -97,6 +97,7 @@ class SettingBoxKey {
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
+      fullScreenGestureReverse = 'fullScreenGestureReverse',
       enableShowDanmaku = 'enableShowDanmaku',
       enableBackgroundPlay = 'enableBackgroundPlay',
 

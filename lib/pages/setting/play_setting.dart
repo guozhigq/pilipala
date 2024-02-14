@@ -158,6 +158,12 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: true,
           ),
           const SetSwitchItem(
+            title: '全屏手势反向',
+            subTitle: '默认播放器中部向上滑动进入全屏，向下退出\n开启后向下全屏，向上退出',
+            setKey: SettingBoxKey.fullScreenGestureReverse,
+            defaultVal: false,
+          ),
+          const SetSwitchItem(
             title: '弹幕开关',
             subTitle: '展示弹幕',
             setKey: SettingBoxKey.enableShowDanmaku,
