@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -45,6 +46,17 @@ class ReplyItem extends StatelessWidget {
           if (replyReply != null) {
             replyReply!(replyItem);
           }
+        },
+        onLongPress: () {
+          feedBack();
+          showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            isScrollControlled: true,
+            builder: (context) {
+              return MorePanel(item: replyItem);
+            },
+          );
         },
         child: Column(
           children: [
@@ -121,98 +133,6 @@ class ReplyItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        // 头像、昵称
-        // SizedBox(
-        //   width: double.infinity,
-        //   child: Stack(
-        //     children: [
-        //       GestureDetector(
-        //         behavior: HitTestBehavior.opaque,
-        //         onTap: () {
-        //           feedBack();
-        //           Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
-        //             'face': replyItem!.member!.avatar!,
-        //             'heroTag': heroTag
-        //           });
-        //         },
-        //         child: Row(
-        //           crossAxisAlignment: CrossAxisAlignment.center,
-        //           mainAxisSize: MainAxisSize.min,
-        //           children: <Widget>[
-        //             lfAvtar(context, heroTag),
-        //             const SizedBox(width: 12),
-        //             Text(
-        //               replyItem!.member!.uname!,
-        //               style: TextStyle(
-        //                 color: replyItem!.member!.vip!['vipStatus'] > 0
-        //                     ? const Color.fromARGB(255, 251, 100, 163)
-        //                     : Theme.of(context).colorScheme.outline,
-        //                 fontSize: 13,
-        //               ),
-        //             ),
-        //             const SizedBox(width: 6),
-        //             Image.asset(
-        //               'assets/images/lv/lv${replyItem!.member!.level}.png',
-        //               height: 11,
-        //             ),
-        //             const SizedBox(width: 6),
-        //             if (replyItem!.isUp!)
-        //               const PBadge(
-        //                 text: 'UP',
-        //                 size: 'small',
-        //                 stack: 'normal',
-        //                 fs: 9,
-        //               ),
-        //           ],
-        //         ),
-        //       ),
-        //       Positioned(
-        //         top: 0,
-        //         left: 0,
-        //         right: 0,
-        //         child: Container(
-        //           width: double.infinity,
-        //           height: 45,
-        //           decoration: BoxDecoration(
-        //             image: replyItem!.member!.userSailing!.cardbg != null
-        //                 ? DecorationImage(
-        //                     alignment: Alignment.centerRight,
-        //                     fit: BoxFit.fitHeight,
-        //                     image: NetworkImage(
-        //                       replyItem!.member!.userSailing!.cardbg!['image'],
-        //                     ),
-        //                   )
-        //                 : null,
-        //           ),
-        //         ),
-        //       ),
-        //       if (replyItem!.member!.userSailing!.cardbg != null &&
-        //           replyItem!.member!.userSailing!.cardbg!['fan']['number'] > 0)
-        //         Positioned(
-        //           top: 10,
-        //           left: Get.size.width / 7 * 5.8,
-        //           child: DefaultTextStyle(
-        //             style: TextStyle(
-        //               fontFamily: 'fansCard',
-        //               fontSize: 9,
-        //               color: Theme.of(context).colorScheme.primary,
-        //             ),
-        //             child: Column(
-        //               crossAxisAlignment: CrossAxisAlignment.start,
-        //               mainAxisAlignment: MainAxisAlignment.center,
-        //               children: [
-        //                 const Text('NO.'),
-        //                 Text(
-        //                   replyItem!.member!.userSailing!.cardbg!['fan']
-        //                       ['num_desc'],
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //     ],
-        //   ),
-        // ),
         /// fix Stack内GestureDetector  onTap无效
         GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -289,30 +209,26 @@ class ReplyItem extends StatelessWidget {
         // title
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
-          child: SelectableRegion(
-            focusNode: FocusNode(),
-            selectionControls: MaterialTextSelectionControls(),
-            child: Text.rich(
-              style: const TextStyle(height: 1.75),
-              maxLines:
-                  replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
-              overflow: TextOverflow.ellipsis,
-              TextSpan(
-                children: [
-                  if (replyItem!.isTop!)
-                    const WidgetSpan(
-                      alignment: PlaceholderAlignment.top,
-                      child: PBadge(
-                        text: 'TOP',
-                        size: 'small',
-                        stack: 'normal',
-                        type: 'line',
-                        fs: 9,
-                      ),
+          child: Text.rich(
+            style: const TextStyle(height: 1.75),
+            maxLines:
+                replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
+            overflow: TextOverflow.ellipsis,
+            TextSpan(
+              children: [
+                if (replyItem!.isTop!)
+                  const WidgetSpan(
+                    alignment: PlaceholderAlignment.top,
+                    child: PBadge(
+                      text: 'TOP',
+                      size: 'small',
+                      stack: 'normal',
+                      type: 'line',
+                      fs: 9,
                     ),
-                  buildContent(context, replyItem!, replyReply, null),
-                ],
-              ),
+                  ),
+                buildContent(context, replyItem!, replyReply, null),
+              ],
             ),
           ),
         ),
@@ -445,6 +361,17 @@ class ReplyItemRow extends StatelessWidget {
                 InkWell(
                   // 一楼点击评论展开评论详情
                   onTap: () => replyReply!(replyItem),
+                  onLongPress: () {
+                    feedBack();
+                    showModalBottomSheet(
+                      context: context,
+                      useRootNavigator: true,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return MorePanel(item: replies![i]);
+                      },
+                    );
+                  },
                   child: Container(
                     width: double.infinity,
                     padding: EdgeInsets.fromLTRB(
@@ -636,8 +563,8 @@ InlineSpan buildContent(
               },
           ),
         );
-
-      } else if (RegExp(r'^\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b$').hasMatch(matchStr)) {
+      } else if (RegExp(r'^\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b$')
+          .hasMatch(matchStr)) {
         matchStr = matchStr.replaceAll('：', ':');
         spanChilds.add(
           TextSpan(
@@ -954,4 +881,102 @@ InlineSpan buildContent(
   }
   // spanChilds.add(TextSpan(text: matchMember));
   return TextSpan(children: spanChilds);
+}
+
+class MorePanel extends StatelessWidget {
+  final dynamic item;
+  const MorePanel({super.key, required this.item});
+
+  Future<dynamic> menuActionHandler(String type) async {
+    String message = item.content.message ?? item.content;
+    switch (type) {
+      case 'copyAll':
+        await Clipboard.setData(ClipboardData(text: message));
+        SmartDialog.showToast('已复制');
+        Get.back();
+        break;
+      case 'copyFreedom':
+        Get.back();
+        showDialog(
+          context: Get.context!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('自由复制'),
+              content: SelectableText(message),
+            );
+          },
+        );
+        break;
+      // case 'block':
+      //   SmartDialog.showToast('加入黑名单');
+      //   break;
+      // case 'report':
+      //   SmartDialog.showToast('举报');
+      //   break;
+      // case 'delete':
+      //   SmartDialog.showToast('删除');
+      //   break;
+      default:
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color errorColor = Theme.of(context).colorScheme.error;
+    return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      // clipBehavior: Clip.hardEdge,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => Get.back(),
+            child: Container(
+              height: 48,
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outline,
+                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+                ),
+              ),
+            ),
+          ),
+          ListTile(
+            onTap: () async => await menuActionHandler('copyAll'),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.copy_all_outlined),
+            title: const Text('复制全部'),
+          ),
+          ListTile(
+            onTap: () async => await menuActionHandler('copyFreedom'),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.copy_outlined),
+            title: const Text('自由复制'),
+          ),
+          // ListTile(
+          //   onTap: () async => await menuActionHandler('block'),
+          //   minLeadingWidth: 0,
+          //   leading: Icon(Icons.block_outlined, color: errorColor),
+          //   title: Text('加入黑名单', style: TextStyle(color: errorColor)),
+          // ),
+          // ListTile(
+          //   onTap: () async => await menuActionHandler('report'),
+          //   minLeadingWidth: 0,
+          //   leading: Icon(Icons.report_outlined, color: errorColor),
+          //   title: Text('举报', style: TextStyle(color: errorColor)),
+          // ),
+          // ListTile(
+          //   onTap: () async => await menuActionHandler('del'),
+          //   minLeadingWidth: 0,
+          //   leading: Icon(Icons.delete_outline, color: errorColor),
+          //   title: Text('删除', style: TextStyle(color: errorColor)),
+          // ),
+        ],
+      ),
+    );
+  }
 }
