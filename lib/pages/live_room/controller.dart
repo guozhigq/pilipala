@@ -3,7 +3,6 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
 import 'package:pilipala/models/live/room_info.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
-
 import '../../models/live/room_info_h5.dart';
 
 class LiveRoomController extends GetxController {
@@ -16,13 +15,6 @@ class LiveRoomController extends GetxController {
   RxBool volumeOff = false.obs;
   PlPlayerController plPlayerController =
       PlPlayerController.getInstance(videoType: 'live');
-
-  // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
-  //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
-  //   pipEnabled: true,
-  //   controlsStyle: ControlsStyle.live,
-  //   enabledButtons: const EnabledButtons(pip: true),
-  // );
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
 
   @override
@@ -39,8 +31,6 @@ class LiveRoomController extends GetxController {
         cover = liveItem.cover;
       }
     }
-    queryLiveInfo();
-    queryLiveInfoH5();
   }
 
   playerInit(source) async {

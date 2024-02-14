@@ -29,20 +29,16 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
   @override
   void initState() {
     super.initState();
-    plPlayerController = _liveRoomController.plPlayerController;
-    plPlayerController!.onPlayerStatusChanged.listen(
-      (PlayerStatus status) {
-        if (status == PlayerStatus.playing) {
-          isShowCover = false;
-          setState(() {});
-        }
-      },
-    );
     if (Platform.isAndroid) {
       floating = Floating();
     }
-    _futureBuilder = _liveRoomController.queryLiveInfoH5();
+    videoSourceInit();
     _futureBuilderFuture = _liveRoomController.queryLiveInfo();
+  }
+
+  Future<void> videoSourceInit() async {
+    _futureBuilder = _liveRoomController.queryLiveInfoH5();
+    plPlayerController = _liveRoomController.plPlayerController;
   }
 
   @override
