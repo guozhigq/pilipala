@@ -24,11 +24,13 @@ class _FavDetailPageState extends State<FavDetailPage> {
       Get.put(FavDetailController());
   late StreamController<bool> titleStreamC; // a
   Future? _futureBuilderFuture;
+  late String mediaId;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
+    mediaId = Get.parameters['mediaId']!;
     titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
@@ -94,8 +96,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
             actions: [
               IconButton(
-                onPressed: () => Get.toNamed(
-                    '/favSearch?searchType=0&mediaId=${Get.parameters['mediaId']!}'),
+                onPressed: () =>
+                    Get.toNamed('/favSearch?searchType=0&mediaId=$mediaId'),
                 icon: const Icon(Icons.search_outlined),
               ),
               //   IconButton(
