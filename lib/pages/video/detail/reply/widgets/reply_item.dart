@@ -925,14 +925,13 @@ class MorePanel extends StatelessWidget {
     Color errorColor = Theme.of(context).colorScheme.error;
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      // clipBehavior: Clip.hardEdge,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
             onTap: () => Get.back(),
             child: Container(
-              height: 48,
+              height: 35,
               padding: const EdgeInsets.only(bottom: 2),
               child: Center(
                 child: Container(
@@ -948,14 +947,14 @@ class MorePanel extends StatelessWidget {
           ListTile(
             onTap: () async => await menuActionHandler('copyAll'),
             minLeadingWidth: 0,
-            leading: const Icon(Icons.copy_all_outlined),
-            title: const Text('复制全部'),
+            leading: const Icon(Icons.copy_all_outlined, size: 19),
+            title: Text('复制全部', style: Theme.of(context).textTheme.titleSmall),
           ),
           ListTile(
             onTap: () async => await menuActionHandler('copyFreedom'),
             minLeadingWidth: 0,
-            leading: const Icon(Icons.copy_outlined),
-            title: const Text('自由复制'),
+            leading: const Icon(Icons.copy_outlined, size: 19),
+            title: Text('自由复制', style: Theme.of(context).textTheme.titleSmall),
           ),
           // ListTile(
           //   onTap: () async => await menuActionHandler('block'),
