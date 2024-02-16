@@ -304,8 +304,6 @@ class AboutController extends GetxController {
   }
 
   tapOnVersion() {
-    SmartDialog.showToast('别点我啦~');
-
     if (settingController.hiddenSettingUnlocked.value) {
       SmartDialog.showToast('您已解锁隐藏设置, 无需再次操作');
       return;
