@@ -121,6 +121,13 @@ class _UpPanelState extends State<UpPanel> {
                   ],
                 ),
               ),
+              Container(
+                height: 6,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onInverseSurface
+                    .withOpacity(0.5),
+              ),
             ],
           )),
     );

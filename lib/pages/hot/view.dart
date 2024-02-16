@@ -89,8 +89,7 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   if (data['status']) {
                     return Obx(
                       () => SliverList(
-                        delegate:
-                            SliverChildBuilderDelegate((context, index) {
+                        delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _hotController.videoList[index],
                             showPubdate: true,
@@ -110,7 +109,12 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
-                      fn: () => setState(() {}),
+                      fn: () {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _hotController.queryHotFeed('init');
+                        });
+                      },
                     );
                   }
                 } else {
