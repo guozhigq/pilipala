@@ -18,12 +18,10 @@ class PiliLogger extends Logger {
   @override
   void log(Level level, dynamic message,
       {Object? error, StackTrace? stackTrace, DateTime? time}) async {
-    if (level == Level.error) {
-      String dir = (await getApplicationDocumentsDirectory()).path;
-      // 创建logo文件
-      final String filename = p.join(dir, ".pili_logs");
+    if (level == Level.error || level == Level.fatal) {
       // 添加至文件末尾
-      await File(filename).writeAsString(
+      File logFile = await getLogsPath();
+      logFile.writeAsString(
         "**${DateTime.now()}** \n $message \n $stackTrace",
         mode: FileMode.writeOnlyAppend,
       );
@@ -35,17 +33,15 @@ class PiliLogger extends Logger {
 Future<File> getLogsPath() async {
   String dir = (await getApplicationDocumentsDirectory()).path;
   final String filename = p.join(dir, ".pili_logs");
-  final file = File(filename);
+  final File file = File(filename);
   if (!await file.exists()) {
-    await file.create();
+    await file.create(recursive: true);
   }
   return file;
 }
 
 Future<bool> clearLogs() async {
-  String dir = (await getApplicationDocumentsDirectory()).path;
-  final String filename = p.join(dir, ".pili_logs");
-  final file = File(filename);
+  final File file = await getLogsPath();
   try {
     await file.writeAsString('');
   } catch (e) {
