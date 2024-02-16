@@ -11,6 +11,7 @@ import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../../models/common/dynamic_badge_mode.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
@@ -65,6 +66,7 @@ class MainController extends GetxController {
   int selectedIndex = 0;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
+  late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
 
   @override
   void onInit() {
@@ -75,7 +77,12 @@ class MainController extends GetxController {
     hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    getUnreadDynamic();
+    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+        SettingBoxKey.dynamicBadgeMode,
+        defaultValue: DynamicBadgeMode.number.code)];
+    if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+      getUnreadDynamic();
+    }
   }
 
   void onBackPressed(BuildContext context) {

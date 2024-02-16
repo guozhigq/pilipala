@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/tab_type.dart';
 import 'package:pilipala/utils/storage.dart';
+import '../../http/index.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
@@ -24,6 +25,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late bool hideSearchBar;
   late List defaultTabs;
   late List<String> tabbarSort;
+  RxString defaultSearch = ''.obs;
 
   @override
   void onInit() {
@@ -35,6 +37,9 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     setTabConfig();
     hideSearchBar =
         setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
+    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
+      searchDefault();
+    }
   }
 
   void onRefresh() {
@@ -58,13 +63,16 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void setTabConfig() async {
-    defaultTabs = tabsConfig;
+    defaultTabs = [...tabsConfig];
     tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
         defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+    defaultTabs.retainWhere(
+        (item) => tabbarSort.contains((item['type'] as TabType).id));
+    defaultTabs.sort((a, b) => tabbarSort
+        .indexOf((a['type'] as TabType).id)
+        .compareTo(tabbarSort.indexOf((b['type'] as TabType).id)));
 
-    tabs.value = defaultTabs
-        .where((i) => tabbarSort.contains((i['type'] as TabType).id))
-        .toList();
+    tabs.value = defaultTabs;
 
     if (tabbarSort.contains(TabType.rcmd.id)) {
       initialIndex.value = tabbarSort.indexOf(TabType.rcmd.id);
@@ -93,5 +101,12 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
         }
       }
     });
+  }
+
+  void searchDefault() async {
+    var res = await Request().get(Api.searchDefault);
+    if (res.data['code'] == 0) {
+      defaultSearch.value = res.data['data']['name'];
+    }
   }
 }

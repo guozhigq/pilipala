@@ -324,8 +324,9 @@ class VideoContent extends StatelessWidget {
                                           reSrc: 11,
                                         );
                                         SmartDialog.dismiss();
-                                        SmartDialog.showToast(
-                                            res['msg'] ?? '成功');
+                                        SmartDialog.showToast(res['code'] == 0
+                                            ? '成功'
+                                            : res['msg']);
                                       },
                                       child: const Text('确认'),
                                     )

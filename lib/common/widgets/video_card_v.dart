@@ -161,12 +161,12 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (videoItem.duration != null)
+                      if (videoItem.duration > 0)
                         if (crossAxisCount == 1) ...[
                           PBadge(
                             bottom: 10,
                             right: 10,
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ] else ...[
                           PBadge(
@@ -174,7 +174,7 @@ class VideoCardV extends StatelessWidget {
                             right: 7,
                             size: 'small',
                             type: 'gray',
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ],
                     ],

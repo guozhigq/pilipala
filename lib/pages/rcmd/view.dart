@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +44,7 @@ class _RcmdPageState extends State<RcmdPage>
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           EasyThrottle.throttle(
-              'my-throttler', const Duration(milliseconds: 500), () {
+              'my-throttler', const Duration(milliseconds: 200), () {
             _rcmdController.isLoadingMore = true;
             _rcmdController.onLoad();
           });
@@ -97,29 +96,24 @@ class _RcmdPageState extends State<RcmdPage>
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
-                      return Platform.isAndroid || Platform.isIOS
-                          ? Obx(
-                              () => contentGrid(
-                                  _rcmdController,
-                                  _rcmdController.defaultRcmdType == 'web'
-                                      ? _rcmdController.webVideoList
-                                      : _rcmdController.appVideoList),
-                            )
-                          : SliverLayoutBuilder(
-                              builder: (context, boxConstraints) {
-                              return Obx(
-                                () => contentGrid(
-                                    _rcmdController,
-                                    _rcmdController.defaultRcmdType == 'web'
-                                        ? _rcmdController.webVideoList
-                                        : _rcmdController.appVideoList),
-                              );
-                            });
+                      return Obx(
+                        () {
+                          if (_rcmdController.isLoadingMore &&
+                              _rcmdController.videoList.isEmpty) {
+                            return contentGrid(_rcmdController, []);
+                          } else {
+                            // 显示视频列表
+                            return contentGrid(
+                                _rcmdController, _rcmdController.videoList);
+                          }
+                        },
+                      );
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
                         fn: () {
                           setState(() {
+                            _rcmdController.isLoadingMore = true;
                             _futureBuilderFuture =
                                 _rcmdController.queryRcmdFeed('init');
                           });
@@ -127,20 +121,11 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     }
                   } else {
-                    // 缓存数据
-                    // if (_rcmdController.videoList.isNotEmpty) {
-                    //   return contentGrid(
-                    //       _rcmdController, _rcmdController.videoList);
-                    // }
-                    // // 骨架屏
-                    // else {
                     return contentGrid(_rcmdController, []);
-                    // }
                   }
                 },
               ),
             ),
-            LoadingMore(ctr: _rcmdController)
           ],
         ),
       ),
@@ -199,36 +184,6 @@ class _RcmdPageState extends State<RcmdPage>
               : const VideoCardVSkeleton();
         },
         childCount: videoList!.isNotEmpty ? videoList!.length : 10,
-      ),
-    );
-  }
-}
-
-class LoadingMore extends StatelessWidget {
-  final dynamic ctr;
-  const LoadingMore({super.key, this.ctr});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        height: MediaQuery.of(context).padding.bottom + 80,
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-        child: GestureDetector(
-          onTap: () {
-            if (ctr != null) {
-              ctr!.isLoadingMore = true;
-              ctr!.onLoad();
-            }
-          },
-          child: Center(
-            child: Text(
-              '点击加载更多 👇',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline, fontSize: 13),
-            ),
-          ),
-        ),
       ),
     );
   }

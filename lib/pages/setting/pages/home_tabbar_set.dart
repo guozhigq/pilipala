@@ -22,6 +22,17 @@ class _TabbarSetPageState extends State<TabbarSetPage> {
     defaultTabs = tabsConfig;
     tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
         defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+    // 对 tabData 进行排序
+    defaultTabs.sort((a, b) {
+      int indexA = tabbarSort.indexOf((a['type'] as TabType).id);
+      int indexB = tabbarSort.indexOf((b['type'] as TabType).id);
+
+      // 如果类型在 sortOrder 中不存在，则放在末尾
+      if (indexA == -1) indexA = tabbarSort.length;
+      if (indexB == -1) indexB = tabbarSort.length;
+
+      return indexA.compareTo(indexB);
+    });
   }
 
   void saveEdit() {

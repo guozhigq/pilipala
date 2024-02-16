@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
 import '../pages/blacklist/index.dart';
@@ -38,6 +40,7 @@ import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
 import '../pages/setting/pages/home_tabbar_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
+import '../pages/setting/recommend_setting.dart';
 import '../pages/setting/play_setting.dart';
 import '../pages/setting/privacy_setting.dart';
 import '../pages/setting/style_setting.dart';
@@ -101,7 +104,9 @@ class Routes {
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
-
+    // 推荐设置
+    CustomGetPage(
+        name: '/recommendSetting', page: () => const RecommendSetting()),
     // 播放设置
     CustomGetPage(name: '/playSetting', page: () => const PlaySetting()),
     // 外观设置
@@ -151,6 +156,10 @@ class Routes {
     // 用户专栏
     CustomGetPage(
         name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    // 日志
+    CustomGetPage(name: '/logs', page: () => const LogsPage()),
+    // 搜索关注
+    CustomGetPage(name: '/followSearch', page: () => const FollowSearchPage()),
   ];
 }
 
