@@ -18,6 +18,7 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
@@ -478,11 +479,15 @@ class VideoIntroController extends GetxController {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
+    final ReleatedController releatedCtr =
+        Get.find<ReleatedController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.oid.value = aid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
+    releatedCtr.bvid = bvid;
+    releatedCtr.queryRelatedVideo();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
