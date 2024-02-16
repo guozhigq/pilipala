@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/github/latest.dart';
+import 'package:pilipala/pages/setting/controller.dart';
+import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/cache_manage.dart';
@@ -60,6 +63,7 @@ class _AboutPageState extends State<AboutPage> {
             const SizedBox(height: 20),
             Obx(
               () => ListTile(
+                onTap: () => _aboutController.tapOnVersion(),
                 title: const Text('当前版本'),
                 trailing: Text(_aboutController.currentVersion.value,
                     style: subTitleStyle),
@@ -171,12 +175,15 @@ class _AboutPageState extends State<AboutPage> {
 }
 
 class AboutController extends GetxController {
+  Box setting = GStrorage.setting;
+  final SettingController settingController = Get.put(SettingController());
   RxString currentVersion = ''.obs;
   RxString remoteVersion = ''.obs;
   late LatestDataModel remoteAppInfo;
   RxBool isUpdate = true.obs;
   RxBool isLoading = true.obs;
   late LatestDataModel data;
+  RxInt count = 0.obs;
 
   @override
   void onInit() {
@@ -294,5 +301,19 @@ class AboutController extends GetxController {
   // 日志
   logs() {
     Get.toNamed('/logs');
+  }
+
+  tapOnVersion() {
+    SmartDialog.showToast('别点我啦~');
+
+    if (settingController.hiddenSettingUnlocked.value) {
+      SmartDialog.showToast('您已解锁隐藏设置, 无需再次操作');
+      return;
+    }
+    count.value++;
+    if (count.value == 5) {
+      setting.put(SettingBoxKey.hiddenSettingUnlocked, true);
+      SmartDialog.showToast('恭喜您发现了隐藏设置!');
+    }
   }
 }

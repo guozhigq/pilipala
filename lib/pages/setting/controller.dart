@@ -17,6 +17,7 @@ class SettingController extends GetxController {
   Box localCache = GStrorage.localCache;
 
   RxBool userLogin = false.obs;
+  RxBool hiddenSettingUnlocked = false.obs;
   RxBool feedBackEnable = false.obs;
   RxDouble toastOpacity = (1.0).obs;
   RxInt picQuality = 10.obs;
@@ -29,6 +30,7 @@ class SettingController extends GetxController {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
+    hiddenSettingUnlocked.value = setting.get(SettingBoxKey.hiddenSettingUnlocked, defaultValue: false);
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
     toastOpacity.value =
