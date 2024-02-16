@@ -3,7 +3,7 @@ import 'package:pilipala/utils/utils.dart';
 
 class StatDanMu extends StatelessWidget {
   final String? theme;
-  final int? danmu;
+  final dynamic danmu;
   final String? size;
 
   const StatDanMu({Key? key, this.theme, this.danmu, this.size})
