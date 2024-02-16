@@ -42,6 +42,16 @@ Future<void> verticalScreen() async {
   ]);
 }
 
+//全向
+Future<void> autoScreen() async {
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
+}
+
 Future<void> enterFullScreen() async {
   await SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.immersiveSticky,

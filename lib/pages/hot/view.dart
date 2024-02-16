@@ -13,6 +13,8 @@ import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/hot/controller.dart';
 import 'package:pilipala/pages/main/index.dart';
 
+import '../../utils/grid.dart';
+
 class HotPage extends StatefulWidget {
   const HotPage({Key? key}) : super(key: key);
 
@@ -88,8 +90,18 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
                   Map data = snapshot.data as Map;
                   if (data['status']) {
                     return Obx(
-                      () => SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
+                      () => SliverGrid(
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          // 行间距
+                          mainAxisSpacing: StyleString.safeSpace,
+                          // 列间距
+                          crossAxisSpacing: StyleString.safeSpace,
+                          // 最大宽度
+                            maxCrossAxisExtent: Grid.maxRowWidth * 2,
+                            mainAxisExtent: Grid.calculateActualWidth(context, Grid.maxRowWidth * 2, StyleString.safeSpace) / 1.9 / StyleString.aspectRatio
+                        ),
+                        delegate:
+                            SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _hotController.videoList[index],
                             showPubdate: true,

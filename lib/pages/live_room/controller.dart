@@ -17,6 +17,13 @@ class LiveRoomController extends GetxController {
       PlPlayerController.getInstance(videoType: 'live');
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
 
+  // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
+  //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
+  //   pipEnabled: true,
+  //   controlsStyle: ControlsStyle.live,
+  //   enabledButtons: const EnabledButtons(pip: true),
+  // );
+
   @override
   void onInit() {
     super.onInit();
@@ -31,10 +38,11 @@ class LiveRoomController extends GetxController {
         cover = liveItem.cover;
       }
     }
+    queryLiveInfo();
   }
 
-  playerInit(source) async {
-    await plPlayerController.setDataSource(
+  playerInit(source) {
+    plPlayerController.setDataSource(
       DataSource(
         videoSource: source,
         audioSource: null,
@@ -60,8 +68,7 @@ class LiveRoomController extends GetxController {
       String videoUrl = (item.urlInfo?.first.host)! +
           item.baseUrl! +
           item.urlInfo!.first.extra!;
-      await playerInit(videoUrl);
-      return res;
+      playerInit(videoUrl);
     }
   }
 
@@ -74,13 +81,5 @@ class LiveRoomController extends GetxController {
       volume = value;
       volumeOff.value = true;
     }
-  }
-
-  Future queryLiveInfoH5() async {
-    var res = await LiveHttp.liveRoomInfoH5(roomId: roomId);
-    if (res['status']) {
-      roomInfoH5.value = res['data'];
-    }
-    return res;
   }
 }

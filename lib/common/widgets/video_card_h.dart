@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import '../../http/search.dart';
-import '../../http/user.dart';
-import '../../http/video.dart';
 import '../../utils/utils.dart';
 import '../constants.dart';
 import 'badge.dart';
 import 'network_img_layer.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
+import 'video_popup_menu.dart';
 
 // 视频卡片 - 水平布局
 class VideoCardH extends StatelessWidget {
@@ -240,113 +239,14 @@ class VideoContent extends StatelessWidget {
                   ),
 
                 const Spacer(),
-                // SizedBox(
-                //   width: 20,
-                //   height: 20,
-                //   child: IconButton(
-                //     tooltip: '稍后再看',
-                //     style: ButtonStyle(
-                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                //     ),
-                //     onPressed: () async {
-                //       var res =
-                //           await UserHttp.toViewLater(bvid: videoItem.bvid);
-                //       SmartDialog.showToast(res['msg']);
-                //     },
-                //     icon: Icon(
-                //       Icons.more_vert_outlined,
-                //       color: Theme.of(context).colorScheme.outline,
-                //       size: 14,
-                //     ),
-                //   ),
-                // ),
                 if (source == 'normal')
                   SizedBox(
                     width: 24,
                     height: 24,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.more_vert_outlined,
-                        color: Theme.of(context).colorScheme.outline,
-                        size: 14,
-                      ),
-                      position: PopupMenuPosition.under,
-                      // constraints: const BoxConstraints(maxHeight: 35),
-                      onSelected: (String type) {},
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          onTap: () async {
-                            var res = await UserHttp.toViewLater(
-                                bvid: videoItem.bvid as String);
-                            SmartDialog.showToast(res['msg']);
-                          },
-                          value: 'pause',
-                          height: 40,
-                          child: const Row(
-                            children: [
-                              Icon(Icons.watch_later_outlined, size: 16),
-                              SizedBox(width: 6),
-                              Text('稍后再看', style: TextStyle(fontSize: 13))
-                            ],
-                          ),
-                        ),
-                        const PopupMenuDivider(),
-                        PopupMenuItem<String>(
-                          onTap: () async {
-                            SmartDialog.show(
-                              useSystem: true,
-                              animationType:
-                                  SmartAnimationType.centerFade_otherSlide,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('提示'),
-                                  content: Text(
-                                      '确定拉黑:${videoItem.owner.name}(${videoItem.owner.mid})?'
-                                      '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => SmartDialog.dismiss(),
-                                      child: Text(
-                                        '点错了',
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outline),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        var res = await VideoHttp.relationMod(
-                                          mid: videoItem.owner.mid,
-                                          act: 5,
-                                          reSrc: 11,
-                                        );
-                                        SmartDialog.dismiss();
-                                        SmartDialog.showToast(res['code'] == 0
-                                            ? '成功'
-                                            : res['msg']);
-                                      },
-                                      child: const Text('确认'),
-                                    )
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          value: 'pause',
-                          height: 40,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.block, size: 16),
-                              const SizedBox(width: 6),
-                              Text('拉黑：${videoItem.owner.name}',
-                                  style: const TextStyle(fontSize: 13))
-                            ],
-                          ),
-                        ),
-                      ],
+                    child: VideoPopupMenu(
+                      size: 32,
+                      iconSize: 18,
+                      videoItem: videoItem,
                     ),
                   ),
               ],

@@ -25,42 +25,59 @@ import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
-      .then((_) async {
-    await GStrorage.init();
-    await setupServiceLocator();
-    Request();
-    await Request.setCookie();
-    RecommendFilter();
-
-    // 异常捕获 logo记录
-    final Catcher2Options debugConfig = Catcher2Options(
-      SilentReportMode(),
+  await GStrorage.init();
+  if (GStrorage.setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+    await SystemChrome.setPreferredOrientations(
+      //支持竖屏与横屏
       [
-        FileHandler(await getLogsPath()),
-        ConsoleHandler(
-          enableDeviceParameters: false,
-          enableApplicationParameters: false,
-        )
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
       ],
     );
-
-    final Catcher2Options releaseConfig = Catcher2Options(
-      SilentReportMode(),
-      [FileHandler(await getLogsPath())],
+  } else {
+    await SystemChrome.setPreferredOrientations(
+      //支持竖屏
+      [
+        DeviceOrientation.portraitUp,
+      ],
     );
+  }
+  await setupServiceLocator();
+  Request();
+  await Request.setCookie();
+  RecommendFilter();
 
-    Catcher2(
-      debugConfig: debugConfig,
-      releaseConfig: releaseConfig,
-      runAppFunction: () {
-        runApp(const MyApp());
-      },
-    );
+  // 异常捕获 logo记录
+  final Catcher2Options debugConfig = Catcher2Options(
+    SilentReportMode(),
+    [
+      FileHandler(await getLogsPath()),
+      ConsoleHandler(
+        enableDeviceParameters: false,
+        enableApplicationParameters: false,
+      )
+    ],
+  );
+
+  final Catcher2Options releaseConfig = Catcher2Options(
+    SilentReportMode(),
+    [FileHandler(await getLogsPath())],
+  );
+
+  Catcher2(
+    debugConfig: debugConfig,
+    releaseConfig: releaseConfig,
+    runAppFunction: () {
+      runApp(const MyApp());
+    },
+  );
+
 
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -70,8 +87,8 @@ void main() async {
       statusBarColor: Colors.transparent,
     ));
     Data.init();
+    GStrorage.lazyInit();
     PiliSchame.init();
-  });
 }
 
 class MyApp extends StatelessWidget {

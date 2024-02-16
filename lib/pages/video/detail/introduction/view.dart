@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/pages/mine/controller.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
@@ -122,9 +123,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late final VideoDetailController videoDetailCtr;
   late final Map<dynamic, dynamic> videoItem;
 
-  final Box<dynamic> localCache = GStrorage.localCache;
   final Box<dynamic> setting = GStrorage.setting;
-  late double sheetHeight;
 
   late final bool loadingStatus; // 加载状态
 
@@ -152,7 +151,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     videoItem = videoIntroController.videoItem!;
-    sheetHeight = localCache.get('sheetHeight');
 
     loadingStatus = widget.loadingStatus;
     owner = loadingStatus ? videoItem['owner'] : widget.videoDetail!.owner;
@@ -285,7 +283,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 7, bottom: 6),
                           child: Row(
-                            children: [
+                            children: <Widget>[
                               StatView(
                                 theme: 'gray',
                                 view: !loadingStatus
@@ -313,6 +311,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                   color: t.colorScheme.outline,
                                 ),
                               ),
+                              if (MineController.anonymity) ...<Widget>[
+                                const SizedBox(width: 10),
+                                Icon(
+                                  Icons.visibility_off_outlined,
+                                  size: 15,
+                                  color: t.colorScheme.outline,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '无痕模式',
+                                  style: TextStyle(fontSize: 12,color: t.colorScheme.outline),
+                                ),
+                              ],
                               const SizedBox(width: 10),
                               if (videoIntroController.isShowOnlineTotal)
                                 Obx(
@@ -367,7 +378,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         cid: videoIntroController.lastPlayCid.value != 0
                             ? videoIntroController.lastPlayCid.value
                             : widget.videoDetail!.pages!.first.cid,
-                        sheetHeight: sheetHeight,
                         changeFuc: (bvid, cid, aid) => videoIntroController
                             .changeSeasonOrbangu(bvid, cid, aid),
                       ),
@@ -379,7 +389,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     Obx(() => PagesPanel(
                           pages: widget.videoDetail!.pages!,
                           cid: videoIntroController.lastPlayCid.value,
-                          sheetHeight: sheetHeight,
                           changeFuc: (cid) =>
                               videoIntroController.changeSeasonOrbangu(
                                   videoIntroController.bvid, cid, null),

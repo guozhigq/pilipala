@@ -5,6 +5,116 @@ import 'api.dart';
 import 'init.dart';
 
 class MsgHttp {
+
+  static Future msgFeedReplyMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedReply, data: {
+      'id': cursor == -1 ? null : cursor,
+      'reply_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedAtMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedAt,data: {
+      'id': cursor == -1 ? null : cursor,
+      'at_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedLikeMe({int cursor = -1, int cursorTime = -1}) async {
+    var res = await Request().get(Api.msgFeedLike,data: {
+      'id': cursor == -1 ? null : cursor,
+      'like_time': cursorTime == -1 ? null : cursorTime,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedSysUserNotify() async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.msgSysUserNotify, data: {
+      'csrf': csrf,
+      'csrf': csrf,
+      'page_size': 20,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedSysUnifiedNotify() async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.msgSysUnifiedNotify, data: {
+      'csrf': csrf,
+      'csrf': csrf,
+      'page_size': 10,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+  static Future msgFeedUnread() async {
+    var res = await Request().get(Api.msgFeedUnread);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
   // 会话列表
   static Future sessionList({int? endTs}) async {
     Map<String, dynamic> params = {
@@ -83,6 +193,37 @@ class MsgHttp {
         'status': false,
         'date': [],
         'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future ackSessionMsg({
+    int? talkerId,
+    int? ackSeqno,
+  }) async {
+    String csrf = await Request.getCsrf();
+    Map params = await WbiSign().makSign({
+      'talker_id': talkerId,
+      'session_type': 1,
+      'ack_seqno': ackSeqno,
+      'build': 0,
+      'mobi_app': 'web',
+      'csrf_token': csrf,
+      'csrf': csrf
+    });
+    var res = await Request().get(Api.ackSessionMsg, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': "message: ${res.data['message']},"
+            " msg: ${res.data['msg']},"
+            " code: ${res.data['code']}",
       };
     }
   }

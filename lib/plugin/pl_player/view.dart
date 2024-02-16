@@ -48,6 +48,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late VideoController videoController;
   final PLVideoPlayerController _ctr = Get.put(PLVideoPlayerController());
 
+  final GlobalKey _playerKey = GlobalKey();
   // bool _mountSeekBackwardButton = false;
   // bool _mountSeekForwardButton = false;
   // bool _hideSeekBackwardButton = false;
@@ -71,11 +72,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
+  late bool fullScreenGestureReverse;
   late bool enableBackgroundPlay;
-  late double screenWidth;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
+  // 记录上一次音量调整值作平均，避免音量调整抖动
+  double lastVolume = -1.0;
 
   void onDoubleTapSeekBackward() {
     _ctr.onDoubleTapSeekBackward();
@@ -114,7 +117,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void initState() {
     super.initState();
-    screenWidth = Get.size.width;
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     videoController = widget.controller.videoController!;
@@ -125,6 +127,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         defaultValue: BtmProgresBehavior.values.first.code);
     enableQuickDouble =
         setting.get(SettingBoxKey.enableQuickDouble, defaultValue: true);
+    fullScreenGestureReverse = setting.get(SettingBoxKey.fullScreenGestureReverse,
+        defaultValue: false);
     enableBackgroundPlay =
         setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: false);
     Future.microtask(() async {
@@ -208,6 +212,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     );
     return Stack(
       fit: StackFit.passthrough,
+      key: _playerKey,
       children: <Widget>[
         Obx(
           () => Video(
@@ -443,7 +448,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               if (_.videoType.value == 'live' || _.controlsLock.value) {
                 return;
               }
-              final double totalWidth = MediaQuery.sizeOf(context).width;
+              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
+              final double totalWidth = renderBox.size.width;
               final double tapPosition = details.localPosition.dx;
               final double sectionWidth = totalWidth / 3;
               String type = 'left';
@@ -473,7 +479,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               // final double tapPosition = details.localPosition.dx;
               final int curSliderPosition =
                   _.sliderPosition.value.inMilliseconds;
-              final double scale = 90000 / MediaQuery.sizeOf(context).width;
+              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
+              final double scale = 90000 / renderBox.size.width;
               final Duration pos = Duration(
                   milliseconds:
                       curSliderPosition + (details.delta.dx * scale).round());
@@ -492,7 +499,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             },
             // 垂直方向 音量/亮度调节
             onVerticalDragUpdate: (DragUpdateDetails details) async {
-              final double totalWidth = MediaQuery.sizeOf(context).width;
+              RenderBox renderBox = _playerKey.currentContext!.findRenderObject() as RenderBox;
+              final double totalWidth = renderBox.size.width;
               final double tapPosition = details.localPosition.dx;
               final double sectionWidth = totalWidth / 3;
               final double delta = details.delta.dy;
@@ -508,10 +516,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               }
               if (tapPosition < sectionWidth) {
                 // 左边区域 👈
-                final double level = (_.isFullScreen.value
-                        ? Get.size.height
-                        : screenWidth * 9 / 16) *
-                    3;
+                final double level = renderBox.size.height * 3;
                 final double brightness =
                     _ctr.brightnessValue.value - delta / level;
                 final double result = brightness.clamp(0.0, 1.0);
@@ -520,30 +525,33 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // 全屏
                 final double dy = details.delta.dy;
                 const double threshold = 7.0; // 滑动阈值
+                void fullScreenTrigger(bool status) async {
+                  lastFullScreenToggleTime = DateTime.now();
+                  await widget.controller.triggerFullScreen(status: status);
+                }
                 if (dy > _distance && dy > threshold) {
-                  if (_.isFullScreen.value) {
-                    lastFullScreenToggleTime = DateTime.now();
-                    // 下滑退出全屏
-                    await widget.controller.triggerFullScreen(status: false);
+                  // 下滑退出全屏/进入全屏
+                  if (_.isFullScreen.value ^ fullScreenGestureReverse) {
+                    fullScreenTrigger(fullScreenGestureReverse);
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
-                  if (!_.isFullScreen.value) {
-                    lastFullScreenToggleTime = DateTime.now();
-                    // 上滑进入全屏
-                    await widget.controller.triggerFullScreen();
+                  // 上划进入全屏/退出全屏
+                  if (!_.isFullScreen.value ^ fullScreenGestureReverse) {
+                    fullScreenTrigger(!fullScreenGestureReverse);
                   }
                   _distance = 0.0;
                 }
                 _distance = dy;
               } else {
                 // 右边区域 👈
-                final double level = (_.isFullScreen.value
-                        ? Get.size.height
-                        : screenWidth * 9 / 16) *
-                    3;
-                final double volume = _ctr.volumeValue.value - delta / level;
+                final double level = renderBox.size.height * 0.5;
+                if(lastVolume < 0) {
+                  lastVolume = _ctr.volumeValue.value;
+                }
+                final double volume = (lastVolume + _ctr.volumeValue.value - delta / level)/2;
                 final double result = volume.clamp(0.0, 1.0);
+                lastVolume = result;
                 setVolume(result);
               }
             },
@@ -586,7 +594,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         /// 进度条 live模式下禁用
-
         Obx(
           () {
             final int value = _.sliderPositionSeconds.value;
@@ -610,7 +617,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             }
 
             if (_.videoType.value == 'live') {
-              return const SizedBox();
+              return nil;
             }
             if (value > max || max <= 0) {
               return nil;
@@ -756,11 +763,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           )
                         : nil,
                   ),
-                  Expanded(
-                    child: SizedBox(
-                      width: MediaQuery.sizeOf(context).width / 4,
-                    ),
-                  ),
+                  const Spacer(),
+                  // Expanded(
+                  //   child: SizedBox(
+                  //     width: context.width / 4,
+                  //   ),
+                  // ),
                   Expanded(
                     child: _ctr.mountSeekForwardButton.value
                         ? TweenAnimationBuilder<double>(

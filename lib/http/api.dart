@@ -233,10 +233,6 @@ class Api {
   static const String liveRoomInfo =
       '${HttpString.liveBaseUrl}/xlive/web-room/v2/index/getRoomPlayInfo';
 
-  // 直播间详情 H5
-  static const String liveRoomInfoH5 =
-      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getH5InfoByRoom';
-
   // 用户信息 需要Wbi签名
   // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
   static const String memberInfo = '/x/space/wbi/acc/info';
@@ -335,6 +331,23 @@ class Api {
   // 获取指定分组下的up
   static const String followUpGroup = '/x/relation/tag';
 
+  // 获取消息中心未读信息
+  static const String msgFeedUnread = '/x/msgfeed/unread';
+  //https://api.bilibili.com/x/msgfeed/reply?platform=web&build=0&mobi_app=web
+  static const String msgFeedReply = '/x/msgfeed/reply';
+  //https://api.bilibili.com/x/msgfeed/at?platform=web&build=0&mobi_app=web
+  static const String msgFeedAt = '/x/msgfeed/at';
+  //https://api.bilibili.com/x/msgfeed/like?platform=web&build=0&mobi_app=web
+  static const String msgFeedLike = '/x/msgfeed/like';
+  //https://message.bilibili.com/x/sys-msg/query_user_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=20&build=0&mobi_app=web
+  static const String msgSysUserNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
+  //https://message.bilibili.com/x/sys-msg/query_unified_notify?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&page_size=10&build=0&mobi_app=web
+  static const String msgSysUnifiedNotify = '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  // 系统信息光标更新（已读标记）
+  //https://message.bilibili.com/x/sys-msg/update_cursor?csrf=31b0caa533cea4d1a1bd2e921f045ec6&csrf=31b0caa533cea4d1a1bd2e921f045ec6&cursor=1705288500000000000&has_up=0&build=0&mobi_app=web
+  static const String msgSysUpdateCursor = '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
   /// 私聊
   ///  'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions?
   /// session_type=1&
@@ -377,7 +390,7 @@ class Api {
   /// mobi_app: web
   /// csrf_token:
   /// csrf:
-  static const String updateAck =
+  static const String ackSessionMsg =
       '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
 
   // 获取某个动态详情

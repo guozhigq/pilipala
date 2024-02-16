@@ -22,8 +22,6 @@ class RcmdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    crossAxisCount.value =
-        setting.get(SettingBoxKey.customRows, defaultValue: 2);
     enableSaveLastData =
         setting.get(SettingBoxKey.enableSaveLastData, defaultValue: false);
     defaultRcmdType =

@@ -9,6 +9,7 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -327,6 +328,16 @@ class Utils {
     return '$formattedHours:$formattedMinutes';
   }
 
+  static double getSheetHeight(BuildContext context) {
+    double height = context.height.abs();
+    double width = context.width.abs();
+    if (height > width) {
+      return height * 0.7;
+    }
+    //横屏状态
+    return height;
+  }
+
   static String appSign(
       Map<String, dynamic> params, String appkey, String appsec) {
     params['appkey'] = appkey;
@@ -339,5 +350,18 @@ class Utils {
     var md5String = md5Digest.toString(); // 获取MD5哈希值
 
     return md5String;
+  }
+
+  static String generateRandomString(int minLength, int maxLength) {
+    const String printable = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ';
+
+    var random = Random();
+    int length = minLength + random.nextInt(maxLength - minLength + 1);
+    return List<String>.generate(length, (index) => printable[random.nextInt(printable.length)]).join();
+  }
+
+  static String base64EncodeRandomString(int minLength, int maxLength) {
+    String randomString = generateRandomString(minLength, maxLength);
+    return base64.encode(utf8.encode(randomString));
   }
 }

@@ -77,7 +77,9 @@ class _ActionPanelState extends State<ActionPanel> {
         Expanded(
           flex: 1,
           child: TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+                SmartDialog.showToast('暂不支持');
+            },
             icon: const Icon(
               FontAwesomeIcons.shareFromSquare,
               size: 16,

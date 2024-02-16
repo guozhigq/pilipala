@@ -99,6 +99,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage> {
             final Map data = snapshot.data as Map;
             if (data['status']) {
               List messageList = _whisperDetailController.messageList;
+              _whisperDetailController.ackSessionMsg();
               return Obx(
                 () => messageList.isEmpty
                     ? const SizedBox()

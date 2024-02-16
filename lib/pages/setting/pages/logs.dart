@@ -45,14 +45,19 @@ class _LogsPageState extends State<LogsPage> {
     }).toList();
     List<Map<String, dynamic>> result = [];
     for (String i in contentList) {
-      DateTime? date;
+      dynamic date;
       String body = i
           .split("\n")
           .map((l) {
             if (l.startsWith("Crash occurred on")) {
-              date = DateTime.parse(
-                l.split("Crash occurred on")[1].trim().split('.')[0],
-              );
+              try {
+                date = DateTime.parse(
+                  l.split("Crash occurred on")[1].trim().split('.')[0],
+                );
+              } catch (e) {
+                print(e.toString());
+                date = l.toString();
+              }
               return "";
             }
             return l;

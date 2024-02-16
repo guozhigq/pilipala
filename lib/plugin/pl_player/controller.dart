@@ -13,6 +13,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/pages/mine/controller.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
@@ -30,6 +31,7 @@ Box localCache = GStrorage.localCache;
 class PlPlayerController {
   Player? _videoPlayerController;
   VideoController? _videoController;
+  void Function({bool? status})? triggerFullscreenCallback;
 
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
@@ -230,6 +232,11 @@ class PlPlayerController {
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
+
+  void setTriggerFullscreenCallback(
+      void Function({bool? status}) triggerFullscreenCallback) {
+    this.triggerFullscreenCallback = triggerFullscreenCallback;
+  }
 
   void updateSliderPositionSecond() {
     int newSecond = _sliderPosition.value.inSeconds;
@@ -951,7 +958,10 @@ class PlPlayerController {
       /// 进入全屏
       await enterFullScreen();
       if (mode == FullScreenMode.vertical ||
-          (mode == FullScreenMode.auto && direction.value == 'vertical')) {
+          (mode == FullScreenMode.auto && direction.value == 'vertical') ||
+          (mode == FullScreenMode.ratio &&
+              (Get.height / Get.width < 1.25 ||
+                  direction.value == 'vertical'))) {
         await verticalScreen();
       } else {
         await landScape();
@@ -992,8 +1002,13 @@ class PlPlayerController {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
       // Get.back();
       exitFullScreen();
-      await verticalScreen();
+      if (!setting.get(SettingBoxKey.horizontalScreen, defaultValue: false)) {
+        await verticalScreen();
+      }
       toggleFullScreen(false);
+    }
+    if (triggerFullscreenCallback != null) {
+      triggerFullscreenCallback!(status: status);
     }
   }
 
@@ -1024,7 +1039,7 @@ class PlPlayerController {
 
   // 记录播放记录
   Future makeHeartBeat(int progress, {type = 'playing'}) async {
-    if (!_enableHeart) {
+    if (!_enableHeart || MineController.anonymity) {
       return false;
     }
     if (videoType.value == 'live') {

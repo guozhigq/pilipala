@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/quality.dart';
@@ -116,6 +118,21 @@ class _PlaySettingState extends State<PlaySetting> {
             setKey: SettingBoxKey.enableAutoExit,
             defaultVal: false,
           ),
+          SetSwitchItem(
+            title: '横屏适配（测试）',
+            subTitle: '开启该项在播放页启用横屏布局与逻辑',
+            setKey: SettingBoxKey.horizontalScreen,
+            defaultVal: false,
+            callFn: (value) {
+              if (value) {
+                autoScreen();
+                SmartDialog.showToast('已开启横屏适配');
+              } else {
+                AutoOrientation.portraitUpMode();
+                SmartDialog.showToast('已关闭横屏适配');
+              }
+            }
+          ),
           const SetSwitchItem(
             title: '开启硬解',
             subTitle: '以较低功耗播放视频',
@@ -139,6 +156,12 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '左侧双击快退，右侧双击快进',
             setKey: SettingBoxKey.enableQuickDouble,
             defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '全屏手势反向',
+            subTitle: '默认播放器中部向上滑动进入全屏，向下退出\n开启后向下全屏，向上退出',
+            setKey: SettingBoxKey.fullScreenGestureReverse,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '弹幕开关',

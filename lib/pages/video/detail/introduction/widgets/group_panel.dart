@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/tags.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
+
+import '../../../../../utils/utils.dart';
 
 class GroupPanel extends StatefulWidget {
   final int? mid;
@@ -17,8 +17,6 @@ class GroupPanel extends StatefulWidget {
 }
 
 class _GroupPanelState extends State<GroupPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
-  late double sheetHeight;
   late Future _futureBuilderFuture;
   late List<MemberTagItemModel> tagsList;
   bool showDefault = true;
@@ -26,7 +24,6 @@ class _GroupPanelState extends State<GroupPanel> {
   @override
   void initState() {
     super.initState();
-    sheetHeight = localCache.get('sheetHeight');
     _futureBuilderFuture = MemberHttp.followUpTags();
   }
 
@@ -56,7 +53,7 @@ class _GroupPanelState extends State<GroupPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: sheetHeight,
+      height: Utils.getSheetHeight(context),
       color: Theme.of(context).colorScheme.background,
       child: Column(
         children: <Widget>[

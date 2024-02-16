@@ -133,6 +133,7 @@ class ChatItem extends StatelessWidget {
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
+            textAlign: TextAlign.center,
             style: TextStyle(
               letterSpacing: 0.6,
               height: 5,
@@ -199,17 +200,22 @@ class ChatItem extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () async {
-                  SmartDialog.showLoading();
-                  var bvid = content["bvid"];
-                  final int cid = await SearchHttp.ab2c(bvid: bvid);
-                  final String heroTag = Utils.makeHeroTag(bvid);
-                  SmartDialog.dismiss<dynamic>().then(
-                        (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
-                        arguments: <String, String?>{
-                          'pic': content['thumb'],
-                          'heroTag': heroTag,
-                        }),
-                  );
+                  try {
+                    SmartDialog.showLoading();
+                    var bvid = content["bvid"];
+                    final int cid = await SearchHttp.ab2c(bvid: bvid);
+                    final String heroTag = Utils.makeHeroTag(bvid);
+                    SmartDialog.dismiss<dynamic>().then(
+                      (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                          arguments: <String, String?>{
+                            'pic': content['thumb'],
+                            'heroTag': heroTag,
+                          }),
+                    );
+                  } catch (err) {
+                    SmartDialog.dismiss();
+                    SmartDialog.showToast(err.toString());
+                  }
                 },
                 child: NetworkImgLayer(
                   width: 220,
@@ -335,7 +341,7 @@ class ChatItem extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  Utils.timeFormat(int.parse(i['field3'])),
+                                  i['field3'],
                                   style: TextStyle(
                                     letterSpacing: 0.6,
                                     height: 1.5,

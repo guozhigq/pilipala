@@ -3,17 +3,17 @@ import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 
+import '../../../../../utils/utils.dart';
+
 class PagesPanel extends StatefulWidget {
   const PagesPanel({
     super.key,
     required this.pages,
     this.cid,
-    this.sheetHeight,
     this.changeFuc,
   });
   final List<Part> pages;
   final int? cid;
-  final double? sheetHeight;
   final Function? changeFuc;
 
   @override
@@ -96,7 +96,7 @@ class _PagesPanelState extends State<PagesPanel> {
                             _scrollController.jumpTo(currentIndex * 56);
                           });
                           return Container(
-                            height: widget.sheetHeight,
+                            height: Utils.getSheetHeight(context),
                             color: Theme.of(context).colorScheme.background,
                             child: Column(
                               children: [

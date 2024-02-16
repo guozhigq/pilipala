@@ -42,8 +42,6 @@ class GStrorage {
         return deletedEntries > 10;
       },
     );
-    // 视频设置
-    video = await Hive.openBox('video');
   }
 
   static void regAdapter() {
@@ -52,6 +50,11 @@ class GStrorage {
     Hive.registerAdapter(LevelInfoAdapter());
     Hive.registerAdapter(HotSearchModelAdapter());
     Hive.registerAdapter(HotSearchItemAdapter());
+  }
+
+  static Future<void> lazyInit() async {
+    // 视频设置
+    video = await Hive.openBox('video');
   }
 
   static Future<void> close() async {
@@ -89,6 +92,7 @@ class SettingBoxKey {
       enableAutoBrightness = 'enableAutoBrightness',
       enableAutoEnter = 'enableAutoEnter',
       enableAutoExit = 'enableAutoExit',
+      horizontalScreen = 'horizontalScreen',
       p1080 = 'p1080',
       enableCDN = 'enableCDN',
       autoPiP = 'autoPiP',
@@ -96,11 +100,13 @@ class SettingBoxKey {
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
+      fullScreenGestureReverse = 'fullScreenGestureReverse',
       enableShowDanmaku = 'enableShowDanmaku',
       enableBackgroundPlay = 'enableBackgroundPlay',
 
       /// 隐私
       blackMidsList = 'blackMidsList',
+      anonymity = 'anonymity',
 
       /// 推荐
       enableRcmdDynamic = 'enableRcmdDynamic',
@@ -130,7 +136,7 @@ class SettingBoxKey {
       customColor = 'customColor', // 自定义主题色
       enableSingleRow = 'enableSingleRow', // 首页单列
       displayMode = 'displayMode',
-      customRows = 'customRows', // 自定义列
+      maxRowWidth = 'maxRowWidth', // 首页列最大宽度（dp）
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏

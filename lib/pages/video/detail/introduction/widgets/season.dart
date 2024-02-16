@@ -5,17 +5,17 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../../../utils/utils.dart';
+
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({
     super.key,
     required this.ugcSeason,
     this.cid,
-    this.sheetHeight,
     this.changeFuc,
   });
   final UgcSeason ugcSeason;
   final int? cid;
-  final double? sheetHeight;
   final Function? changeFuc;
 
   @override
@@ -104,7 +104,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                     itemScrollController.jumpTo(index: currentIndex);
                   });
                   return Container(
-                    height: widget.sheetHeight,
+                    height: Utils.getSheetHeight(context),
                     color: Theme.of(context).colorScheme.background,
                     child: Column(
                       children: [
@@ -131,6 +131,9 @@ class _SeasonPanelState extends State<SeasonPanel> {
                               Theme.of(context).dividerColor.withOpacity(0.1),
                         ),
                         Expanded(
+                            child: Padding(
+                          padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).padding.bottom),
                           child: Material(
                             child: ScrollablePositionedList.builder(
                               itemCount: episodes.length,
@@ -163,7 +166,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                               itemScrollController: itemScrollController,
                             ),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                   );
