@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/member.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class HiddenSetting extends StatefulWidget {
@@ -13,15 +11,14 @@ class HiddenSetting extends StatefulWidget {
 }
 
 class _HiddenSettingState extends State<HiddenSetting> {
-  bool userLogin = false;
-  Box userInfoCache = GStrorage.userInfo;
-  var userInfo;
 
   @override
   void initState() {
     super.initState();
-    userInfo = userInfoCache.get('userInfoCache');
-    userLogin = userInfo != null;
+  }
+
+  void test(Object? val) {
+    print(val);
   }
 
   @override
@@ -36,7 +33,7 @@ class _HiddenSettingState extends State<HiddenSetting> {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          '隐私设置',
+          '隐藏设置',
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -44,25 +41,42 @@ class _HiddenSettingState extends State<HiddenSetting> {
         children: [
           ListTile(
             onTap: () {
-              if (!userLogin) {
-                SmartDialog.showToast('登录后查看');
-                return;
-              }
-              Get.toNamed('/blackListPage');
+              RxInt zero = 0.obs;
+              1 / zero.value;
             },
             dense: false,
-            title: Text('黑名单管理', style: titleStyle),
-            subtitle: Text('已拉黑用户', style: subTitleStyle),
+            title: Text('产生除以0异常', style: titleStyle),
           ),
           ListTile(
             onTap: () {
-              if (!userLogin) {
-                SmartDialog.showToast('请先登录');
-              }
-              MemberHttp.cookieToKey();
+              List list = [];
+              test(list[0]);
             },
             dense: false,
-            title: Text('刷新access_key', style: titleStyle),
+            title: Text('产生数组越界异常', style: titleStyle),
+          ),
+          ListTile(
+            onTap: () {
+              RxInt? integer;
+              test(integer!.value);
+            },
+            dense: false,
+            title: Text('产生空异常', style: titleStyle),
+            subtitle: Text('空安全: 喵喵喵?', style: subTitleStyle),
+          ),
+          ListTile(
+            onTap: () {
+              int.parse("壹");
+            },
+            dense: false,
+            title: Text('产生整数解析异常', style: titleStyle),
+          ),
+          ListTile(
+            onTap: () {
+              throw Exception("测试异常");
+            },
+            dense: false,
+            title: Text('产生测试异常', style: titleStyle),
           ),
         ],
       ),
