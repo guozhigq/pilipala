@@ -36,8 +36,7 @@ class _UpPanelState extends State<UpPanel> {
     }
     upList.insert(
       0,
-      UpItem(
-          face: 'https://files.catbox.moe/8uc48f.png', uname: '全部动态', mid: -1),
+      UpItem(face: '', uname: '全部动态', mid: -1),
     );
     userInfo = userInfoCache.get('userInfoCache');
     upList.insert(
@@ -56,7 +55,7 @@ class _UpPanelState extends State<UpPanel> {
       floating: true,
       pinned: false,
       delegate: _SliverHeaderDelegate(
-          height: 124,
+          height: 126,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,6 +177,9 @@ class _UpPanelState extends State<UpPanel> {
       },
       onLongPress: () {
         feedBack();
+        if (data.mid == -1) {
+          return;
+        }
         String heroTag = Utils.makeHeroTag(data.mid);
         Get.toNamed('/member?mid=${data.mid}',
             arguments: {'face': data.face, 'heroTag': heroTag});
@@ -205,12 +207,19 @@ class _UpPanelState extends State<UpPanel> {
                 backgroundColor: data.type == 'live'
                     ? Theme.of(context).colorScheme.secondaryContainer
                     : Theme.of(context).colorScheme.primary,
-                child: NetworkImgLayer(
-                  width: 49,
-                  height: 49,
-                  src: data.face,
-                  type: 'avatar',
-                ),
+                child: data.face != ''
+                    ? NetworkImgLayer(
+                        width: 50,
+                        height: 50,
+                        src: data.face,
+                        type: 'avatar',
+                      )
+                    : const CircleAvatar(
+                        radius: 25,
+                        backgroundImage: AssetImage(
+                          'assets/images/noface.jpeg',
+                        ),
+                      ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4),
@@ -278,13 +287,11 @@ class UpPanelSkeleton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 49,
-                height: 49,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(24),
-                  ),
+                  borderRadius: BorderRadius.circular(50),
                 ),
               ),
               Container(
