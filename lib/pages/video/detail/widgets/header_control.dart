@@ -55,6 +55,11 @@ class _HeaderControlState extends State<HeaderControl> {
     speedsList = widget.controller!.speedsList;
   }
 
+  @override
+  void dispose() {
+    widget.floating?.dispose();
+    super.dispose();
+  }
   /// 设置面板
   void showSettingSheet() {
     showModalBottomSheet(
@@ -657,7 +662,7 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                   height: 45,
                   child: Center(child: Text('选择解码格式', style: titleStyle))),
               Expanded(
