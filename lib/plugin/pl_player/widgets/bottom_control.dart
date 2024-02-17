@@ -72,9 +72,11 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
           ),
           Row(
             children: [
-              PlayOrPauseButton(
-                controller: _,
-              ),
+              controller != null
+                  ? PlayOrPauseButton(
+                      controller: _,
+                    )
+                  : nil,
               const SizedBox(width: 4),
               // 播放时间
               Obx(() {
