@@ -102,14 +102,11 @@ class _ImagePreviewState extends State<ImagePreview>
     );
   }
 
-  // 设置状态栏图标透明
+  // 隐藏状态栏，避免遮挡图片内容
   setStatusBar() async {
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isAndroid) {
       await StatusBarControl.setHidden(true,
           animation: StatusBarAnimation.SLIDE);
-    }
-    if (Platform.isAndroid) {
-      await StatusBarControl.setColor(Colors.transparent);
     }
   }
 
