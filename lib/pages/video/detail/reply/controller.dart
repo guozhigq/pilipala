@@ -53,9 +53,13 @@ class VideoReplyController extends GetxController {
   }
 
   Future queryReplyList({type = 'init'}) async {
+    if (isLoadingMore) {
+      return;
+    }
     isLoadingMore = true;
     if (type == 'init') {
       currentPage = 0;
+      noMore.value = '';
     }
     if (noMore.value == '没有更多了') {
       return;

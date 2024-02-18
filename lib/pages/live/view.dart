@@ -11,7 +11,6 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
-import 'package:pilipala/pages/rcmd/index.dart';
 
 import 'controller.dart';
 import 'widgets/live_item.dart';
@@ -45,8 +44,8 @@ class _LivePageState extends State<LivePage>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('liveList', const Duration(seconds: 1), () {
-            _liveController.isLoadingMore = true;
+          EasyThrottle.throttle('liveList', const Duration(milliseconds: 200),
+              () {
             _liveController.onLoad();
           });
         }
@@ -108,24 +107,20 @@ class _LivePageState extends State<LivePage>
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
-                        fn: () => {},
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _liveController.queryLiveList('init');
+                          });
+                        },
                       );
                     }
                   } else {
-                    // 缓存数据
-                    if (_liveController.liveList.length > 1) {
-                      return contentGrid(
-                          _liveController, _liveController.liveList);
-                    }
-                    // 骨架屏
-                    else {
-                      return contentGrid(_liveController, []);
-                    }
+                    return contentGrid(_liveController, []);
                   }
                 },
               ),
             ),
-            LoadingMore(ctr: _liveController)
           ],
         ),
       ),

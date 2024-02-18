@@ -438,7 +438,7 @@ class _HeaderControlState extends State<HeaderControl> {
           }),
           actions: <Widget>[
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),

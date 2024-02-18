@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/follow_search/view.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -104,7 +105,8 @@ class Routes {
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
     // 推荐设置
-    CustomGetPage(name: '/recommendSetting', page: () => const RecommendSetting()),
+    CustomGetPage(
+        name: '/recommendSetting', page: () => const RecommendSetting()),
     // 播放设置
     CustomGetPage(name: '/playSetting', page: () => const PlaySetting()),
     // 外观设置
@@ -156,6 +158,8 @@ class Routes {
         name: '/memberSeasons', page: () => const MemberSeasonsPage()),
     // 日志
     CustomGetPage(name: '/logs', page: () => const LogsPage()),
+    // 搜索关注
+    CustomGetPage(name: '/followSearch', page: () => const FollowSearchPage()),
   ];
 }
 

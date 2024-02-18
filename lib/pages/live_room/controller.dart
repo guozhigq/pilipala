@@ -3,6 +3,7 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
 import 'package:pilipala/models/live/room_info.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import '../../models/live/room_info_h5.dart';
 
 class LiveRoomController extends GetxController {
   String cover = '';
@@ -14,13 +15,7 @@ class LiveRoomController extends GetxController {
   RxBool volumeOff = false.obs;
   PlPlayerController plPlayerController =
       PlPlayerController.getInstance(videoType: 'live');
-
-  // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
-  //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
-  //   pipEnabled: true,
-  //   controlsStyle: ControlsStyle.live,
-  //   enabledButtons: const EnabledButtons(pip: true),
-  // );
+  Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
 
   @override
   void onInit() {
@@ -36,11 +31,10 @@ class LiveRoomController extends GetxController {
         cover = liveItem.cover;
       }
     }
-    queryLiveInfo();
   }
 
-  playerInit(source) {
-    plPlayerController.setDataSource(
+  playerInit(source) async {
+    await plPlayerController.setDataSource(
       DataSource(
         videoSource: source,
         audioSource: null,
@@ -66,7 +60,8 @@ class LiveRoomController extends GetxController {
       String videoUrl = (item.urlInfo?.first.host)! +
           item.baseUrl! +
           item.urlInfo!.first.extra!;
-      playerInit(videoUrl);
+      await playerInit(videoUrl);
+      return res;
     }
   }
 
@@ -79,5 +74,13 @@ class LiveRoomController extends GetxController {
       volume = value;
       volumeOff.value = true;
     }
+  }
+
+  Future queryLiveInfoH5() async {
+    var res = await LiveHttp.liveRoomInfoH5(roomId: roomId);
+    if (res['status']) {
+      roomInfoH5.value = res['data'];
+    }
+    return res;
   }
 }

@@ -19,6 +19,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailController extends GetxController
@@ -61,7 +62,7 @@ class VideoDetailController extends GetxController
   Box localCache = GStrorage.localCache;
   Box setting = GStrorage.setting;
 
-  int oid = 0;
+  RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用
   int fRpid = 0;
 
@@ -135,13 +136,14 @@ class VideoDetailController extends GetxController
         defaultValue: VideoDecodeFormats.values.last.code);
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
+    oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
   }
 
   showReplyReplyPanel() {
     PersistentBottomSheetController? ctr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
-        oid: oid,
+        oid: oid.value,
         rpid: fRpid,
         closePanel: () => {
           fRpid = 0,

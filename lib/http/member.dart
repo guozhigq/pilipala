@@ -101,10 +101,13 @@ class MemberHttp {
         'data': MemberArchiveDataModel.fromJson(res.data['data'])
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -123,10 +126,13 @@ class MemberHttp {
         'data': DynamicsDataModel.fromJson(res.data['data']),
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -453,6 +459,43 @@ class MemberHttp {
     var res = await Request().get(Api.getMemberViewApi, data: {'mid': mid});
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 搜索follow
+  static Future getfollowSearch({
+    required int mid,
+    required int ps,
+    required int pn,
+    required String name,
+  }) async {
+    Map<String, dynamic> data = {
+      'vmid': mid,
+      'pn': pn,
+      'ps': ps,
+      'order': 'desc',
+      'order_type': 'attention',
+      'gaia_source': 'main_web',
+      'name': name,
+      'web_location': 333.999,
+    };
+    Map params = await WbiSign().makSign(data);
+    var res = await Request().get(Api.followSearch, data: {
+      ...data,
+      'w_rid': params['w_rid'],
+      'wts': params['wts'],
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': FollowDataModel.fromJson(res.data['data'])
+      };
     } else {
       return {
         'status': false,
