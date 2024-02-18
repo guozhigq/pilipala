@@ -305,11 +305,9 @@ class VideoIntroController extends GetxController {
         delIds: favStatus == 1 ? '$defaultFolderId' : '',
       );
       if (result['status']) {
-        if (result['data']['prompt']) {
-          // 重新获取收藏状态
-          await queryHasFavVideo();
-          SmartDialog.showToast('✅ 操作成功');
-        }
+        // 重新获取收藏状态
+        await queryHasFavVideo();
+        SmartDialog.showToast('✅ 操作成功');
       } else {
         SmartDialog.showToast(result['msg']);
       }
@@ -334,14 +332,12 @@ class VideoIntroController extends GetxController {
         delIds: delMediaIdsNew.join(','));
     SmartDialog.dismiss();
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        await queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      Get.back();
+      // 重新获取收藏状态
+      await queryHasFavVideo();
+      SmartDialog.showToast('✅ 操作成功');
     } else {
       SmartDialog.showToast(result['msg']);
     }

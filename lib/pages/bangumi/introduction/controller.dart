@@ -218,14 +218,12 @@ class BangumiIntroController extends GetxController {
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      // 重新获取收藏状态
+      queryHasFavVideo();
+      SmartDialog.showToast('✅ 操作成功');
+      Get.back();
     }
   }
 
