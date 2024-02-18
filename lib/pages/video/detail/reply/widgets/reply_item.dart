@@ -12,6 +12,7 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -620,26 +621,34 @@ InlineSpan buildContent(
                   ..onTap = () async {
                     final String title = content.jumpUrl[matchStr]['title'];
                     if (appUrlSchema == '') {
-                      final String redirectUrl =
-                          await UrlUtils.parseRedirectUrl(matchStr);
-                      final String pathSegment = Uri.parse(redirectUrl).path;
-                      final String lastPathSegment =
-                          pathSegment.split('/').last;
-                      if (lastPathSegment.startsWith('BV')) {
+                      if (matchStr.startsWith('BV')) {
                         UrlUtils.matchUrlPush(
-                          lastPathSegment,
+                          matchStr,
                           title,
-                          redirectUrl,
+                          '',
                         );
                       } else {
-                        Get.toNamed(
-                          '/webview',
-                          parameters: {
-                            'url': redirectUrl,
-                            'type': 'url',
-                            'pageTitle': title
-                          },
-                        );
+                        final String redirectUrl =
+                            await UrlUtils.parseRedirectUrl(matchStr);
+                        final String pathSegment = Uri.parse(redirectUrl).path;
+                        final String lastPathSegment =
+                            pathSegment.split('/').last;
+                        if (lastPathSegment.startsWith('BV')) {
+                          UrlUtils.matchUrlPush(
+                            lastPathSegment,
+                            title,
+                            redirectUrl,
+                          );
+                        } else {
+                          Get.toNamed(
+                            '/webview',
+                            parameters: {
+                              'url': redirectUrl,
+                              'type': 'url',
+                              'pageTitle': title
+                            },
+                          );
+                        }
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {
