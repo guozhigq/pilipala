@@ -229,9 +229,11 @@ class VideoDetailController extends GetxController
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction: (firstVideo.width! - firstVideo.height!) > 0
-          ? 'horizontal'
-          : 'vertical',
+      direction: firstVideo.width != null && firstVideo.height != null
+          ? ((firstVideo.width! - firstVideo.height!) > 0
+              ? 'horizontal'
+              : 'vertical')
+          : null,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
@@ -248,6 +250,21 @@ class VideoDetailController extends GetxController
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
+      if (data.acceptDesc!.isNotEmpty && data.acceptDesc!.contains('试看')) {
+        SmartDialog.showToast(
+          '该视频为专属视频，仅提供试看',
+          displayTime: const Duration(seconds: 3),
+        );
+        videoUrl = data.durl!.first.url!;
+        audioUrl = '';
+        defaultST = Duration.zero;
+        firstVideo = VideoItem();
+        if (autoPlay.value) {
+          await playerInit();
+          isShowCover.value = false;
+        }
+        return result;
+      }
       final List<VideoItem> allVideosList = data.dash!.video!;
       try {
         // 当前可播放的最高质量视频
