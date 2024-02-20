@@ -208,7 +208,7 @@ jobs:
           METHOD: sendMediaGroup
           path: |
             ./Pilipala-CI/Pili-${{ needs.update_version.outputs.new_version }}.ipa
-            ./Pilipala-CI/Pili-arm64-${{ needs.update_version.outputs.new_version }}.apk
+            ./Pilipala-CI/Pili-arm64-v8a-${{ needs.update_version.outputs.new_version }}.apk
             ./Pilipala-CI/Pili-armeabi-v7a-${{ needs.update_version.outputs.new_version }}.apk
             ./Pilipala-CI/Pili-x86_64-${{ needs.update_version.outputs.new_version }}.apk
           CONTEXT: "**Pre-release:** ${{ needs.update_version.outputs.new_version }}"
