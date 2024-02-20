@@ -197,6 +197,8 @@ jobs:
       #     prerelease: true
       #     allowUpdates: true
       #     artifacts: Pilipala-CI/*
+      - name: 列出文件
+        run: ls -1 ./Pilipala-CI
 
       - name: 发送到Telegram频道
         uses: xireiki/channel-post@main
