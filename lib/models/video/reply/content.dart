@@ -9,6 +9,7 @@ class ReplyContent {
     this.vote,
     this.richText,
     this.isText,
+    this.topicsMeta,
   });
 
   String? message;
@@ -20,6 +21,7 @@ class ReplyContent {
   Map? vote;
   Map? richText;
   bool? isText;
+  Map? topicsMeta;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
     message = json['message']
@@ -39,6 +41,7 @@ class ReplyContent {
     richText = json['rich_text'] ?? {};
     // 不包含@ 笔记 图片的时候，文字可折叠
     isText = atNameToMid!.isEmpty && vote!.isEmpty && pictures!.isEmpty;
+    topicsMeta = json['topics_meta'] ?? {};
   }
 }
 
