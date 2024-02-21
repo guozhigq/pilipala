@@ -477,4 +477,10 @@ class Api {
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
+
+  /// 用户动态主页
+  static const dynamicSpmPrefix = 'https://space.bilibili.com/1/dynamic';
+
+  /// 激活buvid3
+  static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 }
