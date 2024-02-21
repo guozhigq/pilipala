@@ -90,6 +90,8 @@ class VideoDetailController extends GetxController
   late String cacheDecode;
   late int cacheAudioQa;
 
+  PersistentBottomSheetController? replyReplyBottomSheetCtr;
+
   @override
   void onInit() {
     super.onInit();
@@ -140,7 +142,7 @@ class VideoDetailController extends GetxController
   }
 
   showReplyReplyPanel() {
-    PersistentBottomSheetController? ctr =
+    replyReplyBottomSheetCtr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
         oid: oid.value,
@@ -153,7 +155,7 @@ class VideoDetailController extends GetxController
         source: 'videoDetail',
       );
     });
-    ctr?.closed.then((value) {
+    replyReplyBottomSheetCtr?.closed.then((value) {
       fRpid = 0;
     });
   }
@@ -371,5 +373,12 @@ class VideoDetailController extends GetxController
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;
+  }
+
+  // mob端全屏状态关闭二级回复
+  hiddenReplyReplyPanel() {
+    replyReplyBottomSheetCtr != null
+        ? replyReplyBottomSheetCtr!.close()
+        : print('replyReplyBottomSheetCtr is null');
   }
 }
