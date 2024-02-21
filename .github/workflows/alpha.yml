@@ -26,18 +26,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - name: 获取first parent commit次数
         id: get-first-parent-commit-count
         run: |
           version=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
-          git fetch origin "refs/tags/*:refs/tags/*"
           recent_release_tag=$(git tag -l | grep $version | egrep -v "[-|+]" || true)
           if [[ "x$recent_release_tag" == "x" ]]; then
             echo "当前版本tag不存在，请手动生成tag."
             exit 1
           fi
-          first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..FETCH_HEAD)
+          git log --oneline --first-parent $recent_release_tag..HEAD
+          first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
           echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
 
       - name: 更新版本号
