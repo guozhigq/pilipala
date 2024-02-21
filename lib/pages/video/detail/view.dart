@@ -225,7 +225,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 返回当前页面时
   void didPopNext() async {
-    setState(() => isShowing = true);
+    if (plPlayerController != null &&
+        plPlayerController!.videoPlayerController != null) {
+      setState(() => isShowing = true);
+    }
     videoDetailController.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
     videoDetailController.playerInit(autoplay: autoplay);
