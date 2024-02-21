@@ -1,4 +1,4 @@
-name: CI
+name: alpha
 
 on:
   workflow_dispatch:
