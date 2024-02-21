@@ -45,7 +45,7 @@ jobs:
       - name: 获取最后一次提交
         id: get-last-commit
         run: |
-          last_commit=$(git log -1 --pretty="%h %B" --first-parent)
+          last_commit=$(git log -1 --pretty="%h %s" --first-parent)
           echo "last_commit=$last_commit" >> $GITHUB_OUTPUT
 
       - name: 更新版本号
