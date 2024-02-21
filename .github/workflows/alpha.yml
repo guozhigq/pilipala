@@ -209,7 +209,7 @@ jobs:
         run: ls -1 ./Pilipala-CI
 
       - name: 发送到Telegram频道
-        uses: xireiki/channel-post@main
+        uses: xireiki/channel-post@v1.0.4
         with:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
