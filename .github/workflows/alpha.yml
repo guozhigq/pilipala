@@ -20,6 +20,7 @@ jobs:
     outputs:
       # 定义输出变量 version，以便在其他job中引用
       new_version: ${{ steps.version.outputs.new_version }}
+      last_commit: ${{ steps.get-last-commit.outputs.last_commit }}
 
     steps:
       - name: Checkout code
@@ -40,6 +41,12 @@ jobs:
           git log --oneline --first-parent $recent_release_tag..HEAD
           first_parent_commit_count=$(git rev-list --first-parent --count $recent_release_tag..HEAD)
           echo "count=$first_parent_commit_count" >> $GITHUB_OUTPUT
+
+      - name: 获取最后一次提交
+        id: get-last-commit
+        run: |
+          last_commit=$(git log -1 --pretty="%h %B" --first-parent)
+          echo "last_commit=$last_commit" >> $GITHUB_OUTPUT
 
       - name: 更新版本号
         id: version
@@ -210,5 +217,6 @@ jobs:
           path: |
             ./Pilipala-CI/Pili-${{ needs.update_version.outputs.new_version }}.ipa
             ./Pilipala-CI/Pili-arm64-v8a-${{ needs.update_version.outputs.new_version }}.apk
-          CONTEXT: "**Pre-release:** ${{ needs.update_version.outputs.new_version }}"
+          CONTEXT: "**Pre-release: ${{ needs.update_version.outputs.new_version }}**\n${{ needs.update_version.outputs.last_commit }}"
+
           PARSE_MODE: Markdown
