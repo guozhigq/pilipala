@@ -1,5 +1,7 @@
 import 'package:pilipala/models/video/play/url.dart';
 
+import '../models/live/room_info.dart';
+
 class VideoUtils {
   static String getCdnUrl(dynamic item) {
     var backupUrl = "";
@@ -12,13 +14,20 @@ class VideoUtils {
     } else if (item is AudioItem) {
       backupUrl = item.backupUrl ?? "";
       videoUrl = backupUrl.contains("http") ? backupUrl : (item.baseUrl ?? "");
+    } else if (item is CodecItem) {
+      backupUrl = (item.urlInfo?.first.host)! +
+          item.baseUrl! +
+          item.urlInfo!.first.extra!;
+      videoUrl = backupUrl.contains("http") ? backupUrl : (item.baseUrl ?? "");
     } else {
       return "";
     }
 
     /// issues #70
-    if (videoUrl.contains(".mcdn.bilivideo") ||
-        videoUrl.contains("/upgcxcode/")) {
+    if (videoUrl.contains(".mcdn.bilivideo")) {
+      videoUrl =
+          'https://proxy-tf-all-ws.bilivideo.com/?url=${Uri.encodeComponent(videoUrl)}';
+    } else if (videoUrl.contains("/upgcxcode/")) {
       //CDN列表
       var cdnList = {
         'ali': 'upos-sz-mirrorali.bilivideo.com',
