@@ -46,6 +46,16 @@ class SettingPage extends StatelessWidget {
           ),
           Obx(
             () => Visibility(
+              visible: settingController.hiddenSettingUnlocked.value,
+              child: ListTile(
+                onTap: () => Get.toNamed('/hiddenSetting'),
+                dense: false,
+                title: const Text('隐藏设置'),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
               visible: settingController.userLogin.value,
               child: ListTile(
                 onTap: () => settingController.loginOut(),
