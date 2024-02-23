@@ -79,6 +79,8 @@ class MemberHttp {
     String order = 'pubdate',
     bool orderAvoided = true,
   }) async {
+    String dmImgStr = Utils.base64EncodeRandomString(16, 64);
+    String dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
     Map params = await WbiSign().makSign({
       'mid': mid,
       'ps': ps,
@@ -88,7 +90,11 @@ class MemberHttp {
       'order': order,
       'platform': 'web',
       'web_location': 1550101,
-      'order_avoided': orderAvoided
+      'order_avoided': orderAvoided,
+      'dm_img_list': '[]',
+      'dm_img_str': dmImgStr.substring(0, dmImgStr.length - 2),
+      'dm_cover_img_str': dmCoverImgStr.substring(0, dmCoverImgStr.length - 2),
+      'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
     });
     var res = await Request().get(
       Api.memberArchive,

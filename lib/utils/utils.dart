@@ -16,6 +16,8 @@ import '../http/index.dart';
 import '../models/github/latest.dart';
 
 class Utils {
+  static final Random random = Random();
+
   static Future<String> getCookiePath() async {
     final Directory tempDir = await getApplicationSupportDirectory();
     final String tempPath = "${tempDir.path}/.plpl/";
@@ -180,7 +182,7 @@ class Utils {
   }
 
   static String makeHeroTag(v) {
-    return v.toString() + Random().nextInt(9999).toString();
+    return v.toString() + random.nextInt(9999).toString();
   }
 
   static int duration(String duration) {
@@ -339,5 +341,16 @@ class Utils {
     var md5String = md5Digest.toString(); // 获取MD5哈希值
 
     return md5String;
+  }
+
+  static List<int> generateRandomBytes(int minLength, int maxLength) {
+    return List<int>.generate(
+      random.nextInt(maxLength-minLength+1), (_) => random.nextInt(0x60) + 0x20
+    );
+  }
+
+  static String base64EncodeRandomString(int minLength, int maxLength) {
+    List<int> randomBytes = generateRandomBytes(minLength, maxLength);
+    return base64.encode(randomBytes);
   }
 }
