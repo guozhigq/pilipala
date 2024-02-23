@@ -135,7 +135,8 @@ class SettingBoxKey {
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
       tabbarSort = 'tabbarSort', // 首页tabbar
-      dynamicBadgeMode = 'dynamicBadgeMode';
+      dynamicBadgeMode = 'dynamicBadgeMode',
+      enableGradientBg = 'enableGradientBg';
 }
 
 class LocalCacheKey {

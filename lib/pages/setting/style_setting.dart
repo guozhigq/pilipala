@@ -102,6 +102,12 @@ class _StyleSettingState extends State<StyleSetting> {
             defaultVal: true,
             needReboot: true,
           ),
+          const SetSwitchItem(
+            title: '首页底栏背景渐变',
+            setKey: SettingBoxKey.enableGradientBg,
+            defaultVal: true,
+            needReboot: true,
+          ),
           ListTile(
             onTap: () async {
               int? result = await showDialog(
