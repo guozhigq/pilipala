@@ -507,6 +507,7 @@ InlineSpan buildContent(
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
+    ...content.topicsMeta?.keys?.map((e) => '#$e#') ?? [],
     ...content.atNameToMid.keys.map((e) => '@$e'),
     ...content.jumpUrl.keys.map((e) =>
         e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
@@ -590,7 +591,7 @@ InlineSpan buildContent(
           ),
         );
       } else {
-        // print("matchStr=$matchStr");
+        print("matchStr=$matchStr");
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
@@ -693,6 +694,23 @@ InlineSpan buildContent(
           );
           // 只显示一次
           matchedStrs.add(matchStr);
+        } else if (content
+                .topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
+            null) {
+          spanChilds.add(
+            TextSpan(
+              text: matchStr,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  final String topic =
+                      matchStr.substring(1, matchStr.length - 1);
+                  Get.toNamed('/searchResult', parameters: {'keyword': topic});
+                },
+            ),
+          );
         } else {
           addPlainTextSpan(matchStr);
         }
