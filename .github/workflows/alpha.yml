@@ -205,18 +205,16 @@ jobs:
       #     prerelease: true
       #     allowUpdates: true
       #     artifacts: Pilipala-CI/*
-      - name: 列出文件
-        run: ls -1 ./Pilipala-CI
 
       - name: 发送到Telegram频道
-        uses: xireiki/channel-post@v1.0.4
+        uses: xireiki/channel-post@v1.0.7
         with:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          METHOD: sendMediaGroup
-          path: |
-            ./Pilipala-CI/Pili-${{ needs.update_version.outputs.new_version }}.ipa
-            ./Pilipala-CI/Pili-arm64-v8a-${{ needs.update_version.outputs.new_version }}.apk
-          CONTEXT: "**Pre-release: ${{ needs.update_version.outputs.new_version }}**\n${{ needs.update_version.outputs.last_commit }}"
-
-          PARSE_MODE: Markdown
+          bot_token: ${{ secrets.BOT_TOKEN }}
+          chat_id: ${{ secrets.CHAT_ID }}
+          large_file: true
+          api_id: ${{ secrets.TELEGRAM_API_ID }}
+          api_hash: ${{ secrets.TELEGRAM_API_HASH }}
+          method: sendFile
+          path: Pilipala-CI/*
+          parse_mode: Markdown
+          context: "**Pre-release: ${{ needs.update_version.outputs.new_version }}**\n${{ needs.update_version.outputs.last_commit }}"
