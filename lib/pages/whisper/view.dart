@@ -110,7 +110,7 @@ class _WhisperPageState extends State<WhisperPage> {
                         if (snapshot.connectionState == ConnectionState.done) {
                           Map data = snapshot.data as Map;
                           if (data['status']) {
-                            List sessionList = _whisperController.sessionList;
+                            RxList sessionList = _whisperController.sessionList;
                             return Obx(
                               () => sessionList.isEmpty
                                   ? const SizedBox()
@@ -121,33 +121,35 @@ class _WhisperPageState extends State<WhisperPage> {
                                           const NeverScrollableScrollPhysics(),
                                       itemBuilder: (_, int i) {
                                         return ListTile(
-                                          onTap: () => Get.toNamed(
-                                            '/whisperDetail',
-                                            parameters: {
-                                              'talkerId': sessionList[i]
-                                                  .talkerId
-                                                  .toString(),
-                                              'name': sessionList[i]
-                                                  .accountInfo
-                                                  .name,
-                                              'face': sessionList[i]
-                                                  .accountInfo
-                                                  .face,
-                                              'mid': sessionList[i]
-                                                  .accountInfo
-                                                  .mid
-                                                  .toString(),
-                                            },
-                                          ),
+                                          onTap: () {
+                                            sessionList[i].unreadCount = 0;
+                                            sessionList.refresh();
+                                            Get.toNamed(
+                                              '/whisperDetail',
+                                              parameters: {
+                                                'talkerId': sessionList[i]
+                                                    .talkerId
+                                                    .toString(),
+                                                'name': sessionList[i]
+                                                    .accountInfo
+                                                    .name,
+                                                'face': sessionList[i]
+                                                    .accountInfo
+                                                    .face,
+                                                'mid': sessionList[i]
+                                                    .accountInfo
+                                                    .mid
+                                                    .toString(),
+                                              },
+                                            );
+                                          },
                                           leading: Badge(
-                                            isLabelVisible: false,
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
+                                            isLabelVisible:
+                                                sessionList[i].unreadCount > 0,
                                             label: Text(sessionList[i]
                                                 .unreadCount
                                                 .toString()),
-                                            alignment: Alignment.bottomRight,
+                                            alignment: Alignment.topRight,
                                             child: NetworkImgLayer(
                                               width: 45,
                                               height: 45,

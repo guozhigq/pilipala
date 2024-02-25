@@ -492,4 +492,8 @@ class Api {
 
   /// 表情
   static const emojiList = '/x/emote/user/panel/web';
+
+  /// 已读标记
+  static const String ackSessionMsg =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
 }
