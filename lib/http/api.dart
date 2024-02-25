@@ -489,4 +489,8 @@ class Api {
 
   /// 我的订阅详情
   static const userSubFolderDetail = '/x/space/fav/season/list';
+
+  /// 已读标记
+  static const String ackSessionMsg =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
 }
