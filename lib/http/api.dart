@@ -483,4 +483,10 @@ class Api {
 
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅详情
+  static const userSubFolderDetail = '/x/space/fav/season/list';
 }

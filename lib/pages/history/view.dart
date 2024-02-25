@@ -70,10 +70,6 @@ class _HistoryPageState extends State<HistoryPage> {
         child1: AppBar(
           titleSpacing: 0,
           centerTitle: false,
-          leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back_outlined),
-          ),
           title: Text(
             '观看记录',
             style: Theme.of(context).textTheme.titleMedium,

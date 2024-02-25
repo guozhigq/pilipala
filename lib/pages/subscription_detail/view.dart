@@ -7,30 +7,32 @@ import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
-import 'package:pilipala/pages/fav_detail/index.dart';
 
-import 'widget/fav_video_card.dart';
+import '../../models/user/sub_folder.dart';
+import '../../utils/utils.dart';
+import 'controller.dart';
+import 'widget/sub_video_card.dart';
 
-class FavDetailPage extends StatefulWidget {
-  const FavDetailPage({super.key});
+class SubDetailPage extends StatefulWidget {
+  const SubDetailPage({super.key});
 
   @override
-  State<FavDetailPage> createState() => _FavDetailPageState();
+  State<SubDetailPage> createState() => _SubDetailPageState();
 }
 
-class _FavDetailPageState extends State<FavDetailPage> {
+class _SubDetailPageState extends State<SubDetailPage> {
   late final ScrollController _controller = ScrollController();
-  final FavDetailController _favDetailController =
-      Get.put(FavDetailController());
+  final SubDetailController _subDetailController =
+      Get.put(SubDetailController());
   late StreamController<bool> titleStreamC; // a
-  Future? _futureBuilderFuture;
-  late String mediaId;
+  late Future _futureBuilderFuture;
+  late String seasonId;
 
   @override
   void initState() {
     super.initState();
-    mediaId = Get.parameters['mediaId']!;
-    _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
+    seasonId = Get.parameters['seasonId']!;
+    _futureBuilderFuture = _subDetailController.queryUserSubFolderDetail();
     titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
@@ -42,8 +44,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
 
         if (_controller.position.pixels >=
             _controller.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('favDetail', const Duration(seconds: 1), () {
-            _favDetailController.onLoad();
+          EasyThrottle.throttle('subDetail', const Duration(seconds: 1), () {
+            _subDetailController.onLoad();
           });
         }
       },
@@ -80,11 +82,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _favDetailController.item!.title!,
+                            _subDetailController.item.title!,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text(
-                            '共${_favDetailController.item!.mediaCount!}条视频',
+                            '共${_subDetailController.item.mediaCount!}条视频',
                             style: Theme.of(context).textTheme.labelMedium,
                           )
                         ],
@@ -94,18 +96,6 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 );
               },
             ),
-            actions: [
-              IconButton(
-                onPressed: () =>
-                    Get.toNamed('/favSearch?searchType=0&mediaId=$mediaId'),
-                icon: const Icon(Icons.search_outlined),
-              ),
-              //   IconButton(
-              //     onPressed: () {},
-              //     icon: const Icon(Icons.more_vert),
-              //   ),
-              const SizedBox(width: 6),
-            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -128,11 +118,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Hero(
-                        tag: _favDetailController.heroTag,
+                        tag: _subDetailController.heroTag,
                         child: NetworkImgLayer(
                           width: 180,
                           height: 110,
-                          src: _favDetailController.item!.cover,
+                          src: _subDetailController.item.cover,
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -143,7 +133,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                           children: [
                             const SizedBox(height: 4),
                             Text(
-                              _favDetailController.item!.title!,
+                              _subDetailController.item.title!,
                               style: TextStyle(
                                   fontSize: Theme.of(context)
                                       .textTheme
@@ -152,15 +142,34 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                   fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
+                            GestureDetector(
+                              onTap: () {
+                                SubFolderItemData item =
+                                    _subDetailController.item;
+                                Get.toNamed(
+                                  '/member?mid=${item.upper!.mid}',
+                                  arguments: {
+                                    'face': item.upper!.face,
+                                  },
+                                );
+                              },
+                              child: Text(
+                                _subDetailController.item.upper!.name!,
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
                             Text(
-                              _favDetailController.item!.upper!.name!,
+                              '${Utils.numFormat(_subDetailController.item.viewCount)}次播放',
                               style: TextStyle(
                                   fontSize: Theme.of(context)
                                       .textTheme
                                       .labelSmall!
                                       .fontSize,
                                   color: Theme.of(context).colorScheme.outline),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -175,7 +184,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.favList.length}条视频',
+                  '共${_subDetailController.subList.length}条视频',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -191,22 +200,20 @@ class _FavDetailPageState extends State<FavDetailPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 Map data = snapshot.data;
                 if (data['status']) {
-                  if (_favDetailController.item!.mediaCount == 0) {
+                  if (_subDetailController.item.mediaCount == 0) {
                     return const NoData();
                   } else {
-                    List favList = _favDetailController.favList;
+                    List subList = _subDetailController.subList;
                     return Obx(
-                      () => favList.isEmpty
+                      () => subList.isEmpty
                           ? const SliverToBoxAdapter(child: SizedBox())
                           : SliverList(
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
-                                return FavVideoCardH(
-                                  videoItem: favList[index],
-                                  callFn: () => _favDetailController
-                                      .onCancelFav(favList[index].id),
+                                return SubVideoCardH(
+                                  videoItem: subList[index],
                                 );
-                              }, childCount: favList.length),
+                              }, childCount: subList.length),
                             ),
                     );
                   }
@@ -234,7 +241,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
               child: Center(
                 child: Obx(
                   () => Text(
-                    _favDetailController.loadingText.value,
+                    _subDetailController.loadingText.value,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.outline,
                         fontSize: 13),
