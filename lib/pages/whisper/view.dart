@@ -108,8 +108,8 @@ class _WhisperPageState extends State<WhisperPage> {
                       future: _futureBuilderFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
-                          Map data = snapshot.data as Map;
-                          if (data['status']) {
+                          Map? data = snapshot.data;
+                          if (data != null && data['status']) {
                             RxList sessionList = _whisperController.sessionList;
                             return Obx(
                               () => sessionList.isEmpty
@@ -162,20 +162,26 @@ class _WhisperPageState extends State<WhisperPage> {
                                           title: Text(
                                               sessionList[i].accountInfo.name),
                                           subtitle: Text(
-                                              sessionList[i]
-                                                      .lastMsg
-                                                      .content['text'] ??
-                                                  sessionList[i]
-                                                      .lastMsg
-                                                      .content['content'] ??
-                                                  sessionList[i]
-                                                      .lastMsg
-                                                      .content['title'] ??
-                                                  sessionList[i]
+                                              sessionList[i].lastMsg.content !=
+                                                          null &&
+                                                      sessionList[i]
+                                                              .lastMsg
+                                                              .content !=
+                                                          ''
+                                                  ? (sessionList[i]
                                                           .lastMsg
-                                                          .content[
-                                                      'reply_content'] ??
-                                                  '',
+                                                          .content['text'] ??
+                                                      sessionList[i]
+                                                          .lastMsg
+                                                          .content['content'] ??
+                                                      sessionList[i]
+                                                          .lastMsg
+                                                          .content['title'] ??
+                                                      sessionList[i]
+                                                              .lastMsg
+                                                              .content[
+                                                          'reply_content'])
+                                                  : '不支持的消息类型',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: Theme.of(context)
@@ -212,7 +218,9 @@ class _WhisperPageState extends State<WhisperPage> {
                             );
                           } else {
                             // 请求错误
-                            return const SizedBox();
+                            return Center(
+                              child: Text(data?['msg'] ?? '请求异常'),
+                            );
                           }
                         } else {
                           // 骨架屏
