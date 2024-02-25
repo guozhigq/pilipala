@@ -201,11 +201,11 @@ class _AboutPageState extends State<AboutPage> {
                 var cleanStatus = await CacheManage().clearCacheAll();
                 if (cleanStatus) {
                   getCacheSize();
+                  SmartDialog.showToast('清除成功');
                 }
               },
               title: const Text('清除缓存'),
               subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
             SizedBox(height: MediaQuery.of(context).padding.bottom + 20)
           ],
