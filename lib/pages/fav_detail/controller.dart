@@ -34,7 +34,7 @@ class FavDetailController extends GetxController {
       return;
     }
     isLoadingMore = true;
-    var res = await await UserHttp.userFavFolderDetail(
+    var res = await UserHttp.userFavFolderDetail(
       pn: currentPage,
       ps: 20,
       mediaId: mediaId!,

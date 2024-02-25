@@ -8,7 +8,7 @@ class SessionDataModel {
     this.hasMore,
   });
 
-  List? sessionList;
+  List<SessionList>? sessionList;
   int? hasMore;
 
   SessionDataModel.fromJson(Map<String, dynamic> json) {
@@ -121,35 +121,37 @@ class LastMsg {
     this.msgKey,
     this.msgStatus,
     this.notifyCode,
-    this.newFaceVersion,
+    // this.newFaceVersion,
   });
 
   int? senderIid;
   int? receiverType;
   int? receiverId;
   int? msgType;
-  Map? content;
+  dynamic content;
   int? msgSeqno;
   int? timestamp;
   String? atUids;
   int? msgKey;
   int? msgStatus;
   String? notifyCode;
-  int? newFaceVersion;
+  // int? newFaceVersion;
 
   LastMsg.fromJson(Map<String, dynamic> json) {
     senderIid = json['sender_uid'];
     receiverType = json['receiver_type'];
     receiverId = json['receiver_id'];
     msgType = json['msg_type'];
-    content = jsonDecode(json['content']);
+    content = json['content'] != null && json['content'] != ''
+        ? jsonDecode(json['content'])
+        : '';
     msgSeqno = json['msg_seqno'];
     timestamp = json['timestamp'];
     atUids = json['at_uids'];
     msgKey = json['msg_key'];
     msgStatus = json['msg_status'];
     notifyCode = json['notify_code'];
-    newFaceVersion = json['new_face_version'];
+    // newFaceVersion = json['new_face_version'];
   }
 }
 
@@ -214,7 +216,9 @@ class MessageItem {
     receiverId = json['receiver_id'];
     // 1 文本 2 图片 18 系统提示 10 系统通知  5 撤回的消息
     msgType = json['msg_type'];
-    content = jsonDecode(json['content']);
+    content = json['content'] != null && json['content'] != ''
+        ? jsonDecode(json['content'])
+        : '';
     msgSeqno = json['msg_seqno'];
     timestamp = json['timestamp'];
     atUids = json['at_uids'];

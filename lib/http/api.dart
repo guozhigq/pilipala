@@ -483,4 +483,20 @@ class Api {
 
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅详情
+  static const userSubFolderDetail = '/x/space/fav/season/list';
+
+  /// 表情
+  static const emojiList = '/x/emote/user/panel/web';
+
+  /// 已读标记
+  static const String ackSessionMsg =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
+
+  /// 发送私信
+  static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
 }
