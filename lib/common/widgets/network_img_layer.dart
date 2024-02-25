@@ -104,17 +104,19 @@ class NetworkImgLayer extends StatelessWidget {
                 ? 0
                 : StyleString.imgRadius.x),
       ),
-      child: Center(
-        child: Image.asset(
-          type == 'avatar'
-              ? 'assets/images/noface.jpeg'
-              : 'assets/images/loading.png',
-          width: width,
-          height: height,
-          cacheWidth: width.cacheSize(context),
-          cacheHeight: height.cacheSize(context),
-        ),
-      ),
+      child: type == 'bg'
+          ? const SizedBox()
+          : Center(
+              child: Image.asset(
+                type == 'avatar'
+                    ? 'assets/images/noface.jpeg'
+                    : 'assets/images/loading.png',
+                width: width,
+                height: height,
+                cacheWidth: width.cacheSize(context),
+                cacheHeight: height.cacheSize(context),
+              ),
+            ),
     );
   }
 }

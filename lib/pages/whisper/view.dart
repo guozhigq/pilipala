@@ -108,9 +108,9 @@ class _WhisperPageState extends State<WhisperPage> {
                       future: _futureBuilderFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
-                          Map data = snapshot.data as Map;
-                          if (data['status']) {
-                            List sessionList = _whisperController.sessionList;
+                          Map? data = snapshot.data;
+                          if (data != null && data['status']) {
+                            RxList sessionList = _whisperController.sessionList;
                             return Obx(
                               () => sessionList.isEmpty
                                   ? const SizedBox()
@@ -121,33 +121,35 @@ class _WhisperPageState extends State<WhisperPage> {
                                           const NeverScrollableScrollPhysics(),
                                       itemBuilder: (_, int i) {
                                         return ListTile(
-                                          onTap: () => Get.toNamed(
-                                            '/whisperDetail',
-                                            parameters: {
-                                              'talkerId': sessionList[i]
-                                                  .talkerId
-                                                  .toString(),
-                                              'name': sessionList[i]
-                                                  .accountInfo
-                                                  .name,
-                                              'face': sessionList[i]
-                                                  .accountInfo
-                                                  .face,
-                                              'mid': sessionList[i]
-                                                  .accountInfo
-                                                  .mid
-                                                  .toString(),
-                                            },
-                                          ),
+                                          onTap: () {
+                                            sessionList[i].unreadCount = 0;
+                                            sessionList.refresh();
+                                            Get.toNamed(
+                                              '/whisperDetail',
+                                              parameters: {
+                                                'talkerId': sessionList[i]
+                                                    .talkerId
+                                                    .toString(),
+                                                'name': sessionList[i]
+                                                    .accountInfo
+                                                    .name,
+                                                'face': sessionList[i]
+                                                    .accountInfo
+                                                    .face,
+                                                'mid': sessionList[i]
+                                                    .accountInfo
+                                                    .mid
+                                                    .toString(),
+                                              },
+                                            );
+                                          },
                                           leading: Badge(
-                                            isLabelVisible: false,
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
+                                            isLabelVisible:
+                                                sessionList[i].unreadCount > 0,
                                             label: Text(sessionList[i]
                                                 .unreadCount
                                                 .toString()),
-                                            alignment: Alignment.bottomRight,
+                                            alignment: Alignment.topRight,
                                             child: NetworkImgLayer(
                                               width: 45,
                                               height: 45,
@@ -160,20 +162,26 @@ class _WhisperPageState extends State<WhisperPage> {
                                           title: Text(
                                               sessionList[i].accountInfo.name),
                                           subtitle: Text(
-                                              sessionList[i]
-                                                      .lastMsg
-                                                      .content['text'] ??
-                                                  sessionList[i]
-                                                      .lastMsg
-                                                      .content['content'] ??
-                                                  sessionList[i]
-                                                      .lastMsg
-                                                      .content['title'] ??
-                                                  sessionList[i]
+                                              sessionList[i].lastMsg.content !=
+                                                          null &&
+                                                      sessionList[i]
+                                                              .lastMsg
+                                                              .content !=
+                                                          ''
+                                                  ? (sessionList[i]
                                                           .lastMsg
-                                                          .content[
-                                                      'reply_content'] ??
-                                                  '',
+                                                          .content['text'] ??
+                                                      sessionList[i]
+                                                          .lastMsg
+                                                          .content['content'] ??
+                                                      sessionList[i]
+                                                          .lastMsg
+                                                          .content['title'] ??
+                                                      sessionList[i]
+                                                              .lastMsg
+                                                              .content[
+                                                          'reply_content'])
+                                                  : '不支持的消息类型',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: Theme.of(context)
@@ -210,7 +218,9 @@ class _WhisperPageState extends State<WhisperPage> {
                             );
                           } else {
                             // 请求错误
-                            return const SizedBox();
+                            return Center(
+                              child: Text(data?['msg'] ?? '请求异常'),
+                            );
                           }
                         } else {
                           // 骨架屏

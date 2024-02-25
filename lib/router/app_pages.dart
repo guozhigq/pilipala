@@ -44,6 +44,8 @@ import '../pages/setting/recommend_setting.dart';
 import '../pages/setting/play_setting.dart';
 import '../pages/setting/privacy_setting.dart';
 import '../pages/setting/style_setting.dart';
+import '../pages/subscription/index.dart';
+import '../pages/subscription_detail/index.dart';
 import '../pages/video/detail/index.dart';
 import '../pages/video/detail/reply_reply/index.dart';
 import '../pages/webview/index.dart';
@@ -160,6 +162,10 @@ class Routes {
     CustomGetPage(name: '/logs', page: () => const LogsPage()),
     // 搜索关注
     CustomGetPage(name: '/followSearch', page: () => const FollowSearchPage()),
+    // 订阅
+    CustomGetPage(name: '/subscription', page: () => const SubPage()),
+    // 订阅详情
+    CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
   ];
 }
 
