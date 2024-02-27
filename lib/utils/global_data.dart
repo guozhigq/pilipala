@@ -1,5 +1,9 @@
+import '../models/common/index.dart';
+
 class GlobalData {
   int imgQuality = 10;
+  FullScreenGestureMode fullScreenGestureMode =
+      FullScreenGestureMode.values.last;
 
   // 私有构造函数
   GlobalData._();

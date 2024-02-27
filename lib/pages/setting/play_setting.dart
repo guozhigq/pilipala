@@ -73,6 +73,12 @@ class _PlaySettingState extends State<PlaySetting> {
             title: Text('倍速设置', style: titleStyle),
             subtitle: Text('设置视频播放速度', style: subTitleStyle),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/playerGestureSet'),
+            title: Text('手势设置', style: titleStyle),
+            subtitle: Text('设置播放器手势', style: subTitleStyle),
+          ),
           const SetSwitchItem(
             title: '开启1080P',
             subTitle: '免登录查看1080P视频',
@@ -133,12 +139,6 @@ class _PlaySettingState extends State<PlaySetting> {
             subTitle: '返回时自动调整视频亮度',
             setKey: SettingBoxKey.enableAutoBrightness,
             defaultVal: false,
-          ),
-          const SetSwitchItem(
-            title: '双击快退/快进',
-            subTitle: '左侧双击快退，右侧双击快进',
-            setKey: SettingBoxKey.enableQuickDouble,
-            defaultVal: true,
           ),
           const SetSwitchItem(
             title: '弹幕开关',
