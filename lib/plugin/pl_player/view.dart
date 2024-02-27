@@ -16,7 +16,6 @@ import 'package:pilipala/plugin/pl_player/utils.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-
 import 'models/bottom_progress_behavior.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
@@ -427,6 +426,42 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         /// 弹幕面板
         if (widget.danmuWidget != null)
           Positioned.fill(top: 4, child: widget.danmuWidget!),
+
+        widget.controller.subscriptions.isNotEmpty
+            ? Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 30,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Obx(
+                        () => Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: widget.controller.subtitleContent.value != ''
+                                ? Colors.black.withOpacity(0.4)
+                                : Colors.transparent,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            widget.controller.subtitleContent.value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : nil,
 
         /// 手势
         Positioned.fill(

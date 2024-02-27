@@ -21,6 +21,7 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 import 'package:universal_platform/universal_platform.dart';
+import '../../models/video/subTitile/content.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStrorage.video;
@@ -231,6 +232,10 @@ class PlPlayerController {
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
 
+  RxList<SubTitileContentModel> subtitleContents =
+      <SubTitileContentModel>[].obs;
+  RxString subtitleContent = ''.obs;
+
   void updateSliderPositionSecond() {
     int newSecond = _sliderPosition.value.inSeconds;
     if (sliderPositionSeconds.value != newSecond) {
@@ -277,8 +282,7 @@ class PlPlayerController {
     danmakuDurationVal =
         localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
     // 描边粗细
-    strokeWidth =
-        localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
+    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -566,6 +570,8 @@ class PlPlayerController {
             _sliderPosition.value = event;
             updateSliderPositionSecond();
           }
+          querySubtitleContent(
+              videoPlayerController!.state.position.inSeconds.toDouble());
 
           /// 触发回调事件
           for (var element in _positionListeners) {
@@ -1047,6 +1053,17 @@ class PlPlayerController {
         cid: _cid,
         progress: progress,
       );
+    }
+  }
+
+  void querySubtitleContent(double progress) {
+    if (subtitleContents.isNotEmpty) {
+      for (var content in subtitleContents) {
+        if (progress >= content.from! && progress <= content.to!) {
+          subtitleContent.value = content.content!;
+          return;
+        }
+      }
     }
   }
 

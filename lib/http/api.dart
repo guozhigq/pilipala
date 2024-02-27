@@ -483,4 +483,7 @@ class Api {
 
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 获取字幕配置
+  static const getSubtitleConfig = '/x/player/v2';
 }

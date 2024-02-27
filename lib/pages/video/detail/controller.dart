@@ -19,6 +19,8 @@ import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../../http/index.dart';
+import '../../../models/video/subTitile/content.dart';
 import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
 
@@ -91,6 +93,8 @@ class VideoDetailController extends GetxController
   late int cacheAudioQa;
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
+  RxList<SubTitileContentModel> subtitleContents =
+      <SubTitileContentModel>[].obs;
 
   @override
   void onInit() {
@@ -139,6 +143,7 @@ class VideoDetailController extends GetxController
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    getSubtitle();
   }
 
   showReplyReplyPanel() {
@@ -380,5 +385,36 @@ class VideoDetailController extends GetxController
     replyReplyBottomSheetCtr != null
         ? replyReplyBottomSheetCtr!.close()
         : print('replyReplyBottomSheetCtr is null');
+  }
+
+  // 获取字幕配置
+  Future getSubtitle() async {
+    var result = await VideoHttp.getSubtitle(bvid: bvid, cid: cid.value);
+    if (result['status']) {
+      if (result['data'].subtitles.isNotEmpty) {
+        SmartDialog.showToast('字幕加载中...');
+        var subtitle = result['data'].subtitles.first;
+        getSubtitleContent(subtitle.subtitleUrl);
+      }
+      return result['data'];
+    } else {
+      SmartDialog.showToast(result['msg'].toString());
+    }
+  }
+
+  // 获取字幕内容
+  Future getSubtitleContent(String url) async {
+    var res = await Request().get('https:$url');
+    subtitleContents.value = res.data['body'].map<SubTitileContentModel>((e) {
+      return SubTitileContentModel.fromJson(e);
+    }).toList();
+    setSubtitleContent();
+  }
+
+  setSubtitleContent() {
+    plPlayerController.subtitleContent.value = '';
+    if (subtitleContents.isNotEmpty) {
+      plPlayerController.subtitleContents = subtitleContents;
+    }
   }
 }

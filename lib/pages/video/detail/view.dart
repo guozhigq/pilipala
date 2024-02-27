@@ -236,7 +236,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() => isShowing = true);
+      setState(() {
+        videoDetailController.setSubtitleContent();
+        isShowing = true;
+      });
     }
     videoDetailController.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
