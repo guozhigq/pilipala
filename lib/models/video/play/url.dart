@@ -34,6 +34,7 @@ class PlayUrlModel {
   String? seekParam;
   String? seekType;
   Dash? dash;
+  List<Durl>? durl;
   List<FormatItem>? supportFormats;
   // String? highFormat;
   int? lastPlayTime;
@@ -52,7 +53,8 @@ class PlayUrlModel {
     videoCodecid = json['video_codecid'];
     seekParam = json['seek_param'];
     seekType = json['seek_type'];
-    dash = Dash.fromJson(json['dash']);
+    dash = json['dash'] != null ? Dash.fromJson(json['dash']) : null;
+    durl = json['durl']?.map<Durl>((e) => Durl.fromJson(e)).toList();
     supportFormats = json['support_formats'] != null
         ? json['support_formats']
             .map<FormatItem>((e) => FormatItem.fromJson(e))
@@ -248,5 +250,32 @@ class Flac {
   Flac.fromJson(Map<String, dynamic> json) {
     display = json['display'];
     audio = json['audio'] != null ? AudioItem.fromJson(json['audio']) : null;
+  }
+}
+
+class Durl {
+  Durl({
+    this.order,
+    this.length,
+    this.size,
+    this.ahead,
+    this.vhead,
+    this.url,
+  });
+
+  int? order;
+  int? length;
+  int? size;
+  String? ahead;
+  String? vhead;
+  String? url;
+
+  Durl.fromJson(Map<String, dynamic> json) {
+    order = json['order'];
+    length = json['length'];
+    size = json['size'];
+    ahead = json['ahead'];
+    vhead = json['vhead'];
+    url = json['url'];
   }
 }

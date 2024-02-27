@@ -25,16 +25,17 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
           padding: const EdgeInsets.fromLTRB(
               StyleString.safeSpace, 5, StyleString.safeSpace, 5),
           child: LayoutBuilder(builder: (context, boxConstraints) {
-            double width = (boxConstraints.maxWidth -
-                StyleString.cardSpace *
-                    6 /
-                    MediaQuery.textScalerOf(context).scale(2.0));
+            final double width = (boxConstraints.maxWidth -
+                    StyleString.cardSpace *
+                        6 /
+                        MediaQuery.textScalerOf(context).scale(1.0)) /
+                2;
             return Container(
               constraints: const BoxConstraints(minHeight: 88),
               height: width / StyleString.aspectRatio,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   if (list[index].imageUrls != null &&
                       list[index].imageUrls.isNotEmpty)
                     AspectRatio(

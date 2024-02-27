@@ -3,7 +3,7 @@ import 'package:pilipala/utils/utils.dart';
 
 class StatView extends StatelessWidget {
   final String? theme;
-  final int? view;
+  final dynamic view;
   final String? size;
 
   const StatView({Key? key, this.theme, this.view, this.size})

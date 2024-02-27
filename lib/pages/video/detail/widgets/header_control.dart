@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/http/danmaku.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
+import '../../../../models/video_detail_res.dart';
+import '../introduction/index.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   const HeaderControl({
@@ -47,11 +50,31 @@ class _HeaderControlState extends State<HeaderControl> {
   final Box<dynamic> videoStorage = GStrorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
+  bool showTitle = false;
+  late String heroTag;
+  late VideoIntroController videoIntroController;
+  late VideoDetailData videoDetail;
+
   @override
   void initState() {
     super.initState();
     videoInfo = widget.videoDetailCtr!.data;
     speedsList = widget.controller!.speedsList;
+    fullScreenStatusListener();
+    heroTag = Get.arguments['heroTag'];
+    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+  }
+
+  void fullScreenStatusListener() {
+    widget.videoDetailCtr!.plPlayerController.isFullScreen
+        .listen((bool isFullScreen) {
+      if (isFullScreen) {
+        showTitle = true;
+      } else {
+        showTitle = false;
+      }
+      setState(() {});
+    });
   }
 
   /// 设置面板
@@ -341,8 +364,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         },
                         dense: true,
                         contentPadding: const EdgeInsets.only(),
-                        title:
-                            const Text("额外等待视频播放完毕", style: titleStyle),
+                        title: const Text("额外等待视频播放完毕", style: titleStyle),
                         trailing: Switch(
                           // thumb color (round icon)
                           activeColor: Theme.of(context).colorScheme.primary,
@@ -437,7 +459,7 @@ class _HeaderControlState extends State<HeaderControl> {
           }),
           actions: <Widget>[
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -724,6 +746,8 @@ class _HeaderControlState extends State<HeaderControl> {
     double fontSizeVal = widget.controller!.fontSizeVal;
     // 弹幕速度
     double danmakuDurationVal = widget.controller!.danmakuDurationVal;
+    // 弹幕描边
+    double strokeWidth = widget.controller!.strokeWidth;
 
     final DanmakuController danmakuController =
         widget.controller!.danmakuController!;
@@ -851,6 +875,44 @@ class _HeaderControlState extends State<HeaderControl> {
                                 danmakuController.option;
                             final DanmakuOption updatedOption =
                                 currentOption.copyWith(opacity: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('描边粗细 $strokeWidth'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: 3,
+                        value: strokeWidth,
+                        divisions: 6,
+                        label: '$strokeWidth',
+                        onChanged: (double val) {
+                          strokeWidth = val;
+                          widget.controller!.strokeWidth = val;
+                          setState(() {});
+                          try {
+                            final DanmakuOption currentOption =
+                                danmakuController.option;
+                            final DanmakuOption updatedOption =
+                                currentOption.copyWith(strokeWidth: val);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
@@ -1006,6 +1068,8 @@ class _HeaderControlState extends State<HeaderControl> {
       color: Colors.white,
       fontSize: 12,
     );
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
@@ -1040,21 +1104,47 @@ class _HeaderControlState extends State<HeaderControl> {
             },
           ),
           SizedBox(width: buttonSpace),
-          ComBtn(
-            icon: const Icon(
-              FontAwesomeIcons.house,
-              size: 15,
-              color: Colors.white,
+          if (showTitle && isLandscape) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 200),
+                  child: Text(
+                    videoIntroController.videoDetail.value.title!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                if (videoIntroController.isShowOnlineTotal)
+                  Text(
+                    '${videoIntroController.total.value}人正在看',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+              ],
+            )
+          ] else ...[
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                // 销毁播放器实例
+                await widget.controller!.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
             ),
-            fuc: () async {
-              // 销毁播放器实例
-              await widget.controller!.dispose(type: 'all');
-              if (mounted) {
-                Navigator.popUntil(
-                    context, (Route<dynamic> route) => route.isFirst);
-              }
-            },
-          ),
+          ],
           const Spacer(),
           // ComBtn(
           //   icon: const Icon(

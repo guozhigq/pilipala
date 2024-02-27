@@ -8,8 +8,10 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../models/common/dynamic_badge_mode.dart';
 import 'controller.dart';
 import 'widgets/switch_item.dart';
 
@@ -101,6 +103,12 @@ class _StyleSettingState extends State<StyleSetting> {
             defaultVal: true,
             needReboot: true,
           ),
+          const SetSwitchItem(
+            title: '首页底栏背景渐变',
+            setKey: SettingBoxKey.enableGradientBg,
+            defaultVal: true,
+            needReboot: true,
+          ),
           ListTile(
             onTap: () async {
               int? result = await showDialog(
@@ -169,6 +177,8 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
+                              GlobalData().imgQuality = picQuality;
+                              SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),
                           )
@@ -239,6 +249,14 @@ class _StyleSettingState extends State<StyleSetting> {
             title: Text('主题模式', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前模式：${settingController.themeType.value.description}',
+                style: subTitleStyle)),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => settingController.setDynamicBadgeMode(context),
+            title: Text('动态未读标记', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前标记样式：${settingController.dynamicBadgeType.value.description}',
                 style: subTitleStyle)),
           ),
           ListTile(

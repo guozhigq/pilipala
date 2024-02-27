@@ -34,7 +34,7 @@ class FavDetailController extends GetxController {
       return;
     }
     isLoadingMore = true;
-    var res = await await UserHttp.userFavFolderDetail(
+    var res = await UserHttp.userFavFolderDetail(
       pn: currentPage,
       ps: 20,
       mediaId: mediaId!,
@@ -60,16 +60,14 @@ class FavDetailController extends GetxController {
     var result = await VideoHttp.favVideo(
         aid: id, addIds: '', delIds: mediaId.toString());
     if (result['status']) {
-      if (result['data']['prompt']) {
-        List dataList = favList;
-        for (var i in dataList) {
-          if (i.id == id) {
-            dataList.remove(i);
-            break;
-          }
+      List dataList = favList;
+      for (var i in dataList) {
+        if (i.id == id) {
+          dataList.remove(i);
+          break;
         }
-        SmartDialog.showToast('取消收藏');
       }
+      SmartDialog.showToast('取消收藏');
     }
   }
 

@@ -19,6 +19,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
 
 class VideoDetailController extends GetxController
@@ -61,7 +62,7 @@ class VideoDetailController extends GetxController
   Box localCache = GStrorage.localCache;
   Box setting = GStrorage.setting;
 
-  int oid = 0;
+  RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用
   int fRpid = 0;
 
@@ -88,6 +89,8 @@ class VideoDetailController extends GetxController
   late int? cacheVideoQa;
   late String cacheDecode;
   late int cacheAudioQa;
+
+  PersistentBottomSheetController? replyReplyBottomSheetCtr;
 
   @override
   void onInit() {
@@ -135,13 +138,14 @@ class VideoDetailController extends GetxController
         defaultValue: VideoDecodeFormats.values.last.code);
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
+    oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
   }
 
   showReplyReplyPanel() {
-    PersistentBottomSheetController? ctr =
+    replyReplyBottomSheetCtr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
-        oid: oid,
+        oid: oid.value,
         rpid: fRpid,
         closePanel: () => {
           fRpid = 0,
@@ -151,7 +155,7 @@ class VideoDetailController extends GetxController
         source: 'videoDetail',
       );
     });
-    ctr?.closed.then((value) {
+    replyReplyBottomSheetCtr?.closed.then((value) {
       fRpid = 0;
     });
   }
@@ -227,9 +231,11 @@ class VideoDetailController extends GetxController
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction: (firstVideo.width! - firstVideo.height!) > 0
-          ? 'horizontal'
-          : 'vertical',
+      direction: firstVideo.width != null && firstVideo.height != null
+          ? ((firstVideo.width! - firstVideo.height!) > 0
+              ? 'horizontal'
+              : 'vertical')
+          : null,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
@@ -246,6 +252,21 @@ class VideoDetailController extends GetxController
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
+      if (data.acceptDesc!.isNotEmpty && data.acceptDesc!.contains('试看')) {
+        SmartDialog.showToast(
+          '该视频为专属视频，仅提供试看',
+          displayTime: const Duration(seconds: 3),
+        );
+        videoUrl = data.durl!.first.url!;
+        audioUrl = '';
+        defaultST = Duration.zero;
+        firstVideo = VideoItem();
+        if (autoPlay.value) {
+          await playerInit();
+          isShowCover.value = false;
+        }
+        return result;
+      }
       final List<VideoItem> allVideosList = data.dash!.video!;
       try {
         // 当前可播放的最高质量视频
@@ -352,5 +373,12 @@ class VideoDetailController extends GetxController
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;
+  }
+
+  // mob端全屏状态关闭二级回复
+  hiddenReplyReplyPanel() {
+    replyReplyBottomSheetCtr != null
+        ? replyReplyBottomSheetCtr!.close()
+        : print('replyReplyBottomSheetCtr is null');
   }
 }

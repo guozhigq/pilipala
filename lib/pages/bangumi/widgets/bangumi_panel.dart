@@ -151,7 +151,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   }
 
   void changeFucCall(item, i) async {
-    if (item.badge != null && vipStatus != 1) {
+    if (item.badge != null && item.badge == '会员' && vipStatus != 1) {
       SmartDialog.showToast('需要大会员');
       return;
     }
@@ -255,11 +255,24 @@ class _BangumiPanelState extends State<BangumiPanel> {
                               ),
                               const SizedBox(width: 2),
                               if (widget.pages[i].badge != null) ...[
-                                Image.asset(
-                                  'assets/images/big-vip.png',
-                                  height: 16,
-                                ),
-                              ],
+                                if (widget.pages[i].badge == '会员') ...[
+                                  Image.asset(
+                                    'assets/images/big-vip.png',
+                                    height: 16,
+                                  ),
+                                ],
+                                if (widget.pages[i].badge != '会员') ...[
+                                  const Spacer(),
+                                  Text(
+                                    widget.pages[i].badge!,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ]
                             ],
                           ),
                           const SizedBox(height: 3),

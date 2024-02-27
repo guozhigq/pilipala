@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/dynamic_badge_mode.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
@@ -127,11 +128,21 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                         destinations: <Widget>[
                           ..._mainController.navigationBars.map((e) {
                             return NavigationDestination(
-                              icon: Badge(
-                                label: Text(e['count'].toString()),
-                                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                isLabelVisible: e['count'] > 0,
-                                child: e['icon'],
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
+                                              DynamicBadgeMode.number
+                                          ? Text(e['count'].toString())
+                                          : null,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
+                                              DynamicBadgeMode.hidden &&
+                                          e['count'] > 0,
+                                  child: e['icon'],
+                                ),
                               ),
                               selectedIcon: e['selectIcon'],
                               label: e['label'],
@@ -148,11 +159,21 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                         items: [
                           ..._mainController.navigationBars.map((e) {
                             return BottomNavigationBarItem(
-                              icon: Badge(
-                                label: Text(e['count'].toString()),
-                                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                isLabelVisible: e['count'] > 0,
-                                child: e['icon'],
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
+                                              DynamicBadgeMode.number
+                                          ? Text(e['count'].toString())
+                                          : null,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
+                                              DynamicBadgeMode.hidden &&
+                                          e['count'] > 0,
+                                  child: e['icon'],
+                                ),
                               ),
                               activeIcon: e['selectIcon'],
                               label: e['label'],

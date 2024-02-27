@@ -1,15 +1,12 @@
-// import 'package:hive/hive.dart';
 import 'dart:io';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/models/home/rcmd/result.dart';
 import 'package:pilipala/models/model_owner.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
+import 'global_data.dart';
 
 class GStrorage {
-  static late final Box<dynamic> recVideo;
   static late final Box<dynamic> userInfo;
   static late final Box<dynamic> historyword;
   static late final Box<dynamic> localCache;
@@ -21,13 +18,6 @@ class GStrorage {
     final String path = dir.path;
     await Hive.initFlutter('$path/hive');
     regAdapter();
-    // 首页推荐视频
-    recVideo = await Hive.openBox(
-      'recVideo',
-      compactionStrategy: (int entries, int deletedEntries) {
-        return deletedEntries > 12;
-      },
-    );
     // 登录用户信息
     userInfo = await Hive.openBox(
       'userInfo',
@@ -51,13 +41,13 @@ class GStrorage {
         return deletedEntries > 10;
       },
     );
+    // 视频设置
+    video = await Hive.openBox('video');
+    GlobalData().imgQuality =
+        setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
   }
 
   static void regAdapter() {
-    Hive.registerAdapter(RecVideoItemAppModelAdapter());
-    Hive.registerAdapter(RcmdReasonAdapter());
-    Hive.registerAdapter(RcmdStatAdapter());
-    Hive.registerAdapter(RcmdOwnerAdapter());
     Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());
@@ -65,16 +55,9 @@ class GStrorage {
     Hive.registerAdapter(HotSearchItemAdapter());
   }
 
-  static Future<void> lazyInit() async {
-    // 视频设置
-    video = await Hive.openBox('video');
-  }
-
   static Future<void> close() async {
     // user.compact();
     // user.close();
-    recVideo.compact();
-    recVideo.close();
     userInfo.compact();
     userInfo.close();
     historyword.compact();
@@ -120,17 +103,24 @@ class SettingBoxKey {
       /// 隐私
       blackMidsList = 'blackMidsList',
 
+      /// 推荐
+      enableRcmdDynamic = 'enableRcmdDynamic',
+      defaultRcmdType = 'defaultRcmdType',
+      enableSaveLastData = 'enableSaveLastData',
+      minDurationForRcmd = 'minDurationForRcmd',
+      minLikeRatioForRecommend = 'minLikeRatioForRecommend',
+      exemptFilterForFollowed = 'exemptFilterForFollowed',
+      //filterUnfollowedRatio = 'filterUnfollowedRatio',
+      applyFilterToRelatedVideos = 'applyFilterToRelatedVideos',
+
       /// 其他
       autoUpdate = 'autoUpdate',
-      defaultRcmdType = 'defaultRcmdType',
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
       enableQuickFav = 'enableQuickFav',
       enableWordRe = 'enableWordRe',
       enableSearchWord = 'enableSearchWord',
-      enableRcmdDynamic = 'enableRcmdDynamic',
-      enableSaveLastData = 'enableSaveLastData',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi';
 
@@ -145,7 +135,9 @@ class SettingBoxKey {
       enableMYBar = 'enableMYBar',
       hideSearchBar = 'hideSearchBar', // 收起顶栏
       hideTabBar = 'hideTabBar', // 收起底栏
-      tabbarSort = 'tabbarSort'; // 首页tabbar
+      tabbarSort = 'tabbarSort', // 首页tabbar
+      dynamicBadgeMode = 'dynamicBadgeMode',
+      enableGradientBg = 'enableGradientBg';
 }
 
 class LocalCacheKey {
@@ -158,12 +150,13 @@ class LocalCacheKey {
       wbiKeys = 'wbiKeys',
       timeStamp = 'timeStamp',
 
-      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间
+      // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
       danmakuBlockType = 'danmakuBlockType',
       danmakuShowArea = 'danmakuShowArea',
       danmakuOpacity = 'danmakuOpacity',
       danmakuFontScale = 'danmakuFontScale',
       danmakuDuration = 'danmakuDuration',
+      strokeWidth = 'strokeWidth',
 
       // 代理host port
       systemProxyHost = 'systemProxyHost',

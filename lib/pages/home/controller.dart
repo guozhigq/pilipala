@@ -26,6 +26,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late List defaultTabs;
   late List<String> tabbarSort;
   RxString defaultSearch = ''.obs;
+  late bool enableGradientBg;
 
   @override
   void onInit() {
@@ -40,6 +41,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
       searchDefault();
     }
+    enableGradientBg =
+        setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
   }
 
   void onRefresh() {
@@ -63,13 +66,16 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void setTabConfig() async {
-    defaultTabs = tabsConfig;
+    defaultTabs = [...tabsConfig];
     tabbarSort = settingStorage.get(SettingBoxKey.tabbarSort,
         defaultValue: ['live', 'rcmd', 'hot', 'bangumi']);
+    defaultTabs.retainWhere(
+        (item) => tabbarSort.contains((item['type'] as TabType).id));
+    defaultTabs.sort((a, b) => tabbarSort
+        .indexOf((a['type'] as TabType).id)
+        .compareTo(tabbarSort.indexOf((b['type'] as TabType).id)));
 
-    tabs.value = defaultTabs
-        .where((i) => tabbarSort.contains((i['type'] as TabType).id))
-        .toList();
+    tabs.value = defaultTabs;
 
     if (tabbarSort.contains(TabType.rcmd.id)) {
       initialIndex.value = tabbarSort.indexOf(TabType.rcmd.id);

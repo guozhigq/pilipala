@@ -64,7 +64,7 @@ class _MinePageState extends State<MinePage> {
             ),
           ),
           IconButton(
-            onPressed: () => Get.toNamed('/setting'),
+            onPressed: () => Get.toNamed('/setting', preventDuplicates: false),
             icon: const Icon(
               CupertinoIcons.slider_horizontal_3,
             ),

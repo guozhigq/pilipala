@@ -119,7 +119,7 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/follow?mid=${userInfo.value.mid}');
+    Get.toNamed('/follow?mid=${userInfo.value.mid}', preventDuplicates: false);
   }
 
   pushFans() {
@@ -127,7 +127,7 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/fan?mid=${userInfo.value.mid}');
+    Get.toNamed('/fan?mid=${userInfo.value.mid}', preventDuplicates: false);
   }
 
   pushDynamic() {
@@ -135,6 +135,7 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/memberDynamics?mid=${userInfo.value.mid}');
+    Get.toNamed('/memberDynamics?mid=${userInfo.value.mid}',
+        preventDuplicates: false);
   }
 }
