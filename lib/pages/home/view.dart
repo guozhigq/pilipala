@@ -58,6 +58,9 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
+      appBar: _homeController.enableGradientBg
+          ? null
+          : AppBar(toolbarHeight: 0, elevation: 0),
       body: Stack(
         children: [
           // gradient background
