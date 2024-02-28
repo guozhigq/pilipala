@@ -463,7 +463,7 @@ class ReplyItemRow extends StatelessWidget {
 InlineSpan buildContent(
     BuildContext context, replyItem, replyReply, fReplyItem) {
   final String routePath = Get.currentRoute;
-  bool isVideoPage = routePath.startsWith('/video/detail');
+  bool isVideoPage = routePath.startsWith('/video');
 
   // replyItem 当前回复内容
   // replyReply 查看二楼回复（回复详情）回调
