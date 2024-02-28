@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'alpha'
+      - 'main'
     paths-ignore:
       - '**.md'
       - '**.txt'
@@ -58,7 +58,7 @@ jobs:
           #RUN_NUMBER=${{ github.run_number }}
     
           # 构建新版本号
-          NEW_VERSION=$VERSION-alpha.${{ steps.get-first-parent-commit-count.outputs.count }}
+          NEW_VERSION=$VERSION-beta.${{ steps.get-first-parent-commit-count.outputs.count }}
     
           # 输出新版本号
           echo "New version: $NEW_VERSION"
@@ -123,7 +123,7 @@ jobs:
         run: |
           for file in build/app/outputs/flutter-apk/app-*.apk; do
             if [[ $file =~ app-(.?*)release.apk ]]; then
-              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}${{ needs.update_version.outputs.new_version }}.apk"
+              new_file_name="build/app/outputs/flutter-apk/Pili-${BASH_REMATCH[1]}v${{ needs.update_version.outputs.new_version }}.apk"
               mv "$file" "$new_file_name"
             fi
           done
@@ -169,7 +169,7 @@ jobs:
         run: |
           DATE=${{ steps.date.outputs.date }}
           for file in app.ipa; do
-            new_file_name="build/Pili-${{ needs.update_version.outputs.new_version }}.ipa"
+            new_file_name="build/Pili-v${{ needs.update_version.outputs.new_version }}.ipa"
             mv "$file" "$new_file_name"
           done
 
@@ -217,4 +217,4 @@ jobs:
           method: sendFile
           path: Pilipala-CI/*
           parse_mode: Markdown
-          context: "**Pre-release: ${{ needs.update_version.outputs.new_version }}**\n${{ needs.update_version.outputs.last_commit }}"
+          context: "*Pre-release: v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"
