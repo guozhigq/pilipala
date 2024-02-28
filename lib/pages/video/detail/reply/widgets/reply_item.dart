@@ -506,21 +506,25 @@ InlineSpan buildContent(
       .replaceAll('&quot;', '"')
       .replaceAll('&apos;', "'")
       .replaceAll('&nbsp;', ' ');
-  // print("content.jumpUrl.keys:" + content.jumpUrl.keys.toString());
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
     ...content.topicsMeta?.keys?.map((e) => '#$e#') ?? [],
     ...content.atNameToMid.keys.map((e) => '@$e'),
-    ...content.jumpUrl.keys.map((e) =>
-        e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
   ];
+  List<dynamic> jumpUrlKeysList = content.jumpUrl.keys.map((e) {
+    return e.replaceAllMapped(
+        RegExp(r'[?+*]'), (match) => '\\${match.group(0)}');
+  }).toList();
 
   String patternStr = specialTokens.map(RegExp.escape).join('|');
   if (patternStr.isNotEmpty) {
     patternStr += "|";
   }
   patternStr += r'(\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b)';
+  if (jumpUrlKeysList.isNotEmpty) {
+    patternStr += '|${jumpUrlKeysList.join('|')}';
+  }
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   void addPlainTextSpan(str) {
@@ -599,7 +603,6 @@ InlineSpan buildContent(
           ),
         );
       } else {
-        print("matchStr=$matchStr");
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
