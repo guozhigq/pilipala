@@ -51,27 +51,31 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 键盘高度
-      final viewInsets = EdgeInsets.fromViewPadding(
-          View.of(context).viewInsets, View.of(context).devicePixelRatio);
-      _debouncer.run(() {
-        if (mounted) {
-          if (keyboardHeight == 0) {
-            setState(() {
-              emoteHeight = keyboardHeight =
-                  keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
-            });
+    final String routePath = Get.currentRoute;
+    if (mounted && routePath.startsWith('/whisper_detail')) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 键盘高度
+        final viewInsets = EdgeInsets.fromViewPadding(
+            View.of(context).viewInsets, View.of(context).devicePixelRatio);
+        _debouncer.run(() {
+          if (mounted) {
+            if (keyboardHeight == 0) {
+              setState(() {
+                emoteHeight = keyboardHeight =
+                    keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
+              });
+            }
           }
-        }
+        });
       });
-    });
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     replyContentFocusNode.removeListener(() {});
+    replyContentFocusNode.dispose();
     super.dispose();
   }
 
