@@ -23,7 +23,6 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
-import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
@@ -537,6 +536,31 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 .toList(),
                           ),
                         ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TabBar(
+                        controller: videoDetailController.tabCtr,
+                        isScrollable: true,
+                        labelColor: Theme.of(context).colorScheme.primary,
+                        unselectedLabelColor: Colors.grey,
+                        indicator: UnderlineTabIndicator(
+                          borderRadius: BorderRadius.circular(3.0),
+                          borderSide: BorderSide(width: 3.0, color: Theme.of(context).colorScheme.primary),
+                          insets: const EdgeInsets.symmetric(horizontal: 16.0),
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        dividerColor: Colors.transparent,
+                        tabAlignment: TabAlignment.start,
+                        tabs: const [
+                          Tab(
+                            child: Text('简介'),
+                          ),
+                          Tab(
+                            child: Text('评论'),
+                          )
+                        ],
                       ),
                     ),
                     Expanded(
