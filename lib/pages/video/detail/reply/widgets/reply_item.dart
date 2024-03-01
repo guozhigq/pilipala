@@ -462,6 +462,9 @@ class ReplyItemRow extends StatelessWidget {
 
 InlineSpan buildContent(
     BuildContext context, replyItem, replyReply, fReplyItem) {
+  final String routePath = Get.currentRoute;
+  bool isVideoPage = routePath.startsWith('/video');
+
   // replyItem 当前回复内容
   // replyReply 查看二楼回复（回复详情）回调
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
@@ -503,21 +506,25 @@ InlineSpan buildContent(
       .replaceAll('&quot;', '"')
       .replaceAll('&apos;', "'")
       .replaceAll('&nbsp;', ' ');
-  // print("content.jumpUrl.keys:" + content.jumpUrl.keys.toString());
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
     ...content.topicsMeta?.keys?.map((e) => '#$e#') ?? [],
     ...content.atNameToMid.keys.map((e) => '@$e'),
-    ...content.jumpUrl.keys.map((e) =>
-        e.replaceAll('?', '\\?').replaceAll('+', '\\+').replaceAll('*', '\\*')),
   ];
+  List<dynamic> jumpUrlKeysList = content.jumpUrl.keys.map((e) {
+    return e.replaceAllMapped(
+        RegExp(r'[?+*]'), (match) => '\\${match.group(0)}');
+  }).toList();
 
   String patternStr = specialTokens.map(RegExp.escape).join('|');
   if (patternStr.isNotEmpty) {
     patternStr += "|";
   }
   patternStr += r'(\b(?:\d+[:：])?[0-5]?[0-9][:：][0-5]?[0-9]\b)';
+  if (jumpUrlKeysList.isNotEmpty) {
+    patternStr += '|${jumpUrlKeysList.join('|')}';
+  }
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   void addPlainTextSpan(str) {
@@ -571,27 +578,31 @@ InlineSpan buildContent(
         spanChilds.add(
           TextSpan(
             text: ' $matchStr ',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            style: isVideoPage
+                ? TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 // 跳转到指定位置
-                try {
-                  SmartDialog.showToast('跳转至：$matchStr');
-                  Get.find<VideoDetailController>(tag: Get.arguments['heroTag'])
-                      .plPlayerController
-                      .seekTo(
-                        Duration(seconds: Utils.duration(matchStr)),
-                      );
-                } catch (e) {
-                  SmartDialog.showToast('跳转失败: $e');
+                if (isVideoPage) {
+                  try {
+                    SmartDialog.showToast('跳转至：$matchStr');
+                    Get.find<VideoDetailController>(
+                            tag: Get.arguments['heroTag'])
+                        .plPlayerController
+                        .seekTo(
+                          Duration(seconds: Utils.duration(matchStr)),
+                        );
+                  } catch (e) {
+                    SmartDialog.showToast('跳转失败: $e');
+                  }
                 }
               },
           ),
         );
       } else {
-        print("matchStr=$matchStr");
         String appUrlSchema = '';
         final bool enableWordRe = setting.get(SettingBoxKey.enableWordRe,
             defaultValue: false) as bool;
