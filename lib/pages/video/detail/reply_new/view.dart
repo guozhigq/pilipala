@@ -110,7 +110,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   void didChangeMetrics() {
     super.didChangeMetrics();
     final String routePath = Get.currentRoute;
-    if (mounted && routePath.startsWith('/video')) {
+    if (mounted &&
+        (routePath.startsWith('/video') ||
+            routePath.startsWith('/dynamicDetail'))) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // 键盘高度
         final viewInsets = EdgeInsets.fromViewPadding(
