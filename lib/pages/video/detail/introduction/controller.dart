@@ -22,8 +22,9 @@ import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
+  VideoIntroController({required this.bvid});
   // 视频bvid
-  String bvid = Get.parameters['bvid']!;
+  String bvid;
 
   // 是否预渲染 骨架屏
   bool preRender = false;

@@ -23,7 +23,6 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
-import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
@@ -68,7 +67,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController = Get.put(
+        VideoIntroController(bvid: Get.parameters['bvid']!),
+        tag: heroTag);
     videoIntroController.videoDetail.listen((value) {
       videoPlayerServiceHandler.onVideoDetailChange(
           value, videoDetailController.cid.value);
@@ -227,6 +228,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
     }
+    print('🐶🐶');
     setState(() => isShowing = false);
     super.didPushNext();
   }
@@ -550,7 +552,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 slivers: <Widget>[
                                   if (videoDetailController.videoType ==
                                       SearchType.video) ...[
-                                    const VideoIntroPanel(),
+                                    VideoIntroPanel(
+                                        bvid: videoDetailController.bvid),
                                   ] else if (videoDetailController.videoType ==
                                       SearchType.media_bangumi) ...[
                                     Obx(() => BangumiIntroPanel(
@@ -577,7 +580,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .withOpacity(0.06),
                                     ),
                                   ),
-                                  RelatedVideoPanel(),
+                                  const RelatedVideoPanel(),
                                 ],
                               );
                             },
@@ -627,6 +630,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     headerControl: HeaderControl(
                       controller: plPlayerController,
                       videoDetailCtr: videoDetailController,
+                      bvid: videoDetailController.bvid,
                     ),
                     danmuWidget: Obx(
                       () => PlDanmaku(

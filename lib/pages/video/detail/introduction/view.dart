@@ -24,7 +24,10 @@ import 'widgets/page.dart';
 import 'widgets/season.dart';
 
 class VideoIntroPanel extends StatefulWidget {
-  const VideoIntroPanel({super.key});
+  final String bvid;
+  final String? cid;
+
+  const VideoIntroPanel({super.key, required this.bvid, this.cid});
 
   @override
   State<VideoIntroPanel> createState() => _VideoIntroPanelState();
@@ -47,7 +50,8 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 
     /// fix 全屏时参数丢失
     heroTag = Get.arguments['heroTag'];
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
     _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
@@ -77,6 +81,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
                 loadingStatus: false,
                 videoDetail: videoIntroController.videoDetail.value,
                 heroTag: heroTag,
+                bvid: widget.bvid,
               ),
             );
           } else {
@@ -95,6 +100,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             loadingStatus: true,
             videoDetail: videoDetail,
             heroTag: heroTag,
+            bvid: widget.bvid,
           );
         }
       },
@@ -106,10 +112,15 @@ class VideoInfo extends StatefulWidget {
   final bool loadingStatus;
   final VideoDetailData? videoDetail;
   final String? heroTag;
+  final String bvid;
 
-  const VideoInfo(
-      {Key? key, this.loadingStatus = false, this.videoDetail, this.heroTag})
-      : super(key: key);
+  const VideoInfo({
+    Key? key,
+    this.loadingStatus = false,
+    this.videoDetail,
+    this.heroTag,
+    required this.bvid,
+  }) : super(key: key);
 
   @override
   State<VideoInfo> createState() => _VideoInfoState();
@@ -149,7 +160,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     heroTag = widget.heroTag!;
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     videoItem = videoIntroController.videoItem!;
     sheetHeight = localCache.get('sheetHeight');

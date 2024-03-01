@@ -27,11 +27,13 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.controller,
     this.videoDetailCtr,
     this.floating,
+    this.bvid,
     super.key,
   });
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
   final Floating? floating;
+  final String? bvid;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -62,7 +64,8 @@ class _HeaderControlState extends State<HeaderControl> {
     speedsList = widget.controller!.speedsList;
     fullScreenStatusListener();
     heroTag = Get.arguments['heroTag'];
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid!), tag: heroTag);
   }
 
   void fullScreenStatusListener() {
