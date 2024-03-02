@@ -49,6 +49,8 @@ class GStrorage {
     GlobalData().fullScreenGestureMode = FullScreenGestureMode.values[
         setting.get(SettingBoxKey.fullScreenGestureMode,
             defaultValue: FullScreenGestureMode.values.last.index) as int];
+    GlobalData().enablePlayerControlAnimation = setting
+        .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
   }
 
   static void regAdapter() {
@@ -98,6 +100,7 @@ class SettingBoxKey {
       enableCDN = 'enableCDN',
       autoPiP = 'autoPiP',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
+      enablePlayerControlAnimation = 'enablePlayerControlAnimation',
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',

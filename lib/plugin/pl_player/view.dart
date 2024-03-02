@@ -120,7 +120,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     super.initState();
     screenWidth = Get.size.width;
     animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+      vsync: this,
+      duration: GlobalData().enablePlayerControlAnimation
+          ? const Duration(milliseconds: 150)
+          : const Duration(milliseconds: 10),
+    );
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
     widget.controller.bottomControl = widget.bottomControl;

@@ -4,6 +4,7 @@ class GlobalData {
   int imgQuality = 10;
   FullScreenGestureMode fullScreenGestureMode =
       FullScreenGestureMode.values.last;
+  bool enablePlayerControlAnimation = true;
 
   // 私有构造函数
   GlobalData._();
