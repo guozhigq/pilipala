@@ -1,16 +1,16 @@
-name: CI
+name: Pilipala Beta
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - 'main'
+      - "main"
     paths-ignore:
-      - '**.md'
-      - '**.txt'
-      - '.github/**'
-      - '.idea/**'
-      - '!.github/workflows/**'
+      - "**.md"
+      - "**.txt"
+      - ".github/**"
+      - ".idea/**"
+      - "!.github/workflows/**"
 
 jobs:
   update_version:
@@ -53,16 +53,16 @@ jobs:
         run: |
           # 读取版本号
           VERSION=$(yq e .version pubspec.yaml | cut -d "+" -f 1)
-    
+
           # 获取GitHub Actions的run_number
           #RUN_NUMBER=${{ github.run_number }}
-    
+
           # 构建新版本号
           NEW_VERSION=$VERSION-beta.${{ steps.get-first-parent-commit-count.outputs.count }}
-    
+
           # 输出新版本号
           echo "New version: $NEW_VERSION"
-    
+
           # 设置新版本号为输出变量
           echo "new_version=$NEW_VERSION" >>$GITHUB_OUTPUT
 
@@ -189,22 +189,10 @@ jobs:
       - android
       - iOS
     steps:
-
       - uses: actions/download-artifact@v3
         with:
           name: Pilipala-CI
           path: ./Pilipala-CI
-          
-      # - name: Upload Pre-release
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     name: ${{ needs.update_version.outputs.new_version }}
-      #     token: ${{ secrets.GIT_TOKEN }}
-      #     commit: main
-      #     tag: ${{ needs.update_version.outputs.new_version }}
-      #     prerelease: true
-      #     allowUpdates: true
-      #     artifacts: Pilipala-CI/*
 
       - name: 发送到Telegram频道
         uses: xireiki/channel-post@v1.0.7
@@ -217,4 +205,4 @@ jobs:
           method: sendFile
           path: Pilipala-CI/*
           parse_mode: Markdown
-          context: "*Pre-release: v${{ needs.update_version.outputs.new_version }}*\n${{ needs.update_version.outputs.last_commit }}"
+          context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}](${{ github.event.head_commit.url }})"
