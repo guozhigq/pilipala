@@ -20,7 +20,7 @@ import 'package:pilipala/utils/utils.dart';
 class DynamicsController extends GetxController {
   int page = 1;
   String? offset = '';
-  RxList<DynamicItemModel> dynamicsList = [DynamicItemModel()].obs;
+  RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
   Rx<DynamicsType> dynamicsType = DynamicsType.values[0].obs;
   RxString dynamicsTypeLabel = '全部'.obs;
   final ScrollController scrollController = ScrollController();
@@ -105,7 +105,7 @@ class DynamicsController extends GetxController {
 
   onSelectType(value) async {
     dynamicsType.value = filterTypeList[value]['value'];
-    dynamicsList.value = [DynamicItemModel()];
+    dynamicsList.value = <DynamicItemModel>[];
     page = 1;
     initialValue.value = value;
     await queryFollowDynamic();
@@ -264,7 +264,7 @@ class DynamicsController extends GetxController {
 
   onSelectUp(mid) async {
     dynamicsType.value = DynamicsType.values[0];
-    dynamicsList.value = [DynamicItemModel()];
+    dynamicsList.value = <DynamicItemModel>[];
     page = 1;
     queryFollowDynamic();
   }
@@ -293,7 +293,7 @@ class DynamicsController extends GetxController {
     dynamicsType.value = DynamicsType.values[0];
     initialValue.value = 0;
     SmartDialog.showToast('还原默认加载');
-    dynamicsList.value = [DynamicItemModel()];
+    dynamicsList.value = <DynamicItemModel>[];
     queryFollowDynamic();
   }
 }

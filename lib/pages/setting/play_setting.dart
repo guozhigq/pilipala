@@ -7,6 +7,7 @@ import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/services/service_locator.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import 'widgets/switch_item.dart';
@@ -73,6 +74,12 @@ class _PlaySettingState extends State<PlaySetting> {
             title: Text('倍速设置', style: titleStyle),
             subtitle: Text('设置视频播放速度', style: subTitleStyle),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/playerGestureSet'),
+            title: Text('手势设置', style: titleStyle),
+            subtitle: Text('设置播放器手势', style: subTitleStyle),
+          ),
           const SetSwitchItem(
             title: '开启1080P',
             subTitle: '免登录查看1080P视频',
@@ -135,17 +142,19 @@ class _PlaySettingState extends State<PlaySetting> {
             defaultVal: false,
           ),
           const SetSwitchItem(
-            title: '双击快退/快进',
-            subTitle: '左侧双击快退，右侧双击快进',
-            setKey: SettingBoxKey.enableQuickDouble,
-            defaultVal: true,
-          ),
-          const SetSwitchItem(
             title: '弹幕开关',
             subTitle: '展示弹幕',
             setKey: SettingBoxKey.enableShowDanmaku,
             defaultVal: false,
           ),
+          SetSwitchItem(
+              title: '控制栏动画',
+              subTitle: '播放器控制栏显示动画效果',
+              setKey: SettingBoxKey.enablePlayerControlAnimation,
+              defaultVal: true,
+              callFn: (bool val) {
+                GlobalData().enablePlayerControlAnimation = val;
+              }),
           ListTile(
             dense: false,
             title: Text('默认画质', style: titleStyle),

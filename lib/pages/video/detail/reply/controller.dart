@@ -22,7 +22,7 @@ class VideoReplyController extends GetxController {
   String? replyLevel;
   // rpid 请求楼中楼回复
   String? rpid;
-  RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
+  RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
