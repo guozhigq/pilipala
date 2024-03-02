@@ -31,8 +31,8 @@ class _UpPanelState extends State<UpPanel> {
   void initState() {
     super.initState();
     upList = widget.upData!.upList!;
-    if (widget.upData!.liveUsers != null) {
-      liveList = widget.upData!.liveUsers!.items!;
+    if (widget.upData!.liveList!.isNotEmpty) {
+      liveList = widget.upData!.liveList!;
     }
     upList.insert(
       0,
@@ -55,7 +55,7 @@ class _UpPanelState extends State<UpPanel> {
       floating: true,
       pinned: false,
       delegate: _SliverHeaderDelegate(
-          height: 126,
+          height: liveList.isNotEmpty || upList.isNotEmpty ? 126 : 0,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,32 +88,36 @@ class _UpPanelState extends State<UpPanel> {
               Container(
                 height: 90,
                 color: Theme.of(context).colorScheme.background,
-                child: Expanded(
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    controller: scrollController,
-                    children: [
-                      const SizedBox(width: 10),
-                      if (liveList.isNotEmpty) ...[
-                        for (int i = 0; i < liveList.length; i++) ...[
-                          upItemBuild(liveList[i], i)
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        controller: scrollController,
+                        children: [
+                          const SizedBox(width: 10),
+                          if (liveList.isNotEmpty) ...[
+                            for (int i = 0; i < liveList.length; i++) ...[
+                              upItemBuild(liveList[i], i)
+                            ],
+                            VerticalDivider(
+                              indent: 20,
+                              endIndent: 40,
+                              width: 26,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.5),
+                            ),
+                          ],
+                          for (int i = 0; i < upList.length; i++) ...[
+                            upItemBuild(upList[i], i)
+                          ],
+                          const SizedBox(width: 10),
                         ],
-                        VerticalDivider(
-                          indent: 20,
-                          endIndent: 40,
-                          width: 26,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5),
-                        ),
-                      ],
-                      for (int i = 0; i < upList.length; i++) ...[
-                        upItemBuild(upList[i], i)
-                      ],
-                      const SizedBox(width: 10),
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(

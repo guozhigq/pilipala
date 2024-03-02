@@ -249,8 +249,8 @@ class DynamicsController extends GetxController {
       return {'status': false, 'msg': '账号未登录'};
     }
     if (type == 'init') {
-      upData.value.upList = [];
-      upData.value.liveUsers = LiveUsers();
+      upData.value.upList = <UpItem>[];
+      upData.value.liveList = <LiveUserItem>[];
     }
     var res = await DynamicsHttp.followUp();
     if (res['status']) {
@@ -271,7 +271,6 @@ class DynamicsController extends GetxController {
 
   onRefresh() async {
     page = 1;
-    print('onRefresh');
     await queryFollowUp();
     await queryFollowDynamic();
   }

@@ -2,15 +2,22 @@ class FollowUpModel {
   FollowUpModel({
     this.liveUsers,
     this.upList,
+    this.liveList,
   });
 
   LiveUsers? liveUsers;
   List<UpItem>? upList;
+  List<LiveUserItem>? liveList;
 
   FollowUpModel.fromJson(Map<String, dynamic> json) {
     liveUsers = json['live_users'] != null
         ? LiveUsers.fromJson(json['live_users'])
         : null;
+    liveList = json['live_users'] != null
+        ? json['live_users']['items']
+            .map<LiveUserItem>((e) => LiveUserItem.fromJson(e))
+            .toList()
+        : [];
     upList = json['up_list'] != null
         ? json['up_list'].map<UpItem>((e) => UpItem.fromJson(e)).toList()
         : [];
