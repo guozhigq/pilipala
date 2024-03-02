@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -228,7 +229,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
     }
-    print('🐶🐶');
     setState(() => isShowing = false);
     super.didPushNext();
   }
@@ -406,7 +406,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                           ),
                                               );
                                             } else {
-                                              return const SizedBox();
+                                              return buildCustomAppBar();
                                             }
                                           },
                                         ),
@@ -449,33 +449,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                     top: 0,
                                                     left: 0,
                                                     right: 0,
-                                                    child: AppBar(
-                                                      primary: false,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      elevation: 0,
-                                                      scrolledUnderElevation: 0,
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      actions: [
-                                                        IconButton(
-                                                          tooltip: '稍后再看',
-                                                          onPressed: () async {
-                                                            var res = await UserHttp
-                                                                .toViewLater(
-                                                                    bvid: videoDetailController
-                                                                        .bvid);
-                                                            SmartDialog
-                                                                .showToast(
-                                                                    res['msg']);
-                                                          },
-                                                          icon: const Icon(Icons
-                                                              .history_outlined),
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 14)
-                                                      ],
-                                                    ),
+                                                    child: buildCustomAppBar(),
                                                   ),
                                                   Positioned(
                                                     right: 12,
@@ -656,5 +630,49 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     } else {
       return childWhenDisabled;
     }
+  }
+
+  Widget buildCustomAppBar() {
+    return AppBar(
+      backgroundColor: Colors.transparent, // 使背景透明
+      foregroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      primary: false,
+      centerTitle: false,
+      automaticallyImplyLeading: false,
+      titleSpacing: 0,
+      title: Container(
+        height: kToolbarHeight,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: <Color>[
+            Colors.transparent,
+            Colors.black54,
+          ],
+          tileMode: TileMode.mirror,
+        )),
+        child: Row(
+          children: [
+            ComBtn(
+              icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
+              fuc: () => Get.back(),
+            ),
+            const Spacer(),
+            ComBtn(
+              icon: const Icon(Icons.history_outlined, size: 22),
+              fuc: () async {
+                var res = await UserHttp.toViewLater(
+                    bvid: videoDetailController.bvid);
+                SmartDialog.showToast(res['msg']);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
