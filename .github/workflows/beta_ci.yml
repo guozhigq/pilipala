@@ -131,7 +131,7 @@ jobs:
       - name: 上传
         uses: actions/upload-artifact@v3
         with:
-          name: Pilipala-CI
+          name: Pilipala-Beta
           path: |
             build/app/outputs/flutter-apk/Pili-*.apk
 
@@ -177,7 +177,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: Pilipala-CI
+          name: Pilipala-Beta
           path: |
             build/Pili-*.ipa
 
@@ -191,8 +191,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: Pilipala-CI
-          path: ./Pilipala-CI
+          name: Pilipala-Beta
+          path: ./Pilipala-Beta
 
       - name: 发送到Telegram频道
         uses: xireiki/channel-post@v1.0.7
@@ -203,6 +203,6 @@ jobs:
           api_id: ${{ secrets.TELEGRAM_API_ID }}
           api_hash: ${{ secrets.TELEGRAM_API_HASH }}
           method: sendFile
-          path: Pilipala-CI/*
+          path: Pilipala-Beta/*
           parse_mode: Markdown
           context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}](${{ github.event.head_commit.url }})"
