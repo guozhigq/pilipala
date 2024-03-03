@@ -502,7 +502,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: d2d8421c4d80f6113f832404109853684721e11a
+      resolved-ref: "8e89669eb9341f9980265306e24ef96fdbd3fd08"
       url: "https://github.com/guozhigq/floating.git"
     source: git
     version: "2.0.1"
