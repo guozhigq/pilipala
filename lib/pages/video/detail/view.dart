@@ -58,9 +58,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
   late bool autoPiP;
-  final Floating floating = Floating();
-  // 生命周期监听
-  late final AppLifecycleListener _lifecycleListener;
+  late Floating floating;
   bool isShowing = true;
 
   @override
@@ -93,8 +91,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    lifecycleListener();
     fullScreenStatusListener();
+    if (Platform.isAndroid) {
+      floating = videoDetailController.floating!;
+      autoEnterPip();
+    }
   }
 
   // 获取视频资源，初始化播放器
@@ -152,6 +153,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         }
       } catch (_) {}
     }
+    if (Platform.isAndroid) {
+      floating.toggleAutoPip(
+          autoEnter: status == PlayerStatus.playing && autoPiP);
+    }
   }
 
   // 继续播放或重新播放
@@ -168,27 +173,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     videoDetailController.autoPlay.value = true;
     videoDetailController.isShowCover.value = false;
-  }
-
-  // 生命周期监听
-  void lifecycleListener() {
-    _lifecycleListener = AppLifecycleListener(
-      onResume: () => _handleTransition('resume'),
-      // 后台
-      onInactive: () => _handleTransition('inactive'),
-      // 在Android和iOS端不生效
-      onHide: () => _handleTransition('hide'),
-      onShow: () => _handleTransition('show'),
-      onPause: () => _handleTransition('pause'),
-      onRestart: () => _handleTransition('restart'),
-      onDetach: () => _handleTransition('detach'),
-      // 只作用于桌面端
-      onExitRequested: () {
-        ScaffoldMessenger.maybeOf(context)
-            ?.showSnackBar(const SnackBar(content: Text("拦截应用退出")));
-        return Future.value(AppExitResponse.cancel);
-      },
-    );
   }
 
   void fullScreenStatusListener() {
@@ -210,8 +194,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoDetailController.floating!.dispose();
     }
     videoPlayerServiceHandler.onVideoDetailDispose();
-    floating.dispose();
-    _lifecycleListener.dispose();
+    if (Platform.isAndroid) {
+      floating.toggleAutoPip(autoEnter: false);
+      floating.dispose();
+    }
     super.dispose();
   }
 
@@ -264,29 +250,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         .subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
-  void _handleTransition(String name) {
-    switch (name) {
-      case 'inactive':
-        if (plPlayerController != null &&
-            playerStatus == PlayerStatus.playing) {
-          autoEnterPip();
-        }
-        break;
-    }
-  }
-
   void autoEnterPip() {
     final String routePath = Get.currentRoute;
-    final bool isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
-    /// TODO 横屏全屏状态下误触pip
-    if (autoPiP && routePath.startsWith('/video') && isPortrait) {
-      floating.enable(
-          aspectRatio: Rational(
-        videoDetailController.data.dash!.video!.first.width!,
-        videoDetailController.data.dash!.video!.first.height!,
-      ));
+    if (autoPiP && routePath.startsWith('/video')) {
+      floating.toggleAutoPip(autoEnter: autoPiP);
     }
   }
 
