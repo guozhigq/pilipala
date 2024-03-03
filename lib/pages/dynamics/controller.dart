@@ -258,6 +258,10 @@ class DynamicsController extends GetxController {
       if (upData.value.upList!.isEmpty) {
         mid.value = -1;
       }
+      upData.value.upList!.insertAll(0, [
+        UpItem(face: '', uname: '全部动态', mid: -1),
+        UpItem(face: userInfo.face, uname: '我', mid: userInfo.mid),
+      ]);
     }
     return res;
   }

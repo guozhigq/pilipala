@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/dynamics/controller.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
-  final FollowUpModel? upData;
+  final FollowUpModel upData;
   const UpPanel(this.upData, {Key? key}) : super(key: key);
 
   @override
@@ -24,33 +22,17 @@ class _UpPanelState extends State<UpPanel> {
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
   static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
-  Box userInfoCache = GStrorage.userInfo;
-  var userInfo;
+  late MyInfo userInfo;
 
-  @override
-  void initState() {
-    super.initState();
-    upList = widget.upData!.upList!;
-    if (widget.upData!.liveList!.isNotEmpty) {
-      liveList = widget.upData!.liveList!;
-    }
-    upList.insert(
-      0,
-      UpItem(face: '', uname: '全部动态', mid: -1),
-    );
-    userInfo = userInfoCache.get('userInfoCache');
-    upList.insert(
-      1,
-      UpItem(
-        face: userInfo.face,
-        uname: '我',
-        mid: userInfo.mid,
-      ),
-    );
+  void listFormat() {
+    userInfo = widget.upData.myInfo!;
+    upList = widget.upData.upList!;
+    liveList = widget.upData.liveList!;
   }
 
   @override
   Widget build(BuildContext context) {
+    listFormat();
     return SliverPersistentHeader(
       floating: true,
       pinned: false,
