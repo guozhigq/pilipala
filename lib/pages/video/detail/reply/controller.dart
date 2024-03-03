@@ -62,6 +62,7 @@ class VideoReplyController extends GetxController {
       noMore.value = '';
     }
     if (noMore.value == '没有更多了') {
+      isLoadingMore = false;
       return;
     }
     final res = await ReplyHttp.replyList(
