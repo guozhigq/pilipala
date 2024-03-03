@@ -12,6 +12,7 @@ import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
@@ -19,44 +20,7 @@ class MainController extends GetxController {
     const DynamicsPage(),
     const MediaPage(),
   ];
-  RxList navigationBars = [
-    {
-      'icon': const Icon(
-        Icons.home_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.home,
-        size: 21,
-      ),
-      'label': "首页",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.motion_photos_on_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.motion_photos_on,
-        size: 21,
-      ),
-      'label': "动态",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.video_collection_outlined,
-        size: 20,
-      ),
-      'selectIcon': const Icon(
-        Icons.video_collection,
-        size: 21,
-      ),
-      'label': "媒体库",
-      'count': 0,
-    }
-  ].obs;
+  RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =
       StreamController<bool>.broadcast();
   Box setting = GStrorage.setting;
@@ -75,6 +39,10 @@ class MainController extends GetxController {
       Utils.checkUpdata();
     }
     hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
+    int defaultHomePage =
+        setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0) as int;
+    selectedIndex = defaultNavigationBars
+        .indexWhere((item) => item['id'] == defaultHomePage);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(

@@ -12,6 +12,7 @@ import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 import 'controller.dart';
 import 'widgets/switch_item.dart';
 
@@ -29,7 +30,6 @@ class _StyleSettingState extends State<StyleSetting> {
 
   Box setting = GStrorage.setting;
   late int picQuality;
-  late double toastOpacity;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;
 
@@ -37,7 +37,6 @@ class _StyleSettingState extends State<StyleSetting> {
   void initState() {
     super.initState();
     picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
-    toastOpacity = setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     _tempThemeValue = settingController.themeType.value;
     defaultCustomRows = setting.get(SettingBoxKey.customRows, defaultValue: 2);
   }
@@ -265,6 +264,14 @@ class _StyleSettingState extends State<StyleSetting> {
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
                 '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
+                style: subTitleStyle)),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => settingController.seteDefaultHomePage(context),
+            title: Text('默认启动页', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前启动页：${defaultNavigationBars.firstWhere((e) => e['id'] == settingController.defaultHomePage.value)['label']}',
                 style: subTitleStyle)),
           ),
           ListTile(

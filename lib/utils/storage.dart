@@ -130,7 +130,8 @@ class SettingBoxKey {
       enableWordRe = 'enableWordRe',
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
-      enableAi = 'enableAi';
+      enableAi = 'enableAi',
+      defaultHomePage = 'defaultHomePage';
 
   /// 外观
   static const String themeMode = 'themeMode',
