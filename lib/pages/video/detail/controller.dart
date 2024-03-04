@@ -129,6 +129,7 @@ class VideoDetailController extends GetxController
       videoDetailCtr: this,
       floating: floating,
       bvid: bvid,
+      videoType: videoType,
     );
     // CDN优化
     enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);

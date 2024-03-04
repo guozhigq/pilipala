@@ -19,6 +19,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/http/danmaku.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
+import '../../../../models/common/search_type.dart';
 import '../../../../models/video_detail_res.dart';
 import '../introduction/index.dart';
 
@@ -28,12 +29,14 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.videoDetailCtr,
     this.floating,
     this.bvid,
+    this.videoType,
     super.key,
   });
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
   final Floating? floating;
   final String? bvid;
+  final SearchType? videoType;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -1107,14 +1110,16 @@ class _HeaderControlState extends State<HeaderControl> {
             },
           ),
           SizedBox(width: buttonSpace),
-          if (showTitle && isLandscape) ...[
+          if (showTitle &&
+              isLandscape &&
+              widget.videoType == SearchType.video) ...[
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 200),
+                  constraints: const BoxConstraints(maxWidth: 200),
                   child: Text(
-                    videoIntroController.videoDetail.value.title!,
+                    videoIntroController.videoDetail.value.title ?? '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,

@@ -572,6 +572,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       controller: plPlayerController,
                       videoDetailCtr: videoDetailController,
                       bvid: videoDetailController.bvid,
+                      videoType: videoDetailController.videoType,
                     ),
                     danmuWidget: Obx(
                       () => PlDanmaku(
