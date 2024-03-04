@@ -91,19 +91,21 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       vsync: this,
     );
     // 监听 tabController 切换
-    tabController.animation!.addListener(() {
-      if (tabController.indexIsChanging) {
-        if (initialIndex.value != tabController.index) {
-          initialIndex.value = tabController.index;
+    if (enableGradientBg) {
+      tabController.animation!.addListener(() {
+        if (tabController.indexIsChanging) {
+          if (initialIndex.value != tabController.index) {
+            initialIndex.value = tabController.index;
+          }
+        } else {
+          final int temp = tabController.animation!.value.round();
+          if (initialIndex.value != temp) {
+            initialIndex.value = temp;
+            tabController.index = initialIndex.value;
+          }
         }
-      } else {
-        final int temp = tabController.animation!.value.round();
-        if (initialIndex.value != temp) {
-          initialIndex.value = temp;
-          tabController.index = initialIndex.value;
-        }
-      }
-    });
+      });
+    }
   }
 
   void searchDefault() async {
