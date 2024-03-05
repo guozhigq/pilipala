@@ -79,7 +79,11 @@ class _HeaderControlState extends State<HeaderControl> {
       } else {
         showTitle = false;
       }
-      setState(() {});
+
+      /// TODO setState() called after dispose()
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
