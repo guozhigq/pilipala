@@ -92,7 +92,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: () {
                       _videoReplyReplyController.currentPage = 0;
-                      widget.closePanel!();
+                      widget.closePanel?.call;
                       Navigator.pop(context);
                     },
                   ),
@@ -184,6 +184,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                             .add(replyItem);
                                       },
                                       replyType: widget.replyType,
+                                      replyReply: (replyItem) =>
+                                          replyReply(replyItem),
                                     );
                                   }
                                 },
