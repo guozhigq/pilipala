@@ -642,6 +642,11 @@ InlineSpan buildContent(
                       } else {
                         final String redirectUrl =
                             await UrlUtils.parseRedirectUrl(matchStr);
+                        if (redirectUrl == matchStr) {
+                          Clipboard.setData(ClipboardData(text: matchStr));
+                          SmartDialog.showToast('地址可能有误');
+                          return;
+                        }
                         final String pathSegment = Uri.parse(redirectUrl).path;
                         final String lastPathSegment =
                             pathSegment.split('/').last;
