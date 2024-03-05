@@ -34,8 +34,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     userFace.value = userInfo != null ? userInfo.face : '';
-    // 进行tabs配置
-    setTabConfig();
     hideSearchBar =
         setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
@@ -43,6 +41,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     }
     enableGradientBg =
         setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
+    // 进行tabs配置
+    setTabConfig();
   }
 
   void onRefresh() {
