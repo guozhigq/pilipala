@@ -277,8 +277,7 @@ class PlPlayerController {
     danmakuDurationVal =
         localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
     // 描边粗细
-    strokeWidth =
-        localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
+    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -535,8 +534,10 @@ class PlPlayerController {
           if (event) {
             playerStatus.status.value = PlayerStatus.playing;
           } else {
-            // playerStatus.status.value = PlayerStatus.paused;
+            playerStatus.status.value = PlayerStatus.paused;
           }
+          videoPlayerServiceHandler.onStatusChange(
+              playerStatus.status.value, isBuffering.value);
 
           /// 触发回调事件
           for (var element in _statusListeners) {
