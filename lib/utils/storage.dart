@@ -170,6 +170,10 @@ class LocalCacheKey {
       // 代理host port
       systemProxyHost = 'systemProxyHost',
       systemProxyPort = 'systemProxyPort';
+
+  static const String isDisableBatteryOptLocal = 'isDisableBatteryOptLocal',
+      isManufacturerBatteryOptimizationDisabled =
+          'isManufacturerBatteryOptimizationDisabled';
 }
 
 class VideoBoxKey {
