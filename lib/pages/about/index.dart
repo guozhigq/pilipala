@@ -276,7 +276,7 @@ class AboutController extends GetxController {
 
   githubRelease() {
     launchUrl(
-      Uri.parse('https://github.com/guozhigq/pilipala/release'),
+      Uri.parse('https://github.com/guozhigq/pilipala/releases'),
       mode: LaunchMode.externalApplication,
     );
   }
