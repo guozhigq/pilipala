@@ -201,7 +201,6 @@ class _AboutPageState extends State<AboutPage> {
                 var cleanStatus = await CacheManage().clearCacheAll();
                 if (cleanStatus) {
                   getCacheSize();
-                  SmartDialog.showToast('清除成功');
                 }
               },
               title: const Text('清除缓存'),
