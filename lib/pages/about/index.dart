@@ -253,12 +253,16 @@ class AboutController extends GetxController {
   // 获取远程版本
   Future getRemoteApp() async {
     var result = await Request().get(Api.latestApp, extra: {'ua': 'pc'});
+    isLoading.value = false;
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return;
+    }
     data = LatestDataModel.fromJson(result.data);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;
     isUpdate.value =
         Utils.needUpdate(currentVersion.value, remoteVersion.value);
-    isLoading.value = false;
   }
 
   // 跳转下载/本地更新

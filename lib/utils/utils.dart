@@ -243,6 +243,10 @@ class Utils {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return false;
+    }
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
