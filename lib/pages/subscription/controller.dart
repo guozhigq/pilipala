@@ -46,4 +46,41 @@ class SubController extends GetxController {
   Future onLoad() async {
     querySubFolder(type: 'onload');
   }
+
+  // 取消订阅
+  Future<dynamic> cancelSub({required int id}) async {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确认要取消订阅吗?'),
+          actions: [
+            TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  '取消',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.outline),
+                )),
+            TextButton(
+              onPressed: () async {
+                Get.back();
+                var res = await UserHttp.userSubCancel(seasonId: id);
+                if (res['status']) {
+                  SmartDialog.showToast('取消订阅成功');
+                  subFolderData.value.list!
+                      .removeWhere((element) => element.id == id);
+                  subFolderData.update((val) {});
+                } else {
+                  SmartDialog.showToast(res['msg']);
+                }
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
 }

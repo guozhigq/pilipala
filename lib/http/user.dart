@@ -349,4 +349,21 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+
+  // 取消订阅
+  static Future userSubCancel({required int seasonId}) async {
+    var res = await Request().post(
+      Api.userSubCancel,
+      queryParameters: {
+        'season_id': seasonId,
+        'platform': 'web',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '取消订阅成功'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }

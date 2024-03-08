@@ -8,7 +8,8 @@ import '../../../models/user/sub_folder.dart';
 
 class SubItem extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const SubItem({super.key, required this.subFolderItem});
+  final Function fuc;
+  const SubItem({super.key, required this.subFolderItem, required this.fuc});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class SubItem extends StatelessWidget {
                       },
                     ),
                   ),
-                  VideoContent(subFolderItem: subFolderItem)
+                  VideoContent(subFolderItem: subFolderItem, fuc: fuc)
                 ],
               ),
             );
@@ -64,7 +65,9 @@ class SubItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const VideoContent({super.key, required this.subFolderItem});
+  final Function fuc;
+  const VideoContent(
+      {super.key, required this.subFolderItem, required this.fuc});
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +101,20 @@ class VideoContent extends StatelessWidget {
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                 color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              height: 34,
+              child: TextButton(
+                onPressed: () => fuc(),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                  foregroundColor: Theme.of(context).colorScheme.outline,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.onInverseSurface, // 设置按钮背景色
+                ),
+                child: const Text('取消订阅'),
               ),
             ),
           ],

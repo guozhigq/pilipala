@@ -490,6 +490,9 @@ class Api {
   /// 我的订阅详情
   static const userSubFolderDetail = '/x/space/fav/season/list';
 
+  /// 取消订阅
+  static const userSubCancel = '/x/v3/fav/season/unfav';
+
   /// 表情
   static const emojiList = '/x/emote/user/panel/web';
 

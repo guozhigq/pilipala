@@ -57,8 +57,15 @@ class _SubPageState extends State<SubPage> {
                   itemCount: _subController.subFolderData.value.list!.length,
                   itemBuilder: (context, index) {
                     return SubItem(
-                        subFolderItem:
-                            _subController.subFolderData.value.list![index]);
+                      subFolderItem:
+                          _subController.subFolderData.value.list![index],
+                      fuc: () {
+                        _subController.cancelSub(
+                          id: _subController
+                              .subFolderData.value.list![index].id!,
+                        );
+                      },
+                    );
                   },
                 ),
               );
