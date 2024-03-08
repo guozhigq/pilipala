@@ -85,7 +85,9 @@ class SearchVideoItemModel {
     // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
     title = Em.regTitle(json['title']);
     description = json['description'];
-    pic = 'https:${json['pic']}';
+    pic = json['pic'] != null && json['pic'].startsWith('//')
+        ? 'https:${json['pic']}'
+        : json['pic'] ?? '';
     videoReview = json['video_review'];
     pubdate = json['pubdate'];
     senddate = json['senddate'];
