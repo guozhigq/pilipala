@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/live_room/index.dart';
@@ -113,6 +114,30 @@ class _BottomControlState extends State<BottomControl> {
             ),
             const SizedBox(width: 4),
           ],
+          SizedBox(
+            width: 30,
+            child: PopupMenuButton<int>(
+              padding: EdgeInsets.zero,
+              onSelected: (value) {
+                widget.liveRoomCtr!.changeQn(value);
+              },
+              child: Obx(
+                () => Text(
+                  widget.liveRoomCtr!.currentQnDesc.value,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+              itemBuilder: (BuildContext context) {
+                return widget.liveRoomCtr!.acceptQnList.map((e) {
+                  return PopupMenuItem<int>(
+                    value: e['code'],
+                    child: Text(e['desc']),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
           ComBtn(
             icon: const Icon(
               Icons.fullscreen,

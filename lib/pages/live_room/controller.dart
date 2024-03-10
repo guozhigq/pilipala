@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
+import 'package:pilipala/models/live/quality.dart';
 import 'package:pilipala/models/live/room_info.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import '../../models/live/room_info_h5.dart';
@@ -19,10 +20,14 @@ class LiveRoomController extends GetxController {
       PlPlayerController.getInstance(videoType: 'live');
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
   late bool enableCDN;
+  late int currentQn;
+  late List<Map<String, dynamic>> acceptQnList;
+  RxString currentQnDesc = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    currentQn = 10000;
     roomId = int.parse(Get.parameters['roomid']!);
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
@@ -57,11 +62,26 @@ class LiveRoomController extends GetxController {
   }
 
   Future queryLiveInfo() async {
-    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: 10000);
+    /// TODO 默认获取预设质量的直播资源
+    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: currentQn);
     if (res['status']) {
       List<CodecItem> codec =
           res['data'].playurlInfo.playurl.stream.first.format.first.codec;
       CodecItem item = codec.first;
+      // 以服务端返回的码率为准
+      currentQn = item.currentQn!;
+      List acceptQn = item.acceptQn!;
+      acceptQnList = acceptQn.map((e) {
+        return {
+          'code': e,
+          'desc': LiveQuality.values
+              .firstWhere((element) => element.code == e)
+              .description,
+        };
+      }).toList();
+      currentQnDesc.value = LiveQuality.values
+          .firstWhere((element) => element.code == currentQn)
+          .description;
       String videoUrl = enableCDN
           ? VideoUtils.getCdnUrl(item)
           : (item.urlInfo?.first.host)! +
@@ -89,5 +109,17 @@ class LiveRoomController extends GetxController {
       roomInfoH5.value = res['data'];
     }
     return res;
+  }
+
+  // 修改画质
+  void changeQn(int qn) async {
+    if (currentQn == qn) {
+      return;
+    }
+    currentQn = qn;
+    currentQnDesc.value = LiveQuality.values
+        .firstWhere((element) => element.code == currentQn)
+        .description;
+    await queryLiveInfo();
   }
 }
