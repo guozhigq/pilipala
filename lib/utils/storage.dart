@@ -181,6 +181,8 @@ class VideoBoxKey {
       videoSpeed = 'videoSpeed',
       // 播放顺序
       playRepeat = 'playRepeat',
+      // 系统预设倍速
+      playSpeedSystem = 'playSpeedSystem',
       // 默认倍速
       playSpeedDefault = 'playSpeedDefault',
       // 默认长按倍速
