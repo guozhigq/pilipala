@@ -7,4 +7,5 @@ enum BottomControlType {
   fit,
   speed,
   fullscreen,
+  custom,
 }
