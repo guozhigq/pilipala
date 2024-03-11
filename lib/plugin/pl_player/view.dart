@@ -35,6 +35,8 @@ class PLVideoPlayer extends StatefulWidget {
     this.bottomControl,
     this.danmuWidget,
     this.bottomList,
+    this.customWidget,
+    this.customWidgets,
     super.key,
   });
 
@@ -43,6 +45,10 @@ class PLVideoPlayer extends StatefulWidget {
   final PreferredSizeWidget? bottomControl;
   final Widget? danmuWidget;
   final List<BottomControlType>? bottomList;
+  // List<Widget> or Widget
+
+  final Widget? customWidget;
+  final List<Widget>? customWidgets;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -311,7 +317,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       ),
     };
     final List<Widget> list = [];
-    var userSpecifyItem = widget.bottomList ??
+    List<BottomControlType> userSpecifyItem = widget.bottomList ??
         [
           BottomControlType.playOrPause,
           BottomControlType.time,
@@ -320,7 +326,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           BottomControlType.fullscreen,
         ];
     for (var i = 0; i < userSpecifyItem.length; i++) {
-      list.add(videoProgressWidgets[userSpecifyItem[i]]!);
+      if (userSpecifyItem[i] == BottomControlType.custom) {
+        if (widget.customWidget != null && widget.customWidget is Widget) {
+          list.add(widget.customWidget!);
+        }
+        if (widget.customWidgets != null && widget.customWidgets!.isNotEmpty) {
+          list.addAll(widget.customWidgets!);
+        }
+      } else {
+        list.add(videoProgressWidgets[userSpecifyItem[i]]!);
+      }
     }
     return list;
   }
