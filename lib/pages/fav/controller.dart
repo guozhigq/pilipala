@@ -24,7 +24,7 @@ class FavController extends GetxController {
     if (!hasMore.value) {
       return;
     }
-    var res = await await UserHttp.userfavFolder(
+    var res = await UserHttp.userfavFolder(
       pn: currentPage,
       ps: pageSize,
       mid: userInfo!.mid!,

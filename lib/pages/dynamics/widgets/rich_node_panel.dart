@@ -19,6 +19,17 @@ InlineSpan richNode(item, context) {
       // 动态页面 richTextNodes 层级可能与主页动态层级不同
       richTextNodes =
           item.modules.moduleDynamic.major.opus.summary.richTextNodes;
+      if (item.modules.moduleDynamic.major.opus.title != null) {
+        spanChilds.add(
+          TextSpan(
+            text: item.modules.moduleDynamic.major.opus.title + '\n',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+        );
+      }
     }
     if (richTextNodes == null || richTextNodes.isEmpty) {
       return spacer;

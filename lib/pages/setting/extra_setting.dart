@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../home/index.dart';
 import 'widgets/switch_item.dart';
 
 class ExtraSetting extends StatefulWidget {
@@ -138,18 +140,20 @@ class _ExtraSettingState extends State<ExtraSetting> {
       ),
       body: ListView(
         children: [
-          SetSwitchItem(
+          const SetSwitchItem(
             title: '大家都在搜',
             subTitle: '是否展示「大家都在搜」',
             setKey: SettingBoxKey.enableHotKey,
             defaultVal: true,
-            callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '搜索默认词',
             subTitle: '是否展示搜索框默认词',
             setKey: SettingBoxKey.enableSearchWord,
             defaultVal: true,
+            callFn: (val) {
+              Get.find<HomeController>().defaultSearch.value = '';
+            },
           ),
           const SetSwitchItem(
             title: '快速收藏',

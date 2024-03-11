@@ -19,11 +19,11 @@ class AppBarAni extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    visible ? controller.reverse() : controller.forward();
+    visible ? controller.forward() : controller.reverse();
     return SlideTransition(
       position: Tween<Offset>(
-        begin: Offset.zero,
-        end: Offset(0, position! == 'top' ? -1 : 1),
+        begin: Offset(0, position! == 'top' ? -1 : 1),
+        end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: controller,
         curve: Curves.linear,

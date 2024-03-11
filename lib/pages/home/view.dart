@@ -58,6 +58,9 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
+      appBar: _homeController.enableGradientBg
+          ? null
+          : AppBar(toolbarHeight: 0, elevation: 0),
       body: Stack(
         children: [
           // gradient background
@@ -412,13 +415,16 @@ class SearchBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Obx(
-                  () => Text(
-                    ctr!.defaultSearch.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: colorScheme.outline),
+                  () => Expanded(
+                    child: Text(
+                      ctr!.defaultSearch.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: colorScheme.outline),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 15),
               ],
             ),
           ),

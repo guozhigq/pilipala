@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:nil/nil.dart';
+import 'package:pilipala/models/common/gesture_mode.dart';
 import 'package:pilipala/plugin/pl_player/controller.dart';
 import 'package:pilipala/plugin/pl_player/models/duration.dart';
 import 'package:pilipala/plugin/pl_player/models/fullscreen_mode.dart';
@@ -16,6 +17,8 @@ import 'package:pilipala/plugin/pl_player/utils.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+
+import '../../utils/global_data.dart';
 import 'models/bottom_progress_behavior.dart';
 import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
@@ -72,6 +75,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late bool enableQuickDouble;
   late bool enableBackgroundPlay;
   late double screenWidth;
+  final FullScreenGestureMode fullScreenGestureMode =
+      GlobalData().fullScreenGestureMode;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
@@ -115,7 +120,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     super.initState();
     screenWidth = Get.size.width;
     animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+      vsync: this,
+      duration: GlobalData().enablePlayerControlAnimation
+          ? const Duration(milliseconds: 150)
+          : const Duration(milliseconds: 10),
+    );
     videoController = widget.controller.videoController!;
     widget.controller.headerControl = widget.headerControl;
     widget.controller.bottomControl = widget.bottomControl;
@@ -555,18 +564,20 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 // 全屏
                 final double dy = details.delta.dy;
                 const double threshold = 7.0; // 滑动阈值
+                final bool flag =
+                    fullScreenGestureMode != FullScreenGestureMode.values.last;
                 if (dy > _distance && dy > threshold) {
-                  if (_.isFullScreen.value) {
+                  if (_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 下滑退出全屏
-                    await widget.controller.triggerFullScreen(status: false);
+                    await widget.controller.triggerFullScreen(status: flag);
                   }
                   _distance = 0.0;
                 } else if (dy < _distance && dy < -threshold) {
-                  if (!_.isFullScreen.value) {
+                  if (!_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 上滑进入全屏
-                    await widget.controller.triggerFullScreen();
+                    await widget.controller.triggerFullScreen(status: !flag);
                   }
                   _distance = 0.0;
                 }

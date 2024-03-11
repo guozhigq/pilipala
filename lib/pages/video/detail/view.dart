@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -23,7 +24,6 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
-import 'package:pilipala/plugin/pl_player/utils/fullscreen.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/header_control.dart';
 
@@ -58,9 +58,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoExitFullcreen;
   late bool autoPlayEnable;
   late bool autoPiP;
-  final Floating floating = Floating();
-  // 生命周期监听
-  late final AppLifecycleListener _lifecycleListener;
+  late Floating floating;
   bool isShowing = true;
 
   @override
@@ -68,7 +66,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController = Get.put(
+        VideoIntroController(bvid: Get.parameters['bvid']!),
+        tag: heroTag);
     videoIntroController.videoDetail.listen((value) {
       videoPlayerServiceHandler.onVideoDetailChange(
           value, videoDetailController.cid.value);
@@ -91,8 +91,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    lifecycleListener();
     fullScreenStatusListener();
+    if (Platform.isAndroid) {
+      floating = videoDetailController.floating!;
+      autoEnterPip();
+    }
   }
 
   // 获取视频资源，初始化播放器
@@ -150,6 +153,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         }
       } catch (_) {}
     }
+    if (Platform.isAndroid) {
+      floating.toggleAutoPip(
+          autoEnter: status == PlayerStatus.playing && autoPiP);
+    }
   }
 
   // 继续播放或重新播放
@@ -166,27 +173,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     videoDetailController.autoPlay.value = true;
     videoDetailController.isShowCover.value = false;
-  }
-
-  // 生命周期监听
-  void lifecycleListener() {
-    _lifecycleListener = AppLifecycleListener(
-      onResume: () => _handleTransition('resume'),
-      // 后台
-      onInactive: () => _handleTransition('inactive'),
-      // 在Android和iOS端不生效
-      onHide: () => _handleTransition('hide'),
-      onShow: () => _handleTransition('show'),
-      onPause: () => _handleTransition('pause'),
-      onRestart: () => _handleTransition('restart'),
-      onDetach: () => _handleTransition('detach'),
-      // 只作用于桌面端
-      onExitRequested: () {
-        ScaffoldMessenger.maybeOf(context)
-            ?.showSnackBar(const SnackBar(content: Text("拦截应用退出")));
-        return Future.value(AppExitResponse.cancel);
-      },
-    );
   }
 
   void fullScreenStatusListener() {
@@ -208,8 +194,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoDetailController.floating!.dispose();
     }
     videoPlayerServiceHandler.onVideoDetailDispose();
-    floating.dispose();
-    _lifecycleListener.dispose();
+    if (Platform.isAndroid) {
+      floating.toggleAutoPip(autoEnter: false);
+      floating.dispose();
+    }
     super.dispose();
   }
 
@@ -265,29 +253,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         .subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
-  void _handleTransition(String name) {
-    switch (name) {
-      case 'inactive':
-        if (plPlayerController != null &&
-            playerStatus == PlayerStatus.playing) {
-          autoEnterPip();
-        }
-        break;
-    }
-  }
-
   void autoEnterPip() {
     final String routePath = Get.currentRoute;
-    final bool isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
-    /// TODO 横屏全屏状态下误触pip
-    if (autoPiP && routePath.startsWith('/video') && isPortrait) {
-      floating.enable(
-          aspectRatio: Rational(
-        videoDetailController.data.dash!.video!.first.width!,
-        videoDetailController.data.dash!.video!.first.height!,
-      ));
+    if (autoPiP && routePath.startsWith('/video')) {
+      floating.toggleAutoPip(autoEnter: autoPiP);
     }
   }
 
@@ -407,7 +376,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                           ),
                                               );
                                             } else {
-                                              return const SizedBox();
+                                              return buildCustomAppBar();
                                             }
                                           },
                                         ),
@@ -450,33 +419,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                                     top: 0,
                                                     left: 0,
                                                     right: 0,
-                                                    child: AppBar(
-                                                      primary: false,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                      elevation: 0,
-                                                      scrolledUnderElevation: 0,
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      actions: [
-                                                        IconButton(
-                                                          tooltip: '稍后再看',
-                                                          onPressed: () async {
-                                                            var res = await UserHttp
-                                                                .toViewLater(
-                                                                    bvid: videoDetailController
-                                                                        .bvid);
-                                                            SmartDialog
-                                                                .showToast(
-                                                                    res['msg']);
-                                                          },
-                                                          icon: const Icon(Icons
-                                                              .history_outlined),
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 14)
-                                                      ],
-                                                    ),
+                                                    child: buildCustomAppBar(),
                                                   ),
                                                   Positioned(
                                                     right: 12,
@@ -553,7 +496,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 slivers: <Widget>[
                                   if (videoDetailController.videoType ==
                                       SearchType.video) ...[
-                                    const VideoIntroPanel(),
+                                    VideoIntroPanel(
+                                        bvid: videoDetailController.bvid),
                                   ] else if (videoDetailController.videoType ==
                                       SearchType.media_bangumi) ...[
                                     Obx(() => BangumiIntroPanel(
@@ -580,7 +524,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .withOpacity(0.06),
                                     ),
                                   ),
-                                  RelatedVideoPanel(),
+                                  const RelatedVideoPanel(),
                                 ],
                               );
                             },
@@ -630,6 +574,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     headerControl: HeaderControl(
                       controller: plPlayerController,
                       videoDetailCtr: videoDetailController,
+                      bvid: videoDetailController.bvid,
+                      videoType: videoDetailController.videoType,
                     ),
                     danmuWidget: Obx(
                       () => PlDanmaku(
@@ -655,5 +601,49 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     } else {
       return childWhenDisabled;
     }
+  }
+
+  Widget buildCustomAppBar() {
+    return AppBar(
+      backgroundColor: Colors.transparent, // 使背景透明
+      foregroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      primary: false,
+      centerTitle: false,
+      automaticallyImplyLeading: false,
+      titleSpacing: 0,
+      title: Container(
+        height: kToolbarHeight,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: <Color>[
+            Colors.transparent,
+            Colors.black54,
+          ],
+          tileMode: TileMode.mirror,
+        )),
+        child: Row(
+          children: [
+            ComBtn(
+              icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
+              fuc: () => Get.back(),
+            ),
+            const Spacer(),
+            ComBtn(
+              icon: const Icon(Icons.history_outlined, size: 22),
+              fuc: () async {
+                var res = await UserHttp.toViewLater(
+                    bvid: videoDetailController.bvid);
+                SmartDialog.showToast(res['msg']);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

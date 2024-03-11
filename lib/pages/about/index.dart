@@ -205,7 +205,6 @@ class _AboutPageState extends State<AboutPage> {
               },
               title: const Text('清除缓存'),
               subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
             SizedBox(height: MediaQuery.of(context).padding.bottom + 20)
           ],
@@ -254,12 +253,16 @@ class AboutController extends GetxController {
   // 获取远程版本
   Future getRemoteApp() async {
     var result = await Request().get(Api.latestApp, extra: {'ua': 'pc'});
+    isLoading.value = false;
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return;
+    }
     data = LatestDataModel.fromJson(result.data);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;
     isUpdate.value =
         Utils.needUpdate(currentVersion.value, remoteVersion.value);
-    isLoading.value = false;
   }
 
   // 跳转下载/本地更新
@@ -277,7 +280,7 @@ class AboutController extends GetxController {
 
   githubRelease() {
     launchUrl(
-      Uri.parse('https://github.com/guozhigq/pilipala/release'),
+      Uri.parse('https://github.com/guozhigq/pilipala/releases'),
       mode: LaunchMode.externalApplication,
     );
   }

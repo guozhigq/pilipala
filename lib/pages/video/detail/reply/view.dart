@@ -134,13 +134,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        _videoReplyController.currentPage = 0;
-        return await _videoReplyController.queryReplyList();
+        return await _videoReplyController.queryReplyList(type: 'init');
       },
       child: Stack(
         children: [
           CustomScrollView(
             controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(

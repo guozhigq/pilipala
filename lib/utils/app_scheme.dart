@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../http/search.dart';
 import '../models/common/search_type.dart';
 import 'id_utils.dart';
+import 'url_utils.dart';
 import 'utils.dart';
 
 class PiliSchame {
@@ -38,23 +39,16 @@ class PiliSchame {
     final String path = value.path;
 
     if (scheme == 'bilibili') {
-      // bilibili://root
       if (host == 'root') {
         Navigator.popUntil(
             Get.context!, (Route<dynamic> route) => route.isFirst);
-      }
-
-      // bilibili://space/{uid}
-      else if (host == 'space') {
+      } else if (host == 'space') {
         final String mid = path.split('/').last;
         Get.toNamed<dynamic>(
           '/member?mid=$mid',
           arguments: <String, dynamic>{'face': null},
         );
-      }
-
-      // bilibili://video/{aid}
-      else if (host == 'video') {
+      } else if (host == 'video') {
         String pathQuery = path.split('/').last;
         final numericRegex = RegExp(r'^[0-9]+$');
         if (numericRegex.hasMatch(pathQuery)) {
@@ -68,24 +62,16 @@ class PiliSchame {
         } else {
           SmartDialog.showToast('投稿匹配失败');
         }
-      }
-
-      // bilibili://live/{roomid}
-      else if (host == 'live') {
+      } else if (host == 'live') {
         final String roomId = path.split('/').last;
         Get.toNamed<dynamic>('/liveRoom?roomid=$roomId',
             arguments: <String, String?>{'liveItem': null, 'heroTag': roomId});
-      }
-
-      // bilibili://bangumi/season/${ssid}
-      else if (host == 'bangumi') {
+      } else if (host == 'bangumi') {
         if (path.startsWith('/season')) {
           final String seasonId = path.split('/').last;
-          _bangumiPush(int.parse(seasonId));
+          _bangumiPush(int.parse(seasonId), null);
         }
-      }
-      // 专栏 bilibili://opus/detail/883089655985078289
-      else if (host == 'opus') {
+      } else if (host == 'opus') {
         if (path.startsWith('/detail')) {
           var opusId = path.split('/').last;
           Get.toNamed(
@@ -100,6 +86,9 @@ class PiliSchame {
       } else if (host == 'search') {
         Get.toNamed('/searchResult', parameters: {'keyword': ''});
       }
+    }
+    if (scheme == 'https') {
+      _fullPathPush(value);
     }
   }
 
@@ -131,10 +120,10 @@ class PiliSchame {
   }
 
   // 番剧跳转
-  static Future<void> _bangumiPush(int seasonId) async {
+  static Future<void> _bangumiPush(int? seasonId, int? epId) async {
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
-      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: null);
+      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
       if (result['status']) {
         var bangumiDetail = result['data'];
         final int cid = bangumiDetail.episodes!.first.cid;
@@ -151,6 +140,8 @@ class PiliSchame {
             },
           ),
         );
+      } else {
+        SmartDialog.showToast(result['msg']);
       }
     } catch (e) {
       SmartDialog.showToast('番剧获取失败：$e');
@@ -163,29 +154,67 @@ class PiliSchame {
     // final String scheme = value.scheme!;
     final String host = value.host!;
     final String? path = value.path;
-    // Map<String, String> query = value.query!;
-    if (host.startsWith('live.bilibili')) {
+    Map<String, String>? query = value.query;
+    RegExp regExp = RegExp(r'^(www\.)?m?\.(bilibili\.com)$');
+    if (regExp.hasMatch(host)) {
+      print('bilibili.com');
+    } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
-      // print('直播');
-      Get.toNamed('/liveRoom?roomid=$roomId',
-          arguments: {'liveItem': null, 'heroTag': roomId.toString()});
+      Get.toNamed(
+        '/liveRoom?roomid=$roomId',
+        arguments: {'liveItem': null, 'heroTag': roomId.toString()},
+      );
+    } else if (host.contains('space')) {
+      var mid = path!.split('/').last;
+      Get.toNamed('/member?mid=$mid', arguments: {'face': ''});
       return;
-    }
-    if (host.startsWith('space.bilibili')) {
-      print('个人空间');
-      return;
+    } else if (host == 'b23.tv') {
+      final String fullPath = 'https://$host$path';
+      final String redirectUrl = await UrlUtils.parseRedirectUrl(fullPath);
+      final String pathSegment = Uri.parse(redirectUrl).path;
+      final String lastPathSegment = pathSegment.split('/').last;
+      final RegExp avRegex = RegExp(r'^[aA][vV]\d+', caseSensitive: false);
+      if (avRegex.hasMatch(lastPathSegment)) {
+        final Map<String, dynamic> map =
+            IdUtils.matchAvorBv(input: lastPathSegment);
+        if (map.containsKey('AV')) {
+          _videoPush(map['AV']! as int, null);
+        } else if (map.containsKey('BV')) {
+          _videoPush(null, map['BV'] as String);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
+        }
+      } else if (lastPathSegment.startsWith('ep')) {
+        _handleEpisodePath(lastPathSegment, redirectUrl);
+      } else if (lastPathSegment.startsWith('ss')) {
+        _handleSeasonPath(lastPathSegment, redirectUrl);
+      } else if (lastPathSegment.startsWith('BV')) {
+        UrlUtils.matchUrlPush(
+          lastPathSegment,
+          '',
+          redirectUrl,
+        );
+      } else {
+        Get.toNamed(
+          '/webview',
+          parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
+        );
+      }
     }
 
     if (path != null) {
-      final String area = path.split('/')[1];
+      final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':
-          // print('番剧');
-          final String seasonId = path.split('/').last;
-          _bangumiPush(matchNum(seasonId).first);
+          print('番剧');
+          if (area.startsWith('ep')) {
+            _bangumiPush(null, matchNum(area).first);
+          } else if (area.startsWith('ss')) {
+            _bangumiPush(matchNum(area).first, null);
+          }
           break;
         case 'video':
-          // print('投稿');
+          print('投稿');
           final Map<String, dynamic> map = IdUtils.matchAvorBv(input: path);
           if (map.containsKey('AV')) {
             _videoPush(map['AV']! as int, null);
@@ -200,6 +229,7 @@ class PiliSchame {
           break;
         case 'space':
           print('个人空间');
+          Get.toNamed('/member?mid=$area', arguments: {'face': ''});
           break;
       }
     }
@@ -210,5 +240,19 @@ class PiliSchame {
     final Iterable<Match> matches = regExp.allMatches(str);
 
     return matches.map((Match match) => int.parse(match.group(0)!)).toList();
+  }
+
+  static void _handleEpisodePath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = _extractIdFromPath(lastPathSegment);
+    _bangumiPush(null, matchNum(seasonId).first);
+  }
+
+  static void _handleSeasonPath(String lastPathSegment, String redirectUrl) {
+    final String seasonId = _extractIdFromPath(lastPathSegment);
+    _bangumiPush(matchNum(seasonId).first, null);
+  }
+
+  static String _extractIdFromPath(String lastPathSegment) {
+    return lastPathSegment.split('/').last;
   }
 }

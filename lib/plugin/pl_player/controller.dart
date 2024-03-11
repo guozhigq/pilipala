@@ -539,8 +539,10 @@ class PlPlayerController {
           if (event) {
             playerStatus.status.value = PlayerStatus.playing;
           } else {
-            // playerStatus.status.value = PlayerStatus.paused;
+            playerStatus.status.value = PlayerStatus.paused;
           }
+          videoPlayerServiceHandler.onStatusChange(
+              playerStatus.status.value, isBuffering.value);
 
           /// 触发回调事件
           for (var element in _statusListeners) {
