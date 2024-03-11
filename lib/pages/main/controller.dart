@@ -9,6 +9,7 @@ import 'package:pilipala/http/common.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../models/common/dynamic_badge_mode.dart';
@@ -17,6 +18,7 @@ import '../../models/common/nav_bar_config.dart';
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
     const HomePage(),
+    const RankPage(),
     const DynamicsPage(),
     const MediaPage(),
   ];
