@@ -139,7 +139,7 @@ dependencies:
   nil: ^1.1.1
   catcher_2: ^1.1.0
   logger: ^2.0.2+1
-  path: 1.8.3
+  path: any
 
 dev_dependencies:
   flutter_test:

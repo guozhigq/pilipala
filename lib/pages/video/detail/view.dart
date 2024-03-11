@@ -482,6 +482,31 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         ),
                       ),
                     ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TabBar(
+                        controller: videoDetailController.tabCtr,
+                        isScrollable: true,
+                        labelColor: Theme.of(context).colorScheme.primary,
+                        unselectedLabelColor: Colors.grey,
+                        indicator: UnderlineTabIndicator(
+                          borderRadius: BorderRadius.circular(3.0),
+                          borderSide: BorderSide(width: 3.0, color: Theme.of(context).colorScheme.primary),
+                          insets: const EdgeInsets.symmetric(horizontal: 16.0),
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        dividerColor: Colors.transparent,
+                        tabAlignment: TabAlignment.start,
+                        tabs: const [
+                          Tab(
+                            child: Text('简介'),
+                          ),
+                          Tab(
+                            child: Text('评论'),
+                          )
+                        ],
+                      ),
+                    ),
                     Expanded(
                       child: TabBarView(
                         controller: videoDetailController.tabCtr,
