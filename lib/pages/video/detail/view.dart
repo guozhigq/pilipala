@@ -521,7 +521,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           .withOpacity(0.06),
                                     ),
                                   ),
-                                  const RelatedVideoPanel(),
+                                  if (videoDetailController.videoType ==
+                                          SearchType.video &&
+                                      videoDetailController.enableRelatedVideo)
+                                    const RelatedVideoPanel(),
                                 ],
                               );
                             },

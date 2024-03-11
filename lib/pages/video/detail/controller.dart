@@ -91,6 +91,7 @@ class VideoDetailController extends GetxController
   late int cacheAudioQa;
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
+  late bool enableRelatedVideo;
 
   @override
   void onInit() {
@@ -113,7 +114,8 @@ class VideoDetailController extends GetxController
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
-
+    enableRelatedVideo =
+        setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
     if (userInfo == null ||
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
