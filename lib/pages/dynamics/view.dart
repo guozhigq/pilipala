@@ -14,6 +14,7 @@ import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
 import 'widgets/up_panel.dart';
@@ -28,6 +29,7 @@ class DynamicsPage extends StatefulWidget {
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
+  final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   Box userInfoCache = GStrorage.userInfo;
@@ -254,6 +256,16 @@ class _DynamicsPageState extends State<DynamicsPage>
                             ),
                           );
                         }
+                      },
+                    );
+                  } else if (data['msg'] == "账号未登录") {
+                    return HttpError(
+                      errMsg: data['msg'],
+                      btnText: "去登录",
+                      fn: () {
+                        setState(() {
+                          mineController.onLogin();
+                        });
                       },
                     );
                   } else {
