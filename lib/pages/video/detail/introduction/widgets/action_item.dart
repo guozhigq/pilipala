@@ -7,7 +7,6 @@ class ActionItem extends StatelessWidget {
   final Icon? selectIcon;
   final Function? onTap;
   final Function? onLongPress;
-  final bool? loadingStatus;
   final String? text;
   final bool selectStatus;
 
@@ -17,7 +16,6 @@ class ActionItem extends StatelessWidget {
     this.selectIcon,
     this.onTap,
     this.onLongPress,
-    this.loadingStatus,
     this.text,
     this.selectStatus = false,
   }) : super(key: key);
@@ -43,25 +41,15 @@ class ActionItem extends StatelessWidget {
               : Icon(icon!.icon!,
                   size: 18, color: Theme.of(context).colorScheme.outline),
           const SizedBox(height: 6),
-          AnimatedOpacity(
-            opacity: loadingStatus! ? 0 : 1,
-            duration: const Duration(milliseconds: 200),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return ScaleTransition(scale: animation, child: child);
-              },
-              child: Text(
-                text ?? '',
-                key: ValueKey<String>(text ?? ''),
-                style: TextStyle(
-                    color: selectStatus
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline,
-                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize),
-              ),
+          Text(
+            text ?? '',
+            style: TextStyle(
+              color: selectStatus
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outline,
+              fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
             ),
-          ),
+          )
         ],
       ),
     );
