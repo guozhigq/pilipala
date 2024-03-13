@@ -9,7 +9,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:nil/nil.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -308,11 +307,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     );
 
     /// tabbar
-    Widget tabbarBuild = SizedBox(
+    Widget tabbarBuild = Container(
       width: double.infinity,
       height: 45,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 1,
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+        ),
+      ),
       child: Row(
         children: [
+          const SizedBox(width: 20),
           Expanded(
             child: TabBar(
               controller: vdCtr.tabCtr,
@@ -321,7 +329,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ),
           ),
           SizedBox(
-            width: 200,
+            width: 220,
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -333,9 +341,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         padding: MaterialStateProperty.all(EdgeInsets.zero),
                       ),
                       onPressed: () => vdCtr.showShootDanmakuSheet(),
-                      child: const Text(
-                        '发弹幕',
-                      ),
+                      child: const Text('发弹幕', style: TextStyle(fontSize: 12)),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -353,6 +359,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       child: Obx(() => Text(
                             '弹',
                             style: TextStyle(
+                              fontSize: 12,
                               color: (plPlayerController?.isOpenDanmu.value ??
                                       false)
                                   ? Theme.of(context).colorScheme.primary
