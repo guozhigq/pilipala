@@ -27,7 +27,8 @@ class LiveRoomController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    currentQn = 10000;
+    currentQn = setting.get(SettingBoxKey.defaultLiveQa,
+        defaultValue: LiveQuality.values.last.code);
     roomId = int.parse(Get.parameters['roomid']!);
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
@@ -62,7 +63,6 @@ class LiveRoomController extends GetxController {
   }
 
   Future queryLiveInfo() async {
-    /// TODO 默认获取预设质量的直播资源
     var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: currentQn);
     if (res['status']) {
       List<CodecItem> codec =

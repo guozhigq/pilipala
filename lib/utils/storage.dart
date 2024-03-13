@@ -77,6 +77,7 @@ class SettingBoxKey {
       autoUpgradeEnable = 'autoUpgradeEnable',
       feedBackEnable = 'feedBackEnable',
       defaultVideoQa = 'defaultVideoQa',
+      defaultLiveQa = 'defaultLiveQa',
       defaultAudioQa = 'defaultAudioQa',
       autoPlayEnable = 'autoPlayEnable',
       fullScreenMode = 'fullScreenMode',

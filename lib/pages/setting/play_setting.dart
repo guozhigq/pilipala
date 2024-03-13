@@ -9,6 +9,7 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../models/live/quality.dart';
 import 'widgets/switch_item.dart';
 
 class PlaySetting extends StatefulWidget {
@@ -21,6 +22,7 @@ class PlaySetting extends StatefulWidget {
 class _PlaySettingState extends State<PlaySetting> {
   Box setting = GStrorage.setting;
   late dynamic defaultVideoQa;
+  late dynamic defaultLiveQa;
   late dynamic defaultAudioQa;
   late dynamic defaultDecode;
   late int defaultFullScreenMode;
@@ -31,6 +33,8 @@ class _PlaySettingState extends State<PlaySetting> {
     super.initState();
     defaultVideoQa = setting.get(SettingBoxKey.defaultVideoQa,
         defaultValue: VideoQuality.values.last.code);
+    defaultLiveQa = setting.get(SettingBoxKey.defaultLiveQa,
+        defaultValue: LiveQuality.values.last.code);
     defaultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.values.last.code);
     defaultDecode = setting.get(SettingBoxKey.defaultDecode,
@@ -148,9 +152,9 @@ class _PlaySettingState extends State<PlaySetting> {
           ),
           ListTile(
             dense: false,
-            title: Text('默认画质', style: titleStyle),
+            title: Text('默认视频画质', style: titleStyle),
             subtitle: Text(
-              '当前画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
+              '当前默认画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
               style: subTitleStyle,
             ),
             onTap: () async {
@@ -158,7 +162,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 context: context,
                 builder: (context) {
                   return SelectDialog<int>(
-                      title: '默认画质',
+                      title: '默认视频画质',
                       value: defaultVideoQa,
                       values: VideoQuality.values.reversed.map((e) {
                         return {'title': e.description, 'value': e.code};
@@ -168,6 +172,32 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultVideoQa = result;
                 setting.put(SettingBoxKey.defaultVideoQa, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('默认直播画质', style: titleStyle),
+            subtitle: Text(
+              '当前默认画质${LiveQualityCode.fromCode(defaultLiveQa)!.description!}',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(
+                      title: '默认直播画质',
+                      value: defaultLiveQa,
+                      values: LiveQuality.values.reversed.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
+                },
+              );
+              if (result != null) {
+                defaultLiveQa = result;
+                setting.put(SettingBoxKey.defaultLiveQa, result);
                 setState(() {});
               }
             },

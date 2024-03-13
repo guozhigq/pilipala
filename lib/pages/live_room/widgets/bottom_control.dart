@@ -85,6 +85,30 @@ class _BottomControlState extends State<BottomControl> {
           //   ),
           // ),
           // const SizedBox(width: 4),
+          SizedBox(
+            width: 30,
+            child: PopupMenuButton<int>(
+              padding: EdgeInsets.zero,
+              onSelected: (value) {
+                widget.liveRoomCtr!.changeQn(value);
+              },
+              child: Obx(
+                () => Text(
+                  widget.liveRoomCtr!.currentQnDesc.value,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+              itemBuilder: (BuildContext context) {
+                return widget.liveRoomCtr!.acceptQnList.map((e) {
+                  return PopupMenuItem<int>(
+                    value: e['code'],
+                    child: Text(e['desc']),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
           if (Platform.isAndroid) ...[
             SizedBox(
               width: 34,
@@ -112,32 +136,8 @@ class _BottomControlState extends State<BottomControl> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 10),
           ],
-          SizedBox(
-            width: 30,
-            child: PopupMenuButton<int>(
-              padding: EdgeInsets.zero,
-              onSelected: (value) {
-                widget.liveRoomCtr!.changeQn(value);
-              },
-              child: Obx(
-                () => Text(
-                  widget.liveRoomCtr!.currentQnDesc.value,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ),
-              itemBuilder: (BuildContext context) {
-                return widget.liveRoomCtr!.acceptQnList.map((e) {
-                  return PopupMenuItem<int>(
-                    value: e['code'],
-                    child: Text(e['desc']),
-                  );
-                }).toList();
-              },
-            ),
-          ),
-          const SizedBox(width: 10),
           ComBtn(
             icon: const Icon(
               Icons.fullscreen,

@@ -2,7 +2,6 @@ enum LiveQuality {
   dolby,
   super4K,
   origin,
-  veryHigh,
   bluRay,
   superHD,
   smooth,
@@ -37,6 +36,7 @@ extension VideoQualityDesc on LiveQuality {
     '原画',
     '蓝光',
     '超清',
+    '高清',
     '流畅',
   ];
   get description => _descList[index];
