@@ -29,7 +29,6 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
 
 class _BottomControlState extends State<BottomControl> {
   late PlayUrlModel videoInfo;
-  List<PlaySpeed> playSpeed = PlaySpeed.values;
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);

@@ -268,7 +268,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     final Color outline = t.colorScheme.outline;
     return SliverPadding(
       padding: const EdgeInsets.only(
-          left: StyleString.safeSpace, right: StyleString.safeSpace, top: 10),
+        left: StyleString.safeSpace,
+        right: StyleString.safeSpace,
+        top: 16,
+      ),
       sliver: SliverToBoxAdapter(
         child: !loadingStatus
             ? Column(
