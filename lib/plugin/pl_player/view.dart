@@ -672,7 +672,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         // 锁
         Obx(
           () => Visibility(
-            visible: _.videoType.value != 'live',
+            visible: _.videoType.value != 'live' && _.isFullScreen.value,
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(
