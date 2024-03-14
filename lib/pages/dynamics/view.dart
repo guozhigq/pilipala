@@ -263,9 +263,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                       errMsg: data['msg'],
                       btnText: "去登录",
                       fn: () {
-                        setState(() {
-                          mineController.onLogin();
-                        });
+                        mineController.onLogin();
                       },
                     );
                   } else {
