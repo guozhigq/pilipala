@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
@@ -21,6 +22,7 @@ class LiveRoomController extends GetxController {
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
   late bool enableCDN;
   late int currentQn;
+  int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
 
@@ -70,6 +72,9 @@ class LiveRoomController extends GetxController {
       CodecItem item = codec.first;
       // 以服务端返回的码率为准
       currentQn = item.currentQn!;
+      if (tempCurrentQn != null && tempCurrentQn == currentQn) {
+        SmartDialog.showToast('画质切换失败，请检查登录状态');
+      }
       List acceptQn = item.acceptQn!;
       acceptQnList = acceptQn.map((e) {
         return {
@@ -113,6 +118,7 @@ class LiveRoomController extends GetxController {
 
   // 修改画质
   void changeQn(int qn) async {
+    tempCurrentQn = currentQn;
     if (currentQn == qn) {
       return;
     }
