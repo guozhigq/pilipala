@@ -194,6 +194,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       floating.toggleAutoPip(autoEnter: false);
       floating.dispose();
     }
+    appbarStream.close();
     super.dispose();
   }
 

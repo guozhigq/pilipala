@@ -14,12 +14,14 @@ class BangumiPanel extends StatefulWidget {
     this.cid,
     this.sheetHeight,
     this.changeFuc,
+    this.bangumiDetail,
   });
 
   final List<EpisodeItem> pages;
   final int? cid;
   final double? sheetHeight;
   final Function? changeFuc;
+  final BangumiInfoModel? bangumiDetail;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -87,7 +89,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
             )
           : null,
       title: Text(
-        '第${index + 1}话  ${page.longTitle!}',
+        '第${page.title}话  ${page.longTitle!}',
         style: TextStyle(
           fontSize: 14,
           color: isCurrentIndex
@@ -96,9 +98,11 @@ class _BangumiPanelState extends State<BangumiPanel> {
         ),
       ),
       trailing: page.badge != null
-          ? Image.asset(
-              'assets/images/big-vip.png',
-              height: 20,
+          ? Text(
+              page.badge!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             )
           : const SizedBox(),
     );
@@ -201,11 +205,11 @@ class _BangumiPanelState extends State<BangumiPanel> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 6),
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('合集 '),
+              const Text('选集 '),
               Expanded(
                 child: Text(
                   ' 正在播放：${widget.pages[currentIndex].longTitle}',
@@ -225,7 +229,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   ),
                   onPressed: () => showBangumiPanel(),
                   child: Text(
-                    '全${widget.pages.length}话',
+                    '${widget.bangumiDetail!.newEp!['desc']}',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
@@ -278,23 +282,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
                               ),
                               const SizedBox(width: 2),
                               if (widget.pages[i].badge != null) ...[
-                                if (widget.pages[i].badge == '会员') ...[
-                                  Image.asset(
-                                    'assets/images/big-vip.png',
-                                    height: 16,
+                                const Spacer(),
+                                Text(
+                                  widget.pages[i].badge!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
-                                ],
-                                if (widget.pages[i].badge != '会员') ...[
-                                  const Spacer(),
-                                  Text(
-                                    widget.pages[i].badge!,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ]
                             ],
                           ),
