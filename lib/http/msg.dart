@@ -31,14 +31,14 @@ class MsgHttp {
       } catch (err) {
         return {
           'status': false,
-          'date': [],
+          'data': [],
           'msg': err.toString(),
         };
       }
     } else {
       return {
         'status': false,
-        'date': [],
+        'data': [],
         'msg': res.data['message'],
       };
     }
