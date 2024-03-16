@@ -45,7 +45,6 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
 
 class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
-  List<PlaySpeed> playSpeed = PlaySpeed.values;
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
