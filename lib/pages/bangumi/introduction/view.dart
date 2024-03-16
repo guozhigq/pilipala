@@ -362,17 +362,17 @@ class _BangumiInfoState extends State<BangumiInfo> {
                       bangumiItem != null &&
                           bangumiItem!.episodes!.isNotEmpty) ...[
                     BangumiPanel(
-                      pages: bangumiItem != null
-                          ? bangumiItem!.episodes!
-                          : widget.bangumiDetail!.episodes!,
-                      cid: cid ??
-                          (bangumiItem != null
-                              ? bangumiItem!.episodes!.first.cid
-                              : widget.bangumiDetail!.episodes!.first.cid),
-                      sheetHeight: sheetHeight,
-                      changeFuc: (bvid, cid, aid) => bangumiIntroController
-                          .changeSeasonOrbangu(bvid, cid, aid),
-                    )
+                        pages: bangumiItem != null
+                            ? bangumiItem!.episodes!
+                            : widget.bangumiDetail!.episodes!,
+                        cid: cid ??
+                            (bangumiItem != null
+                                ? bangumiItem!.episodes!.first.cid
+                                : widget.bangumiDetail!.episodes!.first.cid),
+                        sheetHeight: sheetHeight,
+                        changeFuc: (bvid, cid, aid) => bangumiIntroController
+                            .changeSeasonOrbangu(bvid, cid, aid),
+                        bangumiDetail: widget.bangumiDetail ?? bangumiItem)
                   ],
                 ],
               )
