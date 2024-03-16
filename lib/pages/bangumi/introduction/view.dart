@@ -321,6 +321,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
               sheetHeight: sheetHeight,
               changeFuc: (bvid, cid, aid) =>
                   bangumiIntroController.changeSeasonOrbangu(bvid, cid, aid),
+              bangumiDetail: bangumiIntroController.bangumiDetail.value,
             )
           ],
         ],
