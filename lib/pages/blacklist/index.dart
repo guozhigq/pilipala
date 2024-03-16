@@ -139,7 +139,7 @@ class BlackListController extends GetxController {
   int currentPage = 1;
   int pageSize = 50;
   RxInt total = 0.obs;
-  RxList<BlackListItem> blackList = [BlackListItem()].obs;
+  RxList<BlackListItem> blackList = <BlackListItem>[].obs;
 
   Future queryBlacklist({type = 'init'}) async {
     if (type == 'init') {

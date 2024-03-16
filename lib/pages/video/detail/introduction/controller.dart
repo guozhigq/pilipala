@@ -22,15 +22,9 @@ import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
+  VideoIntroController({required this.bvid});
   // 视频bvid
-  String bvid = Get.parameters['bvid']!;
-
-  // 是否预渲染 骨架屏
-  bool preRender = false;
-
-  // 视频详情 上个页面传入
-  Map? videoItem = {};
-
+  String bvid;
   // 请求状态
   RxBool isLoading = false.obs;
 
@@ -73,26 +67,6 @@ class VideoIntroController extends GetxController {
     try {
       heroTag = Get.arguments['heroTag'];
     } catch (_) {}
-    if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('videoItem')) {
-        preRender = true;
-        var args = Get.arguments['videoItem'];
-        var keys = Get.arguments.keys.toList();
-        videoItem!['pic'] = args.pic;
-        if (args.title is String) {
-          videoItem!['title'] = args.title;
-        } else {
-          String str = '';
-          for (Map map in args.title) {
-            str += map['text'];
-          }
-          videoItem!['title'] = str;
-        }
-        videoItem!['stat'] = keys.contains('stat') && args.stat;
-        videoItem!['pubdate'] = keys.contains('pubdate') && args.pubdate;
-        videoItem!['owner'] = keys.contains('owner') && args.owner;
-      }
-    }
     userLogin = userInfo != null;
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
     isShowOnlineTotal =

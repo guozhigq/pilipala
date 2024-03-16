@@ -31,7 +31,6 @@ class _FavDetailPageState extends State<FavDetailPage> {
     super.initState();
     mediaId = Get.parameters['mediaId']!;
     _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
-    mediaId = Get.parameters['mediaId']!;
     titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
@@ -85,7 +84,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text(
-                            '共${_favDetailController.item!.mediaCount!}条视频',
+                            '共${_favDetailController.mediaCount}条视频',
                             style: Theme.of(context).textTheme.labelMedium,
                           )
                         ],
@@ -176,7 +175,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.favList.length}条视频',
+                  '共${_favDetailController.mediaCount}条视频',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,

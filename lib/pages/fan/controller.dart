@@ -10,7 +10,7 @@ class FansController extends GetxController {
   int pn = 1;
   int ps = 20;
   int total = 0;
-  RxList<FansItemModel> fansList = [FansItemModel()].obs;
+  RxList<FansItemModel> fansList = <FansItemModel>[].obs;
   late int mid;
   late String name;
   var userInfo;
