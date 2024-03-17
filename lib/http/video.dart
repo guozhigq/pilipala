@@ -491,4 +491,27 @@ class VideoHttp {
       return {'status': false, 'data': [], 'msg': res.data['msg']};
     }
   }
+
+  // 视频排行
+  static Future getRankVideoList(int rid) async {
+    try {
+      var rankApi = "${Api.getRankApi}?rid=$rid&type=all";
+      var res = await Request().get(rankApi);
+      if (res.data['code'] == 0) {
+        List<HotVideoItemModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        for (var i in res.data['data']['list']) {
+          if (!blackMidsList.contains(i['owner']['mid'])) {
+            list.add(HotVideoItemModel.fromJson(i));
+          }
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['message']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err};
+    }
+  }
 }
