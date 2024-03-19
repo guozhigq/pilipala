@@ -375,7 +375,13 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+        dataSource,
+        _looping,
+        enableHA,
+        width,
+        height,
+        seekTo,
+      );
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -386,7 +392,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
+      await _initializePlayer(duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -406,6 +412,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
+    Duration? seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -488,7 +495,11 @@ class PlPlayerController {
       );
     }
     player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+      Media(
+        dataSource.videoSource!,
+        httpHeaders: dataSource.httpHeaders,
+        start: seekTo ?? Duration.zero,
+      ),
       play: false,
     );
     // 音轨
@@ -501,7 +512,6 @@ class PlPlayerController {
 
   // 开始播放
   Future _initializePlayer({
-    Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
     // 设置倍速
@@ -518,11 +528,6 @@ class PlPlayerController {
     // if (_looping) {
     //   await setLooping(_looping);
     // }
-
-    // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
 
     // 自动播放
     if (_autoPlay) {
@@ -637,21 +642,14 @@ class PlPlayerController {
         await _videoPlayerController?.stream.buffer.first;
       }
       await _videoPlayerController?.seek(position);
-      // if (playerStatus.stopped) {
-      //   play();
-      // }
     } else {
       print('seek duration else');
       _timerForSeek?.cancel();
       _timerForSeek =
           Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
           await _videoPlayerController!.stream.buffer.first;
           await _videoPlayerController?.seek(position);
-          // if (playerStatus.status.value == PlayerStatus.paused) {
-          //   play();
-          // }
           t.cancel();
           _timerForSeek = null;
         }
