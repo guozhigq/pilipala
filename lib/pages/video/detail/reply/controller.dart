@@ -22,7 +22,7 @@ class VideoReplyController extends GetxController {
   String? replyLevel;
   // rpid 请求楼中楼回复
   String? rpid;
-  RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
+  RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   // 当前页
   int currentPage = 0;
   bool isLoadingMore = false;
@@ -41,19 +41,28 @@ class VideoReplyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final int deaultReplySortIndex =
+    int deaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
+    if (deaultReplySortIndex == 2) {
+      setting.put(SettingBoxKey.replySortType, 0);
+      deaultReplySortIndex = 0;
+    }
     _sortType = ReplySortType.values[deaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }
 
   Future queryReplyList({type = 'init'}) async {
+    if (isLoadingMore) {
+      return;
+    }
     isLoadingMore = true;
     if (type == 'init') {
       currentPage = 0;
+      noMore.value = '';
     }
     if (noMore.value == '没有更多了') {
+      isLoadingMore = false;
       return;
     }
     final res = await ReplyHttp.replyList(
@@ -115,9 +124,6 @@ class VideoReplyController extends GetxController {
           _sortType = ReplySortType.like;
           break;
         case ReplySortType.like:
-          _sortType = ReplySortType.reply;
-          break;
-        case ReplySortType.reply:
           _sortType = ReplySortType.time;
           break;
         default:

@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.19+1019
+version: 1.0.21+1021
 
 environment:
   sdk: ">=2.19.6 <3.0.0"
@@ -136,7 +136,10 @@ dependencies:
   # 代理
   system_proxy: ^0.1.0
   # pip
-  floating: ^2.0.1
+  floating:
+    git:
+      url: https://github.com/guozhigq/floating.git
+      ref: main
   # html解析
   html: ^0.15.4
   # html渲染
@@ -149,6 +152,8 @@ dependencies:
   catcher_2: ^1.1.0
   logger: ^2.0.2+1
   path: 1.8.3
+  # 电池优化
+  disable_battery_optimization: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -214,6 +219,7 @@ flutter:
     - assets/images/
     - assets/images/lv/
     - assets/images/logo/
+    - assets/images/live/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

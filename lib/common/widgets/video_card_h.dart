@@ -38,6 +38,10 @@ class VideoCardH extends StatelessWidget {
   Widget build(BuildContext context) {
     final int aid = videoItem.aid;
     final String bvid = videoItem.bvid;
+    String type = 'video';
+    try {
+      type = videoItem.type;
+    } catch (_) {}
     final String heroTag = Utils.makeHeroTag(aid);
     return GestureDetector(
       onLongPress: () {
@@ -53,6 +57,10 @@ class VideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           try {
+            if (type == 'ketang') {
+              SmartDialog.showToast('课堂视频暂不支持播放');
+              return;
+            }
             final int cid =
                 videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
             Get.toNamed('/video?bvid=$bvid&cid=$cid',
@@ -95,12 +103,20 @@ class VideoCardH extends StatelessWidget {
                                   height: maxHeight,
                                 ),
                               ),
-                              PBadge(
-                                text: Utils.timeFormat(videoItem.duration!),
-                                right: 6.0,
-                                bottom: 6.0,
-                                type: 'gray',
-                              ),
+                              if (videoItem.duration != 0)
+                                PBadge(
+                                  text: Utils.timeFormat(videoItem.duration!),
+                                  right: 6.0,
+                                  bottom: 6.0,
+                                  type: 'gray',
+                                ),
+                              if (type != 'video')
+                                PBadge(
+                                  text: type,
+                                  left: 6.0,
+                                  bottom: 6.0,
+                                  type: 'primary',
+                                ),
                               // if (videoItem.rcmdReason != null &&
                               //     videoItem.rcmdReason.content != '')
                               //   pBadge(videoItem.rcmdReason.content, context,
@@ -324,8 +340,9 @@ class VideoContent extends StatelessWidget {
                                           reSrc: 11,
                                         );
                                         SmartDialog.dismiss();
-                                        SmartDialog.showToast(
-                                            res['msg'] ?? '成功');
+                                        SmartDialog.showToast(res['code'] == 0
+                                            ? '成功'
+                                            : res['msg']);
                                       },
                                       child: const Text('确认'),
                                     )

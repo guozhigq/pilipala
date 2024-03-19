@@ -96,9 +96,6 @@ class HtmlRenderController extends GetxController {
         _sortType = ReplySortType.like;
         break;
       case ReplySortType.like:
-        _sortType = ReplySortType.reply;
-        break;
-      case ReplySortType.reply:
         _sortType = ReplySortType.time;
         break;
       default:

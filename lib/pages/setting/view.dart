@@ -25,6 +25,11 @@ class SettingPage extends StatelessWidget {
             title: const Text('隐私设置'),
           ),
           ListTile(
+            onTap: () => Get.toNamed('/recommendSetting'),
+            dense: false,
+            title: const Text('推荐设置'),
+          ),
+          ListTile(
             onTap: () => Get.toNamed('/playSetting'),
             dense: false,
             title: const Text('播放设置'),

@@ -214,6 +214,9 @@ class Api {
   // https://api.bilibili.com/x/relation/tags
   static const String followingsClass = '/x/relation/tags';
 
+  // 搜索follow
+  static const followSearch = '/x/relation/followings/search';
+
   // 粉丝
   // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
   // order_type 排序规则 最近访问传空，最常访问传 attention
@@ -229,6 +232,10 @@ class Api {
   // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
   static const String liveRoomInfo =
       '${HttpString.liveBaseUrl}/xlive/web-room/v2/index/getRoomPlayInfo';
+
+  // 直播间详情 H5
+  static const String liveRoomInfoH5 =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getH5InfoByRoom';
 
   // 用户信息 需要Wbi签名
   // https://api.bilibili.com/x/space/wbi/acc/info?mid=503427686&token=&platform=web&web_location=1550101&w_rid=d709892496ce93e3d94d6d37c95bde91&wts=1689301482
@@ -470,4 +477,30 @@ class Api {
 
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
+
+  /// 用户动态主页
+  static const dynamicSpmPrefix = 'https://space.bilibili.com/1/dynamic';
+
+  /// 激活buvid3
+  static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅详情
+  static const userSubFolderDetail = '/x/space/fav/season/list';
+
+  /// 表情
+  static const emojiList = '/x/emote/user/panel/web';
+
+  /// 已读标记
+  static const String ackSessionMsg =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/update_ack';
+
+  /// 发送私信
+  static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
+
+  /// 排行榜
+  static const String getRankApi = "/x/web-interface/ranking/v2";
+
 }

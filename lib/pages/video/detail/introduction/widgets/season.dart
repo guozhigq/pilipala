@@ -80,6 +80,34 @@ class _SeasonPanelState extends State<SeasonPanel> {
     super.dispose();
   }
 
+  Widget buildEpisodeListItem(
+    EpisodeItem episode,
+    int index,
+    bool isCurrentIndex,
+  ) {
+    Color primary = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      onTap: () => changeFucCall(episode, index),
+      dense: false,
+      leading: isCurrentIndex
+          ? Image.asset(
+              'assets/images/live.gif',
+              color: primary,
+              height: 12,
+            )
+          : null,
+      title: Text(
+        episode.title!,
+        style: TextStyle(
+          fontSize: 14,
+          color: isCurrentIndex
+              ? primary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (BuildContext context) {
@@ -134,32 +162,22 @@ class _SeasonPanelState extends State<SeasonPanel> {
                           child: Material(
                             child: ScrollablePositionedList.builder(
                               itemCount: episodes.length,
-                              itemBuilder: (BuildContext context, int index) =>
-                                  ListTile(
-                                onTap: () =>
-                                    changeFucCall(episodes[index], index),
-                                dense: false,
-                                leading: index == currentIndex
-                                    ? Image.asset(
-                                        'assets/images/live.gif',
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        height: 12,
+                              itemBuilder: (BuildContext context, int index) {
+                                bool isLastItem = index == episodes.length - 1;
+                                bool isCurrentIndex = currentIndex == index;
+                                return isLastItem
+                                    ? SizedBox(
+                                        height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
+                                            20,
                                       )
-                                    : null,
-                                title: Text(
-                                  episodes[index].title!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: index == currentIndex
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                  ),
-                                ),
-                              ),
+                                    : buildEpisodeListItem(
+                                        episodes[index],
+                                        index,
+                                        isCurrentIndex,
+                                      );
+                              },
                               itemScrollController: itemScrollController,
                             ),
                           ),

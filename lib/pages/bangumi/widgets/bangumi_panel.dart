@@ -14,12 +14,14 @@ class BangumiPanel extends StatefulWidget {
     this.cid,
     this.sheetHeight,
     this.changeFuc,
+    this.bangumiDetail,
   });
 
   final List<EpisodeItem> pages;
   final int? cid;
   final double? sheetHeight;
   final Function? changeFuc;
+  final BangumiInfoModel? bangumiDetail;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -65,6 +67,47 @@ class _BangumiPanelState extends State<BangumiPanel> {
     super.dispose();
   }
 
+  Widget buildPageListItem(
+    EpisodeItem page,
+    int index,
+    bool isCurrentIndex,
+  ) {
+    Color primary = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      onTap: () {
+        Get.back();
+        setState(() {
+          changeFucCall(page, index);
+        });
+      },
+      dense: false,
+      leading: isCurrentIndex
+          ? Image.asset(
+              'assets/images/live.gif',
+              color: primary,
+              height: 12,
+            )
+          : null,
+      title: Text(
+        '第${page.title}话  ${page.longTitle!}',
+        style: TextStyle(
+          fontSize: 14,
+          color: isCurrentIndex
+              ? primary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+      trailing: page.badge != null
+          ? Text(
+              page.badge!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
+          : const SizedBox(),
+    );
+  }
+
   void showBangumiPanel() {
     showBottomSheet(
       context: context,
@@ -106,37 +149,21 @@ class _BangumiPanelState extends State<BangumiPanel> {
                     child: Material(
                       child: ScrollablePositionedList.builder(
                         itemCount: widget.pages.length,
-                        itemBuilder: (BuildContext context, int index) =>
-                            ListTile(
-                          onTap: () {
-                            setState(() {
-                              changeFucCall(widget.pages[index], index);
-                            });
-                          },
-                          dense: false,
-                          leading: index == currentIndex
-                              ? Image.asset(
-                                  'assets/images/live.gif',
-                                  color: Theme.of(context).colorScheme.primary,
-                                  height: 12,
+                        itemBuilder: (BuildContext context, int index) {
+                          bool isLastItem = index == widget.pages.length - 1;
+                          bool isCurrentIndex = currentIndex == index;
+                          return isLastItem
+                              ? SizedBox(
+                                  height:
+                                      MediaQuery.of(context).padding.bottom +
+                                          20,
                                 )
-                              : null,
-                          title: Text(
-                            '第${index + 1}话  ${widget.pages[index].longTitle!}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: index == currentIndex
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          trailing: widget.pages[index].badge != null
-                              ? Image.asset(
-                                  'assets/images/big-vip.png',
-                                  height: 20,
-                                )
-                              : const SizedBox(),
-                        ),
+                              : buildPageListItem(
+                                  widget.pages[index],
+                                  index,
+                                  isCurrentIndex,
+                                );
+                        },
                         itemScrollController: itemScrollController,
                       ),
                     ),
@@ -151,7 +178,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   }
 
   void changeFucCall(item, i) async {
-    if (item.badge != null && vipStatus != 1) {
+    if (item.badge != null && item.badge == '会员' && vipStatus != 1) {
       SmartDialog.showToast('需要大会员');
       return;
     }
@@ -178,11 +205,11 @@ class _BangumiPanelState extends State<BangumiPanel> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 6),
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('合集 '),
+              const Text('选集 '),
               Expanded(
                 child: Text(
                   ' 正在播放：${widget.pages[currentIndex].longTitle}',
@@ -202,7 +229,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   ),
                   onPressed: () => showBangumiPanel(),
                   child: Text(
-                    '全${widget.pages.length}话',
+                    '${widget.bangumiDetail!.newEp!['desc']}',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
@@ -255,11 +282,16 @@ class _BangumiPanelState extends State<BangumiPanel> {
                               ),
                               const SizedBox(width: 2),
                               if (widget.pages[i].badge != null) ...[
-                                Image.asset(
-                                  'assets/images/big-vip.png',
-                                  height: 16,
+                                const Spacer(),
+                                Text(
+                                  widget.pages[i].badge!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
                                 ),
-                              ],
+                              ]
                             ],
                           ),
                           const SizedBox(height: 3),

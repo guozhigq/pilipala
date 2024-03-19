@@ -277,8 +277,7 @@ class PlPlayerController {
     danmakuDurationVal =
         localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
     // 描边粗细
-    strokeWidth =
-        localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
+    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
     playRepeat = PlayRepeat.values.toList().firstWhere(
           (e) =>
               e.value ==
@@ -293,11 +292,19 @@ class PlPlayerController {
       _longPressSpeed.value = videoStorage
           .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
     }
+    // 自定义倍速集合
     speedsList = List<double>.from(videoStorage
         .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
-    for (final PlaySpeed i in PlaySpeed.values) {
-      speedsList.add(i.value);
-    }
+    // 默认倍速
+    speedsList = List<double>.from(videoStorage
+        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
+    //playSpeedSystem
+    final List<double> playSpeedSystem =
+        videoStorage.get(VideoBoxKey.playSpeedSystem, defaultValue: playSpeed);
+
+    // for (final PlaySpeed i in PlaySpeed.values) {
+    speedsList.addAll(playSpeedSystem);
+    // }
 
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
@@ -535,8 +542,10 @@ class PlPlayerController {
           if (event) {
             playerStatus.status.value = PlayerStatus.playing;
           } else {
-            // playerStatus.status.value = PlayerStatus.paused;
+            playerStatus.status.value = PlayerStatus.paused;
           }
+          videoPlayerServiceHandler.onStatusChange(
+              playerStatus.status.value, isBuffering.value);
 
           /// 触发回调事件
           for (var element in _statusListeners) {
@@ -674,18 +683,6 @@ class PlPlayerController {
     await _videoPlayerController?.setRate(speed);
     _playbackSpeed.value = speed;
   }
-
-  /// 设置倍速
-  // Future<void> togglePlaybackSpeed() async {
-  //   List<double> allowedSpeeds =
-  //       PlaySpeed.values.map<double>((e) => e.value).toList();
-  //   int index = allowedSpeeds.indexOf(_playbackSpeed.value);
-  //   if (index < allowedSpeeds.length - 1) {
-  //     setPlaybackSpeed(allowedSpeeds[index + 1]);
-  //   } else {
-  //     setPlaybackSpeed(allowedSpeeds[0]);
-  //   }
-  // }
 
   /// 播放视频
   /// TODO  _duration.value丢失

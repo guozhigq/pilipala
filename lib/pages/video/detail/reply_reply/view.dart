@@ -54,7 +54,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyReplyController.queryReplyList(type: 'onLoad');
           });
         }
@@ -92,7 +93,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     icon: const Icon(Icons.close, size: 20),
                     onPressed: () {
                       _videoReplyReplyController.currentPage = 0;
-                      widget.closePanel!();
+                      widget.closePanel?.call;
                       Navigator.pop(context);
                     },
                   ),
@@ -184,6 +185,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                                             .add(replyItem);
                                       },
                                       replyType: widget.replyType,
+                                      replyReply: (replyItem) =>
+                                          replyReply(replyItem),
                                     );
                                   }
                                 },
