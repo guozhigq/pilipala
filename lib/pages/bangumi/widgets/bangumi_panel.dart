@@ -148,9 +148,9 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   Expanded(
                     child: Material(
                       child: ScrollablePositionedList.builder(
-                        itemCount: widget.pages.length,
+                        itemCount: widget.pages.length + 1,
                         itemBuilder: (BuildContext context, int index) {
-                          bool isLastItem = index == widget.pages.length - 1;
+                          bool isLastItem = index == widget.pages.length;
                           bool isCurrentIndex = currentIndex == index;
                           return isLastItem
                               ? SizedBox(
