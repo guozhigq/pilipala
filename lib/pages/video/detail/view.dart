@@ -319,62 +319,78 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ),
         ),
       ),
-      child: Row(
-        children: [
-          const SizedBox(width: 20),
-          Expanded(
-            child: TabBar(
-              controller: vdCtr.tabCtr,
-              dividerColor: Colors.transparent,
-              tabs: vdCtr.tabs.map((String name) => Tab(text: name)).toList(),
-            ),
-          ),
-          SizedBox(
-            width: 220,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    height: 32,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      ),
-                      onPressed: () => vdCtr.showShootDanmakuSheet(),
-                      child: const Text('发弹幕', style: TextStyle(fontSize: 12)),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  SizedBox(
-                    width: 34,
-                    height: 32,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      ),
-                      onPressed: () {
-                        plPlayerController?.isOpenDanmu.value =
-                            !(plPlayerController?.isOpenDanmu.value ?? false);
-                      },
-                      child: Obx(() => Text(
-                            '弹',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: (plPlayerController?.isOpenDanmu.value ??
-                                      false)
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.outline,
-                            ),
-                          )),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                ],
+      child: Material(
+        child: Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Obx(
+                () => TabBar(
+                  padding: EdgeInsets.zero,
+                  controller: vdCtr.tabCtr,
+                  labelStyle: const TextStyle(fontSize: 13),
+                  labelPadding:
+                      const EdgeInsets.symmetric(horizontal: 10.0), // 设置每个标签的宽度
+                  dividerColor: Colors.transparent,
+                  tabs: vdCtr.tabs
+                      .map(
+                        (String name) => Flexible(
+                          child: Tab(text: name),
+                        ),
+                      )
+                      .toList(),
+                ),
               ),
             ),
-          ),
-        ],
+            Flexible(
+                flex: 1,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: 32,
+                        child: TextButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                          ),
+                          onPressed: () => vdCtr.showShootDanmakuSheet(),
+                          child:
+                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      SizedBox(
+                        width: 34,
+                        height: 32,
+                        child: TextButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                          ),
+                          onPressed: () {
+                            plPlayerController?.isOpenDanmu.value =
+                                !(plPlayerController?.isOpenDanmu.value ??
+                                    false);
+                          },
+                          child: Obx(() => Text(
+                                '弹',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: (plPlayerController
+                                              ?.isOpenDanmu.value ??
+                                          false)
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.outline,
+                                ),
+                              )),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                    ],
+                  ),
+                )),
+          ],
+        ),
       ),
     );
 
