@@ -395,7 +395,13 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height, seekTo);
+        dataSource,
+        _looping,
+        enableHA,
+        width,
+        height,
+        seekTo,
+      );
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -406,7 +412,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
+      await _initializePlayer(duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -426,7 +432,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
-    Duration seekTo,
+    Duration? seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -508,9 +514,12 @@ class PlPlayerController {
         play: false,
       );
     }
-    await player.open(
-      Media(dataSource.videoSource!,
-          httpHeaders: dataSource.httpHeaders, start: seekTo),
+    player.open(
+      Media(
+        dataSource.videoSource!,
+        httpHeaders: dataSource.httpHeaders,
+        start: seekTo ?? Duration.zero,
+      ),
       play: false,
     );
     // 音轨
@@ -523,7 +532,6 @@ class PlPlayerController {
 
   // 开始播放
   Future _initializePlayer({
-    Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
     getVideoFit();
@@ -550,6 +558,15 @@ class PlPlayerController {
       } else {
         await setPlaybackSpeed(1.0);
       }
+    }
+    getVideoFit();
+    // if (_looping) {
+    //   await setLooping(_looping);
+    // }
+
+    // 自动播放
+    if (_autoPlay) {
+      await play(duration: duration);
     }
   }
 
