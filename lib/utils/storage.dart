@@ -84,6 +84,7 @@ class SettingBoxKey {
       autoUpgradeEnable = 'autoUpgradeEnable',
       feedBackEnable = 'feedBackEnable',
       defaultVideoQa = 'defaultVideoQa',
+      defaultLiveQa = 'defaultLiveQa',
       defaultAudioQa = 'defaultAudioQa',
       autoPlayEnable = 'autoPlayEnable',
       fullScreenMode = 'fullScreenMode',
@@ -171,6 +172,10 @@ class LocalCacheKey {
       // 代理host port
       systemProxyHost = 'systemProxyHost',
       systemProxyPort = 'systemProxyPort';
+
+  static const String isDisableBatteryOptLocal = 'isDisableBatteryOptLocal',
+      isManufacturerBatteryOptimizationDisabled =
+          'isManufacturerBatteryOptimizationDisabled';
 }
 
 class VideoBoxKey {
