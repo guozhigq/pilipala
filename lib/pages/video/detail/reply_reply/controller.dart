@@ -30,6 +30,9 @@ class VideoReplyReplyController extends GetxController {
     if (type == 'init') {
       currentPage = 0;
     }
+    if (isLoadingMore) {
+      return;
+    }
     isLoadingMore = true;
     final res = await ReplyHttp.replyReplyList(
       oid: aid!,
@@ -41,7 +44,7 @@ class VideoReplyReplyController extends GetxController {
       final List<ReplyItemModel> replies = res['data'].replies;
       if (replies.isNotEmpty) {
         noMore.value = '加载中...';
-        if (replyList.length == res['data'].page.count) {
+        if (replies.length == res['data'].page.count) {
           noMore.value = '没有更多了';
         }
         currentPage++;
@@ -50,21 +53,6 @@ class VideoReplyReplyController extends GetxController {
         noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
       }
       if (type == 'init') {
-        // List<ReplyItemModel> replies = res['data'].replies;
-        // 添加置顶回复
-        // if (res['data'].upper.top != null) {
-        //   bool flag = false;
-        //   for (var i = 0; i < res['data'].topReplies.length; i++) {
-        //     if (res['data'].topReplies[i].rpid == res['data'].upper.top.rpid) {
-        //       flag = true;
-        //     }
-        //   }
-        //   if (!flag) {
-        //     replies.insert(0, res['data'].upper.top);
-        //   }
-        // }
-        // replies.insertAll(0, res['data'].topReplies);
-        // res['data'].replies = replies;
         replyList.value = replies;
       } else {
         // 每次回复之后，翻页请求有且只有相同的一条回复数据

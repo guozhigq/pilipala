@@ -50,6 +50,9 @@ class Utils {
       return time;
     }
     if (time < 3600) {
+      if (time == 0) {
+        return time;
+      }
       final int minute = time ~/ 60;
       final double res = time / 60;
       if (minute != res) {
@@ -87,6 +90,9 @@ class Utils {
 
   // 时间显示，刚刚，x分钟前
   static String dateFormat(timeStamp, {formatType = 'list'}) {
+    if (timeStamp == 0 || timeStamp == null || timeStamp == '') {
+      return '';
+    }
     // 当前时间
     int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     // 对比
@@ -103,6 +109,7 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
+    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {
@@ -236,6 +243,10 @@ class Utils {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return false;
+    }
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
@@ -344,9 +355,8 @@ class Utils {
   }
 
   static List<int> generateRandomBytes(int minLength, int maxLength) {
-    return List<int>.generate(
-      random.nextInt(maxLength-minLength+1), (_) => random.nextInt(0x60) + 0x20
-    );
+    return List<int>.generate(random.nextInt(maxLength - minLength + 1),
+        (_) => random.nextInt(0x60) + 0x20);
   }
 
   static String base64EncodeRandomString(int minLength, int maxLength) {

@@ -20,7 +20,7 @@ class AudioSessionHandler {
     session.interruptionEventStream.listen((event) {
       final player = PlPlayerController.getInstance();
       if (event.begin) {
-        if (player.playerStatus != PlayerStatus.playing) return;
+        if (!player.playerStatus.playing) return;
         switch (event.type) {
           case AudioInterruptionType.duck:
             player.setVolume(player.volume.value * 0.5);
@@ -52,7 +52,7 @@ class AudioSessionHandler {
     // 耳机拔出暂停
     session.becomingNoisyEventStream.listen((_) {
       final player = PlPlayerController.getInstance();
-      if (player.playerStatus == PlayerStatus.playing) {
+      if (player.playerStatus.playing) {
         player.pause();
       }
     });
