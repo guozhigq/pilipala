@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -674,13 +675,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 _distance.value = dy;
               } else {
                 // 右边区域 👈
-                final double level = (_.isFullScreen.value
-                        ? Get.size.height
-                        : screenWidth * 9 / 16) *
-                    3;
-                final double volume = _volumeValue.value - delta / level;
-                final double result = volume.clamp(0.0, 1.0);
-                setVolume(result);
+                EasyThrottle.throttle(
+                    'setVolume', const Duration(milliseconds: 20), () {
+                  final double level = (_.isFullScreen.value
+                      ? Get.size.height
+                      : screenWidth * 9 / 16);
+                  final double volume = _volumeValue.value -
+                      double.parse(delta.toStringAsFixed(1)) / level;
+                  final double result = volume.clamp(0.0, 1.0);
+                  setVolume(result);
+                });
               }
             },
             onVerticalDragEnd: (DragEndDetails details) {},
