@@ -142,7 +142,7 @@ class Stat {
 
   Stat.fromJson(Map<String, dynamic> json) {
     view = json["play"];
-    danmaku = json['comment'];
+    danmaku = json['video_review'];
   }
 }
 

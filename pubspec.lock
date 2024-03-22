@@ -393,6 +393,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.4.0"
+  disable_battery_optimization:
+    dependency: "direct main"
+    description:
+      name: disable_battery_optimization
+      sha256: "6b2ba802f984af141faf1b6b5fb956d5ef01f9cd555597c35b9cc335a03185ba"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.1"
   dismissible_page:
     dependency: "direct main"
     description:
@@ -500,10 +508,11 @@ packages:
   floating:
     dependency: "direct main"
     description:
-      name: floating
-      sha256: d9d563089e34fbd714ffdcdd2df447ec41b40c9226dacae6b4f78847aef8b991
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "8e89669eb9341f9980265306e24ef96fdbd3fd08"
+      url: "https://github.com/guozhigq/floating.git"
+    source: git
     version: "2.0.1"
   flutter:
     dependency: "direct main"

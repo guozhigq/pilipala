@@ -9,7 +9,6 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/main/index.dart';
-import 'package:pilipala/pages/rcmd/view.dart';
 
 import 'controller.dart';
 import 'widgets/bangumu_card_v.dart';
@@ -199,7 +198,10 @@ class _BangumiPageState extends State<BangumiPage>
                   } else {
                     return HttpError(
                       errMsg: data['msg'],
-                      fn: () => {},
+                      fn: () {
+                        _futureBuilderFuture =
+                            _bangumidController.queryBangumiListFeed();
+                      },
                     );
                   }
                 } else {
@@ -208,7 +210,6 @@ class _BangumiPageState extends State<BangumiPage>
               },
             ),
           ),
-          const LoadingMore()
         ],
       ),
     );

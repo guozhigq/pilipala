@@ -14,6 +14,7 @@ import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
 import 'widgets/up_panel.dart';
@@ -28,6 +29,7 @@ class DynamicsPage extends StatefulWidget {
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
+  final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   Box userInfoCache = GStrorage.userInfo;
@@ -192,22 +194,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                   )
                 ],
               ),
-              // Obx(
-              //   () => Visibility(
-              //     visible: _dynamicsController.userLogin.value,
-              //     child: Positioned(
-              //       right: 4,
-              //       top: 0,
-              //       bottom: 0,
-              //       child: IconButton(
-              //         padding: EdgeInsets.zero,
-              //         onPressed: () =>
-              //             {feedBack(), _dynamicsController.resetSearch()},
-              //         icon: const Icon(Icons.history, size: 21),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -229,7 +215,8 @@ class _DynamicsPageState extends State<DynamicsPage>
                     return Obx(() => UpPanel(_dynamicsController.upData.value));
                   } else {
                     return const SliverToBoxAdapter(
-                        child: SizedBox(height: 80));
+                      child: SizedBox(height: 80),
+                    );
                   }
                 } else {
                   return const SliverToBoxAdapter(
@@ -239,15 +226,6 @@ class _DynamicsPageState extends State<DynamicsPage>
                   ));
                 }
               },
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                height: 6,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onInverseSurface
-                    .withOpacity(0.5),
-              ),
             ),
             FutureBuilder(
               future: _futureBuilderFuture,
@@ -278,6 +256,14 @@ class _DynamicsPageState extends State<DynamicsPage>
                             ),
                           );
                         }
+                      },
+                    );
+                  } else if (data['msg'] == "账号未登录") {
+                    return HttpError(
+                      errMsg: data['msg'],
+                      btnText: "去登录",
+                      fn: () {
+                        mineController.onLogin();
                       },
                     );
                   } else {

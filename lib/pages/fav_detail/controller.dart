@@ -16,7 +16,7 @@ class FavDetailController extends GetxController {
   RxMap favInfo = {}.obs;
   RxList favList = [].obs;
   RxString loadingText = '加载中...'.obs;
-  int mediaCount = 0;
+  RxInt mediaCount = 0.obs;
 
   @override
   void onInit() {
@@ -29,12 +29,12 @@ class FavDetailController extends GetxController {
   }
 
   Future<dynamic> queryUserFavFolderDetail({type = 'init'}) async {
-    if (type == 'onLoad' && favList.length >= mediaCount) {
+    if (type == 'onLoad' && favList.length >= mediaCount.value) {
       loadingText.value = '没有更多了';
       return;
     }
     isLoadingMore = true;
-    var res = await await UserHttp.userFavFolderDetail(
+    var res = await UserHttp.userFavFolderDetail(
       pn: currentPage,
       ps: 20,
       mediaId: mediaId!,
@@ -43,11 +43,11 @@ class FavDetailController extends GetxController {
       favInfo.value = res['data'].info;
       if (currentPage == 1 && type == 'init') {
         favList.value = res['data'].medias;
-        mediaCount = res['data'].info['media_count'];
+        mediaCount.value = res['data'].info['media_count'];
       } else if (type == 'onLoad') {
         favList.addAll(res['data'].medias);
       }
-      if (favList.length >= mediaCount) {
+      if (favList.length >= mediaCount.value) {
         loadingText.value = '没有更多了';
       }
     }
@@ -60,16 +60,14 @@ class FavDetailController extends GetxController {
     var result = await VideoHttp.favVideo(
         aid: id, addIds: '', delIds: mediaId.toString());
     if (result['status']) {
-      if (result['data']['prompt']) {
-        List dataList = favList;
-        for (var i in dataList) {
-          if (i.id == id) {
-            dataList.remove(i);
-            break;
-          }
+      List dataList = favList;
+      for (var i in dataList) {
+        if (i.id == id) {
+          dataList.remove(i);
+          break;
         }
-        SmartDialog.showToast('取消收藏');
       }
+      SmartDialog.showToast('取消收藏');
     }
   }
 

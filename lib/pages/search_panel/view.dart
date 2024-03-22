@@ -105,7 +105,11 @@ class _SearchPanelState extends State<SearchPanel>
                   slivers: [
                     HttpError(
                       errMsg: data['msg'],
-                      fn: () => setState(() {}),
+                      fn: () {
+                        setState(() {
+                          _searchPanelController.onSearch();
+                        });
+                      },
                     ),
                   ],
                 );
@@ -116,7 +120,11 @@ class _SearchPanelState extends State<SearchPanel>
                 slivers: [
                   HttpError(
                     errMsg: '没有相关数据',
-                    fn: () => setState(() {}),
+                    fn: () {
+                      setState(() {
+                        _searchPanelController.onSearch();
+                      });
+                    },
                   ),
                 ],
               );
