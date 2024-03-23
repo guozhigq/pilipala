@@ -45,6 +45,13 @@ PODS:
     - Flutter
   - screen_brightness_ios (0.1.0):
     - Flutter
+  - Sentry/HybridSDK (8.19.0):
+    - SentryPrivate (= 8.19.0)
+  - sentry_flutter (0.0.1):
+    - Flutter
+    - FlutterMacOS
+    - Sentry/HybridSDK (= 8.19.0)
+  - SentryPrivate (8.19.0)
   - share_plus (0.0.1):
     - Flutter
   - sqflite (0.0.3):
@@ -86,6 +93,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - saver_gallery (from `.symlinks/plugins/saver_gallery/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
+  - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - status_bar_control (from `.symlinks/plugins/status_bar_control/ios`)
@@ -101,6 +109,8 @@ SPEC REPOS:
     - FMDB
     - GT3Captcha-iOS
     - ReachabilitySwift
+    - Sentry
+    - SentryPrivate
     - Toast
 
 EXTERNAL SOURCES:
@@ -142,6 +152,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/saver_gallery/ios"
   screen_brightness_ios:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
+  sentry_flutter:
+    :path: ".symlinks/plugins/sentry_flutter/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   sqflite:
@@ -184,6 +196,9 @@ SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   saver_gallery: 2b4e584106fde2407ab51560f3851564963e6b78
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
+  Sentry: 1ebcaef678a27c8ac515f974cb5425dd1bbdec2f
+  sentry_flutter: ecdfbedee55337205561cfa782ee02d31ec83e1f
+  SentryPrivate: 765c9b4ebe9ac1a5fcdc067c5a1cfbf3f10e1677
   share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   status_bar_control: 7c84146799e6a076315cc1550f78ef53aae3e446

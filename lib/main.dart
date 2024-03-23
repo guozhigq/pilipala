@@ -25,6 +25,9 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+
+import 'services/sentry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,13 +58,35 @@ void main() async {
       [FileHandler(await getLogsPath())],
     );
 
-    Catcher2(
-      debugConfig: debugConfig,
-      releaseConfig: releaseConfig,
-      runAppFunction: () {
-        runApp(const MyApp());
-      },
+    // Catcher2(
+    //   debugConfig: debugConfig,
+    //   releaseConfig: releaseConfig,
+    //   runAppFunction: () {
+    //     runApp(const MyApp());
+    //   },
+    // );
+
+    await SentryService.sentryInit(
+      () => runApp(
+        SentryScreenshotWidget(
+          child: SentryUserInteractionWidget(
+            child: DefaultAssetBundle(
+              bundle: SentryAssetBundle(),
+              child: const MyApp(),
+            ),
+          ),
+        ),
+      ),
     );
+
+    // try {
+    //   int? test;
+    //   test! + 3;
+    // } catch (exception, stackTrace) {
+    //   debugPrint('111');
+    //   await Sentry.captureException(exception, stackTrace: '$stackTrace');
+    //   debugPrint('222');
+    // }
 
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -195,6 +220,7 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [
             VideoDetailPage.routeObserver,
             SearchPage.routeObserver,
+            SentryNavigatorObserver(),
           ],
         );
       }),
