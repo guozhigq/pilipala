@@ -84,6 +84,7 @@ class SettingBoxKey {
       autoUpgradeEnable = 'autoUpgradeEnable',
       feedBackEnable = 'feedBackEnable',
       defaultVideoQa = 'defaultVideoQa',
+      defaultLiveQa = 'defaultLiveQa',
       defaultAudioQa = 'defaultAudioQa',
       autoPlayEnable = 'autoPlayEnable',
       fullScreenMode = 'fullScreenMode',
@@ -131,7 +132,8 @@ class SettingBoxKey {
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi',
-      defaultHomePage = 'defaultHomePage';
+      defaultHomePage = 'defaultHomePage',
+      enableRelatedVideo = 'enableRelatedVideo';
 
   /// 外观
   static const String themeMode = 'themeMode',
@@ -170,6 +172,10 @@ class LocalCacheKey {
       // 代理host port
       systemProxyHost = 'systemProxyHost',
       systemProxyPort = 'systemProxyPort';
+
+  static const String isDisableBatteryOptLocal = 'isDisableBatteryOptLocal',
+      isManufacturerBatteryOptimizationDisabled =
+          'isManufacturerBatteryOptimizationDisabled';
 }
 
 class VideoBoxKey {
@@ -181,6 +187,8 @@ class VideoBoxKey {
       videoSpeed = 'videoSpeed',
       // 播放顺序
       playRepeat = 'playRepeat',
+      // 系统预设倍速
+      playSpeedSystem = 'playSpeedSystem',
       // 默认倍速
       playSpeedDefault = 'playSpeedDefault',
       // 默认长按倍速
