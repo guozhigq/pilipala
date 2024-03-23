@@ -115,7 +115,7 @@ class SSearchController extends GetxController {
 
   onLongSelect(word) {
     int index = historyList.indexOf(word);
-    historyList.value = historyList.removeAt(index);
+    historyList.removeAt(index);
     historyList.refresh();
     histiryWord.put('cacheList', historyList);
   }

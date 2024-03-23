@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
@@ -19,6 +20,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../../http/danmaku.dart';
 import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
 
@@ -91,6 +93,7 @@ class VideoDetailController extends GetxController
   late int cacheAudioQa;
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
+  late bool enableRelatedVideo;
 
   @override
   void onInit() {
@@ -113,7 +116,8 @@ class VideoDetailController extends GetxController
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
-
+    enableRelatedVideo =
+        setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
     if (userInfo == null ||
         localCache.get(LocalCacheKey.historyPause) == true) {
       enableHeart = false;
@@ -382,5 +386,87 @@ class VideoDetailController extends GetxController
     replyReplyBottomSheetCtr != null
         ? replyReplyBottomSheetCtr!.close()
         : print('replyReplyBottomSheetCtr is null');
+  }
+
+  /// 发送弹幕
+  void showShootDanmakuSheet() {
+    final TextEditingController textController = TextEditingController();
+    bool isSending = false; // 追踪是否正在发送
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        // TODO: 支持更多类型和颜色的弹幕
+        return AlertDialog(
+          title: const Text('发送弹幕'),
+          content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return TextField(
+              controller: textController,
+            );
+          }),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return TextButton(
+                onPressed: isSending
+                    ? null
+                    : () async {
+                        final String msg = textController.text;
+                        if (msg.isEmpty) {
+                          SmartDialog.showToast('弹幕内容不能为空');
+                          return;
+                        } else if (msg.length > 100) {
+                          SmartDialog.showToast('弹幕内容不能超过100个字符');
+                          return;
+                        }
+                        setState(() {
+                          isSending = true; // 开始发送，更新状态
+                        });
+                        //修改按钮文字
+                        // SmartDialog.showToast('弹幕发送中,\n$msg');
+                        final dynamic res = await DanmakaHttp.shootDanmaku(
+                          oid: cid.value,
+                          msg: textController.text,
+                          bvid: bvid,
+                          progress:
+                              plPlayerController.position.value.inMilliseconds,
+                          type: 1,
+                        );
+                        setState(() {
+                          isSending = false; // 发送结束，更新状态
+                        });
+                        if (res['status']) {
+                          SmartDialog.showToast('发送成功');
+                          // 发送成功，自动预览该弹幕，避免重新请求
+                          // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
+                          plPlayerController.danmakuController?.addItems([
+                            DanmakuItem(
+                              msg,
+                              color: Colors.white,
+                              time: plPlayerController
+                                  .position.value.inMilliseconds,
+                              type: DanmakuItemType.scroll,
+                              isSend: true,
+                            )
+                          ]);
+                          Get.back();
+                        } else {
+                          SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
+                        }
+                      },
+                child: Text(isSending ? '发送中...' : '发送'),
+              );
+            })
+          ],
+        );
+      },
+    );
   }
 }
