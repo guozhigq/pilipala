@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import '../../models/model_rec_video_item.dart';
+import 'stat/danmu.dart';
+import 'stat/view.dart';
 import '../../http/dynamics.dart';
 import '../../http/search.dart';
 import '../../http/user.dart';
@@ -228,6 +231,7 @@ class VideoContent extends StatelessWidget {
               const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
+                crossAxisCount: crossAxisCount,
               ),
             ],
             if (crossAxisCount == 1) const SizedBox(height: 4),
@@ -291,6 +295,7 @@ class VideoContent extends StatelessWidget {
                   ),
                   VideoStat(
                     videoItem: videoItem,
+                    crossAxisCount: crossAxisCount,
                   ),
                   const Spacer(),
                 ],
@@ -314,27 +319,41 @@ class VideoContent extends StatelessWidget {
 
 class VideoStat extends StatelessWidget {
   final dynamic videoItem;
+  final int crossAxisCount;
 
   const VideoStat({
     Key? key,
     required this.videoItem,
+    required this.crossAxisCount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 1,
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: MediaQuery.textScalerOf(context)
-              .scale(Theme.of(context).textTheme.labelSmall!.fontSize!),
-          color: Theme.of(context).colorScheme.outline,
+    return Row(
+      children: [
+        StatView(
+          theme: 'gray',
+          view: videoItem.stat.view,
         ),
-        children: [
-          TextSpan(text: '${Utils.numFormat(videoItem.stat.view)}观看'),
-          TextSpan(text: ' • ${Utils.numFormat(videoItem.stat.danmu)}弹幕'),
-        ],
-      ),
+        const SizedBox(width: 8),
+        StatDanMu(
+          theme: 'gray',
+          danmu: videoItem.stat.danmu,
+        ),
+        if (videoItem is RecVideoItemModel) ...<Widget>[
+          crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
+          RichText(
+            maxLines: 1,
+            text: TextSpan(
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
+          ),
+          const SizedBox(width: 4),
+        ]
+      ],
     );
   }
 }

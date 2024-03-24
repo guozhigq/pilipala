@@ -68,8 +68,9 @@ class IdUtils {
     if (input == null || input.isEmpty) {
       return result;
     }
-    final RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}', caseSensitive: false);
-    final RegExp avRegex = RegExp(r'AV\d+', caseSensitive: false);
+    final RegExp bvRegex =
+        RegExp(r'[bB][vV][0-9A-Za-z]{10}', caseSensitive: false);
+    final RegExp avRegex = RegExp(r'[aA][vV]\d+', caseSensitive: false);
 
     final Iterable<Match> bvMatches = bvRegex.allMatches(input);
     final Iterable<Match> avMatches = avRegex.allMatches(input);

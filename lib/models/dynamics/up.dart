@@ -2,18 +2,28 @@ class FollowUpModel {
   FollowUpModel({
     this.liveUsers,
     this.upList,
+    this.liveList,
+    this.myInfo,
   });
 
   LiveUsers? liveUsers;
   List<UpItem>? upList;
+  List<LiveUserItem>? liveList;
+  MyInfo? myInfo;
 
   FollowUpModel.fromJson(Map<String, dynamic> json) {
     liveUsers = json['live_users'] != null
         ? LiveUsers.fromJson(json['live_users'])
         : null;
+    liveList = json['live_users'] != null
+        ? json['live_users']['items']
+            .map<LiveUserItem>((e) => LiveUserItem.fromJson(e))
+            .toList()
+        : [];
     upList = json['up_list'] != null
         ? json['up_list'].map<UpItem>((e) => UpItem.fromJson(e)).toList()
         : [];
+    myInfo = json['my_info'] != null ? MyInfo.fromJson(json['my_info']) : null;
   }
 }
 
@@ -91,5 +101,23 @@ class UpItem {
     isReserveRecall = json['is_reserve_recall'];
     mid = json['mid'];
     uname = json['uname'];
+  }
+}
+
+class MyInfo {
+  MyInfo({
+    this.face,
+    this.mid,
+    this.name,
+  });
+
+  String? face;
+  int? mid;
+  String? name;
+
+  MyInfo.fromJson(Map<String, dynamic> json) {
+    face = json['face'];
+    mid = json['mid'];
+    name = json['name'];
   }
 }

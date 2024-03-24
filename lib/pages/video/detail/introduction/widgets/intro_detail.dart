@@ -23,7 +23,10 @@ class IntroDetail extends StatelessWidget {
     sheetHeight = localCache.get('sheetHeight');
     return Container(
         color: Theme.of(context).colorScheme.background,
-        padding: const EdgeInsets.only(left: 14, right: 14),
+        padding: EdgeInsets.only(
+            left: 14,
+            right: 14,
+            bottom: MediaQuery.of(context).padding.bottom + 20),
         height: sheetHeight,
         child: Column(
           children: [

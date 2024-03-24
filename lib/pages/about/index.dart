@@ -53,29 +53,54 @@ class _AboutPageState extends State<AboutPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
-            Text(
-              '使用Flutter开发的哔哩哔哩第三方客户端',
-              style: TextStyle(color: Theme.of(context).colorScheme.outline),
-            ),
-            const SizedBox(height: 20),
             Obx(
-              () => ListTile(
-                title: const Text('当前版本'),
-                trailing: Text(_aboutController.currentVersion.value,
-                    style: subTitleStyle),
-              ),
-            ),
-            Obx(
-              () => ListTile(
-                onTap: () => _aboutController.onUpdate(),
-                title: const Text('最新版本'),
-                trailing: Text(
-                  _aboutController.isLoading.value
-                      ? '正在获取'
-                      : _aboutController.isUpdate.value
-                          ? '有新版本  ❤️${_aboutController.remoteVersion.value}'
-                          : '当前已是最新版',
-                  style: subTitleStyle,
+              () => Badge(
+                isLabelVisible: _aboutController.isLoading.value
+                    ? false
+                    : _aboutController.isUpdate.value,
+                label: const Text('New'),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
+                  child: FilledButton.tonal(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                onTap: () => _aboutController.githubRelease(),
+                                title: const Text('Github下载'),
+                              ),
+                              ListTile(
+                                onTap: () => _aboutController.panDownload(),
+                                title: const Text('网盘下载'),
+                              ),
+                              ListTile(
+                                onTap: () => _aboutController.webSiteUrl(),
+                                title: const Text('官网下载'),
+                              ),
+                              ListTile(
+                                onTap: () => _aboutController.qimiao(),
+                                title: const Text('奇妙应用'),
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).padding.bottom +
+                                          20)
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'V${_aboutController.currentVersion.value}',
+                      style: subTitleStyle.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -87,14 +112,9 @@ class _AboutPageState extends State<AboutPage> {
             //     size: 16,
             //   ),
             // ),
-            Divider(
-              thickness: 1,
-              height: 30,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
             ListTile(
               onTap: () => _aboutController.githubUrl(),
-              title: const Text('Github'),
+              title: const Text('开源地址'),
               trailing: Text(
                 'github.com/guozhigq/pilipala',
                 style: subTitleStyle,
@@ -129,18 +149,42 @@ class _AboutPageState extends State<AboutPage> {
               ),
             ),
             ListTile(
-              onTap: () => _aboutController.qqChanel(),
-              title: const Text('QQ群'),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          onTap: () => _aboutController.qqChanel(),
+                          title: const Text('QQ群'),
+                          trailing: Text(
+                            '616150809',
+                            style: subTitleStyle,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => _aboutController.tgChanel(),
+                          title: const Text('TG频道'),
+                          trailing: Text(
+                            'https://t.me/+lm_oOVmF0RJiODk1',
+                            style: subTitleStyle,
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).padding.bottom + 20)
+                      ],
+                    );
+                  },
+                );
+              },
+              title: const Text('交流社区'),
               trailing: Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
                 color: outline,
               ),
-            ),
-            ListTile(
-              onTap: () => _aboutController.tgChanel(),
-              title: const Text('TG频道'),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
             ListTile(
               onTap: () => _aboutController.aPay(),
@@ -161,8 +205,8 @@ class _AboutPageState extends State<AboutPage> {
               },
               title: const Text('清除缓存'),
               subtitle: Text('图片及网络缓存 $cacheSize', style: subTitleStyle),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: outline),
             ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 20)
           ],
         ),
       ),
@@ -209,12 +253,16 @@ class AboutController extends GetxController {
   // 获取远程版本
   Future getRemoteApp() async {
     var result = await Request().get(Api.latestApp, extra: {'ua': 'pc'});
+    isLoading.value = false;
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return;
+    }
     data = LatestDataModel.fromJson(result.data);
     remoteAppInfo = data;
     remoteVersion.value = data.tagName!;
     isUpdate.value =
         Utils.needUpdate(currentVersion.value, remoteVersion.value);
-    isLoading.value = false;
   }
 
   // 跳转下载/本地更新
@@ -230,11 +278,26 @@ class AboutController extends GetxController {
     );
   }
 
+  githubRelease() {
+    launchUrl(
+      Uri.parse('https://github.com/guozhigq/pilipala/releases'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
   // 从网盘下载
   panDownload() {
-    launchUrl(
-      Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
-      mode: LaunchMode.externalApplication,
+    Clipboard.setData(
+      const ClipboardData(text: 'pili'),
+    );
+    SmartDialog.showToast(
+      '已复制提取码：pili',
+      displayTime: const Duration(milliseconds: 500),
+    ).then(
+      (value) => launchUrl(
+        Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+        mode: LaunchMode.externalApplication,
+      ),
     );
   }
 
@@ -250,7 +313,7 @@ class AboutController extends GetxController {
   // qq频道
   qqChanel() {
     Clipboard.setData(
-      const ClipboardData(text: '489981949'),
+      const ClipboardData(text: '616150809'),
     );
     SmartDialog.showToast('已复制QQ群号');
   }
@@ -287,6 +350,13 @@ class AboutController extends GetxController {
   webSiteUrl() {
     launchUrl(
       Uri.parse('https://pilipalanet.mysxl.cn'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  qimiao() {
+    launchUrl(
+      Uri.parse('https://www.magicalapk.com/home'),
       mode: LaunchMode.externalApplication,
     );
   }

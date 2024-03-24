@@ -1,10 +1,13 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/live.dart';
+import 'package:pilipala/models/live/quality.dart';
 import 'package:pilipala/models/live/room_info.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
-
 import '../../models/live/room_info_h5.dart';
+import '../../utils/storage.dart';
+import '../../utils/video_utils.dart';
 
 class LiveRoomController extends GetxController {
   String cover = '';
@@ -16,18 +19,18 @@ class LiveRoomController extends GetxController {
   RxBool volumeOff = false.obs;
   PlPlayerController plPlayerController =
       PlPlayerController.getInstance(videoType: 'live');
-
-  // MeeduPlayerController meeduPlayerController = MeeduPlayerController(
-  //   colorTheme: Theme.of(Get.context!).colorScheme.primary,
-  //   pipEnabled: true,
-  //   controlsStyle: ControlsStyle.live,
-  //   enabledButtons: const EnabledButtons(pip: true),
-  // );
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
+  late bool enableCDN;
+  late int currentQn;
+  int? tempCurrentQn;
+  late List<Map<String, dynamic>> acceptQnList;
+  RxString currentQnDesc = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    currentQn = setting.get(SettingBoxKey.defaultLiveQa,
+        defaultValue: LiveQuality.values.last.code);
     roomId = int.parse(Get.parameters['roomid']!);
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
@@ -39,8 +42,8 @@ class LiveRoomController extends GetxController {
         cover = liveItem.cover;
       }
     }
-    queryLiveInfo();
-    queryLiveInfoH5();
+    // CDN优化
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
   }
 
   playerInit(source) async {
@@ -62,14 +65,33 @@ class LiveRoomController extends GetxController {
   }
 
   Future queryLiveInfo() async {
-    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: 10000);
+    var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: currentQn);
     if (res['status']) {
       List<CodecItem> codec =
           res['data'].playurlInfo.playurl.stream.first.format.first.codec;
       CodecItem item = codec.first;
-      String videoUrl = (item.urlInfo?.first.host)! +
-          item.baseUrl! +
-          item.urlInfo!.first.extra!;
+      // 以服务端返回的码率为准
+      currentQn = item.currentQn!;
+      if (tempCurrentQn != null && tempCurrentQn == currentQn) {
+        SmartDialog.showToast('画质切换失败，请检查登录状态');
+      }
+      List acceptQn = item.acceptQn!;
+      acceptQnList = acceptQn.map((e) {
+        return {
+          'code': e,
+          'desc': LiveQuality.values
+              .firstWhere((element) => element.code == e)
+              .description,
+        };
+      }).toList();
+      currentQnDesc.value = LiveQuality.values
+          .firstWhere((element) => element.code == currentQn)
+          .description;
+      String videoUrl = enableCDN
+          ? VideoUtils.getCdnUrl(item)
+          : (item.urlInfo?.first.host)! +
+              item.baseUrl! +
+              item.urlInfo!.first.extra!;
       await playerInit(videoUrl);
       return res;
     }
@@ -92,5 +114,18 @@ class LiveRoomController extends GetxController {
       roomInfoH5.value = res['data'];
     }
     return res;
+  }
+
+  // 修改画质
+  void changeQn(int qn) async {
+    tempCurrentQn = currentQn;
+    if (currentQn == qn) {
+      return;
+    }
+    currentQn = qn;
+    currentQnDesc.value = LiveQuality.values
+        .firstWhere((element) => element.code == currentQn)
+        .description;
+    await queryLiveInfo();
   }
 }

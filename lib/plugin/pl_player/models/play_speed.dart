@@ -1,39 +1,15 @@
-enum PlaySpeed {
-  pointTwoFive,
-  pointFive,
-  pointSevenFive,
+List<double> generatePlaySpeedList() {
+  List<double> playSpeed = [];
+  double startSpeed = 0.25;
+  double endSpeed = 2.0;
+  double increment = 0.25;
 
-  one,
-  onePointTwoFive,
-  onePointFive,
-  onePointSevenFive,
+  for (double speed = startSpeed; speed <= endSpeed; speed += increment) {
+    playSpeed.add(speed);
+  }
 
-  two,
+  return playSpeed;
 }
 
-extension PlaySpeedExtension on PlaySpeed {
-  static final List<String> _descList = [
-    '0.25',
-    '0.5',
-    '0.75',
-    '正常',
-    '1.25',
-    '1.5',
-    '1.75',
-    '2.0',
-  ];
-  String get description => _descList[index];
-
-  static final List<double> _valueList = [
-    0.25,
-    0.5,
-    0.75,
-    1.0,
-    1.25,
-    1.5,
-    1.75,
-    2.0,
-  ];
-  double get value => _valueList[index];
-  double get defaultValue => _valueList[3];
-}
+// 导出 playSpeed 列表
+List<double> playSpeed = generatePlaySpeedList();

@@ -14,19 +14,23 @@ class UrlUtils {
     dio.options.validateStatus = (status) {
       return status == 200 || status == 301 || status == 302;
     };
-    final response = await dio.get(url);
-    if (response.statusCode == 302) {
-      redirectUrl = response.headers['location']?.first as String;
-      if (redirectUrl.endsWith('/')) {
-        redirectUrl = redirectUrl.substring(0, redirectUrl.length - 1);
+    try {
+      final response = await dio.get(url);
+      if (response.statusCode == 302) {
+        redirectUrl = response.headers['location']?.first as String;
+        if (redirectUrl.endsWith('/')) {
+          redirectUrl = redirectUrl.substring(0, redirectUrl.length - 1);
+        }
+      } else {
+        if (url.endsWith('/')) {
+          url = url.substring(0, url.length - 1);
+        }
+        return url;
       }
-    } else {
-      if (url.endsWith('/')) {
-        url = url.substring(0, url.length - 1);
-      }
+      return redirectUrl;
+    } catch (err) {
       return url;
     }
-    return redirectUrl;
   }
 
   // 匹配url路由跳转

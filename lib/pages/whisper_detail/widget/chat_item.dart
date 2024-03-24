@@ -204,7 +204,7 @@ class ChatItem extends StatelessWidget {
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = Utils.makeHeroTag(bvid);
                   SmartDialog.dismiss<dynamic>().then(
-                        (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
+                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                         arguments: <String, String?>{
                           'pic': content['thumb'],
                           'heroTag': heroTag,
@@ -352,7 +352,9 @@ class ChatItem extends StatelessWidget {
               ));
         default:
           return Text(
-            content['content'] ?? content.toString(),
+            content != null && content != ''
+                ? (content['content'] ?? content.toString())
+                : '不支持的消息类型',
             style: TextStyle(
               letterSpacing: 0.6,
               height: 1.5,

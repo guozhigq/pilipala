@@ -10,8 +10,7 @@ class LiveController extends GetxController {
   int count = 12;
   int _currentPage = 1;
   RxInt crossAxisCount = 2.obs;
-  RxList<LiveItemModel> liveList = [LiveItemModel()].obs;
-  bool isLoadingMore = false;
+  RxList<LiveItemModel> liveList = <LiveItemModel>[].obs;
   bool flag = false;
   OverlayEntry? popupDialog;
   Box setting = GStrorage.setting;
@@ -39,7 +38,6 @@ class LiveController extends GetxController {
       }
       _currentPage += 1;
     }
-    isLoadingMore = false;
     return res;
   }
 

@@ -187,9 +187,13 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                         ),
                       );
                     } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () => setState(() {}),
+                      return CustomScrollView(
+                        slivers: [
+                          HttpError(
+                            errMsg: data['msg'],
+                            fn: () => setState(() {}),
+                          )
+                        ],
                       );
                     }
                   } else {

@@ -1,3 +1,5 @@
+import 'package:pilipala/utils/id_utils.dart';
+
 class RecVideoItemAppModel {
   RecVideoItemAppModel({
     this.id,
@@ -50,14 +52,15 @@ class RecVideoItemAppModel {
         ? json['player_args']['aid']
         : int.parse(json['param'] ?? '-1');
     aid = json['player_args'] != null ? json['player_args']['aid'] : -1;
-    bvid = null;
+    bvid = json['player_args'] != null
+        ? IdUtils.av2bv(json['player_args']['aid'])
+        : '';
     cid = json['player_args'] != null ? json['player_args']['cid'] : -1;
     pic = json['cover'];
     stat = RcmdStat.fromJson(json);
     // 改用player_args中的duration作为原始数据（秒数）
-    duration = json['player_args'] != null
-        ? json['player_args']['duration']
-        : -1;
+    duration =
+        json['player_args'] != null ? json['player_args']['duration'] : -1;
     //duration = json['cover_right_text'];
     title = json['title'];
     owner = RcmdOwner.fromJson(json);
