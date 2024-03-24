@@ -368,7 +368,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   !(plPlayerController?.isOpenDanmu.value ??
                                       false);
                             },
-                            icon: (plPlayerController?.isOpenDanmu.value ??
+                            icon: !(plPlayerController?.isOpenDanmu.value ??
                                     false)
                                 ? SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
