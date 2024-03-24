@@ -15,6 +15,7 @@ import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../widgets/expandable_section.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
@@ -137,6 +138,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String memberHeroTag;
   late bool enableAi;
   bool isProcessing = false;
+  RxBool isExpand = false.obs;
   void Function()? handleState(Future Function() action) {
     return isProcessing
         ? null
@@ -212,13 +214,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
-      builder: (BuildContext context) {
-        return IntroDetail(videoDetail: widget.videoDetail!);
-      },
-    );
+    isExpand.value = !(isExpand.value);
   }
 
   // 用户主页
@@ -330,6 +326,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ],
           ),
 
+          /// 视频简介
+          Obx(
+            () => ExpandedSection(
+              expand: isExpand.value,
+              begin: 0,
+              end: 1,
+              child: IntroDetail(videoDetail: widget.videoDetail!),
+            ),
+          ),
+
           /// 点赞收藏转发
           actionGrid(context, videoIntroController),
           // 合集
@@ -438,6 +444,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         margin: const EdgeInsets.only(top: 6, bottom: 4),
         height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
+          physics: const NeverScrollableScrollPhysics(),
           primary: false,
           padding: EdgeInsets.zero,
           crossAxisCount: 5,
@@ -451,12 +458,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   selectStatus: videoIntroController.hasLike.value,
                   text: widget.videoDetail!.stat!.like!.toString()),
             ),
-            // ActionItem(
-            //     icon: const Icon(FontAwesomeIcons.clock),
-            //     onTap: () => videoIntroController.actionShareVideo(),
-            //     selectStatus: false,
-            //     loadingStatus: loadingStatus,
-            //     text: '稍后再看'),
             Obx(
               () => ActionItem(
                 icon: const Icon(FontAwesomeIcons.b),
@@ -477,10 +478,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ),
             ),
             ActionItem(
-              icon: const Icon(FontAwesomeIcons.comment),
-              onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+              icon: const Icon(FontAwesomeIcons.clock),
+              onTap: () => videoIntroController.actionShareVideo(),
               selectStatus: false,
-              text: widget.videoDetail!.stat!.reply!.toString(),
+              text: '稍后看',
             ),
             ActionItem(
               icon: const Icon(FontAwesomeIcons.shareFromSquare),
