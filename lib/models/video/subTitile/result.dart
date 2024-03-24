@@ -1,3 +1,6 @@
+import 'package:get/get.dart';
+import '../../common/subtitle_type.dart';
+
 class SubTitlteModel {
   SubTitlteModel({
     this.aid,
@@ -45,6 +48,10 @@ class SubTitlteItemModel {
     this.type,
     this.aiType,
     this.aiStatus,
+    this.title,
+    this.code,
+    this.content,
+    this.body,
   });
 
   int? id;
@@ -55,16 +62,28 @@ class SubTitlteItemModel {
   int? type;
   int? aiType;
   int? aiStatus;
+  String? title;
+  int? code;
+  String? content;
+  List? body;
 
   factory SubTitlteItemModel.fromJson(Map<String, dynamic> json) =>
       SubTitlteItemModel(
         id: json["id"],
-        lan: json["lan"],
+        lan: json["lan"].replaceAll('-', ''),
         lanDoc: json["lan_doc"],
         isLock: json["is_lock"],
         subtitleUrl: json["subtitle_url"],
         type: json["type"],
         aiType: json["ai_type"],
         aiStatus: json["ai_status"],
+        title: json["lan_doc"],
+        code: SubtitleType.values
+                .firstWhereOrNull(
+                    (element) => element.id.toString() == json["lan"])
+                ?.index ??
+            -1,
+        content: '',
+        body: [],
       );
 }

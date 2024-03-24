@@ -22,6 +22,7 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../../models/video/subTitile/content.dart';
+import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStrorage.video;
@@ -74,6 +75,8 @@ class PlPlayerController {
   final Rx<bool> _doubleSpeedStatus = false.obs;
   final Rx<bool> _controlsLock = false.obs;
   final Rx<bool> _isFullScreen = false.obs;
+  final Rx<bool> _subTitleOpen = false.obs;
+  final Rx<int> _subTitleCode = (-1).obs;
   // 默认投稿视频格式
   static Rx<String> _videoType = 'archive'.obs;
 
@@ -119,6 +122,7 @@ class PlPlayerController {
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
+  late RxList subtitles;
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -147,6 +151,11 @@ class PlPlayerController {
   // 视频静音
   Rx<bool> get mute => _mute;
   Stream<bool> get onMuteChanged => _mute.stream;
+
+  /// 字幕开启状态
+  Rx<bool> get subTitleOpen => _subTitleOpen;
+  Rx<int> get subTitleCode => _subTitleCode;
+  // Stream<bool> get onSubTitleOpenChanged => _subTitleOpen.stream;
 
   /// [videoPlayerController] instace of Player
   Player? get videoPlayerController => _videoPlayerController;
@@ -355,6 +364,8 @@ class PlPlayerController {
     bool enableHeart = true,
     // 是否首次加载
     bool isFirstTime = true,
+    //  是否开启字幕
+    bool enableSubTitle = false,
   }) async {
     try {
       _autoPlay = autoplay;
@@ -369,7 +380,9 @@ class PlPlayerController {
       _cid = cid;
       _enableHeart = enableHeart;
       _isFirstTime = isFirstTime;
-
+      _subTitleOpen.value = enableSubTitle;
+      subtitles = [].obs;
+      subtitleContent.value = '';
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
         await pause(notify: false);
@@ -616,6 +629,10 @@ class PlPlayerController {
               const Duration(seconds: 1),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
+
+        // onSubTitleOpenChanged.listen((bool event) {
+        //   toggleSubtitle(event ? subTitleCode.value : -1);
+        // })
       ],
     );
   }
@@ -1054,11 +1071,46 @@ class PlPlayerController {
     }
   }
 
+  /// 字幕
+  void toggleSubtitle(int code) {
+    _subTitleOpen.value = code != -1;
+    _subTitleCode.value = code;
+    // if (code == -1) {
+    //   // 关闭字幕
+    //   _subTitleOpen.value = false;
+    //   _subTitleCode.value = code;
+    //   _videoPlayerController?.setSubtitleTrack(SubtitleTrack.no());
+    //   return;
+    // }
+    // final SubTitlteItemModel? subtitle = subtitles?.firstWhereOrNull(
+    //   (element) => element.code == code,
+    // );
+    // _subTitleOpen.value = true;
+    // _subTitleCode.value = code;
+    // _videoPlayerController?.setSubtitleTrack(
+    //   SubtitleTrack.data(
+    //     subtitle!.content!,
+    //     title: subtitle.title,
+    //     language: subtitle.lan,
+    //   ),
+    // );
+  }
+
   void querySubtitleContent(double progress) {
-    if (subtitleContents.isNotEmpty) {
-      for (var content in subtitleContents) {
-        if (progress >= content.from! && progress <= content.to!) {
-          subtitleContent.value = content.content!;
+    if (subTitleCode.value == -1) {
+      subtitleContent.value = '';
+      return;
+    }
+    if (subtitles.isEmpty) {
+      return;
+    }
+    final SubTitlteItemModel? subtitle = subtitles.firstWhereOrNull(
+      (element) => element.code == subTitleCode.value,
+    );
+    if (subtitle != null && subtitle.body!.isNotEmpty) {
+      for (var content in subtitle.body!) {
+        if (progress >= content['from']! && progress <= content['to']!) {
+          subtitleContent.value = content['content']!;
           return;
         }
       }
@@ -1071,6 +1123,9 @@ class PlPlayerController {
   }
 
   Future<void> dispose({String type = 'single'}) async {
+    print('dispose');
+    print('dispose: ${playerCount.value}');
+
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
@@ -1080,6 +1135,7 @@ class PlPlayerController {
     }
     _playerCount.value = 0;
     try {
+      print('dispose dispose ---------');
       _timer?.cancel();
       _timerForVolume?.cancel();
       _timerForGettingVolume?.cancel();

@@ -580,41 +580,44 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         if (widget.danmuWidget != null)
           Positioned.fill(top: 4, child: widget.danmuWidget!),
 
-        widget.controller.subscriptions.isNotEmpty
-            ? Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 30,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: widget.controller.subtitleContent.value != ''
-                                ? Colors.black.withOpacity(0.4)
-                                : Colors.transparent,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          child: Text(
-                            widget.controller.subtitleContent.value,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
+        /// 开启且有字幕时展示
+        Stack(
+          children: [
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 30,
+              child: Align(
+                alignment: Alignment.center,
+                child: Obx(
+                  () => Visibility(
+                      visible: widget.controller.subTitleCode.value != -1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: widget.controller.subtitleContent.value != ''
+                              ? Colors.black.withOpacity(0.6)
+                              : Colors.transparent,
+                        ),
+                        padding: widget.controller.subTitleCode.value != -1
+                            ? const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              )
+                            : EdgeInsets.zero,
+                        child: Text(
+                          widget.controller.subtitleContent.value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : const SizedBox(),
+                      )),
+                ),
+              ),
+            ),
+          ],
+        ),
 
         /// 手势
         Positioned.fill(
