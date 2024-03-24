@@ -17,7 +17,7 @@ class DynamicDetailController extends GetxController {
   int currentPage = 0;
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
-  RxList<ReplyItemModel> replyList = [ReplyItemModel()].obs;
+  RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   RxInt acount = 0.obs;
   final ScrollController scrollController = ScrollController();
 

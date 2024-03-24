@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +16,8 @@ import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/http/danmaku.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
+import '../../../../models/common/search_type.dart';
 import '../../../../models/video_detail_res.dart';
 import '../introduction/index.dart';
 
@@ -27,11 +26,15 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.controller,
     this.videoDetailCtr,
     this.floating,
+    this.bvid,
+    this.videoType,
     super.key,
   });
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
   final Floating? floating;
+  final String? bvid;
+  final SearchType? videoType;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -42,7 +45,6 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
 
 class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
-  List<PlaySpeed> playSpeed = PlaySpeed.values;
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -62,7 +64,8 @@ class _HeaderControlState extends State<HeaderControl> {
     speedsList = widget.controller!.speedsList;
     fullScreenStatusListener();
     heroTag = Get.arguments['heroTag'];
-    videoIntroController = Get.put(VideoIntroController(), tag: heroTag);
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid!), tag: heroTag);
   }
 
   void fullScreenStatusListener() {
@@ -73,7 +76,11 @@ class _HeaderControlState extends State<HeaderControl> {
       } else {
         showTitle = false;
       }
-      setState(() {});
+
+      /// TODO setState() called after dispose()
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -208,88 +215,6 @@ class _HeaderControlState extends State<HeaderControl> {
       },
       clipBehavior: Clip.hardEdge,
       isScrollControlled: true,
-    );
-  }
-
-  /// 发送弹幕
-  void showShootDanmakuSheet() {
-    final TextEditingController textController = TextEditingController();
-    bool isSending = false; // 追踪是否正在发送
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        // TODO: 支持更多类型和颜色的弹幕
-        return AlertDialog(
-          title: const Text('发送弹幕（测试）'),
-          content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return TextField(
-              controller: textController,
-            );
-          }),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                '取消',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-            StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-              return TextButton(
-                onPressed: isSending
-                    ? null
-                    : () async {
-                        final String msg = textController.text;
-                        if (msg.isEmpty) {
-                          SmartDialog.showToast('弹幕内容不能为空');
-                          return;
-                        } else if (msg.length > 100) {
-                          SmartDialog.showToast('弹幕内容不能超过100个字符');
-                          return;
-                        }
-                        setState(() {
-                          isSending = true; // 开始发送，更新状态
-                        });
-                        //修改按钮文字
-                        // SmartDialog.showToast('弹幕发送中,\n$msg');
-                        final dynamic res = await DanmakaHttp.shootDanmaku(
-                          oid: widget.videoDetailCtr!.cid.value,
-                          msg: textController.text,
-                          bvid: widget.videoDetailCtr!.bvid,
-                          progress:
-                              widget.controller!.position.value.inMilliseconds,
-                          type: 1,
-                        );
-                        setState(() {
-                          isSending = false; // 发送结束，更新状态
-                        });
-                        if (res['status']) {
-                          SmartDialog.showToast('发送成功');
-                          // 发送成功，自动预览该弹幕，避免重新请求
-                          // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
-                          widget.controller!.danmakuController!.addItems([
-                            DanmakuItem(
-                              msg,
-                              color: Colors.white,
-                              time: widget
-                                  .controller!.position.value.inMilliseconds,
-                              type: DanmakuItemType.scroll,
-                              isSend: true,
-                            )
-                          ]);
-                          Get.back();
-                        } else {
-                          SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
-                        }
-                      },
-                child: Text(isSending ? '发送中...' : '发送'),
-              );
-            })
-          ],
-        );
-      },
     );
   }
 
@@ -1104,14 +1029,16 @@ class _HeaderControlState extends State<HeaderControl> {
             },
           ),
           SizedBox(width: buttonSpace),
-          if (showTitle && isLandscape) ...[
+          if (showTitle &&
+              isLandscape &&
+              widget.videoType == SearchType.video) ...[
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 200),
+                  constraints: const BoxConstraints(maxWidth: 200),
                   child: Text(
-                    videoIntroController.videoDetail.value.title!,
+                    videoIntroController.videoDetail.value.title ?? '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -1154,41 +1081,6 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
-          SizedBox(
-            width: 56,
-            height: 34,
-            child: TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(EdgeInsets.zero),
-              ),
-              onPressed: () => showShootDanmakuSheet(),
-              child: const Text(
-                '发弹幕',
-                style: textStyle,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 34,
-            height: 34,
-            child: Obx(
-              () => IconButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                ),
-                onPressed: () {
-                  _.isOpenDanmu.value = !_.isOpenDanmu.value;
-                },
-                icon: Icon(
-                  _.isOpenDanmu.value
-                      ? Icons.subtitles_outlined
-                      : Icons.subtitles_off_outlined,
-                  size: 19,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
           SizedBox(width: buttonSpace),
           if (Platform.isAndroid) ...<Widget>[
             SizedBox(

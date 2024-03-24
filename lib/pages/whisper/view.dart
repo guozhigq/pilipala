@@ -180,7 +180,8 @@ class _WhisperPageState extends State<WhisperPage> {
                                                       sessionList[i]
                                                               .lastMsg
                                                               .content[
-                                                          'reply_content'])
+                                                          'reply_content'] ??
+                                                      '不支持的消息类型')
                                                   : '不支持的消息类型',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
