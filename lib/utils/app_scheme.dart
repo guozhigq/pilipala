@@ -20,7 +20,7 @@ class PiliSchame {
     /// 完整链接进入 b23.无效
     appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _fullPathPush(value);
+        _routePush(value);
       }
     });
 
@@ -37,7 +37,6 @@ class PiliSchame {
     final String scheme = value.scheme;
     final String host = value.host;
     final String path = value.path;
-
     if (scheme == 'bilibili') {
       if (host == 'root') {
         Navigator.popUntil(
@@ -85,6 +84,14 @@ class PiliSchame {
         }
       } else if (host == 'search') {
         Get.toNamed('/searchResult', parameters: {'keyword': ''});
+      } else if (host == 'article') {
+        final String id = path.split('/').last.split('?').first;
+        Get.toNamed('/htmlRender', parameters: {
+          'url': 'https://www.bilibili.com/read/cv$id',
+          'title': 'cv$id',
+          'id': 'cv$id',
+          'dynamicType': 'read'
+        });
       }
     }
     if (scheme == 'https') {
@@ -226,6 +233,13 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
+          String id = 'cv${matchNum(query!['id']!).first}';
+          Get.toNamed('/htmlRender', parameters: {
+            'url': value.dataString!,
+            'title': '',
+            'id': id,
+            'dynamicType': 'read'
+          });
           break;
         case 'space':
           print('个人空间');

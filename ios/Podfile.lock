@@ -9,6 +9,7 @@ PODS:
     - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
+    - FlutterMacOS
     - ReachabilitySwift
   - device_info_plus (0.0.1):
     - Flutter
@@ -38,7 +39,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.1.1):
+  - permission_handler_apple (9.3.0):
     - Flutter
   - ReachabilitySwift (5.0.0)
   - saver_gallery (0.0.1):
@@ -71,7 +72,7 @@ DEPENDENCIES:
   - audio_service (from `.symlinks/plugins/audio_service/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - auto_orientation (from `.symlinks/plugins/auto_orientation/ios`)
-  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_mailer (from `.symlinks/plugins/flutter_mailer/ios`)
@@ -113,7 +114,7 @@ EXTERNAL SOURCES:
   auto_orientation:
     :path: ".symlinks/plugins/auto_orientation/ios"
   connectivity_plus:
-    :path: ".symlinks/plugins/connectivity_plus/ios"
+    :path: ".symlinks/plugins/connectivity_plus/darwin"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
@@ -166,7 +167,7 @@ SPEC CHECKSUMS:
   audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   auto_orientation: 102ed811a5938d52c86520ddd7ecd3a126b5d39d
-  connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
+  connectivity_plus: e2dad488011aeb593e219360e804c43cc1af5770
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_mailer: 2ef5a67087bc8c6c4cefd04a178bf1ae2c94cd83
@@ -180,7 +181,7 @@ SPEC CHECKSUMS:
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
   package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   saver_gallery: 2b4e584106fde2407ab51560f3851564963e6b78
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
@@ -193,7 +194,7 @@ SPEC CHECKSUMS:
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
   webview_cookie_manager: eaf920722b493bd0f7611b5484771ca53fed03f7
-  webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
+  webview_flutter_wkwebview: 4f3e50f7273d31e5500066ed267e3ae4309c5ae4
 
 PODFILE CHECKSUM: 637cd290bed23275b5f5ffcc7eb1e73d0a5fb2be
 
