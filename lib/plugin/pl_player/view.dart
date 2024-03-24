@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,6 +35,8 @@ class PLVideoPlayer extends StatefulWidget {
     this.bottomControl,
     this.danmuWidget,
     this.bottomList,
+    this.customWidget,
+    this.customWidgets,
     super.key,
   });
 
@@ -42,6 +45,10 @@ class PLVideoPlayer extends StatefulWidget {
   final PreferredSizeWidget? bottomControl;
   final Widget? danmuWidget;
   final List<BottomControlType>? bottomList;
+  // List<Widget> or Widget
+
+  final Widget? customWidget;
+  final List<Widget>? customWidgets;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -310,7 +317,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       ),
     };
     final List<Widget> list = [];
-    var userSpecifyItem = widget.bottomList ??
+    List<BottomControlType> userSpecifyItem = widget.bottomList ??
         [
           BottomControlType.playOrPause,
           BottomControlType.time,
@@ -319,7 +326,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           BottomControlType.fullscreen,
         ];
     for (var i = 0; i < userSpecifyItem.length; i++) {
-      list.add(videoProgressWidgets[userSpecifyItem[i]]!);
+      if (userSpecifyItem[i] == BottomControlType.custom) {
+        if (widget.customWidget != null && widget.customWidget is Widget) {
+          list.add(widget.customWidget!);
+        }
+        if (widget.customWidgets != null && widget.customWidgets!.isNotEmpty) {
+          list.addAll(widget.customWidgets!);
+        }
+      } else {
+        list.add(videoProgressWidgets[userSpecifyItem[i]]!);
+      }
     }
     return list;
   }
@@ -346,6 +362,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       children: <Widget>[
         Obx(
           () => Video(
+            key: ValueKey(_.videoFit.value),
             controller: videoController,
             controls: NoVideoControls,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
@@ -674,13 +691,16 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 _distance.value = dy;
               } else {
                 // 右边区域 👈
-                final double level = (_.isFullScreen.value
-                        ? Get.size.height
-                        : screenWidth * 9 / 16) *
-                    3;
-                final double volume = _volumeValue.value - delta / level;
-                final double result = volume.clamp(0.0, 1.0);
-                setVolume(result);
+                EasyThrottle.throttle(
+                    'setVolume', const Duration(milliseconds: 20), () {
+                  final double level = (_.isFullScreen.value
+                      ? Get.size.height
+                      : screenWidth * 9 / 16);
+                  final double volume = _volumeValue.value -
+                      double.parse(delta.toStringAsFixed(1)) / level;
+                  final double result = volume.clamp(0.0, 1.0);
+                  setVolume(result);
+                });
               }
             },
             onVerticalDragEnd: (DragEndDetails details) {},
