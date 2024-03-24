@@ -161,9 +161,9 @@ class _SeasonPanelState extends State<SeasonPanel> {
                         Expanded(
                           child: Material(
                             child: ScrollablePositionedList.builder(
-                              itemCount: episodes.length,
+                              itemCount: episodes.length + 1,
                               itemBuilder: (BuildContext context, int index) {
-                                bool isLastItem = index == episodes.length - 1;
+                                bool isLastItem = index == episodes.length;
                                 bool isCurrentIndex = currentIndex == index;
                                 return isLastItem
                                     ? SizedBox(
