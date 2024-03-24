@@ -212,6 +212,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      vdCtr.clearSubtitleContent();
     }
     setState(() => isShowing = false);
     super.didPushNext();
@@ -222,7 +223,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() => isShowing = true);
+      setState(() {
+        vdCtr.setSubtitleContent();
+        isShowing = true;
+      });
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
