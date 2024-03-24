@@ -26,6 +26,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
   static final List<MediaItem> _item = [];
   Box setting = GStrorage.setting;
   bool enableBackgroundPlay = false;
+  PlPlayerController player = PlPlayerController.getInstance();
 
   VideoPlayerServiceHandler() {
     revalidateSetting();
@@ -38,12 +39,12 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    PlPlayerController.getInstance().play();
+    player.play();
   }
 
   @override
   Future<void> pause() async {
-    PlPlayerController.getInstance().pause();
+    player.pause();
   }
 
   @override
@@ -51,7 +52,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
     playbackState.add(playbackState.value.copyWith(
       updatePosition: position,
     ));
-    await PlPlayerController.getInstance().seekTo(position);
+    await player.seekTo(position);
   }
 
   Future<void> setMediaItem(MediaItem newMediaItem) async {

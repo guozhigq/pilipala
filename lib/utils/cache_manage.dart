@@ -99,10 +99,8 @@ class CacheManage {
                 try {
                   // 清除缓存 图片缓存
                   await clearLibraryCache();
-                  Timer(const Duration(milliseconds: 500), () {
-                    SmartDialog.dismiss().then((res) {
-                      SmartDialog.showToast('清除完成');
-                    });
+                  SmartDialog.dismiss().then((res) {
+                    SmartDialog.showToast('清除完成');
                   });
                 } catch (err) {
                   SmartDialog.dismiss();

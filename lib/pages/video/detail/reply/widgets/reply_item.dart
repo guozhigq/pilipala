@@ -280,7 +280,7 @@ class ReplyItem extends StatelessWidget {
                     // 完成评论，数据添加
                     if (value != null && value['data'] != null)
                       {
-                        addReply!(value['data'])
+                        addReply?.call(value['data'])
                         // replyControl.replies.add(value['data']),
                       }
                   });
@@ -498,7 +498,7 @@ InlineSpan buildContent(
       return str;
     });
   }
-  // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
+  content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
   content.message = content.message
       .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')
@@ -531,8 +531,8 @@ InlineSpan buildContent(
     spanChilds.add(TextSpan(
         text: str,
         recognizer: TapGestureRecognizer()
-          ..onTap =
-              () => replyReply(replyItem.root == 0 ? replyItem : fReplyItem)));
+          ..onTap = () =>
+              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem)));
   }
 
   // 分割文本并处理每个部分
@@ -642,6 +642,11 @@ InlineSpan buildContent(
                       } else {
                         final String redirectUrl =
                             await UrlUtils.parseRedirectUrl(matchStr);
+                        if (redirectUrl == matchStr) {
+                          Clipboard.setData(ClipboardData(text: matchStr));
+                          SmartDialog.showToast('地址可能有误');
+                          return;
+                        }
                         final String pathSegment = Uri.parse(redirectUrl).path;
                         final String lastPathSegment =
                             pathSegment.split('/').last;

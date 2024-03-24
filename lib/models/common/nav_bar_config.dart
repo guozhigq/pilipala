@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-const defaultNavigationBars = [
+List defaultNavigationBars = [
   {
     'id': 0,
-    'icon': Icon(
+    'icon': const Icon(
       Icons.home_outlined,
       size: 21,
     ),
-    'selectIcon': Icon(
+    'selectIcon': const Icon(
       Icons.home,
       size: 21,
     ),
@@ -16,11 +16,24 @@ const defaultNavigationBars = [
   },
   {
     'id': 1,
-    'icon': Icon(
+    'icon': const Icon(
+      Icons.trending_up,
+      size: 21,
+    ),
+    'selectIcon': const Icon(
+      Icons.trending_up_outlined,
+      size: 21,
+    ),
+    'label': "排行榜",
+    'count': 0,
+  },
+  {
+    'id': 2,
+    'icon': const Icon(
       Icons.motion_photos_on_outlined,
       size: 21,
     ),
-    'selectIcon': Icon(
+    'selectIcon': const Icon(
       Icons.motion_photos_on,
       size: 21,
     ),
@@ -28,12 +41,12 @@ const defaultNavigationBars = [
     'count': 0,
   },
   {
-    'id': 2,
-    'icon': Icon(
+    'id': 3,
+    'icon': const Icon(
       Icons.video_collection_outlined,
       size: 20,
     ),
-    'selectIcon': Icon(
+    'selectIcon': const Icon(
       Icons.video_collection,
       size: 21,
     ),

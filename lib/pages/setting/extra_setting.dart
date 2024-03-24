@@ -173,6 +173,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableAi,
             defaultVal: true,
           ),
+          const SetSwitchItem(
+            title: '相关视频推荐',
+            subTitle: '视频详情页推荐相关视频',
+            setKey: SettingBoxKey.enableRelatedVideo,
+            defaultVal: true,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),
