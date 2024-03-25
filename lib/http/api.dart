@@ -484,6 +484,9 @@ class Api {
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 
+  /// 获取字幕配置
+  static const getSubtitleConfig = '/x/player/v2';
+
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
 
@@ -499,4 +502,8 @@ class Api {
 
   /// 发送私信
   static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
+
+  /// 排行榜
+  static const String getRankApi = "/x/web-interface/ranking/v2";
+
 }

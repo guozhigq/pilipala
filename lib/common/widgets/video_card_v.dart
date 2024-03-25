@@ -231,6 +231,7 @@ class VideoContent extends StatelessWidget {
               const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
+                crossAxisCount: crossAxisCount,
               ),
             ],
             if (crossAxisCount == 1) const SizedBox(height: 4),
@@ -294,6 +295,7 @@ class VideoContent extends StatelessWidget {
                   ),
                   VideoStat(
                     videoItem: videoItem,
+                    crossAxisCount: crossAxisCount,
                   ),
                   const Spacer(),
                 ],
@@ -317,10 +319,12 @@ class VideoContent extends StatelessWidget {
 
 class VideoStat extends StatelessWidget {
   final dynamic videoItem;
+  final int crossAxisCount;
 
   const VideoStat({
     Key? key,
     required this.videoItem,
+    required this.crossAxisCount,
   }) : super(key: key);
 
   @override
@@ -337,7 +341,7 @@ class VideoStat extends StatelessWidget {
           danmu: videoItem.stat.danmu,
         ),
         if (videoItem is RecVideoItemModel) ...<Widget>[
-          const Spacer(),
+          crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
           RichText(
             maxLines: 1,
             text: TextSpan(

@@ -109,21 +109,26 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 键盘高度
-      final viewInsets = EdgeInsets.fromViewPadding(
-          View.of(context).viewInsets, View.of(context).devicePixelRatio);
-      _debouncer.run(() {
-        if (mounted) {
-          if (keyboardHeight == 0 && emoteHeight == 0) {
-            setState(() {
-              emoteHeight = keyboardHeight =
-                  keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
-            });
+    final String routePath = Get.currentRoute;
+    if (mounted &&
+        (routePath.startsWith('/video') ||
+            routePath.startsWith('/dynamicDetail'))) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 键盘高度
+        final viewInsets = EdgeInsets.fromViewPadding(
+            View.of(context).viewInsets, View.of(context).devicePixelRatio);
+        _debouncer.run(() {
+          if (mounted) {
+            if (keyboardHeight == 0 && emoteHeight == 0) {
+              setState(() {
+                emoteHeight = keyboardHeight =
+                    keyboardHeight == 0.0 ? viewInsets.bottom : keyboardHeight;
+              });
+            }
           }
-        }
+        });
       });
-    });
+    }
   }
 
   @override
@@ -131,11 +136,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     WidgetsBinding.instance.removeObserver(this);
     _replyContentController.dispose();
     replyContentFocusNode.removeListener(() {});
+    replyContentFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    double keyboardHeight = EdgeInsets.fromViewPadding(
+            View.of(context).viewInsets, View.of(context).devicePixelRatio)
+        .bottom;
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(

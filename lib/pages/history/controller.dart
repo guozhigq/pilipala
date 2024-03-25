@@ -88,8 +88,10 @@ class HistoryController extends GetxController {
   // 观看历史暂停状态
   Future historyStatus() async {
     var res = await UserHttp.historyStatus();
-    pauseStatus.value = res.data['data'];
-    localCache.put(LocalCacheKey.historyPause, res.data['data']);
+    if (res.data['code'] == 0) {
+      pauseStatus.value = res.data['data'];
+      localCache.put(LocalCacheKey.historyPause, res.data['data']);
+    }
   }
 
   // 清空观看历史

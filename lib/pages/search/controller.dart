@@ -15,7 +15,7 @@ class SSearchController extends GetxController {
   Box histiryWord = GStrorage.historyword;
   List historyCacheList = [];
   RxList historyList = [].obs;
-  RxList<SearchSuggestItem> searchSuggestList = [SearchSuggestItem()].obs;
+  RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
@@ -115,7 +115,7 @@ class SSearchController extends GetxController {
 
   onLongSelect(word) {
     int index = historyList.indexOf(word);
-    historyList.value = historyList.removeAt(index);
+    historyList.removeAt(index);
     historyList.refresh();
     histiryWord.put('cacheList', historyList);
   }
