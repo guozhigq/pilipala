@@ -50,21 +50,5 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
       length: tabs.length,
       vsync: this,
     );
-    // 监听 tabController 切换
-    if (enableGradientBg) {
-      tabController.animation!.addListener(() {
-        if (tabController.indexIsChanging) {
-          if (initialIndex.value != tabController.index) {
-            initialIndex.value = tabController.index;
-          }
-        } else {
-          final int temp = tabController.animation!.value.round();
-          if (initialIndex.value != temp) {
-            initialIndex.value = temp;
-            tabController.index = initialIndex.value;
-          }
-        }
-      });
-    }
   }
 }
