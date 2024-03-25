@@ -8,9 +8,11 @@ import '../models/model_rec_video_item.dart';
 import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
+import '../models/video/subTitile/result.dart';
 import '../models/video_detail_res.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
+import '../utils/subtitle.dart';
 import '../utils/wbi_sign.dart';
 import 'api.dart';
 import 'init.dart';
@@ -476,6 +478,25 @@ class VideoHttp {
     }
   }
 
+  static Future getSubtitle({int? cid, String? bvid}) async {
+    var res = await Request().get(Api.getSubtitleConfig, data: {
+      'cid': cid,
+      'bvid': bvid,
+    });
+    try {
+      if (res.data['code'] == 0) {
+        return {
+          'status': true,
+          'data': SubTitlteModel.fromJson(res.data['data']),
+        };
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['msg']};
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
+
   // 视频排行
   static Future getRankVideoList(int rid) async {
     try {
@@ -497,5 +518,13 @@ class VideoHttp {
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
     }
+  }
+
+  // 获取字幕内容
+  static Future<Map<String, dynamic>> getSubtitleContent(url) async {
+    var res = await Request().get('https:$url');
+    final String content = SubTitleUtils.convertToWebVTT(res.data['body']);
+    final List body = res.data['body'];
+    return {'content': content, 'body': body};
   }
 }
