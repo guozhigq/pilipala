@@ -15,6 +15,7 @@ import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../../../../http/user.dart';
 import '../widgets/expandable_section.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
@@ -479,7 +480,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             ActionItem(
               icon: const Icon(FontAwesomeIcons.clock),
-              onTap: () => videoIntroController.actionShareVideo(),
+              onTap: () async {
+                final res =
+                    await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
+                SmartDialog.showToast(res['msg']);
+              },
               selectStatus: false,
               text: '稍后看',
             ),
