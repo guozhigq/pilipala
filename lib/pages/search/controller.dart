@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/index.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
@@ -16,7 +15,7 @@ class SSearchController extends GetxController {
   Box histiryWord = GStrorage.historyword;
   List historyCacheList = [];
   RxList historyList = [].obs;
-  RxList<SearchSuggestItem> searchSuggestList = [SearchSuggestItem()].obs;
+  RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
@@ -27,9 +26,6 @@ class SSearchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
-      searchDefault();
-    }
     // 其他页面跳转过来
     if (Get.parameters.keys.isNotEmpty) {
       if (Get.parameters['keyword'] != null) {
@@ -119,7 +115,7 @@ class SSearchController extends GetxController {
 
   onLongSelect(word) {
     int index = historyList.indexOf(word);
-    historyList.value = historyList.removeAt(index);
+    historyList.removeAt(index);
     historyList.refresh();
     histiryWord.put('cacheList', historyList);
   }
@@ -129,13 +125,5 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     histiryWord.put('cacheList', []);
-  }
-
-  void searchDefault() async {
-    var res = await Request().get(Api.searchDefault);
-    if (res.data['code'] == 0) {
-      searchKeyWord.value =
-          hintText = defaultSearch.value = res.data['data']['name'];
-    }
   }
 }

@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
@@ -49,38 +48,51 @@ class _HomePageState extends State<HomePage>
     super.build(context);
     Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
     // 设置状态栏图标的亮度
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarIconBrightness: currentBrightness == Brightness.light
-          ? Brightness.dark
-          : Brightness.light,
-    ));
+    if (_homeController.enableGradientBg) {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarIconBrightness: currentBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light,
+      ));
+    }
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
+      appBar: _homeController.enableGradientBg
+          ? null
+          : AppBar(toolbarHeight: 0, elevation: 0),
       body: Stack(
         children: [
           // gradient background
-          Align(
-            alignment: Alignment.topLeft,
-            child: Opacity(
-              opacity: 0.6,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary.withOpacity(0.9),
-                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                        Theme.of(context).colorScheme.surface
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      stops: const [0, 0.0034, 0.34]),
+          if (_homeController.enableGradientBg) ...[
+            Align(
+              alignment: Alignment.topLeft,
+              child: Opacity(
+                opacity: 0.6,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.9),
+                          Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.5),
+                          Theme.of(context).colorScheme.surface
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        stops: const [0, 0.0034, 0.34]),
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
           Column(
             children: [
               CustomAppBar(
@@ -90,7 +102,41 @@ class _HomePageState extends State<HomePage>
                 ctr: _homeController,
                 callback: showUserBottomSheet,
               ),
-              const CustomTabs(),
+              if (_homeController.tabs.length > 1) ...[
+                if (_homeController.enableGradientBg) ...[
+                  const CustomTabs(),
+                ] else ...[
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 42,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: TabBar(
+                        controller: _homeController.tabController,
+                        tabs: [
+                          for (var i in _homeController.tabs)
+                            Tab(text: i['label'])
+                        ],
+                        isScrollable: true,
+                        dividerColor: Colors.transparent,
+                        enableFeedback: true,
+                        splashBorderRadius: BorderRadius.circular(10),
+                        tabAlignment: TabAlignment.center,
+                        onTap: (value) {
+                          feedBack();
+                          if (_homeController.initialIndex.value == value) {
+                            _homeController.tabsCtrList[value]().animateToTop();
+                          }
+                          _homeController.initialIndex.value = value;
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ] else ...[
+                const SizedBox(height: 6),
+              ],
               Expanded(
                 child: TabBarView(
                   controller: _homeController.tabController,
@@ -140,6 +186,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
             child: UserInfoWidget(
               top: top,
+              ctr: ctr,
               userLogin: isUserLoggedIn,
               userFace: ctr?.userFace.value,
               callback: () => callback!(),
@@ -158,18 +205,20 @@ class UserInfoWidget extends StatelessWidget {
     required this.userLogin,
     required this.userFace,
     required this.callback,
+    required this.ctr,
   }) : super(key: key);
 
   final double top;
   final RxBool userLogin;
   final String? userFace;
   final VoidCallback? callback;
+  final HomeController? ctr;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SearchBar(),
+        SearchBar(ctr: ctr),
         if (userLogin.value) ...[
           const SizedBox(width: 4),
           ClipRect(
@@ -250,17 +299,6 @@ class CustomTabs extends StatefulWidget {
 
 class _CustomTabsState extends State<CustomTabs> {
   final HomeController _homeController = Get.put(HomeController());
-  int currentTabIndex = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    _homeController.tabController.addListener(listen);
-  }
-
-  void listen() {
-    _homeController.initialIndex.value = _homeController.tabController.index;
-  }
 
   void onTap(int index) {
     feedBack();
@@ -272,33 +310,29 @@ class _CustomTabsState extends State<CustomTabs> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _homeController.tabController.removeListener(listen);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       height: 44,
       margin: const EdgeInsets.only(top: 4),
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-        scrollDirection: Axis.horizontal,
-        itemCount: _homeController.tabs.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 10);
-        },
-        itemBuilder: (BuildContext context, int index) {
-          String label = _homeController.tabs[index]['label'];
-          return Obx(
-            () => CustomChip(
-              onTap: () => onTap(index),
-              label: label,
-              selected: index == _homeController.initialIndex.value,
-            ),
-          );
-        },
+      child: Obx(
+        () => ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 14.0),
+          scrollDirection: Axis.horizontal,
+          itemCount: _homeController.tabs.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const SizedBox(width: 10);
+          },
+          itemBuilder: (BuildContext context, int index) {
+            String label = _homeController.tabs[index]['label'];
+            return Obx(
+              () => CustomChip(
+                onTap: () => onTap(index),
+                label: label,
+                selected: index == _homeController.initialIndex.value,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -346,11 +380,15 @@ class CustomChip extends StatelessWidget {
 }
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({super.key});
+  const SearchBar({
+    Key? key,
+    required this.ctr,
+  }) : super(key: key);
+
+  final HomeController? ctr;
 
   @override
   Widget build(BuildContext context) {
-    final SSearchController searchController = Get.put(SSearchController());
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: Container(
@@ -364,7 +402,10 @@ class SearchBar extends StatelessWidget {
           color: colorScheme.onSecondaryContainer.withOpacity(0.05),
           child: InkWell(
             splashColor: colorScheme.primaryContainer.withOpacity(0.3),
-            onTap: () => Get.toNamed('/search'),
+            onTap: () => Get.toNamed(
+              '/search',
+              parameters: {'hintText': ctr!.defaultSearch.value},
+            ),
             child: Row(
               children: [
                 const SizedBox(width: 14),
@@ -373,16 +414,17 @@ class SearchBar extends StatelessWidget {
                   color: colorScheme.onSecondaryContainer,
                 ),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Obx(
-                    () => Text(
-                      searchController.defaultSearch.value,
+                Obx(
+                  () => Expanded(
+                    child: Text(
+                      ctr!.defaultSearch.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: colorScheme.outline),
                     ),
                   ),
                 ),
+                const SizedBox(width: 15),
               ],
             ),
           ),

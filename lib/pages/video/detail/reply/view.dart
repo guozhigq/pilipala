@@ -16,11 +16,13 @@ import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
   final String? bvid;
+  final int? oid;
   final int rpid;
   final String? replyLevel;
 
   const VideoReplyPanel({
     this.bvid,
+    this.oid,
     this.rpid = 0,
     this.replyLevel,
     super.key,
@@ -48,16 +50,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   @override
   void initState() {
     super.initState();
-    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
+    // int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     heroTag = Get.arguments['heroTag'];
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(oid, widget.rpid.toString(), replyLevel),
+          VideoReplyController(widget.oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
     } else {
-      _videoReplyController =
-          Get.put(VideoReplyController(oid, '', replyLevel), tag: heroTag);
+      _videoReplyController = Get.put(
+          VideoReplyController(widget.oid, '', replyLevel),
+          tag: heroTag);
     }
 
     fabAnimationCtr = AnimationController(
@@ -75,7 +78,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyController.onLoad();
           });
         }
@@ -110,7 +114,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
-      videoDetailCtr.oid = replyItem.oid;
+      videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
       videoDetailCtr.showReplyReplyPanel();
@@ -130,13 +134,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        _videoReplyController.currentPage = 0;
-        return await _videoReplyController.queryReplyList();
+        return await _videoReplyController.queryReplyList(type: 'init');
       },
       child: Stack(
         children: [
           CustomScrollView(
             controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(
@@ -144,35 +148,14 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    height: 45,
-                    padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.1)),
-                      ),
-                    ),
+                    height: 40,
+                    padding: const EdgeInsets.fromLTRB(12, 6, 6, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Obx(
-                          () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                              '共${_videoReplyController.count.value}条回复',
-                              key: ValueKey<int>(
-                                  _videoReplyController.count.value),
-                            ),
-                          ),
+                        Text(
+                          '${_videoReplyController.sortTypeLabel.value}评论',
+                          style: const TextStyle(fontSize: 13),
                         ),
                         SizedBox(
                           height: 35,
@@ -180,10 +163,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
                             icon: const Icon(Icons.sort, size: 16),
-                            label: Obx(() => Text(
-                                  _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 13),
-                                )),
+                            label: Obx(
+                              () => Text(
+                                _videoReplyController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -256,7 +241,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                       // 请求错误
                       return HttpError(
                         errMsg: data['msg'],
-                        fn: () => setState(() {}),
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _videoReplyController.queryReplyList();
+                          });
+                        },
                       );
                     }
                   } else {
@@ -320,8 +310,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
 class _MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   _MySliverPersistentHeaderDelegate({required this.child});
-  final double _minExtent = 45;
-  final double _maxExtent = 45;
+  final double _minExtent = 40;
+  final double _maxExtent = 40;
   final Widget child;
 
   @override

@@ -35,6 +35,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late double opacityVal;
   late double fontSizeVal;
   late double danmakuDurationVal;
+  late double strokeWidth;
   int latestAddedPosition = -1;
 
   @override
@@ -65,6 +66,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
     showArea = playerController.showArea;
     opacityVal = playerController.opacityVal;
     fontSizeVal = playerController.fontSizeVal;
+    strokeWidth = playerController.strokeWidth;
     danmakuDurationVal = playerController.danmakuDurationVal;
   }
 
@@ -136,6 +138,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideBottom: blockTypes.contains(4),
               duration:
                   danmakuDurationVal / playerController.playbackSpeed,
+              strokeWidth: strokeWidth,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
             ),

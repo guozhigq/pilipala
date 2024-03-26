@@ -1,15 +1,19 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
+import 'api.dart';
 import 'constants.dart';
 import 'interceptor.dart';
 
@@ -23,6 +27,7 @@ class Request {
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
+  static final RegExp spmPrefixExp = RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
 
   /// 设置cookie
   static setCookie() async {
@@ -50,13 +55,12 @@ class Request {
     }
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
 
-    if (cookie.isEmpty) {
-      try {
-        await Request().get(HttpString.baseUrl);
-      } catch (e) {
-        log("setCookie, ${e.toString()}");
-      }
+    try {
+      await buvidActivate();
+    } catch (e) {
+      log("setCookie, ${e.toString()}");
     }
+
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
@@ -77,12 +81,40 @@ class Request {
   static setOptionsHeaders(userInfo, bool status) {
     if (status) {
       dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+      dio.options.headers['x-bili-aurora-eid'] =
+          IdUtils.genAuroraEid(userInfo.mid);
     }
     dio.options.headers['env'] = 'prod';
     dio.options.headers['app-key'] = 'android64';
-    dio.options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
     dio.options.headers['x-bili-aurora-zone'] = 'sh001';
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
+  }
+
+  static Future buvidActivate() async {
+    var html = await Request().get(Api.dynamicSpmPrefix);
+    String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
+    Random rand = Random();
+    String rand_png_end = base64.encode(
+      List<int>.generate(32, (_) => rand.nextInt(256)) +
+      List<int>.filled(4, 0) +
+      [73, 69, 78, 68] +
+      List<int>.generate(4, (_) => rand.nextInt(256))
+    );
+
+    String jsonData = json.encode({
+      '3064': 1,
+      '39c8': '${spmPrefix}.fp.risk',
+      '3c43': {
+        'adca': 'Linux',
+        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
+      },
+    });
+
+    await Request().post(
+      Api.activateBuvidApi,
+      data: {'payload': jsonData},
+      options: Options(contentType: 'application/json')
+    );
   }
 
   /*
@@ -177,8 +209,14 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      print('get error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 
@@ -199,8 +237,14 @@ class Request {
       // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
-      print('post error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 

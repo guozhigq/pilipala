@@ -6,6 +6,8 @@ import '../models/user/fav_folder.dart';
 import '../models/user/history.dart';
 import '../models/user/info.dart';
 import '../models/user/stat.dart';
+import '../models/user/sub_detail.dart';
+import '../models/user/sub_folder.dart';
 import 'api.dart';
 import 'init.dart';
 
@@ -301,6 +303,48 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 我的订阅
+  static Future userSubFolder({
+    required int mid,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userSubFolder, data: {
+      'up_mid': mid,
+      'ps': ps,
+      'pn': pn,
+      'platform': 'web',
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubFolderModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future userSubFolderDetail({
+    required int seasonId,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userSubFolderDetail, data: {
+      'season_id': seasonId,
+      'ps': ps,
+      'pn': pn,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubDetailModelData.fromJson(res.data['data'])
+      };
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

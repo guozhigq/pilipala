@@ -25,13 +25,6 @@ class BangumiIntroController extends GetxController {
       ? int.tryParse(Get.parameters['epId']!)
       : null;
 
-  // 是否预渲染 骨架屏
-  bool preRender = false;
-
-  // 视频详情 上个页面传入
-  Map? videoItem = {};
-  BangumiInfoModel? bangumiItem;
-
   // 请求状态
   RxBool isLoading = false.obs;
 
@@ -63,27 +56,6 @@ class BangumiIntroController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.arguments.isNotEmpty as bool) {
-      if (Get.arguments.containsKey('bangumiItem') as bool) {
-        preRender = true;
-        bangumiItem = Get.arguments['bangumiItem'];
-        // bangumiItem!['pic'] = args.pic;
-        // if (args.title is String) {
-        //   videoItem!['title'] = args.title;
-        // } else {
-        //   String str = '';
-        //   for (Map map in args.title) {
-        //     str += map['text'];
-        //   }
-        //   videoItem!['title'] = str;
-        // }
-        // if (args.stat != null) {
-        //   videoItem!['stat'] = args.stat;
-        // }
-        // videoItem!['pubdate'] = args.pubdate;
-        // videoItem!['owner'] = args.owner;
-      }
-    }
     userInfo = userInfoCache.get('userInfoCache');
     userLogin = userInfo != null;
   }
@@ -183,20 +155,21 @@ class BangumiIntroController extends GetxController {
             actions: [
               TextButton(onPressed: () => Get.back(), child: const Text('取消')),
               TextButton(
-                  onPressed: () async {
-                    var res = await VideoHttp.coinVideo(
-                        bvid: bvid, multiply: _tempThemeValue);
-                    if (res['status']) {
-                      SmartDialog.showToast('投币成功 👏');
-                      hasCoin.value = true;
-                      bangumiDetail.value.stat!['coins'] =
-                          bangumiDetail.value.stat!['coins'] + _tempThemeValue;
-                    } else {
-                      SmartDialog.showToast(res['msg']);
-                    }
-                    Get.back();
-                  },
-                  child: const Text('确定'))
+                onPressed: () async {
+                  var res = await VideoHttp.coinVideo(
+                      bvid: bvid, multiply: _tempThemeValue);
+                  if (res['status']) {
+                    SmartDialog.showToast('投币成功 👏');
+                    hasCoin.value = true;
+                    bangumiDetail.value.stat!['coins'] =
+                        bangumiDetail.value.stat!['coins'] + _tempThemeValue;
+                  } else {
+                    SmartDialog.showToast(res['msg']);
+                  }
+                  Get.back();
+                },
+                child: const Text('确定'),
+              )
             ],
           );
         });
@@ -218,14 +191,12 @@ class BangumiIntroController extends GetxController {
         addIds: addMediaIdsNew.join(','),
         delIds: delMediaIdsNew.join(','));
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      // 重新获取收藏状态
+      queryHasFavVideo();
+      SmartDialog.showToast('✅ 操作成功');
+      Get.back();
     }
   }
 

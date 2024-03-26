@@ -20,7 +20,7 @@ class MemberController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   late int ownerMid;
   // 投稿列表
-  RxList<VListItemModel>? archiveList = [VListItemModel()].obs;
+  RxList<VListItemModel>? archiveList = <VListItemModel>[].obs;
   dynamic userInfo;
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;

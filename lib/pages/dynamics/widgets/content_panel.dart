@@ -1,5 +1,6 @@
 // 内容
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
@@ -44,7 +45,9 @@ class _ContentState extends State<Content> {
     if (len == 1) {
       OpusPicsModel pictureItem = pics.first;
       picList.add(pictureItem.url!);
-      spanChilds.add(const TextSpan(text: '\n'));
+
+      /// 图片上方的空白间隔
+      // spanChilds.add(const TextSpan(text: '\n'));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
@@ -80,7 +83,7 @@ class _ContentState extends State<Content> {
                             height: height,
                           ),
                         ),
-                        height > maxHeight
+                        height > Get.size.height * 0.9
                             ? const PBadge(
                                 text: '长图',
                                 right: 8,

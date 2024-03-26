@@ -8,8 +8,11 @@ import '../models/model_rec_video_item.dart';
 import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
+import '../models/video/subTitile/result.dart';
 import '../models/video_detail_res.dart';
+import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
+import '../utils/subtitle.dart';
 import '../utils/wbi_sign.dart';
 import 'api.dart';
 import 'init.dart';
@@ -46,8 +49,13 @@ class VideoHttp {
             setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
         for (var i in res.data['data']['item']) {
           //过滤掉live与ad，以及拉黑用户
-          if (i['goto'] == 'av' && !blackMidsList.contains(i['owner']['mid'])) {
-            list.add(RecVideoItemModel.fromJson(i));
+          if (i['goto'] == 'av' &&
+              (i['owner'] != null &&
+                  !blackMidsList.contains(i['owner']['mid']))) {
+            RecVideoItemModel videoItem = RecVideoItemModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)) {
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
@@ -59,7 +67,9 @@ class VideoHttp {
     }
   }
 
-  static Future rcmdVideoListApp({int? ps, required int freshIdx}) async {
+  // 添加额外的loginState变量模拟未登录状态
+  static Future rcmdVideoListApp(
+      {bool loginStatus = true, required int freshIdx}) async {
     try {
       var res = await Request().get(
         Api.recommendListApp,
@@ -72,9 +82,11 @@ class VideoHttp {
           'device_name': 'vivo',
           'pull': freshIdx == 0 ? 'true' : 'false',
           'appkey': Constants.appKey,
-          'access_key': localCache
-                  .get(LocalCacheKey.accessKey, defaultValue: {})['value'] ??
-              ''
+          'access_key': loginStatus
+              ? (localCache.get(LocalCacheKey.accessKey,
+                      defaultValue: {})['value'] ??
+                  '')
+              : ''
         },
       );
       if (res.data['code'] == 0) {
@@ -87,12 +99,15 @@ class VideoHttp {
               (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
               (i['args'] != null &&
                   !blackMidsList.contains(i['args']['up_mid']))) {
-            list.add(RecVideoItemAppModel.fromJson(i));
+            RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
+            if (!RecommendFilter.filter(videoItem)) {
+              list.add(videoItem);
+            }
           }
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': [], 'msg': ''};
+        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err.toString()};
@@ -117,7 +132,7 @@ class VideoHttp {
         }
         return {'status': true, 'data': list};
       } else {
-        return {'status': false, 'data': []};
+        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
@@ -203,7 +218,10 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       List<HotVideoItemModel> list = [];
       for (var i in res.data['data']) {
-        list.add(HotVideoItemModel.fromJson(i));
+        HotVideoItemModel videoItem = HotVideoItemModel.fromJson(i);
+        if (!RecommendFilter.filter(videoItem, relatedVideos: true)) {
+          list.add(videoItem);
+        }
       }
       return {'status': true, 'data': list};
     } else {
@@ -224,10 +242,11 @@ class VideoHttp {
   // 获取投币状态
   static Future hasCoinVideo({required String bvid}) async {
     var res = await Request().get(Api.hasCoinVideo, data: {'bvid': bvid});
+    print('res: $res');
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -305,7 +324,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -361,7 +380,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -377,7 +396,7 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
-      return {'status': true, 'data': []};
+      return {'status': false, 'data': []};
     }
   }
 
@@ -433,6 +452,8 @@ class VideoHttp {
     });
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': null, 'msg': res.data['message']};
     }
   }
 
@@ -447,11 +468,63 @@ class VideoHttp {
       'up_mid': upMid,
     });
     var res = await Request().get(Api.aiConclusion, data: params);
-    if (res.data['code'] == 0) {
+    if (res.data['code'] == 0 && res.data['data']['code'] == 0) {
       return {
         'status': true,
         'data': AiConclusionModel.fromJson(res.data['data']),
       };
+    } else {
+      return {'status': false, 'data': []};
     }
+  }
+
+  static Future getSubtitle({int? cid, String? bvid}) async {
+    var res = await Request().get(Api.getSubtitleConfig, data: {
+      'cid': cid,
+      'bvid': bvid,
+    });
+    try {
+      if (res.data['code'] == 0) {
+        return {
+          'status': true,
+          'data': SubTitlteModel.fromJson(res.data['data']),
+        };
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['msg']};
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  // 视频排行
+  static Future getRankVideoList(int rid) async {
+    try {
+      var rankApi = "${Api.getRankApi}?rid=$rid&type=all";
+      var res = await Request().get(rankApi);
+      if (res.data['code'] == 0) {
+        List<HotVideoItemModel> list = [];
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        for (var i in res.data['data']['list']) {
+          if (!blackMidsList.contains(i['owner']['mid'])) {
+            list.add(HotVideoItemModel.fromJson(i));
+          }
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['message']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err};
+    }
+  }
+
+  // 获取字幕内容
+  static Future<Map<String, dynamic>> getSubtitleContent(url) async {
+    var res = await Request().get('https:$url');
+    final String content = SubTitleUtils.convertToWebVTT(res.data['body']);
+    final List body = res.data['body'];
+    return {'content': content, 'body': body};
   }
 }

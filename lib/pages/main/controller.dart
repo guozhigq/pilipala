@@ -9,53 +9,20 @@ import 'package:pilipala/http/common.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/view.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[
     const HomePage(),
+    const RankPage(),
     const DynamicsPage(),
     const MediaPage(),
   ];
-  RxList navigationBars = [
-    {
-      'icon': const Icon(
-        Icons.home_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.home,
-        size: 21,
-      ),
-      'label': "首页",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.motion_photos_on_outlined,
-        size: 21,
-      ),
-      'selectIcon': const Icon(
-        Icons.motion_photos_on,
-        size: 21,
-      ),
-      'label': "动态",
-      'count': 0,
-    },
-    {
-      'icon': const Icon(
-        Icons.video_collection_outlined,
-        size: 20,
-      ),
-      'selectIcon': const Icon(
-        Icons.video_collection,
-        size: 21,
-      ),
-      'label': "媒体库",
-      'count': 0,
-    }
-  ].obs;
+  RxList navigationBars = defaultNavigationBars.obs;
   final StreamController<bool> bottomBarStream =
       StreamController<bool>.broadcast();
   Box setting = GStrorage.setting;
@@ -65,6 +32,7 @@ class MainController extends GetxController {
   int selectedIndex = 0;
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
+  late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
 
   @override
   void onInit() {
@@ -73,9 +41,18 @@ class MainController extends GetxController {
       Utils.checkUpdata();
     }
     hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
+    int defaultHomePage =
+        setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0) as int;
+    selectedIndex = defaultNavigationBars
+        .indexWhere((item) => item['id'] == defaultHomePage);
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    getUnreadDynamic();
+    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+        SettingBoxKey.dynamicBadgeMode,
+        defaultValue: DynamicBadgeMode.number.code)];
+    if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+      getUnreadDynamic();
+    }
   }
 
   void onBackPressed(BuildContext context) {

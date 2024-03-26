@@ -9,14 +9,20 @@ import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import '../../../common/widgets/badge.dart';
 
 // 收藏视频卡片 - 水平布局
 class FavVideoCardH extends StatelessWidget {
   final dynamic videoItem;
   final Function? callFn;
+  final int? searchType;
 
-  const FavVideoCardH({Key? key, required this.videoItem, this.callFn})
-      : super(key: key);
+  const FavVideoCardH({
+    Key? key,
+    required this.videoItem,
+    this.callFn,
+    this.searchType,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +33,9 @@ class FavVideoCardH extends StatelessWidget {
       onTap: () async {
         // int? seasonId;
         String? epId;
-        if (videoItem.ogv != null && videoItem.ogv['type_name'] == '番剧') {
+        if (videoItem.ogv != null &&
+            (videoItem.ogv['type_name'] == '番剧' ||
+                videoItem.ogv['type_name'] == '国创')) {
           videoItem.cid = await SearchHttp.ab2c(bvid: bvid);
           // seasonId = videoItem.ogv['season_id'];
           epId = videoItem.epId;
@@ -84,28 +92,31 @@ class FavVideoCardH extends StatelessWidget {
                                     height: maxHeight,
                                   ),
                                 ),
-                                Positioned(
-                                  right: 4,
-                                  bottom: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 1, horizontal: 6),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: Colors.black54.withOpacity(0.4)),
-                                    child: Text(
-                                      Utils.timeFormat(videoItem.duration!),
-                                      style: const TextStyle(
-                                          fontSize: 11, color: Colors.white),
-                                    ),
+                                PBadge(
+                                  text: Utils.timeFormat(videoItem.duration!),
+                                  right: 6.0,
+                                  bottom: 6.0,
+                                  type: 'gray',
+                                ),
+                                if (videoItem.ogv != null) ...[
+                                  PBadge(
+                                    text: videoItem.ogv['type_name'],
+                                    top: 6.0,
+                                    right: 6.0,
+                                    bottom: null,
+                                    left: null,
                                   ),
-                                )
+                                ],
                               ],
                             );
                           },
                         ),
                       ),
-                      VideoContent(videoItem: videoItem, callFn: callFn)
+                      VideoContent(
+                        videoItem: videoItem,
+                        callFn: callFn,
+                        searchType: searchType,
+                      )
                     ],
                   ),
                 );
@@ -121,93 +132,123 @@ class FavVideoCardH extends StatelessWidget {
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
   final Function? callFn;
-  const VideoContent({super.key, required this.videoItem, this.callFn});
+  final int? searchType;
+  const VideoContent({
+    super.key,
+    required this.videoItem,
+    this.callFn,
+    this.searchType,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Text(
-              videoItem.title,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Spacer(),
-            Text(
-              Utils.dateFormat(videoItem.ctime!),
-              style: TextStyle(
-                  fontSize: 11, color: Theme.of(context).colorScheme.outline),
-            ),
-            Text(
-              videoItem.owner.name,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StatView(
-                  theme: 'gray',
-                  view: videoItem.cntInfo['play'],
+                Text(
+                  videoItem.title,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 8),
-                StatDanMu(theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
-                const Spacer(),
-                SizedBox(
-                  width: 26,
-                  height: 26,
-                  child: IconButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: Get.context!,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('提示'),
-                            content: const Text('要取消收藏吗?'),
-                            actions: [
-                              TextButton(
-                                  onPressed: () => Get.back(),
-                                  child: Text(
-                                    '取消',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline),
-                                  )),
-                              TextButton(
-                                onPressed: () async {
-                                  await callFn!();
-                                  Get.back();
-                                },
-                                child: const Text('确定取消'),
-                              )
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    icon: Icon(
-                      Icons.clear_outlined,
+                if (videoItem.ogv != null) ...[
+                  Text(
+                    videoItem.intro,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
                       color: Theme.of(context).colorScheme.outline,
-                      size: 18,
                     ),
+                  ),
+                ],
+                const Spacer(),
+                Text(
+                  Utils.dateFormat(videoItem.favTime),
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.outline),
+                ),
+                if (videoItem.owner.name != '') ...[
+                  Text(
+                    videoItem.owner.name,
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Row(
+                    children: [
+                      StatView(
+                        theme: 'gray',
+                        view: videoItem.cntInfo['play'],
+                      ),
+                      const SizedBox(width: 8),
+                      StatDanMu(
+                          theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
+                      const Spacer(),
+                    ],
                   ),
                 ),
               ],
             ),
+            searchType != 1
+                ? Positioned(
+                    right: 0,
+                    bottom: -4,
+                    child: IconButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: Get.context!,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('提示'),
+                              content: const Text('要取消收藏吗?'),
+                              actions: [
+                                TextButton(
+                                    onPressed: () => Get.back(),
+                                    child: Text(
+                                      '取消',
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline),
+                                    )),
+                                TextButton(
+                                  onPressed: () async {
+                                    await callFn!();
+                                    Get.back();
+                                  },
+                                  child: const Text('确定取消'),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.clear_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 18,
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
           ],
         ),
       ),

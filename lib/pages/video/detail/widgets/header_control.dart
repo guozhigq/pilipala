@@ -16,19 +16,25 @@ import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/http/danmaku.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
+import '../../../../models/common/search_type.dart';
+import '../../../../models/video_detail_res.dart';
+import '../introduction/index.dart';
 
 class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   const HeaderControl({
     this.controller,
     this.videoDetailCtr,
     this.floating,
+    this.bvid,
+    this.videoType,
     super.key,
   });
   final PlPlayerController? controller;
   final VideoDetailController? videoDetailCtr;
   final Floating? floating;
+  final String? bvid;
+  final SearchType? videoType;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -39,7 +45,6 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
 
 class _HeaderControlState extends State<HeaderControl> {
   late PlayUrlModel videoInfo;
-  List<PlaySpeed> playSpeed = PlaySpeed.values;
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -47,11 +52,36 @@ class _HeaderControlState extends State<HeaderControl> {
   final Box<dynamic> videoStorage = GStrorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
+  bool showTitle = false;
+  late String heroTag;
+  late VideoIntroController videoIntroController;
+  late VideoDetailData videoDetail;
+
   @override
   void initState() {
     super.initState();
     videoInfo = widget.videoDetailCtr!.data;
     speedsList = widget.controller!.speedsList;
+    fullScreenStatusListener();
+    heroTag = Get.arguments['heroTag'];
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid!), tag: heroTag);
+  }
+
+  void fullScreenStatusListener() {
+    widget.videoDetailCtr!.plPlayerController.isFullScreen
+        .listen((bool isFullScreen) {
+      if (isFullScreen) {
+        showTitle = true;
+      } else {
+        showTitle = false;
+      }
+
+      /// TODO setState() called after dispose()
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   /// 设置面板
@@ -188,88 +218,6 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
-  /// 发送弹幕
-  void showShootDanmakuSheet() {
-    final TextEditingController textController = TextEditingController();
-    bool isSending = false; // 追踪是否正在发送
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        // TODO: 支持更多类型和颜色的弹幕
-        return AlertDialog(
-          title: const Text('发送弹幕（测试）'),
-          content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return TextField(
-              controller: textController,
-            );
-          }),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                '取消',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-            StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-              return TextButton(
-                onPressed: isSending
-                    ? null
-                    : () async {
-                        final String msg = textController.text;
-                        if (msg.isEmpty) {
-                          SmartDialog.showToast('弹幕内容不能为空');
-                          return;
-                        } else if (msg.length > 100) {
-                          SmartDialog.showToast('弹幕内容不能超过100个字符');
-                          return;
-                        }
-                        setState(() {
-                          isSending = true; // 开始发送，更新状态
-                        });
-                        //修改按钮文字
-                        // SmartDialog.showToast('弹幕发送中,\n$msg');
-                        final dynamic res = await DanmakaHttp.shootDanmaku(
-                          oid: widget.videoDetailCtr!.cid.value,
-                          msg: textController.text,
-                          bvid: widget.videoDetailCtr!.bvid,
-                          progress:
-                              widget.controller!.position.value.inMilliseconds,
-                          type: 1,
-                        );
-                        setState(() {
-                          isSending = false; // 发送结束，更新状态
-                        });
-                        if (res['status']) {
-                          SmartDialog.showToast('发送成功');
-                          // 发送成功，自动预览该弹幕，避免重新请求
-                          // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
-                          widget.controller!.danmakuController!.addItems([
-                            DanmakuItem(
-                              msg,
-                              color: Colors.white,
-                              time: widget
-                                  .controller!.position.value.inMilliseconds,
-                              type: DanmakuItemType.scroll,
-                              isSend: true,
-                            )
-                          ]);
-                          Get.back();
-                        } else {
-                          SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
-                        }
-                      },
-                child: Text(isSending ? '发送中...' : '发送'),
-              );
-            })
-          ],
-        );
-      },
-    );
-  }
-
   /// 定时关闭
   void scheduleExit() async {
     const List<int> scheduleTimeChoices = [
@@ -341,8 +289,7 @@ class _HeaderControlState extends State<HeaderControl> {
                         },
                         dense: true,
                         contentPadding: const EdgeInsets.only(),
-                        title:
-                            const Text("额外等待视频播放完毕", style: titleStyle),
+                        title: const Text("额外等待视频播放完毕", style: titleStyle),
                         trailing: Switch(
                           // thumb color (round icon)
                           activeColor: Theme.of(context).colorScheme.primary,
@@ -397,6 +344,56 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  /// 选择字幕
+  void showSubtitleDialog() async {
+    int tempThemeValue = widget.controller!.subTitleCode.value;
+    int len = widget.videoDetailCtr!.subtitles.length;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('选择字幕'),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
+            content: StatefulBuilder(builder: (context, StateSetter setState) {
+              return len == 0
+                  ? const SizedBox(
+                      height: 60,
+                      child: Center(
+                        child: Text('没有字幕'),
+                      ),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile(
+                          value: -1,
+                          title: const Text('关闭弹幕'),
+                          groupValue: tempThemeValue,
+                          onChanged: (value) {
+                            tempThemeValue = value!;
+                            widget.controller?.toggleSubtitle(value);
+                            Get.back();
+                          },
+                        ),
+                        ...widget.videoDetailCtr!.subtitles
+                            .map((e) => RadioListTile(
+                                  value: e.code,
+                                  title: Text(e.title),
+                                  groupValue: tempThemeValue,
+                                  onChanged: (value) {
+                                    tempThemeValue = value!;
+                                    widget.controller?.toggleSubtitle(value);
+                                    Get.back();
+                                  },
+                                ))
+                            .toList(),
+                      ],
+                    );
+            }),
+          );
+        });
+  }
+
   /// 选择倍速
   void showSetSpeedSheet() {
     final double currentSpeed = widget.controller!.playbackSpeed;
@@ -437,7 +434,7 @@ class _HeaderControlState extends State<HeaderControl> {
           }),
           actions: <Widget>[
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: () => Get.back(),
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -724,6 +721,8 @@ class _HeaderControlState extends State<HeaderControl> {
     double fontSizeVal = widget.controller!.fontSizeVal;
     // 弹幕速度
     double danmakuDurationVal = widget.controller!.danmakuDurationVal;
+    // 弹幕描边
+    double strokeWidth = widget.controller!.strokeWidth;
 
     final DanmakuController danmakuController =
         widget.controller!.danmakuController!;
@@ -851,6 +850,44 @@ class _HeaderControlState extends State<HeaderControl> {
                                 danmakuController.option;
                             final DanmakuOption updatedOption =
                                 currentOption.copyWith(opacity: val);
+                            danmakuController.updateOption(updatedOption);
+                          } catch (_) {}
+                        },
+                      ),
+                    ),
+                  ),
+                  Text('描边粗细 $strokeWidth'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 6,
+                      left: 10,
+                      right: 10,
+                    ),
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackShape: MSliderTrackShape(),
+                        thumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary,
+                        trackHeight: 10,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6.0),
+                      ),
+                      child: Slider(
+                        min: 0,
+                        max: 3,
+                        value: strokeWidth,
+                        divisions: 6,
+                        label: '$strokeWidth',
+                        onChanged: (double val) {
+                          strokeWidth = val;
+                          widget.controller!.strokeWidth = val;
+                          setState(() {});
+                          try {
+                            final DanmakuOption currentOption =
+                                danmakuController.option;
+                            final DanmakuOption updatedOption =
+                                currentOption.copyWith(strokeWidth: val);
                             danmakuController.updateOption(updatedOption);
                           } catch (_) {}
                         },
@@ -1006,6 +1043,8 @@ class _HeaderControlState extends State<HeaderControl> {
       color: Colors.white,
       fontSize: 12,
     );
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
@@ -1040,21 +1079,49 @@ class _HeaderControlState extends State<HeaderControl> {
             },
           ),
           SizedBox(width: buttonSpace),
-          ComBtn(
-            icon: const Icon(
-              FontAwesomeIcons.house,
-              size: 15,
-              color: Colors.white,
+          if (showTitle &&
+              isLandscape &&
+              widget.videoType == SearchType.video) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  child: Text(
+                    videoIntroController.videoDetail.value.title ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                if (videoIntroController.isShowOnlineTotal)
+                  Text(
+                    '${videoIntroController.total.value}人正在看',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+              ],
+            )
+          ] else ...[
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                // 销毁播放器实例
+                await widget.controller!.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
             ),
-            fuc: () async {
-              // 销毁播放器实例
-              await widget.controller!.dispose(type: 'all');
-              if (mounted) {
-                Navigator.popUntil(
-                    context, (Route<dynamic> route) => route.isFirst);
-              }
-            },
-          ),
+          ],
           const Spacer(),
           // ComBtn(
           //   icon: const Icon(
@@ -1064,41 +1131,6 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
-          SizedBox(
-            width: 56,
-            height: 34,
-            child: TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(EdgeInsets.zero),
-              ),
-              onPressed: () => showShootDanmakuSheet(),
-              child: const Text(
-                '发弹幕',
-                style: textStyle,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 34,
-            height: 34,
-            child: Obx(
-              () => IconButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                ),
-                onPressed: () {
-                  _.isOpenDanmu.value = !_.isOpenDanmu.value;
-                },
-                icon: Icon(
-                  _.isOpenDanmu.value
-                      ? Icons.subtitles_outlined
-                      : Icons.subtitles_off_outlined,
-                  size: 19,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
           SizedBox(width: buttonSpace),
           if (Platform.isAndroid) ...<Widget>[
             SizedBox(
@@ -1133,6 +1165,31 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             SizedBox(width: buttonSpace),
           ],
+
+          /// 字幕
+          // SizedBox(
+          //   width: 34,
+          //   height: 34,
+          //   child: IconButton(
+          //     style: ButtonStyle(
+          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
+          //     ),
+          //     onPressed: () => showSubtitleDialog(),
+          //     icon: const Icon(
+          //       Icons.closed_caption_off,
+          //       size: 22,
+          //     ),
+          //   ),
+          // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.closed_caption_off,
+              size: 22,
+              color: Colors.white,
+            ),
+            fuc: () => showSubtitleDialog(),
+          ),
+          SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(
               width: 45,

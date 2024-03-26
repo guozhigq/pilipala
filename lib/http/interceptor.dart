@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import '../utils/storage.dart';
-// import 'package:get/get.dart' hide Response;
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -46,10 +45,13 @@ class ApiInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
     // handler.next(err);
-    SmartDialog.showToast(
-      await dioError(err),
-      displayType: SmartToastType.onlyRefresh,
-    );
+    String url = err.requestOptions.uri.toString();
+    if (!url.contains('heartBeat')) {
+      SmartDialog.showToast(
+        await dioError(err),
+        displayType: SmartToastType.onlyRefresh,
+      );
+    }
     super.onError(err, handler);
   }
 
@@ -70,34 +72,28 @@ class ApiInterceptor extends Interceptor {
       case DioExceptionType.sendTimeout:
         return '发送请求超时，请检查网络设置';
       case DioExceptionType.unknown:
-        final String res = await checkConect();
-        return '$res \n 网络异常，请稍后重试！';
-      // default:
-      //   return 'Dio异常';
+        final String res = await checkConnect();
+        return '$res，网络异常！';
     }
   }
 
-  static Future<String> checkConect() async {
-    final ConnectivityResult connectivityResult =
+  static Future<String> checkConnect() async {
+    final List<ConnectivityResult> connectivityResult =
         await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.mobile) {
-      return 'connected with mobile network';
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-      return 'connected with wifi network';
-    } else if (connectivityResult == ConnectivityResult.ethernet) {
-      // I am connected to a ethernet network.
-      return '';
-    } else if (connectivityResult == ConnectivityResult.vpn) {
-      // I am connected to a vpn network.
-      // Note for iOS and macOS:
-      // There is no separate network interface type for [vpn].
-      // It returns [other] on any device (also simulator)
-      return '';
-    } else if (connectivityResult == ConnectivityResult.other) {
-      // I am connected to a network which is not in the above mentioned networks.
-      return '';
-    } else if (connectivityResult == ConnectivityResult.none) {
-      return 'not connected to any network';
+    if (connectivityResult.contains(ConnectivityResult.mobile)) {
+      return '正在使用移动流量';
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      return '正在使用wifi';
+    } else if (connectivityResult.contains(ConnectivityResult.ethernet)) {
+      return '正在使用局域网';
+    } else if (connectivityResult.contains(ConnectivityResult.vpn)) {
+      return '正在使用代理网络';
+    } else if (connectivityResult.contains(ConnectivityResult.bluetooth)) {
+      return '正在使用蓝牙网络';
+    } else if (connectivityResult.contains(ConnectivityResult.other)) {
+      return '正在使用其他网络';
+    } else if (connectivityResult.contains(ConnectivityResult.none)) {
+      return '未连接到任何网络';
     } else {
       return '';
     }
