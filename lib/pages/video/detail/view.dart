@@ -372,6 +372,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                     false)
                                 ? SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
+                                    // ignore: deprecated_member_use
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
                                   )
                                 : SvgPicture.asset(
                                     'assets/images/video/danmu_open.svg',
