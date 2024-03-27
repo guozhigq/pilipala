@@ -22,15 +22,20 @@ class ZonePage extends StatefulWidget {
   State<ZonePage> createState() => _ZonePageState();
 }
 
-class _ZonePageState extends State<ZonePage> {
-  final ZoneController _zoneController = Get.put(ZoneController());
+class _ZonePageState extends State<ZonePage>
+    with AutomaticKeepAliveClientMixin {
+  late ZoneController _zoneController;
   List videoList = [];
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    _zoneController = Get.put(ZoneController(), tag: widget.rid.toString());
     _futureBuilderFuture = _zoneController.queryRankFeed('init', widget.rid);
     scrollController = _zoneController.scrollController;
     StreamController<bool> mainStream =
@@ -68,6 +73,7 @@ class _ZonePageState extends State<ZonePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         return await _zoneController.onRefresh();

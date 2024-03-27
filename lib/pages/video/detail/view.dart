@@ -212,6 +212,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      vdCtr.clearSubtitleContent();
     }
     setState(() => isShowing = false);
     super.didPushNext();
@@ -222,7 +223,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() => isShowing = true);
+      setState(() {
+        vdCtr.setSubtitleContent();
+        isShowing = true;
+      });
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
@@ -368,10 +372,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   !(plPlayerController?.isOpenDanmu.value ??
                                       false);
                             },
-                            icon: (plPlayerController?.isOpenDanmu.value ??
+                            icon: !(plPlayerController?.isOpenDanmu.value ??
                                     false)
                                 ? SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
+                                    // ignore: deprecated_member_use
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
                                   )
                                 : SvgPicture.asset(
                                     'assets/images/video/danmu_open.svg',
