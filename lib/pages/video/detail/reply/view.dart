@@ -149,13 +149,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
                     height: 40,
-                    padding: const EdgeInsets.fromLTRB(12, 6, 6, 0),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${_videoReplyController.sortTypeLabel.value}评论',
-                          style: const TextStyle(fontSize: 13),
+                        Obx(
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
+                          ),
                         ),
                         SizedBox(
                           height: 35,
