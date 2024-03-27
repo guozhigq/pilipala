@@ -39,6 +39,7 @@ import '../pages/setting/pages/color_select.dart';
 import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
 import '../pages/setting/pages/home_tabbar_set.dart';
+import '../pages/setting/pages/navigation_bar_set.dart';
 import '../pages/setting/pages/play_gesture_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
 import '../pages/setting/recommend_setting.dart';
@@ -170,6 +171,9 @@ class Routes {
     // 播放器手势
     CustomGetPage(
         name: '/playerGestureSet', page: () => const PlayGesturePage()),
+    // navigation bar
+    CustomGetPage(
+        name: '/navbarSetting', page: () => const NavigationBarSetPage()),
   ];
 }
 

@@ -284,12 +284,17 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/tabbarSetting'),
             title: Text('首页tabbar', style: titleStyle),
           ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/navbarSetting'),
+            title: Text('navbar设置', style: titleStyle),
+          ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,
               onTap: () => Get.toNamed('/displayModeSetting'),
               title: Text('屏幕帧率', style: titleStyle),
-            )
+            ),
         ],
       ),
     );

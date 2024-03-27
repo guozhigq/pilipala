@@ -148,7 +148,8 @@ class SettingBoxKey {
       hideTabBar = 'hideTabBar', // 收起底栏
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
-      enableGradientBg = 'enableGradientBg';
+      enableGradientBg = 'enableGradientBg',
+      navBarSort = 'navBarSort';
 }
 
 class LocalCacheKey {
