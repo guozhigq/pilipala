@@ -498,7 +498,7 @@ InlineSpan buildContent(
       return str;
     });
   }
-  // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
+  content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
   content.message = content.message
       .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')

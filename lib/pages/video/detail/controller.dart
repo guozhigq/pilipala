@@ -20,6 +20,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
+import '../../../models/video/subTitile/content.dart';
 import '../../../http/danmaku.dart';
 import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
@@ -93,7 +94,10 @@ class VideoDetailController extends GetxController
   late int cacheAudioQa;
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
+  RxList<SubTitileContentModel> subtitleContents =
+      <SubTitileContentModel>[].obs;
   late bool enableRelatedVideo;
+  List subtitles = [];
 
   @override
   void onInit() {
@@ -145,6 +149,7 @@ class VideoDetailController extends GetxController
     cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    getSubtitle();
   }
 
   showReplyReplyPanel() {
@@ -251,6 +256,8 @@ class VideoDetailController extends GetxController
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl
     plPlayerController.headerControl = headerControl;
+
+    plPlayerController.subtitles.value = subtitles;
   }
 
   // 视频链接
@@ -386,6 +393,45 @@ class VideoDetailController extends GetxController
     replyReplyBottomSheetCtr != null
         ? replyReplyBottomSheetCtr!.close()
         : print('replyReplyBottomSheetCtr is null');
+  }
+
+  // 获取字幕配置
+  Future getSubtitle() async {
+    var result = await VideoHttp.getSubtitle(bvid: bvid, cid: cid.value);
+    if (result['status']) {
+      if (result['data'].subtitles.isNotEmpty) {
+        subtitles = result['data'].subtitles;
+        if (subtitles.isNotEmpty) {
+          for (var i in subtitles) {
+            final Map<String, dynamic> res = await VideoHttp.getSubtitleContent(
+              i.subtitleUrl,
+            );
+            i.content = res['content'];
+            i.body = res['body'];
+          }
+        }
+      }
+      return result['data'];
+    }
+  }
+
+  // 获取字幕内容
+  // Future getSubtitleContent(String url) async {
+  //   var res = await Request().get('https:$url');
+  //   subtitleContents.value = res.data['body'].map<SubTitileContentModel>((e) {
+  //     return SubTitileContentModel.fromJson(e);
+  //   }).toList();
+  //   setSubtitleContent();
+  // }
+
+  setSubtitleContent() {
+    plPlayerController.subtitleContent.value = '';
+    plPlayerController.subtitles.value = subtitles;
+  }
+
+  clearSubtitleContent() {
+    plPlayerController.subtitleContent.value = '';
+    plPlayerController.subtitles.value = [];
   }
 
   /// 发送弹幕

@@ -32,28 +32,14 @@ class _ExpandedSectionState extends State<ExpandedSection>
     _runExpandCheck();
   }
 
-  ///Setting up the animation
-  // void prepareAnimations() {
-  //   expandController = AnimationController(
-  //       vsync: this, duration: const Duration(milliseconds: 500));
-  //   animation = CurvedAnimation(
-  //     parent: expandController,
-  //     curve: Curves.fastOutSlowIn,
-  //   );
-  // }
-
   void prepareAnimations() {
     expandController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
     Animation<double> curve = CurvedAnimation(
       parent: expandController,
-      curve: Curves.fastOutSlowIn,
+      curve: Curves.linear,
     );
     animation = Tween(begin: widget.begin, end: widget.end).animate(curve);
-    //   animation = CurvedAnimation(
-    //     parent: expandController,
-    //     curve: Curves.fastOutSlowIn,
-    //   );
   }
 
   void _runExpandCheck() {
@@ -67,7 +53,9 @@ class _ExpandedSectionState extends State<ExpandedSection>
   @override
   void didUpdateWidget(ExpandedSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _runExpandCheck();
+    if (widget.expand != oldWidget.expand) {
+      _runExpandCheck();
+    }
   }
 
   @override

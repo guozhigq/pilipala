@@ -85,10 +85,9 @@ class VideoIntroController extends GetxController {
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
-      // Get.find<VideoDetailController>(tag: heroTag).tabs.value = [
-      //   '简介',
-      //   '评论 ${result['data']!.stat!.reply}'
-      // ];
+      final VideoDetailController videoDetailCtr =
+          Get.find<VideoDetailController>(tag: heroTag);
+      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
       // 获取到粉丝数再返回
       await queryUserStat();
     }

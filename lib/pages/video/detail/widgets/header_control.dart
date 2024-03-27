@@ -344,6 +344,56 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  /// 选择字幕
+  void showSubtitleDialog() async {
+    int tempThemeValue = widget.controller!.subTitleCode.value;
+    int len = widget.videoDetailCtr!.subtitles.length;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('选择字幕'),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
+            content: StatefulBuilder(builder: (context, StateSetter setState) {
+              return len == 0
+                  ? const SizedBox(
+                      height: 60,
+                      child: Center(
+                        child: Text('没有字幕'),
+                      ),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile(
+                          value: -1,
+                          title: const Text('关闭弹幕'),
+                          groupValue: tempThemeValue,
+                          onChanged: (value) {
+                            tempThemeValue = value!;
+                            widget.controller?.toggleSubtitle(value);
+                            Get.back();
+                          },
+                        ),
+                        ...widget.videoDetailCtr!.subtitles
+                            .map((e) => RadioListTile(
+                                  value: e.code,
+                                  title: Text(e.title),
+                                  groupValue: tempThemeValue,
+                                  onChanged: (value) {
+                                    tempThemeValue = value!;
+                                    widget.controller?.toggleSubtitle(value);
+                                    Get.back();
+                                  },
+                                ))
+                            .toList(),
+                      ],
+                    );
+            }),
+          );
+        });
+  }
+
   /// 选择倍速
   void showSetSpeedSheet() {
     final double currentSpeed = widget.controller!.playbackSpeed;
@@ -1115,6 +1165,31 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             SizedBox(width: buttonSpace),
           ],
+
+          /// 字幕
+          // SizedBox(
+          //   width: 34,
+          //   height: 34,
+          //   child: IconButton(
+          //     style: ButtonStyle(
+          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
+          //     ),
+          //     onPressed: () => showSubtitleDialog(),
+          //     icon: const Icon(
+          //       Icons.closed_caption_off,
+          //       size: 22,
+          //     ),
+          //   ),
+          // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.closed_caption_off,
+              size: 22,
+              color: Colors.white,
+            ),
+            fuc: () => showSubtitleDialog(),
+          ),
+          SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(
               width: 45,
