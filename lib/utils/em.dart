@@ -27,7 +27,8 @@ class Em {
             .replaceAll('&quot;', '"')
             .replaceAll('&apos;', "'")
             .replaceAll('&nbsp;', " ")
-            .replaceAll('&amp;', "&");
+            .replaceAll('&amp;', "&")
+            .replaceAll('&#x27;', "'");
         Map map = {'type': 'text', 'text': str};
         res.add(map);
       }
