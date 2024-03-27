@@ -19,21 +19,25 @@ class Em {
       return regCate(matchStr);
     }, onNonMatch: (String str) {
       if (str != '') {
-        str = str
-            .replaceAll('&lt;', '<')
-            .replaceAll('&gt;', '>')
-            .replaceAll('&#34;', '"')
-            .replaceAll('&#39;', "'")
-            .replaceAll('&quot;', '"')
-            .replaceAll('&apos;', "'")
-            .replaceAll('&nbsp;', " ")
-            .replaceAll('&amp;', "&")
-            .replaceAll('&#x27;', "'");
+        str = decodeHtmlEntities(str);
         Map map = {'type': 'text', 'text': str};
         res.add(map);
       }
       return str;
     });
     return res;
+  }
+
+  static String decodeHtmlEntities(String title) {
+    return title
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&#34;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&quot;', '"')
+        .replaceAll('&apos;', "'")
+        .replaceAll('&nbsp;', " ")
+        .replaceAll('&amp;', "&")
+        .replaceAll('&#x27;', "'");
   }
 }
