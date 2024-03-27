@@ -185,7 +185,7 @@ class HistoryItem extends StatelessWidget {
                                             ? '已看完'
                                             : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
                                         right: 6.0,
-                                        bottom: 6.0,
+                                        bottom: 8.0,
                                         type: 'gray',
                                       ),
                                     // 右上角
@@ -258,6 +258,24 @@ class HistoryItem extends StatelessWidget {
                               ),
                             ),
                           ),
+                          Positioned(
+                            left: 3,
+                            right: 3,
+                            bottom: 0,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft:
+                                    Radius.circular(StyleString.imgRadius.x),
+                                bottomRight:
+                                    Radius.circular(StyleString.imgRadius.x),
+                              ),
+                              child: LinearProgressIndicator(
+                                value: videoItem.progress == -1
+                                    ? 100
+                                    : videoItem.progress / videoItem.duration,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                       VideoContent(videoItem: videoItem, ctr: ctr)
