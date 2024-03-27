@@ -44,6 +44,7 @@ class MainController extends GetxController {
     if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
       getUnreadDynamic();
     }
+    setNavBarConfig();
   }
 
   void onBackPressed(BuildContext context) {
