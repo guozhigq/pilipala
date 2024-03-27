@@ -209,8 +209,6 @@ class Utils {
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
     int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
-
-    // 向下查找
     try {
       for (int number in numbers) {
         if (number < target) {
