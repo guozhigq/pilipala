@@ -208,14 +208,16 @@ class Utils {
 
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
-    late int closestNumber;
+    int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
     try {
       for (int number in numbers) {
-        int diff = (number - target).abs();
+        if (number < target) {
+          int diff = target - number; // 计算目标值与当前整数的差值
 
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestNumber = number;
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+          }
         }
       }
     } catch (_) {}
