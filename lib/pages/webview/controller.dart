@@ -131,13 +131,13 @@ class WebviewController extends GetxController {
         Get.back();
       } else {
         // 获取用户信息失败
-        SmartDialog.showToast(result.msg);
-        Clipboard.setData(ClipboardData(text: result.msg.toString()));
+        SmartDialog.showToast(result['msg']);
+        Clipboard.setData(ClipboardData(text: result['msg']));
       }
     } catch (e) {
       SmartDialog.showNotify(msg: e.toString(), notifyType: NotifyType.warning);
       content = content + e.toString();
+      Clipboard.setData(ClipboardData(text: content));
     }
-    Clipboard.setData(ClipboardData(text: content));
   }
 }

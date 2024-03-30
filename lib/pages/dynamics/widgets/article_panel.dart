@@ -34,25 +34,25 @@ Widget articlePanel(item, context, {floor = 1}) {
           ),
           const SizedBox(height: 8),
         ],
-        Text(
-          item.modules.moduleDynamic.major.opus.title,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 2),
-        if (item.modules.moduleDynamic.major.opus.summary.text !=
-            'undefined') ...[
-          Text(
-            item.modules.moduleDynamic.major.opus.summary.richTextNodes.first
-                .text,
-            maxLines: 4,
-            style: const TextStyle(height: 1.55),
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-        ],
+        // Text(
+        //   item.modules.moduleDynamic.major.opus.title,
+        //   style: Theme.of(context)
+        //       .textTheme
+        //       .titleMedium!
+        //       .copyWith(fontWeight: FontWeight.bold),
+        // ),
+        // const SizedBox(height: 2),
+        // if (item.modules.moduleDynamic.major.opus.summary.text !=
+        //     'undefined') ...[
+        //   Text(
+        //     item.modules.moduleDynamic.major.opus.summary.richTextNodes.first
+        //         .text,
+        //     maxLines: 4,
+        //     style: const TextStyle(height: 1.55),
+        //     overflow: TextOverflow.ellipsis,
+        //   ),
+        //   const SizedBox(height: 2),
+        // ],
         picWidget(item, context)
       ],
     ),

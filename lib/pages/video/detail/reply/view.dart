@@ -134,13 +134,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        _videoReplyController.currentPage = 0;
-        return await _videoReplyController.queryReplyList();
+        return await _videoReplyController.queryReplyList(type: 'init');
       },
       child: Stack(
         children: [
           CustomScrollView(
             controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(
@@ -148,34 +148,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    height: 45,
+                    height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.1)),
-                      ),
-                    ),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Obx(
-                          () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                              '共${_videoReplyController.count.value}条回复',
-                              key: ValueKey<int>(
-                                  _videoReplyController.count.value),
-                            ),
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
                           ),
                         ),
                         SizedBox(
@@ -184,10 +166,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
                             icon: const Icon(Icons.sort, size: 16),
-                            label: Obx(() => Text(
-                                  _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 13),
-                                )),
+                            label: Obx(
+                              () => Text(
+                                _videoReplyController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -329,8 +313,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
 class _MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   _MySliverPersistentHeaderDelegate({required this.child});
-  final double _minExtent = 45;
-  final double _maxExtent = 45;
+  final double _minExtent = 40;
+  final double _maxExtent = 40;
   final Widget child;
 
   @override

@@ -223,6 +223,10 @@
                     android:pathPattern="/mobile/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/mobile/video/.*" />
+                <data android:scheme="https" android:host="b23.tv"
+                    android:pathPattern="/*" />
+                <data android:scheme="https" android:host="space.bilibili.com"
+                    android:pathPattern="/*" />
 
             </intent-filter>
         </activity>
