@@ -8,7 +8,12 @@ import '../../../models/user/sub_folder.dart';
 
 class SubItem extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const SubItem({super.key, required this.subFolderItem});
+  final Function(SubFolderItemData) cancelSub;
+  const SubItem({
+    super.key,
+    required this.subFolderItem,
+    required this.cancelSub,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +56,10 @@ class SubItem extends StatelessWidget {
                       },
                     ),
                   ),
-                  VideoContent(subFolderItem: subFolderItem)
+                  VideoContent(
+                    subFolderItem: subFolderItem,
+                    cancelSub: cancelSub,
+                  )
                 ],
               ),
             );
@@ -64,7 +72,8 @@ class SubItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const VideoContent({super.key, required this.subFolderItem});
+  final Function(SubFolderItemData)? cancelSub;
+  const VideoContent({super.key, required this.subFolderItem, this.cancelSub});
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +109,24 @@ class VideoContent extends StatelessWidget {
                 color: Theme.of(context).colorScheme.outline,
               ),
             ),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  height: 35,
+                  width: 35,
+                  child: IconButton(
+                    onPressed: () => cancelSub?.call(subFolderItem),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.outline,
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    ),
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),
