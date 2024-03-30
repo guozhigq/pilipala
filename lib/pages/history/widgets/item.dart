@@ -258,24 +258,27 @@ class HistoryItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Positioned(
-                            left: 3,
-                            right: 3,
-                            bottom: 0,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft:
-                                    Radius.circular(StyleString.imgRadius.x),
-                                bottomRight:
-                                    Radius.circular(StyleString.imgRadius.x),
-                              ),
-                              child: LinearProgressIndicator(
-                                value: videoItem.progress == -1
-                                    ? 100
-                                    : videoItem.progress / videoItem.duration,
-                              ),
-                            ),
-                          )
+                          videoItem.progress != 0
+                              ? Positioned(
+                                  left: 3,
+                                  right: 3,
+                                  bottom: 0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(
+                                          StyleString.imgRadius.x),
+                                      bottomRight: Radius.circular(
+                                          StyleString.imgRadius.x),
+                                    ),
+                                    child: LinearProgressIndicator(
+                                      value: videoItem.progress == -1
+                                          ? 100
+                                          : videoItem.progress /
+                                              videoItem.duration,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox()
                         ],
                       ),
                       VideoContent(videoItem: videoItem, ctr: ctr)
