@@ -17,12 +17,16 @@ class ScrollAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     final videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
+    double scrollDistance = scrollVal;
+    if (scrollVal > videoHeight - kToolbarHeight) {
+      scrollDistance = videoHeight - kToolbarHeight;
+    }
     return Positioned(
-      top: -videoHeight + scrollVal + kToolbarHeight + 0.5,
+      top: -videoHeight + scrollDistance + kToolbarHeight + 0.5,
       left: 0,
       right: 0,
       child: Opacity(
-        opacity: scrollVal / (videoHeight - kToolbarHeight),
+        opacity: scrollDistance / (videoHeight - kToolbarHeight),
         child: Container(
           height: statusBarHeight + kToolbarHeight,
           color: Theme.of(context).colorScheme.background,

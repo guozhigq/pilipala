@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -211,6 +212,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      vdCtr.clearSubtitleContent();
     }
     setState(() => isShowing = false);
     super.didPushNext();
@@ -221,7 +223,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() => isShowing = true);
+      setState(() {
+        vdCtr.setSubtitleContent();
+        isShowing = true;
+      });
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
@@ -319,62 +324,77 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           ),
         ),
       ),
-      child: Row(
-        children: [
-          const SizedBox(width: 20),
-          Expanded(
-            child: TabBar(
-              controller: vdCtr.tabCtr,
-              dividerColor: Colors.transparent,
-              tabs: vdCtr.tabs.map((String name) => Tab(text: name)).toList(),
-            ),
-          ),
-          SizedBox(
-            width: 220,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    height: 32,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      ),
-                      onPressed: () => vdCtr.showShootDanmakuSheet(),
-                      child: const Text('发弹幕', style: TextStyle(fontSize: 12)),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  SizedBox(
-                    width: 34,
-                    height: 32,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      ),
-                      onPressed: () {
-                        plPlayerController?.isOpenDanmu.value =
-                            !(plPlayerController?.isOpenDanmu.value ?? false);
-                      },
-                      child: Obx(() => Text(
-                            '弹',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: (plPlayerController?.isOpenDanmu.value ??
-                                      false)
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.outline,
-                            ),
-                          )),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                ],
+      child: Material(
+        child: Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Obx(
+                () => TabBar(
+                  padding: EdgeInsets.zero,
+                  controller: vdCtr.tabCtr,
+                  labelStyle: const TextStyle(fontSize: 13),
+                  labelPadding:
+                      const EdgeInsets.symmetric(horizontal: 10.0), // 设置每个标签的宽度
+                  dividerColor: Colors.transparent,
+                  tabs: vdCtr.tabs
+                      .map(
+                        (String name) => Tab(text: name),
+                      )
+                      .toList(),
+                ),
               ),
             ),
-          ),
-        ],
+            Flexible(
+                flex: 1,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: 32,
+                        child: TextButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                          ),
+                          onPressed: () => vdCtr.showShootDanmakuSheet(),
+                          child:
+                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 38,
+                        height: 38,
+                        child: Obx(
+                          () => IconButton(
+                            onPressed: () {
+                              plPlayerController?.isOpenDanmu.value =
+                                  !(plPlayerController?.isOpenDanmu.value ??
+                                      false);
+                            },
+                            icon: !(plPlayerController?.isOpenDanmu.value ??
+                                    false)
+                                ? SvgPicture.asset(
+                                    'assets/images/video/danmu_close.svg',
+                                    // ignore: deprecated_member_use
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/images/video/danmu_open.svg',
+                                    // ignore: deprecated_member_use
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                    ],
+                  ),
+                )),
+          ],
+        ),
       ),
     );
 

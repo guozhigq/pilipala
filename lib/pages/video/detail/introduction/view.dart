@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,7 @@ import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../../../../http/user.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
@@ -137,6 +139,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String memberHeroTag;
   late bool enableAi;
   bool isProcessing = false;
+  RxBool isExpand = false.obs;
+  late ExpandableController _expandableCtr;
+
   void Function()? handleState(Future Function() action) {
     return isProcessing
         ? null
@@ -160,6 +165,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     follower = Utils.numFormat(videoIntroController.userStat['follower']);
     followStatus = videoIntroController.followStatus;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
+    _expandableCtr = ExpandableController(initialExpanded: false);
   }
 
   // 收藏
@@ -212,13 +218,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
-      builder: (BuildContext context) {
-        return IntroDetail(videoDetail: widget.videoDetail!);
-      },
-    );
+    isExpand.value = !(isExpand.value);
+    _expandableCtr.toggle();
   }
 
   // 用户主页
@@ -243,6 +244,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _expandableCtr.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
@@ -259,14 +266,34 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => showIntroDetail(),
-            child: Text(
-              widget.videoDetail!.title!,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            child: ExpandablePanel(
+              controller: _expandableCtr,
+              collapsed: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              expanded: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 4,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              theme: const ExpandableThemeData(
+                animationDuration: Duration(milliseconds: 300),
+                scrollAnimationDuration: Duration(milliseconds: 300),
+                crossFadePoint: 0,
+                fadeCurve: Curves.ease,
+                sizeCurve: Curves.linear,
+              ),
             ),
           ),
           Stack(
@@ -328,6 +355,20 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   ),
                 )
             ],
+          ),
+
+          /// 视频简介
+          ExpandablePanel(
+            controller: _expandableCtr,
+            collapsed: const SizedBox(height: 0),
+            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            theme: const ExpandableThemeData(
+              animationDuration: Duration(milliseconds: 300),
+              scrollAnimationDuration: Duration(milliseconds: 300),
+              crossFadePoint: 0,
+              fadeCurve: Curves.ease,
+              sizeCurve: Curves.linear,
+            ),
           ),
 
           /// 点赞收藏转发
@@ -438,6 +479,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         margin: const EdgeInsets.only(top: 6, bottom: 4),
         height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
+          physics: const NeverScrollableScrollPhysics(),
           primary: false,
           padding: EdgeInsets.zero,
           crossAxisCount: 5,
@@ -451,12 +493,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   selectStatus: videoIntroController.hasLike.value,
                   text: widget.videoDetail!.stat!.like!.toString()),
             ),
-            // ActionItem(
-            //     icon: const Icon(FontAwesomeIcons.clock),
-            //     onTap: () => videoIntroController.actionShareVideo(),
-            //     selectStatus: false,
-            //     loadingStatus: loadingStatus,
-            //     text: '稍后再看'),
             Obx(
               () => ActionItem(
                 icon: const Icon(FontAwesomeIcons.b),
@@ -477,10 +513,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ),
             ),
             ActionItem(
-              icon: const Icon(FontAwesomeIcons.comment),
-              onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+              icon: const Icon(FontAwesomeIcons.clock),
+              onTap: () async {
+                final res =
+                    await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
+                SmartDialog.showToast(res['msg']);
+              },
               selectStatus: false,
-              text: widget.videoDetail!.stat!.reply!.toString(),
+              text: '稍后看',
             ),
             ActionItem(
               icon: const Icon(FontAwesomeIcons.shareFromSquare),

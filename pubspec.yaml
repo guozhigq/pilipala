@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.21+1021
 
 environment:
-  sdk: ">=2.19.6 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,15 +36,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
   # 动态取色
-  dynamic_color: ^1.6.8
+  dynamic_color: ^1.7.0
 
   get: ^4.6.5
 
   # 网络
-  dio: ^5.3.3
+  dio: ^5.4.1
   cookie_jar: ^4.0.8
   dio_cookie_manager: ^3.1.1
-  connectivity_plus: ^4.0.1
+  connectivity_plus: ^6.0.1
   dio_http2_adapter: ^2.3.1+1
 
   # 图片
@@ -58,17 +58,17 @@ dependencies:
   hive_flutter: ^1.1.0
 
   # 设备信息
-  device_info_plus: ^9.0.2
+  device_info_plus: ^9.0.0
   # 权限
-  permission_handler: ^11.0.1
+  permission_handler: ^11.3.0
   # 分享
   share_plus: ^7.0.2
   # cookie 管理
   webview_cookie_manager: ^2.0.6
   # 浏览器
-  webview_flutter: ^4.2.2
+  webview_flutter: ^4.5.0
   # 解决sliver滑动不同步
-  extended_nested_scroll_view: ^6.1.2
+  extended_nested_scroll_view: ^6.2.1
   # 上拉加载
   loading_more_list: ^6.0.0
   # 下拉刷新
@@ -99,15 +99,15 @@ dependencies:
   wakelock_plus: ^1.1.1
   universal_platform: ^1.0.0+1
   # 进度条
-  audio_video_progress_bar: ^2.0.1
+  audio_video_progress_bar: ^2.0.2
   auto_orientation: ^2.3.1
   protobuf: ^3.0.0
-  animations: ^2.0.8
+  animations: ^2.0.11
 
   # 获取appx信息
   package_info_plus: ^4.1.0
   url_launcher: ^6.1.14
-  flutter_svg: ^2.0.7
+  flutter_svg: ^2.0.10+1
   # 防抖节流
   easy_debounce: ^2.0.3
   # 高帧率
@@ -137,11 +137,13 @@ dependencies:
   uuid: ^3.0.7
   scrollable_positioned_list: ^0.3.8
   nil: ^1.1.1
-  catcher_2: ^1.1.0
+  catcher_2: ^1.2.3
   logger: ^2.0.2+1
   path: 1.8.3
   # 电池优化
   disable_battery_optimization: ^1.1.1
+  # 展开/收起
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -159,7 +161,7 @@ dev_dependencies:
   #     url: https://github.com/nvi9/flutter_launcher_icons.git
   #     ref: e045d40
   hive_generator: ^2.0.0
-  build_runner: ^2.3.3
+  build_runner: ^2.4.8
 
 dependency_overrides:
   media_kit:
@@ -205,6 +207,7 @@ flutter:
     - assets/images/lv/
     - assets/images/logo/
     - assets/images/live/
+    - assets/images/video/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
