@@ -506,4 +506,6 @@ class Api {
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
 
+  /// 取消订阅
+  static const String cancelSub = '/x/v3/fav/season/unfav';
 }
