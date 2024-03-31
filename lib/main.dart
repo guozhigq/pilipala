@@ -34,6 +34,7 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     await setupServiceLocator();
+    clearLogs();
     Request();
     await Request.setCookie();
     RecommendFilter();
