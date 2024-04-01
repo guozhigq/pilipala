@@ -18,45 +18,32 @@ class MemberSeasonsPanel extends StatelessWidget {
       itemBuilder: (context, index) {
         MemberSeasonsList item = data!.seasonsList![index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12, right: 4),
+          padding: const EdgeInsets.only(bottom: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12, left: 4),
-                child: Row(
-                  children: [
-                    Text(
-                      item.meta!.name!,
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.titleSmall!,
-                    ),
-                    const SizedBox(width: 10),
-                    PBadge(
-                      stack: 'relative',
-                      size: 'small',
-                      text: item.meta!.total.toString(),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: 35,
-                      height: 35,
-                      child: IconButton(
-                        onPressed: () => Get.toNamed(
-                            '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}'),
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.zero),
-                        ),
-                        icon: const Icon(
-                          Icons.arrow_forward,
-                          size: 20,
-                        ),
-                      ),
-                    )
-                  ],
+              ListTile(
+                onTap: () => Get.toNamed(
+                    '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}'),
+                title: Text(
+                  item.meta!.name!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall!,
+                ),
+                dense: true,
+                leading: PBadge(
+                  stack: 'relative',
+                  size: 'small',
+                  text: item.meta!.total.toString(),
+                ),
+                trailing: const Icon(
+                  Icons.arrow_forward,
+                  size: 20,
                 ),
               ),
+              const SizedBox(height: 10),
               LayoutBuilder(
                 builder: (context, boxConstraints) {
                   return GridView.builder(
