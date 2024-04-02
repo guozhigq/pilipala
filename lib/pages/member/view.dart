@@ -281,8 +281,8 @@ class _MemberPageState extends State<MemberPage>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data!;
-            if (data['status']) {
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               return Obx(
                 () => Stack(
                   alignment: AlignmentDirectional.center,
@@ -302,7 +302,14 @@ class _MemberPageState extends State<MemberPage>
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _memberController.memberInfo.value
+                                                  .vip!.nicknameColor !=
+                                              null
+                                          ? Color(_memberController.memberInfo
+                                              .value.vip!.nicknameColor!)
+                                          : null),
                             )),
                             const SizedBox(width: 2),
                             if (_memberController.memberInfo.value.sex == '女')
