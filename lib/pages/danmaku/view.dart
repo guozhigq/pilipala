@@ -55,13 +55,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
         ..addStatusLister(playerListener)
         ..addPositionListener(videoPositionListen);
     }
-    playerController.isOpenDanmu.listen((p0) {
-      if (p0 && !_plDanmakuController.initiated) {
-        _plDanmakuController.initiate(
-            playerController.duration.value.inMilliseconds,
-            playerController.position.value.inMilliseconds);
-      }
-    });
+    danmakuStatusListen();
     blockTypes = playerController.blockTypes;
     showArea = playerController.showArea;
     opacityVal = playerController.opacityVal;
@@ -111,6 +105,20 @@ class _PlDanmakuState extends State<PlDanmaku> {
     }
   }
 
+  // 弹幕开关状态监听
+  void danmakuStatusListen() {
+    playerController.isOpenDanmu.listen((p0) {
+      if (p0 && !_plDanmakuController.initiated) {
+        _plDanmakuController.initiate(
+            playerController.duration.value.inMilliseconds,
+            playerController.position.value.inMilliseconds);
+      } else {
+        playerController.danmakuController!.pause();
+        playerController.danmakuController!.clear();
+      }
+    });
+  }
+
   @override
   void dispose() {
     playerController.removePositionListener(videoPositionListen);
@@ -122,28 +130,23 @@ class _PlDanmakuState extends State<PlDanmaku> {
     return LayoutBuilder(builder: (context, box) {
       // double initDuration = box.maxWidth / 12;
       return Obx(
-        () => AnimatedOpacity(
-          opacity: playerController.isOpenDanmu.value ? 1 : 0,
-          duration: const Duration(milliseconds: 100),
-          child: DanmakuView(
-            createdController: (DanmakuController e) async {
-              playerController.danmakuController = _controller = e;
-            },
-            option: DanmakuOption(
-              fontSize: 15 * fontSizeVal,
-              area: showArea,
-              opacity: opacityVal,
-              hideTop: blockTypes.contains(5),
-              hideScroll: blockTypes.contains(2),
-              hideBottom: blockTypes.contains(4),
-              duration:
-                  danmakuDurationVal / playerController.playbackSpeed,
-              strokeWidth: strokeWidth,
-              // initDuration /
-              //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
-            ),
-            statusChanged: (isPlaying) {},
+        () => DanmakuView(
+          createdController: (DanmakuController e) async {
+            playerController.danmakuController = _controller = e;
+          },
+          option: DanmakuOption(
+            fontSize: 15 * fontSizeVal,
+            area: showArea,
+            opacity: opacityVal,
+            hideTop: blockTypes.contains(5),
+            hideScroll: blockTypes.contains(2),
+            hideBottom: blockTypes.contains(4),
+            duration: danmakuDurationVal / playerController.playbackSpeed,
+            strokeWidth: strokeWidth,
+            // initDuration /
+            //     (danmakuSpeedVal * widget.playerController.playbackSpeed),
           ),
+          statusChanged: (isPlaying) {},
         ),
       );
     });
