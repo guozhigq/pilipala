@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import '../../common/widgets/http_error.dart';
 import '../dynamics/widgets/dynamic_panel.dart';
 
 class MemberDynamicsPage extends StatefulWidget {
@@ -52,7 +53,9 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('他的动态'),
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text('他的动态', style: Theme.of(context).textTheme.titleMedium),
       ),
       body: CustomScrollView(
         controller: _memberDynamicController.scrollController,
@@ -78,10 +81,16 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
                           : const SliverToBoxAdapter(),
                     );
                   } else {
-                    return const SliverToBoxAdapter();
+                    return HttpError(
+                      errMsg: snapshot.data['msg'],
+                      fn: () {},
+                    );
                   }
                 } else {
-                  return const SliverToBoxAdapter();
+                  return HttpError(
+                    errMsg: snapshot.data['msg'],
+                    fn: () {},
+                  );
                 }
               } else {
                 return const SliverToBoxAdapter();

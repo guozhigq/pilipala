@@ -6,11 +6,6 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class SeasonPanel extends StatefulWidget {
-  final UgcSeason ugcSeason;
-  final int? cid;
-  final double? sheetHeight;
-  final Function? changeFuc;
-
   const SeasonPanel({
     super.key,
     required this.ugcSeason,
@@ -18,6 +13,10 @@ class SeasonPanel extends StatefulWidget {
     this.sheetHeight,
     this.changeFuc,
   });
+  final UgcSeason ugcSeason;
+  final int? cid;
+  final double? sheetHeight;
+  final Function? changeFuc;
 
   @override
   State<SeasonPanel> createState() => _SeasonPanelState();
@@ -27,7 +26,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
   late List<EpisodeItem> episodes;
   late int cid;
   late int currentIndex;
-  String heroTag = Get.arguments['heroTag'];
+  final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   final ScrollController _scrollController = ScrollController();
   final ItemScrollController itemScrollController = ItemScrollController();
@@ -41,9 +40,9 @@ class _SeasonPanelState extends State<SeasonPanel> {
     /// 根据 cid 找到对应集，找到对应 episodes
     /// 有多个episodes时，只显示其中一个
     /// TODO 同时显示多个合集
-    List<SectionItem> sections = widget.ugcSeason.sections!;
+    final List<SectionItem> sections = widget.ugcSeason.sections!;
     for (int i = 0; i < sections.length; i++) {
-      List<EpisodeItem> episodesList = sections[i].episodes!;
+      final List<EpisodeItem> episodesList = sections[i].episodes!;
       for (int j = 0; j < episodesList.length; j++) {
         if (episodesList[j].cid == cid) {
           episodes = episodesList;
@@ -56,22 +55,21 @@ class _SeasonPanelState extends State<SeasonPanel> {
     // episodes = widget.ugcSeason.sections!
     //     .firstWhere((e) => e.seasonId == widget.ugcSeason.id)
     //     .episodes!;
-    currentIndex = episodes.indexWhere((e) => e.cid == cid);
-    _videoDetailController.cid.listen((p0) {
+    currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    _videoDetailController.cid.listen((int p0) {
       cid = p0;
       setState(() {});
-      currentIndex = episodes.indexWhere((e) => e.cid == cid);
+      currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     });
   }
 
-  void changeFucCall(item, i) async {
+  void changeFucCall(item, int i) async {
     await widget.changeFuc!(
       IdUtils.av2bv(item.aid),
       item.cid,
       item.aid,
     );
     currentIndex = i;
-    setState(() {});
     Get.back();
     setState(() {});
   }
@@ -82,9 +80,37 @@ class _SeasonPanelState extends State<SeasonPanel> {
     super.dispose();
   }
 
+  Widget buildEpisodeListItem(
+    EpisodeItem episode,
+    int index,
+    bool isCurrentIndex,
+  ) {
+    Color primary = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      onTap: () => changeFucCall(episode, index),
+      dense: false,
+      leading: isCurrentIndex
+          ? Image.asset(
+              'assets/images/live.gif',
+              color: primary,
+              height: 12,
+            )
+          : null,
+      title: Text(
+        episode.title!,
+        style: TextStyle(
+          fontSize: 14,
+          color: isCurrentIndex
+              ? primary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
+    return Builder(builder: (BuildContext context) {
       return Container(
         margin: const EdgeInsets.only(
           top: 8,
@@ -135,32 +161,23 @@ class _SeasonPanelState extends State<SeasonPanel> {
                         Expanded(
                           child: Material(
                             child: ScrollablePositionedList.builder(
-                              itemCount: episodes.length,
-                              itemBuilder: (context, index) => ListTile(
-                                onTap: () =>
-                                    changeFucCall(episodes[index], index),
-                                dense: false,
-                                leading: index == currentIndex
-                                    ? Image.asset(
-                                        'assets/images/live.gif',
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        height: 12,
+                              itemCount: episodes.length + 1,
+                              itemBuilder: (BuildContext context, int index) {
+                                bool isLastItem = index == episodes.length;
+                                bool isCurrentIndex = currentIndex == index;
+                                return isLastItem
+                                    ? SizedBox(
+                                        height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
+                                            20,
                                       )
-                                    : null,
-                                title: Text(
-                                  episodes[index].title!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: index == currentIndex
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                  ),
-                                ),
-                              ),
+                                    : buildEpisodeListItem(
+                                        episodes[index],
+                                        index,
+                                        isCurrentIndex,
+                                      );
+                              },
                               itemScrollController: itemScrollController,
                             ),
                           ),
@@ -174,7 +191,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
               child: Row(
-                children: [
+                children: <Widget>[
                   Expanded(
                     child: Text(
                       '合集：${widget.ugcSeason.title!}',

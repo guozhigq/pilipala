@@ -8,7 +8,7 @@ import 'package:pilipala/common/skeleton/video_reply.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/replyNew/index.dart';
+import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'controller.dart';
@@ -16,11 +16,13 @@ import 'widgets/reply_item.dart';
 
 class VideoReplyPanel extends StatefulWidget {
   final String? bvid;
+  final int? oid;
   final int rpid;
   final String? replyLevel;
 
   const VideoReplyPanel({
     this.bvid,
+    this.oid,
     this.rpid = 0,
     this.replyLevel,
     super.key,
@@ -48,16 +50,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   @override
   void initState() {
     super.initState();
-    int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
+    // int oid = widget.bvid != null ? IdUtils.bv2av(widget.bvid!) : 0;
     heroTag = Get.arguments['heroTag'];
     replyLevel = widget.replyLevel ?? '1';
     if (replyLevel == '2') {
       _videoReplyController = Get.put(
-          VideoReplyController(oid, widget.rpid.toString(), replyLevel),
+          VideoReplyController(widget.oid, widget.rpid.toString(), replyLevel),
           tag: widget.rpid.toString());
     } else {
-      _videoReplyController =
-          Get.put(VideoReplyController(oid, '', replyLevel), tag: heroTag);
+      _videoReplyController = Get.put(
+          VideoReplyController(widget.oid, '', replyLevel),
+          tag: heroTag);
     }
 
     fabAnimationCtr = AnimationController(
@@ -75,7 +78,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
+              () {
             _videoReplyController.onLoad();
           });
         }
@@ -107,10 +111,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   // 展示二级回复
   void replyReply(replyItem) {
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
-      videoDetailCtr.oid = replyItem.oid;
+      videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
       videoDetailCtr.showReplyReplyPanel();
@@ -130,13 +134,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        _videoReplyController.currentPage = 0;
-        return await _videoReplyController.queryReplyList();
+        return await _videoReplyController.queryReplyList(type: 'init');
       },
       child: Stack(
         children: [
           CustomScrollView(
             controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('评论'),
             slivers: <Widget>[
               SliverPersistentHeader(
@@ -144,34 +148,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    height: 45,
+                    height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.1)),
-                      ),
-                    ),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Obx(
-                          () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                              '共${_videoReplyController.count.value}条回复',
-                              key: ValueKey<int>(
-                                  _videoReplyController.count.value),
-                            ),
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
                           ),
                         ),
                         SizedBox(
@@ -180,10 +166,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
                             icon: const Icon(Icons.sort, size: 16),
-                            label: Obx(() => Text(
-                                  _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 13),
-                                )),
+                            label: Obx(
+                              () => Text(
+                                _videoReplyController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -193,7 +181,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
               ),
               FutureBuilder(
                 future: _futureBuilderFuture,
-                builder: (context, snapshot) {
+                builder: (BuildContext context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
                     if (data['status']) {
@@ -203,13 +191,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                 _videoReplyController.replyList.isEmpty
                             ? SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                    (context, index) {
+                                    (BuildContext context, index) {
                                   return const VideoReplySkeleton();
                                 }, childCount: 5),
                               )
                             : SliverList(
                                 delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
+                                  (BuildContext context, index) {
                                     double bottom =
                                         MediaQuery.of(context).padding.bottom;
                                     if (index ==
@@ -256,13 +244,19 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                       // 请求错误
                       return HttpError(
                         errMsg: data['msg'],
-                        fn: () => setState(() {}),
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _videoReplyController.queryReplyList();
+                          });
+                        },
                       );
                     }
                   } else {
                     // 骨架屏
                     return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
+                      delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, index) {
                         return const VideoReplySkeleton();
                       }, childCount: 5),
                     );
@@ -318,11 +312,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 }
 
 class _MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double _minExtent = 45;
-  final double _maxExtent = 45;
-  final Widget child;
-
   _MySliverPersistentHeaderDelegate({required this.child});
+  final double _minExtent = 40;
+  final double _maxExtent = 40;
+  final Widget child;
 
   @override
   Widget build(

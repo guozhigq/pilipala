@@ -7,8 +7,8 @@ import 'package:pilipala/utils/storage.dart';
 
 class BangumiController extends GetxController {
   final ScrollController scrollController = ScrollController();
-  RxList<BangumiListItemModel> bangumiList = [BangumiListItemModel()].obs;
-  RxList<BangumiListItemModel> bangumiFollowList = [BangumiListItemModel()].obs;
+  RxList<BangumiListItemModel> bangumiList = <BangumiListItemModel>[].obs;
+  RxList<BangumiListItemModel> bangumiFollowList = <BangumiListItemModel>[].obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
   Box userInfoCache = GStrorage.userInfo;

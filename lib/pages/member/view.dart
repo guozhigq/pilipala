@@ -41,7 +41,7 @@ class _MemberPageState extends State<MemberPage>
     _memberCoinsFuture = _memberController.getRecentCoinVideo();
     _extendNestCtr.addListener(
       () {
-        double offset = _extendNestCtr.position.pixels;
+        final double offset = _extendNestCtr.position.pixels;
         if (offset > 100) {
           appbarStream.add(true);
         } else {
@@ -67,7 +67,7 @@ class _MemberPageState extends State<MemberPage>
             title: StreamBuilder(
               stream: appbarStream.stream,
               initialData: false,
-              builder: (context, AsyncSnapshot snapshot) {
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
                   opacity: snapshot.data ? 1 : 0,
                   curve: Curves.easeOut,
@@ -105,7 +105,7 @@ class _MemberPageState extends State<MemberPage>
             actions: [
               IconButton(
                 onPressed: () => Get.toNamed(
-                    '/memberSearch?mid=${Get.parameters['mid']}&uname=${_memberController.memberInfo.value.name!}'),
+                    '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.name!}'),
                 icon: const Icon(Icons.search_outlined),
               ),
               PopupMenuButton(
@@ -281,8 +281,8 @@ class _MemberPageState extends State<MemberPage>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data!;
-            if (data['status']) {
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               return Obx(
                 () => Stack(
                   alignment: AlignmentDirectional.center,
@@ -302,7 +302,14 @@ class _MemberPageState extends State<MemberPage>
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _memberController.memberInfo.value
+                                                  .vip!.nicknameColor !=
+                                              null
+                                          ? Color(_memberController.memberInfo
+                                              .value.vip!.nicknameColor!)
+                                          : null),
                             )),
                             const SizedBox(width: 2),
                             if (_memberController.memberInfo.value.sex == '女')

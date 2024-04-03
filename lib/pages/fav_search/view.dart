@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
-import 'package:pilipala/pages/favDetail/widget/fav_video_card.dart';
+import 'package:pilipala/pages/fav_detail/widget/fav_video_card.dart';
 
 import 'controller.dart';
 
 class FavSearchPage extends StatefulWidget {
-  final int? sourceType;
-  final int? mediaId;
-  const FavSearchPage({super.key, this.sourceType, this.mediaId});
+  const FavSearchPage({super.key});
 
   @override
   State<FavSearchPage> createState() => _FavSearchPageState();
@@ -19,11 +17,12 @@ class FavSearchPage extends StatefulWidget {
 class _FavSearchPageState extends State<FavSearchPage> {
   final FavSearchController _favSearchCtr = Get.put(FavSearchController());
   late ScrollController scrollController;
+  late int searchType;
 
   @override
   void initState() {
     super.initState();
-
+    searchType = int.parse(Get.parameters['searchType']!);
     scrollController = _favSearchCtr.scrollController;
     scrollController.addListener(
       () {
@@ -100,7 +99,11 @@ class _FavSearchPageState extends State<FavSearchPage> {
                       } else {
                         return FavVideoCardH(
                           videoItem: _favSearchCtr.favList[index],
-                          callFn: () => null,
+                          searchType: searchType,
+                          callFn: () => searchType != 1
+                              ? _favSearchCtr
+                                  .onCancelFav(_favSearchCtr.favList[index].id!)
+                              : {},
                         );
                       }
                     },

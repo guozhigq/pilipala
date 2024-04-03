@@ -1,14 +1,15 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/http/api.dart';
-import 'package:pilipala/http/init.dart';
-import 'package:pilipala/models/model_hot_video_item.dart';
-import 'package:pilipala/models/user/fav_detail.dart';
-import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/models/user/history.dart';
-import 'package:pilipala/models/user/info.dart';
-import 'package:pilipala/models/user/stat.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../common/constants.dart';
+import '../models/model_hot_video_item.dart';
+import '../models/user/fav_detail.dart';
+import '../models/user/fav_folder.dart';
+import '../models/user/history.dart';
+import '../models/user/info.dart';
+import '../models/user/stat.dart';
+import '../models/user/sub_detail.dart';
+import '../models/user/sub_folder.dart';
+import 'api.dart';
+import 'init.dart';
 
 class UserHttp {
   static Future<dynamic> userStat({required int mid}) async {
@@ -302,6 +303,65 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 我的订阅
+  static Future userSubFolder({
+    required int mid,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userSubFolder, data: {
+      'up_mid': mid,
+      'ps': ps,
+      'pn': pn,
+      'platform': 'web',
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubFolderModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future userSubFolderDetail({
+    required int seasonId,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userSubFolderDetail, data: {
+      'season_id': seasonId,
+      'ps': ps,
+      'pn': pn,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SubDetailModelData.fromJson(res.data['data'])
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 取消订阅
+  static Future cancelSub({required int seasonId}) async {
+    var res = await Request().post(
+      Api.cancelSub,
+      queryParameters: {
+        'platform': 'web',
+        'season_id': seasonId,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

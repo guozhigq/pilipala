@@ -3,55 +3,61 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/pages/about/index.dart';
-import 'package:pilipala/pages/blacklist/index.dart';
-import 'package:pilipala/pages/dynamics/deatil/index.dart';
-import 'package:pilipala/pages/dynamics/index.dart';
-import 'package:pilipala/pages/fan/index.dart';
-import 'package:pilipala/pages/fav/index.dart';
-import 'package:pilipala/pages/favDetail/index.dart';
-import 'package:pilipala/pages/fav_search/index.dart';
-import 'package:pilipala/pages/follow/index.dart';
-import 'package:pilipala/pages/history/index.dart';
-import 'package:pilipala/pages/history_search/index.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/hot/index.dart';
-import 'package:pilipala/pages/html/index.dart';
-import 'package:pilipala/pages/later/index.dart';
-import 'package:pilipala/pages/liveRoom/view.dart';
-import 'package:pilipala/pages/login/index.dart';
-import 'package:pilipala/pages/member/index.dart';
-import 'package:pilipala/pages/member_archive/index.dart';
-import 'package:pilipala/pages/member_coin/index.dart';
-import 'package:pilipala/pages/member_dynamics/index.dart';
-import 'package:pilipala/pages/member_like/index.dart';
-import 'package:pilipala/pages/member_search/index.dart';
-import 'package:pilipala/pages/member_seasons/index.dart';
-import 'package:pilipala/pages/search/index.dart';
-import 'package:pilipala/pages/searchResult/index.dart';
-import 'package:pilipala/pages/setting/extra_setting.dart';
-import 'package:pilipala/pages/setting/pages/color_select.dart';
-import 'package:pilipala/pages/setting/pages/display_mode.dart';
-import 'package:pilipala/pages/setting/pages/font_size_select.dart';
-import 'package:pilipala/pages/setting/pages/play_speed_set.dart';
-import 'package:pilipala/pages/setting/play_setting.dart';
-import 'package:pilipala/pages/setting/privacy_setting.dart';
-import 'package:pilipala/pages/setting/style_setting.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
-import 'package:pilipala/pages/video/detail/replyReply/index.dart';
-import 'package:pilipala/pages/webview/index.dart';
-import 'package:pilipala/pages/setting/index.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/pages/whisper/index.dart';
-import 'package:pilipala/pages/whisperDetail/index.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/setting/pages/logs.dart';
 
-Box setting = GStrorage.setting;
-bool iosTransition =
-    setting.get(SettingBoxKey.iosTransition, defaultValue: false);
+import '../pages/about/index.dart';
+import '../pages/blacklist/index.dart';
+import '../pages/dynamics/detail/index.dart';
+import '../pages/dynamics/index.dart';
+import '../pages/fan/index.dart';
+import '../pages/fav/index.dart';
+import '../pages/fav_detail/index.dart';
+import '../pages/fav_search/index.dart';
+import '../pages/follow/index.dart';
+import '../pages/history/index.dart';
+import '../pages/history_search/index.dart';
+import '../pages/home/index.dart';
+import '../pages/hot/index.dart';
+import '../pages/html/index.dart';
+import '../pages/later/index.dart';
+import '../pages/live_room/view.dart';
+import '../pages/login/index.dart';
+import '../pages/media/index.dart';
+import '../pages/member/index.dart';
+import '../pages/member_archive/index.dart';
+import '../pages/member_coin/index.dart';
+import '../pages/member_dynamics/index.dart';
+import '../pages/member_like/index.dart';
+import '../pages/member_search/index.dart';
+import '../pages/member_seasons/index.dart';
+import '../pages/search/index.dart';
+import '../pages/search_result/index.dart';
+import '../pages/setting/extra_setting.dart';
+import '../pages/setting/index.dart';
+import '../pages/setting/pages/color_select.dart';
+import '../pages/setting/pages/display_mode.dart';
+import '../pages/setting/pages/font_size_select.dart';
+import '../pages/setting/pages/home_tabbar_set.dart';
+import '../pages/setting/pages/play_gesture_set.dart';
+import '../pages/setting/pages/play_speed_set.dart';
+import '../pages/setting/recommend_setting.dart';
+import '../pages/setting/play_setting.dart';
+import '../pages/setting/privacy_setting.dart';
+import '../pages/setting/style_setting.dart';
+import '../pages/subscription/index.dart';
+import '../pages/subscription_detail/index.dart';
+import '../pages/video/detail/index.dart';
+import '../pages/video/detail/reply_reply/index.dart';
+import '../pages/webview/index.dart';
+import '../pages/whisper/index.dart';
+import '../pages/whisper_detail/index.dart';
+import '../utils/storage.dart';
+
+Box<dynamic> setting = GStrorage.setting;
 
 class Routes {
-  static final List<GetPage> getPages = [
+  static final List<GetPage<dynamic>> getPages = [
     // 首页(推荐)
     CustomGetPage(name: '/', page: () => const HomePage()),
     // 热门
@@ -101,7 +107,9 @@ class Routes {
     // 二级回复
     CustomGetPage(
         name: '/replyReply', page: () => const VideoReplyReplyPanel()),
-
+    // 推荐设置
+    CustomGetPage(
+        name: '/recommendSetting', page: () => const RecommendSetting()),
     // 播放设置
     CustomGetPage(name: '/playSetting', page: () => const PlaySetting()),
     // 外观设置
@@ -113,6 +121,8 @@ class Routes {
     //
     CustomGetPage(name: '/blackListPage', page: () => const BlackListPage()),
     CustomGetPage(name: '/colorSetting', page: () => const ColorSelectPage()),
+    // 首页tabbar
+    CustomGetPage(name: '/tabbarSetting', page: () => const TabbarSetPage()),
     CustomGetPage(
         name: '/fontSizeSetting', page: () => const FontSizeSelectPage()),
     // 屏幕帧率
@@ -149,25 +159,32 @@ class Routes {
     // 用户专栏
     CustomGetPage(
         name: '/memberSeasons', page: () => const MemberSeasonsPage()),
+    // 日志
+    CustomGetPage(name: '/logs', page: () => const LogsPage()),
+    // 搜索关注
+    CustomGetPage(name: '/followSearch', page: () => const FollowSearchPage()),
+    // 订阅
+    CustomGetPage(name: '/subscription', page: () => const SubPage()),
+    // 订阅详情
+    CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
+    // 播放器手势
+    CustomGetPage(
+        name: '/playerGestureSet', page: () => const PlayGesturePage()),
   ];
 }
 
-class CustomGetPage extends GetPage {
-  bool? fullscreen = false;
-
+class CustomGetPage extends GetPage<dynamic> {
   CustomGetPage({
-    name,
-    page,
+    required super.name,
+    required super.page,
     this.fullscreen,
-    transitionDuration,
+    super.transitionDuration,
   }) : super(
-          name: name,
-          page: page,
           curve: Curves.linear,
-          transition: iosTransition ? Transition.cupertino : Transition.native,
+          transition: Transition.native,
           showCupertinoParallax: false,
           popGesture: false,
-          transitionDuration: transitionDuration,
           fullscreenDialog: fullscreen != null && fullscreen,
         );
+  bool? fullscreen = false;
 }

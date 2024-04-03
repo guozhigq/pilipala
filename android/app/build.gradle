@@ -58,11 +58,10 @@ android {
         applicationId "com.guozhigq.pilipala"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        // minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        minSdkVersion 19
+        minSdkVersion 21
         multiDexEnabled true
     }
 
@@ -94,4 +93,15 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+ext.abiCodes = ["x86_64": 1, "armeabi-v7a": 2, "arm64-v8a": 3]
+import com.android.build.OutputFile
+android.applicationVariants.all { variant ->
+  variant.outputs.each { output ->
+    def abiVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
+    if (abiVersionCode != null) {
+      output.versionCodeOverride = variant.versionCode * 10 + abiVersionCode
+    }
+  }
 }

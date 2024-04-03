@@ -67,9 +67,9 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="bilibili" android:host="forward" />
@@ -223,6 +223,10 @@
                     android:pathPattern="/mobile/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/mobile/video/.*" />
+                <data android:scheme="https" android:host="b23.tv"
+                    android:pathPattern="/*" />
+                <data android:scheme="https" android:host="space.bilibili.com"
+                    android:pathPattern="/*" />
 
             </intent-filter>
         </activity>

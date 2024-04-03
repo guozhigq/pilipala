@@ -1,78 +1,104 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/extension.dart';
+import 'package:pilipala/utils/global_data.dart';
+import '../../utils/storage.dart';
+import '../constants.dart';
 
-Box setting = GStrorage.setting;
+Box<dynamic> setting = GStrorage.setting;
 
 class NetworkImgLayer extends StatelessWidget {
-  final String? src;
-  final double? width;
-  final double? height;
-  final double? cacheW;
-  final double? cacheH;
-  final String? type;
-  final Duration? fadeOutDuration;
-  final Duration? fadeInDuration;
-  final int? quality;
-
   const NetworkImgLayer({
-    Key? key,
+    super.key,
     this.src,
     required this.width,
     required this.height,
-    this.cacheW,
-    this.cacheH,
     this.type,
     this.fadeOutDuration,
     this.fadeInDuration,
     // 图片质量 默认1%
     this.quality,
-  }) : super(key: key);
+    this.origAspectRatio,
+  });
+
+  final String? src;
+  final double width;
+  final double height;
+  final String? type;
+  final Duration? fadeOutDuration;
+  final Duration? fadeInDuration;
+  final int? quality;
+  final double? origAspectRatio;
 
   @override
   Widget build(BuildContext context) {
-    double pr = MediaQuery.of(context).devicePixelRatio;
-    int picQuality = setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
+    final int defaultImgQuality = GlobalData().imgQuality;
+    final String imageUrl =
+        '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
+    print(imageUrl);
+    int? memCacheWidth, memCacheHeight;
+    double aspectRatio = (width / height).toDouble();
 
-    // double pr = 2;
-    return src != ''
+    void setMemCacheSizes() {
+      if (aspectRatio > 1) {
+        memCacheHeight = height.cacheSize(context);
+      } else if (aspectRatio < 1) {
+        memCacheWidth = width.cacheSize(context);
+      } else {
+        if (origAspectRatio != null && origAspectRatio! > 1) {
+          memCacheWidth = width.cacheSize(context);
+        } else if (origAspectRatio != null && origAspectRatio! < 1) {
+          memCacheHeight = height.cacheSize(context);
+        } else {
+          memCacheWidth = width.cacheSize(context);
+          memCacheHeight = height.cacheSize(context);
+        }
+      }
+    }
+
+    setMemCacheSizes();
+
+    if (memCacheWidth == null && memCacheHeight == null) {
+      memCacheWidth = width.toInt();
+    }
+
+    return src != '' && src != null
         ? ClipRRect(
-            clipBehavior: Clip.hardEdge,
-            borderRadius: BorderRadius.circular(type == 'avatar'
-                ? 50
-                : type == 'emote'
-                    ? 0
-                    : StyleString.imgRadius.x),
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.circular(
+              type == 'avatar'
+                  ? 50
+                  : type == 'emote'
+                      ? 0
+                      : StyleString.imgRadius.x,
+            ),
             child: CachedNetworkImage(
-              imageUrl:
-                  '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? picQuality}q.webp',
-              width: width ?? double.infinity,
-              height: height ?? double.infinity,
-              alignment: Alignment.center,
-              maxWidthDiskCache: ((cacheW ?? width!) * pr).toInt(),
-              // maxHeightDiskCache: (cacheH ?? height!).toInt(),
-              memCacheWidth: ((cacheW ?? width!) * pr).toInt(),
-              // memCacheHeight: (cacheH ?? height!).toInt(),
+              imageUrl: imageUrl,
+              width: width,
+              height: height,
+              memCacheWidth: memCacheWidth,
+              memCacheHeight: memCacheHeight,
               fit: BoxFit.cover,
               fadeOutDuration:
-                  fadeOutDuration ?? const Duration(milliseconds: 200),
+                  fadeOutDuration ?? const Duration(milliseconds: 120),
               fadeInDuration:
-                  fadeInDuration ?? const Duration(milliseconds: 200),
-              // filterQuality: FilterQuality.high,
-              errorWidget: (context, url, error) => placeholder(context),
-              placeholder: (context, url) => placeholder(context),
+                  fadeInDuration ?? const Duration(milliseconds: 120),
+              filterQuality: FilterQuality.low,
+              errorWidget: (BuildContext context, String url, Object error) =>
+                  placeholder(context),
+              placeholder: (BuildContext context, String url) =>
+                  placeholder(context),
             ),
           )
         : placeholder(context);
   }
 
-  Widget placeholder(context) {
+  Widget placeholder(BuildContext context) {
     return Container(
-      width: width ?? double.infinity,
-      height: height ?? double.infinity,
-      clipBehavior: Clip.hardEdge,
+      width: width,
+      height: height,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(type == 'avatar'
@@ -81,14 +107,19 @@ class NetworkImgLayer extends StatelessWidget {
                 ? 0
                 : StyleString.imgRadius.x),
       ),
-      child: Center(
-          child: Image.asset(
-        type == 'avatar'
-            ? 'assets/images/noface.jpeg'
-            : 'assets/images/loading.png',
-        width: 300,
-        height: 300,
-      )),
+      child: type == 'bg'
+          ? const SizedBox()
+          : Center(
+              child: Image.asset(
+                type == 'avatar'
+                    ? 'assets/images/noface.jpeg'
+                    : 'assets/images/loading.png',
+                width: width,
+                height: height,
+                cacheWidth: width.cacheSize(context),
+                cacheHeight: height.cacheSize(context),
+              ),
+            ),
     );
   }
 }

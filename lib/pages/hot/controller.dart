@@ -7,7 +7,7 @@ class HotController extends GetxController {
   final ScrollController scrollController = ScrollController();
   final int _count = 20;
   int _currentPage = 1;
-  RxList<HotVideoItemModel> videoList = [HotVideoItemModel()].obs;
+  RxList<HotVideoItemModel> videoList = <HotVideoItemModel>[].obs;
   bool isLoadingMore = false;
   bool flag = false;
   OverlayEntry? popupDialog;

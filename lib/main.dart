@@ -16,11 +16,15 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
+import 'package:pilipala/services/disable_battery_opt.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
+import 'package:pilipala/utils/recommend_filter.dart';
+import 'package:catcher_2/catcher_2.dart';
+import './services/loggeer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +34,36 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     await setupServiceLocator();
-    runApp(const MyApp());
+    clearLogs();
+    Request();
+    await Request.setCookie();
+    RecommendFilter();
+
+    // 异常捕获 logo记录
+    final Catcher2Options debugConfig = Catcher2Options(
+      SilentReportMode(),
+      [
+        FileHandler(await getLogsPath()),
+        ConsoleHandler(
+          enableDeviceParameters: false,
+          enableApplicationParameters: false,
+        )
+      ],
+    );
+
+    final Catcher2Options releaseConfig = Catcher2Options(
+      SilentReportMode(),
+      [FileHandler(await getLogsPath())],
+    );
+
+    Catcher2(
+      debugConfig: debugConfig,
+      releaseConfig: releaseConfig,
+      runAppFunction: () {
+        runApp(const MyApp());
+      },
+    );
+
     // 小白条、导航栏沉浸
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -38,10 +71,9 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
       statusBarColor: Colors.transparent,
     ));
-    await Request.setCookie();
     Data.init();
-    GStrorage.lazyInit();
     PiliSchame.init();
+    DisableBatteryOpt();
   });
 }
 
@@ -112,6 +144,13 @@ class MyApp extends StatelessWidget {
                 ? darkColorScheme
                 : lightColorScheme,
             useMaterial3: true,
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: lightColorScheme.primary,
+              backgroundColor: lightColorScheme.secondaryContainer,
+              closeIconColor: lightColorScheme.secondary,
+              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
+              elevation: 20,
+            ),
             pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
                 TargetPlatform.android: ZoomPageTransitionsBuilder(
@@ -126,6 +165,13 @@ class MyApp extends StatelessWidget {
                 ? lightColorScheme
                 : darkColorScheme,
             useMaterial3: true,
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: darkColorScheme.primary,
+              backgroundColor: darkColorScheme.secondaryContainer,
+              closeIconColor: darkColorScheme.secondary,
+              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
+              elevation: 20,
+            ),
           ),
           localizationsDelegates: const [
             GlobalCupertinoLocalizations.delegate,
@@ -141,9 +187,8 @@ class MyApp extends StatelessWidget {
             return FlutterSmartDialog(
               toastBuilder: (String msg) => CustomToast(msg: msg),
               child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                    textScaleFactor:
-                        MediaQuery.of(context).textScaleFactor * textScale),
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
                 child: child!,
               ),
             );

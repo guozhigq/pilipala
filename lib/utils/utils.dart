@@ -9,29 +9,36 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get_utils/get_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/github/latest.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../http/index.dart';
+import '../models/github/latest.dart';
 
 class Utils {
+  static final Random random = Random();
+
   static Future<String> getCookiePath() async {
-    Directory tempDir = await getApplicationSupportDirectory();
-    String tempPath = "${tempDir.path}/.plpl/";
-    Directory dir = Directory(tempPath);
-    bool b = await dir.exists();
+    final Directory tempDir = await getApplicationSupportDirectory();
+    final String tempPath = "${tempDir.path}/.plpl/";
+    final Directory dir = Directory(tempPath);
+    final bool b = await dir.exists();
     if (!b) {
       dir.createSync(recursive: true);
     }
     return tempPath;
   }
 
-  static String numFormat(int number) {
-    String res = (number / 10000).toString();
+  static String numFormat(dynamic number) {
+    if (number == null) {
+      return '0';
+    }
+    if (number is String) {
+      return number;
+    }
+    final String res = (number / 10000).toString();
     if (int.parse(res.split('.')[0]) >= 1) {
-      return '${(number / 10000).toPrecision(1)}万';
+      return '${(number / 10000).toStringAsFixed(1)}万';
     } else {
       return number.toString();
     }
@@ -43,23 +50,49 @@ class Utils {
       return time;
     }
     if (time < 3600) {
-      int minute = time ~/ 60;
-      double res = time / 60;
+      if (time == 0) {
+        return '00:00';
+      }
+      final int minute = time ~/ 60;
+      final double res = time / 60;
       if (minute != res) {
         return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
       } else {
         return '$minute:00';
       }
     } else {
-      int hour = time ~/ 3600;
-      String hourStr = hour < 10 ? '0$hour' : hour.toString();
+      final int hour = time ~/ 3600;
+      final String hourStr = hour < 10 ? '0$hour' : hour.toString();
       var a = timeFormat(time - hour * 3600);
       return '$hourStr:$a';
     }
   }
 
+  // 完全相对时间显示
+  static String formatTimestampToRelativeTime(timeStamp) {
+    var difference = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000));
+
+    if (difference.inDays > 365) {
+      return '${difference.inDays ~/ 365}年前';
+    } else if (difference.inDays > 30) {
+      return '${difference.inDays ~/ 30}个月前';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}天前';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}小时前';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}分钟前';
+    } else {
+      return '刚刚';
+    }
+  }
+
   // 时间显示，刚刚，x分钟前
   static String dateFormat(timeStamp, {formatType = 'list'}) {
+    if (timeStamp == 0 || timeStamp == null || timeStamp == '') {
+      return '';
+    }
     // 当前时间
     int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     // 对比
@@ -76,6 +109,7 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
+    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {
@@ -155,7 +189,7 @@ class Utils {
   }
 
   static String makeHeroTag(v) {
-    return v.toString() + Random().nextInt(9999).toString();
+    return v.toString() + random.nextInt(9999).toString();
   }
 
   static int duration(String duration) {
@@ -174,14 +208,16 @@ class Utils {
 
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
-    late int closestNumber;
+    int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
     try {
       for (int number in numbers) {
-        int diff = (number - target).abs();
+        if (number < target) {
+          int diff = target - number; // 计算目标值与当前整数的差值
 
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestNumber = number;
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+          }
         }
       }
     } catch (_) {}
@@ -209,6 +245,10 @@ class Utils {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return false;
+    }
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
@@ -276,16 +316,18 @@ class Utils {
       // [arm64-v8a]
       String abi = androidInfo.supportedAbis.first;
       late String downloadUrl;
-      for (var i in data.assets) {
-        if (i.downloadUrl.contains(abi)) {
-          downloadUrl = i.downloadUrl;
+      if (data.assets.isNotEmpty) {
+        for (var i in data.assets) {
+          if (i.downloadUrl.contains(abi)) {
+            downloadUrl = i.downloadUrl;
+          }
         }
+        // 应用外下载
+        launchUrl(
+          Uri.parse(downloadUrl),
+          mode: LaunchMode.externalApplication,
+        );
       }
-      // 应用外下载
-      launchUrl(
-        Uri.parse(downloadUrl),
-        mode: LaunchMode.externalApplication,
-      );
     }
   }
 
@@ -312,5 +354,15 @@ class Utils {
     var md5String = md5Digest.toString(); // 获取MD5哈希值
 
     return md5String;
+  }
+
+  static List<int> generateRandomBytes(int minLength, int maxLength) {
+    return List<int>.generate(random.nextInt(maxLength - minLength + 1),
+        (_) => random.nextInt(0x60) + 0x20);
+  }
+
+  static String base64EncodeRandomString(int minLength, int maxLength) {
+    List<int> randomBytes = generateRandomBytes(minLength, maxLength);
+    return base64.encode(randomBytes);
   }
 }

@@ -1,13 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
+import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
 import 'controller.dart';
 import 'widgets/switch_item.dart';
 
@@ -20,7 +25,8 @@ class StyleSetting extends StatefulWidget {
 
 class _StyleSettingState extends State<StyleSetting> {
   final SettingController settingController = Get.put(SettingController());
-  final ColorSelectController colorSelectController = Get.put(ColorSelectController());
+  final ColorSelectController colorSelectController =
+      Get.put(ColorSelectController());
 
   Box setting = GStrorage.setting;
   late int picQuality;
@@ -77,12 +83,6 @@ class _StyleSettingState extends State<StyleSetting> {
             ),
           ),
           const SetSwitchItem(
-            title: 'iOS路由切换',
-            subTitle: 'iOS路由切换样式，需重启',
-            setKey: SettingBoxKey.iosTransition,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: 'MD3样式底栏',
             subTitle: '符合Material You设计规范的底栏',
             setKey: SettingBoxKey.enableMYBar,
@@ -102,14 +102,23 @@ class _StyleSettingState extends State<StyleSetting> {
             defaultVal: true,
             needReboot: true,
           ),
+          const SetSwitchItem(
+            title: '首页底栏背景渐变',
+            setKey: SettingBoxKey.enableGradientBg,
+            defaultVal: true,
+            needReboot: true,
+          ),
           ListTile(
             onTap: () async {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '自定义列数', value: defaultCustomRows, values: [1, 2, 3, 4, 5].map((e) {
-                    return {'title': '$e 列', 'value': e};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '自定义列数',
+                      value: defaultCustomRows,
+                      values: [1, 2, 3, 4, 5].map((e) {
+                        return {'title': '$e 列', 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -167,6 +176,8 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
+                              GlobalData().imgQuality = picQuality;
+                              SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),
                           )
@@ -192,19 +203,45 @@ class _StyleSettingState extends State<StyleSetting> {
           ListTile(
             dense: false,
             onTap: () async {
+              double? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SlideDialog<double>(
+                    title: 'Toast不透明度',
+                    value: settingController.toastOpacity.value,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                  );
+                },
+              );
+              if (result != null) {
+                settingController.toastOpacity.value = result;
+                SmartDialog.showToast('设置成功');
+                setting.put(SettingBoxKey.defaultToastOp, result);
+              }
+            },
+            title: Text('Toast不透明度', style: titleStyle),
+            subtitle: Text('自定义Toast不透明度', style: subTitleStyle),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () async {
               ThemeType? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<ThemeType>(title: '主题模式', value: _tempThemeValue, values: ThemeType.values.map((e) {
-                    return {'title': e.description, 'value': e};
-                  }).toList());
+                  return SelectDialog<ThemeType>(
+                      title: '主题模式',
+                      value: _tempThemeValue,
+                      values: ThemeType.values.map((e) {
+                        return {'title': e.description, 'value': e};
+                      }).toList());
                 },
               );
               if (result != null) {
                 _tempThemeValue = result;
                 settingController.themeType.value = result;
-                setting.put(
-                    SettingBoxKey.themeMode, result.code);
+                setting.put(SettingBoxKey.themeMode, result.code);
                 Get.forceAppUpdate();
               }
             },
@@ -215,16 +252,37 @@ class _StyleSettingState extends State<StyleSetting> {
           ),
           ListTile(
             dense: false,
+            onTap: () => settingController.setDynamicBadgeMode(context),
+            title: Text('动态未读标记', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前标记样式：${settingController.dynamicBadgeType.value.description}',
+                style: subTitleStyle)),
+          ),
+          ListTile(
+            dense: false,
             onTap: () => Get.toNamed('/colorSetting'),
             title: Text('应用主题', style: titleStyle),
             subtitle: Obx(() => Text(
-                '当前主题：${colorSelectController.type.value == 0 ? '动态取色': '指定颜色'}',
+                '当前主题：${colorSelectController.type.value == 0 ? '动态取色' : '指定颜色'}',
+                style: subTitleStyle)),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => settingController.seteDefaultHomePage(context),
+            title: Text('默认启动页', style: titleStyle),
+            subtitle: Obx(() => Text(
+                '当前启动页：${defaultNavigationBars.firstWhere((e) => e['id'] == settingController.defaultHomePage.value)['label']}',
                 style: subTitleStyle)),
           ),
           ListTile(
             dense: false,
             onTap: () => Get.toNamed('/fontSizeSetting'),
             title: Text('字体大小', style: titleStyle),
+          ),
+          ListTile(
+            dense: false,
+            onTap: () => Get.toNamed('/tabbarSetting'),
+            title: Text('首页tabbar', style: titleStyle),
           ),
           if (Platform.isAndroid)
             ListTile(

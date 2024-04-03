@@ -1,17 +1,29 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/common/widgets/stat/danmu.dart';
-import 'package:pilipala/common/widgets/stat/view.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
+import '../../http/search.dart';
+import '../../http/user.dart';
+import '../../http/video.dart';
+import '../../utils/utils.dart';
+import '../constants.dart';
+import 'badge.dart';
+import 'network_img_layer.dart';
+import 'stat/danmu.dart';
+import 'stat/view.dart';
 
 // 视频卡片 - 水平布局
 class VideoCardH extends StatelessWidget {
+  const VideoCardH({
+    super.key,
+    required this.videoItem,
+    this.longPress,
+    this.longPressEnd,
+    this.source = 'normal',
+    this.showOwner = true,
+    this.showView = true,
+    this.showDanmaku = true,
+    this.showPubdate = false,
+  });
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
   final Function()? longPress;
@@ -22,23 +34,15 @@ class VideoCardH extends StatelessWidget {
   final bool showDanmaku;
   final bool showPubdate;
 
-  const VideoCardH({
-    Key? key,
-    required this.videoItem,
-    this.longPress,
-    this.longPressEnd,
-    this.source = 'normal',
-    this.showOwner = true,
-    this.showView = true,
-    this.showDanmaku = true,
-    this.showPubdate = false,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    int aid = videoItem.aid;
-    String bvid = videoItem.bvid;
-    String heroTag = Utils.makeHeroTag(aid);
+    final int aid = videoItem.aid;
+    final String bvid = videoItem.bvid;
+    String type = 'video';
+    try {
+      type = videoItem.type;
+    } catch (_) {}
+    final String heroTag = Utils.makeHeroTag(aid);
     return GestureDetector(
       onLongPress: () {
         if (longPress != null) {
@@ -53,7 +57,11 @@ class VideoCardH extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           try {
-            int cid =
+            if (type == 'ketang') {
+              SmartDialog.showToast('课堂视频暂不支持播放');
+              return;
+            }
+            final int cid =
                 videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
             Get.toNamed('/video?bvid=$bvid&cid=$cid',
                 arguments: {'videoItem': videoItem, 'heroTag': heroTag});
@@ -65,11 +73,11 @@ class VideoCardH extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(
               StyleString.safeSpace, 5, StyleString.safeSpace, 5),
           child: LayoutBuilder(
-            builder: (context, boxConstraints) {
-              double width = (boxConstraints.maxWidth -
+            builder: (BuildContext context, BoxConstraints boxConstraints) {
+              final double width = (boxConstraints.maxWidth -
                       StyleString.cardSpace *
                           6 /
-                          MediaQuery.of(context).textScaleFactor) /
+                          MediaQuery.textScalerOf(context).scale(1.0)) /
                   2;
               return Container(
                 constraints: const BoxConstraints(minHeight: 88),
@@ -77,31 +85,38 @@ class VideoCardH extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     AspectRatio(
                       aspectRatio: StyleString.aspectRatio,
                       child: LayoutBuilder(
-                        builder: (context, boxConstraints) {
-                          double maxWidth = boxConstraints.maxWidth;
-                          double maxHeight = boxConstraints.maxHeight;
+                        builder: (BuildContext context,
+                            BoxConstraints boxConstraints) {
+                          final double maxWidth = boxConstraints.maxWidth;
+                          final double maxHeight = boxConstraints.maxHeight;
                           return Stack(
                             children: [
                               Hero(
                                 tag: heroTag,
                                 child: NetworkImgLayer(
-                                  src: videoItem.pic,
+                                  src: videoItem.pic as String,
                                   width: maxWidth,
                                   height: maxHeight,
                                 ),
                               ),
-                              PBadge(
-                                text: Utils.timeFormat(videoItem.duration!),
-                                top: null,
-                                right: 6.0,
-                                bottom: 6.0,
-                                left: null,
-                                type: 'gray',
-                              ),
+                              if (videoItem.duration != 0)
+                                PBadge(
+                                  text: Utils.timeFormat(videoItem.duration!),
+                                  right: 6.0,
+                                  bottom: 6.0,
+                                  type: 'gray',
+                                ),
+                              if (type != 'video')
+                                PBadge(
+                                  text: type,
+                                  left: 6.0,
+                                  bottom: 6.0,
+                                  type: 'primary',
+                                ),
                               // if (videoItem.rcmdReason != null &&
                               //     videoItem.rcmdReason.content != '')
                               //   pBadge(videoItem.rcmdReason.content, context,
@@ -159,7 +174,7 @@ class VideoContent extends StatelessWidget {
           children: [
             if (videoItem.title is String) ...[
               Text(
-                videoItem.title,
+                videoItem.title as String,
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
@@ -172,9 +187,9 @@ class VideoContent extends StatelessWidget {
                 maxLines: 2,
                 text: TextSpan(
                   children: [
-                    for (var i in videoItem.title) ...[
+                    for (final i in videoItem.title) ...[
                       TextSpan(
-                        text: i['text'],
+                        text: i['text'] as String,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
@@ -216,7 +231,7 @@ class VideoContent extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    videoItem.owner.name,
+                    videoItem.owner.name as String,
                     style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -230,14 +245,14 @@ class VideoContent extends StatelessWidget {
                 if (showView) ...[
                   StatView(
                     theme: 'gray',
-                    view: videoItem.stat.view,
+                    view: videoItem.stat.view as int,
                   ),
                   const SizedBox(width: 8),
                 ],
                 if (showDanmaku)
                   StatDanMu(
                     theme: 'gray',
-                    danmu: videoItem.stat.danmaku,
+                    danmu: videoItem.stat.danmaku as int,
                   ),
 
                 const Spacer(),
@@ -267,7 +282,6 @@ class VideoContent extends StatelessWidget {
                     height: 24,
                     child: PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
-                      tooltip: '稍后再看',
                       icon: Icon(
                         Icons.more_vert_outlined,
                         color: Theme.of(context).colorScheme.outline,
@@ -281,16 +295,70 @@ class VideoContent extends StatelessWidget {
                         PopupMenuItem<String>(
                           onTap: () async {
                             var res = await UserHttp.toViewLater(
-                                bvid: videoItem.bvid);
+                                bvid: videoItem.bvid as String);
                             SmartDialog.showToast(res['msg']);
                           },
                           value: 'pause',
-                          height: 35,
+                          height: 40,
                           child: const Row(
                             children: [
                               Icon(Icons.watch_later_outlined, size: 16),
                               SizedBox(width: 6),
                               Text('稍后再看', style: TextStyle(fontSize: 13))
+                            ],
+                          ),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem<String>(
+                          onTap: () async {
+                            SmartDialog.show(
+                              useSystem: true,
+                              animationType:
+                                  SmartAnimationType.centerFade_otherSlide,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('提示'),
+                                  content: Text(
+                                      '确定拉黑:${videoItem.owner.name}(${videoItem.owner.mid})?'
+                                      '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => SmartDialog.dismiss(),
+                                      child: Text(
+                                        '点错了',
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outline),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        var res = await VideoHttp.relationMod(
+                                          mid: videoItem.owner.mid,
+                                          act: 5,
+                                          reSrc: 11,
+                                        );
+                                        SmartDialog.dismiss();
+                                        SmartDialog.showToast(res['code'] == 0
+                                            ? '成功'
+                                            : res['msg']);
+                                      },
+                                      child: const Text('确认'),
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          value: 'pause',
+                          height: 40,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.block, size: 16),
+                              const SizedBox(width: 6),
+                              Text('拉黑：${videoItem.owner.name}',
+                                  style: const TextStyle(fontSize: 13))
                             ],
                           ),
                         ),

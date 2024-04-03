@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -87,7 +88,7 @@ Widget picWidget(item, context) {
               childAspectRatio: aspectRatio,
               children: list,
             ),
-            if (len == 1 && origAspectRatio < 0.4)
+            if (len == 1 && height > Get.size.height * 0.9)
               const PBadge(
                 text: '长图',
                 top: null,

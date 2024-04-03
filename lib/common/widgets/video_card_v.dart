@@ -1,17 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/common/widgets/stat/danmu.dart';
-import 'package:pilipala/common/widgets/stat/view.dart';
-import 'package:pilipala/http/dynamics.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/models/common/search_type.dart';
-import 'package:pilipala/utils/id_utils.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/common/widgets/network_img_layer.dart';
+import '../../models/model_rec_video_item.dart';
+import 'stat/danmu.dart';
+import 'stat/view.dart';
+import '../../http/dynamics.dart';
+import '../../http/search.dart';
+import '../../http/user.dart';
+import '../../http/video.dart';
+import '../../models/common/search_type.dart';
+import '../../utils/id_utils.dart';
+import '../../utils/utils.dart';
+import '../constants.dart';
+import 'badge.dart';
+import 'network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class VideoCardV extends StatelessWidget {
@@ -159,12 +161,12 @@ class VideoCardV extends StatelessWidget {
                           height: maxHeight,
                         ),
                       ),
-                      if (videoItem.duration != null)
+                      if (videoItem.duration > 0)
                         if (crossAxisCount == 1) ...[
                           PBadge(
                             bottom: 10,
                             right: 10,
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ] else ...[
                           PBadge(
@@ -172,7 +174,7 @@ class VideoCardV extends StatelessWidget {
                             right: 7,
                             size: 'small',
                             type: 'gray',
-                            text: videoItem.duration,
+                            text: Utils.timeFormat(videoItem.duration),
                           )
                         ],
                     ],
@@ -217,15 +219,10 @@ class VideoContent extends StatelessWidget {
                 ),
                 if (videoItem.goto == 'av' && crossAxisCount == 1) ...[
                   const SizedBox(width: 10),
-                  WatchLater(
+                  VideoPopupMenu(
                     size: 32,
                     iconSize: 18,
-                    callFn: () async {
-                      int aid = videoItem.param;
-                      var res =
-                          await UserHttp.toViewLater(bvid: IdUtils.av2bv(aid));
-                      SmartDialog.showToast(res['msg']);
-                    },
+                    videoItem: videoItem,
                   ),
                 ],
               ],
@@ -234,6 +231,7 @@ class VideoContent extends StatelessWidget {
               const SizedBox(height: 2),
               VideoStat(
                 videoItem: videoItem,
+                crossAxisCount: crossAxisCount,
               ),
             ],
             if (crossAxisCount == 1) const SizedBox(height: 4),
@@ -266,6 +264,14 @@ class VideoContent extends StatelessWidget {
                     fs: 9,
                   )
                 ],
+                if (videoItem.isFollowed == 1) ...[
+                  const PBadge(
+                    text: '已关注',
+                    stack: 'normal',
+                    size: 'small',
+                    type: 'color',
+                  )
+                ],
                 Expanded(
                   flex: crossAxisCount == 1 ? 0 : 1,
                   child: Text(
@@ -289,19 +295,15 @@ class VideoContent extends StatelessWidget {
                   ),
                   VideoStat(
                     videoItem: videoItem,
+                    crossAxisCount: crossAxisCount,
                   ),
                   const Spacer(),
                 ],
                 if (videoItem.goto == 'av' && crossAxisCount != 1) ...[
-                  WatchLater(
+                  VideoPopupMenu(
                     size: 24,
                     iconSize: 14,
-                    callFn: () async {
-                      int aid = videoItem.param;
-                      var res =
-                          await UserHttp.toViewLater(bvid: IdUtils.av2bv(aid));
-                      SmartDialog.showToast(res['msg']);
-                    },
+                    videoItem: videoItem,
                   ),
                 ] else ...[
                   const SizedBox(height: 24)
@@ -317,42 +319,55 @@ class VideoContent extends StatelessWidget {
 
 class VideoStat extends StatelessWidget {
   final dynamic videoItem;
+  final int crossAxisCount;
 
   const VideoStat({
     Key? key,
     required this.videoItem,
+    required this.crossAxisCount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 1,
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-          color: Theme.of(context).colorScheme.outline,
+    return Row(
+      children: [
+        StatView(
+          theme: 'gray',
+          view: videoItem.stat.view,
         ),
-        children: [
-          if (videoItem.stat.view != '-')
-            TextSpan(text: '${videoItem.stat.view}观看'),
-          if (videoItem.stat.danmu != '-')
-            TextSpan(text: ' • ${videoItem.stat.danmu}弹幕'),
-        ],
-      ),
+        const SizedBox(width: 8),
+        StatDanMu(
+          theme: 'gray',
+          danmu: videoItem.stat.danmu,
+        ),
+        if (videoItem is RecVideoItemModel) ...<Widget>[
+          crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
+          RichText(
+            maxLines: 1,
+            text: TextSpan(
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                text: Utils.formatTimestampToRelativeTime(videoItem.pubdate)),
+          ),
+          const SizedBox(width: 4),
+        ]
+      ],
     );
   }
 }
 
-class WatchLater extends StatelessWidget {
+class VideoPopupMenu extends StatelessWidget {
   final double? size;
   final double? iconSize;
-  final Function? callFn;
+  final dynamic videoItem;
 
-  const WatchLater({
+  const VideoPopupMenu({
     Key? key,
     required this.size,
     required this.iconSize,
-    this.callFn,
+    required this.videoItem,
   }) : super(key: key);
 
   @override
@@ -362,7 +377,6 @@ class WatchLater extends StatelessWidget {
       height: size,
       child: PopupMenuButton<String>(
         padding: EdgeInsets.zero,
-        tooltip: '稍后再看',
         icon: Icon(
           Icons.more_vert_outlined,
           color: Theme.of(context).colorScheme.outline,
@@ -373,14 +387,67 @@ class WatchLater extends StatelessWidget {
         onSelected: (String type) {},
         itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
           PopupMenuItem<String>(
-            onTap: () => callFn!(),
+            onTap: () async {
+              var res =
+                  await UserHttp.toViewLater(bvid: videoItem.bvid as String);
+              SmartDialog.showToast(res['msg']);
+            },
             value: 'pause',
-            height: 35,
+            height: 40,
             child: const Row(
               children: [
                 Icon(Icons.watch_later_outlined, size: 16),
                 SizedBox(width: 6),
                 Text('稍后再看', style: TextStyle(fontSize: 13))
+              ],
+            ),
+          ),
+          const PopupMenuDivider(),
+          PopupMenuItem<String>(
+            onTap: () async {
+              SmartDialog.show(
+                useSystem: true,
+                animationType: SmartAnimationType.centerFade_otherSlide,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('提示'),
+                    content: Text(
+                        '确定拉黑:${videoItem.owner.name}(${videoItem.owner.mid})?'
+                        '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => SmartDialog.dismiss(),
+                        child: Text(
+                          '点错了',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.outline),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          var res = await VideoHttp.relationMod(
+                            mid: videoItem.owner.mid,
+                            act: 5,
+                            reSrc: 11,
+                          );
+                          SmartDialog.dismiss();
+                          SmartDialog.showToast(res['msg'] ?? '成功');
+                        },
+                        child: const Text('确认'),
+                      )
+                    ],
+                  );
+                },
+              );
+            },
+            value: 'pause',
+            height: 40,
+            child: Row(
+              children: [
+                const Icon(Icons.block, size: 16),
+                const SizedBox(width: 6),
+                Text('拉黑：${videoItem.owner.name}',
+                    style: const TextStyle(fontSize: 13))
               ],
             ),
           ),

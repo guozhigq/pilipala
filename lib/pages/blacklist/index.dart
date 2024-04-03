@@ -70,7 +70,7 @@ class _BlackListPageState extends State<BlackListPage> {
         onRefresh: () async => await _blackListController.queryBlacklist(),
         child: FutureBuilder(
           future: _futureBuilderFuture,
-          builder: (context, snapshot) {
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               var data = snapshot.data;
               if (data['status']) {
@@ -139,7 +139,7 @@ class BlackListController extends GetxController {
   int currentPage = 1;
   int pageSize = 50;
   RxInt total = 0.obs;
-  RxList<BlackListItem> blackList = [BlackListItem()].obs;
+  RxList<BlackListItem> blackList = <BlackListItem>[].obs;
 
   Future queryBlacklist({type = 'init'}) async {
     if (type == 'init') {

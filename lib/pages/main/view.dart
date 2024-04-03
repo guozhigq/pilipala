@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/dynamic_badge_mode.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -21,15 +23,10 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   final HomeController _homeController = Get.put(HomeController());
+  final RankController _rankController = Get.put(RankController());
   final DynamicsController _dynamicController = Get.put(DynamicsController());
   final MediaController _mediaController = Get.put(MediaController());
 
-  PageController? _pageController;
-
-  late AnimationController? _animationController;
-  late Animation<double>? _fadeAnimation;
-  late Animation<double>? _slideAnimation;
-  int selectedIndex = 0;
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
   late bool enableMYBar;
@@ -37,32 +34,15 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      reverseDuration: const Duration(milliseconds: 0),
-      value: 1,
-      vsync: this,
-    );
-    _fadeAnimation =
-        Tween<double>(begin: 0.8, end: 1.0).animate(_animationController!);
-    _slideAnimation =
-        Tween(begin: 0.8, end: 1.0).animate(_animationController!);
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
-    _pageController = PageController(initialPage: selectedIndex);
+    _mainController.pageController =
+        PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
   }
 
   void setIndex(int value) async {
     feedBack();
-    if (selectedIndex != value) {
-      selectedIndex = value;
-      _animationController!.reverse().then((_) {
-        selectedIndex = value;
-        _animationController!.forward();
-      });
-      setState(() {});
-    }
-    _pageController!.jumpToPage(value);
+    _mainController.pageController.jumpToPage(value);
     var currentPage = _mainController.pages[value];
     if (currentPage is HomePage) {
       if (_homeController.flag) {
@@ -79,6 +59,21 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _homeController.flag = false;
     }
 
+    if (currentPage is RankPage) {
+      if (_rankController.flag) {
+        // 单击返回顶部 双击并刷新
+        if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
+          _rankController.onRefresh();
+        } else {
+          _rankController.animateToTop();
+        }
+        _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
+      }
+      _rankController.flag = true;
+    } else {
+      _rankController.flag = false;
+    }
+
     if (currentPage is DynamicsPage) {
       if (_dynamicController.flag) {
         // 单击返回顶部 双击并刷新
@@ -90,6 +85,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
       _dynamicController.flag = true;
+      _mainController.clearUnread();
     } else {
       _dynamicController.flag = false;
     }
@@ -110,38 +106,26 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     Box localCache = GStrorage.localCache;
     double statusBarHeight = MediaQuery.of(context).padding.top;
-    double sheetHeight = MediaQuery.of(context).size.height -
+    double sheetHeight = MediaQuery.sizeOf(context).height -
         MediaQuery.of(context).padding.top -
-        MediaQuery.of(context).size.width * 9 / 16;
+        MediaQuery.sizeOf(context).width * 9 / 16;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
     return PopScope(
-      onPopInvoked: (bool status) => _mainController.onBackPressed(context),
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        _mainController.onBackPressed(context);
+      },
       child: Scaffold(
         extendBody: true,
-        body: FadeTransition(
-          opacity: _fadeAnimation!,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.5),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(
-                parent: _slideAnimation!,
-                curve: Curves.fastOutSlowIn,
-                reverseCurve: Curves.linear,
-              ),
-            ),
-            child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _pageController,
-              onPageChanged: (index) {
-                selectedIndex = index;
-                setState(() {});
-              },
-              children: _mainController.pages,
-            ),
-          ),
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _mainController.pageController,
+          onPageChanged: (index) {
+            _mainController.selectedIndex = index;
+            setState(() {});
+          },
+          children: _mainController.pages,
         ),
         bottomNavigationBar: StreamBuilder(
           stream: _mainController.hideTabBar
@@ -153,36 +137,68 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               curve: Curves.easeInOutCubicEmphasized,
               duration: const Duration(milliseconds: 500),
               offset: Offset(0, snapshot.data ? 0 : 1),
-              child: enableMYBar
-                  ? NavigationBar(
-                      onDestinationSelected: (value) => setIndex(value),
-                      selectedIndex: selectedIndex,
-                      destinations: <Widget>[
-                        ..._mainController.navigationBars.map((e) {
-                          return NavigationDestination(
-                            icon: e['icon'],
-                            selectedIcon: e['selectIcon'],
-                            label: e['label'],
-                          );
-                        }).toList(),
-                      ],
-                    )
-                  : BottomNavigationBar(
-                      currentIndex: selectedIndex,
-                      onTap: (value) => setIndex(value),
-                      iconSize: 16,
-                      selectedFontSize: 12,
-                      unselectedFontSize: 12,
-                      items: [
-                        ..._mainController.navigationBars.map((e) {
-                          return BottomNavigationBarItem(
-                            icon: e['icon'],
-                            activeIcon: e['selectIcon'],
-                            label: e['label'],
-                          );
-                        }).toList(),
-                      ],
-                    ),
+              child: Obx(
+                () => enableMYBar
+                    ? NavigationBar(
+                        onDestinationSelected: (value) => setIndex(value),
+                        selectedIndex: _mainController.selectedIndex,
+                        destinations: <Widget>[
+                          ..._mainController.navigationBars.map((e) {
+                            return NavigationDestination(
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
+                                              DynamicBadgeMode.number
+                                          ? Text(e['count'].toString())
+                                          : null,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
+                                              DynamicBadgeMode.hidden &&
+                                          e['count'] > 0,
+                                  child: e['icon'],
+                                ),
+                              ),
+                              selectedIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      )
+                    : BottomNavigationBar(
+                        currentIndex: _mainController.selectedIndex,
+                        onTap: (value) => setIndex(value),
+                        iconSize: 16,
+                        selectedFontSize: 12,
+                        unselectedFontSize: 12,
+                        items: [
+                          ..._mainController.navigationBars.map((e) {
+                            return BottomNavigationBarItem(
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
+                                              DynamicBadgeMode.number
+                                          ? Text(e['count'].toString())
+                                          : null,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
+                                              DynamicBadgeMode.hidden &&
+                                          e['count'] > 0,
+                                  child: e['icon'],
+                                ),
+                              ),
+                              activeIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      ),
+              ),
             );
           },
         ),

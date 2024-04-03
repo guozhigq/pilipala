@@ -24,7 +24,7 @@ class RecVideoItemModelAdapter extends TypeAdapter<RecVideoItemModel> {
       uri: fields[4] as String?,
       pic: fields[5] as String?,
       title: fields[6] as String?,
-      duration: fields[7] as String?,
+      duration: fields[7] as int?,
       pubdate: fields[8] as int?,
       owner: fields[9] as Owner?,
       stat: fields[10] as Stat?,

@@ -4,11 +4,6 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 
 class PagesPanel extends StatefulWidget {
-  final List<Part> pages;
-  final int? cid;
-  final double? sheetHeight;
-  final Function? changeFuc;
-
   const PagesPanel({
     super.key,
     required this.pages,
@@ -16,6 +11,10 @@ class PagesPanel extends StatefulWidget {
     this.sheetHeight,
     this.changeFuc,
   });
+  final List<Part> pages;
+  final int? cid;
+  final double? sheetHeight;
+  final Function? changeFuc;
 
   @override
   State<PagesPanel> createState() => _PagesPanelState();
@@ -25,7 +24,7 @@ class _PagesPanelState extends State<PagesPanel> {
   late List<Part> episodes;
   late int cid;
   late int currentIndex;
-  String heroTag = Get.arguments['heroTag'];
+  final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   final ScrollController _scrollController = ScrollController();
 
@@ -35,11 +34,11 @@ class _PagesPanelState extends State<PagesPanel> {
     cid = widget.cid!;
     episodes = widget.pages;
     _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
-    currentIndex = episodes.indexWhere((e) => e.cid == cid);
-    _videoDetailController.cid.listen((p0) {
+    currentIndex = episodes.indexWhere((Part e) => e.cid == cid);
+    _videoDetailController.cid.listen((int p0) {
       cid = p0;
       setState(() {});
-      currentIndex = episodes.indexWhere((e) => e.cid == cid);
+      currentIndex = episodes.indexWhere((Part e) => e.cid == cid);
     });
   }
 
@@ -57,10 +56,41 @@ class _PagesPanelState extends State<PagesPanel> {
     super.dispose();
   }
 
+  Widget buildEpisodeListItem(
+    Part episode,
+    int index,
+    bool isCurrentIndex,
+  ) {
+    Color primary = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      onTap: () {
+        changeFucCall(episode, index);
+        Get.back();
+      },
+      dense: false,
+      leading: isCurrentIndex
+          ? Image.asset(
+              'assets/images/live.gif',
+              color: primary,
+              height: 12,
+            )
+          : null,
+      title: Text(
+        episode.pagePart!,
+        style: TextStyle(
+          fontSize: 14,
+          color: isCurrentIndex
+              ? primary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 2),
           child: Row(
@@ -132,38 +162,25 @@ class _PagesPanelState extends State<PagesPanel> {
                                   child: Material(
                                     child: ListView.builder(
                                       controller: _scrollController,
-                                      itemCount: episodes.length,
-                                      itemBuilder: (context, index) {
-                                        return ListTile(
-                                          onTap: () {
-                                            changeFucCall(
-                                                episodes[index], index);
-                                            Get.back();
-                                          },
-                                          dense: false,
-                                          leading: index == currentIndex
-                                              ? Image.asset(
-                                                  'assets/images/live.gif',
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  height: 12,
-                                                )
-                                              : null,
-                                          title: Text(
-                                            episodes[index].pagePart!,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: index == currentIndex
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .primary
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                            ),
-                                          ),
-                                        );
+                                      itemCount: episodes.length + 1,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        bool isLastItem =
+                                            index == episodes.length;
+                                        bool isCurrentIndex =
+                                            currentIndex == index;
+                                        return isLastItem
+                                            ? SizedBox(
+                                                height: MediaQuery.of(context)
+                                                        .padding
+                                                        .bottom +
+                                                    20,
+                                              )
+                                            : buildEpisodeListItem(
+                                                episodes[index],
+                                                index,
+                                                isCurrentIndex,
+                                              );
                                       },
                                     ),
                                   ),
@@ -191,7 +208,8 @@ class _PagesPanelState extends State<PagesPanel> {
             scrollDirection: Axis.horizontal,
             itemCount: widget.pages.length,
             itemExtent: 150,
-            itemBuilder: ((context, i) {
+            itemBuilder: (BuildContext context, int i) {
+              bool isCurrentIndex = currentIndex == i;
               return Container(
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
@@ -205,8 +223,8 @@ class _PagesPanelState extends State<PagesPanel> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),
                       child: Row(
-                        children: [
-                          if (i == currentIndex) ...[
+                        children: <Widget>[
+                          if (isCurrentIndex) ...<Widget>[
                             Image.asset(
                               'assets/images/live.gif',
                               color: Theme.of(context).colorScheme.primary,
@@ -220,7 +238,7 @@ class _PagesPanelState extends State<PagesPanel> {
                             maxLines: 1,
                             style: TextStyle(
                                 fontSize: 13,
-                                color: i == currentIndex
+                                color: isCurrentIndex
                                     ? Theme.of(context).colorScheme.primary
                                     : Theme.of(context).colorScheme.onSurface),
                             overflow: TextOverflow.ellipsis,
@@ -231,7 +249,7 @@ class _PagesPanelState extends State<PagesPanel> {
                   ),
                 ),
               );
-            }),
+            },
           ),
         )
       ],

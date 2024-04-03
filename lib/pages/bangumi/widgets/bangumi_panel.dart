@@ -8,18 +8,20 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class BangumiPanel extends StatefulWidget {
-  final List<EpisodeItem> pages;
-  final int? cid;
-  final double? sheetHeight;
-  final Function? changeFuc;
-
   const BangumiPanel({
     super.key,
     required this.pages,
     this.cid,
     this.sheetHeight,
     this.changeFuc,
+    this.bangumiDetail,
   });
+
+  final List<EpisodeItem> pages;
+  final int? cid;
+  final double? sheetHeight;
+  final Function? changeFuc;
+  final BangumiInfoModel? bangumiDetail;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -50,10 +52,10 @@ class _BangumiPanelState extends State<BangumiPanel> {
     }
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
 
-    videoDetailCtr.cid.listen((p0) {
+    videoDetailCtr.cid.listen((int p0) {
       cid = p0;
       setState(() {});
-      currentIndex = widget.pages.indexWhere((e) => e.cid == cid);
+      currentIndex = widget.pages.indexWhere((EpisodeItem e) => e.cid == cid);
       scrollToIndex();
     });
   }
@@ -63,6 +65,47 @@ class _BangumiPanelState extends State<BangumiPanel> {
     listViewScrollCtr.dispose();
     listViewScrollCtr_2.dispose();
     super.dispose();
+  }
+
+  Widget buildPageListItem(
+    EpisodeItem page,
+    int index,
+    bool isCurrentIndex,
+  ) {
+    Color primary = Theme.of(context).colorScheme.primary;
+    return ListTile(
+      onTap: () {
+        Get.back();
+        setState(() {
+          changeFucCall(page, index);
+        });
+      },
+      dense: false,
+      leading: isCurrentIndex
+          ? Image.asset(
+              'assets/images/live.gif',
+              color: primary,
+              height: 12,
+            )
+          : null,
+      title: Text(
+        '第${page.title}话  ${page.longTitle!}',
+        style: TextStyle(
+          fontSize: 14,
+          color: isCurrentIndex
+              ? primary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+      trailing: page.badge != null
+          ? Text(
+              page.badge!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
+          : const SizedBox(),
+    );
   }
 
   void showBangumiPanel() {
@@ -105,37 +148,22 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   Expanded(
                     child: Material(
                       child: ScrollablePositionedList.builder(
-                        itemCount: widget.pages.length,
-                        itemBuilder: (context, index) => ListTile(
-                          onTap: () {
-                            setState(() {
-                              changeFucCall(widget.pages[index], index);
-                            });
-                          },
-                          dense: false,
-                          leading: index == currentIndex
-                              ? Image.asset(
-                                  'assets/images/live.gif',
-                                  color: Theme.of(context).colorScheme.primary,
-                                  height: 12,
+                        itemCount: widget.pages.length + 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          bool isLastItem = index == widget.pages.length;
+                          bool isCurrentIndex = currentIndex == index;
+                          return isLastItem
+                              ? SizedBox(
+                                  height:
+                                      MediaQuery.of(context).padding.bottom +
+                                          20,
                                 )
-                              : null,
-                          title: Text(
-                            '第${index + 1}话  ${widget.pages[index].longTitle!}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: index == currentIndex
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          trailing: widget.pages[index].badge != null
-                              ? Image.asset(
-                                  'assets/images/big-vip.png',
-                                  height: 20,
-                                )
-                              : const SizedBox(),
-                        ),
+                              : buildPageListItem(
+                                  widget.pages[index],
+                                  index,
+                                  isCurrentIndex,
+                                );
+                        },
                         itemScrollController: itemScrollController,
                       ),
                     ),
@@ -150,7 +178,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
   }
 
   void changeFucCall(item, i) async {
-    if (item.badge != null && vipStatus != 1) {
+    if (item.badge != null && item.badge == '会员' && vipStatus != 1) {
       SmartDialog.showToast('需要大会员');
       return;
     }
@@ -177,11 +205,11 @@ class _BangumiPanelState extends State<BangumiPanel> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 6),
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('合集 '),
+              const Text('选集 '),
               Expanded(
                 child: Text(
                   ' 正在播放：${widget.pages[currentIndex].longTitle}',
@@ -201,7 +229,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
                   ),
                   onPressed: () => showBangumiPanel(),
                   child: Text(
-                    '全${widget.pages.length}话',
+                    '${widget.bangumiDetail!.newEp!['desc']}',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
@@ -212,78 +240,79 @@ class _BangumiPanelState extends State<BangumiPanel> {
         SizedBox(
           height: 60,
           child: ListView.builder(
-              controller: listViewScrollCtr,
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.pages.length,
-              itemExtent: 150,
-              itemBuilder: ((context, i) {
-                return Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Material(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    borderRadius: BorderRadius.circular(6),
-                    clipBehavior: Clip.hardEdge,
-                    child: InkWell(
-                      onTap: () => changeFucCall(widget.pages[i], i),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                if (i == currentIndex) ...[
-                                  Image.asset(
-                                    'assets/images/live.png',
+            controller: listViewScrollCtr,
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.pages.length,
+            itemExtent: 150,
+            itemBuilder: (BuildContext context, int i) {
+              return Container(
+                width: 150,
+                margin: const EdgeInsets.only(right: 10),
+                child: Material(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  borderRadius: BorderRadius.circular(6),
+                  clipBehavior: Clip.hardEdge,
+                  child: InkWell(
+                    onTap: () => changeFucCall(widget.pages[i], i),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              if (i == currentIndex) ...<Widget>[
+                                Image.asset(
+                                  'assets/images/live.png',
+                                  color: Theme.of(context).colorScheme.primary,
+                                  height: 12,
+                                ),
+                                const SizedBox(width: 6)
+                              ],
+                              Text(
+                                '第${i + 1}话',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: i == currentIndex
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                              ),
+                              const SizedBox(width: 2),
+                              if (widget.pages[i].badge != null) ...[
+                                const Spacer(),
+                                Text(
+                                  widget.pages[i].badge!,
+                                  style: TextStyle(
+                                    fontSize: 12,
                                     color:
                                         Theme.of(context).colorScheme.primary,
-                                    height: 12,
                                   ),
-                                  const SizedBox(width: 6)
-                                ],
-                                Text(
-                                  '第${i + 1}话',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: i == currentIndex
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
                                 ),
-                                const SizedBox(width: 2),
-                                if (widget.pages[i].badge != null) ...[
-                                  Image.asset(
-                                    'assets/images/big-vip.png',
-                                    height: 16,
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              widget.pages[i].longTitle!,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: i == currentIndex
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
-                        ),
+                              ]
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            widget.pages[i].longTitle!,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: i == currentIndex
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurface),
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                );
-              })),
+                ),
+              );
+            },
+          ),
         )
       ],
     );

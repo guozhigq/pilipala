@@ -7,6 +7,10 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
+import '../../models/common/dynamic_badge_mode.dart';
+import '../../models/common/nav_bar_config.dart';
+import '../main/index.dart';
+import 'widgets/select_dialog.dart';
 
 class SettingController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
@@ -15,9 +19,12 @@ class SettingController extends GetxController {
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
+  RxDouble toastOpacity = (1.0).obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   var userInfo;
+  Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
+  RxInt defaultHomePage = 0.obs;
 
   @override
   void onInit() {
@@ -26,10 +33,17 @@ class SettingController extends GetxController {
     userLogin.value = userInfo != null;
     feedBackEnable.value =
         setting.get(SettingBoxKey.feedBackEnable, defaultValue: false);
+    toastOpacity.value =
+        setting.get(SettingBoxKey.defaultToastOp, defaultValue: 1.0);
     picQuality.value =
         setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10);
     themeType.value = ThemeType.values[setting.get(SettingBoxKey.themeMode,
         defaultValue: ThemeType.system.code)];
+    dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
+        SettingBoxKey.dynamicBadgeMode,
+        defaultValue: DynamicBadgeMode.number.code)];
+    defaultHomePage.value =
+        setting.get(SettingBoxKey.defaultHomePage, defaultValue: 0);
   }
 
   loginOut() async {
@@ -72,5 +86,52 @@ class SettingController extends GetxController {
     feedBack();
     feedBackEnable.value = !feedBackEnable.value;
     setting.put(SettingBoxKey.feedBackEnable, feedBackEnable.value);
+  }
+
+  // 设置动态未读标记
+  setDynamicBadgeMode(BuildContext context) async {
+    DynamicBadgeMode? result = await showDialog(
+      context: context,
+      builder: (context) {
+        return SelectDialog<DynamicBadgeMode>(
+          title: '动态未读标记',
+          value: dynamicBadgeType.value,
+          values: DynamicBadgeMode.values.map((e) {
+            return {'title': e.description, 'value': e};
+          }).toList(),
+        );
+      },
+    );
+    if (result != null) {
+      dynamicBadgeType.value = result;
+      setting.put(SettingBoxKey.dynamicBadgeMode, result.code);
+      MainController mainController = Get.put(MainController());
+      mainController.dynamicBadgeType.value =
+          DynamicBadgeMode.values[result.code];
+      if (mainController.dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+        mainController.getUnreadDynamic();
+      }
+      SmartDialog.showToast('设置成功');
+    }
+  }
+
+  // 设置默认启动页
+  seteDefaultHomePage(BuildContext context) async {
+    int? result = await showDialog(
+      context: context,
+      builder: (context) {
+        return SelectDialog<int>(
+            title: '首页启动页',
+            value: defaultHomePage.value,
+            values: defaultNavigationBars.map((e) {
+              return {'title': e['label'], 'value': e['id']};
+            }).toList());
+      },
+    );
+    if (result != null) {
+      defaultHomePage.value = result;
+      setting.put(SettingBoxKey.defaultHomePage, result);
+      SmartDialog.showToast('设置成功，重启生效');
+    }
   }
 }

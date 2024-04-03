@@ -22,20 +22,27 @@ class HttpError extends StatelessWidget {
               "assets/images/error.svg",
               height: 200,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Text(
               errMsg ?? '请求异常',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleSmall,
             ),
-            const SizedBox(height: 30),
-            OutlinedButton.icon(
+            const SizedBox(height: 20),
+            FilledButton.tonal(
               onPressed: () {
                 fn!();
               },
-              icon: const Icon(Icons.arrow_forward_outlined, size: 20),
-              label: Text(btnText ?? '点击重试'),
-            )
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith((states) {
+                  return Theme.of(context).colorScheme.primary.withAlpha(20);
+                }),
+              ),
+              child: Text(
+                btnText ?? '点击重试',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
+            ),
           ],
         ),
       ),

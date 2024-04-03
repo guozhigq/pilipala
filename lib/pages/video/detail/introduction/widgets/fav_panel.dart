@@ -6,15 +6,15 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
-  final dynamic ctr;
   const FavPanel({super.key, this.ctr});
+  final dynamic ctr;
 
   @override
   State<FavPanel> createState() => _FavPanelState();
 }
 
 class _FavPanelState extends State<FavPanel> {
-  Box localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStrorage.localCache;
   late double sheetHeight;
   late Future _futureBuilderFuture;
 
@@ -45,7 +45,7 @@ class _FavPanelState extends State<FavPanel> {
             child: Material(
               child: FutureBuilder(
                 future: _futureBuilderFuture,
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {
@@ -109,7 +109,7 @@ class _FavPanelState extends State<FavPanel> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
+              children: <Widget>[
                 TextButton(
                   onPressed: () => Get.back(),
                   style: TextButton.styleFrom(

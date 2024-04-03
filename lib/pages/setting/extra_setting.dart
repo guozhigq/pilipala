@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../home/index.dart';
 import 'widgets/switch_item.dart';
 
 class ExtraSetting extends StatefulWidget {
@@ -23,6 +25,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
   late dynamic enableSystemProxy;
   late String defaultSystemProxyHost;
   late String defaultSystemProxyPort;
+  bool userLogin = false;
 
   @override
   void initState() {
@@ -30,6 +33,10 @@ class _ExtraSettingState extends State<ExtraSetting> {
     // 默认优先显示最新评论
     defaultReplySort =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
+    if (defaultReplySort == 2) {
+      setting.put(SettingBoxKey.replySortType, 0);
+      defaultReplySort = 0;
+    }
     // 优先展示全部动态 all
     defaultDynamicType =
         setting.get(SettingBoxKey.defaultDynamicType, defaultValue: 0);
@@ -133,24 +140,20 @@ class _ExtraSettingState extends State<ExtraSetting> {
       ),
       body: ListView(
         children: [
-          SetSwitchItem(
+          const SetSwitchItem(
             title: '大家都在搜',
             subTitle: '是否展示「大家都在搜」',
             setKey: SettingBoxKey.enableHotKey,
             defaultVal: true,
-            callFn: (val) => {SmartDialog.showToast('下次启动时生效')},
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '搜索默认词',
             subTitle: '是否展示搜索框默认词',
             setKey: SettingBoxKey.enableSearchWord,
             defaultVal: true,
-          ),
-          const SetSwitchItem(
-            title: '推荐动态',
-            subTitle: '是否在推荐内容中展示动态',
-            setKey: SettingBoxKey.enableRcmdDynamic,
-            defaultVal: true,
+            callFn: (val) {
+              Get.find<HomeController>().defaultSearch.value = '';
+            },
           ),
           const SetSwitchItem(
             title: '快速收藏',
@@ -165,15 +168,15 @@ class _ExtraSettingState extends State<ExtraSetting> {
             defaultVal: false,
           ),
           const SetSwitchItem(
-            title: '首页推荐刷新',
-            subTitle: '下拉刷新时保留上次内容',
-            setKey: SettingBoxKey.enableSaveLastData,
-            defaultVal: false,
-          ),
-          const SetSwitchItem(
             title: '启用ai总结',
             subTitle: '视频详情页开启ai总结',
             setKey: SettingBoxKey.enableAi,
+            defaultVal: true,
+          ),
+          const SetSwitchItem(
+            title: '相关视频推荐',
+            subTitle: '视频详情页推荐相关视频',
+            setKey: SettingBoxKey.enableRelatedVideo,
             defaultVal: true,
           ),
           ListTile(
@@ -187,9 +190,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '评论展示', value: defaultReplySort, values: ReplySortType.values.map((e) {
-                    return {'title': e.titles, 'value': e.index};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '评论展示',
+                      value: defaultReplySort,
+                      values: ReplySortType.values.map((e) {
+                        return {'title': e.titles, 'value': e.index};
+                      }).toList());
                 },
               );
               if (result != null) {
@@ -210,9 +216,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
               int? result = await showDialog(
                 context: context,
                 builder: (context) {
-                  return SelectDialog<int>(title: '动态展示', value: defaultDynamicType, values: DynamicsType.values.map((e) {
-                    return {'title': e.labels, 'value': e.index};
-                  }).toList());
+                  return SelectDialog<int>(
+                      title: '动态展示',
+                      value: defaultDynamicType,
+                      values: DynamicsType.values.map((e) {
+                        return {'title': e.labels, 'value': e.index};
+                      }).toList());
                 },
               );
               if (result != null) {

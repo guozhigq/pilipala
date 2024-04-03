@@ -1,6 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:pilipala/http/index.dart';
+import 'index.dart';
 
 class HtmlHttp {
   // article
@@ -15,7 +15,7 @@ class HtmlHttp {
       Match match = regex.firstMatch(response.data)!;
       String matchedString = match.group(0)!;
       response = await Request().get(
-        'https:$matchedString' + '/',
+        'https:$matchedString/',
         extra: {'ua': 'pc'},
       );
     }
@@ -40,9 +40,13 @@ class HtmlHttp {
       //
       String opusContent =
           opusDetail.querySelector('.opus-module-content')!.innerHtml;
-      String test = opusDetail
-          .querySelector('.horizontal-scroll-album__pic__img')!
-          .innerHtml;
+      String? test;
+      try {
+        test = opusDetail
+            .querySelector('.horizontal-scroll-album__pic__img')!
+            .innerHtml;
+      } catch (_) {}
+
       String commentId = opusDetail
           .querySelector('.bili-comment-container')!
           .className
@@ -54,7 +58,7 @@ class HtmlHttp {
         'avatar': avatar,
         'uname': uname,
         'updateTime': updateTime,
-        'content': test + opusContent,
+        'content': (test ?? '') + opusContent,
         'commentId': int.parse(commentId)
       };
     } catch (err) {

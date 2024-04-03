@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
-
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/login/index.dart';
-import 'package:pilipala/utils/login.dart';
 import 'package:uuid/uuid.dart';
+import '../models/login/index.dart';
+import '../utils/login.dart';
+import 'index.dart';
 
 class LoginHttp {
   static Future queryCaptcha() async {

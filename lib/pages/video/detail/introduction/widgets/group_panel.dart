@@ -17,7 +17,7 @@ class GroupPanel extends StatefulWidget {
 }
 
 class _GroupPanelState extends State<GroupPanel> {
-  Box localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStrorage.localCache;
   late double sheetHeight;
   late Future _futureBuilderFuture;
   late List<MemberTagItemModel> tagsList;
@@ -33,17 +33,20 @@ class _GroupPanelState extends State<GroupPanel> {
   void onSave() async {
     feedBack();
     // 是否有选中的 有选中的带id，没选使用默认0
-    bool anyHasChecked = tagsList.any((e) => e.checked == true);
+    final bool anyHasChecked =
+        tagsList.any((MemberTagItemModel e) => e.checked == true);
     late String tagids;
     if (anyHasChecked) {
-      List checkedList = tagsList.where((e) => e.checked == true).toList();
-      List<int> tagidList = checkedList.map<int>((e) => e.tagid).toList();
+      final List<MemberTagItemModel> checkedList =
+          tagsList.where((MemberTagItemModel e) => e.checked == true).toList();
+      final List<int> tagidList =
+          checkedList.map<int>((e) => e.tagid!).toList();
       tagids = tagidList.join(',');
     } else {
       tagids = '0';
     }
     // 保存
-    var res = await MemberHttp.addUsers(widget.mid, tagids);
+    final res = await MemberHttp.addUsers(widget.mid, tagids);
     SmartDialog.showToast(res['msg']);
     if (res['status']) {
       Get.back();
@@ -56,7 +59,7 @@ class _GroupPanelState extends State<GroupPanel> {
       height: sheetHeight,
       color: Theme.of(context).colorScheme.background,
       child: Column(
-        children: [
+        children: <Widget>[
           AppBar(
             centerTitle: false,
             elevation: 0,
@@ -70,7 +73,7 @@ class _GroupPanelState extends State<GroupPanel> {
             child: Material(
               child: FutureBuilder(
                 future: _futureBuilderFuture,
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Map data = snapshot.data as Map;
                     if (data['status']) {

@@ -1,5 +1,7 @@
 // 内容
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/pages/preview/index.dart';
@@ -43,11 +45,20 @@ class _ContentState extends State<Content> {
     if (len == 1) {
       OpusPicsModel pictureItem = pics.first;
       picList.add(pictureItem.url!);
-      spanChilds.add(const TextSpan(text: '\n'));
+
+      /// 图片上方的空白间隔
+      // spanChilds.add(const TextSpan(text: '\n'));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
+              double maxWidth = box.maxWidth.truncateToDouble();
+              double maxHeight = box.maxWidth * 0.6; // 设置最大高度
+              double height = maxWidth *
+                  0.5 *
+                  (pictureItem.height != null && pictureItem.width != null
+                      ? pictureItem.height! / pictureItem.width!
+                      : 1);
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -58,18 +69,29 @@ class _ContentState extends State<Content> {
                     },
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: NetworkImgLayer(
-                    src: pictureItem.url,
+                child: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    constraints: BoxConstraints(maxHeight: maxHeight),
                     width: box.maxWidth / 2,
-                    height: box.maxWidth *
-                        0.5 *
-                        (pictureItem.height != null && pictureItem.width != null
-                            ? pictureItem.height! / pictureItem.width!
-                            : 1),
-                  ),
-                ),
+                    height: height,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: pictureItem.url,
+                            width: maxWidth / 2,
+                            height: height,
+                          ),
+                        ),
+                        height > Get.size.height * 0.9
+                            ? const PBadge(
+                                text: '长图',
+                                right: 8,
+                                bottom: 8,
+                              )
+                            : const SizedBox(),
+                      ],
+                    )),
               );
             },
           ),
@@ -83,6 +105,7 @@ class _ContentState extends State<Content> {
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
+              double maxWidth = box.maxWidth.truncateToDouble();
               return GestureDetector(
                 onTap: () {
                   showDialog(
@@ -95,8 +118,10 @@ class _ContentState extends State<Content> {
                 },
                 child: NetworkImgLayer(
                   src: pics[i].url,
-                  width: box.maxWidth,
-                  height: box.maxWidth,
+                  width: maxWidth,
+                  height: maxWidth,
+                  origAspectRatio:
+                      pics[i].width!.toInt() / pics[i].height!.toInt(),
                 ),
               );
             },
@@ -107,7 +132,7 @@ class _ContentState extends State<Content> {
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth;
+              double maxWidth = box.maxWidth.truncateToDouble();
               double crossCount = len < 3 ? 2 : 3;
               double height = maxWidth /
                       crossCount *

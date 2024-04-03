@@ -1,17 +1,21 @@
 // ignore_for_file: avoid_print
+import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:async';
-import 'package:dio/dio.dart';
+import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:dio_http2_adapter/dio_http2_adapter.dart';
-import 'package:hive/hive.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/http/constants.dart';
-import 'package:pilipala/http/interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+// import 'package:dio_http2_adapter/dio_http2_adapter.dart';
+import 'package:hive/hive.dart';
+import 'package:pilipala/utils/id_utils.dart';
+import '../utils/storage.dart';
+import '../utils/utils.dart';
+import 'api.dart';
+import 'constants.dart';
+import 'interceptor.dart';
 
 class Request {
   static final Request _instance = Request._internal();
@@ -20,25 +24,26 @@ class Request {
   factory Request() => _instance;
   Box setting = GStrorage.setting;
   static Box localCache = GStrorage.localCache;
-  late dynamic enableSystemProxy;
+  late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
+  static final RegExp spmPrefixExp = RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
 
   /// 设置cookie
   static setCookie() async {
     Box userInfoCache = GStrorage.userInfo;
-    var cookiePath = await Utils.getCookiePath();
-    var cookieJar = PersistCookieJar(
+    final String cookiePath = await Utils.getCookiePath();
+    final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
       storage: FileStorage(cookiePath),
     );
     cookieManager = CookieManager(cookieJar);
     dio.interceptors.add(cookieManager);
-    var cookie = await cookieManager.cookieJar
+    final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    var userInfo = userInfoCache.get('userInfoCache');
+    final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
-      var cookie2 = await cookieManager.cookieJar
+      final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
       if (cookie2.isEmpty) {
         try {
@@ -50,22 +55,22 @@ class Request {
     }
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
 
-    if (cookie.isEmpty) {
-      try {
-        await Request().get(HttpString.baseUrl);
-      } catch (e) {
-        log("setCookie, ${e.toString()}");
-      }
+    try {
+      await buvidActivate();
+    } catch (e) {
+      log("setCookie, ${e.toString()}");
     }
-    var cookieString =
-        cookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+
+    final String cookieString = cookie
+        .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
+        .join('; ');
     dio.options.headers['cookie'] = cookieString;
   }
 
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
-    var cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.baseApiUrl));
+    List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
     String token = '';
     if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
@@ -73,15 +78,43 @@ class Request {
     return token;
   }
 
-  static setOptionsHeaders(userInfo, status) {
+  static setOptionsHeaders(userInfo, bool status) {
     if (status) {
       dio.options.headers['x-bili-mid'] = userInfo.mid.toString();
+      dio.options.headers['x-bili-aurora-eid'] =
+          IdUtils.genAuroraEid(userInfo.mid);
     }
     dio.options.headers['env'] = 'prod';
     dio.options.headers['app-key'] = 'android64';
-    dio.options.headers['x-bili-aurora-eid'] = 'UlMFQVcABlAH';
     dio.options.headers['x-bili-aurora-zone'] = 'sh001';
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
+  }
+
+  static Future buvidActivate() async {
+    var html = await Request().get(Api.dynamicSpmPrefix);
+    String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
+    Random rand = Random();
+    String rand_png_end = base64.encode(
+      List<int>.generate(32, (_) => rand.nextInt(256)) +
+      List<int>.filled(4, 0) +
+      [73, 69, 78, 68] +
+      List<int>.generate(4, (_) => rand.nextInt(256))
+    );
+
+    String jsonData = json.encode({
+      '3064': 1,
+      '39c8': '${spmPrefix}.fp.risk',
+      '3c43': {
+        'adca': 'Linux',
+        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
+      },
+    });
+
+    await Request().post(
+      Api.activateBuvidApi,
+      data: {'payload': jsonData},
+      options: Options(contentType: 'application/json')
+    );
   }
 
   /*
@@ -91,7 +124,7 @@ class Request {
     //BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
     BaseOptions options = BaseOptions(
       //请求基地址,可以包含子路径
-      baseUrl: HttpString.baseApiUrl,
+      baseUrl: HttpString.apiBaseUrl,
       //连接服务器超时时间，单位是毫秒.
       connectTimeout: const Duration(milliseconds: 12000),
       //响应流上前后两次接受到数据的间隔，单位为毫秒。
@@ -100,30 +133,31 @@ class Request {
       headers: {},
     );
 
-    enableSystemProxy =
-        setting.get(SettingBoxKey.enableSystemProxy, defaultValue: false);
+    enableSystemProxy = setting.get(SettingBoxKey.enableSystemProxy,
+        defaultValue: false) as bool;
     systemProxyHost =
         localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
     systemProxyPort =
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
 
-    dio = Dio(options)
+    dio = Dio(options);
 
-      /// fix 第三方登录 302重定向 跟iOS代理问题冲突
-      ..httpClientAdapter = Http2Adapter(
-        ConnectionManager(
-          idleTimeout: const Duration(milliseconds: 10000),
-          onClientCreate: (_, config) => config.onBadCertificate = (_) => true,
-        ),
-      );
+    /// fix 第三方登录 302重定向 跟iOS代理问题冲突
+    // ..httpClientAdapter = Http2Adapter(
+    //   ConnectionManager(
+    //     idleTimeout: const Duration(milliseconds: 10000),
+    //     onClientCreate: (_, ClientSetting config) =>
+    //         config.onBadCertificate = (_) => true,
+    //   ),
+    // );
 
     /// 设置代理
     if (enableSystemProxy) {
       dio.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
-          final client = HttpClient();
+          final HttpClient client = HttpClient();
           // Config the client.
-          client.findProxy = (uri) {
+          client.findProxy = (Uri uri) {
             // return 'PROXY host:port';
             return 'PROXY $systemProxyHost:$systemProxyPort';
           };
@@ -145,7 +179,7 @@ class Request {
     ));
 
     dio.transformer = BackgroundTransformer();
-    dio.options.validateStatus = (status) {
+    dio.options.validateStatus = (int? status) {
       return status! >= 200 && status < 300 ||
           HttpString.validateStatusCodes.contains(status);
     };
@@ -156,7 +190,7 @@ class Request {
    */
   get(url, {data, options, cancelToken, extra}) async {
     Response response;
-    Options options = Options();
+    final Options options = Options();
     ResponseType resType = ResponseType.json;
     if (extra != null) {
       resType = extra!['resType'] ?? ResponseType.json;
@@ -175,8 +209,14 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      print('get error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 
@@ -197,8 +237,14 @@ class Request {
       // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
-      print('post error: $e');
-      return Future.error(await ApiInterceptor.dioError(e));
+      Response errResponse = Response(
+        data: {
+          'message': await ApiInterceptor.dioError(e)
+        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+        statusCode: 200,
+        requestOptions: RequestOptions(),
+      );
+      return errResponse;
     }
   }
 

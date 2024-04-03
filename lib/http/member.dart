@@ -1,17 +1,17 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/http/index.dart';
-import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/models/follow/result.dart';
-import 'package:pilipala/models/member/archive.dart';
-import 'package:pilipala/models/member/coin.dart';
-import 'package:pilipala/models/member/info.dart';
-import 'package:pilipala/models/member/seasons.dart';
-import 'package:pilipala/models/member/tags.dart';
-import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
-import 'package:pilipala/utils/wbi_sign.dart';
+import '../common/constants.dart';
+import '../models/dynamics/result.dart';
+import '../models/follow/result.dart';
+import '../models/member/archive.dart';
+import '../models/member/coin.dart';
+import '../models/member/info.dart';
+import '../models/member/seasons.dart';
+import '../models/member/tags.dart';
+import '../utils/storage.dart';
+import '../utils/utils.dart';
+import '../utils/wbi_sign.dart';
+import 'index.dart';
 
 class MemberHttp {
   static Future memberInfo({
@@ -79,6 +79,8 @@ class MemberHttp {
     String order = 'pubdate',
     bool orderAvoided = true,
   }) async {
+    String dmImgStr = Utils.base64EncodeRandomString(16, 64);
+    String dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
     Map params = await WbiSign().makSign({
       'mid': mid,
       'ps': ps,
@@ -88,7 +90,11 @@ class MemberHttp {
       'order': order,
       'platform': 'web',
       'web_location': 1550101,
-      'order_avoided': orderAvoided
+      'order_avoided': orderAvoided,
+      'dm_img_list': '[]',
+      'dm_img_str': dmImgStr.substring(0, dmImgStr.length - 2),
+      'dm_cover_img_str': dmCoverImgStr.substring(0, dmCoverImgStr.length - 2),
+      'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
     });
     var res = await Request().get(
       Api.memberArchive,
@@ -101,10 +107,13 @@ class MemberHttp {
         'data': MemberArchiveDataModel.fromJson(res.data['data'])
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -123,10 +132,13 @@ class MemberHttp {
         'data': DynamicsDataModel.fromJson(res.data['data']),
       };
     } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
       };
     }
   }
@@ -453,6 +465,43 @@ class MemberHttp {
     var res = await Request().get(Api.getMemberViewApi, data: {'mid': mid});
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 搜索follow
+  static Future getfollowSearch({
+    required int mid,
+    required int ps,
+    required int pn,
+    required String name,
+  }) async {
+    Map<String, dynamic> data = {
+      'vmid': mid,
+      'pn': pn,
+      'ps': ps,
+      'order': 'desc',
+      'order_type': 'attention',
+      'gaia_source': 'main_web',
+      'name': name,
+      'web_location': 333.999,
+    };
+    Map params = await WbiSign().makSign(data);
+    var res = await Request().get(Api.followSearch, data: {
+      ...data,
+      'w_rid': params['w_rid'],
+      'wts': params['wts'],
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': FollowDataModel.fromJson(res.data['data'])
+      };
     } else {
       return {
         'status': false,

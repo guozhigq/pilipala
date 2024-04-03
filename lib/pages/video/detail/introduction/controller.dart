@@ -18,18 +18,13 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
+  VideoIntroController({required this.bvid});
   // 视频bvid
-  String bvid = Get.parameters['bvid']!;
-
-  // 是否预渲染 骨架屏
-  bool preRender = false;
-
-  // 视频详情 上个页面传入
-  Map? videoItem = {};
-
+  String bvid;
   // 请求状态
   RxBool isLoading = false.obs;
 
@@ -72,26 +67,6 @@ class VideoIntroController extends GetxController {
     try {
       heroTag = Get.arguments['heroTag'];
     } catch (_) {}
-    if (Get.arguments.isNotEmpty) {
-      if (Get.arguments.containsKey('videoItem')) {
-        preRender = true;
-        var args = Get.arguments['videoItem'];
-        var keys = Get.arguments.keys.toList();
-        videoItem!['pic'] = args.pic;
-        if (args.title is String) {
-          videoItem!['title'] = args.title;
-        } else {
-          String str = '';
-          for (Map map in args.title) {
-            str += map['text'];
-          }
-          videoItem!['title'] = str;
-        }
-        videoItem!['stat'] = keys.contains('stat') && args.stat;
-        videoItem!['pubdate'] = keys.contains('pubdate') && args.pubdate;
-        videoItem!['owner'] = keys.contains('owner') && args.owner;
-      }
-    }
     userLogin = userInfo != null;
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
     isShowOnlineTotal =
@@ -110,10 +85,9 @@ class VideoIntroController extends GetxController {
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
-      // Get.find<VideoDetailController>(tag: heroTag).tabs.value = [
-      //   '简介',
-      //   '评论 ${result['data']!.stat!.reply}'
-      // ];
+      final VideoDetailController videoDetailCtr =
+          Get.find<VideoDetailController>(tag: heroTag);
+      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
       // 获取到粉丝数再返回
       await queryUserStat();
     }
@@ -148,7 +122,9 @@ class VideoIntroController extends GetxController {
   // 获取投币状态
   Future queryHasCoinVideo() async {
     var result = await VideoHttp.hasCoinVideo(bvid: bvid);
-    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    if (result['status']) {
+      hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    }
   }
 
   // 获取收藏状态
@@ -208,6 +184,10 @@ class VideoIntroController extends GetxController {
 
   // （取消）点赞
   Future actionLikeVideo() async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
       // hasLike.value = result["data"] == 1 ? true : false;
@@ -292,18 +272,17 @@ class VideoIntroController extends GetxController {
       await queryVideoInFolder();
       int defaultFolderId = favFolderData.value.list!.first.id!;
       int favStatus = favFolderData.value.list!.first.favState!;
-      print('favStatus: $favStatus');
       var result = await VideoHttp.favVideo(
         aid: IdUtils.bv2av(bvid),
         addIds: favStatus == 0 ? '$defaultFolderId' : '',
         delIds: favStatus == 1 ? '$defaultFolderId' : '',
       );
       if (result['status']) {
-        if (result['data']['prompt']) {
-          // 重新获取收藏状态
-          await queryHasFavVideo();
-          SmartDialog.showToast('✅ 操作成功');
-        }
+        // 重新获取收藏状态
+        await queryHasFavVideo();
+        SmartDialog.showToast('✅ 操作成功');
+      } else {
+        SmartDialog.showToast(result['msg']);
       }
       return;
     }
@@ -326,14 +305,14 @@ class VideoIntroController extends GetxController {
         delIds: delMediaIdsNew.join(','));
     SmartDialog.dismiss();
     if (result['status']) {
-      if (result['data']['prompt']) {
-        addMediaIdsNew = [];
-        delMediaIdsNew = [];
-        Get.back();
-        // 重新获取收藏状态
-        await queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
-      }
+      addMediaIdsNew = [];
+      delMediaIdsNew = [];
+      Get.back();
+      // 重新获取收藏状态
+      await queryHasFavVideo();
+      SmartDialog.showToast('✅ 操作成功');
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
   }
 
@@ -389,7 +368,7 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    int currentStatus = followStatus['attribute'];
+    final int currentStatus = followStatus['attribute'];
     int actionStatus = 0;
     switch (currentStatus) {
       case 0:
@@ -411,8 +390,12 @@ class VideoIntroController extends GetxController {
           content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
           actions: [
             TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
             TextButton(
               onPressed: () async {
                 var result = await VideoHttp.relationMod(
@@ -463,16 +446,21 @@ class VideoIntroController extends GetxController {
   // 修改分P或番剧分集
   Future changeSeasonOrbangu(bvid, cid, aid) async {
     // 重新获取视频资源
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
+    final ReleatedController releatedCtr =
+        Get.find<ReleatedController>(tag: heroTag);
     videoDetailCtr.bvid = bvid;
+    videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
+    releatedCtr.bvid = bvid;
+    releatedCtr.queryRelatedVideo();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
-      VideoReplyController videoReplyCtr =
+      final VideoReplyController videoReplyCtr =
           Get.find<VideoReplyController>(tag: heroTag);
       videoReplyCtr.aid = aid;
       videoReplyCtr.queryReplyList(type: 'init');
@@ -513,29 +501,27 @@ class VideoIntroController extends GetxController {
 
   /// 列表循环或者顺序播放时，自动播放下一个
   void nextPlay() {
-    late List episodes;
+    final List episodes = [];
     bool isPages = false;
     if (videoDetail.value.ugcSeason != null) {
-      UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
-      List<SectionItem> sections = ugcSeason.sections!;
-      episodes = [];
-
+      final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
+      final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
-        List<EpisodeItem> episodesList = sections[i].episodes!;
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
     } else if (videoDetail.value.pages != null) {
       isPages = true;
-      List<Part> pages = videoDetail.value.pages!;
-      episodes = [];
+      final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
 
-    int currentIndex = episodes.indexWhere((e) => e.cid == lastPlayCid.value);
+    final int currentIndex =
+        episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
-    VideoDetailController videoDetailCtr =
+    final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+    final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
 
     // 列表循环
     if (nextIndex >= episodes.length) {
@@ -546,9 +532,9 @@ class VideoIntroController extends GetxController {
         return;
       }
     }
-    int cid = episodes[nextIndex].cid!;
-    String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
-    int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
+    final int cid = episodes[nextIndex].cid!;
+    final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
+    final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid);
   }
 
@@ -563,15 +549,17 @@ class VideoIntroController extends GetxController {
   // ai总结
   Future aiConclusion() async {
     SmartDialog.showLoading(msg: '正在生产ai总结');
-    var res = await VideoHttp.aiConclusion(
+    final res = await VideoHttp.aiConclusion(
       bvid: bvid,
       cid: lastPlayCid.value,
       upMid: videoDetail.value.owner!.mid!,
     );
+    SmartDialog.dismiss();
     if (res['status']) {
       modelResult = res['data'].modelResult;
+    } else {
+      SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
     }
-    SmartDialog.dismiss();
     return res;
   }
 }

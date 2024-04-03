@@ -44,15 +44,19 @@ class AuthorPanel extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              item.modules.moduleAuthor.name,
-              style: TextStyle(
-                color: item.modules.moduleAuthor!.vip != null &&
-                        item.modules.moduleAuthor!.vip['status'] > 0
-                    ? const Color.fromARGB(255, 251, 100, 163)
-                    : Theme.of(context).colorScheme.onBackground,
-                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-              ),
+            Row(
+              children: [
+                Text(
+                  item.modules.moduleAuthor.name,
+                  style: TextStyle(
+                    color: item.modules.moduleAuthor!.vip != null &&
+                            item.modules.moduleAuthor!.vip['status'] > 0
+                        ? const Color.fromARGB(255, 251, 100, 163)
+                        : Theme.of(context).colorScheme.onBackground,
+                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                  ),
+                ),
+              ],
             ),
             DefaultTextStyle.merge(
               style: TextStyle(
