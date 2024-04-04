@@ -91,7 +91,7 @@ class VideoDetailController extends GetxController
   late bool enableCDN;
   late int? cacheVideoQa;
   late String cacheDecode;
-  late int cacheAudioQa;
+  late int defaultAudioQa;
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
   RxList<SubTitileContentModel> subtitleContents =
@@ -146,7 +146,7 @@ class VideoDetailController extends GetxController
     // 预设的解码格式
     cacheDecode = setting.get(SettingBoxKey.defaultDecode,
         defaultValue: VideoDecodeFormats.values.last.code);
-    cacheAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
+    defaultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
     getSubtitle();
@@ -353,9 +353,9 @@ class VideoDetailController extends GetxController
 
         if (audiosList.isNotEmpty) {
           final List<int> numbers = audiosList.map((map) => map.id!).toList();
-          int closestNumber = Utils.findClosestNumber(cacheAudioQa, numbers);
-          if (!numbers.contains(cacheAudioQa) &&
-              numbers.any((e) => e > cacheAudioQa)) {
+          int closestNumber = Utils.findClosestNumber(defaultAudioQa, numbers);
+          if (!numbers.contains(defaultAudioQa) &&
+              numbers.any((e) => e > defaultAudioQa)) {
             closestNumber = 30280;
           }
           firstAudio = audiosList.firstWhere((e) => e.id == closestNumber);
