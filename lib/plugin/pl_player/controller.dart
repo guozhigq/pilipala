@@ -101,7 +101,7 @@ class PlPlayerController {
   bool _isFirstTime = true;
 
   Timer? _timer;
-  Timer? _timerForSeek;
+  late Timer? _timerForSeek;
   Timer? _timerForVolume;
   Timer? _timerForShowingVolume;
   Timer? _timerForGettingVolume;
@@ -646,9 +646,6 @@ class PlPlayerController {
 
   /// 跳转至指定位置
   Future<void> seekTo(Duration position, {type = 'seek'}) async {
-    // if (position >= duration.value) {
-    //   position = duration.value - const Duration(milliseconds: 100);
-    // }
     if (position < Duration.zero) {
       position = Duration.zero;
     }
@@ -661,21 +658,13 @@ class PlPlayerController {
         await _videoPlayerController?.stream.buffer.first;
       }
       await _videoPlayerController?.seek(position);
-      // if (playerStatus.stopped) {
-      //   play();
-      // }
     } else {
-      print('seek duration else');
       _timerForSeek?.cancel();
-      _timerForSeek =
+      _timerForSeek ??=
           Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        //_timerForSeek = null;
         if (duration.value.inSeconds != 0) {
           await _videoPlayerController!.stream.buffer.first;
           await _videoPlayerController?.seek(position);
-          // if (playerStatus.status.value == PlayerStatus.paused) {
-          //   play();
-          // }
           t.cancel();
           _timerForSeek = null;
         }
