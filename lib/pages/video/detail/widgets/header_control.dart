@@ -83,6 +83,7 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 设置面板
   void showSettingSheet() {
+    // Scaffold.of(context).openDrawer();
     showModalBottomSheet(
       elevation: 0,
       context: context,
