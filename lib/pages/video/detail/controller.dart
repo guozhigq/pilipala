@@ -21,6 +21,7 @@ import 'package:pilipala/utils/video_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 import '../../../http/danmaku.dart';
+import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../utils/id_utils.dart';
 import 'widgets/header_control.dart';
 
@@ -94,6 +95,14 @@ class VideoDetailController extends GetxController
 
   PersistentBottomSheetController? replyReplyBottomSheetCtr;
   late bool enableRelatedVideo;
+  List subtitles = [];
+  RxList<BottomControlType> bottomList = [
+    BottomControlType.playOrPause,
+    BottomControlType.time,
+    BottomControlType.space,
+    BottomControlType.fit,
+    BottomControlType.fullscreen,
+  ].obs;
 
   @override
   void onInit() {

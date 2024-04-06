@@ -24,6 +24,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
 
@@ -298,6 +299,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           playerController: plPlayerController!,
                         ),
                       ),
+                      bottomList: vdCtr.bottomList,
                     );
             },
           );

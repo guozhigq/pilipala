@@ -214,8 +214,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 上一集
       BottomControlType.pre: ComBtn(
         icon: const Icon(
-          Icons.skip_previous_outlined,
-          size: 15,
+          Icons.skip_previous_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -229,8 +229,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 下一集
       BottomControlType.next: ComBtn(
         icon: const Icon(
-          Icons.last_page_outlined,
-          size: 15,
+          Icons.skip_next_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -239,6 +239,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 时间进度
       BottomControlType.time: Row(
         children: [
+          const SizedBox(width: 8),
           Obx(() {
             return Text(
               _.durationSeconds.value >= 3600
