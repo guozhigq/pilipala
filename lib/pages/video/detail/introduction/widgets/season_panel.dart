@@ -30,7 +30,7 @@ class SeasonPanel extends StatefulWidget {
 class _SeasonPanelState extends State<SeasonPanel> {
   late List<EpisodeItem> episodes;
   late int cid;
-  late int currentIndex;
+  late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   final ItemScrollController itemScrollController = ItemScrollController();
@@ -57,11 +57,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
     }
 
     /// 取对应 season_id 的 episodes
-    currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      setState(() {});
-      currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+      currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     });
   }
 
@@ -71,9 +70,8 @@ class _SeasonPanelState extends State<SeasonPanel> {
       item.cid,
       item.aid,
     );
-    currentIndex = i;
+    currentIndex.value = i;
     _bottomSheetController?.close();
-    setState(() {});
   }
 
   Widget buildEpisodeListItem(
@@ -148,10 +146,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
                     height: 12,
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    '${currentIndex + 1}/${episodes.length}',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                  Obx(() => Text(
+                        '${currentIndex.value + 1}/${episodes.length}',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      )),
                   const SizedBox(width: 6),
                   const Icon(
                     Icons.arrow_forward_ios_outlined,
