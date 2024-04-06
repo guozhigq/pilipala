@@ -25,15 +25,10 @@ class VideoIntroController extends GetxController {
   VideoIntroController({required this.bvid});
   // 视频bvid
   String bvid;
-  // 请求状态
-  RxBool isLoading = false.obs;
-
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
-
   // up主粉丝数
   Map userStat = {'follower': '-'};
-
   // 是否点赞
   RxBool hasLike = false.obs;
   // 是否投币
@@ -59,6 +54,7 @@ class VideoIntroController extends GetxController {
   bool isPaused = false;
   String heroTag = '';
   late ModelResult modelResult;
+  late PersistentBottomSheetController? bottomSheetController;
 
   @override
   void onInit() {
@@ -561,5 +557,9 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
     }
     return res;
+  }
+
+  hiddenEpisodeBottomSheet() {
+    bottomSheetController?.close();
   }
 }
