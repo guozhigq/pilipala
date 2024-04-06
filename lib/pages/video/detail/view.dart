@@ -178,9 +178,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
         videoIntroController.hiddenEpisodeBottomSheet();
-        vdCtr.bottomList.insert(3, BottomControlType.episode);
+        if (videoIntroController.videoDetail.value.ugcSeason != null ||
+            (videoIntroController.videoDetail.value.pages != null &&
+                videoIntroController.videoDetail.value.pages!.length > 1)) {
+          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        }
       } else {
-        vdCtr.bottomList.removeAt(3);
+        if (vdCtr.bottomList.contains(BottomControlType.episode)) {
+          vdCtr.bottomList.removeAt(3);
+        }
       }
     });
   }
