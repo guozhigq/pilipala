@@ -178,6 +178,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
         videoIntroController.hiddenEpisodeBottomSheet();
+        vdCtr.bottomList.insert(3, BottomControlType.episode);
+      } else {
+        vdCtr.bottomList.removeAt(3);
       }
     });
   }
@@ -294,17 +297,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             () {
               return !vdCtr.autoPlay.value
                   ? const SizedBox()
-                  : PLVideoPlayer(
-                      controller: plPlayerController!,
-                      headerControl: vdCtr.headerControl,
-                      danmuWidget: Obx(
-                        () => PlDanmaku(
+                  : Obx(
+                      () => PLVideoPlayer(
+                        controller: plPlayerController!,
+                        headerControl: vdCtr.headerControl,
+                        danmuWidget: PlDanmaku(
                           key: Key(vdCtr.danmakuCid.value.toString()),
                           cid: vdCtr.danmakuCid.value,
                           playerController: plPlayerController!,
                         ),
+                        bottomList: vdCtr.bottomList,
+                        showEposideCb: () => vdCtr.videoType == SearchType.video
+                            ? videoIntroController.showEposideHandler()
+                            : bangumiIntroController.showEposideHandler(),
                       ),
-                      bottomList: vdCtr.bottomList,
                     );
             },
           );

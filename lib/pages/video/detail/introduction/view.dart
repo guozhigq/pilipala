@@ -373,7 +373,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
           /// 点赞收藏转发
           actionGrid(context, videoIntroController),
-          // 合集
+          // 合集 videoPart 简洁
           if (widget.videoDetail!.ugcSeason != null) ...[
             Obx(
               () => SeasonPanel(
@@ -383,11 +383,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     : widget.videoDetail!.pages!.first.cid,
                 sheetHeight: sheetHeight,
                 changeFuc: (bvid, cid, aid) =>
-                    videoIntroController.changeSeasonOrbangu(bvid, cid, aid),
+                    videoIntroController.changeSeasonOrbangu(
+                  bvid,
+                  cid,
+                  aid,
+                ),
                 videoIntroCtr: videoIntroController,
               ),
             )
           ],
+          // 合集 videoEpisode
           if (widget.videoDetail!.pages != null &&
               widget.videoDetail!.pages!.length > 1) ...[
             Obx(

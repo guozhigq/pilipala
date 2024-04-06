@@ -18,6 +18,9 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../common/pages_bottom_sheet.dart';
+import '../../../../models/common/video_episode_type.dart';
+import '../../../../utils/drawer.dart';
 import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
@@ -54,7 +57,7 @@ class VideoIntroController extends GetxController {
   bool isPaused = false;
   String heroTag = '';
   late ModelResult modelResult;
-  late PersistentBottomSheetController? bottomSheetController;
+  PersistentBottomSheetController? bottomSheetController;
 
   @override
   void onInit() {
@@ -561,5 +564,49 @@ class VideoIntroController extends GetxController {
 
   hiddenEpisodeBottomSheet() {
     bottomSheetController?.close();
+  }
+
+  // 播放器底栏 选集 回调
+  void showEposideHandler() {
+    late List episodes;
+    VideoEpidoesType dataType = VideoEpidoesType.videoEpisode;
+    if (videoDetail.value.ugcSeason != null) {
+      dataType = VideoEpidoesType.videoEpisode;
+      final List<SectionItem> sections = videoDetail.value.ugcSeason!.sections!;
+      for (int i = 0; i < sections.length; i++) {
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
+        for (int j = 0; j < episodesList.length; j++) {
+          if (episodesList[j].cid == lastPlayCid.value) {
+            episodes = episodesList;
+            continue;
+          }
+        }
+      }
+    }
+    if (videoDetail.value.pages != null &&
+        videoDetail.value.pages!.length > 1) {
+      dataType = VideoEpidoesType.videoPart;
+      episodes = videoDetail.value.pages!;
+    }
+
+    DrawerUtils.showRightDialog(
+      child: EpisodeBottomSheet(
+        episodes: episodes,
+        currentCid: lastPlayCid.value,
+        dataType: dataType,
+        context: Get.context!,
+        sheetHeight: Get.size.height,
+        isFullScreen: true,
+        changeFucCall: (item, index) {
+          if (dataType == VideoEpidoesType.videoEpisode) {
+            changeSeasonOrbangu(IdUtils.av2bv(item.aid), item.cid, item.aid);
+          }
+          if (dataType == VideoEpidoesType.videoPart) {
+            changeSeasonOrbangu(bvid, item.cid, null);
+          }
+          SmartDialog.dismiss();
+        },
+      ).buildShowContent(Get.context!),
+    );
   }
 }
