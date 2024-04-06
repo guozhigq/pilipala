@@ -60,6 +60,7 @@ class _PagesPanelState extends State<PagesPanel> {
   }
 
   void changeFucCall(item, i) async {
+    print('pages changeFucCall');
     widget.changeFuc?.call(item.cid);
     currentIndex.value = i;
     _bottomSheetController?.close();

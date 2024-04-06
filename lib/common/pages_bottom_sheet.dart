@@ -11,6 +11,7 @@ class EpisodeBottomSheet {
   final Function changeFucCall;
   final int? cid;
   final double? sheetHeight;
+  bool isFullScreen = false;
 
   EpisodeBottomSheet({
     required this.episodes,
@@ -20,6 +21,7 @@ class EpisodeBottomSheet {
     required this.changeFucCall,
     this.cid,
     this.sheetHeight,
+    this.isFullScreen = false,
   });
 
   Widget buildEpisodeListItem(
@@ -74,60 +76,69 @@ class EpisodeBottomSheet {
         '合集（${episodes.length}）',
         style: Theme.of(context).textTheme.titleMedium,
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.close, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        const SizedBox(width: 14),
-      ],
+      actions: !isFullScreen
+          ? [
+              IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const SizedBox(width: 14),
+            ]
+          : null,
     );
+  }
+
+  Widget buildShowContent(BuildContext context) {
+    final ItemScrollController itemScrollController = ItemScrollController();
+    int currentIndex = episodes.indexWhere((dynamic e) => e.cid == currentCid);
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        itemScrollController.jumpTo(index: currentIndex);
+      });
+      return Container(
+        height: sheetHeight,
+        color: Theme.of(context).colorScheme.background,
+        child: Column(
+          children: [
+            buildTitle(),
+            Expanded(
+              child: Material(
+                child: PageStorage(
+                  bucket: PageStorageBucket(),
+                  child: ScrollablePositionedList.builder(
+                    itemScrollController: itemScrollController,
+                    itemCount: episodes.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      bool isLastItem = index == episodes.length;
+                      bool isCurrentIndex = currentIndex == index;
+                      return isLastItem
+                          ? SizedBox(
+                              height:
+                                  MediaQuery.of(context).padding.bottom + 20,
+                            )
+                          : buildEpisodeListItem(
+                              episodes[index],
+                              index,
+                              isCurrentIndex,
+                            );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   /// The [BuildContext] of the widget that calls the bottom sheet.
   PersistentBottomSheetController show(BuildContext context) {
-    final ItemScrollController itemScrollController = ItemScrollController();
-    int currentIndex = episodes.indexWhere((dynamic e) => e.cid == currentCid);
     final PersistentBottomSheetController btmSheetCtr = showBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            itemScrollController.jumpTo(index: currentIndex);
-          });
-          return Container(
-            height: sheetHeight,
-            color: Theme.of(context).colorScheme.background,
-            child: Column(
-              children: [
-                buildTitle(),
-                Expanded(
-                  child: Material(
-                    child: ScrollablePositionedList.builder(
-                      itemScrollController: itemScrollController,
-                      itemCount: episodes.length + 1,
-                      itemBuilder: (BuildContext context, int index) {
-                        bool isLastItem = index == episodes.length;
-                        bool isCurrentIndex = currentIndex == index;
-                        return isLastItem
-                            ? SizedBox(
-                                height:
-                                    MediaQuery.of(context).padding.bottom + 20,
-                              )
-                            : buildEpisodeListItem(
-                                episodes[index],
-                                index,
-                                isCurrentIndex,
-                              );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
+        return buildShowContent(context);
       },
     );
     return btmSheetCtr;
