@@ -177,6 +177,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
+        videoIntroController.hiddenEpisodeBottomSheet();
       }
     });
   }

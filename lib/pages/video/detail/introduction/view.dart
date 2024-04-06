@@ -20,8 +20,8 @@ import '../../../../http/user.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
-import 'widgets/page.dart';
-import 'widgets/season.dart';
+import 'widgets/page_panel.dart';
+import 'widgets/season_panel.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -384,18 +384,25 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 sheetHeight: sheetHeight,
                 changeFuc: (bvid, cid, aid) =>
                     videoIntroController.changeSeasonOrbangu(bvid, cid, aid),
+                videoIntroCtr: videoIntroController,
               ),
             )
           ],
           if (widget.videoDetail!.pages != null &&
               widget.videoDetail!.pages!.length > 1) ...[
-            Obx(() => PagesPanel(
-                  pages: widget.videoDetail!.pages!,
-                  cid: videoIntroController.lastPlayCid.value,
-                  sheetHeight: sheetHeight,
-                  changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
-                      videoIntroController.bvid, cid, null),
-                ))
+            Obx(
+              () => PagesPanel(
+                pages: widget.videoDetail!.pages!,
+                cid: videoIntroController.lastPlayCid.value,
+                sheetHeight: sheetHeight,
+                changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
+                  videoIntroController.bvid,
+                  cid,
+                  null,
+                ),
+                videoIntroCtr: videoIntroController,
+              ),
+            )
           ],
           GestureDetector(
             onTap: onPushMember,
