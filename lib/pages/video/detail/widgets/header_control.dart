@@ -82,6 +82,7 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 设置面板
   void showSettingSheet() {
+    // Scaffold.of(context).openDrawer();
     showModalBottomSheet(
       elevation: 0,
       context: context,
@@ -158,7 +159,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       dense: true,
                       leading:
                           const Icon(Icons.hourglass_top_outlined, size: 20),
-                      title: const Text('定时关闭（测试）', style: titleStyle),
+                      title: const Text('定时关闭', style: titleStyle),
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
