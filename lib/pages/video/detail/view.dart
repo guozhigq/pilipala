@@ -523,6 +523,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           }
                         },
                       ),
+                      bottomList: vdCtr.bottomList,
                     );
             },
           );
