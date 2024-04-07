@@ -74,7 +74,7 @@ class _NavigationbarSetPageState extends State<NavigationBarSetPage> {
           },
           title: Text(defaultNavTabs[i]['label']),
           secondary: const Icon(Icons.drag_indicator_rounded),
-          enabled: defaultNavTabs[i]['id'] != 3,
+          enabled: defaultNavTabs[i]['id'] != 0,
         )
       ]
     ];
