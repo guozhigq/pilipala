@@ -11,6 +11,7 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
+import 'package:pilipala/pages/dlna/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
@@ -1209,6 +1210,22 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.cast,
+              size: 19,
+              color: Colors.white,
+            ),
+            fuc: () async {
+              showDialog<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return LiveDlnaPage(
+                      datasource: widget.videoDetailCtr!.videoUrl);
+                },
+              );
+            },
+          ),
           if (isFullScreen.value) ...[
             SizedBox(
               width: 56,
