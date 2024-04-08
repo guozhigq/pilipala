@@ -1,5 +1,18 @@
 name: Pilipala Beta
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "never"
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - ".github/**"
+      - ".idea/**"
+      - "!.github/workflows/**"
+
+
 jobs:
   update_version:
     name: Read and update version
