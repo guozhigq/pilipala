@@ -11,8 +11,7 @@ class DownloadUtils {
   static Future<bool> requestStoragePer() async {
     await Permission.storage.request();
     PermissionStatus status = await Permission.storage.status;
-    if (status == PermissionStatus.denied ||
-        status == PermissionStatus.permanentlyDenied) {
+    if (status == PermissionStatus.denied) {
       SmartDialog.show(
         useSystem: true,
         animationType: SmartAnimationType.centerFade_otherSlide,
@@ -41,8 +40,7 @@ class DownloadUtils {
   static Future<bool> requestPhotoPer() async {
     await Permission.photos.request();
     PermissionStatus status = await Permission.photos.status;
-    if (status == PermissionStatus.denied ||
-        status == PermissionStatus.permanentlyDenied) {
+    if (status == PermissionStatus.denied) {
       SmartDialog.show(
         useSystem: true,
         animationType: SmartAnimationType.centerFade_otherSlide,
