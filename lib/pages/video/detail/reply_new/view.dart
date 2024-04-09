@@ -142,9 +142,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
-    double keyboardHeight = EdgeInsets.fromViewPadding(
+    double _keyboardHeight = EdgeInsets.fromViewPadding(
             View.of(context).viewInsets, View.of(context).devicePixelRatio)
         .bottom;
+    print('_keyboardHeight: $_keyboardHeight');
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
@@ -235,7 +236,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
             duration: const Duration(milliseconds: 300),
             child: SizedBox(
               width: double.infinity,
-              height: toolbarType == 'input' ? keyboardHeight : emoteHeight,
+              height: toolbarType == 'input'
+                  ? (_keyboardHeight > keyboardHeight
+                      ? _keyboardHeight
+                      : keyboardHeight)
+                  : emoteHeight,
               child: EmotePanel(
                 onChoose: (package, emote) => onChooseEmote(package, emote),
               ),

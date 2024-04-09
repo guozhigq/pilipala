@@ -62,6 +62,11 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
               controller: plPlayerController,
               liveRoomCtr: _liveRoomController,
               floating: floating,
+              onRefresh: () {
+                setState(() {
+                  _futureBuilderFuture = _liveRoomController.queryLiveInfo();
+                });
+              },
             ),
           );
         } else {

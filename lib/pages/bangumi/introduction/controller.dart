@@ -15,6 +15,10 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../common/pages_bottom_sheet.dart';
+import '../../../models/common/video_episode_type.dart';
+import '../../../utils/drawer.dart';
+
 class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
@@ -290,5 +294,30 @@ class BangumiIntroController extends GetxController {
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
     changeSeasonOrbangu(bvid, cid, aid);
+  }
+
+  // 播放器底栏 选集 回调
+  void showEposideHandler() {
+    late List episodes = bangumiDetail.value.episodes!;
+    VideoEpidoesType dataType = VideoEpidoesType.bangumiEpisode;
+    if (episodes.isEmpty) {
+      return;
+    }
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    DrawerUtils.showRightDialog(
+      child: EpisodeBottomSheet(
+        episodes: episodes,
+        currentCid: videoDetailCtr.cid.value,
+        dataType: dataType,
+        context: Get.context!,
+        sheetHeight: Get.size.height,
+        isFullScreen: true,
+        changeFucCall: (item, index) {
+          changeSeasonOrbangu(item.bvid, item.cid, item.aid);
+          SmartDialog.dismiss();
+        },
+      ).buildShowContent(Get.context!),
+    );
   }
 }

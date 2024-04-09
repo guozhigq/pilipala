@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "main"
+      - "never"
     paths-ignore:
       - "**.md"
       - "**.txt"
       - ".github/**"
       - ".idea/**"
       - "!.github/workflows/**"
+
 
 jobs:
   update_version:

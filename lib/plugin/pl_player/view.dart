@@ -37,6 +37,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.bottomList,
     this.customWidget,
     this.customWidgets,
+    this.showEposideCb,
     super.key,
   });
 
@@ -49,6 +50,7 @@ class PLVideoPlayer extends StatefulWidget {
 
   final Widget? customWidget;
   final List<Widget>? customWidgets;
+  final Function? showEposideCb;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -214,8 +216,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 上一集
       BottomControlType.pre: ComBtn(
         icon: const Icon(
-          Icons.skip_previous_outlined,
-          size: 15,
+          Icons.skip_previous_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -229,8 +231,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 下一集
       BottomControlType.next: ComBtn(
         icon: const Icon(
-          Icons.last_page_outlined,
-          size: 15,
+          Icons.skip_next_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -239,6 +241,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 时间进度
       BottomControlType.time: Row(
         children: [
+          const SizedBox(width: 8),
           Obx(() {
             return Text(
               _.durationSeconds.value >= 3600
@@ -265,6 +268,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
       /// 空白占位
       BottomControlType.space: const Spacer(),
+
+      /// 选集
+      BottomControlType.episode: SizedBox(
+        height: 30,
+        width: 30,
+        child: TextButton(
+          onPressed: () {
+            widget.showEposideCb?.call();
+          },
+          style: ButtonStyle(
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+          ),
+          child: const Text(
+            '选集',
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ),
+      ),
 
       /// 画面比例
       BottomControlType.fit: SizedBox(
