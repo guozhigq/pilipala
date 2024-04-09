@@ -83,7 +83,6 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 设置面板
   void showSettingSheet() {
-    // Scaffold.of(context).openDrawer();
     showModalBottomSheet(
       elevation: 0,
       context: context,
@@ -732,9 +731,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择解码格式', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择解码格式', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1079,9 +1081,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择播放顺序', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1166,11 +1171,13 @@ class _HeaderControlState extends State<HeaderControl> {
               children: [
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
-                  child: Text(
-                    videoIntroController.videoDetail.value.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                  child: Obx(
+                    () => Text(
+                      videoIntroController.videoDetail.value.title ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
