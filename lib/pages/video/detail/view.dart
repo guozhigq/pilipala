@@ -24,6 +24,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
 
@@ -176,6 +177,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
+        videoIntroController.hiddenEpisodeBottomSheet();
+        if (videoIntroController.videoDetail.value.ugcSeason != null ||
+            (videoIntroController.videoDetail.value.pages != null &&
+                videoIntroController.videoDetail.value.pages!.length > 1)) {
+          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        }
+      } else {
+        if (vdCtr.bottomList.contains(BottomControlType.episode)) {
+          vdCtr.bottomList.removeAt(3);
+        }
       }
     });
   }
@@ -292,15 +303,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             () {
               return !vdCtr.autoPlay.value
                   ? const SizedBox()
-                  : PLVideoPlayer(
-                      controller: plPlayerController!,
-                      headerControl: vdCtr.headerControl,
-                      danmuWidget: Obx(
-                        () => PlDanmaku(
+                  : Obx(
+                      () => PLVideoPlayer(
+                        controller: plPlayerController!,
+                        headerControl: vdCtr.headerControl,
+                        danmuWidget: PlDanmaku(
                           key: Key(vdCtr.danmakuCid.value.toString()),
                           cid: vdCtr.danmakuCid.value,
                           playerController: plPlayerController!,
                         ),
+                        bottomList: vdCtr.bottomList,
+                        showEposideCb: () => vdCtr.videoType == SearchType.video
+                            ? videoIntroController.showEposideHandler()
+                            : bangumiIntroController.showEposideHandler(),
                       ),
                     );
             },
