@@ -140,8 +140,8 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                     future: _futureBuilderFuture,
                     builder: (BuildContext context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
-                        final Map data = snapshot.data as Map;
-                        if (data['status']) {
+                        Map? data = snapshot.data;
+                        if (data != null && data['status']) {
                           // 请求成功
                           return Obx(
                             () => SliverList(
@@ -199,7 +199,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                         } else {
                           // 请求错误
                           return HttpError(
-                            errMsg: data['msg'],
+                            errMsg: data?['msg'] ?? '请求错误',
                             fn: () => setState(() {}),
                           );
                         }
