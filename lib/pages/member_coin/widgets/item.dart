@@ -59,6 +59,7 @@ class MemberCoinsItem extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(5, 6, 0, 0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     coinItem.title!,
