@@ -10,6 +10,7 @@ import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
@@ -29,7 +30,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
-  late bool enableMYBar;
 
   @override
   void initState() {
@@ -37,7 +37,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
     _mainController.pageController =
         PageController(initialPage: _mainController.selectedIndex);
-    enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
   }
 
   void setIndex(int value) async {
@@ -138,7 +137,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                     curve: Curves.easeInOutCubicEmphasized,
                     duration: const Duration(milliseconds: 500),
                     offset: Offset(0, snapshot.data ? 0 : 1),
-                    child: enableMYBar
+                    child: GlobalData().enableMYBar
                         ? NavigationBar(
                             onDestinationSelected: (value) => setIndex(value),
                             selectedIndex: _mainController.selectedIndex,
@@ -169,6 +168,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                           )
                         : BottomNavigationBar(
                             currentIndex: _mainController.selectedIndex,
+                            type: BottomNavigationBarType.fixed,
                             onTap: (value) => setIndex(value),
                             iconSize: 16,
                             selectedFontSize: 12,
