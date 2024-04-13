@@ -4,7 +4,6 @@ import 'package:pilipala/common/pages_bottom_sheet.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../../../models/common/video_episode_type.dart';
 import '../controller.dart';
 
@@ -33,7 +32,6 @@ class _SeasonPanelState extends State<SeasonPanel> {
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
-  final ItemScrollController itemScrollController = ItemScrollController();
   late PersistentBottomSheetController? _bottomSheetController;
 
   @override

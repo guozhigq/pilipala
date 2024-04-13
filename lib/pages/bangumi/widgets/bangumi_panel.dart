@@ -92,11 +92,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
       // 在回调函数中获取更新后的状态
       final double offset = min((currentIndex * 150) - 75,
           listViewScrollCtr.position.maxScrollExtent);
-      listViewScrollCtr.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (currentIndex.value == 0) {
+        listViewScrollCtr.jumpTo(0);
+      } else {
+        listViewScrollCtr.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
