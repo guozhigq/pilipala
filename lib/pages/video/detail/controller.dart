@@ -106,6 +106,7 @@ class VideoDetailController extends GetxController
     BottomControlType.fit,
     BottomControlType.fullscreen,
   ].obs;
+  RxDouble sheetHeight = 0.0.obs;
 
   @override
   void onInit() {
@@ -172,6 +173,7 @@ class VideoDetailController extends GetxController
         firstFloor: firstFloor,
         replyType: ReplyType.video,
         source: 'videoDetail',
+        sheetHeight: sheetHeight.value,
       );
     });
     replyReplyBottomSheetCtr?.closed.then((value) {
