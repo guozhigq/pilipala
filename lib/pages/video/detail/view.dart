@@ -108,7 +108,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 流
   appbarStreamListen() {
-    appbarStream = StreamController<double>();
+    appbarStream = StreamController<double>.broadcast();
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;

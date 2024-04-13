@@ -20,6 +20,7 @@ import 'package:pilipala/services/disable_battery_opt.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:pilipala/utils/recommend_filter.dart';
@@ -64,14 +65,8 @@ void main() async {
       },
     );
 
-    // 小白条、导航栏沉浸
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-      statusBarColor: Colors.transparent,
-    ));
     Data.init();
+    GlobalData();
     PiliSchame.init();
     DisableBatteryOpt();
   });
@@ -134,45 +129,51 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
           );
         }
+
+        final SnackBarThemeData snackBarThemeData = SnackBarThemeData(
+          actionTextColor: darkColorScheme.primary,
+          backgroundColor: darkColorScheme.secondaryContainer,
+          closeIconColor: darkColorScheme.secondary,
+          contentTextStyle: TextStyle(color: darkColorScheme.secondary),
+          elevation: 20,
+        );
+
+        ThemeData themeData = ThemeData(
+          // fontFamily: 'HarmonyOS',
+          colorScheme: currentThemeValue == ThemeType.dark
+              ? darkColorScheme
+              : lightColorScheme,
+          snackBarTheme: snackBarThemeData,
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: <TargetPlatform, PageTransitionsBuilder>{
+              TargetPlatform.android: ZoomPageTransitionsBuilder(
+                allowEnterRouteSnapshotting: false,
+              ),
+            },
+          ),
+        );
+
+        // 小白条、导航栏沉浸
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          systemNavigationBarColor: GlobalData().enableMYBar
+              ? const Color(0x00010000)
+              : themeData.canvasColor,
+          systemNavigationBarDividerColor: GlobalData().enableMYBar
+              ? const Color(0x00010000)
+              : themeData.canvasColor,
+          systemNavigationBarIconBrightness: currentThemeValue == ThemeType.dark
+              ? Brightness.light
+              : Brightness.dark,
+          statusBarColor: Colors.transparent,
+        ));
+
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
           title: 'PiLiPaLa',
-          theme: ThemeData(
-            // fontFamily: 'HarmonyOS',
-            colorScheme: currentThemeValue == ThemeType.dark
-                ? darkColorScheme
-                : lightColorScheme,
-            useMaterial3: true,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: lightColorScheme.primary,
-              backgroundColor: lightColorScheme.secondaryContainer,
-              closeIconColor: lightColorScheme.secondary,
-              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
-              elevation: 20,
-            ),
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: ZoomPageTransitionsBuilder(
-                  allowEnterRouteSnapshotting: false,
-                ),
-              },
-            ),
-          ),
-          darkTheme: ThemeData(
-            // fontFamily: 'HarmonyOS',
-            colorScheme: currentThemeValue == ThemeType.light
-                ? lightColorScheme
-                : darkColorScheme,
-            useMaterial3: true,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: darkColorScheme.primary,
-              backgroundColor: darkColorScheme.secondaryContainer,
-              closeIconColor: darkColorScheme.secondary,
-              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
-              elevation: 20,
-            ),
-          ),
+          theme: themeData,
+          darkTheme: themeData,
           localizationsDelegates: const [
             GlobalCupertinoLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
