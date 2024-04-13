@@ -144,6 +144,8 @@ dependencies:
   disable_battery_optimization: ^1.1.1
   # 展开/收起
   expandable: ^5.0.1
+  # 投屏
+  dlna_dart: ^0.0.8
 
 dev_dependencies:
   flutter_test:

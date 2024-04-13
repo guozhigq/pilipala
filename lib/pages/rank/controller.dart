@@ -9,7 +9,7 @@ import 'package:pilipala/utils/storage.dart';
 class RankController extends GetxController with GetTickerProviderStateMixin {
   bool flag = false;
   late RxList tabs = [].obs;
-  RxInt initialIndex = 1.obs;
+  RxInt initialIndex = 0.obs;
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
@@ -50,21 +50,5 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
       length: tabs.length,
       vsync: this,
     );
-    // 监听 tabController 切换
-    if (enableGradientBg) {
-      tabController.animation!.addListener(() {
-        if (tabController.indexIsChanging) {
-          if (initialIndex.value != tabController.index) {
-            initialIndex.value = tabController.index;
-          }
-        } else {
-          final int temp = tabController.animation!.value.round();
-          if (initialIndex.value != temp) {
-            initialIndex.value = temp;
-            tabController.index = initialIndex.value;
-          }
-        }
-      });
-    }
   }
 }

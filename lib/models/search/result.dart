@@ -437,7 +437,8 @@ class SearchArticleItemModel {
     pubTime = json['pub_time'];
     like = json['like'];
     title = Em.regTitle(json['title']);
-    subTitle = json['title'].replaceAll(RegExp(r'<[^>]*>'), '');
+    subTitle =
+        Em.decodeHtmlEntities(json['title'].replaceAll(RegExp(r'<[^>]*>'), ''));
     rankOffset = json['rank_offset'];
     mid = json['mid'];
     imageUrls = json['image_urls'];

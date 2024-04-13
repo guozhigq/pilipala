@@ -11,6 +11,7 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
+import 'package:pilipala/pages/dlna/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
@@ -158,7 +159,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       dense: true,
                       leading:
                           const Icon(Icons.hourglass_top_outlined, size: 20),
-                      title: const Text('定时关闭（测试）', style: titleStyle),
+                      title: const Text('定时关闭', style: titleStyle),
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
@@ -421,6 +422,56 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  /// 选择字幕
+  void showSubtitleDialog() async {
+    int tempThemeValue = widget.controller!.subTitleCode.value;
+    int len = widget.videoDetailCtr!.subtitles.length;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('选择字幕'),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
+            content: StatefulBuilder(builder: (context, StateSetter setState) {
+              return len == 0
+                  ? const SizedBox(
+                      height: 60,
+                      child: Center(
+                        child: Text('没有字幕'),
+                      ),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile(
+                          value: -1,
+                          title: const Text('关闭弹幕'),
+                          groupValue: tempThemeValue,
+                          onChanged: (value) {
+                            tempThemeValue = value!;
+                            widget.controller?.toggleSubtitle(value);
+                            Get.back();
+                          },
+                        ),
+                        ...widget.videoDetailCtr!.subtitles
+                            .map((e) => RadioListTile(
+                                  value: e.code,
+                                  title: Text(e.title),
+                                  groupValue: tempThemeValue,
+                                  onChanged: (value) {
+                                    tempThemeValue = value!;
+                                    widget.controller?.toggleSubtitle(value);
+                                    Get.back();
+                                  },
+                                ))
+                            .toList(),
+                      ],
+                    );
+            }),
+          );
+        });
+  }
+
   /// 选择倍速
   void showSetSpeedSheet() {
     final double currentSpeed = widget.controller!.playbackSpeed;
@@ -680,9 +731,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择解码格式', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择解码格式', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1027,9 +1081,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择播放顺序', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1114,11 +1171,13 @@ class _HeaderControlState extends State<HeaderControl> {
               children: [
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
-                  child: Text(
-                    videoIntroController.videoDetail.value.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                  child: Obx(
+                    () => Text(
+                      videoIntroController.videoDetail.value.title ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -1158,6 +1217,22 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.cast,
+              size: 19,
+              color: Colors.white,
+            ),
+            fuc: () async {
+              showDialog<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return LiveDlnaPage(
+                      datasource: widget.videoDetailCtr!.videoUrl);
+                },
+              );
+            },
+          ),
           if (isFullScreen.value) ...[
             SizedBox(
               width: 56,
@@ -1229,6 +1304,31 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
             SizedBox(width: buttonSpace),
           ],
+
+          /// 字幕
+          // SizedBox(
+          //   width: 34,
+          //   height: 34,
+          //   child: IconButton(
+          //     style: ButtonStyle(
+          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
+          //     ),
+          //     onPressed: () => showSubtitleDialog(),
+          //     icon: const Icon(
+          //       Icons.closed_caption_off,
+          //       size: 22,
+          //     ),
+          //   ),
+          // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.closed_caption_off,
+              size: 22,
+              color: Colors.white,
+            ),
+            fuc: () => showSubtitleDialog(),
+          ),
+          SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(
               width: 45,

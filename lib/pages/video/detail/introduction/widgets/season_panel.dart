@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/pages_bottom_sheet.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import '../../../../../models/common/video_episode_type.dart';
+import '../controller.dart';
 
 class SeasonPanel extends StatefulWidget {
   const SeasonPanel({
@@ -12,11 +15,13 @@ class SeasonPanel extends StatefulWidget {
     this.cid,
     this.sheetHeight,
     this.changeFuc,
+    required this.videoIntroCtr,
   });
   final UgcSeason ugcSeason;
   final int? cid;
   final double? sheetHeight;
   final Function? changeFuc;
+  final VideoIntroController videoIntroCtr;
 
   @override
   State<SeasonPanel> createState() => _SeasonPanelState();
@@ -25,11 +30,11 @@ class SeasonPanel extends StatefulWidget {
 class _SeasonPanelState extends State<SeasonPanel> {
   late List<EpisodeItem> episodes;
   late int cid;
-  late int currentIndex;
+  late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
-  final ScrollController _scrollController = ScrollController();
   final ItemScrollController itemScrollController = ItemScrollController();
+  late PersistentBottomSheetController? _bottomSheetController;
 
   @override
   void initState() {
@@ -52,32 +57,21 @@ class _SeasonPanelState extends State<SeasonPanel> {
     }
 
     /// 取对应 season_id 的 episodes
-    // episodes = widget.ugcSeason.sections!
-    //     .firstWhere((e) => e.seasonId == widget.ugcSeason.id)
-    //     .episodes!;
-    currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      setState(() {});
-      currentIndex = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+      currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
     });
   }
 
   void changeFucCall(item, int i) async {
-    await widget.changeFuc!(
+    widget.changeFuc?.call(
       IdUtils.av2bv(item.aid),
       item.cid,
       item.aid,
     );
-    currentIndex = i;
-    Get.back();
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+    currentIndex.value = i;
+    _bottomSheetController?.close();
   }
 
   Widget buildEpisodeListItem(
@@ -123,71 +117,17 @@ class _SeasonPanelState extends State<SeasonPanel> {
           borderRadius: BorderRadius.circular(6),
           clipBehavior: Clip.hardEdge,
           child: InkWell(
-            onTap: () => showBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) async {
-                    itemScrollController.jumpTo(index: currentIndex);
-                  });
-                  return Container(
-                    height: widget.sheetHeight,
-                    color: Theme.of(context).colorScheme.background,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 45,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '合集（${episodes.length}）',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          height: 1,
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.1),
-                        ),
-                        Expanded(
-                          child: Material(
-                            child: ScrollablePositionedList.builder(
-                              itemCount: episodes.length + 1,
-                              itemBuilder: (BuildContext context, int index) {
-                                bool isLastItem = index == episodes.length;
-                                bool isCurrentIndex = currentIndex == index;
-                                return isLastItem
-                                    ? SizedBox(
-                                        height: MediaQuery.of(context)
-                                                .padding
-                                                .bottom +
-                                            20,
-                                      )
-                                    : buildEpisodeListItem(
-                                        episodes[index],
-                                        index,
-                                        isCurrentIndex,
-                                      );
-                              },
-                              itemScrollController: itemScrollController,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                });
-              },
-            ),
+            onTap: () {
+              widget.videoIntroCtr.bottomSheetController =
+                  _bottomSheetController = EpisodeBottomSheet(
+                currentCid: cid,
+                episodes: episodes,
+                changeFucCall: changeFucCall,
+                sheetHeight: widget.sheetHeight,
+                dataType: VideoEpidoesType.videoEpisode,
+                context: context,
+              ).show(context);
+            },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
               child: Row(
@@ -206,10 +146,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
                     height: 12,
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    '${currentIndex + 1}/${episodes.length}',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                  Obx(() => Text(
+                        '${currentIndex.value + 1}/${episodes.length}',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      )),
                   const SizedBox(width: 6),
                   const Icon(
                     Icons.arrow_forward_ios_outlined,

@@ -330,12 +330,12 @@ class UserHttp {
     }
   }
 
-  static Future userSubFolderDetail({
+  static Future userSeasonList({
     required int seasonId,
     required int pn,
     required int ps,
   }) async {
-    var res = await Request().get(Api.userSubFolderDetail, data: {
+    var res = await Request().get(Api.userSeasonList, data: {
       'season_id': seasonId,
       'ps': ps,
       'pn': pn,
@@ -345,6 +345,52 @@ class UserHttp {
         'status': true,
         'data': SubDetailModelData.fromJson(res.data['data'])
       };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future userResourceList({
+    required int seasonId,
+    required int pn,
+    required int ps,
+  }) async {
+    var res = await Request().get(Api.userResourceList, data: {
+      'media_id': seasonId,
+      'ps': ps,
+      'pn': pn,
+      'keyword': '',
+      'order': 'mtime',
+      'type': 0,
+      'tid': 0,
+      'platform': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': SubDetailModelData.fromJson(res.data['data'])
+        };
+      } catch (err) {
+        return {'status': false, 'msg': err};
+      }
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 取消订阅
+  static Future cancelSub({required int seasonId}) async {
+    var res = await Request().post(
+      Api.cancelSub,
+      queryParameters: {
+        'platform': 'web',
+        'season_id': seasonId,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true};
     } else {
       return {'status': false, 'msg': res.data['message']};
     }

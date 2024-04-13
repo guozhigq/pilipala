@@ -24,6 +24,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
 
@@ -176,6 +177,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
+        videoIntroController.hiddenEpisodeBottomSheet();
+        if (videoIntroController.videoDetail.value.ugcSeason != null ||
+            (videoIntroController.videoDetail.value.pages != null &&
+                videoIntroController.videoDetail.value.pages!.length > 1)) {
+          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        }
+      } else {
+        if (vdCtr.bottomList.contains(BottomControlType.episode)) {
+          vdCtr.bottomList.removeAt(3);
+        }
       }
     });
   }
@@ -212,6 +223,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       videoIntroController.isPaused = true;
       plPlayerController!.removeStatusLister(playerListener);
       plPlayerController!.pause();
+      vdCtr.clearSubtitleContent();
     }
     setState(() => isShowing = false);
     super.didPushNext();
@@ -222,7 +234,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void didPopNext() async {
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() => isShowing = true);
+      setState(() {
+        vdCtr.setSubtitleContent();
+        isShowing = true;
+      });
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
@@ -288,15 +303,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             () {
               return !vdCtr.autoPlay.value
                   ? const SizedBox()
-                  : PLVideoPlayer(
-                      controller: plPlayerController!,
-                      headerControl: vdCtr.headerControl,
-                      danmuWidget: Obx(
-                        () => PlDanmaku(
+                  : Obx(
+                      () => PLVideoPlayer(
+                        controller: plPlayerController!,
+                        headerControl: vdCtr.headerControl,
+                        danmuWidget: PlDanmaku(
                           key: Key(vdCtr.danmakuCid.value.toString()),
                           cid: vdCtr.danmakuCid.value,
                           playerController: plPlayerController!,
                         ),
+                        bottomList: vdCtr.bottomList,
+                        showEposideCb: () => vdCtr.videoType == SearchType.video
+                            ? videoIntroController.showEposideHandler()
+                            : bangumiIntroController.showEposideHandler(),
                       ),
                     );
             },
@@ -599,7 +618,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           /// 重新进入会刷新
           // 播放完成/暂停播放
           StreamBuilder(
-            stream: appbarStream.stream,
+            stream: appbarStream.stream.distinct(),
             initialData: 0,
             builder: ((context, snapshot) {
               return ScrollAppBar(

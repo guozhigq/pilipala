@@ -484,11 +484,17 @@ class Api {
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 
+  /// 获取字幕配置
+  static const getSubtitleConfig = '/x/player/v2';
+
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
 
-  /// 我的订阅详情
-  static const userSubFolderDetail = '/x/space/fav/season/list';
+  /// 我的订阅详情 type 21
+  static const userSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅详情 type 11
+  static const userResourceList = '/x/v3/fav/resource/list';
 
   /// 表情
   static const emojiList = '/x/emote/user/panel/web';
@@ -503,4 +509,6 @@ class Api {
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
 
+  /// 取消订阅
+  static const String cancelSub = '/x/v3/fav/season/unfav';
 }
