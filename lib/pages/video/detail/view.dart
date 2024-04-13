@@ -180,11 +180,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
-        videoIntroController.hiddenEpisodeBottomSheet();
-        if (videoIntroController.videoDetail.value.ugcSeason != null ||
-            (videoIntroController.videoDetail.value.pages != null &&
-                videoIntroController.videoDetail.value.pages!.length > 1)) {
-          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        if (vdCtr.videoType == SearchType.video) {
+          videoIntroController.hiddenEpisodeBottomSheet();
+          if (videoIntroController.videoDetail.value.ugcSeason != null ||
+              (videoIntroController.videoDetail.value.pages != null &&
+                  videoIntroController.videoDetail.value.pages!.length > 1)) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
+        }
+        if (vdCtr.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.hiddenEpisodeBottomSheet();
+          if (bangumiIntroController.bangumiDetail.value.episodes != null &&
+              bangumiIntroController.bangumiDetail.value.episodes!.length > 1) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
         }
       } else {
         if (vdCtr.bottomList.contains(BottomControlType.episode)) {
