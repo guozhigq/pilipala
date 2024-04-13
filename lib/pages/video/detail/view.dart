@@ -618,7 +618,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           /// 重新进入会刷新
           // 播放完成/暂停播放
           StreamBuilder(
-            stream: appbarStream.stream,
+            stream: appbarStream.stream.distinct(),
             initialData: 0,
             builder: ((context, snapshot) {
               return ScrollAppBar(

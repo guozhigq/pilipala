@@ -65,7 +65,7 @@ class _MemberPageState extends State<MemberPage>
         children: [
           AppBar(
             title: StreamBuilder(
-              stream: appbarStream.stream,
+              stream: appbarStream.stream.distinct(),
               initialData: false,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
