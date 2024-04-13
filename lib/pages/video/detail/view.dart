@@ -67,6 +67,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
+    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
     videoIntroController = Get.put(
         VideoIntroController(bvid: Get.parameters['bvid']!),
         tag: heroTag);
@@ -112,6 +113,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
+        vdCtr.sheetHeight.value =
+            Get.size.height - videoHeight - statusBarHeight + offset;
         appbarStream.add(offset);
       },
     );
@@ -271,7 +274,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    // final double videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
     final sizeContext = MediaQuery.sizeOf(context);
     final _context = MediaQuery.of(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
