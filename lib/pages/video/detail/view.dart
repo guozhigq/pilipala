@@ -47,7 +47,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late BangumiIntroController bangumiIntroController;
   late String heroTag;
 
-  PlayerStatus playerStatus = PlayerStatus.playing;
+  Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   double doubleOffset = 0;
 
   final Box<dynamic> localCache = GStrorage.localCache;
@@ -122,7 +122,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
-    playerStatus = status!;
+    playerStatus.value = status!;
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -368,6 +368,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Obx(() => AnimatedOpacity(
+                            opacity: playerStatus.value != PlayerStatus.playing
+                                ? 1
+                                : 0,
+                            duration: const Duration(milliseconds: 100),
+                            child: const Icon(
+                              Icons.drag_handle_rounded,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                          )),
+                      const SizedBox(width: 8),
                       SizedBox(
                         height: 32,
                         child: TextButton(
@@ -406,7 +418,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 18),
                     ],
                   ),
                 )),
@@ -559,7 +571,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             Orientation.landscape ||
                         plPlayerController?.isFullScreen.value == true
                     ? MediaQuery.sizeOf(context).height
-                    : playerStatus != PlayerStatus.playing
+                    : playerStatus.value != PlayerStatus.playing
                         ? kToolbarHeight
                         : pinnedHeaderHeight;
               },
@@ -626,7 +638,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
                 () => continuePlay(),
-                playerStatus,
+                playerStatus.value,
                 null,
               );
             }),
