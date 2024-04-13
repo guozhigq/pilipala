@@ -28,13 +28,11 @@ class _MediaPageState extends State<MediaPage>
     super.initState();
     mediaController = Get.put(MediaController());
     _futureBuilderFuture = mediaController.queryFavFolder();
-    ScrollController scrollController = mediaController.scrollController;
     mediaController.userLogin.listen((status) {
       setState(() {
         _futureBuilderFuture = mediaController.queryFavFolder();
       });
     });
-    handleScrollEvent(scrollController);
   }
 
   @override
