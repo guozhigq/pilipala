@@ -341,4 +341,8 @@ class BangumiIntroController extends GetxController {
       ).buildShowContent(Get.context!),
     );
   }
+
+  hiddenEpisodeBottomSheet() {
+    bottomSheetController?.close();
+  }
 }
