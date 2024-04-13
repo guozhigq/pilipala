@@ -56,6 +56,7 @@ class BangumiIntroController extends GetxController {
   RxMap followStatus = {}.obs;
   int _tempThemeValue = -1;
   var userInfo;
+  PersistentBottomSheetController? bottomSheetController;
 
   @override
   void onInit() {
@@ -319,5 +320,9 @@ class BangumiIntroController extends GetxController {
         },
       ).buildShowContent(Get.context!),
     );
+  }
+
+  hiddenEpisodeBottomSheet() {
+    bottomSheetController?.close();
   }
 }
