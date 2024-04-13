@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../mine/controller.dart';
@@ -44,8 +43,6 @@ class _DynamicsPageState extends State<DynamicsPage>
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
     _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
     scrollController = _dynamicsController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
       () async {
         if (scrollController.position.pixels >=
@@ -55,14 +52,7 @@ class _DynamicsPageState extends State<DynamicsPage>
             _dynamicsController.queryFollowDynamic(type: 'onLoad');
           });
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
 

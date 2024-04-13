@@ -25,7 +25,7 @@ class MemberSeasonsItem extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           int cid =
-          await SearchHttp.ab2c(aid: seasonItem.aid, bvid: seasonItem.bvid);
+              await SearchHttp.ab2c(aid: seasonItem.aid, bvid: seasonItem.bvid);
           Get.toNamed('/video?bvid=${seasonItem.bvid}&cid=$cid',
               arguments: {'videoItem': seasonItem, 'heroTag': heroTag});
         },
@@ -51,8 +51,7 @@ class MemberSeasonsItem extends StatelessWidget {
                         bottom: 6,
                         right: 6,
                         type: 'gray',
-                        text: Utils.CustomStamp_str(
-                            timestamp: seasonItem.pubdate, date: 'YY-MM-DD'),
+                        text: Utils.timeFormat(seasonItem.duration),
                       )
                   ],
                 );
