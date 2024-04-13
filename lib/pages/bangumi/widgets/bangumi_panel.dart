@@ -10,6 +10,7 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../common/pages_bottom_sheet.dart';
 import '../../../models/common/video_episode_type.dart';
+import '../introduction/controller.dart';
 
 class BangumiPanel extends StatefulWidget {
   const BangumiPanel({
@@ -19,6 +20,7 @@ class BangumiPanel extends StatefulWidget {
     this.sheetHeight,
     this.changeFuc,
     this.bangumiDetail,
+    this.bangumiIntroController,
   });
 
   final List<EpisodeItem> pages;
@@ -26,6 +28,7 @@ class BangumiPanel extends StatefulWidget {
   final double? sheetHeight;
   final Function? changeFuc;
   final BangumiInfoModel? bangumiDetail;
+  final BangumiIntroController? bangumiIntroController;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -92,11 +95,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
       // 在回调函数中获取更新后的状态
       final double offset = min((currentIndex * 150) - 75,
           listViewScrollCtr.position.maxScrollExtent);
-      listViewScrollCtr.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (currentIndex.value == 0) {
+        listViewScrollCtr.jumpTo(0);
+      } else {
+        listViewScrollCtr.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -132,7 +139,8 @@ class _BangumiPanelState extends State<BangumiPanel> {
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
-                    _bottomSheetController = EpisodeBottomSheet(
+                    widget.bangumiIntroController?.bottomSheetController =
+                        _bottomSheetController = EpisodeBottomSheet(
                       currentCid: cid,
                       episodes: widget.pages,
                       changeFucCall: changeFucCall,

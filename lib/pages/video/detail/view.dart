@@ -47,7 +47,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late BangumiIntroController bangumiIntroController;
   late String heroTag;
 
-  PlayerStatus playerStatus = PlayerStatus.playing;
+  Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   double doubleOffset = 0;
 
   final Box<dynamic> localCache = GStrorage.localCache;
@@ -67,6 +67,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
+    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
     videoIntroController = Get.put(
         VideoIntroController(bvid: Get.parameters['bvid']!),
         tag: heroTag);
@@ -112,6 +113,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
+        vdCtr.sheetHeight.value =
+            Get.size.height - videoHeight - statusBarHeight + offset;
         appbarStream.add(offset);
       },
     );
@@ -119,7 +122,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
-    playerStatus = status!;
+    playerStatus.value = status!;
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -177,11 +180,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
-        videoIntroController.hiddenEpisodeBottomSheet();
-        if (videoIntroController.videoDetail.value.ugcSeason != null ||
-            (videoIntroController.videoDetail.value.pages != null &&
-                videoIntroController.videoDetail.value.pages!.length > 1)) {
-          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        if (vdCtr.videoType == SearchType.video) {
+          videoIntroController.hiddenEpisodeBottomSheet();
+          if (videoIntroController.videoDetail.value.ugcSeason != null ||
+              (videoIntroController.videoDetail.value.pages != null &&
+                  videoIntroController.videoDetail.value.pages!.length > 1)) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
+        }
+        if (vdCtr.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.hiddenEpisodeBottomSheet();
+          if (bangumiIntroController.bangumiDetail.value.episodes != null &&
+              bangumiIntroController.bangumiDetail.value.episodes!.length > 1) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
         }
       } else {
         if (vdCtr.bottomList.contains(BottomControlType.episode)) {
@@ -271,7 +283,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    // final double videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
     final sizeContext = MediaQuery.sizeOf(context);
     final _context = MediaQuery.of(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
@@ -366,6 +377,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Obx(() => AnimatedOpacity(
+                            opacity: playerStatus.value != PlayerStatus.playing
+                                ? 1
+                                : 0,
+                            duration: const Duration(milliseconds: 100),
+                            child: const Icon(
+                              Icons.drag_handle_rounded,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                          )),
+                      const SizedBox(width: 8),
                       SizedBox(
                         height: 32,
                         child: TextButton(
@@ -404,7 +427,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 18),
                     ],
                   ),
                 )),
@@ -557,7 +580,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             Orientation.landscape ||
                         plPlayerController?.isFullScreen.value == true
                     ? MediaQuery.sizeOf(context).height
-                    : playerStatus != PlayerStatus.playing
+                    : playerStatus.value != PlayerStatus.playing
                         ? kToolbarHeight
                         : pinnedHeaderHeight;
               },
@@ -624,7 +647,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
                 () => continuePlay(),
-                playerStatus,
+                playerStatus.value,
                 null,
               );
             }),

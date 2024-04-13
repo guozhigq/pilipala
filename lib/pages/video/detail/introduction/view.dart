@@ -372,7 +372,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ),
 
           /// 点赞收藏转发
-          actionGrid(context, videoIntroController),
+          Material(child: actionGrid(context, videoIntroController)),
           // 合集 videoPart 简洁
           if (widget.videoDetail!.ugcSeason != null) ...[
             Obx(
@@ -381,7 +381,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 cid: videoIntroController.lastPlayCid.value != 0
                     ? videoIntroController.lastPlayCid.value
                     : widget.videoDetail!.pages!.first.cid,
-                sheetHeight: sheetHeight,
+                sheetHeight: videoDetailCtr.sheetHeight.value,
                 changeFuc: (bvid, cid, aid) =>
                     videoIntroController.changeSeasonOrbangu(
                   bvid,
@@ -399,7 +399,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               () => PagesPanel(
                 pages: widget.videoDetail!.pages!,
                 cid: videoIntroController.lastPlayCid.value,
-                sheetHeight: sheetHeight,
+                sheetHeight: videoDetailCtr.sheetHeight.value,
                 changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
                   videoIntroController.bvid,
                   cid,

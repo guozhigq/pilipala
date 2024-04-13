@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../../../common/pages_bottom_sheet.dart';
 import '../../../../../models/common/video_episode_type.dart';
 
@@ -35,7 +34,6 @@ class _PagesPanelState extends State<PagesPanel> {
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   final ScrollController listViewScrollCtr = ScrollController();
-  final ItemScrollController itemScrollController = ItemScrollController();
   late PersistentBottomSheetController? _bottomSheetController;
 
   @override
@@ -60,7 +58,6 @@ class _PagesPanelState extends State<PagesPanel> {
   }
 
   void changeFucCall(item, i) async {
-    print('pages changeFucCall');
     widget.changeFuc?.call(item.cid);
     currentIndex.value = i;
     _bottomSheetController?.close();
@@ -72,11 +69,15 @@ class _PagesPanelState extends State<PagesPanel> {
       // 在回调函数中获取更新后的状态
       final double offset = min((currentIndex * 150) - 75,
           listViewScrollCtr.position.maxScrollExtent);
-      listViewScrollCtr.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (currentIndex.value == 0) {
+        listViewScrollCtr.jumpTo(0);
+      } else {
+        listViewScrollCtr.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
