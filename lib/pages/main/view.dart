@@ -129,7 +129,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         bottomNavigationBar: _mainController.navigationBars.length > 1
             ? StreamBuilder(
                 stream: _mainController.hideTabBar
-                    ? _mainController.bottomBarStream.stream
+                    ? _mainController.bottomBarStream.stream.distinct()
                     : StreamController<bool>.broadcast().stream,
                 initialData: true,
                 builder: (context, AsyncSnapshot snapshot) {

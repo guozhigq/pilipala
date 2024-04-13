@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
@@ -31,25 +29,12 @@ class _MediaPageState extends State<MediaPage>
     mediaController = Get.put(MediaController());
     _futureBuilderFuture = mediaController.queryFavFolder();
     ScrollController scrollController = mediaController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-
     mediaController.userLogin.listen((status) {
       setState(() {
         _futureBuilderFuture = mediaController.queryFavFolder();
       });
     });
-    scrollController.addListener(
-      () {
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-        }
-      },
-    );
+    handleScrollEvent(scrollController);
   }
 
   @override

@@ -194,7 +194,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         centerTitle: false,
         titleSpacing: 0,
         title: StreamBuilder(
-          stream: titleStreamC.stream,
+          stream: titleStreamC.stream.distinct(),
           initialData: false,
           builder: (context, AsyncSnapshot snapshot) {
             return AnimatedOpacity(
