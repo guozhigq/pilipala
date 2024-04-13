@@ -157,10 +157,10 @@ class MyApp extends StatelessWidget {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           systemNavigationBarColor: GlobalData().enableMYBar
-              ? themeData.colorScheme.surfaceVariant
+              ? const Color(0x00010000)
               : themeData.canvasColor,
           systemNavigationBarDividerColor: GlobalData().enableMYBar
-              ? themeData.colorScheme.surfaceVariant
+              ? const Color(0x00010000)
               : themeData.canvasColor,
           systemNavigationBarIconBrightness: currentThemeValue == ThemeType.dark
               ? Brightness.light
