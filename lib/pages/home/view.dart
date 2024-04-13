@@ -171,7 +171,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: stream,
+      stream: stream!.distinct(),
       initialData: true,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         final RxBool isUserLoggedIn = ctr!.userLogin;

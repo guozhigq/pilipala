@@ -126,82 +126,82 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           },
           children: _mainController.pages,
         ),
-        bottomNavigationBar: _mainController.navigationBars.length > 1
-            ? StreamBuilder(
-                stream: _mainController.hideTabBar
-                    ? _mainController.bottomBarStream.stream
-                    : StreamController<bool>.broadcast().stream,
-                initialData: true,
-                builder: (context, AsyncSnapshot snapshot) {
-                  return AnimatedSlide(
-                    curve: Curves.easeInOutCubicEmphasized,
-                    duration: const Duration(milliseconds: 500),
-                    offset: Offset(0, snapshot.data ? 0 : 1),
-                    child: GlobalData().enableMYBar
-                        ? NavigationBar(
-                            onDestinationSelected: (value) => setIndex(value),
-                            selectedIndex: _mainController.selectedIndex,
-                            destinations: <Widget>[
-                              ..._mainController.navigationBars.map((e) {
-                                return NavigationDestination(
-                                  icon: Obx(
-                                    () => Badge(
-                                      label: _mainController
-                                                  .dynamicBadgeType.value ==
+        bottomNavigationBar: StreamBuilder(
+          stream: _mainController.hideTabBar
+              ? _mainController.bottomBarStream.stream.distinct()
+              : StreamController<bool>.broadcast().stream,
+          initialData: true,
+          builder: (context, AsyncSnapshot snapshot) {
+            return AnimatedSlide(
+              curve: Curves.easeInOutCubicEmphasized,
+              duration: const Duration(milliseconds: 500),
+              offset: Offset(0, snapshot.data ? 0 : 1),
+              child: Obx(
+                () => GlobalData().enableMYBar
+                    ? NavigationBar(
+                        onDestinationSelected: (value) => setIndex(value),
+                        selectedIndex: _mainController.selectedIndex,
+                        destinations: <Widget>[
+                          ..._mainController.navigationBars.map((e) {
+                            return NavigationDestination(
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
                                               DynamicBadgeMode.number
                                           ? Text(e['count'].toString())
                                           : null,
-                                      padding:
-                                          const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                      isLabelVisible: _mainController
-                                                  .dynamicBadgeType.value !=
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
                                               DynamicBadgeMode.hidden &&
                                           e['count'] > 0,
-                                      child: e['icon'],
-                                    ),
-                                  ),
-                                  selectedIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            ],
-                          )
-                        : BottomNavigationBar(
-                            currentIndex: _mainController.selectedIndex,
-                            type: BottomNavigationBarType.fixed,
-                            onTap: (value) => setIndex(value),
-                            iconSize: 16,
-                            selectedFontSize: 12,
-                            unselectedFontSize: 12,
-                            items: [
-                              ..._mainController.navigationBars.map((e) {
-                                return BottomNavigationBarItem(
-                                  icon: Obx(
-                                    () => Badge(
-                                      label: _mainController
-                                                  .dynamicBadgeType.value ==
+                                  child: e['icon'],
+                                ),
+                              ),
+                              selectedIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      )
+                    : BottomNavigationBar(
+                        currentIndex: _mainController.selectedIndex,
+                        type: BottomNavigationBarType.fixed,
+                        onTap: (value) => setIndex(value),
+                        iconSize: 16,
+                        selectedFontSize: 12,
+                        unselectedFontSize: 12,
+                        items: [
+                          ..._mainController.navigationBars.map((e) {
+                            return BottomNavigationBarItem(
+                              icon: Obx(
+                                () => Badge(
+                                  label:
+                                      _mainController.dynamicBadgeType.value ==
                                               DynamicBadgeMode.number
                                           ? Text(e['count'].toString())
                                           : null,
-                                      padding:
-                                          const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                      isLabelVisible: _mainController
-                                                  .dynamicBadgeType.value !=
+                                  padding:
+                                      const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                  isLabelVisible:
+                                      _mainController.dynamicBadgeType.value !=
                                               DynamicBadgeMode.hidden &&
                                           e['count'] > 0,
-                                      child: e['icon'],
-                                    ),
-                                  ),
-                                  activeIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            ],
-                          ),
-                  );
-                },
-              )
-            : null,
+                                  child: e['icon'],
+                                ),
+                              ),
+                              activeIcon: e['selectIcon'],
+                              label: e['label'],
+                            );
+                          }).toList(),
+                        ],
+                      ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
