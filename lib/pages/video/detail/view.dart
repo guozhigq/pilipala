@@ -404,27 +404,41 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         width: 38,
                         height: 38,
                         child: Obx(
-                          () => IconButton(
-                            onPressed: () {
-                              plPlayerController?.isOpenDanmu.value =
-                                  !(plPlayerController?.isOpenDanmu.value ??
-                                      false);
-                            },
-                            icon: !(plPlayerController?.isOpenDanmu.value ??
-                                    false)
-                                ? SvgPicture.asset(
+                          () => !vdCtr.isShowCover.value
+                              ? IconButton(
+                                  onPressed: () {
+                                    plPlayerController?.isOpenDanmu.value =
+                                        !(plPlayerController
+                                                ?.isOpenDanmu.value ??
+                                            false);
+                                  },
+                                  icon:
+                                      !(plPlayerController?.isOpenDanmu.value ??
+                                              false)
+                                          ? SvgPicture.asset(
+                                              'assets/images/video/danmu_close.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/video/danmu_open.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                )
+                              : IconButton(
+                                  icon: SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
                                     // ignore: deprecated_member_use
                                     color:
                                         Theme.of(context).colorScheme.outline,
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/images/video/danmu_open.svg',
-                                    // ignore: deprecated_member_use
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
                                   ),
-                          ),
+                                  onPressed: () {},
+                                ),
                         ),
                       ),
                       const SizedBox(width: 18),
