@@ -58,6 +58,7 @@ class VideoIntroController extends GetxController {
   String heroTag = '';
   late ModelResult modelResult;
   PersistentBottomSheetController? bottomSheetController;
+  late bool enableRelatedVideo;
 
   @override
   void onInit() {
@@ -74,6 +75,8 @@ class VideoIntroController extends GetxController {
       queryOnlineTotal();
       startTimer(); // 在页面加载时启动定时器
     }
+    enableRelatedVideo =
+        setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
   }
 
   // 获取视频简介&分p
@@ -447,15 +450,18 @@ class VideoIntroController extends GetxController {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    final ReleatedController releatedCtr =
-        Get.find<ReleatedController>(tag: heroTag);
+    if (enableRelatedVideo) {
+      final ReleatedController releatedCtr =
+          Get.find<ReleatedController>(tag: heroTag);
+      releatedCtr.bvid = bvid;
+      releatedCtr.queryRelatedVideo();
+    }
+
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
-    releatedCtr.bvid = bvid;
-    releatedCtr.queryRelatedVideo();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
