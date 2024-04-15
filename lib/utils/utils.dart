@@ -209,6 +209,9 @@ class Utils {
     int minDiff = 127;
     int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
 
+    if (numbers.contains(target)) {
+      return target;
+    }
     // 向下查找
     try {
       for (int number in numbers) {
@@ -232,6 +235,7 @@ class Utils {
           if (diff < minDiff) {
             minDiff = diff;
             closestNumber = number;
+            return closestNumber;
           }
         }
       } catch (_) {}
