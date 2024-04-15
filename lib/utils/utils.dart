@@ -210,15 +210,18 @@ class Utils {
     int minDiff = 127;
     int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
 
+    if (numbers.contains(target)) {
+      return target;
+    }
     // 向下查找
     try {
       for (int number in numbers) {
         if (number < target) {
           int diff = target - number; // 计算目标值与当前整数的差值
-
           if (diff < minDiff) {
             minDiff = diff;
             closestNumber = number;
+            return closestNumber;
           }
         }
       }
