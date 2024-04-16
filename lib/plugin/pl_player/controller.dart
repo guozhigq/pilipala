@@ -473,17 +473,17 @@ class PlPlayerController {
     }
 
     // 字幕
-    if (dataSource.subFiles != '' && dataSource.subFiles != null) {
-      await pp.setProperty(
-        'sub-files',
-        UniversalPlatform.isWindows
-            ? dataSource.subFiles!.replaceAll(';', '\\;')
-            : dataSource.subFiles!.replaceAll(':', '\\:'),
-      );
-      await pp.setProperty("subs-with-matching-audio", "no");
-      await pp.setProperty("sub-forced-only", "yes");
-      await pp.setProperty("blend-subtitles", "video");
-    }
+    // if (dataSource.subFiles != '' && dataSource.subFiles != null) {
+    //   await pp.setProperty(
+    //     'sub-files',
+    //     UniversalPlatform.isWindows
+    //         ? dataSource.subFiles!.replaceAll(';', '\\;')
+    //         : dataSource.subFiles!.replaceAll(':', '\\:'),
+    //   );
+    //   await pp.setProperty("subs-with-matching-audio", "no");
+    //   await pp.setProperty("sub-forced-only", "yes");
+    //   await pp.setProperty("blend-subtitles", "video");
+    // }
 
     _videoController = _videoController ??
         VideoController(
@@ -603,7 +603,9 @@ class PlPlayerController {
           makeHeartBeat(event.inSeconds);
         }),
         videoPlayerController!.stream.duration.listen((event) {
-          duration.value = event;
+          if (event > Duration.zero) {
+            duration.value = event;
+          }
         }),
         videoPlayerController!.stream.buffer.listen((event) {
           _buffered.value = event;
@@ -646,30 +648,36 @@ class PlPlayerController {
 
   /// 跳转至指定位置
   Future<void> seekTo(Duration position, {type = 'seek'}) async {
-    if (position < Duration.zero) {
-      position = Duration.zero;
-    }
-    _position.value = position;
-    updatePositionSecond();
-    _heartDuration = position.inSeconds;
-    if (duration.value.inSeconds != 0) {
-      if (type != 'slider') {
-        /// 拖动进度条调节时，不等待第一帧，防止抖动
-        await _videoPlayerController?.stream.buffer.first;
+    try {
+      if (position < Duration.zero) {
+        position = Duration.zero;
       }
-      await _videoPlayerController?.seek(position);
-    } else {
-      _timerForSeek?.cancel();
-      _timerForSeek ??=
-          Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        if (duration.value.inSeconds != 0) {
-          await _videoPlayerController!.stream.buffer.first;
-          await _videoPlayerController?.seek(position);
-          t.cancel();
-          _timerForSeek = null;
+      _position.value = position;
+      updatePositionSecond();
+      _heartDuration = position.inSeconds;
+      if (duration.value.inSeconds != 0) {
+        if (type != 'slider') {
+          await _videoPlayerController?.stream.buffer.first;
         }
-      });
+        await _videoPlayerController?.seek(position);
+      } else {
+        _timerForSeek?.cancel();
+        _timerForSeek ??= _startSeekTimer(position);
+      }
+    } catch (err) {
+      print('Error while seeking: $err');
     }
+  }
+
+  Timer? _startSeekTimer(Duration position) {
+    return Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
+      if (duration.value.inSeconds != 0) {
+        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.seek(position);
+        t.cancel();
+        _timerForSeek = null;
+      }
+    });
   }
 
   /// 设置倍速
