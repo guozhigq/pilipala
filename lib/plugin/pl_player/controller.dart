@@ -522,7 +522,22 @@ class PlPlayerController {
     Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
-    // 设置倍速
+    getVideoFit();
+    // if (_looping) {
+    //   await setLooping(_looping);
+    // }
+
+    /// 跳转播放
+    if (seekTo != Duration.zero) {
+      await this.seekTo(seekTo);
+    }
+
+    /// 自动播放
+    if (_autoPlay) {
+      await play(duration: duration);
+    }
+
+    /// 设置倍速
     if (videoType.value == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
@@ -531,20 +546,6 @@ class PlPlayerController {
       } else {
         await setPlaybackSpeed(1.0);
       }
-    }
-    getVideoFit();
-    // if (_looping) {
-    //   await setLooping(_looping);
-    // }
-
-    // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
-
-    // 自动播放
-    if (_autoPlay) {
-      await play(duration: duration);
     }
   }
 
@@ -716,11 +717,10 @@ class PlPlayerController {
       await seekTo(Duration.zero);
     }
     await _videoPlayerController?.play();
-
+    playerStatus.status.value = PlayerStatus.playing;
     await getCurrentVolume();
     await getCurrentBrightness();
 
-    playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
 
     /// 临时fix _duration.value丢失
