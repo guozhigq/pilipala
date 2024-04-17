@@ -44,6 +44,7 @@ class _SelectDialogState<T> extends State<SelectDialog<T>> {
                     setState(() {
                       _tempValue = value as T;
                     });
+                    Navigator.pop(context, _tempValue);
                   },
                 ),
               ]
@@ -51,19 +52,6 @@ class _SelectDialogState<T> extends State<SelectDialog<T>> {
           ),
         );
       }),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            '取消',
-            style: TextStyle(color: Theme.of(context).colorScheme.outline),
-          ),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _tempValue),
-          child: const Text('确定'),
-        )
-      ],
     );
   }
 }

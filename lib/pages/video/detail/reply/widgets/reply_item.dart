@@ -525,14 +525,18 @@ InlineSpan buildContent(
   if (jumpUrlKeysList.isNotEmpty) {
     patternStr += '|${jumpUrlKeysList.join('|')}';
   }
+  RegExp bv23Regex = RegExp(r'https://b23\.tv/[a-zA-Z0-9]{7}');
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   void addPlainTextSpan(str) {
-    spanChilds.add(TextSpan(
+    spanChilds.add(
+      TextSpan(
         text: str,
         recognizer: TapGestureRecognizer()
           ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem)));
+              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
+      ),
+    );
   }
 
   // 分割文本并处理每个部分
@@ -734,8 +738,36 @@ InlineSpan buildContent(
       return '';
     },
     onNonMatch: (String nonMatchStr) {
-      addPlainTextSpan(nonMatchStr);
-      return nonMatchStr;
+      return nonMatchStr.splitMapJoin(
+        bv23Regex,
+        onMatch: (Match match) {
+          String matchStr = match[0]!;
+          spanChilds.add(
+            TextSpan(
+              text: ' $matchStr ',
+              style: isVideoPage
+                  ? TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  : null,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => Get.toNamed(
+                      '/webview',
+                      parameters: {
+                        'url': matchStr,
+                        'type': 'url',
+                        'pageTitle': matchStr
+                      },
+                    ),
+            ),
+          );
+          return '';
+        },
+        onNonMatch: (String nonMatchOtherStr) {
+          addPlainTextSpan(nonMatchOtherStr);
+          return nonMatchOtherStr;
+        },
+      );
     },
   );
 

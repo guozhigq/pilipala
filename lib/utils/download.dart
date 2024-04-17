@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -70,9 +72,20 @@ class DownloadUtils {
   static Future<bool> downloadImg(String imgUrl,
       {String imgType = 'cover'}) async {
     try {
-      if (!await requestPhotoPer()) {
+      if (!Platform.isAndroid || !await requestPhotoPer()) {
         return false;
       }
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        if (!await requestStoragePer()) {
+          return false;
+        }
+      } else {
+        if (!await requestPhotoPer()) {
+          return false;
+        }
+      }
+
       SmartDialog.showLoading(msg: '保存中');
       var response = await Dio()
           .get(imgUrl, options: Options(responseType: ResponseType.bytes));

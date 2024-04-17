@@ -51,7 +51,7 @@ class Utils {
     }
     if (time < 3600) {
       if (time == 0) {
-        return time;
+        return '00:00';
       }
       final int minute = time ~/ 60;
       final double res = time / 60;
@@ -208,17 +208,38 @@ class Utils {
 
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
-    late int closestNumber;
+    int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
+
+    if (numbers.contains(target)) {
+      return target;
+    }
+    // 向下查找
     try {
       for (int number in numbers) {
-        int diff = (number - target).abs();
-
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestNumber = number;
+        if (number < target) {
+          int diff = target - number; // 计算目标值与当前整数的差值
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+            return closestNumber;
+          }
         }
       }
     } catch (_) {}
+
+    // 向上查找
+    if (closestNumber == 0) {
+      try {
+        for (int number in numbers) {
+          int diff = (number - target).abs();
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+          }
+        }
+      } catch (_) {}
+    }
     return closestNumber;
   }
 

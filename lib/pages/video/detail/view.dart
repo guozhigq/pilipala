@@ -24,6 +24,7 @@ import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
 
@@ -46,7 +47,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late BangumiIntroController bangumiIntroController;
   late String heroTag;
 
-  PlayerStatus playerStatus = PlayerStatus.playing;
+  Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   double doubleOffset = 0;
 
   final Box<dynamic> localCache = GStrorage.localCache;
@@ -66,6 +67,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
+    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
     videoIntroController = Get.put(
         VideoIntroController(bvid: Get.parameters['bvid']!),
         tag: heroTag);
@@ -107,10 +109,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 流
   appbarStreamListen() {
-    appbarStream = StreamController<double>();
+    appbarStream = StreamController<double>.broadcast();
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
+        vdCtr.sheetHeight.value =
+            Get.size.height - videoHeight - statusBarHeight + offset;
         appbarStream.add(offset);
       },
     );
@@ -118,7 +122,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   // 播放器状态监听
   void playerListener(PlayerStatus? status) async {
-    playerStatus = status!;
+    playerStatus.value = status!;
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -176,6 +180,25 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
+        if (vdCtr.videoType == SearchType.video) {
+          videoIntroController.hiddenEpisodeBottomSheet();
+          if (videoIntroController.videoDetail.value.ugcSeason != null ||
+              (videoIntroController.videoDetail.value.pages != null &&
+                  videoIntroController.videoDetail.value.pages!.length > 1)) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
+        }
+        if (vdCtr.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.hiddenEpisodeBottomSheet();
+          if (bangumiIntroController.bangumiDetail.value.episodes != null &&
+              bangumiIntroController.bangumiDetail.value.episodes!.length > 1) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
+        }
+      } else {
+        if (vdCtr.bottomList.contains(BottomControlType.episode)) {
+          vdCtr.bottomList.removeAt(3);
+        }
       }
     });
   }
@@ -260,7 +283,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    // final double videoHeight = MediaQuery.sizeOf(context).width * 9 / 16;
     final sizeContext = MediaQuery.sizeOf(context);
     final _context = MediaQuery.of(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
@@ -292,15 +314,19 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             () {
               return !vdCtr.autoPlay.value
                   ? const SizedBox()
-                  : PLVideoPlayer(
-                      controller: plPlayerController!,
-                      headerControl: vdCtr.headerControl,
-                      danmuWidget: Obx(
-                        () => PlDanmaku(
+                  : Obx(
+                      () => PLVideoPlayer(
+                        controller: plPlayerController!,
+                        headerControl: vdCtr.headerControl,
+                        danmuWidget: PlDanmaku(
                           key: Key(vdCtr.danmakuCid.value.toString()),
                           cid: vdCtr.danmakuCid.value,
                           playerController: plPlayerController!,
                         ),
+                        bottomList: vdCtr.bottomList,
+                        showEposideCb: () => vdCtr.videoType == SearchType.video
+                            ? videoIntroController.showEposideHandler()
+                            : bangumiIntroController.showEposideHandler(),
                       ),
                     );
             },
@@ -351,6 +377,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Obx(() => AnimatedOpacity(
+                            opacity: playerStatus.value != PlayerStatus.playing
+                                ? 1
+                                : 0,
+                            duration: const Duration(milliseconds: 100),
+                            child: const Icon(
+                              Icons.drag_handle_rounded,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                          )),
+                      const SizedBox(width: 8),
                       SizedBox(
                         height: 32,
                         child: TextButton(
@@ -366,27 +404,44 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         width: 38,
                         height: 38,
                         child: Obx(
-                          () => IconButton(
-                            onPressed: () {
-                              plPlayerController?.isOpenDanmu.value =
-                                  !(plPlayerController?.isOpenDanmu.value ??
-                                      false);
-                            },
-                            icon: !(plPlayerController?.isOpenDanmu.value ??
-                                    false)
-                                ? SvgPicture.asset(
+                          () => !vdCtr.isShowCover.value
+                              ? IconButton(
+                                  onPressed: () {
+                                    plPlayerController?.isOpenDanmu.value =
+                                        !(plPlayerController
+                                                ?.isOpenDanmu.value ??
+                                            false);
+                                  },
+                                  icon:
+                                      !(plPlayerController?.isOpenDanmu.value ??
+                                              false)
+                                          ? SvgPicture.asset(
+                                              'assets/images/video/danmu_close.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/video/danmu_open.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                )
+                              : IconButton(
+                                  icon: SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/images/video/danmu_open.svg',
                                     // ignore: deprecated_member_use
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.outline,
                                   ),
-                          ),
+                                  onPressed: () {},
+                                ),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 18),
                     ],
                   ),
                 )),
@@ -539,7 +594,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             Orientation.landscape ||
                         plPlayerController?.isFullScreen.value == true
                     ? MediaQuery.sizeOf(context).height
-                    : playerStatus != PlayerStatus.playing
+                    : playerStatus.value != PlayerStatus.playing
                         ? kToolbarHeight
                         : pinnedHeaderHeight;
               },
@@ -600,13 +655,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           /// 重新进入会刷新
           // 播放完成/暂停播放
           StreamBuilder(
-            stream: appbarStream.stream,
+            stream: appbarStream.stream.distinct(),
             initialData: 0,
             builder: ((context, snapshot) {
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
                 () => continuePlay(),
-                playerStatus,
+                playerStatus.value,
                 null,
               );
             }),

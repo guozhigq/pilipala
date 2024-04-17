@@ -102,7 +102,7 @@ class _RankPageState extends State<RankPage>
                       onTap: (value) {
                         feedBack();
                         if (_rankController.initialIndex.value == value) {
-                          _rankController.tabsCtrList[value]().animateToTop();
+                          _rankController.tabsCtrList[value].animateToTop();
                         }
                         _rankController.initialIndex.value = value;
                       },

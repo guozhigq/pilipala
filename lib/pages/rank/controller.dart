@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/rank_type.dart';
+import 'package:pilipala/pages/rank/zone/index.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RankController extends GetxController with GetTickerProviderStateMixin {
@@ -29,20 +30,22 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
 
   void onRefresh() {
     int index = tabController.index;
-    var ctr = tabsCtrList[index];
-    ctr().onRefresh();
+    final ZoneController ctr = tabsCtrList[index];
+    ctr.onRefresh();
   }
 
   void animateToTop() {
     int index = tabController.index;
-    var ctr = tabsCtrList[index];
-    ctr().animateToTop();
+    final ZoneController ctr = tabsCtrList[index];
+    ctr.animateToTop();
   }
 
   void setTabConfig() async {
     tabs.value = tabsConfig;
     initialIndex.value = 0;
-    tabsCtrList = tabs.map((e) => e['ctr']).toList();
+    tabsCtrList = tabs
+        .map((e) => Get.put(ZoneController(), tag: e['rid'].toString()))
+        .toList();
     tabsPageList = tabs.map<Widget>((e) => e['page']).toList();
 
     tabController = TabController(
@@ -50,21 +53,5 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
       length: tabs.length,
       vsync: this,
     );
-    // 监听 tabController 切换
-    if (enableGradientBg) {
-      tabController.animation!.addListener(() {
-        if (tabController.indexIsChanging) {
-          if (initialIndex.value != tabController.index) {
-            initialIndex.value = tabController.index;
-          }
-        } else {
-          final int temp = tabController.animation!.value.round();
-          if (initialIndex.value != temp) {
-            initialIndex.value = temp;
-            tabController.index = initialIndex.value;
-          }
-        }
-      });
-    }
   }
 }

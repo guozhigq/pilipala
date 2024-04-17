@@ -18,6 +18,9 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../common/pages_bottom_sheet.dart';
+import '../../../../models/common/video_episode_type.dart';
+import '../../../../utils/drawer.dart';
 import '../related/index.dart';
 import 'widgets/group_panel.dart';
 
@@ -25,15 +28,10 @@ class VideoIntroController extends GetxController {
   VideoIntroController({required this.bvid});
   // 视频bvid
   String bvid;
-  // 请求状态
-  RxBool isLoading = false.obs;
-
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
-
   // up主粉丝数
   Map userStat = {'follower': '-'};
-
   // 是否点赞
   RxBool hasLike = false.obs;
   // 是否投币
@@ -59,6 +57,8 @@ class VideoIntroController extends GetxController {
   bool isPaused = false;
   String heroTag = '';
   late ModelResult modelResult;
+  PersistentBottomSheetController? bottomSheetController;
+  late bool enableRelatedVideo;
 
   @override
   void onInit() {
@@ -75,6 +75,8 @@ class VideoIntroController extends GetxController {
       queryOnlineTotal();
       startTimer(); // 在页面加载时启动定时器
     }
+    enableRelatedVideo =
+        setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
   }
 
   // 获取视频简介&分p
@@ -448,15 +450,18 @@ class VideoIntroController extends GetxController {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    final ReleatedController releatedCtr =
-        Get.find<ReleatedController>(tag: heroTag);
+    if (enableRelatedVideo) {
+      final ReleatedController releatedCtr =
+          Get.find<ReleatedController>(tag: heroTag);
+      releatedCtr.bvid = bvid;
+      releatedCtr.queryRelatedVideo();
+    }
+
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
-    releatedCtr.bvid = bvid;
-    releatedCtr.queryRelatedVideo();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
@@ -561,5 +566,53 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
     }
     return res;
+  }
+
+  hiddenEpisodeBottomSheet() {
+    bottomSheetController?.close();
+  }
+
+  // 播放器底栏 选集 回调
+  void showEposideHandler() {
+    late List episodes;
+    VideoEpidoesType dataType = VideoEpidoesType.videoEpisode;
+    if (videoDetail.value.ugcSeason != null) {
+      dataType = VideoEpidoesType.videoEpisode;
+      final List<SectionItem> sections = videoDetail.value.ugcSeason!.sections!;
+      for (int i = 0; i < sections.length; i++) {
+        final List<EpisodeItem> episodesList = sections[i].episodes!;
+        for (int j = 0; j < episodesList.length; j++) {
+          if (episodesList[j].cid == lastPlayCid.value) {
+            episodes = episodesList;
+            continue;
+          }
+        }
+      }
+    }
+    if (videoDetail.value.pages != null &&
+        videoDetail.value.pages!.length > 1) {
+      dataType = VideoEpidoesType.videoPart;
+      episodes = videoDetail.value.pages!;
+    }
+
+    DrawerUtils.showRightDialog(
+      child: EpisodeBottomSheet(
+        episodes: episodes,
+        currentCid: lastPlayCid.value,
+        dataType: dataType,
+        context: Get.context!,
+        sheetHeight: Get.size.height,
+        isFullScreen: true,
+        changeFucCall: (item, index) {
+          if (dataType == VideoEpidoesType.videoEpisode) {
+            changeSeasonOrbangu(IdUtils.av2bv(item.aid), item.cid, item.aid);
+          }
+          if (dataType == VideoEpidoesType.videoPart) {
+            changeSeasonOrbangu(bvid, item.cid, null);
+          }
+          SmartDialog.dismiss();
+        },
+      ).buildShowContent(Get.context!),
+    );
   }
 }

@@ -67,7 +67,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
             pinned: true,
             titleSpacing: 0,
             title: StreamBuilder(
-              stream: titleStreamC.stream,
+              stream: titleStreamC.stream.distinct(),
               initialData: false,
               builder: (context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
