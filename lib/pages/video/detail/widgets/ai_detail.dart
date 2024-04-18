@@ -49,7 +49,7 @@ class AiDetail extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text(
+                  SelectableText(
                     modelResult!.summary!,
                     style: const TextStyle(
                       fontSize: 15,
@@ -60,13 +60,15 @@ class AiDetail extends StatelessWidget {
                   const SizedBox(height: 20),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: modelResult!.outline!.length,
                     physics: const NeverScrollableScrollPhysics(),
+                    itemCount: modelResult!.outline!.length,
                     itemBuilder: (context, index) {
+                      final outline = modelResult!.outline![index];
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            modelResult!.outline![index].title!,
+                          SelectableText(
+                            outline.title!,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -77,76 +79,59 @@ class AiDetail extends StatelessWidget {
                           ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: modelResult!
-                                .outline![index].partOutline!.length,
+                            itemCount: outline.partOutline!.length,
                             itemBuilder: (context, i) {
+                              final part = outline.partOutline![i];
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Wrap(
-                                    children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onBackground,
-                                            height: 1.5,
+                                  GestureDetector(
+                                    onTap: () {
+                                      try {
+                                        final controller =
+                                            Get.find<VideoDetailController>(
+                                          tag: Get.arguments['heroTag'],
+                                        );
+                                        controller.plPlayerController.seekTo(
+                                          Duration(
+                                            seconds: Utils.duration(
+                                              Utils.tampToSeektime(
+                                                  part.timestamp!),
+                                            ).toInt(),
                                           ),
-                                          children: [
-                                            TextSpan(
-                                              text: Utils.tampToSeektime(
-                                                  modelResult!
-                                                      .outline![index]
-                                                      .partOutline![i]
-                                                      .timestamp!),
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                              ),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  // 跳转到指定位置
-                                                  try {
-                                                    Get.find<VideoDetailController>(
-                                                            tag: Get.arguments[
-                                                                'heroTag'])
-                                                        .plPlayerController
-                                                        .seekTo(
-                                                          Duration(
-                                                            seconds:
-                                                                Utils.duration(
-                                                              Utils.tampToSeektime(modelResult!
-                                                                      .outline![
-                                                                          index]
-                                                                      .partOutline![
-                                                                          i]
-                                                                      .timestamp!)
-                                                                  .toString(),
-                                                            ),
-                                                          ),
-                                                        );
-                                                  } catch (_) {}
-                                                },
-                                            ),
-                                            const TextSpan(text: ' '),
-                                            TextSpan(
-                                                text: modelResult!
-                                                    .outline![index]
-                                                    .partOutline![i]
-                                                    .content!),
-                                          ],
+                                        );
+                                      } catch (_) {}
+                                    },
+                                    child: SelectableText.rich(
+                                      TextSpan(
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          height: 1.5,
                                         ),
+                                        children: [
+                                          TextSpan(
+                                            text: Utils.tampToSeektime(
+                                                part.timestamp!),
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                          ),
+                                          const TextSpan(text: ' '),
+                                          TextSpan(text: part.content!),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
+                                  const SizedBox(height: 20),
                                 ],
                               );
                             },
                           ),
-                          const SizedBox(height: 20),
                         ],
                       );
                     },
