@@ -10,6 +10,7 @@ import 'package:pilipala/utils/storage.dart';
 class FavController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
   Box userInfoCache = GStrorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
@@ -32,9 +33,10 @@ class FavController extends GetxController {
     if (res['status']) {
       if (type == 'init') {
         favFolderData.value = res['data'];
+        favFolderList.value = res['data'].list;
       } else {
         if (res['data'].list.isNotEmpty) {
-          favFolderData.value.list!.addAll(res['data'].list);
+          favFolderList.addAll(res['data'].list);
           favFolderData.update((val) {});
         }
       }
@@ -48,5 +50,14 @@ class FavController extends GetxController {
 
   Future onLoad() async {
     queryFavFolder(type: 'onload');
+  }
+
+  removeFavFolder({required int mediaIds}) async {
+    for (var i in favFolderList) {
+      if (i.id == mediaIds) {
+        favFolderList.remove(i);
+        break;
+      }
+    }
   }
 }

@@ -101,11 +101,19 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     Get.toNamed('/favSearch?searchType=0&mediaId=$mediaId'),
                 icon: const Icon(Icons.search_outlined),
               ),
-              //   IconButton(
-              //     onPressed: () {},
-              //     icon: const Icon(Icons.more_vert),
-              //   ),
-              const SizedBox(width: 6),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert_outlined),
+                position: PopupMenuPosition.under,
+                onSelected: (String type) {},
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    onTap: () => _favDetailController.onDelFavFolder(),
+                    value: 'pause',
+                    child: const Text('删除收藏夹'),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 14),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(

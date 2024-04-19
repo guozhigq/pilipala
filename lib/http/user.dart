@@ -395,4 +395,21 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
+
+  // 删除文件夹
+  static Future delFavFolder({required int mediaIds}) async {
+    var res = await Request().post(
+      Api.delFavFolder,
+      queryParameters: {
+        'media_ids': mediaIds,
+        'platform': 'web',
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }
