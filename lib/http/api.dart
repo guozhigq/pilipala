@@ -511,4 +511,7 @@ class Api {
 
   /// 取消订阅
   static const String cancelSub = '/x/v3/fav/season/unfav';
+
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
 }
