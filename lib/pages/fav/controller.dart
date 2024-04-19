@@ -13,7 +13,7 @@ class FavController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
-  int pageSize = 10;
+  int pageSize = 60;
   RxBool hasMore = true.obs;
 
   Future<dynamic> queryFavFolder({type = 'init'}) async {
