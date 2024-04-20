@@ -53,6 +53,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
   @override
   void dispose() {
     _controller.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 

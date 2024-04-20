@@ -54,4 +54,10 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
       vsync: this,
     );
   }
+
+  @override
+  void onClose() {
+    searchBarStream.close();
+    super.onClose();
+  }
 }
