@@ -101,4 +101,10 @@ class MainController extends GetxController {
     selectedIndex = defaultIndex != -1 ? defaultIndex : 0;
     pages = navigationBars.map<Widget>((e) => e['page']).toList();
   }
+
+  @override
+  void onClose() {
+    bottomBarStream.close();
+    super.onClose();
+  }
 }

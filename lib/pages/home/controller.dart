@@ -114,4 +114,10 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       defaultSearch.value = res.data['data']['name'];
     }
   }
+
+  @override
+  void onClose() {
+    searchBarStream.close();
+    super.onClose();
+  }
 }

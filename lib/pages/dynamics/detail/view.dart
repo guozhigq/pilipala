@@ -183,6 +183,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     scrollController.removeListener(() {});
     fabAnimationCtr.dispose();
     scrollController.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 
