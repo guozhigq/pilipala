@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/emote.dart';
@@ -40,6 +41,8 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   double keyboardHeight = 0.0; // 键盘高度
   final _debouncer = Debouncer(milliseconds: 200); // 设置延迟时间
   String toolbarType = 'input';
+  RxBool isForward = false.obs;
+  RxBool showForward = false.obs;
 
   @override
   void initState() {
@@ -52,6 +55,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     _autoFocus();
     // 监听聚焦状态
     _focuslistener();
+    final String routePath = Get.currentRoute;
+    if (routePath.startsWith('/video')) {
+      showForward.value = true;
+    }
   }
 
   _autoFocus() async {
@@ -88,6 +95,16 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       Get.back(result: {
         'data': ReplyItemModel.fromJson(result['data']['reply'], ''),
       });
+
+      /// 投稿、番剧页面
+      if (isForward.value) {
+        await DynamicsHttp.dynamicCreate(
+          mid: 0,
+          rawText: message,
+          oid: widget.oid!,
+          scene: 5,
+        );
+      }
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -145,7 +162,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     double _keyboardHeight = EdgeInsets.fromViewPadding(
             View.of(context).viewInsets, View.of(context).devicePixelRatio)
         .bottom;
-    print('_keyboardHeight: $_keyboardHeight');
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
@@ -225,9 +241,37 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'emote',
                 ),
+                const SizedBox(width: 6),
+                Obx(
+                  () => showForward.value
+                      ? TextButton.icon(
+                          onPressed: () {
+                            isForward.value = !isForward.value;
+                          },
+                          icon: Icon(
+                              isForward.value
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              size: 22),
+                          label: const Text('转发到动态'),
+                          style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(
+                              isForward.value
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
                 const Spacer(),
-                TextButton(
-                    onPressed: () => submitReplyAdd(), child: const Text('发送'))
+                SizedBox(
+                  height: 36,
+                  child: FilledButton(
+                    onPressed: () => submitReplyAdd(),
+                    child: const Text('发送'),
+                  ),
+                ),
               ],
             ),
           ),
