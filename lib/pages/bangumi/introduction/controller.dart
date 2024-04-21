@@ -316,33 +316,4 @@ class BangumiIntroController extends GetxController {
   hiddenEpisodeBottomSheet() {
     bottomSheetController?.close();
   }
-
-  // 播放器底栏 选集 回调
-  void showEposideHandler() {
-    late List episodes = bangumiDetail.value.episodes!;
-    VideoEpidoesType dataType = VideoEpidoesType.bangumiEpisode;
-    if (episodes.isEmpty) {
-      return;
-    }
-    VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
-    DrawerUtils.showRightDialog(
-      child: EpisodeBottomSheet(
-        episodes: episodes,
-        currentCid: videoDetailCtr.cid.value,
-        dataType: dataType,
-        context: Get.context!,
-        sheetHeight: Get.size.height,
-        isFullScreen: true,
-        changeFucCall: (item, index) {
-          changeSeasonOrbangu(item.bvid, item.cid, item.aid);
-          SmartDialog.dismiss();
-        },
-      ).buildShowContent(Get.context!),
-    );
-  }
-
-  hiddenEpisodeBottomSheet() {
-    bottomSheetController?.close();
-  }
 }
