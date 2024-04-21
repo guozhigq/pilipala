@@ -162,9 +162,14 @@ class PiliSchame {
     final String host = value.host!;
     final String? path = value.path;
     Map<String, String>? query = value.query;
-    RegExp regExp = RegExp(r'^(www\.)?m?\.(bilibili\.com)$');
+    RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      print('bilibili.com');
+      print('bilibili.com host: $host');
+      print('bilibili.com path: $path');
+      final String lastPathSegment = path!.split('/').last;
+      if (lastPathSegment.contains('BV')) {
+        _videoPush(null, lastPathSegment);
+      }
     } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
       Get.toNamed(
