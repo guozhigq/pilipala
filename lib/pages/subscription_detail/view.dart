@@ -53,6 +53,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
   @override
   void dispose() {
     _controller.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 
