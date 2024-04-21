@@ -517,4 +517,7 @@ class Api {
 
   /// 创建动态
   static const String dynamicCreate = '/x/dynamic/feed/create/dyn';
+
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
 }
