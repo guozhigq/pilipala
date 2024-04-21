@@ -361,6 +361,7 @@ class _ActionPanelState extends State<ActionPanel>
       dynIdStr: dynamicId,
       mid: _dynamicsController.userInfo.mid,
       rawText: _inputText,
+      scene: 4,
     );
     if (res['status']) {
       SmartDialog.showToast(type == 'forward' ? '转发成功' : '发布成功');
