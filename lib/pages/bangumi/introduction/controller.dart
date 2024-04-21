@@ -236,6 +236,7 @@ class BangumiIntroController extends GetxController {
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
+    videoDetailCtr.oid.value = aid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
