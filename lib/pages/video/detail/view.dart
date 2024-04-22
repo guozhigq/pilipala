@@ -23,6 +23,7 @@ import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:status_bar_control/status_bar_control.dart';
 
 import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
@@ -61,10 +62,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoPiP;
   late Floating floating;
   bool isShowing = true;
+  late double statusHeight;
 
   @override
   void initState() {
     super.initState();
+    getStatusHeight();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
     vdCtr.sheetHeight.value = localCache.get('sheetHeight');
@@ -203,6 +206,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     });
   }
 
+  getStatusHeight() async {
+    statusHeight = await StatusBarControl.getHeight;
+  }
+
   @override
   void dispose() {
     shutdownTimerService.handleWaitingFinished();
@@ -281,6 +288,143 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
   }
 
+  /// 手动播放
+  Widget handlePlayPanel() {
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: handlePlay,
+          child: Image.network(
+            vdCtr.videoItem['pic'],
+            width: Get.width,
+            height: videoHeight,
+            fit: BoxFit.cover, // 适应方式根据需要调整
+          ),
+        ),
+        buildCustomAppBar(),
+        Positioned(
+          right: 12,
+          bottom: 10,
+          child: GestureDetector(
+            onTap: handlePlay,
+            child: Image.asset(
+              'assets/images/play.png',
+              width: 60,
+              height: 60,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// tabbar
+  Widget tabbarBuild() {
+    return Container(
+      width: double.infinity,
+      height: 45,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 1,
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+        ),
+      ),
+      child: Material(
+        child: Row(
+          children: [
+            Expanded(
+              child: Obx(
+                () => TabBar(
+                  padding: EdgeInsets.zero,
+                  controller: vdCtr.tabCtr,
+                  labelStyle: const TextStyle(fontSize: 13),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  dividerColor: Colors.transparent,
+                  tabs:
+                      vdCtr.tabs.map((String name) => Tab(text: name)).toList(),
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Obx(() => AnimatedOpacity(
+                          opacity: playerStatus.value != PlayerStatus.playing
+                              ? 1
+                              : 0,
+                          duration: const Duration(milliseconds: 100),
+                          child: const Icon(
+                            Icons.drag_handle_rounded,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                        )),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 32,
+                      child: TextButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
+                        onPressed: () => vdCtr.showShootDanmakuSheet(),
+                        child:
+                            const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 38,
+                      height: 38,
+                      child: Obx(
+                        () => !vdCtr.isShowCover.value
+                            ? IconButton(
+                                onPressed: () {
+                                  plPlayerController?.isOpenDanmu.value =
+                                      !(plPlayerController?.isOpenDanmu.value ??
+                                          false);
+                                },
+                                icon: !(plPlayerController?.isOpenDanmu.value ??
+                                        false)
+                                    ? SvgPicture.asset(
+                                        'assets/images/video/danmu_close.svg',
+                                        // ignore: deprecated_member_use
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                      )
+                                    : SvgPicture.asset(
+                                        'assets/images/video/danmu_open.svg',
+                                        // ignore: deprecated_member_use
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                              )
+                            : IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/images/video/danmu_close.svg',
+                                  // ignore: deprecated_member_use
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                onPressed: () {},
+                              ),
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
@@ -338,162 +482,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       },
     );
 
-    /// tabbar
-    Widget tabbarBuild = Container(
-      width: double.infinity,
-      height: 45,
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            width: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-        ),
-      ),
-      child: Material(
-        child: Row(
-          children: [
-            Flexible(
-              flex: 1,
-              child: Obx(
-                () => TabBar(
-                  padding: EdgeInsets.zero,
-                  controller: vdCtr.tabCtr,
-                  labelStyle: const TextStyle(fontSize: 13),
-                  labelPadding:
-                      const EdgeInsets.symmetric(horizontal: 10.0), // 设置每个标签的宽度
-                  dividerColor: Colors.transparent,
-                  tabs: vdCtr.tabs
-                      .map(
-                        (String name) => Tab(text: name),
-                      )
-                      .toList(),
-                ),
-              ),
-            ),
-            Flexible(
-                flex: 1,
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Obx(() => AnimatedOpacity(
-                            opacity: playerStatus.value != PlayerStatus.playing
-                                ? 1
-                                : 0,
-                            duration: const Duration(milliseconds: 100),
-                            child: const Icon(
-                              Icons.drag_handle_rounded,
-                              size: 20,
-                              color: Colors.grey,
-                            ),
-                          )),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        height: 32,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(EdgeInsets.zero),
-                          ),
-                          onPressed: () => vdCtr.showShootDanmakuSheet(),
-                          child:
-                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 38,
-                        height: 38,
-                        child: Obx(
-                          () => !vdCtr.isShowCover.value
-                              ? IconButton(
-                                  onPressed: () {
-                                    plPlayerController?.isOpenDanmu.value =
-                                        !(plPlayerController
-                                                ?.isOpenDanmu.value ??
-                                            false);
-                                  },
-                                  icon:
-                                      !(plPlayerController?.isOpenDanmu.value ??
-                                              false)
-                                          ? SvgPicture.asset(
-                                              'assets/images/video/danmu_close.svg',
-                                              // ignore: deprecated_member_use
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                            )
-                                          : SvgPicture.asset(
-                                              'assets/images/video/danmu_open.svg',
-                                              // ignore: deprecated_member_use
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            ),
-                                )
-                              : IconButton(
-                                  icon: SvgPicture.asset(
-                                    'assets/images/video/danmu_close.svg',
-                                    // ignore: deprecated_member_use
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                        ),
-                      ),
-                      const SizedBox(width: 18),
-                    ],
-                  ),
-                )),
-          ],
-        ),
-      ),
-    );
-
-    /// 手动播放
-    Widget handlePlayPanel() {
-      return Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              handlePlay();
-            },
-            child: NetworkImgLayer(
-              type: 'emote',
-              src: vdCtr.videoItem['pic'],
-              width: Get.width,
-              height: videoHeight.value,
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: buildCustomAppBar(),
-          ),
-          Positioned(
-            right: 12,
-            bottom: 10,
-            child: IconButton(
-                tooltip: '播放',
-                onPressed: () => handlePlay(),
-                icon: Image.asset(
-                  'assets/images/play.png',
-                  width: 60,
-                  height: 60,
-                )),
-          ),
-        ],
-      );
-    }
-
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
       bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
-      left: false, //plPlayerController?.isFullScreen.value != true,
-      right: false, //plPlayerController?.isFullScreen.value != true,
+      left: false,
+      right: false,
       child: Stack(
         children: [
           Scaffold(
@@ -511,12 +506,22 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               controller: _extendNestCtr,
               headerSliverBuilder:
                   (BuildContext context2, bool innerBoxIsScrolled) {
+                final Orientation orientation =
+                    MediaQuery.of(context).orientation;
+                final bool isFullScreen =
+                    plPlayerController?.isFullScreen.value == true;
+                final double expandedHeight =
+                    orientation == Orientation.landscape || isFullScreen
+                        ? (MediaQuery.sizeOf(context).height -
+                            (orientation == Orientation.landscape
+                                ? 0
+                                : MediaQuery.of(context).padding.top))
+                        : videoHeight.value;
                 return <Widget>[
                   Obx(
                     () {
-                      if (MediaQuery.of(context).orientation ==
-                              Orientation.landscape ||
-                          plPlayerController?.isFullScreen.value == true) {
+                      if (orientation == Orientation.landscape ||
+                          isFullScreen) {
                         enterFullScreen();
                       } else {
                         exitFullScreen();
@@ -528,15 +533,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         elevation: 0,
                         scrolledUnderElevation: 0,
                         forceElevated: innerBoxIsScrolled,
-                        expandedHeight: MediaQuery.of(context).orientation ==
-                                    Orientation.landscape ||
-                                plPlayerController?.isFullScreen.value == true
-                            ? (MediaQuery.sizeOf(context).height -
-                                (MediaQuery.of(context).orientation ==
-                                        Orientation.landscape
-                                    ? 0
-                                    : MediaQuery.of(context).padding.top))
-                            : videoHeight.value,
+                        expandedHeight: expandedHeight,
                         backgroundColor: Colors.black,
                         flexibleSpace: FlexibleSpaceBar(
                           background: PopScope(
@@ -556,13 +553,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                               child: LayoutBuilder(
                                 builder: (BuildContext context,
                                     BoxConstraints boxConstraints) {
-                                  // final double maxWidth =
-                                  //     boxConstraints.maxWidth;
-                                  // final double maxHeight =
-                                  //     boxConstraints.maxHeight;
                                   return Stack(
                                     children: <Widget>[
-                                      if (isShowing) videoPlayerPanel,
+                                      if (isShowing)
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 0),
+                                          child: videoPlayerPanel,
+                                        ),
 
                                       /// 关闭自动播放时 手动播放
                                       Obx(
@@ -604,7 +601,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 color: Theme.of(context).colorScheme.background,
                 child: Column(
                   children: [
-                    tabbarBuild,
+                    tabbarBuild(),
                     Expanded(
                       child: TabBarView(
                         controller: vdCtr.tabCtr,
