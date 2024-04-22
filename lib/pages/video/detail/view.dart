@@ -556,6 +556,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               controller: _extendNestCtr,
               headerSliverBuilder:
                   (BuildContext context2, bool innerBoxIsScrolled) {
+                final Orientation orientation =
+                    MediaQuery.of(context).orientation;
+                final bool isFullScreen =
+                    plPlayerController?.isFullScreen.value == true;
+                final double expandedHeight =
+                    orientation == Orientation.landscape || isFullScreen
+                        ? (MediaQuery.sizeOf(context).height -
+                            (orientation == Orientation.landscape
+                                ? 0
+                                : MediaQuery.of(context).padding.top))
+                        : videoHeight.value;
                 return <Widget>[
                   Obx(
                     () {
@@ -606,7 +617,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   tag: heroTag,
                                   child: Stack(
                                     children: <Widget>[
-                                      if (isShowing) videoPlayerPanel,
+                                      if (isShowing)
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 0),
+                                          child: videoPlayerPanel,
+                                        ),
 
                                       /// 关闭自动播放时 手动播放
                                       Obx(
