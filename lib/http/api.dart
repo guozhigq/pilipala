@@ -511,4 +511,13 @@ class Api {
 
   /// 取消订阅
   static const String cancelSub = '/x/v3/fav/season/unfav';
+
+  /// 动态转发
+  static const String dynamicForwardUrl = '/x/dynamic/feed/create/submit_check';
+
+  /// 创建动态
+  static const String dynamicCreate = '/x/dynamic/feed/create/dyn';
+
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
 }

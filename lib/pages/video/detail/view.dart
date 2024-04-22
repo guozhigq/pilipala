@@ -180,11 +180,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController?.isFullScreen.listen((bool isFullScreen) {
       if (isFullScreen) {
         vdCtr.hiddenReplyReplyPanel();
-        videoIntroController.hiddenEpisodeBottomSheet();
-        if (videoIntroController.videoDetail.value.ugcSeason != null ||
-            (videoIntroController.videoDetail.value.pages != null &&
-                videoIntroController.videoDetail.value.pages!.length > 1)) {
-          vdCtr.bottomList.insert(3, BottomControlType.episode);
+        if (vdCtr.videoType == SearchType.video) {
+          videoIntroController.hiddenEpisodeBottomSheet();
+          if (videoIntroController.videoDetail.value.ugcSeason != null ||
+              (videoIntroController.videoDetail.value.pages != null &&
+                  videoIntroController.videoDetail.value.pages!.length > 1)) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
+        }
+        if (vdCtr.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.hiddenEpisodeBottomSheet();
+          if (bangumiIntroController.bangumiDetail.value.episodes != null &&
+              bangumiIntroController.bangumiDetail.value.episodes!.length > 1) {
+            vdCtr.bottomList.insert(3, BottomControlType.episode);
+          }
         }
       } else {
         if (vdCtr.bottomList.contains(BottomControlType.episode)) {
@@ -395,27 +404,41 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         width: 38,
                         height: 38,
                         child: Obx(
-                          () => IconButton(
-                            onPressed: () {
-                              plPlayerController?.isOpenDanmu.value =
-                                  !(plPlayerController?.isOpenDanmu.value ??
-                                      false);
-                            },
-                            icon: !(plPlayerController?.isOpenDanmu.value ??
-                                    false)
-                                ? SvgPicture.asset(
+                          () => !vdCtr.isShowCover.value
+                              ? IconButton(
+                                  onPressed: () {
+                                    plPlayerController?.isOpenDanmu.value =
+                                        !(plPlayerController
+                                                ?.isOpenDanmu.value ??
+                                            false);
+                                  },
+                                  icon:
+                                      !(plPlayerController?.isOpenDanmu.value ??
+                                              false)
+                                          ? SvgPicture.asset(
+                                              'assets/images/video/danmu_close.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/video/danmu_open.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                )
+                              : IconButton(
+                                  icon: SvgPicture.asset(
                                     'assets/images/video/danmu_close.svg',
                                     // ignore: deprecated_member_use
                                     color:
                                         Theme.of(context).colorScheme.outline,
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/images/video/danmu_open.svg',
-                                    // ignore: deprecated_member_use
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
                                   ),
-                          ),
+                                  onPressed: () {},
+                                ),
                         ),
                       ),
                       const SizedBox(width: 18),

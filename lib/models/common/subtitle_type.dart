@@ -5,6 +5,10 @@ enum SubtitleType {
   aizh,
   // 英语（自动生成）
   aien,
+  // 中文（简体）
+  zhHans,
+  // 英文（美国）
+  enUS,
 }
 
 extension SubtitleTypeExtension on SubtitleType {
@@ -16,6 +20,10 @@ extension SubtitleTypeExtension on SubtitleType {
         return '中文（自动翻译）';
       case SubtitleType.aien:
         return '英语（自动生成）';
+      case SubtitleType.zhHans:
+        return '中文（简体）';
+      case SubtitleType.enUS:
+        return '英文（美国）';
     }
   }
 }
@@ -29,6 +37,10 @@ extension SubtitleIdExtension on SubtitleType {
         return 'ai-zh';
       case SubtitleType.aien:
         return 'ai-en';
+      case SubtitleType.zhHans:
+        return 'zh-Hans';
+      case SubtitleType.enUS:
+        return 'en-US';
     }
   }
 }
@@ -42,6 +54,10 @@ extension SubtitleCodeExtension on SubtitleType {
         return 2;
       case SubtitleType.aien:
         return 3;
+      case SubtitleType.zhHans:
+        return 4;
+      case SubtitleType.enUS:
+        return 5;
     }
   }
 }

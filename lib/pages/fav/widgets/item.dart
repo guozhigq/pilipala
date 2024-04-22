@@ -13,14 +13,16 @@ class FavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(favFolderItem.fid);
     return InkWell(
-      onTap: () => Get.toNamed(
-        '/favDetail',
-        arguments: favFolderItem,
-        parameters: {
-          'heroTag': heroTag,
-          'mediaId': favFolderItem.id.toString(),
-        },
-      ),
+      onTap: () async {
+        Get.toNamed(
+          '/favDetail',
+          arguments: favFolderItem,
+          parameters: {
+            'heroTag': heroTag,
+            'mediaId': favFolderItem.id.toString(),
+          },
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),
         child: LayoutBuilder(

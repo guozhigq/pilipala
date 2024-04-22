@@ -1306,20 +1306,6 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          // SizedBox(
-          //   width: 34,
-          //   height: 34,
-          //   child: IconButton(
-          //     style: ButtonStyle(
-          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     ),
-          //     onPressed: () => showSubtitleDialog(),
-          //     icon: const Icon(
-          //       Icons.closed_caption_off,
-          //       size: 22,
-          //     ),
-          //   ),
-          // ),
           ComBtn(
             icon: const Icon(
               Icons.closed_caption_off,
