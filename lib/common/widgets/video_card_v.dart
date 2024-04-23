@@ -5,6 +5,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/image_save.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../../models/model_rec_video_item.dart';
+import 'overlay_pop.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
