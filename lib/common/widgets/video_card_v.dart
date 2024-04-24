@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import '../../models/model_rec_video_item.dart';
 import 'overlay_pop.dart';
 import 'stat/danmu.dart';
@@ -20,15 +21,11 @@ import 'network_img_layer.dart';
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
   final int crossAxisCount;
-  // final Function()? longPress;
-  // final Function()? longPressEnd;
 
   const VideoCardV({
     Key? key,
     required this.videoItem,
     required this.crossAxisCount,
-    // this.longPress,
-    // this.longPressEnd,
   }) : super(key: key);
 
   bool isStringNumeric(String str) {
@@ -128,60 +125,56 @@ class VideoCardV extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(videoItem.id);
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.zero,
-      child: InkWell(
-        onTap: () async => onPushDetail(heroTag),
-        onLongPress: () {
-          SmartDialog.show(
-            builder: (context) => OverlayPop(
-              videoItem: videoItem,
-              closeFn: () => SmartDialog.dismiss(),
-            ),
-          );
-        },
-        child: Column(
-          children: [
-            AspectRatio(
-              aspectRatio: StyleString.aspectRatio,
-              child: LayoutBuilder(builder: (context, boxConstraints) {
-                double maxWidth = boxConstraints.maxWidth;
-                double maxHeight = boxConstraints.maxHeight;
-                return Stack(
-                  children: [
-                    Hero(
-                      tag: heroTag,
-                      child: NetworkImgLayer(
-                        src: videoItem.pic,
-                        width: maxWidth,
-                        height: maxHeight,
-                      ),
+    return InkWell(
+      onTap: () async => onPushDetail(heroTag),
+      onLongPress: () {
+        SmartDialog.show(
+          builder: (context) => OverlayPop(
+            videoItem: videoItem,
+            closeFn: () => SmartDialog.dismiss(),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Column(
+        children: [
+          AspectRatio(
+            aspectRatio: StyleString.aspectRatio,
+            child: LayoutBuilder(builder: (context, boxConstraints) {
+              double maxWidth = boxConstraints.maxWidth;
+              double maxHeight = boxConstraints.maxHeight;
+              return Stack(
+                children: [
+                  Hero(
+                    tag: heroTag,
+                    child: NetworkImgLayer(
+                      src: videoItem.pic,
+                      width: maxWidth,
+                      height: maxHeight,
                     ),
-                    if (videoItem.duration > 0)
-                      if (crossAxisCount == 1) ...[
-                        PBadge(
-                          bottom: 10,
-                          right: 10,
-                          text: Utils.timeFormat(videoItem.duration),
-                        )
-                      ] else ...[
-                        PBadge(
-                          bottom: 6,
-                          right: 7,
-                          size: 'small',
-                          type: 'gray',
-                          text: Utils.timeFormat(videoItem.duration),
-                        )
-                      ],
-                  ],
-                );
-              }),
-            ),
-            VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
-          ],
-        ),
+                  ),
+                  if (videoItem.duration > 0)
+                    if (crossAxisCount == 1) ...[
+                      PBadge(
+                        bottom: 10,
+                        right: 10,
+                        text: Utils.timeFormat(videoItem.duration),
+                      )
+                    ] else ...[
+                      PBadge(
+                        bottom: 6,
+                        right: 7,
+                        size: 'small',
+                        type: 'gray',
+                        text: Utils.timeFormat(videoItem.duration),
+                      )
+                    ],
+                ],
+              );
+            }),
+          ),
+          VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
+        ],
       ),
     );
   }
@@ -252,11 +245,28 @@ class VideoContent extends StatelessWidget {
                 const Spacer(),
               ],
               if (videoItem.goto == 'av')
-                VideoPopupMenu(
-                  size: 24,
-                  iconSize: 14,
-                  videoItem: videoItem,
-                ),
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: IconButton(
+                    onPressed: () {
+                      feedBack();
+                      showModalBottomSheet(
+                        context: context,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        builder: (context) {
+                          return MorePanel(videoItem: videoItem);
+                        },
+                      );
+                    },
+                    icon: Icon(
+                      Icons.more_vert_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 14,
+                    ),
+                  ),
+                )
             ],
           ),
         ],
@@ -279,15 +289,9 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        StatView(
-          theme: 'gray',
-          view: videoItem.stat.view,
-        ),
+        StatView(theme: 'gray', view: videoItem.stat.view),
         const SizedBox(width: 8),
-        StatDanMu(
-          theme: 'gray',
-          danmu: videoItem.stat.danmu,
-        ),
+        StatDanMu(theme: 'gray', danmu: videoItem.stat.danmu),
         if (videoItem is RecVideoItemModel) ...<Widget>[
           crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
           RichText(
@@ -306,97 +310,97 @@ class VideoStat extends StatelessWidget {
   }
 }
 
-class VideoPopupMenu extends StatelessWidget {
-  final double? size;
-  final double? iconSize;
+class MorePanel extends StatelessWidget {
   final dynamic videoItem;
+  const MorePanel({super.key, required this.videoItem});
 
-  const VideoPopupMenu({
-    Key? key,
-    required this.size,
-    required this.iconSize,
-    required this.videoItem,
-  }) : super(key: key);
+  Future<dynamic> menuActionHandler(String type) async {
+    switch (type) {
+      case 'block':
+        blockUser();
+        break;
+      case 'watchLater':
+        var res = await UserHttp.toViewLater(bvid: videoItem.bvid as String);
+        SmartDialog.showToast(res['msg']);
+        Get.back();
+        break;
+      default:
+    }
+  }
+
+  void blockUser() async {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: Text('确定拉黑:${videoItem.owner.name}(${videoItem.owner.mid})?'
+              '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
+          actions: [
+            TextButton(
+              onPressed: () => SmartDialog.dismiss(),
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                var res = await VideoHttp.relationMod(
+                  mid: videoItem.owner.mid,
+                  act: 5,
+                  reSrc: 11,
+                );
+                SmartDialog.dismiss();
+                SmartDialog.showToast(res['msg'] ?? '成功');
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: PopupMenuButton<String>(
-        padding: EdgeInsets.zero,
-        icon: Icon(
-          Icons.more_vert_outlined,
-          color: Theme.of(context).colorScheme.outline,
-          size: iconSize,
-        ),
-        position: PopupMenuPosition.under,
-        onSelected: (String type) {},
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-          PopupMenuItem<String>(
-            onTap: () async {
-              var res =
-                  await UserHttp.toViewLater(bvid: videoItem.bvid as String);
-              SmartDialog.showToast(res['msg']);
-            },
-            value: 'pause',
-            height: 40,
-            child: const Row(
-              children: [
-                Icon(Icons.watch_later_outlined, size: 16),
-                SizedBox(width: 6),
-                Text('稍后再看', style: TextStyle(fontSize: 13))
-              ],
+    return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => Get.back(),
+            child: Container(
+              height: 35,
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outline,
+                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+                ),
+              ),
             ),
           ),
-          const PopupMenuDivider(),
-          PopupMenuItem<String>(
-            onTap: () async {
-              SmartDialog.show(
-                useSystem: true,
-                animationType: SmartAnimationType.centerFade_otherSlide,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('提示'),
-                    content: Text(
-                        '确定拉黑:${videoItem.owner.name}(${videoItem.owner.mid})?'
-                        '\n\n注：被拉黑的Up可以在隐私设置-黑名单管理中解除'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => SmartDialog.dismiss(),
-                        child: Text(
-                          '点错了',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.outline),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          var res = await VideoHttp.relationMod(
-                            mid: videoItem.owner.mid,
-                            act: 5,
-                            reSrc: 11,
-                          );
-                          SmartDialog.dismiss();
-                          SmartDialog.showToast(res['msg'] ?? '成功');
-                        },
-                        child: const Text('确认'),
-                      )
-                    ],
-                  );
-                },
-              );
-            },
-            value: 'pause',
-            height: 40,
-            child: Row(
-              children: [
-                const Icon(Icons.block, size: 16),
-                const SizedBox(width: 6),
-                Text('拉黑：${videoItem.owner.name}',
-                    style: const TextStyle(fontSize: 13))
-              ],
+          ListTile(
+            onTap: () async => await menuActionHandler('block'),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.block, size: 19),
+            title: Text(
+              '拉黑up主 「${videoItem.owner.name}」',
+              style: Theme.of(context).textTheme.titleSmall,
             ),
+          ),
+          ListTile(
+            onTap: () async => await menuActionHandler('watchLater'),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.watch_later_outlined, size: 19),
+            title:
+                Text('添加至稍后再看', style: Theme.of(context).textTheme.titleSmall),
           ),
         ],
       ),
