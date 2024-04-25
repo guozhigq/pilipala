@@ -35,7 +35,7 @@ class VideoHttp {
         Api.recommendListWeb,
         data: {
           'version': 1,
-          'feed_version': 'V8',
+          'feed_version': 'V3',
           'homepage_ver': 1,
           'ps': ps,
           'fresh_idx': freshIdx,
