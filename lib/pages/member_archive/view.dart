@@ -79,6 +79,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                                     videoItem: list[index],
                                     showOwner: false,
                                     showPubdate: true,
+                                    showCharge: true,
                                   );
                                 },
                                 childCount: list.length,
