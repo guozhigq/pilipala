@@ -39,6 +39,14 @@ extension VideoQualityCode on VideoQuality {
     }
     return null;
   }
+
+  static int? toCode(VideoQuality quality) {
+    final index = VideoQuality.values.indexOf(quality);
+    if (index != -1 && index < _codeList.length) {
+      return _codeList[index];
+    }
+    return null;
+  }
 }
 
 extension VideoQualityDesc on VideoQuality {
