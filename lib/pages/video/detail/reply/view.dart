@@ -277,32 +277,39 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 parent: fabAnimationCtr,
                 curve: Curves.easeInOut,
               )),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () {
-                  feedBack();
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return VideoReplyNewDialog(
-                        oid: _videoReplyController.aid ??
-                            IdUtils.bv2av(Get.parameters['bvid']!),
-                        root: 0,
-                        parent: 0,
-                        replyType: ReplyType.video,
-                      );
-                    },
-                  ).then(
-                    (value) => {
-                      // 完成评论，数据添加
-                      if (value != null && value['data'] != null)
-                        {_videoReplyController.replyList.add(value['data'])}
-                    },
-                  );
-                },
-                tooltip: '发表评论',
-                child: const Icon(Icons.reply),
+              child: Obx(
+                () => _videoReplyController.replyReqCode.value == 12061
+                    ? const SizedBox()
+                    : FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () {
+                          feedBack();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return VideoReplyNewDialog(
+                                oid: _videoReplyController.aid ??
+                                    IdUtils.bv2av(Get.parameters['bvid']!),
+                                root: 0,
+                                parent: 0,
+                                replyType: ReplyType.video,
+                              );
+                            },
+                          ).then(
+                            (value) => {
+                              // 完成评论，数据添加
+                              if (value != null && value['data'] != null)
+                                {
+                                  _videoReplyController.replyList
+                                      .add(value['data'])
+                                }
+                            },
+                          );
+                        },
+                        tooltip: '发表评论',
+                        child: const Icon(Icons.reply),
+                      ),
               ),
             ),
           ),
