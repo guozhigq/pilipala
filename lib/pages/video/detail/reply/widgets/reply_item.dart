@@ -14,7 +14,6 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -47,7 +46,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem);
+            replyReply!(replyItem, null);
           }
         },
         onLongPress: () {
@@ -430,7 +429,7 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1)
               InkWell(
                 // 一楼点击【共xx条回复】展开评论详情
-                onTap: () => replyReply!(replyItem),
+                onTap: () => replyReply!(replyItem, null),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
@@ -534,8 +533,10 @@ InlineSpan buildContent(
       TextSpan(
         text: str,
         recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
+          ..onTap = () => replyReply?.call(
+                replyItem.root == 0 ? replyItem : fReplyItem,
+                replyItem,
+              ),
       ),
     );
   }
