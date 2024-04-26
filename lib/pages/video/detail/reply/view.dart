@@ -110,14 +110,15 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply) {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
       videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
-      videoDetailCtr.showReplyReplyPanel();
+      videoDetailCtr.showReplyReplyPanel(
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply);
     }
   }
 
@@ -228,8 +229,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem) =>
-                                            replyReply(replyItem),
+                                        replyReply: (replyItem, currentReply) =>
+                                            replyReply(replyItem, currentReply),
                                         replyType: ReplyType.video,
                                       );
                                     }

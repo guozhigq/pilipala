@@ -161,11 +161,11 @@ class VideoDetailController extends GetxController
     getSubtitle();
   }
 
-  showReplyReplyPanel() {
+  showReplyReplyPanel(oid, fRpid, firstFloor, currentReply) {
     replyReplyBottomSheetCtr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
-        oid: oid.value,
+        oid: oid,
         rpid: fRpid,
         closePanel: () => {
           fRpid = 0,
@@ -174,6 +174,7 @@ class VideoDetailController extends GetxController
         replyType: ReplyType.video,
         source: 'videoDetail',
         sheetHeight: sheetHeight.value,
+        currentReply: currentReply,
       );
     });
     replyReplyBottomSheetCtr?.closed.then((value) {
