@@ -26,7 +26,7 @@ class VideoReplyReplyController extends GetxController {
     currentPage = 0;
   }
 
-  Future queryReplyList({type = 'init'}) async {
+  Future queryReplyList({type = 'init', currentReply}) async {
     if (type == 'init') {
       currentPage = 0;
     }
@@ -61,6 +61,14 @@ class VideoReplyReplyController extends GetxController {
         }
         replyList.addAll(replies);
         // res['data'].replies.addAll(replyList);
+      }
+    }
+    if (replyList.isNotEmpty && currentReply != null) {
+      int indexToRemove =
+          replyList.indexWhere((item) => currentReply.rpid == item.rpid);
+      // 如果找到了指定ID的项，则移除
+      if (indexToRemove != -1) {
+        replyList.removeAt(indexToRemove);
       }
     }
     isLoadingMore = false;
