@@ -446,7 +446,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       children: [
                         RadioListTile(
                           value: -1,
-                          title: const Text('关闭弹幕'),
+                          title: const Text('关闭字幕'),
                           groupValue: tempThemeValue,
                           onChanged: (value) {
                             tempThemeValue = value!;
