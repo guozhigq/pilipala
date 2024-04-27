@@ -22,6 +22,7 @@ import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
 import 'widgets/page_panel.dart';
 import 'widgets/season_panel.dart';
+import 'widgets/staff_up_item.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -409,32 +410,35 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ),
             )
           ],
-          GestureDetector(
-            onTap: onPushMember,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: Row(
-                children: [
-                  NetworkImgLayer(
-                    type: 'avatar',
-                    src: widget.videoDetail!.owner!.face,
-                    width: 34,
-                    height: 34,
-                    fadeInDuration: Duration.zero,
-                    fadeOutDuration: Duration.zero,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(owner.name, style: const TextStyle(fontSize: 13)),
-                  const SizedBox(width: 6),
-                  Text(
-                    follower,
-                    style: TextStyle(
-                      fontSize: t.textTheme.labelSmall!.fontSize,
-                      color: outline,
+          if (widget.videoDetail!.staff == null)
+            GestureDetector(
+              onTap: onPushMember,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                child: Row(
+                  children: [
+                    NetworkImgLayer(
+                      type: 'avatar',
+                      src: widget.videoDetail!.owner!.face,
+                      width: 34,
+                      height: 34,
+                      fadeInDuration: Duration.zero,
+                      fadeOutDuration: Duration.zero,
                     ),
-                  ),
-                  const Spacer(),
-                  Obx(() => AnimatedOpacity(
+                    const SizedBox(width: 10),
+                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(
+                      follower,
+                      style: TextStyle(
+                        fontSize: t.textTheme.labelSmall!.fontSize,
+                        color: outline,
+                      ),
+                    ),
+                    const Spacer(),
+                    Obx(
+                      () => AnimatedOpacity(
                         opacity:
                             videoIntroController.followStatus.isEmpty ? 0 : 1,
                         duration: const Duration(milliseconds: 50),
@@ -474,11 +478,58 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                   ),
                           ),
                         ),
-                      )),
-                ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          if (widget.videoDetail!.staff != null) ...[
+            const SizedBox(height: 15),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '创作团队',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const WidgetSpan(child: SizedBox(width: 6)),
+                      TextSpan(
+                        text: '${widget.videoDetail!.staff!.length}人',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 120,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      for (int i = 0;
+                          i < widget.videoDetail!.staff!.length;
+                          i++) ...[
+                        StaffUpItem(item: widget.videoDetail!.staff![i])
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ]
         ],
       )),
     );
@@ -545,4 +596,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
+
+  // Widget StaffPanel(BuildContext context, videoIntroController) {
+  //   return
+  // }
 }
