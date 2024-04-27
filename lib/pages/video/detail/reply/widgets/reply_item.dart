@@ -533,10 +533,8 @@ InlineSpan buildContent(
       TextSpan(
         text: str,
         recognizer: TapGestureRecognizer()
-          ..onTap = () => replyReply?.call(
-                replyItem.root == 0 ? replyItem : fReplyItem,
-                replyItem,
-              ),
+          ..onTap = () =>
+              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
       ),
     );
   }
