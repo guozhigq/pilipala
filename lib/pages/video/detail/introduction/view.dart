@@ -383,11 +383,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? videoIntroController.lastPlayCid.value
                     : widget.videoDetail!.pages!.first.cid,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (bvid, cid, aid) =>
+                changeFuc: (bvid, cid, aid, cover) =>
                     videoIntroController.changeSeasonOrbangu(
                   bvid,
                   cid,
                   aid,
+                  cover,
                 ),
                 videoIntroCtr: videoIntroController,
               ),
@@ -401,10 +402,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 pages: widget.videoDetail!.pages!,
                 cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
+                changeFuc: (cid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
                   videoIntroController.bvid,
                   cid,
                   null,
+                  cover,
                 ),
                 videoIntroCtr: videoIntroController,
               ),
