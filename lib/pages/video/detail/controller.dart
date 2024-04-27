@@ -59,7 +59,7 @@ class VideoDetailController extends GetxController
   // 封面图的展示
   RxBool isShowCover = true.obs;
   // 硬解
-  RxBool enableHA = true.obs;
+  RxBool enableHA = false.obs;
 
   /// 本地存储
   Box userInfoCache = GStrorage.userInfo;
@@ -128,7 +128,7 @@ class VideoDetailController extends GetxController
     tabCtr = TabController(length: 2, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
-    enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
+    enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: false);
     enableRelatedVideo =
         setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
     if (userInfo == null ||

@@ -351,7 +351,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
