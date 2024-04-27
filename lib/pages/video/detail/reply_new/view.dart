@@ -43,6 +43,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   String toolbarType = 'input';
   RxBool isForward = false.obs;
   RxBool showForward = false.obs;
+  RxString message = ''.obs;
 
   @override
   void initState() {
@@ -80,15 +81,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   Future submitReplyAdd() async {
     feedBack();
-    String message = _replyContentController.text;
+    // String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
       type: widget.replyType ?? ReplyType.video,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,
       message: widget.replyItem != null && widget.replyItem!.root != 0
-          ? ' 回复 @${widget.replyItem!.member!.uname!} : $message'
-          : message,
+          ? ' 回复 @${widget.replyItem!.member!.uname!} : ${message.value}'
+          : message.value,
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
@@ -100,7 +101,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       if (isForward.value) {
         await DynamicsHttp.dynamicCreate(
           mid: 0,
-          rawText: message,
+          rawText: message.value,
           oid: widget.oid!,
           scene: 5,
         );
@@ -188,7 +189,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: TextField(
                     controller: _replyContentController,
-                    minLines: 1,
+                    minLines: 3,
                     maxLines: null,
                     autofocus: false,
                     focusNode: replyContentFocusNode,
@@ -199,6 +200,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                           fontSize: 14,
                         )),
                     style: Theme.of(context).textTheme.bodyLarge,
+                    onChanged: (text) {
+                      message.value = text;
+                    },
                   ),
                 ),
               ),
@@ -267,9 +271,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                 const Spacer(),
                 SizedBox(
                   height: 36,
-                  child: FilledButton(
-                    onPressed: () => submitReplyAdd(),
-                    child: const Text('发送'),
+                  child: Obx(
+                    () => FilledButton(
+                      onPressed: message.isNotEmpty ? submitReplyAdd : null,
+                      child: const Text('发送'),
+                    ),
                   ),
                 ),
               ],

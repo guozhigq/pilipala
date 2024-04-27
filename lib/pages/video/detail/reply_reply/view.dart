@@ -20,6 +20,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
     this.source,
     this.replyType,
     this.sheetHeight,
+    this.currentReply,
     super.key,
   });
   final int? oid;
@@ -29,6 +30,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
   final String? source;
   final ReplyType? replyType;
   final double? sheetHeight;
+  final dynamic currentReply;
 
   @override
   State<VideoReplyReplyPanel> createState() => _VideoReplyReplyPanelState();
@@ -63,7 +65,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       },
     );
 
-    _futureBuilderFuture = _videoReplyReplyController.queryReplyList();
+    _futureBuilderFuture = _videoReplyReplyController.queryReplyList(
+      currentReply: widget.currentReply,
+    );
   }
 
   void replyReply(replyItem) {}
@@ -107,7 +111,9 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
               onRefresh: () async {
                 setState(() {});
                 _videoReplyReplyController.currentPage = 0;
-                return await _videoReplyReplyController.queryReplyList();
+                return await _videoReplyReplyController.queryReplyList(
+                  currentReply: widget.currentReply,
+                );
               },
               child: CustomScrollView(
                 controller: _videoReplyReplyController.scrollController,
@@ -140,6 +146,10 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                       if (snapshot.connectionState == ConnectionState.done) {
                         Map? data = snapshot.data;
                         if (data != null && data['status']) {
+                          if (widget.currentReply != null) {
+                            _videoReplyReplyController.replyList
+                                .insert(0, widget.currentReply);
+                          }
                           // 请求成功
                           return Obx(
                             () => SliverList(

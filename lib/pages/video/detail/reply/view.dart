@@ -110,14 +110,15 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply) {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
       videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
-      videoDetailCtr.showReplyReplyPanel();
+      videoDetailCtr.showReplyReplyPanel(
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply);
     }
   }
 
@@ -228,8 +229,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem) =>
-                                            replyReply(replyItem),
+                                        replyReply: (replyItem, currentReply) =>
+                                            replyReply(replyItem, currentReply),
                                         replyType: ReplyType.video,
                                       );
                                     }
@@ -276,32 +277,39 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 parent: fabAnimationCtr,
                 curve: Curves.easeInOut,
               )),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () {
-                  feedBack();
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return VideoReplyNewDialog(
-                        oid: _videoReplyController.aid ??
-                            IdUtils.bv2av(Get.parameters['bvid']!),
-                        root: 0,
-                        parent: 0,
-                        replyType: ReplyType.video,
-                      );
-                    },
-                  ).then(
-                    (value) => {
-                      // 完成评论，数据添加
-                      if (value != null && value['data'] != null)
-                        {_videoReplyController.replyList.add(value['data'])}
-                    },
-                  );
-                },
-                tooltip: '发表评论',
-                child: const Icon(Icons.reply),
+              child: Obx(
+                () => _videoReplyController.replyReqCode.value == 12061
+                    ? const SizedBox()
+                    : FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () {
+                          feedBack();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return VideoReplyNewDialog(
+                                oid: _videoReplyController.aid ??
+                                    IdUtils.bv2av(Get.parameters['bvid']!),
+                                root: 0,
+                                parent: 0,
+                                replyType: ReplyType.video,
+                              );
+                            },
+                          ).then(
+                            (value) => {
+                              // 完成评论，数据添加
+                              if (value != null && value['data'] != null)
+                                {
+                                  _videoReplyController.replyList
+                                      .add(value['data'])
+                                }
+                            },
+                          );
+                        },
+                        tooltip: '发表评论',
+                        child: const Icon(Icons.reply),
+                      ),
               ),
             ),
           ),
