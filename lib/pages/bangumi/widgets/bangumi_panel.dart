@@ -85,7 +85,9 @@ class _BangumiPanelState extends State<BangumiPanel> {
       item.cid,
       item.aid,
     );
-    _bottomSheetController?.close();
+    if (_bottomSheetController != null) {
+      _bottomSheetController?.close();
+    }
     currentIndex = i;
     scrollToIndex();
   }
