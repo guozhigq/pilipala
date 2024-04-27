@@ -432,7 +432,7 @@ class VideoIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid) async {
+  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
@@ -447,6 +447,7 @@ class VideoIntroController extends GetxController {
     videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
+    videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
@@ -494,6 +495,7 @@ class VideoIntroController extends GetxController {
   void nextPlay() {
     final List episodes = [];
     bool isPages = false;
+    late String cover;
     if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
@@ -510,6 +512,7 @@ class VideoIntroController extends GetxController {
     final int currentIndex =
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
+    cover = episodes[nextIndex].cover;
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
@@ -526,7 +529,7 @@ class VideoIntroController extends GetxController {
     final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
-    changeSeasonOrbangu(rBvid, cid, rAid);
+    changeSeasonOrbangu(rBvid, cid, rAid, cover);
   }
 
   // 设置关注分组
@@ -591,10 +594,11 @@ class VideoIntroController extends GetxController {
         isFullScreen: true,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
-            changeSeasonOrbangu(IdUtils.av2bv(item.aid), item.cid, item.aid);
+            changeSeasonOrbangu(
+                IdUtils.av2bv(item.aid), item.cid, item.aid, item.cover);
           }
           if (dataType == VideoEpidoesType.videoPart) {
-            changeSeasonOrbangu(bvid, item.cid, null);
+            changeSeasonOrbangu(bvid, item.cid, null, item.cover);
           }
           SmartDialog.dismiss();
         },

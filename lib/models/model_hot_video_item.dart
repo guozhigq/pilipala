@@ -23,6 +23,7 @@ class HotVideoItemModel {
     this.dimension,
     this.shortLinkV2,
     this.firstFrame,
+    this.cover,
     this.pubLocation,
     this.seasontype,
     this.isOgv,
@@ -50,6 +51,7 @@ class HotVideoItemModel {
   Dimension? dimension;
   String? shortLinkV2;
   String? firstFrame;
+  String? cover;
   String? pubLocation;
   int? seasontype;
   bool? isOgv;
@@ -77,6 +79,7 @@ class HotVideoItemModel {
     dimension = Dimension.fromMap(json['dimension']);
     shortLinkV2 = json["short_link_v2"];
     firstFrame = json["first_frame"];
+    cover = json["first_frame"];
     pubLocation = json["pub_location"];
     seasontype = json["seasontype"];
     isOgv = json["isOgv"];

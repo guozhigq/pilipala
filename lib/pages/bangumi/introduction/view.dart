@@ -322,8 +322,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               pages: widget.bangumiDetail!.episodes!,
               cid: cid! ?? widget.bangumiDetail!.episodes!.first.cid!,
               sheetHeight: sheetHeight,
-              changeFuc: (bvid, cid, aid) =>
-                  bangumiIntroController.changeSeasonOrbangu(bvid, cid, aid),
+              changeFuc: (bvid, cid, aid, cover) => bangumiIntroController
+                  .changeSeasonOrbangu(bvid, cid, aid, cover),
               bangumiDetail: bangumiIntroController.bangumiDetail.value,
               bangumiIntroController: bangumiIntroController,
             )
