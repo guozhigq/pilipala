@@ -458,11 +458,17 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             onTap: () {
               handlePlay();
             },
-            child: NetworkImgLayer(
-              type: 'emote',
-              src: vdCtr.videoItem['pic'],
-              width: Get.width,
-              height: videoHeight.value,
+            child: Obx(
+              () => AnimatedOpacity(
+                duration: const Duration(milliseconds: 100), // 渐变动画的持续时间
+                opacity: 1, // 设置不透明度
+                child: NetworkImgLayer(
+                  type: 'emote',
+                  src: vdCtr.cover.value,
+                  width: Get.width,
+                  height: videoHeight.value,
+                ),
+              ),
             ),
           ),
           Positioned(

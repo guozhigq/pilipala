@@ -23,6 +23,7 @@ class VideoCardH extends StatelessWidget {
     this.showView = true,
     this.showDanmaku = true,
     this.showPubdate = false,
+    this.showCharge = false,
   });
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
@@ -33,6 +34,7 @@ class VideoCardH extends StatelessWidget {
   final bool showView;
   final bool showDanmaku;
   final bool showPubdate;
+  final bool showCharge;
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +123,13 @@ class VideoCardH extends StatelessWidget {
                               //     videoItem.rcmdReason.content != '')
                               //   pBadge(videoItem.rcmdReason.content, context,
                               //       6.0, 6.0, null, null),
+                              if (showCharge && videoItem?.isChargingSrc)
+                                const PBadge(
+                                  text: '充电专属',
+                                  right: 6.0,
+                                  top: 6.0,
+                                  type: 'primary',
+                                ),
                             ],
                           );
                         },

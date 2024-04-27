@@ -59,7 +59,7 @@ class VideoDetailController extends GetxController
   // 封面图的展示
   RxBool isShowCover = true.obs;
   // 硬解
-  RxBool enableHA = true.obs;
+  RxBool enableHA = false.obs;
 
   /// 本地存储
   Box userInfoCache = GStrorage.userInfo;
@@ -73,6 +73,7 @@ class VideoDetailController extends GetxController
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
+  RxString cover = ''.obs;
   PlPlayerController plPlayerController = PlPlayerController.getInstance();
 
   late VideoItem firstVideo;
@@ -120,16 +121,18 @@ class VideoDetailController extends GetxController
         var args = argMap['videoItem'];
         if (args.pic != null && args.pic != '') {
           videoItem['pic'] = args.pic;
+          cover.value = args.pic;
         }
       }
       if (keys.contains('pic')) {
         videoItem['pic'] = argMap['pic'];
+        cover.value = argMap['pic'];
       }
     }
     tabCtr = TabController(length: 2, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
-    enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: true);
+    enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: false);
     enableRelatedVideo =
         setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
     if (userInfo == null ||
@@ -162,11 +165,11 @@ class VideoDetailController extends GetxController
     getSubtitle();
   }
 
-  showReplyReplyPanel() {
+  showReplyReplyPanel(oid, fRpid, firstFloor, currentReply) {
     replyReplyBottomSheetCtr =
         scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
       return VideoReplyReplyPanel(
-        oid: oid.value,
+        oid: oid,
         rpid: fRpid,
         closePanel: () => {
           fRpid = 0,
@@ -175,6 +178,7 @@ class VideoDetailController extends GetxController
         replyType: ReplyType.video,
         source: 'videoDetail',
         sheetHeight: sheetHeight.value,
+        currentReply: currentReply,
       );
     });
     replyReplyBottomSheetCtr?.closed.then((value) {

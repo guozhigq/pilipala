@@ -58,7 +58,7 @@ class _PagesPanelState extends State<PagesPanel> {
   }
 
   void changeFucCall(item, i) async {
-    widget.changeFuc?.call(item.cid);
+    widget.changeFuc?.call(item.cid, item.cover);
     currentIndex.value = i;
     _bottomSheetController?.close();
     scrollToIndex();
@@ -129,7 +129,7 @@ class _PagesPanelState extends State<PagesPanel> {
           ),
         ),
         Container(
-          height: 35,
+          height: 55,
           margin: const EdgeInsets.only(bottom: 8),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -163,7 +163,7 @@ class _PagesPanelState extends State<PagesPanel> {
                           Expanded(
                               child: Text(
                             widget.pages[i].pagePart!,
-                            maxLines: 1,
+                            maxLines: 2,
                             style: TextStyle(
                                 fontSize: 13,
                                 color: isCurrentIndex

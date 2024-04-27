@@ -22,19 +22,14 @@ class ReplyHttp {
       return {
         'status': true,
         'data': ReplyData.fromJson(res.data['data']),
+        'code': 200,
       };
     } else {
-      Map errMap = {
-        -400: '请求错误',
-        -404: '无此项',
-        12002: '当前页面评论功能已关闭',
-        12009: '评论主体的type不合法',
-        12061: 'UP主已关闭评论区',
-      };
       return {
         'status': false,
         'date': [],
-        'msg': errMap[res.data['code']] ?? res.data['message'],
+        'code': res.data['code'],
+        'msg': res.data['message'],
       };
     }
   }

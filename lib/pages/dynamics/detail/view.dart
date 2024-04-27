@@ -106,7 +106,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   }
 
   // 查看二级评论
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply) {
     int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
     Get.to(
@@ -324,8 +324,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                       replyItem: replyList[index],
                                       showReplyRow: true,
                                       replyLevel: '1',
-                                      replyReply: (replyItem) =>
-                                          replyReply(replyItem),
+                                      replyReply: (replyItem, currentReply) =>
+                                          replyReply(replyItem, currentReply),
                                       replyType: ReplyType.values[replyType],
                                       addReply: (replyItem) {
                                         replyList[index]
@@ -369,35 +369,40 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             curve: Curves.easeInOut,
           ),
         ),
-        child: FloatingActionButton(
-          heroTag: null,
-          onPressed: () {
-            feedBack();
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (BuildContext context) {
-                return VideoReplyNewDialog(
-                  oid: _dynamicDetailController.oid ??
-                      IdUtils.bv2av(Get.parameters['bvid']!),
-                  root: 0,
-                  parent: 0,
-                  replyType: ReplyType.values[replyType],
-                );
-              },
-            ).then(
-              (value) => {
-                // 完成评论，数据添加
-                if (value != null && value['data'] != null)
-                  {
-                    _dynamicDetailController.replyList.add(value['data']),
-                    _dynamicDetailController.acount.value++
-                  }
-              },
-            );
-          },
-          tooltip: '评论动态',
-          child: const Icon(Icons.reply),
+        child: Obx(
+          () => _dynamicDetailController.replyReqCode.value == 12061
+              ? const SizedBox()
+              : FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () {
+                    feedBack();
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return VideoReplyNewDialog(
+                          oid: _dynamicDetailController.oid ??
+                              IdUtils.bv2av(Get.parameters['bvid']!),
+                          root: 0,
+                          parent: 0,
+                          replyType: ReplyType.values[replyType],
+                        );
+                      },
+                    ).then(
+                      (value) => {
+                        // 完成评论，数据添加
+                        if (value != null && value['data'] != null)
+                          {
+                            _dynamicDetailController.replyList
+                                .add(value['data']),
+                            _dynamicDetailController.acount.value++
+                          }
+                      },
+                    );
+                  },
+                  tooltip: '评论动态',
+                  child: const Icon(Icons.reply),
+                ),
         ),
       ),
     );

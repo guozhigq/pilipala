@@ -29,7 +29,7 @@ class _SelectDialogState<T> extends State<SelectDialog<T>> {
 
     return AlertDialog(
       title: Text(widget.title),
-      contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+      contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
       content: StatefulBuilder(builder: (context, StateSetter setState) {
         return SingleChildScrollView(
           child: Column(
