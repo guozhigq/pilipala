@@ -219,50 +219,36 @@ class VideoIntroController extends GetxController {
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
-            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: StatefulBuilder(builder: (context, StateSetter setState) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: 1,
-                    title: const Text('1枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                  RadioListTile(
-                    value: 2,
-                    title: const Text('2枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                ],
+                children: [1, 2]
+                    .map(
+                      (e) => RadioListTile(
+                        value: e,
+                        title: Text('$e枚'),
+                        groupValue: _tempThemeValue,
+                        onChanged: (value) async {
+                          _tempThemeValue = value!;
+                          setState(() {});
+                          var res = await VideoHttp.coinVideo(
+                              bvid: bvid, multiply: _tempThemeValue);
+                          if (res['status']) {
+                            SmartDialog.showToast('投币成功 👏');
+                            hasCoin.value = true;
+                            videoDetail.value.stat!.coin =
+                                videoDetail.value.stat!.coin! + _tempThemeValue;
+                          } else {
+                            SmartDialog.showToast(res['msg']);
+                          }
+                          Get.back();
+                        },
+                      ),
+                    )
+                    .toList(),
               );
             }),
-            actions: [
-              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
-              TextButton(
-                  onPressed: () async {
-                    var res = await VideoHttp.coinVideo(
-                        bvid: bvid, multiply: _tempThemeValue);
-                    if (res['status']) {
-                      SmartDialog.showToast('投币成功 👏');
-                      hasCoin.value = true;
-                      videoDetail.value.stat!.coin =
-                          videoDetail.value.stat!.coin! + _tempThemeValue;
-                    } else {
-                      SmartDialog.showToast(res['msg']);
-                    }
-                    Get.back();
-                  },
-                  child: const Text('确定'))
-            ],
           );
         });
   }
@@ -446,7 +432,7 @@ class VideoIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid) async {
+  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
@@ -461,6 +447,7 @@ class VideoIntroController extends GetxController {
     videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
+    videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
@@ -508,6 +495,7 @@ class VideoIntroController extends GetxController {
   void nextPlay() {
     final List episodes = [];
     bool isPages = false;
+    late String cover;
     if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
@@ -524,6 +512,7 @@ class VideoIntroController extends GetxController {
     final int currentIndex =
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
+    cover = episodes[nextIndex].cover;
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
@@ -540,7 +529,7 @@ class VideoIntroController extends GetxController {
     final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
-    changeSeasonOrbangu(rBvid, cid, rAid);
+    changeSeasonOrbangu(rBvid, cid, rAid, cover);
   }
 
   // 设置关注分组
@@ -605,10 +594,11 @@ class VideoIntroController extends GetxController {
         isFullScreen: true,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
-            changeSeasonOrbangu(IdUtils.av2bv(item.aid), item.cid, item.aid);
+            changeSeasonOrbangu(
+                IdUtils.av2bv(item.aid), item.cid, item.aid, item.cover);
           }
           if (dataType == VideoEpidoesType.videoPart) {
-            changeSeasonOrbangu(bvid, item.cid, null);
+            changeSeasonOrbangu(bvid, item.cid, null, item.cover);
           }
           SmartDialog.dismiss();
         },
