@@ -45,25 +45,37 @@ class EpisodeBottomSheet {
         title = '第${episode.title}话  ${episode.longTitle!}';
         break;
     }
-    return InkWell(
-      onTap: () {
-        SmartDialog.showToast('切换至「$title」');
-        changeFucCall.call(episode, index);
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 14, right: 14, top: 8, bottom: 8),
-        child: isFullScreen
-            ? Text(
-                title,
-                maxLines: 1,
+    return isFullScreen || episode?.cover == null
+        ? ListTile(
+            onTap: () {
+              SmartDialog.showToast('切换至「$title」');
+              changeFucCall.call(episode, index);
+            },
+            dense: false,
+            leading: isCurrentIndex
+                ? Image.asset(
+                    'assets/images/live.gif',
+                    color: primary,
+                    height: 12,
+                  )
+                : null,
+            title: Text(title,
                 style: TextStyle(
                   fontSize: 14,
                   color: isCurrentIndex ? primary : onSurface,
-                ),
-              )
-            : Row(
+                )))
+        : InkWell(
+            onTap: () {
+              SmartDialog.showToast('切换至「$title」');
+              changeFucCall.call(episode, index);
+            },
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 14, right: 14, top: 8, bottom: 8),
+              child: Row(
                 children: [
-                  NetworkImgLayer(width: 130, height: 75, src: episode.cover),
+                  NetworkImgLayer(
+                      width: 130, height: 75, src: episode?.cover ?? ''),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -77,8 +89,8 @@ class EpisodeBottomSheet {
                   ),
                 ],
               ),
-      ),
-    );
+            ),
+          );
   }
 
   Widget buildTitle() {
