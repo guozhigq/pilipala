@@ -102,7 +102,7 @@ class PlPlayerController {
   bool _isFirstTime = true;
 
   Timer? _timer;
-  late Timer? _timerForSeek;
+  Timer? _timerForSeek;
   Timer? _timerForVolume;
   Timer? _timerForShowingVolume;
   Timer? _timerForGettingVolume;
