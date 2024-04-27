@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_v.dart';
 import 'package:pilipala/utils/main_stream.dart';
 
@@ -118,16 +116,6 @@ class _RcmdPageState extends State<RcmdPage>
     );
   }
 
-  OverlayEntry _createPopupDialog(videoItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _rcmdController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: videoItem, closeFn: _rcmdController.popupDialog?.remove),
-      ),
-    );
-  }
-
   Widget contentGrid(ctr, videoList) {
     // double maxWidth = Get.size.width;
     // int baseWidth = 500;
@@ -158,14 +146,6 @@ class _RcmdPageState extends State<RcmdPage>
               ? VideoCardV(
                   videoItem: videoList[index],
                   crossAxisCount: crossAxisCount,
-                  longPress: () {
-                    _rcmdController.popupDialog =
-                        _createPopupDialog(videoList[index]);
-                    Overlay.of(context).insert(_rcmdController.popupDialog!);
-                  },
-                  longPressEnd: () {
-                    _rcmdController.popupDialog?.remove();
-                  },
                 )
               : const VideoCardVSkeleton();
         },

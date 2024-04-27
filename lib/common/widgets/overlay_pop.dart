@@ -62,6 +62,7 @@ class OverlayPop extends StatelessWidget {
                   Expanded(
                     child: Text(
                       videoItem.title! as String,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
                   const SizedBox(width: 4),
