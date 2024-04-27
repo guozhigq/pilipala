@@ -215,7 +215,7 @@ class BangumiIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid) async {
+  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
     // 重新获取视频资源
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
@@ -223,6 +223,7 @@ class BangumiIntroController extends GetxController {
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.oid.value = aid;
+    videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {
@@ -281,7 +282,8 @@ class BangumiIntroController extends GetxController {
     int cid = episodes[nextIndex].cid!;
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
-    changeSeasonOrbangu(bvid, cid, aid);
+    String cover = episodes[nextIndex].cover!;
+    changeSeasonOrbangu(bvid, cid, aid, cover);
   }
 
   // 播放器底栏 选集 回调
@@ -302,7 +304,7 @@ class BangumiIntroController extends GetxController {
         sheetHeight: Get.size.height,
         isFullScreen: true,
         changeFucCall: (item, index) {
-          changeSeasonOrbangu(item.bvid, item.cid, item.aid);
+          changeSeasonOrbangu(item.bvid, item.cid, item.aid, item.cover);
           SmartDialog.dismiss();
         },
       ).buildShowContent(Get.context!),

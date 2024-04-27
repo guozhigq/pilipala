@@ -73,6 +73,7 @@ class VideoDetailController extends GetxController
   ReplyItemModel? firstFloor;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
+  RxString cover = ''.obs;
   PlPlayerController plPlayerController = PlPlayerController.getInstance();
 
   late VideoItem firstVideo;
@@ -120,10 +121,12 @@ class VideoDetailController extends GetxController
         var args = argMap['videoItem'];
         if (args.pic != null && args.pic != '') {
           videoItem['pic'] = args.pic;
+          cover.value = args.pic;
         }
       }
       if (keys.contains('pic')) {
         videoItem['pic'] = argMap['pic'];
+        cover.value = argMap['pic'];
       }
     }
     tabCtr = TabController(length: 2, vsync: this);
