@@ -58,6 +58,7 @@ class VideoIntroController extends GetxController {
   String heroTag = '';
   late ModelResult modelResult;
   PersistentBottomSheetController? bottomSheetController;
+  late bool enableRelatedVideo;
 
   @override
   void onInit() {
@@ -74,6 +75,8 @@ class VideoIntroController extends GetxController {
       queryOnlineTotal();
       startTimer(); // 在页面加载时启动定时器
     }
+    enableRelatedVideo =
+        setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
   }
 
   // 获取视频简介&分p
@@ -216,50 +219,36 @@ class VideoIntroController extends GetxController {
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
-            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: StatefulBuilder(builder: (context, StateSetter setState) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: 1,
-                    title: const Text('1枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                  RadioListTile(
-                    value: 2,
-                    title: const Text('2枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                ],
+                children: [1, 2]
+                    .map(
+                      (e) => RadioListTile(
+                        value: e,
+                        title: Text('$e枚'),
+                        groupValue: _tempThemeValue,
+                        onChanged: (value) async {
+                          _tempThemeValue = value!;
+                          setState(() {});
+                          var res = await VideoHttp.coinVideo(
+                              bvid: bvid, multiply: _tempThemeValue);
+                          if (res['status']) {
+                            SmartDialog.showToast('投币成功 👏');
+                            hasCoin.value = true;
+                            videoDetail.value.stat!.coin =
+                                videoDetail.value.stat!.coin! + _tempThemeValue;
+                          } else {
+                            SmartDialog.showToast(res['msg']);
+                          }
+                          Get.back();
+                        },
+                      ),
+                    )
+                    .toList(),
               );
             }),
-            actions: [
-              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
-              TextButton(
-                  onPressed: () async {
-                    var res = await VideoHttp.coinVideo(
-                        bvid: bvid, multiply: _tempThemeValue);
-                    if (res['status']) {
-                      SmartDialog.showToast('投币成功 👏');
-                      hasCoin.value = true;
-                      videoDetail.value.stat!.coin =
-                          videoDetail.value.stat!.coin! + _tempThemeValue;
-                    } else {
-                      SmartDialog.showToast(res['msg']);
-                    }
-                    Get.back();
-                  },
-                  child: const Text('确定'))
-            ],
           );
         });
   }
@@ -447,15 +436,18 @@ class VideoIntroController extends GetxController {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
-    final ReleatedController releatedCtr =
-        Get.find<ReleatedController>(tag: heroTag);
+    if (enableRelatedVideo) {
+      final ReleatedController releatedCtr =
+          Get.find<ReleatedController>(tag: heroTag);
+      releatedCtr.bvid = bvid;
+      releatedCtr.queryRelatedVideo();
+    }
+
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.queryVideoUrl();
-    releatedCtr.bvid = bvid;
-    releatedCtr.queryRelatedVideo();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常

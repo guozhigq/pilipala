@@ -180,15 +180,16 @@ class _HeaderControlState extends State<HeaderControl> {
                             '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
                             style: subTitleStyle),
                       ),
-                    ListTile(
-                      onTap: () => {Get.back(), showSetDecodeFormats()},
-                      dense: true,
-                      leading: const Icon(Icons.av_timer_outlined, size: 20),
-                      title: const Text('解码格式', style: titleStyle),
-                      subtitle: Text(
-                          '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
-                          style: subTitleStyle),
-                    ),
+                    if (widget.videoDetailCtr!.currentDecodeFormats != null)
+                      ListTile(
+                        onTap: () => {Get.back(), showSetDecodeFormats()},
+                        dense: true,
+                        leading: const Icon(Icons.av_timer_outlined, size: 20),
+                        title: const Text('解码格式', style: titleStyle),
+                        subtitle: Text(
+                            '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats!.description}',
+                            style: subTitleStyle),
+                      ),
                     ListTile(
                       onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
@@ -541,14 +542,22 @@ class _HeaderControlState extends State<HeaderControl> {
 
     /// 可用的质量分类
     int userfulQaSam = 0;
-    final List<VideoItem> video = videoInfo.dash!.video!;
-    final Set<int> idSet = {};
-    for (final VideoItem item in video) {
-      final int id = item.id!;
-      if (!idSet.contains(id)) {
-        idSet.add(id);
-        userfulQaSam++;
+    if (videoInfo.dash != null) {
+      // dash格式视频一次请求会返回所有可播放的清晰度video
+      final List<VideoItem> video = videoInfo.dash!.video!;
+      final Set<int> idSet = {};
+      for (final VideoItem item in video) {
+        final int id = item.id!;
+        if (!idSet.contains(id)) {
+          idSet.add(id);
+          userfulQaSam++;
+        }
       }
+    }
+
+    if (videoInfo.durl != null) {
+      // durl格式视频一次请求返回对应清晰度video
+      userfulQaSam = videoFormat.length - 1;
     }
 
     showModalBottomSheet(
@@ -707,7 +716,7 @@ class _HeaderControlState extends State<HeaderControl> {
   void showSetDecodeFormats() {
     // 当前选中的解码格式
     final VideoDecodeFormats currentDecodeFormats =
-        widget.videoDetailCtr!.currentDecodeFormats;
+        widget.videoDetailCtr!.currentDecodeFormats!;
     final VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
@@ -1306,20 +1315,6 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          // SizedBox(
-          //   width: 34,
-          //   height: 34,
-          //   child: IconButton(
-          //     style: ButtonStyle(
-          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     ),
-          //     onPressed: () => showSubtitleDialog(),
-          //     icon: const Icon(
-          //       Icons.closed_caption_off,
-          //       size: 22,
-          //     ),
-          //   ),
-          // ),
           ComBtn(
             icon: const Icon(
               Icons.closed_caption_off,

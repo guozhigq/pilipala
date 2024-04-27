@@ -23,16 +23,34 @@ class IntroDetail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 4),
-            GestureDetector(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
-                SmartDialog.showToast('已复制');
-              },
-              child: Text(
-                videoDetail!.bvid!,
-                style: TextStyle(
-                    fontSize: 13, color: Theme.of(context).colorScheme.primary),
-              ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
+                    SmartDialog.showToast('已复制');
+                  },
+                  child: Text(
+                    videoDetail!.bvid!,
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.primary),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
+                    SmartDialog.showToast('已复制');
+                  },
+                  child: Text(
+                    videoDetail!.aid!.toString(),
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.primary),
+                  ),
+                )
+              ],
             ),
             const SizedBox(height: 4),
             Text.rich(

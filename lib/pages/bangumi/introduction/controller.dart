@@ -131,51 +131,37 @@ class BangumiIntroController extends GetxController {
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
-            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: StatefulBuilder(builder: (context, StateSetter setState) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: 1,
-                    title: const Text('1枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                  RadioListTile(
-                    value: 2,
-                    title: const Text('2枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                ],
+                children: [1, 2]
+                    .map(
+                      (e) => RadioListTile(
+                        value: e,
+                        title: Text('$e枚'),
+                        groupValue: _tempThemeValue,
+                        onChanged: (value) async {
+                          _tempThemeValue = value!;
+                          setState(() {});
+                          var res = await VideoHttp.coinVideo(
+                              bvid: bvid, multiply: _tempThemeValue);
+                          if (res['status']) {
+                            SmartDialog.showToast('投币成功 👏');
+                            hasCoin.value = true;
+                            bangumiDetail.value.stat!['coins'] =
+                                bangumiDetail.value.stat!['coins'] +
+                                    _tempThemeValue;
+                          } else {
+                            SmartDialog.showToast(res['msg']);
+                          }
+                          Get.back();
+                        },
+                      ),
+                    )
+                    .toList(),
               );
             }),
-            actions: [
-              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
-              TextButton(
-                onPressed: () async {
-                  var res = await VideoHttp.coinVideo(
-                      bvid: bvid, multiply: _tempThemeValue);
-                  if (res['status']) {
-                    SmartDialog.showToast('投币成功 👏');
-                    hasCoin.value = true;
-                    bangumiDetail.value.stat!['coins'] =
-                        bangumiDetail.value.stat!['coins'] + _tempThemeValue;
-                  } else {
-                    SmartDialog.showToast(res['msg']);
-                  }
-                  Get.back();
-                },
-                child: const Text('确定'),
-              )
-            ],
           );
         });
   }
@@ -236,6 +222,7 @@ class BangumiIntroController extends GetxController {
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
+    videoDetailCtr.oid.value = aid;
     videoDetailCtr.queryVideoUrl();
     // 重新请求评论
     try {

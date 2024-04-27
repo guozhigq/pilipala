@@ -5,8 +5,8 @@ class SubTitleUtils {
 
     for (int i = 0; i < jsonData.length; i++) {
       final item = jsonData[i];
-      double from = item['from'] as double;
-      double to = item['to'] as double;
+      double from = double.parse(item['from'].toString());
+      double to = double.parse(item['to'].toString());
       int sid = (item['sid'] ?? 0) as int;
       String content = item['content'] as String;
 
