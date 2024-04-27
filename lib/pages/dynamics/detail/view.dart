@@ -106,7 +106,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   }
 
   // 查看二级评论
-  void replyReply(replyItem, currentReply) {
+  void replyReply(replyItem) {
     int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
     Get.to(
@@ -324,8 +324,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                       replyItem: replyList[index],
                                       showReplyRow: true,
                                       replyLevel: '1',
-                                      replyReply: (replyItem, currentReply) =>
-                                          replyReply(replyItem, currentReply),
+                                      replyReply: (replyItem) =>
+                                          replyReply(replyItem),
                                       replyType: ReplyType.values[replyType],
                                       addReply: (replyItem) {
                                         replyList[index]
