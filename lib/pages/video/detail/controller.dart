@@ -115,20 +115,15 @@ class VideoDetailController extends GetxController
     super.onInit();
     final Map argMap = Get.arguments;
     userInfo = userInfoCache.get('userInfoCache');
-    var keys = argMap.keys.toList();
-    if (keys.isNotEmpty) {
-      if (keys.contains('videoItem')) {
-        var args = argMap['videoItem'];
-        if (args.pic != null && args.pic != '') {
-          videoItem['pic'] = args.pic;
-          cover.value = args.pic;
-        }
-      }
-      if (keys.contains('pic')) {
-        videoItem['pic'] = argMap['pic'];
-        cover.value = argMap['pic'];
-      }
+    if (argMap.containsKey('videoItem')) {
+      var args = argMap['videoItem'];
+      updateCover(args.pic);
     }
+
+    if (argMap.containsKey('pic')) {
+      updateCover(argMap['pic']);
+    }
+
     tabCtr = TabController(length: 2, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
@@ -550,5 +545,11 @@ class VideoDetailController extends GetxController
         );
       },
     );
+  }
+
+  void updateCover(String? pic) {
+    if (pic != null && pic != '') {
+      cover.value = videoItem['pic'] = pic;
+    }
   }
 }
