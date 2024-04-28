@@ -14,10 +14,12 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final LiveRoomController? liveRoomCtr;
   final Floating? floating;
+  final Function? onRefresh;
   const BottomControl({
     this.controller,
     this.liveRoomCtr,
     this.floating,
+    this.onRefresh,
     Key? key,
   }) : super(key: key);
 
@@ -61,6 +63,14 @@ class _BottomControlState extends State<BottomControl> {
           //   ),
           //   fuc: () => Get.back(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.refresh_outlined,
+              size: 18,
+              color: Colors.white,
+            ),
+            fuc: widget.onRefresh,
+          ),
           const Spacer(),
           // ComBtn(
           //   icon: const Icon(
@@ -148,23 +158,5 @@ class _BottomControlState extends State<BottomControl> {
         ],
       ),
     );
-  }
-}
-
-class MSliderTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    SliderThemeData? sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    const double trackHeight = 3;
-    final double trackLeft = offset.dx;
-    final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2 + 4;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

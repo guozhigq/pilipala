@@ -47,18 +47,23 @@ class Vip {
     this.status,
     this.dueDate,
     this.label,
+    this.nicknameColor,
   });
 
   int? type;
   int? status;
   int? dueDate;
   Map? label;
+  int? nicknameColor;
 
   Vip.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     status = json['status'];
     dueDate = json['due_date'];
     label = json['label'];
+    nicknameColor = json['nickname_color'] == ''
+        ? null
+        : int.parse("0xFF${json['nickname_color'].replaceAll('#', '')}");
   }
 }
 

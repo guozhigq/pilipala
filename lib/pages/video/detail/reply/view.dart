@@ -117,7 +117,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
-      videoDetailCtr.showReplyReplyPanel();
+      videoDetailCtr.showReplyReplyPanel(
+          replyItem.oid, replyItem.rpid!, replyItem);
     }
   }
 
@@ -149,13 +150,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
                     height: 40,
-                    padding: const EdgeInsets.fromLTRB(12, 6, 6, 0),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${_videoReplyController.sortTypeLabel.value}评论',
-                          style: const TextStyle(fontSize: 13),
+                        Obx(
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
+                          ),
                         ),
                         SizedBox(
                           height: 35,
@@ -273,32 +277,39 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 parent: fabAnimationCtr,
                 curve: Curves.easeInOut,
               )),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () {
-                  feedBack();
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return VideoReplyNewDialog(
-                        oid: _videoReplyController.aid ??
-                            IdUtils.bv2av(Get.parameters['bvid']!),
-                        root: 0,
-                        parent: 0,
-                        replyType: ReplyType.video,
-                      );
-                    },
-                  ).then(
-                    (value) => {
-                      // 完成评论，数据添加
-                      if (value != null && value['data'] != null)
-                        {_videoReplyController.replyList.add(value['data'])}
-                    },
-                  );
-                },
-                tooltip: '发表评论',
-                child: const Icon(Icons.reply),
+              child: Obx(
+                () => _videoReplyController.replyReqCode.value == 12061
+                    ? const SizedBox()
+                    : FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () {
+                          feedBack();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return VideoReplyNewDialog(
+                                oid: _videoReplyController.aid ??
+                                    IdUtils.bv2av(Get.parameters['bvid']!),
+                                root: 0,
+                                parent: 0,
+                                replyType: ReplyType.video,
+                              );
+                            },
+                          ).then(
+                            (value) => {
+                              // 完成评论，数据添加
+                              if (value != null && value['data'] != null)
+                                {
+                                  _videoReplyController.replyList
+                                      .add(value['data'])
+                                }
+                            },
+                          );
+                        },
+                        tooltip: '发表评论',
+                        child: const Icon(Icons.reply),
+                      ),
               ),
             ),
           ),

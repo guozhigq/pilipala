@@ -35,6 +35,7 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     await setupServiceLocator();
+    clearLogs();
     Request();
     await Request.setCookie();
     RecommendFilter();
@@ -129,27 +130,10 @@ class MyApp extends StatelessWidget {
           );
         }
 
-        final SnackBarThemeData snackBarThemeData = SnackBarThemeData(
-          actionTextColor: darkColorScheme.primary,
-          backgroundColor: darkColorScheme.secondaryContainer,
-          closeIconColor: darkColorScheme.secondary,
-          contentTextStyle: TextStyle(color: darkColorScheme.secondary),
-          elevation: 20,
-        );
-
         ThemeData themeData = ThemeData(
-          // fontFamily: 'HarmonyOS',
           colorScheme: currentThemeValue == ThemeType.dark
               ? darkColorScheme
               : lightColorScheme,
-          snackBarTheme: snackBarThemeData,
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: <TargetPlatform, PageTransitionsBuilder>{
-              TargetPlatform.android: ZoomPageTransitionsBuilder(
-                allowEnterRouteSnapshotting: false,
-              ),
-            },
-          ),
         );
 
         // 小白条、导航栏沉浸
@@ -170,9 +154,38 @@ class MyApp extends StatelessWidget {
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
-          title: 'PiLiPaLa',
-          theme: themeData,
-          darkTheme: themeData,
+          title: 'PiliPala',
+          theme: ThemeData(
+            colorScheme: currentThemeValue == ThemeType.dark
+                ? darkColorScheme
+                : lightColorScheme,
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: lightColorScheme.primary,
+              backgroundColor: lightColorScheme.secondaryContainer,
+              closeIconColor: lightColorScheme.secondary,
+              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
+              elevation: 20,
+            ),
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: ZoomPageTransitionsBuilder(
+                  allowEnterRouteSnapshotting: false,
+                ),
+              },
+            ),
+          ),
+          darkTheme: ThemeData(
+            colorScheme: currentThemeValue == ThemeType.light
+                ? lightColorScheme
+                : darkColorScheme,
+            snackBarTheme: SnackBarThemeData(
+              actionTextColor: darkColorScheme.primary,
+              backgroundColor: darkColorScheme.secondaryContainer,
+              closeIconColor: darkColorScheme.secondary,
+              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
+              elevation: 20,
+            ),
+          ),
           localizationsDelegates: const [
             GlobalCupertinoLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

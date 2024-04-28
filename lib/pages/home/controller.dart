@@ -35,7 +35,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     userLogin.value = userInfo != null;
     userFace.value = userInfo != null ? userInfo.face : '';
     hideSearchBar =
-        setting.get(SettingBoxKey.hideSearchBar, defaultValue: true);
+        setting.get(SettingBoxKey.hideSearchBar, defaultValue: false);
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
       searchDefault();
     }
@@ -113,5 +113,11 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (res.data['code'] == 0) {
       defaultSearch.value = res.data['data']['name'];
     }
+  }
+
+  @override
+  void onClose() {
+    searchBarStream.close();
+    super.onClose();
   }
 }

@@ -33,7 +33,7 @@ class MainController extends GetxController {
     if (setting.get(SettingBoxKey.autoUpdate, defaultValue: false)) {
       Utils.checkUpdata();
     }
-    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: true);
+    hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: false);
 
     var userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
@@ -100,5 +100,11 @@ class MainController extends GetxController {
     // 如果找不到匹配项，默认索引设置为0或其他合适的值
     selectedIndex = defaultIndex != -1 ? defaultIndex : 0;
     pages = navigationBars.map<Widget>((e) => e['page']).toList();
+  }
+
+  @override
+  void onClose() {
+    bottomBarStream.close();
+    super.onClose();
   }
 }

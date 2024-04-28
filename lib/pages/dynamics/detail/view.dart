@@ -16,6 +16,7 @@ import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 
+import '../../../models/video/reply/item.dart';
 import '../widgets/dynamic_panel.dart';
 
 class DynamicDetailPage extends StatefulWidget {
@@ -182,6 +183,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     scrollController.removeListener(() {});
     fabAnimationCtr.dispose();
     scrollController.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 
@@ -194,7 +196,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         centerTitle: false,
         titleSpacing: 0,
         title: StreamBuilder(
-          stream: titleStreamC.stream,
+          stream: titleStreamC.stream.distinct(),
           initialData: false,
           builder: (context, AsyncSnapshot snapshot) {
             return AnimatedOpacity(
@@ -210,173 +212,167 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         onRefresh: () async {
           await _dynamicDetailController.queryReplyList();
         },
-        child: Stack(
-          children: [
-            CustomScrollView(
-              controller: scrollController,
-              slivers: [
-                if (action != 'comment')
-                  SliverToBoxAdapter(
-                    child: DynamicPanel(
-                      item: _dynamicDetailController.item,
-                      source: 'detail',
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            if (action != 'comment')
+              SliverToBoxAdapter(
+                child: DynamicPanel(
+                  item: _dynamicDetailController.item,
+                  source: 'detail',
+                ),
+              ),
+            SliverPersistentHeader(
+              delegate: _MySliverPersistentHeaderDelegate(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    border: Border(
+                      top: BorderSide(
+                        width: 0.6,
+                        color: Theme.of(context).dividerColor.withOpacity(0.05),
+                      ),
                     ),
                   ),
-                SliverPersistentHeader(
-                  delegate: _MySliverPersistentHeaderDelegate(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        border: Border(
-                          top: BorderSide(
-                            width: 0.6,
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withOpacity(0.05),
+                  height: 45,
+                  padding: const EdgeInsets.only(left: 12, right: 6),
+                  child: Row(
+                    children: [
+                      Obx(
+                        () => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                            '${_dynamicDetailController.acount.value}',
+                            key: ValueKey<int>(
+                                _dynamicDetailController.acount.value),
                           ),
                         ),
                       ),
-                      height: 45,
-                      padding: const EdgeInsets.only(left: 12, right: 6),
-                      child: Row(
-                        children: [
-                          Obx(
-                            () => AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              transitionBuilder:
-                                  (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                    scale: animation, child: child);
-                              },
-                              child: Text(
-                                '${_dynamicDetailController.acount.value}',
-                                key: ValueKey<int>(
-                                    _dynamicDetailController.acount.value),
-                              ),
-                            ),
-                          ),
-                          const Text('条回复'),
-                          const Spacer(),
-                          SizedBox(
-                            height: 35,
-                            child: TextButton.icon(
-                              onPressed: () =>
-                                  _dynamicDetailController.queryBySort(),
-                              icon: const Icon(Icons.sort, size: 16),
-                              label: Obx(() => Text(
-                                    _dynamicDetailController
-                                        .sortTypeLabel.value,
-                                    style: const TextStyle(fontSize: 13),
-                                  )),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                      const Text('条回复'),
+                      const Spacer(),
+                      SizedBox(
+                        height: 35,
+                        child: TextButton.icon(
+                          onPressed: () =>
+                              _dynamicDetailController.queryBySort(),
+                          icon: const Icon(Icons.sort, size: 16),
+                          label: Obx(() => Text(
+                                _dynamicDetailController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              )),
+                        ),
+                      )
+                    ],
                   ),
-                  pinned: true,
                 ),
-                FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map data = snapshot.data as Map;
-                      if (snapshot.data['status']) {
-                        // 请求成功
-                        return Obx(
-                          () => _dynamicDetailController.replyList.isEmpty &&
-                                  _dynamicDetailController.isLoadingMore
-                              ? SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                    return const VideoReplySkeleton();
-                                  }, childCount: 8),
-                                )
-                              : SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) {
-                                      if (index ==
-                                          _dynamicDetailController
-                                              .replyList.length) {
-                                        return Container(
-                                          padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context)
-                                                  .padding
-                                                  .bottom),
-                                          height: MediaQuery.of(context)
-                                                  .padding
-                                                  .bottom +
-                                              100,
-                                          child: Center(
-                                            child: Obx(
-                                              () => Text(
-                                                _dynamicDetailController
-                                                    .noMore.value,
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .outline,
-                                                ),
-                                              ),
+              ),
+              pinned: true,
+            ),
+            FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data as Map;
+                  if (snapshot.data['status']) {
+                    RxList<ReplyItemModel> replyList =
+                        _dynamicDetailController.replyList;
+                    // 请求成功
+                    return Obx(
+                      () => replyList.isEmpty &&
+                              _dynamicDetailController.isLoadingMore
+                          ? SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                return const VideoReplySkeleton();
+                              }, childCount: 8),
+                            )
+                          : SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  if (index == replyList.length) {
+                                    return Container(
+                                      padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context)
+                                              .padding
+                                              .bottom),
+                                      height: MediaQuery.of(context)
+                                              .padding
+                                              .bottom +
+                                          100,
+                                      child: Center(
+                                        child: Obx(
+                                          () => Text(
+                                            _dynamicDetailController
+                                                .noMore.value,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
                                             ),
                                           ),
-                                        );
-                                      } else {
-                                        return ReplyItem(
-                                          replyItem: _dynamicDetailController
-                                              .replyList[index],
-                                          showReplyRow: true,
-                                          replyLevel: '1',
-                                          replyReply: (replyItem) =>
-                                              replyReply(replyItem),
-                                          replyType:
-                                              ReplyType.values[replyType],
-                                          addReply: (replyItem) {
-                                            _dynamicDetailController
-                                                .replyList[index].replies!
-                                                .add(replyItem);
-                                          },
-                                        );
-                                      }
-                                    },
-                                    childCount: _dynamicDetailController
-                                            .replyList.length +
-                                        1,
-                                  ),
-                                ),
-                        );
-                      } else {
-                        // 请求错误
-                        return HttpError(
-                          errMsg: data['msg'],
-                          fn: () => setState(() {}),
-                        );
-                      }
-                    } else {
-                      // 骨架屏
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return const VideoReplySkeleton();
-                        }, childCount: 8),
-                      );
-                    }
-                  },
-                )
-              ],
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 14,
-              right: 14,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 2),
-                  end: const Offset(0, 0),
-                ).animate(CurvedAnimation(
-                  parent: fabAnimationCtr,
-                  curve: Curves.easeInOut,
-                )),
-                child: FloatingActionButton(
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return ReplyItem(
+                                      replyItem: replyList[index],
+                                      showReplyRow: true,
+                                      replyLevel: '1',
+                                      replyReply: (replyItem) =>
+                                          replyReply(replyItem),
+                                      replyType: ReplyType.values[replyType],
+                                      addReply: (replyItem) {
+                                        replyList[index]
+                                            .replies!
+                                            .add(replyItem);
+                                      },
+                                    );
+                                  }
+                                },
+                                childCount: replyList.length + 1,
+                              ),
+                            ),
+                    );
+                  } else {
+                    // 请求错误
+                    return HttpError(
+                      errMsg: data['msg'],
+                      fn: () => setState(() {}),
+                    );
+                  }
+                } else {
+                  // 骨架屏
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return const VideoReplySkeleton();
+                    }, childCount: 8),
+                  );
+                }
+              },
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 2),
+          end: const Offset(0, 0),
+        ).animate(
+          CurvedAnimation(
+            parent: fabAnimationCtr,
+            curve: Curves.easeInOut,
+          ),
+        ),
+        child: Obx(
+          () => _dynamicDetailController.replyReqCode.value == 12061
+              ? const SizedBox()
+              : FloatingActionButton(
                   heroTag: null,
                   onPressed: () {
                     feedBack();
@@ -407,9 +403,6 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                   tooltip: '评论动态',
                   child: const Icon(Icons.reply),
                 ),
-              ),
-            ),
-          ],
         ),
       ),
     );

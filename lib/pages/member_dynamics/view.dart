@@ -5,6 +5,7 @@ import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import '../../common/widgets/http_error.dart';
+import '../../models/dynamics/result.dart';
 import '../dynamics/widgets/dynamic_panel.dart';
 
 class MemberDynamicsPage extends StatefulWidget {
@@ -66,7 +67,8 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
                   Map data = snapshot.data as Map;
-                  List list = _memberDynamicController.dynamicsList;
+                  RxList<DynamicItemModel> list =
+                      _memberDynamicController.dynamicsList;
                   if (data['status']) {
                     return Obx(
                       () => list.isNotEmpty

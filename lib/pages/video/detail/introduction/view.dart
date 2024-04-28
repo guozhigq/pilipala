@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -16,12 +17,12 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../../../http/user.dart';
-import '../widgets/expandable_section.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
-import 'widgets/page.dart';
-import 'widgets/season.dart';
+import 'widgets/page_panel.dart';
+import 'widgets/season_panel.dart';
+import 'widgets/staff_up_item.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -140,6 +141,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late bool enableAi;
   bool isProcessing = false;
   RxBool isExpand = false.obs;
+  late ExpandableController _expandableCtr;
+
   void Function()? handleState(Future Function() action) {
     return isProcessing
         ? null
@@ -163,6 +166,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     follower = Utils.numFormat(videoIntroController.userStat['follower']);
     followStatus = videoIntroController.followStatus;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
+    _expandableCtr = ExpandableController(initialExpanded: false);
   }
 
   // 收藏
@@ -216,6 +220,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   showIntroDetail() {
     feedBack();
     isExpand.value = !(isExpand.value);
+    _expandableCtr.toggle();
   }
 
   // 用户主页
@@ -240,6 +245,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _expandableCtr.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
@@ -256,14 +267,34 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => showIntroDetail(),
-            child: Text(
-              widget.videoDetail!.title!,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            child: ExpandablePanel(
+              controller: _expandableCtr,
+              collapsed: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              expanded: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 4,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              theme: const ExpandableThemeData(
+                animationDuration: Duration(milliseconds: 300),
+                scrollAnimationDuration: Duration(milliseconds: 300),
+                crossFadePoint: 0,
+                fadeCurve: Curves.ease,
+                sizeCurve: Curves.linear,
+              ),
             ),
           ),
           Stack(
@@ -328,18 +359,22 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ),
 
           /// 视频简介
-          Obx(
-            () => ExpandedSection(
-              expand: isExpand.value,
-              begin: 0,
-              end: 1,
-              child: IntroDetail(videoDetail: widget.videoDetail!),
+          ExpandablePanel(
+            controller: _expandableCtr,
+            collapsed: const SizedBox(height: 0),
+            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            theme: const ExpandableThemeData(
+              animationDuration: Duration(milliseconds: 300),
+              scrollAnimationDuration: Duration(milliseconds: 300),
+              crossFadePoint: 0,
+              fadeCurve: Curves.ease,
+              sizeCurve: Curves.linear,
             ),
           ),
 
           /// 点赞收藏转发
-          actionGrid(context, videoIntroController),
-          // 合集
+          Material(child: actionGrid(context, videoIntroController)),
+          // 合集 videoPart 简洁
           if (widget.videoDetail!.ugcSeason != null) ...[
             Obx(
               () => SeasonPanel(
@@ -347,48 +382,66 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 cid: videoIntroController.lastPlayCid.value != 0
                     ? videoIntroController.lastPlayCid.value
                     : widget.videoDetail!.pages!.first.cid,
-                sheetHeight: sheetHeight,
-                changeFuc: (bvid, cid, aid) =>
-                    videoIntroController.changeSeasonOrbangu(bvid, cid, aid),
+                sheetHeight: videoDetailCtr.sheetHeight.value,
+                changeFuc: (bvid, cid, aid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
+                  bvid,
+                  cid,
+                  aid,
+                  cover,
+                ),
+                videoIntroCtr: videoIntroController,
               ),
             )
           ],
+          // 合集 videoEpisode
           if (widget.videoDetail!.pages != null &&
               widget.videoDetail!.pages!.length > 1) ...[
-            Obx(() => PagesPanel(
-                  pages: widget.videoDetail!.pages!,
-                  cid: videoIntroController.lastPlayCid.value,
-                  sheetHeight: sheetHeight,
-                  changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
-                      videoIntroController.bvid, cid, null),
-                ))
+            Obx(
+              () => PagesPanel(
+                pages: widget.videoDetail!.pages!,
+                cid: videoIntroController.lastPlayCid.value,
+                sheetHeight: videoDetailCtr.sheetHeight.value,
+                changeFuc: (cid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
+                  videoIntroController.bvid,
+                  cid,
+                  null,
+                  cover,
+                ),
+                videoIntroCtr: videoIntroController,
+              ),
+            )
           ],
-          GestureDetector(
-            onTap: onPushMember,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: Row(
-                children: [
-                  NetworkImgLayer(
-                    type: 'avatar',
-                    src: widget.videoDetail!.owner!.face,
-                    width: 34,
-                    height: 34,
-                    fadeInDuration: Duration.zero,
-                    fadeOutDuration: Duration.zero,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(owner.name, style: const TextStyle(fontSize: 13)),
-                  const SizedBox(width: 6),
-                  Text(
-                    follower,
-                    style: TextStyle(
-                      fontSize: t.textTheme.labelSmall!.fontSize,
-                      color: outline,
+          if (widget.videoDetail!.staff == null)
+            GestureDetector(
+              onTap: onPushMember,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                child: Row(
+                  children: [
+                    NetworkImgLayer(
+                      type: 'avatar',
+                      src: widget.videoDetail!.owner!.face,
+                      width: 34,
+                      height: 34,
+                      fadeInDuration: Duration.zero,
+                      fadeOutDuration: Duration.zero,
                     ),
-                  ),
-                  const Spacer(),
-                  Obx(() => AnimatedOpacity(
+                    const SizedBox(width: 10),
+                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(
+                      follower,
+                      style: TextStyle(
+                        fontSize: t.textTheme.labelSmall!.fontSize,
+                        color: outline,
+                      ),
+                    ),
+                    const Spacer(),
+                    Obx(
+                      () => AnimatedOpacity(
                         opacity:
                             videoIntroController.followStatus.isEmpty ? 0 : 1,
                         duration: const Duration(milliseconds: 50),
@@ -428,11 +481,58 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                   ),
                           ),
                         ),
-                      )),
-                ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          if (widget.videoDetail!.staff != null) ...[
+            const SizedBox(height: 15),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '创作团队',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const WidgetSpan(child: SizedBox(width: 6)),
+                      TextSpan(
+                        text: '${widget.videoDetail!.staff!.length}人',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 120,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      for (int i = 0;
+                          i < widget.videoDetail!.staff!.length;
+                          i++) ...[
+                        StaffUpItem(item: widget.videoDetail!.staff![i])
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ]
         ],
       )),
     );
@@ -499,4 +599,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
+
+  // Widget StaffPanel(BuildContext context, videoIntroController) {
+  //   return
+  // }
 }
