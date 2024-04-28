@@ -38,7 +38,7 @@ class VideoDetailPage extends StatefulWidget {
 }
 
 class _VideoDetailPageState extends State<VideoDetailPage>
-    with TickerProviderStateMixin, RouteAware {
+    with TickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
   late VideoDetailController vdCtr;
   PlPlayerController? plPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
@@ -61,6 +61,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoPiP;
   late Floating floating;
   bool isShowing = true;
+  // 生命周期监听
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
@@ -96,6 +98,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       floating = vdCtr.floating!;
       autoEnterPip();
     }
+    WidgetsBinding.instance.addObserver(this);
+    lifecycleListener();
   }
 
   // 获取视频资源，初始化播放器
@@ -219,6 +223,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       floating.dispose();
     }
     appbarStream.close();
+    WidgetsBinding.instance.removeObserver(this);
+    _lifecycleListener.dispose();
     super.dispose();
   }
 
@@ -278,6 +284,29 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final String routePath = Get.currentRoute;
     if (autoPiP && routePath.startsWith('/video')) {
       floating.toggleAutoPip(autoEnter: autoPiP);
+    }
+  }
+
+  // 生命周期监听
+  void lifecycleListener() {
+    _lifecycleListener = AppLifecycleListener(
+      // onResume: () => _handleTransition('resume'),
+      // 后台
+      // onInactive: () => _handleTransition('inactive'),
+      // 在Android和iOS端不生效
+      // onHide: () => _handleTransition('hide'),
+      onShow: () => _handleTransition('show'),
+      onPause: () => _handleTransition('pause'),
+      onRestart: () => _handleTransition('restart'),
+      onDetach: () => _handleTransition('detach'),
+    );
+  }
+
+  void _handleTransition(String name) {
+    switch (name) {
+      case 'show' || 'restart':
+        plPlayerController?.danmakuController?.clear();
+        break;
     }
   }
 
