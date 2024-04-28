@@ -65,6 +65,20 @@ void main() async {
       },
     );
 
+    // 小白条、导航栏沉浸
+    if (Platform.isAndroid) {
+      List<String> versionParts = Platform.version.split('.');
+      int androidVersion = int.parse(versionParts[0]);
+      if (androidVersion >= 29) {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      }
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        statusBarColor: Colors.transparent,
+      ));
+    }
+
     Data.init();
     GlobalData();
     PiliSchame.init();
@@ -130,26 +144,33 @@ class MyApp extends StatelessWidget {
           );
         }
 
-        ThemeData themeData = ThemeData(
-          colorScheme: currentThemeValue == ThemeType.dark
-              ? darkColorScheme
-              : lightColorScheme,
-        );
+        // ThemeData themeData = ThemeData(
+        //   colorScheme: currentThemeValue == ThemeType.dark
+        //       ? darkColorScheme
+        //       : lightColorScheme,
+        // );
 
-        // 小白条、导航栏沉浸
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          systemNavigationBarColor: GlobalData().enableMYBar
-              ? const Color(0x00010000)
-              : themeData.canvasColor,
-          systemNavigationBarDividerColor: GlobalData().enableMYBar
-              ? const Color(0x00010000)
-              : themeData.canvasColor,
-          systemNavigationBarIconBrightness: currentThemeValue == ThemeType.dark
-              ? Brightness.light
-              : Brightness.dark,
-          statusBarColor: Colors.transparent,
-        ));
+        // // 小白条、导航栏沉浸
+        // if (Platform.isAndroid) {
+        //   List<String> versionParts = Platform.version.split('.');
+        //   int androidVersion = int.parse(versionParts[0]);
+        //   if (androidVersion >= 29) {
+        //     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        //   }
+        //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        //     systemNavigationBarColor: GlobalData().enableMYBar
+        //         ? const Color(0x00010000)
+        //         : themeData.canvasColor,
+        //     systemNavigationBarDividerColor: GlobalData().enableMYBar
+        //         ? const Color(0x00010000)
+        //         : themeData.canvasColor,
+        //     systemNavigationBarIconBrightness:
+        //         currentThemeValue == ThemeType.dark
+        //             ? Brightness.light
+        //             : Brightness.dark,
+        //     statusBarColor: Colors.transparent,
+        //   ));
+        // }
 
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
