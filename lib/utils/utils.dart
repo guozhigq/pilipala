@@ -109,7 +109,6 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
-    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {
