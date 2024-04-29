@@ -412,8 +412,8 @@ class Part {
     dimension = json["dimension"] == null
         ? null
         : Dimension.fromJson(json["dimension"]);
-    firstFrame = json["first_frame"];
-    cover = json["first_frame"];
+    firstFrame = json["first_frame"] ?? '';
+    cover = json["first_frame"] ?? '';
   }
 
   Map<String, dynamic> toJson() {

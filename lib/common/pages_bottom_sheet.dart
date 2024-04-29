@@ -45,7 +45,7 @@ class EpisodeBottomSheet {
         title = '第${episode.title}话  ${episode.longTitle!}';
         break;
     }
-    return isFullScreen || episode?.cover == null
+    return isFullScreen || episode?.cover == null || episode?.cover == ''
         ? ListTile(
             onTap: () {
               SmartDialog.showToast('切换至「$title」');
