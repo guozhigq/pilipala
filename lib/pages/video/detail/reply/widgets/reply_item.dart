@@ -427,7 +427,7 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1)
               InkWell(
                 // 一楼点击【共xx条回复】展开评论详情
-                onTap: () => replyReply!(replyItem, null),
+                onTap: () => replyReply!(replyItem),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
