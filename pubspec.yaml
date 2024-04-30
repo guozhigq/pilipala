@@ -165,6 +165,20 @@ dev_dependencies:
   hive_generator: ^2.0.0
   build_runner: ^2.4.8
 
+dependency_overrides:
+  media_kit: 
+    git:
+      url: https://github.com/media-kit/media-kit
+      path: media_kit
+  media_kit_video: 
+    git:
+      url: https://github.com/media-kit/media-kit
+      path: media_kit_video
+  media_kit_libs_video: 
+    git:
+      url: https://github.com/media-kit/media-kit
+      path: libs/universal/media_kit_libs_video
+
 flutter_launcher_icons:
   android: true
   ios: true
