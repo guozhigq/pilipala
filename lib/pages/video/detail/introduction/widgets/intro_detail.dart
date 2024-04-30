@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class IntroDetail extends StatelessWidget {
@@ -16,44 +17,47 @@ class IntroDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: SelectableRegion(
-        focusNode: FocusNode(),
-        selectionControls: MaterialTextSelectionControls(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
-                    SmartDialog.showToast('已复制');
-                  },
-                  child: Text(
-                    videoDetail!.bvid!,
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
+                  SmartDialog.showToast('已复制');
+                },
+                child: Text(
+                  videoDetail!.bvid!,
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
-                    SmartDialog.showToast('已复制');
-                  },
-                  child: Text(
-                    videoDetail!.aid!.toString(),
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text.rich(
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  Clipboard.setData(
+                      ClipboardData(text: videoDetail!.aid!.toString()));
+                  SmartDialog.showToast('已复制');
+                },
+                child: Text(
+                  videoDetail!.aid!.toString(),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.primary),
+                ),
+              )
+            ],
+          ),
+          const SizedBox(height: 4),
+          SelectableRegion(
+            focusNode: FocusNode(),
+            selectionControls: MaterialTextSelectionControls(),
+            child: Text.rich(
               style: const TextStyle(height: 1.4),
               TextSpan(
                 children: [
@@ -61,8 +65,8 @@ class IntroDetail extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
