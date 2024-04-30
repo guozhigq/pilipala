@@ -395,7 +395,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+          dataSource, _looping, enableHA, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -426,6 +426,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
+    Duration seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -507,8 +508,9 @@ class PlPlayerController {
         play: false,
       );
     }
-    player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+    await player.open(
+      Media(dataSource.videoSource!,
+          httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
     // 音轨
@@ -530,9 +532,9 @@ class PlPlayerController {
     // }
 
     /// 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
 
     /// 自动播放
     if (_autoPlay) {
