@@ -1,4 +1,5 @@
 import 'package:expandable/expandable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -265,6 +266,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => showIntroDetail(),
+            onLongPress: () async {
+              feedBack();
+              await Clipboard.setData(
+                  ClipboardData(text: widget.videoDetail!.title!));
+              SmartDialog.showToast('标题已复制');
+            },
             child: ExpandablePanel(
               controller: _expandableCtr,
               collapsed: Text(
