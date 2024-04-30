@@ -117,7 +117,7 @@ class PiliSchame {
         // ignore: always_specify_types
         (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
             arguments: <String, String?>{
-              'pic': null,
+              'pic': '',
               'heroTag': heroTag,
             }),
       );

@@ -37,6 +37,7 @@ class VideoReplyController extends GetxController {
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
   Box setting = GStrorage.setting;
+  RxInt replyReqCode = 200.obs;
 
   @override
   void onInit() {
@@ -106,6 +107,7 @@ class VideoReplyController extends GetxController {
         replyList.addAll(replies);
       }
     }
+    replyReqCode.value = res['code'];
     isLoadingMore = false;
     return res;
   }

@@ -67,6 +67,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
       IdUtils.av2bv(item.aid),
       item.cid,
       item.aid,
+      item.cover,
     );
     currentIndex.value = i;
     _bottomSheetController?.close();

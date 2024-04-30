@@ -101,7 +101,7 @@ class PlPlayerController {
   bool _isFirstTime = true;
 
   Timer? _timer;
-  late Timer? _timerForSeek;
+  Timer? _timerForSeek;
   Timer? _timerForVolume;
   Timer? _timerForShowingVolume;
   Timer? _timerForGettingVolume;
@@ -335,8 +335,10 @@ class PlPlayerController {
   }) {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
-    _instance!._playerCount.value += 1;
-    _videoType.value = videoType;
+    if (videoType != 'none') {
+      _instance!._playerCount.value += 1;
+      _videoType.value = videoType;
+    }
     return _instance!;
   }
 
@@ -351,7 +353,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
@@ -1120,9 +1122,6 @@ class PlPlayerController {
   }
 
   Future<void> dispose({String type = 'single'}) async {
-    print('dispose');
-    print('dispose: ${playerCount.value}');
-
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
@@ -1132,7 +1131,6 @@ class PlPlayerController {
     }
     _playerCount.value = 0;
     try {
-      print('dispose dispose ---------');
       _timer?.cancel();
       _timerForVolume?.cancel();
       _timerForGettingVolume?.cancel();

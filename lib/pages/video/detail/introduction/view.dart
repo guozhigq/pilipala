@@ -22,6 +22,7 @@ import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
 import 'widgets/page_panel.dart';
 import 'widgets/season_panel.dart';
+import 'widgets/staff_up_item.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -380,11 +381,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     ? videoIntroController.lastPlayCid.value
                     : widget.videoDetail!.pages!.first.cid,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (bvid, cid, aid) =>
+                changeFuc: (bvid, cid, aid, cover) =>
                     videoIntroController.changeSeasonOrbangu(
                   bvid,
                   cid,
                   aid,
+                  cover,
                 ),
                 videoIntroCtr: videoIntroController,
               ),
@@ -398,77 +400,128 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 pages: widget.videoDetail!.pages!,
                 cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
+                changeFuc: (cid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
                   videoIntroController.bvid,
                   cid,
                   null,
+                  cover,
                 ),
                 videoIntroCtr: videoIntroController,
               ),
             )
           ],
-          GestureDetector(
-            onTap: onPushMember,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: Row(
-                children: [
-                  NetworkImgLayer(
-                    type: 'avatar',
-                    src: widget.videoDetail!.owner!.face,
-                    width: 34,
-                    height: 34,
-                    fadeInDuration: Duration.zero,
-                    fadeOutDuration: Duration.zero,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(owner.name, style: const TextStyle(fontSize: 13)),
-                  const SizedBox(width: 6),
-                  Text(
-                    follower,
-                    style: TextStyle(
-                      fontSize: t.textTheme.labelSmall!.fontSize,
-                      color: outline,
+          if (widget.videoDetail!.staff == null)
+            GestureDetector(
+              onTap: onPushMember,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                child: Row(
+                  children: [
+                    NetworkImgLayer(
+                      type: 'avatar',
+                      src: widget.videoDetail!.owner!.face,
+                      width: 34,
+                      height: 34,
+                      fadeInDuration: Duration.zero,
+                      fadeOutDuration: Duration.zero,
                     ),
-                  ),
-                  const Spacer(),
-                  Obx(
-                    () {
-                      final bool isFollowed =
-                          videoIntroController.followStatus['attribute'] != 0;
-                      return videoIntroController.followStatus.isEmpty
-                          ? const SizedBox()
-                          : SizedBox(
-                              height: 32,
-                              child: TextButton(
-                                onPressed:
-                                    videoIntroController.actionRelationMod,
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.only(
-                                    left: 8,
-                                    right: 8,
+                    const SizedBox(width: 10),
+                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(
+                      follower,
+                      style: TextStyle(
+                        fontSize: t.textTheme.labelSmall!.fontSize,
+                        color: outline,
+                      ),
+                    ),
+                    const Spacer(),
+                    Obx(
+                      () {
+                        final bool isFollowed =
+                            videoIntroController.followStatus['attribute'] != 0;
+                        return videoIntroController.followStatus.isEmpty
+                            ? const SizedBox()
+                            : SizedBox(
+                                height: 32,
+                                child: TextButton(
+                                  onPressed:
+                                      videoIntroController.actionRelationMod,
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                      right: 8,
+                                    ),
+                                    foregroundColor: isFollowed
+                                        ? outline
+                                        : t.colorScheme.onPrimary,
+                                    backgroundColor: isFollowed
+                                        ? t.colorScheme.onInverseSurface
+                                        : t.colorScheme.primary, // 设置按钮背景色
                                   ),
-                                  foregroundColor: isFollowed
-                                      ? outline
-                                      : t.colorScheme.onPrimary,
-                                  backgroundColor: isFollowed
-                                      ? t.colorScheme.onInverseSurface
-                                      : t.colorScheme.primary, // 设置按钮背景色
-                                ),
-                                child: Text(
-                                  isFollowed ? '已关注' : '关注',
-                                  style: TextStyle(
-                                    fontSize: t.textTheme.labelMedium!.fontSize,
+                                  child: Text(
+                                    isFollowed ? '已关注' : '关注',
+                                    style: TextStyle(
+                                      fontSize:
+                                          t.textTheme.labelMedium!.fontSize,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                    },
-                  )
-                ],
+                              );
+                      },
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
+          if (widget.videoDetail!.staff != null) ...[
+            const SizedBox(height: 15),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '创作团队',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const WidgetSpan(child: SizedBox(width: 6)),
+                      TextSpan(
+                        text: '${widget.videoDetail!.staff!.length}人',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 120,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      for (int i = 0;
+                          i < widget.videoDetail!.staff!.length;
+                          i++) ...[
+                        StaffUpItem(item: widget.videoDetail!.staff![i])
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ]
         ],
       )),
     );
@@ -535,4 +588,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
+
+  // Widget StaffPanel(BuildContext context, videoIntroController) {
+  //   return
+  // }
 }
