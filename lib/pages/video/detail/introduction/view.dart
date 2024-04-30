@@ -135,7 +135,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late double sheetHeight;
   late final dynamic owner;
   late final dynamic follower;
-  late final dynamic followStatus;
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
@@ -164,7 +163,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     follower = Utils.numFormat(videoIntroController.userStat['follower']);
-    followStatus = videoIntroController.followStatus;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     _expandableCtr = ExpandableController(initialExpanded: false);
   }
@@ -429,60 +427,41 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fadeInDuration: Duration.zero,
                       fadeOutDuration: Duration.zero,
                     ),
-                    const SizedBox(width: 10),
-                    Text(owner.name, style: const TextStyle(fontSize: 13)),
-                    const SizedBox(width: 6),
-                    Text(
-                      follower,
-                      style: TextStyle(
-                        fontSize: t.textTheme.labelSmall!.fontSize,
-                        color: outline,
-                      ),
-                    ),
                     const Spacer(),
                     Obx(
-                      () => AnimatedOpacity(
-                        opacity:
-                            videoIntroController.followStatus.isEmpty ? 0 : 1,
-                        duration: const Duration(milliseconds: 50),
-                        child: SizedBox(
-                          height: 32,
-                          child: Obx(
-                            () => videoIntroController.followStatus.isNotEmpty
-                                ? TextButton(
-                                    onPressed:
-                                        videoIntroController.actionRelationMod,
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.only(
-                                          left: 8, right: 8),
-                                      foregroundColor:
-                                          followStatus['attribute'] != 0
-                                              ? outline
-                                              : t.colorScheme.onPrimary,
-                                      backgroundColor:
-                                          followStatus['attribute'] != 0
-                                              ? t.colorScheme.onInverseSurface
-                                              : t.colorScheme
-                                                  .primary, // 设置按钮背景色
+                      () {
+                        final bool isFollowed =
+                            videoIntroController.followStatus['attribute'] != 0;
+                        return videoIntroController.followStatus.isEmpty
+                            ? const SizedBox()
+                            : SizedBox(
+                                height: 32,
+                                child: TextButton(
+                                  onPressed:
+                                      videoIntroController.actionRelationMod,
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                      right: 8,
                                     ),
-                                    child: Text(
-                                      followStatus['attribute'] != 0
-                                          ? '已关注'
-                                          : '关注',
-                                      style: TextStyle(
-                                          fontSize: t
-                                              .textTheme.labelMedium!.fontSize),
-                                    ),
-                                  )
-                                : ElevatedButton(
-                                    onPressed:
-                                        videoIntroController.actionRelationMod,
-                                    child: const Text('关注'),
+                                    foregroundColor: isFollowed
+                                        ? outline
+                                        : t.colorScheme.onPrimary,
+                                    backgroundColor: isFollowed
+                                        ? t.colorScheme.onInverseSurface
+                                        : t.colorScheme.primary, // 设置按钮背景色
                                   ),
-                          ),
-                        ),
-                      ),
-                    ),
+                                  child: Text(
+                                    isFollowed ? '已关注' : '关注',
+                                    style: TextStyle(
+                                      fontSize:
+                                          t.textTheme.labelMedium!.fontSize,
+                                    ),
+                                  ),
+                                ),
+                              );
+                      },
+                    )
                   ],
                 ),
               ),
