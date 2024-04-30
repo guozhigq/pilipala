@@ -90,6 +90,7 @@ class VideoIntroController extends GetxController {
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
       videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
+      videoDetailCtr.cover.value = result['data'].pic ?? '';
       // 获取到粉丝数再返回
       await queryUserStat();
     }
