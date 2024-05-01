@@ -46,7 +46,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem, null);
+            replyReply!(replyItem);
           }
         },
         onLongPress: () {
