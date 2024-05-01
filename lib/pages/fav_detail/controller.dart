@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/pages/fav/index.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
@@ -73,5 +75,42 @@ class FavDetailController extends GetxController {
 
   onLoad() {
     queryUserFavFolderDetail(type: 'onLoad');
+  }
+
+  onDelFavFolder() async {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确定删除这个收藏夹吗？'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                SmartDialog.dismiss();
+              },
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                var res = await UserHttp.delFavFolder(mediaIds: mediaId!);
+                SmartDialog.dismiss();
+                SmartDialog.showToast(res['status'] ? '操作成功' : res['msg']);
+                if (res['status']) {
+                  FavController favController = Get.find<FavController>();
+                  await favController.removeFavFolder(mediaIds: mediaId!);
+                  Get.back();
+                }
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
   }
 }

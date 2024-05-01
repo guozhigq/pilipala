@@ -409,6 +409,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.2"
+  dlna_dart:
+    dependency: "direct main"
+    description:
+      name: dlna_dart
+      sha256: ae07c1c53077bbf58756fa589f936968719b0085441981d33e74f82f89d1d281
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.8"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -433,6 +441,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.0.3"
+  expandable:
+    dependency: "direct main"
+    description:
+      name: expandable
+      sha256: "9604d612d4d1146dafa96c6d8eec9c2ff0994658d6d09fed720ab788c7f5afc2"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.0.1"
   extended_image:
     dependency: "direct main"
     description:
@@ -857,10 +873,11 @@ packages:
   media_kit:
     dependency: "direct main"
     description:
-      name: media_kit
-      sha256: "3289062540e3b8b9746e5c50d95bd78a9289826b7227e253dff806d002b9e67a"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: media_kit
+      ref: HEAD
+      resolved-ref: "7775f8b1aa5ec77815d5739bf25549fe37f17cae"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.1.10+1"
   media_kit_libs_android_video:
     dependency: transitive
@@ -897,10 +914,11 @@ packages:
   media_kit_libs_video:
     dependency: "direct main"
     description:
-      name: media_kit_libs_video
-      sha256: "3688e0c31482074578652bf038ce6301a5d21e1eda6b54fc3117ffeb4bdba067"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "libs/universal/media_kit_libs_video"
+      ref: HEAD
+      resolved-ref: "7775f8b1aa5ec77815d5739bf25549fe37f17cae"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.0.4"
   media_kit_libs_windows_video:
     dependency: transitive
@@ -921,10 +939,11 @@ packages:
   media_kit_video:
     dependency: "direct main"
     description:
-      name: media_kit_video
-      sha256: c048d11a19e379aebbe810647636e3fc6d18374637e2ae12def4ff8a4b99a882
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: media_kit_video
+      ref: HEAD
+      resolved-ref: "7775f8b1aa5ec77815d5739bf25549fe37f17cae"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.2.4"
   meta:
     dependency: transitive

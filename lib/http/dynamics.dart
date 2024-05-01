@@ -1,3 +1,4 @@
+import 'dart:math';
 import '../models/dynamics/result.dart';
 import '../models/dynamics/up.dart';
 import 'index.dart';
@@ -109,6 +110,96 @@ class DynamicsHttp {
           'msg': err.toString(),
         };
       }
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future dynamicForward() async {
+    var res = await Request().post(
+      Api.dynamicForwardUrl,
+      queryParameters: {
+        'csrf': await Request.getCsrf(),
+        'x-bili-device-req-json': {'platform': 'web', 'device': 'pc'},
+        'x-bili-web-req-json': {'spm_id': '333.999'},
+      },
+      data: {
+        'attach_card': null,
+        'scene': 4,
+        'content': {
+          'conetents': [
+            {'raw_text': "2", 'type': 1, 'biz_id': ""}
+          ]
+        }
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future dynamicCreate({
+    required int mid,
+    required int scene,
+    int? oid,
+    String? dynIdStr,
+    String? rawText,
+  }) async {
+    DateTime now = DateTime.now();
+    int timestamp = now.millisecondsSinceEpoch ~/ 1000;
+    Random random = Random();
+    int randomNumber = random.nextInt(9000) + 1000;
+    String uploadId = '${mid}_${timestamp}_$randomNumber';
+
+    Map<String, dynamic> webRepostSrc = {
+      'dyn_id_str': dynIdStr ?? '',
+    };
+
+    /// 投稿转发
+    if (scene == 5) {
+      webRepostSrc = {
+        'revs_id': {'dyn_type': 8, 'rid': oid}
+      };
+    }
+    var res = await Request().post(Api.dynamicCreate, queryParameters: {
+      'platform': 'web',
+      'csrf': await Request.getCsrf(),
+      'x-bili-device-req-json': {'platform': 'web', 'device': 'pc'},
+      'x-bili-web-req-json': {'spm_id': '333.999'},
+    }, data: {
+      'dyn_req': {
+        'content': {
+          'contents': [
+            {'raw_text': rawText ?? '', 'type': 1, 'biz_id': ''}
+          ]
+        },
+        'scene': scene,
+        'attach_card': null,
+        'upload_id': uploadId,
+        'meta': {
+          'app_meta': {'from': 'create.dynamic.web', 'mobi_app': 'web'}
+        }
+      },
+      'web_repost_src': webRepostSrc
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
     } else {
       return {
         'status': false,

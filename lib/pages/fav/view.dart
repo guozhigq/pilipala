@@ -62,11 +62,10 @@ class _FavPageState extends State<FavPage> {
               return Obx(
                 () => ListView.builder(
                   controller: scrollController,
-                  itemCount: _favController.favFolderData.value.list!.length,
+                  itemCount: _favController.favFolderList.length,
                   itemBuilder: (context, index) {
                     return FavItem(
-                        favFolderItem:
-                            _favController.favFolderData.value.list![index]);
+                        favFolderItem: _favController.favFolderList[index]);
                   },
                 ),
               );

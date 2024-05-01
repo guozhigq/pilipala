@@ -138,6 +138,9 @@ class _BangumiInfoState extends State<BangumiInfo> {
     cid = widget.cid!;
     videoDetailCtr.cid.listen((p0) {
       cid = p0;
+      if (!mounted) {
+        return;
+      }
       setState(() {});
     });
   }
@@ -317,11 +320,12 @@ class _BangumiInfoState extends State<BangumiInfo> {
           if (widget.bangumiDetail!.episodes!.isNotEmpty) ...[
             BangumiPanel(
               pages: widget.bangumiDetail!.episodes!,
-              cid: cid ?? widget.bangumiDetail!.episodes!.first.cid,
+              cid: cid! ?? widget.bangumiDetail!.episodes!.first.cid!,
               sheetHeight: sheetHeight,
-              changeFuc: (bvid, cid, aid) =>
-                  bangumiIntroController.changeSeasonOrbangu(bvid, cid, aid),
+              changeFuc: (bvid, cid, aid, cover) => bangumiIntroController
+                  .changeSeasonOrbangu(bvid, cid, aid, cover),
               bangumiDetail: bangumiIntroController.bangumiDetail.value,
+              bangumiIntroController: bangumiIntroController,
             )
           ],
         ],

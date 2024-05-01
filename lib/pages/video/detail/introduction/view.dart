@@ -1,3 +1,5 @@
+import 'package:expandable/expandable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -15,11 +17,13 @@ import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
+import '../../../../http/user.dart';
 import 'widgets/action_item.dart';
 import 'widgets/fav_panel.dart';
 import 'widgets/intro_detail.dart';
-import 'widgets/page.dart';
-import 'widgets/season.dart';
+import 'widgets/page_panel.dart';
+import 'widgets/season_panel.dart';
+import 'widgets/staff_up_item.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -132,11 +136,13 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late double sheetHeight;
   late final dynamic owner;
   late final dynamic follower;
-  late final dynamic followStatus;
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
   bool isProcessing = false;
+  RxBool isExpand = false.obs;
+  late ExpandableController _expandableCtr;
+
   void Function()? handleState(Future Function() action) {
     return isProcessing
         ? null
@@ -158,8 +164,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     follower = Utils.numFormat(videoIntroController.userStat['follower']);
-    followStatus = videoIntroController.followStatus;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
+    _expandableCtr = ExpandableController(initialExpanded: false);
   }
 
   // 收藏
@@ -212,13 +218,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   // 视频介绍
   showIntroDetail() {
     feedBack();
-    showBottomSheet(
-      context: context,
-      enableDrag: true,
-      builder: (BuildContext context) {
-        return IntroDetail(videoDetail: widget.videoDetail!);
-      },
-    );
+    isExpand.value = !(isExpand.value);
+    _expandableCtr.toggle();
   }
 
   // 用户主页
@@ -243,6 +244,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _expandableCtr.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
@@ -259,14 +266,40 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => showIntroDetail(),
-            child: Text(
-              widget.videoDetail!.title!,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            onLongPress: () async {
+              feedBack();
+              await Clipboard.setData(
+                  ClipboardData(text: widget.videoDetail!.title!));
+              SmartDialog.showToast('标题已复制');
+            },
+            child: ExpandablePanel(
+              controller: _expandableCtr,
+              collapsed: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              expanded: Text(
+                widget.videoDetail!.title!,
+                softWrap: true,
+                maxLines: 4,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              theme: const ExpandableThemeData(
+                animationDuration: Duration(milliseconds: 300),
+                scrollAnimationDuration: Duration(milliseconds: 300),
+                crossFadePoint: 0,
+                fadeCurve: Curves.ease,
+                sizeCurve: Curves.linear,
+              ),
             ),
           ),
           Stack(
@@ -330,9 +363,23 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ],
           ),
 
+          /// 视频简介
+          ExpandablePanel(
+            controller: _expandableCtr,
+            collapsed: const SizedBox(height: 0),
+            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            theme: const ExpandableThemeData(
+              animationDuration: Duration(milliseconds: 300),
+              scrollAnimationDuration: Duration(milliseconds: 300),
+              crossFadePoint: 0,
+              fadeCurve: Curves.ease,
+              sizeCurve: Curves.linear,
+            ),
+          ),
+
           /// 点赞收藏转发
-          actionGrid(context, videoIntroController),
-          // 合集
+          Material(child: actionGrid(context, videoIntroController)),
+          // 合集 videoPart 简洁
           if (widget.videoDetail!.ugcSeason != null) ...[
             Obx(
               () => SeasonPanel(
@@ -340,92 +387,148 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 cid: videoIntroController.lastPlayCid.value != 0
                     ? videoIntroController.lastPlayCid.value
                     : widget.videoDetail!.pages!.first.cid,
-                sheetHeight: sheetHeight,
-                changeFuc: (bvid, cid, aid) =>
-                    videoIntroController.changeSeasonOrbangu(bvid, cid, aid),
+                sheetHeight: videoDetailCtr.sheetHeight.value,
+                changeFuc: (bvid, cid, aid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
+                  bvid,
+                  cid,
+                  aid,
+                  cover,
+                ),
+                videoIntroCtr: videoIntroController,
               ),
             )
           ],
+          // 合集 videoEpisode
           if (widget.videoDetail!.pages != null &&
               widget.videoDetail!.pages!.length > 1) ...[
-            Obx(() => PagesPanel(
-                  pages: widget.videoDetail!.pages!,
-                  cid: videoIntroController.lastPlayCid.value,
-                  sheetHeight: sheetHeight,
-                  changeFuc: (cid) => videoIntroController.changeSeasonOrbangu(
-                      videoIntroController.bvid, cid, null),
-                ))
+            Obx(
+              () => PagesPanel(
+                pages: widget.videoDetail!.pages!,
+                cid: videoIntroController.lastPlayCid.value,
+                sheetHeight: videoDetailCtr.sheetHeight.value,
+                changeFuc: (cid, cover) =>
+                    videoIntroController.changeSeasonOrbangu(
+                  videoIntroController.bvid,
+                  cid,
+                  null,
+                  cover,
+                ),
+                videoIntroCtr: videoIntroController,
+              ),
+            )
           ],
-          GestureDetector(
-            onTap: onPushMember,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: Row(
-                children: [
-                  NetworkImgLayer(
-                    type: 'avatar',
-                    src: widget.videoDetail!.owner!.face,
-                    width: 34,
-                    height: 34,
-                    fadeInDuration: Duration.zero,
-                    fadeOutDuration: Duration.zero,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(owner.name, style: const TextStyle(fontSize: 13)),
-                  const SizedBox(width: 6),
-                  Text(
-                    follower,
-                    style: TextStyle(
-                      fontSize: t.textTheme.labelSmall!.fontSize,
-                      color: outline,
+          if (widget.videoDetail!.staff == null)
+            GestureDetector(
+              onTap: onPushMember,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                child: Row(
+                  children: [
+                    NetworkImgLayer(
+                      type: 'avatar',
+                      src: widget.videoDetail!.owner!.face,
+                      width: 34,
+                      height: 34,
+                      fadeInDuration: Duration.zero,
+                      fadeOutDuration: Duration.zero,
                     ),
-                  ),
-                  const Spacer(),
-                  Obx(() => AnimatedOpacity(
-                        opacity:
-                            videoIntroController.followStatus.isEmpty ? 0 : 1,
-                        duration: const Duration(milliseconds: 50),
-                        child: SizedBox(
-                          height: 32,
-                          child: Obx(
-                            () => videoIntroController.followStatus.isNotEmpty
-                                ? TextButton(
-                                    onPressed:
-                                        videoIntroController.actionRelationMod,
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.only(
-                                          left: 8, right: 8),
-                                      foregroundColor:
-                                          followStatus['attribute'] != 0
-                                              ? outline
-                                              : t.colorScheme.onPrimary,
-                                      backgroundColor:
-                                          followStatus['attribute'] != 0
-                                              ? t.colorScheme.onInverseSurface
-                                              : t.colorScheme
-                                                  .primary, // 设置按钮背景色
+                    const SizedBox(width: 10),
+                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(
+                      follower,
+                      style: TextStyle(
+                        fontSize: t.textTheme.labelSmall!.fontSize,
+                        color: outline,
+                      ),
+                    ),
+                    const Spacer(),
+                    Obx(
+                      () {
+                        final bool isFollowed =
+                            videoIntroController.followStatus['attribute'] != 0;
+                        return videoIntroController.followStatus.isEmpty
+                            ? const SizedBox()
+                            : SizedBox(
+                                height: 32,
+                                child: TextButton(
+                                  onPressed:
+                                      videoIntroController.actionRelationMod,
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                      right: 8,
                                     ),
-                                    child: Text(
-                                      followStatus['attribute'] != 0
-                                          ? '已关注'
-                                          : '关注',
-                                      style: TextStyle(
-                                          fontSize: t
-                                              .textTheme.labelMedium!.fontSize),
-                                    ),
-                                  )
-                                : ElevatedButton(
-                                    onPressed:
-                                        videoIntroController.actionRelationMod,
-                                    child: const Text('关注'),
+                                    foregroundColor: isFollowed
+                                        ? outline
+                                        : t.colorScheme.onPrimary,
+                                    backgroundColor: isFollowed
+                                        ? t.colorScheme.onInverseSurface
+                                        : t.colorScheme.primary, // 设置按钮背景色
                                   ),
-                          ),
-                        ),
-                      )),
-                ],
+                                  child: Text(
+                                    isFollowed ? '已关注' : '关注',
+                                    style: TextStyle(
+                                      fontSize:
+                                          t.textTheme.labelMedium!.fontSize,
+                                    ),
+                                  ),
+                                ),
+                              );
+                      },
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
+          if (widget.videoDetail!.staff != null) ...[
+            const SizedBox(height: 15),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.labelMedium!.fontSize,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '创作团队',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const WidgetSpan(child: SizedBox(width: 6)),
+                      TextSpan(
+                        text: '${widget.videoDetail!.staff!.length}人',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 120,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      for (int i = 0;
+                          i < widget.videoDetail!.staff!.length;
+                          i++) ...[
+                        StaffUpItem(item: widget.videoDetail!.staff![i])
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ]
         ],
       )),
     );
@@ -438,6 +541,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         margin: const EdgeInsets.only(top: 6, bottom: 4),
         height: constraints.maxWidth / 5 * 0.8,
         child: GridView.count(
+          physics: const NeverScrollableScrollPhysics(),
           primary: false,
           padding: EdgeInsets.zero,
           crossAxisCount: 5,
@@ -451,12 +555,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   selectStatus: videoIntroController.hasLike.value,
                   text: widget.videoDetail!.stat!.like!.toString()),
             ),
-            // ActionItem(
-            //     icon: const Icon(FontAwesomeIcons.clock),
-            //     onTap: () => videoIntroController.actionShareVideo(),
-            //     selectStatus: false,
-            //     loadingStatus: loadingStatus,
-            //     text: '稍后再看'),
             Obx(
               () => ActionItem(
                 icon: const Icon(FontAwesomeIcons.b),
@@ -477,10 +575,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ),
             ),
             ActionItem(
-              icon: const Icon(FontAwesomeIcons.comment),
-              onTap: () => videoDetailCtr.tabCtr.animateTo(1),
+              icon: const Icon(FontAwesomeIcons.clock),
+              onTap: () async {
+                final res =
+                    await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
+                SmartDialog.showToast(res['msg']);
+              },
               selectStatus: false,
-              text: widget.videoDetail!.stat!.reply!.toString(),
+              text: '稍后看',
             ),
             ActionItem(
               icon: const Icon(FontAwesomeIcons.shareFromSquare),
@@ -493,4 +595,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
+
+  // Widget StaffPanel(BuildContext context, videoIntroController) {
+  //   return
+  // }
 }

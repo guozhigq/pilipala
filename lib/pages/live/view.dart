@@ -2,15 +2,11 @@ import 'dart:async';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/utils/main_stream.dart';
 
 import 'controller.dart';
 import 'widgets/live_item.dart';
@@ -36,10 +32,6 @@ class _LivePageState extends State<LivePage>
     super.initState();
     _futureBuilderFuture = _liveController.queryLiveList('init');
     scrollController = _liveController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-    StreamController<bool> searchBarStream =
-        Get.find<HomeController>().searchBarStream;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -49,16 +41,7 @@ class _LivePageState extends State<LivePage>
             _liveController.onLoad();
           });
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-          searchBarStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-          searchBarStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
   }
@@ -127,16 +110,6 @@ class _LivePageState extends State<LivePage>
     );
   }
 
-  OverlayEntry _createPopupDialog(liveItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _liveController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
-      ),
-    );
-  }
-
   Widget contentGrid(ctr, liveList) {
     // double maxWidth = Get.size.width;
     // int baseWidth = 500;
@@ -167,14 +140,6 @@ class _LivePageState extends State<LivePage>
               ? LiveCardV(
                   liveItem: liveList[index],
                   crossAxisCount: crossAxisCount,
-                  longPress: () {
-                    _liveController.popupDialog =
-                        _createPopupDialog(liveList[index]);
-                    Overlay.of(context).insert(_liveController.popupDialog!);
-                  },
-                  longPressEnd: () {
-                    _liveController.popupDialog?.remove();
-                  },
                 )
               : const VideoCardVSkeleton();
         },

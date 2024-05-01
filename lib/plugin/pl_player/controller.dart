@@ -21,6 +21,8 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 import 'package:universal_platform/universal_platform.dart';
+import '../../models/video/subTitile/content.dart';
+import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStrorage.video;
@@ -73,6 +75,8 @@ class PlPlayerController {
   final Rx<bool> _doubleSpeedStatus = false.obs;
   final Rx<bool> _controlsLock = false.obs;
   final Rx<bool> _isFullScreen = false.obs;
+  final Rx<bool> _subTitleOpen = false.obs;
+  final Rx<int> _subTitleCode = (-1).obs;
   // 默认投稿视频格式
   static Rx<String> _videoType = 'archive'.obs;
 
@@ -118,6 +122,7 @@ class PlPlayerController {
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
+  late RxList subtitles;
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -146,6 +151,11 @@ class PlPlayerController {
   // 视频静音
   Rx<bool> get mute => _mute;
   Stream<bool> get onMuteChanged => _mute.stream;
+
+  /// 字幕开启状态
+  Rx<bool> get subTitleOpen => _subTitleOpen;
+  Rx<int> get subTitleCode => _subTitleCode;
+  // Stream<bool> get onSubTitleOpenChanged => _subTitleOpen.stream;
 
   /// [videoPlayerController] instace of Player
   Player? get videoPlayerController => _videoPlayerController;
@@ -230,6 +240,10 @@ class PlPlayerController {
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
+
+  RxList<SubTitileContentModel> subtitleContents =
+      <SubTitileContentModel>[].obs;
+  RxString subtitleContent = ''.obs;
 
   void updateSliderPositionSecond() {
     int newSecond = _sliderPosition.value.inSeconds;
@@ -321,8 +335,10 @@ class PlPlayerController {
   }) {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
-    _instance!._playerCount.value += 1;
-    _videoType.value = videoType;
+    if (videoType != 'none') {
+      _instance!._playerCount.value += 1;
+      _videoType.value = videoType;
+    }
     return _instance!;
   }
 
@@ -337,7 +353,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
@@ -350,6 +366,8 @@ class PlPlayerController {
     bool enableHeart = true,
     // 是否首次加载
     bool isFirstTime = true,
+    //  是否开启字幕
+    bool enableSubTitle = false,
   }) async {
     try {
       _autoPlay = autoplay;
@@ -364,7 +382,9 @@ class PlPlayerController {
       _cid = cid;
       _enableHeart = enableHeart;
       _isFirstTime = isFirstTime;
-
+      _subTitleOpen.value = enableSubTitle;
+      subtitles = [].obs;
+      subtitleContent.value = '';
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
         await pause(notify: false);
@@ -375,7 +395,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+          dataSource, _looping, enableHA, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -406,6 +426,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
+    Duration seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -455,17 +476,17 @@ class PlPlayerController {
     }
 
     // 字幕
-    if (dataSource.subFiles != '' && dataSource.subFiles != null) {
-      await pp.setProperty(
-        'sub-files',
-        UniversalPlatform.isWindows
-            ? dataSource.subFiles!.replaceAll(';', '\\;')
-            : dataSource.subFiles!.replaceAll(':', '\\:'),
-      );
-      await pp.setProperty("subs-with-matching-audio", "no");
-      await pp.setProperty("sub-forced-only", "yes");
-      await pp.setProperty("blend-subtitles", "video");
-    }
+    // if (dataSource.subFiles != '' && dataSource.subFiles != null) {
+    //   await pp.setProperty(
+    //     'sub-files',
+    //     UniversalPlatform.isWindows
+    //         ? dataSource.subFiles!.replaceAll(';', '\\;')
+    //         : dataSource.subFiles!.replaceAll(':', '\\:'),
+    //   );
+    //   await pp.setProperty("subs-with-matching-audio", "no");
+    //   await pp.setProperty("sub-forced-only", "yes");
+    //   await pp.setProperty("blend-subtitles", "video");
+    // }
 
     _videoController = _videoController ??
         VideoController(
@@ -487,8 +508,9 @@ class PlPlayerController {
         play: false,
       );
     }
-    player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+    await player.open(
+      Media(dataSource.videoSource!,
+          httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
     // 音轨
@@ -504,7 +526,22 @@ class PlPlayerController {
     Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
-    // 设置倍速
+    getVideoFit();
+    // if (_looping) {
+    //   await setLooping(_looping);
+    // }
+
+    /// 跳转播放
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
+
+    /// 自动播放
+    if (_autoPlay) {
+      await play(duration: duration);
+    }
+
+    /// 设置倍速
     if (videoType.value == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
@@ -513,20 +550,6 @@ class PlPlayerController {
       } else {
         await setPlaybackSpeed(1.0);
       }
-    }
-    getVideoFit();
-    // if (_looping) {
-    //   await setLooping(_looping);
-    // }
-
-    // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
-
-    // 自动播放
-    if (_autoPlay) {
-      await play(duration: duration);
     }
   }
 
@@ -575,6 +598,8 @@ class PlPlayerController {
             _sliderPosition.value = event;
             updateSliderPositionSecond();
           }
+          querySubtitleContent(
+              videoPlayerController!.state.position.inSeconds.toDouble());
 
           /// 触发回调事件
           for (var element in _positionListeners) {
@@ -583,7 +608,9 @@ class PlPlayerController {
           makeHeartBeat(event.inSeconds);
         }),
         videoPlayerController!.stream.duration.listen((event) {
-          duration.value = event;
+          if (event > Duration.zero) {
+            duration.value = event;
+          }
         }),
         videoPlayerController!.stream.buffer.listen((event) {
           _buffered.value = event;
@@ -609,6 +636,10 @@ class PlPlayerController {
               const Duration(seconds: 1),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
+
+        // onSubTitleOpenChanged.listen((bool event) {
+        //   toggleSubtitle(event ? subTitleCode.value : -1);
+        // })
       ],
     );
   }
@@ -622,41 +653,36 @@ class PlPlayerController {
 
   /// 跳转至指定位置
   Future<void> seekTo(Duration position, {type = 'seek'}) async {
-    // if (position >= duration.value) {
-    //   position = duration.value - const Duration(milliseconds: 100);
-    // }
-    if (position < Duration.zero) {
-      position = Duration.zero;
-    }
-    _position.value = position;
-    updatePositionSecond();
-    _heartDuration = position.inSeconds;
-    if (duration.value.inSeconds != 0) {
-      if (type != 'slider') {
-        /// 拖动进度条调节时，不等待第一帧，防止抖动
-        await _videoPlayerController?.stream.buffer.first;
+    try {
+      if (position < Duration.zero) {
+        position = Duration.zero;
       }
-      await _videoPlayerController?.seek(position);
-      // if (playerStatus.stopped) {
-      //   play();
-      // }
-    } else {
-      print('seek duration else');
-      _timerForSeek?.cancel();
-      _timerForSeek =
-          Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        //_timerForSeek = null;
-        if (duration.value.inSeconds != 0) {
-          await _videoPlayerController!.stream.buffer.first;
-          await _videoPlayerController?.seek(position);
-          // if (playerStatus.status.value == PlayerStatus.paused) {
-          //   play();
-          // }
-          t.cancel();
-          _timerForSeek = null;
+      _position.value = position;
+      updatePositionSecond();
+      _heartDuration = position.inSeconds;
+      if (duration.value.inSeconds != 0) {
+        if (type != 'slider') {
+          await _videoPlayerController?.stream.buffer.first;
         }
-      });
+        await _videoPlayerController?.seek(position);
+      } else {
+        _timerForSeek?.cancel();
+        _timerForSeek ??= _startSeekTimer(position);
+      }
+    } catch (err) {
+      print('Error while seeking: $err');
     }
+  }
+
+  Timer? _startSeekTimer(Duration position) {
+    return Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
+      if (duration.value.inSeconds != 0) {
+        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.seek(position);
+        t.cancel();
+        _timerForSeek = null;
+      }
+    });
   }
 
   /// 设置倍速
@@ -695,11 +721,10 @@ class PlPlayerController {
       await seekTo(Duration.zero);
     }
     await _videoPlayerController?.play();
-
+    playerStatus.status.value = PlayerStatus.playing;
     await getCurrentVolume();
     await getCurrentBrightness();
 
-    playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
 
     /// 临时fix _duration.value丢失
@@ -1044,6 +1069,52 @@ class PlPlayerController {
         cid: _cid,
         progress: progress,
       );
+    }
+  }
+
+  /// 字幕
+  void toggleSubtitle(int code) {
+    _subTitleOpen.value = code != -1;
+    _subTitleCode.value = code;
+    // if (code == -1) {
+    //   // 关闭字幕
+    //   _subTitleOpen.value = false;
+    //   _subTitleCode.value = code;
+    //   _videoPlayerController?.setSubtitleTrack(SubtitleTrack.no());
+    //   return;
+    // }
+    // final SubTitlteItemModel? subtitle = subtitles?.firstWhereOrNull(
+    //   (element) => element.code == code,
+    // );
+    // _subTitleOpen.value = true;
+    // _subTitleCode.value = code;
+    // _videoPlayerController?.setSubtitleTrack(
+    //   SubtitleTrack.data(
+    //     subtitle!.content!,
+    //     title: subtitle.title,
+    //     language: subtitle.lan,
+    //   ),
+    // );
+  }
+
+  void querySubtitleContent(double progress) {
+    if (subTitleCode.value == -1) {
+      subtitleContent.value = '';
+      return;
+    }
+    if (subtitles.isEmpty) {
+      return;
+    }
+    final SubTitlteItemModel? subtitle = subtitles.firstWhereOrNull(
+      (element) => element.code == subTitleCode.value,
+    );
+    if (subtitle != null && subtitle.body!.isNotEmpty) {
+      for (var content in subtitle.body!) {
+        if (progress >= content['from']! && progress <= content['to']!) {
+          subtitleContent.value = content['content']!;
+          return;
+        }
+      }
     }
   }
 

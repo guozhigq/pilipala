@@ -131,7 +131,7 @@ class _PlaySettingState extends State<PlaySetting> {
             title: '开启硬解',
             subTitle: '以较低功耗播放视频',
             setKey: SettingBoxKey.enableHA,
-            defaultVal: true,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '观看人数',

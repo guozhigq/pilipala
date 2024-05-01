@@ -37,6 +37,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.bottomList,
     this.customWidget,
     this.customWidgets,
+    this.showEposideCb,
     super.key,
   });
 
@@ -49,6 +50,7 @@ class PLVideoPlayer extends StatefulWidget {
 
   final Widget? customWidget;
   final List<Widget>? customWidgets;
+  final Function? showEposideCb;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -214,8 +216,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 上一集
       BottomControlType.pre: ComBtn(
         icon: const Icon(
-          Icons.skip_previous_outlined,
-          size: 15,
+          Icons.skip_previous_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -229,8 +231,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 下一集
       BottomControlType.next: ComBtn(
         icon: const Icon(
-          Icons.last_page_outlined,
-          size: 15,
+          Icons.skip_next_rounded,
+          size: 21,
           color: Colors.white,
         ),
         fuc: () {},
@@ -239,6 +241,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       /// 时间进度
       BottomControlType.time: Row(
         children: [
+          const SizedBox(width: 8),
           Obx(() {
             return Text(
               _.durationSeconds.value >= 3600
@@ -265,6 +268,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
       /// 空白占位
       BottomControlType.space: const Spacer(),
+
+      /// 选集
+      BottomControlType.episode: SizedBox(
+        height: 30,
+        width: 30,
+        child: TextButton(
+          onPressed: () {
+            widget.showEposideCb?.call();
+          },
+          style: ButtonStyle(
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+          ),
+          child: const Text(
+            '选集',
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ),
+      ),
 
       /// 画面比例
       BottomControlType.fit: SizedBox(
@@ -579,6 +600,45 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         /// 弹幕面板
         if (widget.danmuWidget != null)
           Positioned.fill(top: 4, child: widget.danmuWidget!),
+
+        /// 开启且有字幕时展示
+        Stack(
+          children: [
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 30,
+              child: Align(
+                alignment: Alignment.center,
+                child: Obx(
+                  () => Visibility(
+                      visible: widget.controller.subTitleCode.value != -1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: widget.controller.subtitleContent.value != ''
+                              ? Colors.black.withOpacity(0.6)
+                              : Colors.transparent,
+                        ),
+                        padding: widget.controller.subTitleCode.value != -1
+                            ? const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              )
+                            : EdgeInsets.zero,
+                        child: Text(
+                          widget.controller.subtitleContent.value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      )),
+                ),
+              ),
+            ),
+          ],
+        ),
 
         /// 手势
         Positioned.fill(

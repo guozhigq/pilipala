@@ -180,7 +180,9 @@ class ProfilePanel extends StatelessWidget {
                           Obx(
                             () => Expanded(
                               child: TextButton(
-                                onPressed: () => ctr.actionRelationMod(),
+                                onPressed: () => loadingStatus
+                                    ? null
+                                    : ctr.actionRelationMod(),
                                 style: TextButton.styleFrom(
                                   foregroundColor: ctr.attribute.value == -1
                                       ? Colors.transparent

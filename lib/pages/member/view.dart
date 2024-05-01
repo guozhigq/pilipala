@@ -54,6 +54,7 @@ class _MemberPageState extends State<MemberPage>
   @override
   void dispose() {
     _extendNestCtr.removeListener(() {});
+    appbarStream.close();
     super.dispose();
   }
 
@@ -65,7 +66,7 @@ class _MemberPageState extends State<MemberPage>
         children: [
           AppBar(
             title: StreamBuilder(
-              stream: appbarStream.stream,
+              stream: appbarStream.stream.distinct(),
               initialData: false,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
@@ -281,8 +282,8 @@ class _MemberPageState extends State<MemberPage>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data!;
-            if (data['status']) {
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               return Obx(
                 () => Stack(
                   alignment: AlignmentDirectional.center,
@@ -302,7 +303,14 @@ class _MemberPageState extends State<MemberPage>
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _memberController.memberInfo.value
+                                                  .vip!.nicknameColor !=
+                                              null
+                                          ? Color(_memberController.memberInfo
+                                              .value.vip!.nicknameColor!)
+                                          : null),
                             )),
                             const SizedBox(width: 2),
                             if (_memberController.memberInfo.value.sex == '女')
