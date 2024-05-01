@@ -44,7 +44,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem, null);
+            replyReply!(replyItem);
           }
         },
         onLongPress: () {
@@ -358,7 +358,7 @@ class ReplyItemRow extends StatelessWidget {
                 InkWell(
                   // 一楼点击评论展开评论详情
                   // onTap: () {
-                  //   replyReply?.call(replyItem, replies![i]);
+                  //   replyReply?.call(replyItem);
                   // },
                   onLongPress: () {
                     feedBack();
