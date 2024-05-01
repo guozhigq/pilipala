@@ -84,7 +84,7 @@ class _LaterPageState extends State<LaterPage> {
                               return VideoCardH(
                                   videoItem: videoItem,
                                   source: 'later',
-                                  longPress: () => _laterController.toViewDel(
+                                  onPressedFn: () => _laterController.toViewDel(
                                       aid: videoItem.aid));
                             }, childCount: _laterController.laterList.length),
                           )

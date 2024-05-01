@@ -63,7 +63,7 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface),
                         children: [
-                          for (var i in i.title) ...[
+                          for (var i in i.titleList) ...[
                             TextSpan(
                               text: i['text'],
                               style: TextStyle(

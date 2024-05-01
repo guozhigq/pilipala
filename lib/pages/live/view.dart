@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/utils/main_stream.dart';
 
 import 'controller.dart';
@@ -112,16 +110,6 @@ class _LivePageState extends State<LivePage>
     );
   }
 
-  OverlayEntry _createPopupDialog(liveItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _liveController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
-      ),
-    );
-  }
-
   Widget contentGrid(ctr, liveList) {
     // double maxWidth = Get.size.width;
     // int baseWidth = 500;
@@ -152,14 +140,6 @@ class _LivePageState extends State<LivePage>
               ? LiveCardV(
                   liveItem: liveList[index],
                   crossAxisCount: crossAxisCount,
-                  longPress: () {
-                    _liveController.popupDialog =
-                        _createPopupDialog(liveList[index]);
-                    Overlay.of(context).insert(_liveController.popupDialog!);
-                  },
-                  longPressEnd: () {
-                    _liveController.popupDialog?.remove();
-                  },
                 )
               : const VideoCardVSkeleton();
         },

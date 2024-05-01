@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/utils/image_save.dart';
 import '../../http/search.dart';
 import '../../http/user.dart';
 import '../../http/video.dart';
@@ -16,8 +17,7 @@ class VideoCardH extends StatelessWidget {
   const VideoCardH({
     super.key,
     required this.videoItem,
-    this.longPress,
-    this.longPressEnd,
+    this.onPressedFn,
     this.source = 'normal',
     this.showOwner = true,
     this.showView = true,
@@ -27,8 +27,8 @@ class VideoCardH extends StatelessWidget {
   });
   // ignore: prefer_typing_uninitialized_variables
   final videoItem;
-  final Function()? longPress;
-  final Function()? longPressEnd;
+  final Function()? onPressedFn;
+  // normal 推荐, later 稍后再看, search 搜索
   final String source;
   final bool showOwner;
   final bool showView;
@@ -45,109 +45,103 @@ class VideoCardH extends StatelessWidget {
       type = videoItem.type;
     } catch (_) {}
     final String heroTag = Utils.makeHeroTag(aid);
-    return GestureDetector(
-      onLongPress: () {
-        if (longPress != null) {
-          longPress!();
+    return InkWell(
+      onTap: () async {
+        try {
+          if (type == 'ketang') {
+            SmartDialog.showToast('课堂视频暂不支持播放');
+            return;
+          }
+          final int cid =
+              videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
+          Get.toNamed('/video?bvid=$bvid&cid=$cid',
+              arguments: {'videoItem': videoItem, 'heroTag': heroTag});
+        } catch (err) {
+          SmartDialog.showToast(err.toString());
         }
       },
-      // onLongPressEnd: (details) {
-      //   if (longPressEnd != null) {
-      //     longPressEnd!();
-      //   }
-      // },
-      child: InkWell(
-        onTap: () async {
-          try {
-            if (type == 'ketang') {
-              SmartDialog.showToast('课堂视频暂不支持播放');
-              return;
-            }
-            final int cid =
-                videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
-            Get.toNamed('/video?bvid=$bvid&cid=$cid',
-                arguments: {'videoItem': videoItem, 'heroTag': heroTag});
-          } catch (err) {
-            SmartDialog.showToast(err.toString());
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              StyleString.safeSpace, 5, StyleString.safeSpace, 5),
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints boxConstraints) {
-              final double width = (boxConstraints.maxWidth -
-                      StyleString.cardSpace *
-                          6 /
-                          MediaQuery.textScalerOf(context).scale(1.0)) /
-                  2;
-              return Container(
-                constraints: const BoxConstraints(minHeight: 88),
-                height: width / StyleString.aspectRatio,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: StyleString.aspectRatio,
-                      child: LayoutBuilder(
-                        builder: (BuildContext context,
-                            BoxConstraints boxConstraints) {
-                          final double maxWidth = boxConstraints.maxWidth;
-                          final double maxHeight = boxConstraints.maxHeight;
-                          return Stack(
-                            children: [
-                              Hero(
-                                tag: heroTag,
-                                child: NetworkImgLayer(
-                                  src: videoItem.pic as String,
-                                  width: maxWidth,
-                                  height: maxHeight,
-                                ),
+      onLongPress: () => imageSaveDialog(
+        context,
+        videoItem,
+        SmartDialog.dismiss,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+            StyleString.safeSpace, 5, StyleString.safeSpace, 5),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints boxConstraints) {
+            final double width = (boxConstraints.maxWidth -
+                    StyleString.cardSpace *
+                        6 /
+                        MediaQuery.textScalerOf(context).scale(1.0)) /
+                2;
+            return Container(
+              constraints: const BoxConstraints(minHeight: 88),
+              height: width / StyleString.aspectRatio,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: StyleString.aspectRatio,
+                    child: LayoutBuilder(
+                      builder: (BuildContext context,
+                          BoxConstraints boxConstraints) {
+                        final double maxWidth = boxConstraints.maxWidth;
+                        final double maxHeight = boxConstraints.maxHeight;
+                        return Stack(
+                          children: [
+                            Hero(
+                              tag: heroTag,
+                              child: NetworkImgLayer(
+                                src: videoItem.pic as String,
+                                width: maxWidth,
+                                height: maxHeight,
                               ),
-                              if (videoItem.duration != 0)
-                                PBadge(
-                                  text: Utils.timeFormat(videoItem.duration!),
-                                  right: 6.0,
-                                  bottom: 6.0,
-                                  type: 'gray',
-                                ),
-                              if (type != 'video')
-                                PBadge(
-                                  text: type,
-                                  left: 6.0,
-                                  bottom: 6.0,
-                                  type: 'primary',
-                                ),
-                              // if (videoItem.rcmdReason != null &&
-                              //     videoItem.rcmdReason.content != '')
-                              //   pBadge(videoItem.rcmdReason.content, context,
-                              //       6.0, 6.0, null, null),
-                              if (showCharge && videoItem?.isChargingSrc)
-                                const PBadge(
-                                  text: '充电专属',
-                                  right: 6.0,
-                                  top: 6.0,
-                                  type: 'primary',
-                                ),
-                            ],
-                          );
-                        },
-                      ),
+                            ),
+                            if (videoItem.duration != 0)
+                              PBadge(
+                                text: Utils.timeFormat(videoItem.duration!),
+                                right: 6.0,
+                                bottom: 6.0,
+                                type: 'gray',
+                              ),
+                            if (type != 'video')
+                              PBadge(
+                                text: type,
+                                left: 6.0,
+                                bottom: 6.0,
+                                type: 'primary',
+                              ),
+                            // if (videoItem.rcmdReason != null &&
+                            //     videoItem.rcmdReason.content != '')
+                            //   pBadge(videoItem.rcmdReason.content, context,
+                            //       6.0, 6.0, null, null),
+                            if (showCharge && videoItem?.isChargingSrc)
+                              const PBadge(
+                                text: '充电专属',
+                                right: 6.0,
+                                top: 6.0,
+                                type: 'primary',
+                              ),
+                          ],
+                        );
+                      },
                     ),
-                    VideoContent(
-                      videoItem: videoItem,
-                      source: source,
-                      showOwner: showOwner,
-                      showView: showView,
-                      showDanmaku: showDanmaku,
-                      showPubdate: showPubdate,
-                    )
-                  ],
-                ),
-              );
-            },
-          ),
+                  ),
+                  VideoContent(
+                    videoItem: videoItem,
+                    source: source,
+                    showOwner: showOwner,
+                    showView: showView,
+                    showDanmaku: showDanmaku,
+                    showPubdate: showPubdate,
+                    onPressedFn: onPressedFn,
+                  )
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -162,6 +156,7 @@ class VideoContent extends StatelessWidget {
   final bool showView;
   final bool showDanmaku;
   final bool showPubdate;
+  final Function()? onPressedFn;
 
   const VideoContent({
     super.key,
@@ -171,6 +166,7 @@ class VideoContent extends StatelessWidget {
     this.showView = true,
     this.showDanmaku = true,
     this.showPubdate = false,
+    this.onPressedFn,
   });
 
   @override
@@ -181,7 +177,7 @@ class VideoContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (videoItem.title is String) ...[
+            if (source == 'normal' || source == 'later') ...[
               Text(
                 videoItem.title as String,
                 textAlign: TextAlign.start,
@@ -196,7 +192,7 @@ class VideoContent extends StatelessWidget {
                 maxLines: 2,
                 text: TextSpan(
                   children: [
-                    for (final i in videoItem.title) ...[
+                    for (final i in videoItem.titleList) ...[
                       TextSpan(
                         text: i['text'] as String,
                         style: TextStyle(
@@ -374,6 +370,19 @@ class VideoContent extends StatelessWidget {
                       ],
                     ),
                   ),
+                if (source == 'later') ...[
+                  IconButton(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () => onPressedFn?.call(),
+                    icon: Icon(
+                      Icons.clear_outlined,
+                      color: Theme.of(context).colorScheme.outline,
+                      size: 18,
+                    ),
+                  )
+                ],
               ],
             ),
           ],
