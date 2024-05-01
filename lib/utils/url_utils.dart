@@ -42,12 +42,14 @@ class UrlUtils {
     final Map matchRes = IdUtils.matchAvorBv(input: pathSegment);
     if (matchRes.containsKey('BV')) {
       final String bv = matchRes['BV'];
-      final int cid = await SearchHttp.ab2c(bvid: bv);
+      final Map res = await SearchHttp.ab2cWithPic(bvid: bv);
+      final int cid = res['cid'];
+      final String pic = res['pic'];
       final String heroTag = Utils.makeHeroTag(bv);
       await Get.toNamed(
         '/video?bvid=$bv&cid=$cid',
         arguments: <String, String?>{
-          'pic': '',
+          'pic': pic,
           'heroTag': heroTag,
         },
       );
