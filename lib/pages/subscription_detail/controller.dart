@@ -14,13 +14,16 @@ class SubDetailController extends GetxController {
   RxList<SubDetailMediaItem> subList = <SubDetailMediaItem>[].obs;
   RxString loadingText = '加载中...'.obs;
   int mediaCount = 0;
+  late int channelType;
 
   @override
   void onInit() {
     item = Get.arguments;
-    if (Get.parameters.keys.isNotEmpty) {
-      seasonId = int.parse(Get.parameters['seasonId']!);
-      heroTag = Get.parameters['heroTag']!;
+    final parameters = Get.parameters;
+    if (parameters.isNotEmpty) {
+      seasonId = int.tryParse(parameters['seasonId'] ?? '') ?? 0;
+      heroTag = parameters['heroTag'] ?? '';
+      channelType = int.tryParse(parameters['type'] ?? '') ?? 0;
     }
     super.onInit();
   }
@@ -31,7 +34,7 @@ class SubDetailController extends GetxController {
       return;
     }
     isLoadingMore = true;
-    var res = type == 21
+    var res = channelType == 21
         ? await UserHttp.userSeasonList(
             seasonId: seasonId,
             ps: 20,
