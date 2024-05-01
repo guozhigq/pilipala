@@ -198,8 +198,8 @@ class _SubDetailPageState extends State<SubDetailPage> {
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data;
-                if (data['status']) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
                   if (_subDetailController.item.mediaCount == 0) {
                     return const NoData();
                   } else {
@@ -219,7 +219,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: data['msg'],
+                    errMsg: data?['msg'] ?? '请求异常',
                     fn: () => setState(() {}),
                   );
                 }
