@@ -544,20 +544,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               controller: _extendNestCtr,
               headerSliverBuilder:
                   (BuildContext context2, bool innerBoxIsScrolled) {
-                final Orientation orientation =
-                    MediaQuery.of(context).orientation;
-                final bool isFullScreen =
-                    plPlayerController?.isFullScreen.value == true;
-                final double expandedHeight =
-                    orientation == Orientation.landscape || isFullScreen
-                        ? (MediaQuery.sizeOf(context).height -
-                            (orientation == Orientation.landscape
-                                ? 0
-                                : MediaQuery.of(context).padding.top))
-                        : videoHeight.value;
                 return <Widget>[
                   Obx(
                     () {
+                      final Orientation orientation =
+                          MediaQuery.of(context).orientation;
+                      final bool isFullScreen =
+                          plPlayerController?.isFullScreen.value == true;
+                      final double expandedHeight =
+                          orientation == Orientation.landscape || isFullScreen
+                              ? (MediaQuery.sizeOf(context).height -
+                                  (orientation == Orientation.landscape
+                                      ? 0
+                                      : MediaQuery.of(context).padding.top))
+                              : videoHeight.value;
                       if (orientation == Orientation.landscape ||
                           isFullScreen) {
                         enterFullScreen();
