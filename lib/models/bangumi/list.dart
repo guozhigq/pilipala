@@ -30,6 +30,7 @@ class BangumiListItemModel {
   BangumiListItemModel({
     this.badge,
     this.badgeType,
+    this.pic,
     this.cover,
     // this.firstEp,
     this.indexShow,
@@ -50,6 +51,7 @@ class BangumiListItemModel {
 
   String? badge;
   int? badgeType;
+  String? pic;
   String? cover;
   String? indexShow;
   int? isFinish;
@@ -70,6 +72,7 @@ class BangumiListItemModel {
   BangumiListItemModel.fromJson(Map<String, dynamic> json) {
     badge = json['badge'] == '' ? null : json['badge'];
     badgeType = json['badge_type'];
+    pic = json['cover'];
     cover = json['cover'];
     indexShow = json['index_show'];
     isFinish = json['is_finish'];
