@@ -25,6 +25,7 @@ class SubItem extends StatelessWidget {
         parameters: {
           'heroTag': heroTag,
           'seasonId': subFolderItem.id.toString(),
+          'type': subFolderItem.type.toString(),
         },
       ),
       child: Padding(
