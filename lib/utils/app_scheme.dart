@@ -167,8 +167,21 @@ class PiliSchame {
       print('bilibili.com host: $host');
       print('bilibili.com path: $path');
       final String lastPathSegment = path!.split('/').last;
-      if (lastPathSegment.contains('BV')) {
-        _videoPush(null, lastPathSegment);
+      if (path.startsWith('/video')) {
+        if (lastPathSegment.contains('BV')) {
+          _videoPush(null, lastPathSegment);
+        }
+        if (lastPathSegment.contains('av')) {
+          _videoPush(matchNum(lastPathSegment)[0], null);
+        }
+      }
+      if (path.startsWith('/bangumi')) {
+        if (lastPathSegment.contains('ss')) {
+          _bangumiPush(matchNum(lastPathSegment).first, null);
+        }
+        if (lastPathSegment.contains('ep')) {
+          _bangumiPush(null, matchNum(lastPathSegment).first);
+        }
       }
     } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
