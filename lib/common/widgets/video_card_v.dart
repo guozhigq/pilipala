@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/image_save.dart';
 import '../../models/model_rec_video_item.dart';
-import 'overlay_pop.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
@@ -127,14 +127,11 @@ class VideoCardV extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(videoItem.id);
     return InkWell(
       onTap: () async => onPushDetail(heroTag),
-      onLongPress: () {
-        SmartDialog.show(
-          builder: (context) => OverlayPop(
-            videoItem: videoItem,
-            closeFn: () => SmartDialog.dismiss(),
-          ),
-        );
-      },
+      onLongPress: () => imageSaveDialog(
+        context,
+        videoItem,
+        SmartDialog.dismiss,
+      ),
       borderRadius: BorderRadius.circular(16),
       child: Column(
         children: [

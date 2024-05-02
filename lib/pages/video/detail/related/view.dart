@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import './controller.dart';
 
@@ -54,20 +52,6 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                       child: VideoCardH(
                         videoItem: relatedVideoList[index],
                         showPubdate: true,
-                        longPress: () {
-                          try {
-                            _releatedController.popupDialog =
-                                _createPopupDialog(_releatedController
-                                    .relatedVideoList[index]);
-                            Overlay.of(context)
-                                .insert(_releatedController.popupDialog!);
-                          } catch (err) {
-                            return {};
-                          }
-                        },
-                        longPressEnd: () {
-                          _releatedController.popupDialog?.remove();
-                        },
                       ),
                     );
                   }
@@ -87,17 +71,6 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
           );
         }
       },
-    );
-  }
-
-  OverlayEntry _createPopupDialog(videoItem) {
-    return OverlayEntry(
-      builder: (BuildContext context) => AnimatedDialog(
-        closeFn: _releatedController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: videoItem,
-            closeFn: _releatedController.popupDialog?.remove),
-      ),
     );
   }
 }

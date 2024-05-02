@@ -547,7 +547,7 @@ class VideoDetailController extends GetxController
   }
 
   void updateCover(String? pic) {
-    if (pic != null && pic != '') {
+    if (pic != null) {
       cover.value = videoItem['pic'] = pic;
     }
   }
