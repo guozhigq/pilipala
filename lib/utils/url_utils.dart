@@ -16,7 +16,7 @@ class UrlUtils {
     };
     try {
       final response = await dio.get(url);
-      if (response.statusCode == 302) {
+      if (response.statusCode == 302 || response.statusCode == 301) {
         redirectUrl = response.headers['location']?.first as String;
         if (redirectUrl.endsWith('/')) {
           redirectUrl = redirectUrl.substring(0, redirectUrl.length - 1);
