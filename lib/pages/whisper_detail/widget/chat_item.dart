@@ -49,6 +49,13 @@ class ChatItem extends StatelessWidget {
     this.e_infos,
   });
 
+  static List<int> matchNum(String str) {
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
+
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isOwner =
