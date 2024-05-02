@@ -144,15 +144,15 @@ class PiliSchame {
           _videoPush(null, lastPathSegment);
         }
         if (lastPathSegment.contains('av')) {
-          _videoPush(matchNum(lastPathSegment)[0], null);
+          _videoPush(Utils.matchNum(lastPathSegment)[0], null);
         }
       }
       if (path.startsWith('/bangumi')) {
         if (lastPathSegment.contains('ss')) {
-          RoutePush.bangumiPush(matchNum(lastPathSegment).first, null);
+          RoutePush.bangumiPush(Utils.matchNum(lastPathSegment).first, null);
         }
         if (lastPathSegment.contains('ep')) {
-          RoutePush.bangumiPush(null, matchNum(lastPathSegment).first);
+          RoutePush.bangumiPush(null, Utils.matchNum(lastPathSegment).first);
         }
       }
     } else if (host.contains('live')) {
@@ -205,9 +205,9 @@ class PiliSchame {
         case 'bangumi':
           print('番剧');
           if (area.startsWith('ep')) {
-            RoutePush.bangumiPush(null, matchNum(area).first);
+            RoutePush.bangumiPush(null, Utils.matchNum(area).first);
           } else if (area.startsWith('ss')) {
-            RoutePush.bangumiPush(matchNum(area).first, null);
+            RoutePush.bangumiPush(Utils.matchNum(area).first, null);
           }
           break;
         case 'video':
@@ -223,7 +223,7 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = 'cv${matchNum(query!['id']!).first}';
+          String id = 'cv${Utils.matchNum(query!['id']!).first}';
           Get.toNamed('/htmlRender', parameters: {
             'url': value.dataString!,
             'title': '',
@@ -239,21 +239,14 @@ class PiliSchame {
     }
   }
 
-  static List<int> matchNum(String str) {
-    final RegExp regExp = RegExp(r'\d+');
-    final Iterable<Match> matches = regExp.allMatches(str);
-
-    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
-  }
-
   static void _handleEpisodePath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    RoutePush.bangumiPush(null, matchNum(seasonId).first);
+    RoutePush.bangumiPush(null, Utils.matchNum(seasonId).first);
   }
 
   static void _handleSeasonPath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    RoutePush.bangumiPush(matchNum(seasonId).first, null);
+    RoutePush.bangumiPush(Utils.matchNum(seasonId).first, null);
   }
 
   static String _extractIdFromPath(String lastPathSegment) {

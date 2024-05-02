@@ -50,13 +50,6 @@ class ChatItem extends StatelessWidget {
     this.e_infos,
   });
 
-  static List<int> matchNum(String str) {
-    final RegExp regExp = RegExp(r'\d+');
-    final Iterable<Match> matches = regExp.allMatches(str);
-
-    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isOwner =
@@ -183,9 +176,9 @@ class ChatItem extends StatelessWidget {
                     if (url != null) {
                       final String area = url.split('/').last;
                       if (area.startsWith('ep')) {
-                        RoutePush.bangumiPush(null, matchNum(area).first);
+                        RoutePush.bangumiPush(null, Utils.matchNum(area).first);
                       } else if (area.startsWith('ss')) {
-                        RoutePush.bangumiPush(matchNum(area).first, null);
+                        RoutePush.bangumiPush(Utils.matchNum(area).first, null);
                       }
                     }
                   }
