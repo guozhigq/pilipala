@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/bangumi/list.dart';
-import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/image_save.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -24,32 +21,12 @@ class BangumiCardV extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(bangumiItem.mediaId);
     return InkWell(
-      onTap: () async {
-        final int seasonId = bangumiItem.seasonId!;
-        SmartDialog.showLoading(msg: '获取中...');
-        final res = await SearchHttp.bangumiInfo(seasonId: seasonId);
-        SmartDialog.dismiss().then((value) {
-          if (res['status']) {
-            if (res['data'].episodes.isEmpty) {
-              SmartDialog.showToast('资源加载失败');
-              return;
-            }
-            EpisodeItem episode = res['data'].episodes.first;
-            String bvid = episode.bvid!;
-            int cid = episode.cid!;
-            String pic = episode.cover!;
-            String heroTag = Utils.makeHeroTag(cid);
-            Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&seasonId=$seasonId',
-              arguments: {
-                'pic': pic,
-                'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
-                'bangumiItem': res['data'],
-              },
-            );
-          }
-        });
+      onTap: () {
+        RoutePush.bangumiPush(
+          bangumiItem.seasonId,
+          null,
+          heroTag: heroTag,
+        );
       },
       onLongPress: () =>
           imageSaveDialog(context, bangumiItem, SmartDialog.dismiss),
