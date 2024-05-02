@@ -3,14 +3,13 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/image_save.dart';
+import 'package:pilipala/utils/route_push.dart';
 import '../../models/model_rec_video_item.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
-import '../../http/search.dart';
 import '../../http/user.dart';
 import '../../http/video.dart';
-import '../../models/common/search_type.dart';
 import '../../utils/id_utils.dart';
 import '../../utils/utils.dart';
 import '../constants.dart';
@@ -42,23 +41,11 @@ class VideoCardV extends StatelessWidget {
           return;
         }
         int epId = videoItem.param;
-        SmartDialog.showLoading(msg: '资源获取中');
-        var result = await SearchHttp.bangumiInfo(seasonId: null, epId: epId);
-        if (result['status']) {
-          var bangumiDetail = result['data'];
-          int cid = bangumiDetail.episodes!.first.cid;
-          String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-          SmartDialog.dismiss().then(
-            (value) => Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&epId=$epId',
-              arguments: {
-                'pic': videoItem.pic,
-                'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
-              },
-            ),
-          );
-        }
+        RoutePush.bangumiPush(
+          null,
+          epId,
+          heroTag: heroTag,
+        );
         break;
       case 'av':
         String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
