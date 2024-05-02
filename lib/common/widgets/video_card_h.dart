@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/utils/image_save.dart';
+import 'package:pilipala/utils/route_push.dart';
+import 'package:pilipala/utils/url_utils.dart';
 import '../../http/search.dart';
 import '../../http/user.dart';
 import '../../http/video.dart';
@@ -50,6 +53,20 @@ class VideoCardH extends StatelessWidget {
         try {
           if (type == 'ketang') {
             SmartDialog.showToast('课堂视频暂不支持播放');
+            return;
+          }
+          if (showCharge && videoItem?.typeid == 33) {
+            final String redirectUrl = await UrlUtils.parseRedirectUrl(
+                '${HttpString.baseUrl}/video/$bvid/');
+            final String lastPathSegment = redirectUrl.split('/').last;
+            if (lastPathSegment.contains('ss')) {
+              RoutePush.bangumiPush(
+                  Utils.matchNum(lastPathSegment).first, null);
+            }
+            if (lastPathSegment.contains('ep')) {
+              RoutePush.bangumiPush(
+                  null, Utils.matchNum(lastPathSegment).first);
+            }
             return;
           }
           final int cid =
