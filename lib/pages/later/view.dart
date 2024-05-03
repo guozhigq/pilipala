@@ -5,6 +5,7 @@ import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/pages/later/index.dart';
+import 'package:pilipala/utils/route_push.dart';
 
 class LaterPage extends StatefulWidget {
   const LaterPage({super.key});
@@ -72,8 +73,8 @@ class _LaterPageState extends State<LaterPage> {
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data as Map;
-                if (data['status']) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
                   return Obx(
                     () => _laterController.laterList.isNotEmpty &&
                             !_laterController.isLoading.value
@@ -96,10 +97,18 @@ class _LaterPageState extends State<LaterPage> {
                   );
                 } else {
                   return HttpError(
-                    errMsg: data['msg'],
-                    fn: () => setState(() {
-                      _futureBuilderFuture = _laterController.queryLaterList();
-                    }),
+                    errMsg: data?['msg'] ?? '请求异常',
+                    btnText: data?['code'] == -101 ? '去登录' : null,
+                    fn: () {
+                      if (data?['code'] == -101) {
+                        RoutePush.loginRedirectPush();
+                      } else {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _laterController.queryLaterList();
+                        });
+                      }
+                    },
                   );
                 }
               } else {
