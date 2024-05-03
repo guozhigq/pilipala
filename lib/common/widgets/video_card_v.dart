@@ -233,6 +233,7 @@ class VideoContent extends StatelessWidget {
                   width: 24,
                   height: 24,
                   child: IconButton(
+                    padding: EdgeInsets.zero,
                     onPressed: () {
                       feedBack();
                       showModalBottomSheet(
@@ -386,6 +387,15 @@ class MorePanel extends StatelessWidget {
             title:
                 Text('添加至稍后再看', style: Theme.of(context).textTheme.titleSmall),
           ),
+          ListTile(
+            onTap: () =>
+                imageSaveDialog(context, videoItem, SmartDialog.dismiss),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.photo_outlined, size: 19),
+            title:
+                Text('查看视频封面', style: Theme.of(context).textTheme.titleSmall),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
