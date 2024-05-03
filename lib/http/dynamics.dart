@@ -41,6 +41,7 @@ class DynamicsHttp {
         'status': false,
         'data': [],
         'msg': res.data['message'],
+        'code': res.data['code'],
       };
     }
   }
