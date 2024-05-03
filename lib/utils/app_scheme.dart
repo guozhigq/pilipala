@@ -2,6 +2,7 @@ import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
 import '../models/common/search_type.dart';
 import 'id_utils.dart';
@@ -68,7 +69,7 @@ class PiliSchame {
       } else if (host == 'bangumi') {
         if (path.startsWith('/season')) {
           final String seasonId = path.split('/').last;
-          _bangumiPush(int.parse(seasonId), null);
+          RoutePush.bangumiPush(int.parse(seasonId), null);
         }
       } else if (host == 'opus') {
         if (path.startsWith('/detail')) {
@@ -126,35 +127,6 @@ class PiliSchame {
     }
   }
 
-  // 番剧跳转
-  static Future<void> _bangumiPush(int? seasonId, int? epId) async {
-    SmartDialog.showLoading<dynamic>(msg: '获取中...');
-    try {
-      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
-      if (result['status']) {
-        var bangumiDetail = result['data'];
-        final int cid = bangumiDetail.episodes!.first.cid;
-        final String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-        final String heroTag = Utils.makeHeroTag(cid);
-        var epId = bangumiDetail.episodes!.first.id;
-        SmartDialog.dismiss().then(
-          (e) => Get.toNamed(
-            '/video?bvid=$bvid&cid=$cid&epId=$epId',
-            arguments: <String, dynamic>{
-              'pic': bangumiDetail.cover,
-              'heroTag': heroTag,
-              'videoType': SearchType.media_bangumi,
-            },
-          ),
-        );
-      } else {
-        SmartDialog.showToast(result['msg']);
-      }
-    } catch (e) {
-      SmartDialog.showToast('番剧获取失败：$e');
-    }
-  }
-
   static Future<void> _fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
@@ -167,8 +139,21 @@ class PiliSchame {
       print('bilibili.com host: $host');
       print('bilibili.com path: $path');
       final String lastPathSegment = path!.split('/').last;
-      if (lastPathSegment.contains('BV')) {
-        _videoPush(null, lastPathSegment);
+      if (path.startsWith('/video')) {
+        if (lastPathSegment.contains('BV')) {
+          _videoPush(null, lastPathSegment);
+        }
+        if (lastPathSegment.contains('av')) {
+          _videoPush(Utils.matchNum(lastPathSegment)[0], null);
+        }
+      }
+      if (path.startsWith('/bangumi')) {
+        if (lastPathSegment.contains('ss')) {
+          RoutePush.bangumiPush(Utils.matchNum(lastPathSegment).first, null);
+        }
+        if (lastPathSegment.contains('ep')) {
+          RoutePush.bangumiPush(null, Utils.matchNum(lastPathSegment).first);
+        }
       }
     } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
@@ -220,9 +205,9 @@ class PiliSchame {
         case 'bangumi':
           print('番剧');
           if (area.startsWith('ep')) {
-            _bangumiPush(null, matchNum(area).first);
+            RoutePush.bangumiPush(null, Utils.matchNum(area).first);
           } else if (area.startsWith('ss')) {
-            _bangumiPush(matchNum(area).first, null);
+            RoutePush.bangumiPush(Utils.matchNum(area).first, null);
           }
           break;
         case 'video':
@@ -238,7 +223,7 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = 'cv${matchNum(query!['id']!).first}';
+          String id = 'cv${Utils.matchNum(query!['id']!).first}';
           Get.toNamed('/htmlRender', parameters: {
             'url': value.dataString!,
             'title': '',
@@ -254,21 +239,14 @@ class PiliSchame {
     }
   }
 
-  static List<int> matchNum(String str) {
-    final RegExp regExp = RegExp(r'\d+');
-    final Iterable<Match> matches = regExp.allMatches(str);
-
-    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
-  }
-
   static void _handleEpisodePath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(null, matchNum(seasonId).first);
+    RoutePush.bangumiPush(null, Utils.matchNum(seasonId).first);
   }
 
   static void _handleSeasonPath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(matchNum(seasonId).first, null);
+    RoutePush.bangumiPush(Utils.matchNum(seasonId).first, null);
   }
 
   static String _extractIdFromPath(String lastPathSegment) {
