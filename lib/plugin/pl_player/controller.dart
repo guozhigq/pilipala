@@ -978,41 +978,8 @@ class PlPlayerController {
       } else {
         await landScape();
       }
-
-      // bool isValid =
-      //     direction.value == 'vertical' || mode == FullScreenMode.vertical
-      //         ? true
-      //         : false;
-      // var result = await showDialog(
-      //   context: Get.context!,
-      //   useSafeArea: false,
-      //   builder: (context) => Dialog.fullscreen(
-      //     backgroundColor: Colors.black,
-      //     child: SafeArea(
-      //       // 忽略手机安全区域
-      //       top: isValid,
-      //       left: false,
-      //       right: false,
-      //       bottom: isValid,
-      //       child: PLVideoPlayer(
-      //         controller: this,
-      //         headerControl: headerControl,
-      //         bottomControl: bottomControl,
-      //         danmuWidget: danmuWidget,
-      //       ),
-      //     ),
-      //   ),
-      // );
-      // if (result == null) {
-      //   // 退出全屏
-      //   StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      //   exitFullScreen();
-      //   await verticalScreen();
-      //   toggleFullScreen(false);
-      // }
-    } else if (isFullScreen.value) {
+    } else if (isFullScreen.value && !status) {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      // Get.back();
       exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);
