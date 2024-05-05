@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
-import '../../../models/dynamics/result.dart';
 import 'action_panel.dart';
 import 'author_panel.dart';
 import 'content_panel.dart';
 import 'forward_panel.dart';
 
 class DynamicPanel extends StatelessWidget {
-  final DynamicItemModel item;
+  final dynamic item;
   final String? source;
   DynamicPanel({required this.item, this.source, Key? key}) : super(key: key);
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
