@@ -520,4 +520,7 @@ class Api {
 
   /// 删除收藏夹
   static const String delFavFolder = '/x/v3/fav/folder/del';
+
+  /// 搜索结果计数
+  static const String searchCount = '/x/web-interface/wbi/search/all/v2';
 }
