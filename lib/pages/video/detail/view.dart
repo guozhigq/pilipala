@@ -323,11 +323,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       children: [
         GestureDetector(
           onTap: handlePlay,
-          child: Image.network(
-            vdCtr.videoItem['pic'],
-            width: Get.width,
-            height: videoHeight,
-            fit: BoxFit.cover, // 适应方式根据需要调整
+          child: Obx(
+            () => NetworkImgLayer(
+              src: vdCtr.cover.value,
+              width: Get.width,
+              height: videoHeight,
+              type: 'emote',
+            ),
           ),
         ),
         buildCustomAppBar(),
