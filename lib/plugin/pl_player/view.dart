@@ -334,7 +334,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             color: Colors.white,
           ),
         ),
-        fuc: () => _.triggerFullScreen(),
+        fuc: () => _.triggerFullScreen(status: !_.isFullScreen.value),
       ),
     };
     final List<Widget> list = [];
