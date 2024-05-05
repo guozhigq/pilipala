@@ -62,7 +62,8 @@ class UserHttp {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'] ?? '账号未登录'
+        'msg': res.data['message'],
+        'code': res.data['code'],
       };
     }
   }
@@ -111,7 +112,12 @@ class UserHttp {
         'data': {'list': list, 'count': res.data['data']['count']}
       };
     } else {
-      return {'status': false, 'data': [], 'msg': res.data['message']};
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+        'code': res.data['code'],
+      };
     }
   }
 
@@ -126,7 +132,12 @@ class UserHttp {
     if (res.data['code'] == 0) {
       return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
     } else {
-      return {'status': false, 'data': [], 'msg': res.data['message']};
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+        'code': res.data['code'],
+      };
     }
   }
 
@@ -326,7 +337,12 @@ class UserHttp {
         'data': SubFolderModelData.fromJson(res.data['data'])
       };
     } else {
-      return {'status': false, 'msg': res.data['message']};
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+        'code': res.data['code'],
+      };
     }
   }
 
