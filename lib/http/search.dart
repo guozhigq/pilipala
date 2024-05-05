@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/search/all.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
 import '../models/bangumi/info.dart';
 import '../models/common/search_type.dart';
 import '../models/search/hot.dart';
@@ -178,5 +180,27 @@ class SearchHttp {
       'cid': res.data['data'].first['cid'],
       'pic': res.data['data'].first['first_frame'],
     };
+  }
+
+  static Future<Map<String, dynamic>> searchCount(
+      {required String keyword}) async {
+    Map<String, dynamic> data = {
+      'keyword': keyword,
+      'web_location': 333.999,
+    };
+    Map params = await WbiSign().makSign(data);
+    final dynamic res = await Request().get(Api.searchCount, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SearchAllModel.fromJson(res.data['data']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': '请求错误 🙅',
+      };
+    }
   }
 }
