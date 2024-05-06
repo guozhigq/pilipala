@@ -218,7 +218,7 @@ class AboutController extends GetxController {
   RxString currentVersion = ''.obs;
   RxString remoteVersion = ''.obs;
   late LatestDataModel remoteAppInfo;
-  RxBool isUpdate = true.obs;
+  RxBool isUpdate = false.obs;
   RxBool isLoading = true.obs;
   late LatestDataModel data;
 
