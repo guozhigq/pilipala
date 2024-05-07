@@ -52,15 +52,19 @@ class WebviewController extends GetxController {
             loadProgress.value = progress;
           },
           onPageStarted: (String url) {
-            final String str = Uri.parse(url).pathSegments[0];
-            final Map matchRes = IdUtils.matchAvorBv(input: str);
-            final List matchKeys = matchRes.keys.toList();
-            if (matchKeys.isNotEmpty) {
-              if (matchKeys.first == 'BV') {
-                Get.offAndToNamed(
-                  '/searchResult',
-                  parameters: {'keyword': matchRes['BV']},
-                );
+            final List pathSegments = Uri.parse(url).pathSegments;
+            if (pathSegments.isNotEmpty &&
+                url != 'https://passport.bilibili.com/h5-app/passport/login') {
+              final String str = pathSegments[0];
+              final Map matchRes = IdUtils.matchAvorBv(input: str);
+              final List matchKeys = matchRes.keys.toList();
+              if (matchKeys.isNotEmpty) {
+                if (matchKeys.first == 'BV') {
+                  Get.offAndToNamed(
+                    '/searchResult',
+                    parameters: {'keyword': matchRes['BV']},
+                  );
+                }
               }
             }
           },
