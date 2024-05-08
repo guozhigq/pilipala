@@ -450,6 +450,7 @@ class VideoIntroController extends GetxController {
     videoDetailCtr.danmakuCid.value = cid;
     videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
+    videoDetailCtr.getSubtitle();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
