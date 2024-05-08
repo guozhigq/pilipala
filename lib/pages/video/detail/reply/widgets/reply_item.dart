@@ -657,11 +657,11 @@ InlineSpan buildContent(
                         } else {
                           final String redirectUrl =
                               await UrlUtils.parseRedirectUrl(matchStr);
-                          if (redirectUrl == matchStr) {
-                            Clipboard.setData(ClipboardData(text: matchStr));
-                            SmartDialog.showToast('地址可能有误');
-                            return;
-                          }
+                          // if (redirectUrl == matchStr) {
+                          //   Clipboard.setData(ClipboardData(text: matchStr));
+                          //   SmartDialog.showToast('地址可能有误');
+                          //   return;
+                          // }
                           Get.toNamed(
                             '/webview',
                             parameters: {
