@@ -40,10 +40,10 @@ class MainController extends GetxController {
     dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
         SettingBoxKey.dynamicBadgeMode,
         defaultValue: DynamicBadgeMode.number.code)];
+    setNavBarConfig();
     if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
       getUnreadDynamic();
     }
-    setNavBarConfig();
   }
 
   void onBackPressed(BuildContext context) {

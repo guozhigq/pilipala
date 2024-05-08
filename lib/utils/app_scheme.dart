@@ -4,7 +4,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
-import '../models/common/search_type.dart';
 import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';
@@ -140,11 +139,13 @@ class PiliSchame {
       print('bilibili.com path: $path');
       final String lastPathSegment = path!.split('/').last;
       if (path.startsWith('/video')) {
-        if (lastPathSegment.contains('BV')) {
-          _videoPush(null, lastPathSegment);
-        }
-        if (lastPathSegment.contains('av')) {
-          _videoPush(Utils.matchNum(lastPathSegment)[0], null);
+        Map matchRes = IdUtils.matchAvorBv(input: path);
+        if (matchRes.containsKey('AV')) {
+          _videoPush(matchRes['AV']! as int, null);
+        } else if (matchRes.containsKey('BV')) {
+          _videoPush(null, matchRes['BV'] as String);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
         }
       }
       if (path.startsWith('/bangumi')) {
