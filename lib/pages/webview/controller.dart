@@ -110,6 +110,9 @@ class WebviewController extends GetxController {
         SmartDialog.showToast('登录成功');
         try {
           Box userInfoCache = GStrorage.userInfo;
+          if (!userInfoCache.isOpen) {
+            userInfoCache = await Hive.openBox('userInfo');
+          }
           await userInfoCache.put('userInfoCache', result['data']);
 
           final HomeController homeCtr = Get.find<HomeController>();
