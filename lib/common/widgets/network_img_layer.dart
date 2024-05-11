@@ -34,9 +34,11 @@ class NetworkImgLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int defaultImgQuality = GlobalData().imgQuality;
+    if (src == '' || src == null) {
+      return placeholder(context);
+    }
     final String imageUrl =
         '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
-    print(imageUrl);
     int? memCacheWidth, memCacheHeight;
     double aspectRatio = (width / height).toDouble();
 

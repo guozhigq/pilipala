@@ -1,17 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/rank/zone/index.dart';
+import 'package:pilipala/utils/main_stream.dart';
 
 class ZonePage extends StatefulWidget {
   const ZonePage({Key? key, required this.rid}) : super(key: key);
@@ -38,10 +34,6 @@ class _ZonePageState extends State<ZonePage>
     _zoneController = Get.put(ZoneController(), tag: widget.rid.toString());
     _futureBuilderFuture = _zoneController.queryRankFeed('init', widget.rid);
     scrollController = _zoneController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-    StreamController<bool> searchBarStream =
-        Get.find<HomeController>().searchBarStream;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -51,16 +43,7 @@ class _ZonePageState extends State<ZonePage>
             _zoneController.onLoad();
           }
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-          searchBarStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-          searchBarStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
   }
@@ -97,15 +80,6 @@ class _ZonePageState extends State<ZonePage>
                           return VideoCardH(
                             videoItem: _zoneController.videoList[index],
                             showPubdate: true,
-                            longPress: () {
-                              _zoneController.popupDialog = _createPopupDialog(
-                                  _zoneController.videoList[index]);
-                              Overlay.of(context)
-                                  .insert(_zoneController.popupDialog!);
-                            },
-                            longPressEnd: () {
-                              _zoneController.popupDialog?.remove();
-                            },
                           );
                         }, childCount: _zoneController.videoList.length),
                       ),
@@ -138,16 +112,6 @@ class _ZonePageState extends State<ZonePage>
             ),
           )
         ],
-      ),
-    );
-  }
-
-  OverlayEntry _createPopupDialog(videoItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _zoneController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: videoItem, closeFn: _zoneController.popupDialog?.remove),
       ),
     );
   }

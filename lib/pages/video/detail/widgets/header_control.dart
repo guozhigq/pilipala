@@ -11,12 +11,14 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
+import 'package:pilipala/pages/dlna/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
+import '../../../../http/danmaku.dart';
 import '../../../../models/common/search_type.dart';
 import '../../../../models/video_detail_res.dart';
 import '../introduction/index.dart';
@@ -52,7 +54,7 @@ class _HeaderControlState extends State<HeaderControl> {
   final Box<dynamic> videoStorage = GStrorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
-  bool showTitle = false;
+  RxBool isFullScreen = false.obs;
   late String heroTag;
   late VideoIntroController videoIntroController;
   late VideoDetailData videoDetail;
@@ -69,13 +71,8 @@ class _HeaderControlState extends State<HeaderControl> {
   }
 
   void fullScreenStatusListener() {
-    widget.videoDetailCtr!.plPlayerController.isFullScreen
-        .listen((bool isFullScreen) {
-      if (isFullScreen) {
-        showTitle = true;
-      } else {
-        showTitle = false;
-      }
+    widget.videoDetailCtr!.plPlayerController.isFullScreen.listen((bool val) {
+      isFullScreen.value = val;
 
       /// TODO setState() called after dispose()
       if (mounted) {
@@ -162,7 +159,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       dense: true,
                       leading:
                           const Icon(Icons.hourglass_top_outlined, size: 20),
-                      title: const Text('定时关闭（测试）', style: titleStyle),
+                      title: const Text('定时关闭', style: titleStyle),
                     ),
                     ListTile(
                       onTap: () => {Get.back(), showSetVideoQa()},
@@ -183,15 +180,16 @@ class _HeaderControlState extends State<HeaderControl> {
                             '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
                             style: subTitleStyle),
                       ),
-                    ListTile(
-                      onTap: () => {Get.back(), showSetDecodeFormats()},
-                      dense: true,
-                      leading: const Icon(Icons.av_timer_outlined, size: 20),
-                      title: const Text('解码格式', style: titleStyle),
-                      subtitle: Text(
-                          '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
-                          style: subTitleStyle),
-                    ),
+                    if (widget.videoDetailCtr!.currentDecodeFormats != null)
+                      ListTile(
+                        onTap: () => {Get.back(), showSetDecodeFormats()},
+                        dense: true,
+                        leading: const Icon(Icons.av_timer_outlined, size: 20),
+                        title: const Text('解码格式', style: titleStyle),
+                        subtitle: Text(
+                            '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats!.description}',
+                            style: subTitleStyle),
+                      ),
                     ListTile(
                       onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
@@ -215,6 +213,87 @@ class _HeaderControlState extends State<HeaderControl> {
       },
       clipBehavior: Clip.hardEdge,
       isScrollControlled: true,
+    );
+  }
+
+  /// 发送弹幕
+  void showShootDanmakuSheet() {
+    final TextEditingController textController = TextEditingController();
+    bool isSending = false; // 追踪是否正在发送
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        // TODO: 支持更多类型和颜色的弹幕
+        return AlertDialog(
+          title: const Text('发送弹幕（测试）'),
+          content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return TextField(
+              controller: textController,
+            );
+          }),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return TextButton(
+                onPressed: isSending
+                    ? null
+                    : () async {
+                        final String msg = textController.text;
+                        if (msg.isEmpty) {
+                          SmartDialog.showToast('弹幕内容不能为空');
+                          return;
+                        } else if (msg.length > 100) {
+                          SmartDialog.showToast('弹幕内容不能超过100个字符');
+                          return;
+                        }
+                        setState(() {
+                          isSending = true; // 开始发送，更新状态
+                        });
+                        //修改按钮文字
+                        final dynamic res = await DanmakaHttp.shootDanmaku(
+                          oid: widget.videoDetailCtr!.cid.value,
+                          msg: textController.text,
+                          bvid: widget.videoDetailCtr!.bvid,
+                          progress:
+                              widget.controller!.position.value.inMilliseconds,
+                          type: 1,
+                        );
+                        setState(() {
+                          isSending = false; // 发送结束，更新状态
+                        });
+                        if (res['status']) {
+                          SmartDialog.showToast('发送成功');
+                          // 发送成功，自动预览该弹幕，避免重新请求
+                          // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
+                          widget.controller!.danmakuController!.addItems([
+                            DanmakuItem(
+                              msg,
+                              color: Colors.white,
+                              time: widget
+                                  .controller!.position.value.inMilliseconds,
+                              type: DanmakuItemType.scroll,
+                              isSend: true,
+                            )
+                          ]);
+                          Get.back();
+                        } else {
+                          SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
+                        }
+                      },
+                child: Text(isSending ? '发送中...' : '发送'),
+              );
+            })
+          ],
+        );
+      },
     );
   }
 
@@ -367,7 +446,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       children: [
                         RadioListTile(
                           value: -1,
-                          title: const Text('关闭弹幕'),
+                          title: const Text('关闭字幕'),
                           groupValue: tempThemeValue,
                           onChanged: (value) {
                             tempThemeValue = value!;
@@ -463,14 +542,22 @@ class _HeaderControlState extends State<HeaderControl> {
 
     /// 可用的质量分类
     int userfulQaSam = 0;
-    final List<VideoItem> video = videoInfo.dash!.video!;
-    final Set<int> idSet = {};
-    for (final VideoItem item in video) {
-      final int id = item.id!;
-      if (!idSet.contains(id)) {
-        idSet.add(id);
-        userfulQaSam++;
+    if (videoInfo.dash != null) {
+      // dash格式视频一次请求会返回所有可播放的清晰度video
+      final List<VideoItem> video = videoInfo.dash!.video!;
+      final Set<int> idSet = {};
+      for (final VideoItem item in video) {
+        final int id = item.id!;
+        if (!idSet.contains(id)) {
+          idSet.add(id);
+          userfulQaSam++;
+        }
       }
+    }
+
+    if (videoInfo.durl != null) {
+      // durl格式视频一次请求返回对应清晰度video
+      userfulQaSam = videoFormat.length - 1;
     }
 
     showModalBottomSheet(
@@ -629,7 +716,7 @@ class _HeaderControlState extends State<HeaderControl> {
   void showSetDecodeFormats() {
     // 当前选中的解码格式
     final VideoDecodeFormats currentDecodeFormats =
-        widget.videoDetailCtr!.currentDecodeFormats;
+        widget.videoDetailCtr!.currentDecodeFormats!;
     final VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
@@ -653,9 +740,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择解码格式', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择解码格式', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1000,9 +1090,12 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择播放顺序', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1079,7 +1172,7 @@ class _HeaderControlState extends State<HeaderControl> {
             },
           ),
           SizedBox(width: buttonSpace),
-          if (showTitle &&
+          if (isFullScreen.value &&
               isLandscape &&
               widget.videoType == SearchType.video) ...[
             Column(
@@ -1087,11 +1180,13 @@ class _HeaderControlState extends State<HeaderControl> {
               children: [
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
-                  child: Text(
-                    videoIntroController.videoDetail.value.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                  child: Obx(
+                    () => Text(
+                      videoIntroController.videoDetail.value.title ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -1131,6 +1226,59 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.cast,
+              size: 19,
+              color: Colors.white,
+            ),
+            fuc: () async {
+              showDialog<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return LiveDlnaPage(
+                      datasource: widget.videoDetailCtr!.videoUrl);
+                },
+              );
+            },
+          ),
+          if (isFullScreen.value) ...[
+            SizedBox(
+              width: 56,
+              height: 34,
+              child: TextButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                ),
+                onPressed: () => showShootDanmakuSheet(),
+                child: const Text(
+                  '发弹幕',
+                  style: textStyle,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: Obx(
+                () => IconButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () {
+                    _.isOpenDanmu.value = !_.isOpenDanmu.value;
+                  },
+                  icon: Icon(
+                    _.isOpenDanmu.value
+                        ? Icons.subtitles_outlined
+                        : Icons.subtitles_off_outlined,
+                    size: 19,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
           SizedBox(width: buttonSpace),
           if (Platform.isAndroid) ...<Widget>[
             SizedBox(
@@ -1167,20 +1315,6 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          // SizedBox(
-          //   width: 34,
-          //   height: 34,
-          //   child: IconButton(
-          //     style: ButtonStyle(
-          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     ),
-          //     onPressed: () => showSubtitleDialog(),
-          //     icon: const Icon(
-          //       Icons.closed_caption_off,
-          //       size: 22,
-          //     ),
-          //   ),
-          // ),
           ComBtn(
             icon: const Icon(
               Icons.closed_caption_off,

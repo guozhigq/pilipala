@@ -26,13 +26,13 @@
 Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 ```bash
-[✓] Flutter (Channel stable, 3.16.4, on macOS 14.1.2 23B92 darwin-arm64, locale
+[✓] Flutter (Channel stable, 3.16.5, on macOS 14.1.2 23B92 darwin-arm64, locale
     zh-Hans-CN)
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
 [✓] Chrome - develop for the web
 [✓] Android Studio (version 2022.3)
-[✓] VS Code (version 1.85.1)
+[✓] VS Code (version 1.87.2)
 [✓] Connected device (3 available)
 [✓] Network resources
 
@@ -44,6 +44,9 @@ Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 ## 技术交流
 
 Telegram: https://t.me/+lm_oOVmF0RJiODk1
+
+Tg Beta版本：@PiliPala_Beta
+
 QQ频道: https://pd.qq.com/s/365esodk3
 
 

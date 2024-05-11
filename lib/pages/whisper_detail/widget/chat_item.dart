@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -154,16 +155,33 @@ class ChatItem extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   SmartDialog.showLoading();
-                  var bvid = content["bvid"];
+                  final String bvid = content["bvid"];
+                  // 16番剧 5投稿
+                  final int source = content["source"];
+                  final String? url = content["url"];
+
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = Utils.makeHeroTag(bvid);
-                  SmartDialog.dismiss<dynamic>().then(
-                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
-                        arguments: <String, String?>{
-                          'pic': content['thumb'],
-                          'heroTag': heroTag,
-                        }),
-                  );
+                  await SmartDialog.dismiss();
+                  if (source == 5) {
+                    Get.toNamed<dynamic>(
+                      '/video?bvid=$bvid&cid=$cid',
+                      arguments: <String, String?>{
+                        'pic': content['thumb'],
+                        'heroTag': heroTag,
+                      },
+                    );
+                  }
+                  if (source == 16) {
+                    if (url != null) {
+                      final String area = url.split('/').last;
+                      if (area.startsWith('ep')) {
+                        RoutePush.bangumiPush(null, Utils.matchNum(area).first);
+                      } else if (area.startsWith('ss')) {
+                        RoutePush.bangumiPush(Utils.matchNum(area).first, null);
+                      }
+                    }
+                  }
                 },
                 child: NetworkImgLayer(
                   width: 220,
@@ -183,7 +201,7 @@ class ChatItem extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                content['author'],
+                content['author'] ?? '',
                 style: TextStyle(
                   letterSpacing: 0.6,
                   height: 1.5,
@@ -206,7 +224,7 @@ class ChatItem extends StatelessWidget {
                   SmartDialog.dismiss<dynamic>().then(
                     (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                         arguments: <String, String?>{
-                          'pic': content['thumb'],
+                          'pic': content['thumb'] ?? '',
                           'heroTag': heroTag,
                         }),
                   );

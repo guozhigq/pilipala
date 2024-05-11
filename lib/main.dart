@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -20,6 +21,7 @@ import 'package:pilipala/services/disable_battery_opt.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:pilipala/utils/recommend_filter.dart';
@@ -34,6 +36,7 @@ void main() async {
       .then((_) async {
     await GStrorage.init();
     await setupServiceLocator();
+    clearLogs();
     Request();
     await Request.setCookie();
     RecommendFilter();
@@ -64,13 +67,20 @@ void main() async {
     );
 
     // 小白条、导航栏沉浸
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-      statusBarColor: Colors.transparent,
-    ));
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt >= 29) {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      }
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        statusBarColor: Colors.transparent,
+      ));
+    }
+
     Data.init();
+    GlobalData();
     PiliSchame.init();
     DisableBatteryOpt();
   });
@@ -133,16 +143,43 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
           );
         }
+
+        // ThemeData themeData = ThemeData(
+        //   colorScheme: currentThemeValue == ThemeType.dark
+        //       ? darkColorScheme
+        //       : lightColorScheme,
+        // );
+
+        // // 小白条、导航栏沉浸
+        // if (Platform.isAndroid) {
+        //   List<String> versionParts = Platform.version.split('.');
+        //   int androidVersion = int.parse(versionParts[0]);
+        //   if (androidVersion >= 29) {
+        //     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        //   }
+        //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        //     systemNavigationBarColor: GlobalData().enableMYBar
+        //         ? const Color(0x00010000)
+        //         : themeData.canvasColor,
+        //     systemNavigationBarDividerColor: GlobalData().enableMYBar
+        //         ? const Color(0x00010000)
+        //         : themeData.canvasColor,
+        //     systemNavigationBarIconBrightness:
+        //         currentThemeValue == ThemeType.dark
+        //             ? Brightness.light
+        //             : Brightness.dark,
+        //     statusBarColor: Colors.transparent,
+        //   ));
+        // }
+
         // 图片缓存
         // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
         return GetMaterialApp(
-          title: 'PiLiPaLa',
+          title: 'PiliPala',
           theme: ThemeData(
-            // fontFamily: 'HarmonyOS',
             colorScheme: currentThemeValue == ThemeType.dark
                 ? darkColorScheme
                 : lightColorScheme,
-            useMaterial3: true,
             snackBarTheme: SnackBarThemeData(
               actionTextColor: lightColorScheme.primary,
               backgroundColor: lightColorScheme.secondaryContainer,
@@ -159,11 +196,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           darkTheme: ThemeData(
-            // fontFamily: 'HarmonyOS',
             colorScheme: currentThemeValue == ThemeType.light
                 ? lightColorScheme
                 : darkColorScheme,
-            useMaterial3: true,
             snackBarTheme: SnackBarThemeData(
               actionTextColor: darkColorScheme.primary,
               backgroundColor: darkColorScheme.secondaryContainer,

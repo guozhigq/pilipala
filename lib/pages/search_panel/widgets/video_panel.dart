@@ -35,7 +35,11 @@ class SearchVideoPanel extends StatelessWidget {
                 padding: index == 0
                     ? const EdgeInsets.only(top: 2)
                     : EdgeInsets.zero,
-                child: VideoCardH(videoItem: i, showPubdate: true),
+                child: VideoCardH(
+                  videoItem: i,
+                  showPubdate: true,
+                  source: 'search',
+                ),
               );
             },
           ),

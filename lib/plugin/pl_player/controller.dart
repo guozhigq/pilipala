@@ -335,8 +335,10 @@ class PlPlayerController {
   }) {
     // 如果实例尚未创建，则创建一个新实例
     _instance ??= PlPlayerController._();
-    _instance!._playerCount.value += 1;
-    _videoType.value = videoType;
+    if (videoType != 'none') {
+      _instance!._playerCount.value += 1;
+      _videoType.value = videoType;
+    }
     return _instance!;
   }
 
@@ -351,7 +353,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
@@ -393,13 +395,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-        dataSource,
-        _looping,
-        enableHA,
-        width,
-        height,
-        seekTo,
-      );
+          dataSource, _looping, enableHA, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -430,7 +426,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
-    Duration? seekTo,
+    Duration seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -480,17 +476,17 @@ class PlPlayerController {
     }
 
     // 字幕
-    if (dataSource.subFiles != '' && dataSource.subFiles != null) {
-      await pp.setProperty(
-        'sub-files',
-        UniversalPlatform.isWindows
-            ? dataSource.subFiles!.replaceAll(';', '\\;')
-            : dataSource.subFiles!.replaceAll(':', '\\:'),
-      );
-      await pp.setProperty("subs-with-matching-audio", "no");
-      await pp.setProperty("sub-forced-only", "yes");
-      await pp.setProperty("blend-subtitles", "video");
-    }
+    // if (dataSource.subFiles != '' && dataSource.subFiles != null) {
+    //   await pp.setProperty(
+    //     'sub-files',
+    //     UniversalPlatform.isWindows
+    //         ? dataSource.subFiles!.replaceAll(';', '\\;')
+    //         : dataSource.subFiles!.replaceAll(':', '\\:'),
+    //   );
+    //   await pp.setProperty("subs-with-matching-audio", "no");
+    //   await pp.setProperty("sub-forced-only", "yes");
+    //   await pp.setProperty("blend-subtitles", "video");
+    // }
 
     _videoController = _videoController ??
         VideoController(
@@ -512,12 +508,9 @@ class PlPlayerController {
         play: false,
       );
     }
-    player.open(
-      Media(
-        dataSource.videoSource!,
-        httpHeaders: dataSource.httpHeaders,
-        start: seekTo ?? Duration.zero,
-      ),
+    await player.open(
+      Media(dataSource.videoSource!,
+          httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
     // 音轨
@@ -532,7 +525,22 @@ class PlPlayerController {
   Future _initializePlayer({
     Duration? duration,
   }) async {
-    // 设置倍速
+    getVideoFit();
+    // if (_looping) {
+    //   await setLooping(_looping);
+    // }
+
+    /// 跳转播放
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
+
+    /// 自动播放
+    if (_autoPlay) {
+      await play(duration: duration);
+    }
+
+    /// 设置倍速
     if (videoType.value == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
@@ -541,15 +549,6 @@ class PlPlayerController {
       } else {
         await setPlaybackSpeed(1.0);
       }
-    }
-    getVideoFit();
-    // if (_looping) {
-    //   await setLooping(_looping);
-    // }
-
-    // 自动播放
-    if (_autoPlay) {
-      await play(duration: duration);
     }
   }
 
@@ -608,7 +607,9 @@ class PlPlayerController {
           makeHeartBeat(event.inSeconds);
         }),
         videoPlayerController!.stream.duration.listen((event) {
-          duration.value = event;
+          if (event > Duration.zero) {
+            duration.value = event;
+          }
         }),
         videoPlayerController!.stream.buffer.listen((event) {
           _buffered.value = event;
@@ -651,34 +652,36 @@ class PlPlayerController {
 
   /// 跳转至指定位置
   Future<void> seekTo(Duration position, {type = 'seek'}) async {
-    // if (position >= duration.value) {
-    //   position = duration.value - const Duration(milliseconds: 100);
-    // }
-    if (position < Duration.zero) {
-      position = Duration.zero;
-    }
-    _position.value = position;
-    updatePositionSecond();
-    _heartDuration = position.inSeconds;
-    if (duration.value.inSeconds != 0) {
-      if (type != 'slider') {
-        /// 拖动进度条调节时，不等待第一帧，防止抖动
-        await _videoPlayerController?.stream.buffer.first;
+    try {
+      if (position < Duration.zero) {
+        position = Duration.zero;
       }
-      await _videoPlayerController?.seek(position);
-    } else {
-      print('seek duration else');
-      _timerForSeek?.cancel();
-      _timerForSeek =
-          Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        if (duration.value.inSeconds != 0) {
-          await _videoPlayerController!.stream.buffer.first;
-          await _videoPlayerController?.seek(position);
-          t.cancel();
-          _timerForSeek = null;
+      _position.value = position;
+      updatePositionSecond();
+      _heartDuration = position.inSeconds;
+      if (duration.value.inSeconds != 0) {
+        if (type != 'slider') {
+          await _videoPlayerController?.stream.buffer.first;
         }
-      });
+        await _videoPlayerController?.seek(position);
+      } else {
+        _timerForSeek?.cancel();
+        _timerForSeek ??= _startSeekTimer(position);
+      }
+    } catch (err) {
+      print('Error while seeking: $err');
     }
+  }
+
+  Timer? _startSeekTimer(Duration position) {
+    return Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
+      if (duration.value.inSeconds != 0) {
+        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.seek(position);
+        t.cancel();
+        _timerForSeek = null;
+      }
+    });
   }
 
   /// 设置倍速
@@ -717,11 +720,10 @@ class PlPlayerController {
       await seekTo(Duration.zero);
     }
     await _videoPlayerController?.play();
-
+    playerStatus.status.value = PlayerStatus.playing;
     await getCurrentVolume();
     await getCurrentBrightness();
 
-    playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
 
     /// 临时fix _duration.value丢失
@@ -975,41 +977,8 @@ class PlPlayerController {
       } else {
         await landScape();
       }
-
-      // bool isValid =
-      //     direction.value == 'vertical' || mode == FullScreenMode.vertical
-      //         ? true
-      //         : false;
-      // var result = await showDialog(
-      //   context: Get.context!,
-      //   useSafeArea: false,
-      //   builder: (context) => Dialog.fullscreen(
-      //     backgroundColor: Colors.black,
-      //     child: SafeArea(
-      //       // 忽略手机安全区域
-      //       top: isValid,
-      //       left: false,
-      //       right: false,
-      //       bottom: isValid,
-      //       child: PLVideoPlayer(
-      //         controller: this,
-      //         headerControl: headerControl,
-      //         bottomControl: bottomControl,
-      //         danmuWidget: danmuWidget,
-      //       ),
-      //     ),
-      //   ),
-      // );
-      // if (result == null) {
-      //   // 退出全屏
-      //   StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      //   exitFullScreen();
-      //   await verticalScreen();
-      //   toggleFullScreen(false);
-      // }
-    } else if (isFullScreen.value) {
+    } else if (isFullScreen.value && !status) {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      // Get.back();
       exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);
@@ -1121,9 +1090,6 @@ class PlPlayerController {
   }
 
   Future<void> dispose({String type = 'single'}) async {
-    print('dispose');
-    print('dispose: ${playerCount.value}');
-
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
@@ -1133,7 +1099,6 @@ class PlPlayerController {
     }
     _playerCount.value = 0;
     try {
-      print('dispose dispose ---------');
       _timer?.cancel();
       _timerForVolume?.cancel();
       _timerForGettingVolume?.cancel();

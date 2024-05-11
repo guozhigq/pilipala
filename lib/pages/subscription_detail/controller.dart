@@ -6,7 +6,6 @@ import '../../models/user/sub_folder.dart';
 
 class SubDetailController extends GetxController {
   late SubFolderItemData item;
-
   late int seasonId;
   late String heroTag;
   int currentPage = 1;
@@ -15,28 +14,37 @@ class SubDetailController extends GetxController {
   RxList<SubDetailMediaItem> subList = <SubDetailMediaItem>[].obs;
   RxString loadingText = '加载中...'.obs;
   int mediaCount = 0;
+  late int channelType;
 
   @override
   void onInit() {
     item = Get.arguments;
-    if (Get.parameters.keys.isNotEmpty) {
-      seasonId = int.parse(Get.parameters['seasonId']!);
-      heroTag = Get.parameters['heroTag']!;
+    final parameters = Get.parameters;
+    if (parameters.isNotEmpty) {
+      seasonId = int.tryParse(parameters['seasonId'] ?? '') ?? 0;
+      heroTag = parameters['heroTag'] ?? '';
+      channelType = int.tryParse(parameters['type'] ?? '') ?? 0;
     }
     super.onInit();
   }
 
-  Future<dynamic> queryUserSubFolderDetail({type = 'init'}) async {
+  Future<dynamic> queryUserSeasonList({type = 'init'}) async {
     if (type == 'onLoad' && subList.length >= mediaCount) {
       loadingText.value = '没有更多了';
       return;
     }
     isLoadingMore = true;
-    var res = await UserHttp.userSubFolderDetail(
-      seasonId: seasonId,
-      ps: 20,
-      pn: currentPage,
-    );
+    var res = channelType == 21
+        ? await UserHttp.userSeasonList(
+            seasonId: seasonId,
+            ps: 20,
+            pn: currentPage,
+          )
+        : await UserHttp.userResourceList(
+            seasonId: seasonId,
+            ps: 20,
+            pn: currentPage,
+          );
     if (res['status']) {
       subInfo.value = res['data'].info;
       if (currentPage == 1 && type == 'init') {
@@ -55,6 +63,6 @@ class SubDetailController extends GetxController {
   }
 
   onLoad() {
-    queryUserSubFolderDetail(type: 'onLoad');
+    queryUserSeasonList(type: 'onLoad');
   }
 }

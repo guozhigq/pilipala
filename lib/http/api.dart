@@ -490,8 +490,11 @@ class Api {
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
 
-  /// 我的订阅详情
-  static const userSubFolderDetail = '/x/space/fav/season/list';
+  /// 我的订阅详情 type 21
+  static const userSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅详情 type 11
+  static const userResourceList = '/x/v3/fav/resource/list';
 
   /// 表情
   static const emojiList = '/x/emote/user/panel/web';
@@ -506,4 +509,18 @@ class Api {
   /// 排行榜
   static const String getRankApi = "/x/web-interface/ranking/v2";
 
+  /// 取消订阅
+  static const String cancelSub = '/x/v3/fav/season/unfav';
+
+  /// 动态转发
+  static const String dynamicForwardUrl = '/x/dynamic/feed/create/submit_check';
+
+  /// 创建动态
+  static const String dynamicCreate = '/x/dynamic/feed/create/dyn';
+
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
+
+  /// 搜索结果计数
+  static const String searchCount = '/x/web-interface/wbi/search/all/v2';
 }

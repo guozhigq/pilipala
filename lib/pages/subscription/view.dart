@@ -2,6 +2,7 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'controller.dart';
 import 'widgets/item.dart';
 
@@ -58,7 +59,8 @@ class _SubPageState extends State<SubPage> {
                   itemBuilder: (context, index) {
                     return SubItem(
                         subFolderItem:
-                            _subController.subFolderData.value.list![index]);
+                            _subController.subFolderData.value.list![index],
+                        cancelSub: _subController.cancelSub);
                   },
                 ),
               );
@@ -67,8 +69,18 @@ class _SubPageState extends State<SubPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 slivers: [
                   HttpError(
-                    errMsg: data?['msg'],
-                    fn: () => setState(() {}),
+                    errMsg: data?['msg'] ?? '请求异常',
+                    btnText: data?['code'] == -101 ? '去登录' : null,
+                    fn: () {
+                      if (data?['code'] == -101) {
+                        RoutePush.loginRedirectPush();
+                      } else {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _subController.querySubFolder();
+                        });
+                      }
+                    },
                   ),
                 ],
               );

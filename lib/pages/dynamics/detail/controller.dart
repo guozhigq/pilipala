@@ -25,6 +25,7 @@ class DynamicDetailController extends GetxController {
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
   Box setting = GStrorage.setting;
+  RxInt replyReqCode = 200.obs;
 
   @override
   void onInit() {
@@ -84,6 +85,7 @@ class DynamicDetailController extends GetxController {
         replyList.addAll(replies);
       }
     }
+    replyReqCode.value = res['code'];
     isLoadingMore = false;
     return res;
   }

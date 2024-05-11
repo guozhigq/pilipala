@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
-import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/models/bangumi/list.dart';
+import 'package:pilipala/utils/image_save.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
@@ -14,109 +13,67 @@ class BangumiCardV extends StatelessWidget {
   const BangumiCardV({
     super.key,
     required this.bangumiItem,
-    this.longPress,
-    this.longPressEnd,
   });
 
-  final bangumiItem;
-  final Function()? longPress;
-  final Function()? longPressEnd;
+  final BangumiListItemModel bangumiItem;
 
   @override
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(bangumiItem.mediaId);
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.zero,
-      child: GestureDetector(
-        // onLongPress: () {
-        //   if (longPress != null) {
-        //     longPress!();
-        //   }
-        // },
-        // onLongPressEnd: (details) {
-        //   if (longPressEnd != null) {
-        //     longPressEnd!();
-        //   }
-        // },
-        child: InkWell(
-          onTap: () async {
-            final int seasonId = bangumiItem.seasonId;
-            SmartDialog.showLoading(msg: '获取中...');
-            final res = await SearchHttp.bangumiInfo(seasonId: seasonId);
-            SmartDialog.dismiss().then((value) {
-              if (res['status']) {
-                if (res['data'].episodes.isEmpty) {
-                  SmartDialog.showToast('资源加载失败');
-                  return;
-                }
-                EpisodeItem episode = res['data'].episodes.first;
-                String bvid = episode.bvid!;
-                int cid = episode.cid!;
-                String pic = episode.cover!;
-                String heroTag = Utils.makeHeroTag(cid);
-                Get.toNamed(
-                  '/video?bvid=$bvid&cid=$cid&seasonId=$seasonId',
-                  arguments: {
-                    'pic': pic,
-                    'heroTag': heroTag,
-                    'videoType': SearchType.media_bangumi,
-                    'bangumiItem': res['data'],
-                  },
+    return InkWell(
+      onTap: () {
+        RoutePush.bangumiPush(
+          bangumiItem.seasonId,
+          null,
+          heroTag: heroTag,
+        );
+      },
+      onLongPress: () =>
+          imageSaveDialog(context, bangumiItem, SmartDialog.dismiss),
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.all(
+              StyleString.imgRadius,
+            ),
+            child: AspectRatio(
+              aspectRatio: 0.65,
+              child: LayoutBuilder(builder: (context, boxConstraints) {
+                final double maxWidth = boxConstraints.maxWidth;
+                final double maxHeight = boxConstraints.maxHeight;
+                return Stack(
+                  children: [
+                    Hero(
+                      tag: heroTag,
+                      child: NetworkImgLayer(
+                        src: bangumiItem.cover,
+                        width: maxWidth,
+                        height: maxHeight,
+                      ),
+                    ),
+                    if (bangumiItem.badge != null)
+                      PBadge(
+                          text: bangumiItem.badge,
+                          top: 6,
+                          right: 6,
+                          bottom: null,
+                          left: null),
+                    if (bangumiItem.order != null)
+                      PBadge(
+                        text: bangumiItem.order,
+                        top: null,
+                        right: null,
+                        bottom: 6,
+                        left: 6,
+                        type: 'gray',
+                      ),
+                  ],
                 );
-              }
-            });
-          },
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: StyleString.imgRadius,
-                  topRight: StyleString.imgRadius,
-                  bottomLeft: StyleString.imgRadius,
-                  bottomRight: StyleString.imgRadius,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 0.65,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    final double maxWidth = boxConstraints.maxWidth;
-                    final double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
-                          tag: heroTag,
-                          child: NetworkImgLayer(
-                            src: bangumiItem.cover,
-                            width: maxWidth,
-                            height: maxHeight,
-                          ),
-                        ),
-                        if (bangumiItem.badge != null)
-                          PBadge(
-                              text: bangumiItem.badge,
-                              top: 6,
-                              right: 6,
-                              bottom: null,
-                              left: null),
-                        if (bangumiItem.order != null)
-                          PBadge(
-                            text: bangumiItem.order,
-                            top: null,
-                            right: null,
-                            bottom: 6,
-                            left: 6,
-                            type: 'gray',
-                          ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-              BangumiContent(bangumiItem: bangumiItem)
-            ],
+              }),
+            ),
           ),
-        ),
+          BangumiContent(bangumiItem: bangumiItem)
+        ],
       ),
     );
   }
