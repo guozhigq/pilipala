@@ -46,7 +46,7 @@ class ApiInterceptor extends Interceptor {
     // 处理网络请求错误
     // handler.next(err);
     String url = err.requestOptions.uri.toString();
-    if (!url.contains('heartBeat')) {
+    if (!url.contains('heartbeat')) {
       SmartDialog.showToast(
         await dioError(err),
         displayType: SmartToastType.onlyRefresh,

@@ -138,14 +138,14 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                     duration: const Duration(milliseconds: 500),
                     offset: Offset(0, snapshot.data ? 0 : 1),
                     child: GlobalData().enableMYBar
-                        ? NavigationBar(
-                            onDestinationSelected: (value) => setIndex(value),
-                            selectedIndex: _mainController.selectedIndex,
-                            destinations: <Widget>[
-                              ..._mainController.navigationBars.map((e) {
-                                return NavigationDestination(
-                                  icon: Obx(
-                                    () => Badge(
+                        ? Obx(
+                            () => NavigationBar(
+                              onDestinationSelected: (value) => setIndex(value),
+                              selectedIndex: _mainController.selectedIndex,
+                              destinations: <Widget>[
+                                ..._mainController.navigationBars.map((e) {
+                                  return NavigationDestination(
+                                    icon: Badge(
                                       label: _mainController
                                                   .dynamicBadgeType.value ==
                                               DynamicBadgeMode.number
@@ -159,25 +159,25 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                                           e['count'] > 0,
                                       child: e['icon'],
                                     ),
-                                  ),
-                                  selectedIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            ],
+                                    selectedIcon: e['selectIcon'],
+                                    label: e['label'],
+                                  );
+                                }).toList(),
+                              ],
+                            ),
                           )
-                        : BottomNavigationBar(
-                            currentIndex: _mainController.selectedIndex,
-                            type: BottomNavigationBarType.fixed,
-                            onTap: (value) => setIndex(value),
-                            iconSize: 16,
-                            selectedFontSize: 12,
-                            unselectedFontSize: 12,
-                            items: [
-                              ..._mainController.navigationBars.map((e) {
-                                return BottomNavigationBarItem(
-                                  icon: Obx(
-                                    () => Badge(
+                        : Obx(
+                            () => BottomNavigationBar(
+                              currentIndex: _mainController.selectedIndex,
+                              type: BottomNavigationBarType.fixed,
+                              onTap: (value) => setIndex(value),
+                              iconSize: 16,
+                              selectedFontSize: 12,
+                              unselectedFontSize: 12,
+                              items: [
+                                ..._mainController.navigationBars.map((e) {
+                                  return BottomNavigationBarItem(
+                                    icon: Badge(
                                       label: _mainController
                                                   .dynamicBadgeType.value ==
                                               DynamicBadgeMode.number
@@ -191,12 +191,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                                           e['count'] > 0,
                                       child: e['icon'],
                                     ),
-                                  ),
-                                  activeIcon: e['selectIcon'],
-                                  label: e['label'],
-                                );
-                              }).toList(),
-                            ],
+                                    activeIcon: e['selectIcon'],
+                                    label: e['label'],
+                                  );
+                                }).toList(),
+                              ],
+                            ),
                           ),
                   );
                 },
