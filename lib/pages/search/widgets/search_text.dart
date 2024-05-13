@@ -5,12 +5,14 @@ class SearchText extends StatelessWidget {
   final Function? onSelect;
   final int? searchTextIdx;
   final Function? onLongSelect;
+  final bool isSelect;
   const SearchText({
     super.key,
     this.searchText,
     this.onSelect,
     this.searchTextIdx,
     this.onLongSelect,
+    this.isSelect = false,
   });
 
   @override
@@ -34,7 +36,10 @@ class SearchText extends StatelessWidget {
             child: Text(
               searchText!,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: isSelect
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),
