@@ -123,6 +123,7 @@ class PlPlayerController {
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
   late RxList subtitles;
+  String videoType = 'archive';
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -220,7 +221,7 @@ class PlPlayerController {
   Rx<int> get playerCount => _playerCount;
 
   ///
-  Rx<String> get videoType => _videoType;
+  // Rx<String> get videoType => _videoType;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
@@ -274,8 +275,7 @@ class PlPlayerController {
   }
 
   // 添加一个私有构造函数
-  PlPlayerController._() {
-    _videoType = videoType;
+  PlPlayerController._internal(this.videoType) {
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     blockTypes =
@@ -330,11 +330,11 @@ class PlPlayerController {
   }
 
   // 获取实例 传参
-  static PlPlayerController getInstance({
+  factory PlPlayerController({
     String videoType = 'archive',
   }) {
     // 如果实例尚未创建，则创建一个新实例
-    _instance ??= PlPlayerController._();
+    _instance ??= PlPlayerController._internal(videoType);
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
       _videoType.value = videoType;
@@ -449,7 +449,7 @@ class PlPlayerController {
           configuration: PlayerConfiguration(
             // 默认缓存 5M 大小
             bufferSize:
-                videoType.value == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
+                videoType == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
           ),
         );
 
@@ -550,7 +550,7 @@ class PlPlayerController {
     }
 
     /// 设置倍速
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
       if (_playbackSpeed.value != 1.0) {
@@ -951,7 +951,7 @@ class PlPlayerController {
 
   /// 设置长按倍速状态 live模式下禁用
   void setDoubleSpeedStatus(bool val) {
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     if (controlsLock.value) {
@@ -1033,7 +1033,7 @@ class PlPlayerController {
     if (!_enableHeart) {
       return false;
     }
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     // 播放状态变化时，更新
@@ -1132,7 +1132,6 @@ class PlPlayerController {
       // _buffered.close();
       // _showControls.close();
       // _controlsLock.close();
-
       // playerStatus.status.close();
       // dataStatus.status.close();
 
