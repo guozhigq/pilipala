@@ -74,7 +74,7 @@ class VideoDetailController extends GetxController
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
   RxString cover = ''.obs;
-  PlPlayerController plPlayerController = PlPlayerController.getInstance();
+  PlPlayerController plPlayerController = PlPlayerController();
 
   late VideoItem firstVideo;
   late AudioItem firstAudio;

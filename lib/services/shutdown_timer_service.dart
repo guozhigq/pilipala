@@ -89,7 +89,7 @@ class ShutdownTimerService {
       return;
     }
     PlPlayerController plPlayerController =
-        PlPlayerController.getInstance(videoType: 'none');
+        PlPlayerController(videoType: 'none');
     if (!exitApp && !waitForPlayingCompleted) {
       if (!plPlayerController.playerStatus.playing) {
         //仅提示用户
@@ -124,7 +124,7 @@ class ShutdownTimerService {
     } else {
       //暂停播放
       PlPlayerController plPlayerController =
-          PlPlayerController.getInstance(videoType: 'none');
+          PlPlayerController(videoType: 'none');
       if (plPlayerController.playerStatus.playing) {
         plPlayerController.pause();
         waitForPlayingCompleted = true;
