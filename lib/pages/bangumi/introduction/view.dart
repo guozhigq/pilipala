@@ -194,7 +194,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                     src: widget.bangumiDetail!.cover!,
                   ),
                   PBadge(
-                    text: '评分 ${widget.bangumiDetail!.rating!['score']!}',
+                    text:
+                        '评分 ${widget.bangumiDetail?.rating?['score']! ?? '暂无'}',
                     top: null,
                     right: 6,
                     bottom: 6,
