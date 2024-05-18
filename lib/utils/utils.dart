@@ -383,4 +383,11 @@ class Utils {
     List<int> randomBytes = generateRandomBytes(minLength, maxLength);
     return base64.encode(randomBytes);
   }
+
+  static List<int> matchNum(String str) {
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
+
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
+  }
 }

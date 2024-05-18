@@ -69,10 +69,10 @@ packages:
     dependency: "direct main"
     description:
       name: audio_service
-      sha256: a4d989f1225ea9621898d60f23236dcbfc04876fa316086c23c5c4af075dbac4
+      sha256: "4547c312a94f9cb2c48b60823fb190767cbd63454a83c73049384d5d3cba4650"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.18.12"
+    version: "0.18.13"
   audio_service_platform_interface:
     dependency: transitive
     description:
@@ -85,10 +85,10 @@ packages:
     dependency: transitive
     description:
       name: audio_service_web
-      sha256: "523e64ddc914c714d53eec2da85bba1074f08cf26c786d4efb322de510815ea7"
+      sha256: "9d7d5ae5f98a5727f2580fad73062f2484f400eef6cef42919413268e62a363e"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.2"
   audio_session:
     dependency: "direct main"
     description:
@@ -873,10 +873,11 @@ packages:
   media_kit:
     dependency: "direct main"
     description:
-      name: media_kit
-      sha256: "3289062540e3b8b9746e5c50d95bd78a9289826b7227e253dff806d002b9e67a"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: media_kit
+      ref: HEAD
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.1.10+1"
   media_kit_libs_android_video:
     dependency: transitive
@@ -913,10 +914,11 @@ packages:
   media_kit_libs_video:
     dependency: "direct main"
     description:
-      name: media_kit_libs_video
-      sha256: "3688e0c31482074578652bf038ce6301a5d21e1eda6b54fc3117ffeb4bdba067"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "libs/universal/media_kit_libs_video"
+      ref: HEAD
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.0.4"
   media_kit_libs_windows_video:
     dependency: transitive
@@ -937,10 +939,11 @@ packages:
   media_kit_video:
     dependency: "direct main"
     description:
-      name: media_kit_video
-      sha256: c048d11a19e379aebbe810647636e3fc6d18374637e2ae12def4ff8a4b99a882
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: media_kit_video
+      ref: HEAD
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
+    source: git
     version: "1.2.4"
   meta:
     dependency: transitive

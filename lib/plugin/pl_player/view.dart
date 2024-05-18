@@ -334,7 +334,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             color: Colors.white,
           ),
         ),
-        fuc: () => _.triggerFullScreen(),
+        fuc: () => _.triggerFullScreen(status: !_.isFullScreen.value),
       ),
     };
     final List<Widget> list = [];
@@ -652,7 +652,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             },
             onDoubleTapDown: (TapDownDetails details) {
               // live模式下禁用 锁定时🔒禁用
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
+              if (_.videoType == 'live' || _.controlsLock.value) {
                 return;
               }
               final double totalWidth = MediaQuery.sizeOf(context).width;
@@ -679,7 +679,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             /// 水平位置 快进 live模式下禁用
             onHorizontalDragUpdate: (DragUpdateDetails details) {
               // live模式下禁用 锁定时🔒禁用
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
+              if (_.videoType == 'live' || _.controlsLock.value) {
                 return;
               }
               // final double tapPosition = details.localPosition.dx;
@@ -695,7 +695,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               _.onChangedSliderStart();
             },
             onHorizontalDragEnd: (DragEndDetails details) {
-              if (_.videoType.value == 'live' || _.controlsLock.value) {
+              if (_.videoType == 'live' || _.controlsLock.value) {
                 return;
               }
               _.onChangedSliderEnd();
@@ -826,7 +826,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
               return const SizedBox();
             }
 
-            if (_.videoType.value == 'live') {
+            if (_.videoType == 'live') {
               return const SizedBox();
             }
             if (value > max || max <= 0) {
@@ -879,7 +879,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         // 锁
         Obx(
           () => Visibility(
-            visible: _.videoType.value != 'live' && _.isFullScreen.value,
+            visible: _.videoType != 'live' && _.isFullScreen.value,
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionalTranslation(

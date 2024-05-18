@@ -12,6 +12,7 @@ import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -44,7 +45,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem, null);
+            replyReply!(replyItem);
           }
         },
         onLongPress: () {
@@ -358,7 +359,7 @@ class ReplyItemRow extends StatelessWidget {
                 InkWell(
                   // 一楼点击评论展开评论详情
                   // onTap: () {
-                  //   replyReply?.call(replyItem, replies![i]);
+                  //   replyReply?.call(replyItem);
                   // },
                   onLongPress: () {
                     feedBack();
@@ -642,23 +643,25 @@ InlineSpan buildContent(
                           '',
                         );
                       } else {
-                        final String redirectUrl =
-                            await UrlUtils.parseRedirectUrl(matchStr);
-                        if (redirectUrl == matchStr) {
-                          Clipboard.setData(ClipboardData(text: matchStr));
-                          SmartDialog.showToast('地址可能有误');
-                          return;
-                        }
-                        final String pathSegment = Uri.parse(redirectUrl).path;
-                        final String lastPathSegment =
-                            pathSegment.split('/').last;
-                        if (lastPathSegment.startsWith('BV')) {
+                        final String pathSegment = Uri.parse(matchStr).path;
+                        Map matchRes = IdUtils.matchAvorBv(input: pathSegment);
+                        List matchKeys = matchRes.keys.toList();
+                        if (matchKeys.isNotEmpty) {
                           UrlUtils.matchUrlPush(
-                            lastPathSegment,
+                            matchRes.containsKey('AV')
+                                ? matchRes['AV']! as int
+                                : matchRes['BV'],
                             title,
-                            redirectUrl,
+                            matchStr,
                           );
                         } else {
+                          final String redirectUrl =
+                              await UrlUtils.parseRedirectUrl(matchStr);
+                          // if (redirectUrl == matchStr) {
+                          //   Clipboard.setData(ClipboardData(text: matchStr));
+                          //   SmartDialog.showToast('地址可能有误');
+                          //   return;
+                          // }
                           Get.toNamed(
                             '/webview',
                             parameters: {

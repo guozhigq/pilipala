@@ -17,10 +17,15 @@ class SubController extends GetxController {
   int pageSize = 20;
   RxBool hasMore = true.obs;
 
-  Future<dynamic> querySubFolder({type = 'init'}) async {
+  @override
+  void onInit() {
+    super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
+  }
+
+  Future<dynamic> querySubFolder({type = 'init'}) async {
     if (userInfo == null) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     var res = await UserHttp.userSubFolder(
       pn: currentPage,

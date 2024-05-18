@@ -323,11 +323,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       children: [
         GestureDetector(
           onTap: handlePlay,
-          child: Image.network(
-            vdCtr.videoItem['pic'],
-            width: Get.width,
-            height: videoHeight,
-            fit: BoxFit.cover, // 适应方式根据需要调整
+          child: Obx(
+            () => NetworkImgLayer(
+              src: vdCtr.cover.value,
+              width: Get.width,
+              height: videoHeight,
+              type: 'emote',
+            ),
           ),
         ),
         buildCustomAppBar(),
@@ -535,20 +537,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               controller: _extendNestCtr,
               headerSliverBuilder:
                   (BuildContext context2, bool innerBoxIsScrolled) {
-                final Orientation orientation =
-                    MediaQuery.of(context).orientation;
-                final bool isFullScreen =
-                    plPlayerController?.isFullScreen.value == true;
-                final double expandedHeight =
-                    orientation == Orientation.landscape || isFullScreen
-                        ? (MediaQuery.sizeOf(context).height -
-                            (orientation == Orientation.landscape
-                                ? 0
-                                : MediaQuery.of(context).padding.top))
-                        : videoHeight.value;
                 return <Widget>[
                   Obx(
                     () {
+                      final Orientation orientation =
+                          MediaQuery.of(context).orientation;
+                      final bool isFullScreen =
+                          plPlayerController?.isFullScreen.value == true;
+                      final double expandedHeight =
+                          orientation == Orientation.landscape || isFullScreen
+                              ? (MediaQuery.sizeOf(context).height -
+                                  (orientation == Orientation.landscape
+                                      ? 0
+                                      : MediaQuery.of(context).padding.top))
+                              : videoHeight.value;
                       if (orientation == Orientation.landscape ||
                           isFullScreen) {
                         enterFullScreen();

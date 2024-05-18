@@ -74,7 +74,7 @@ class VideoDetailController extends GetxController
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
   RxString cover = ''.obs;
-  PlPlayerController plPlayerController = PlPlayerController.getInstance();
+  PlPlayerController plPlayerController = PlPlayerController();
 
   late VideoItem firstVideo;
   late AudioItem firstAudio;
@@ -547,7 +547,7 @@ class VideoDetailController extends GetxController
   }
 
   void updateCover(String? pic) {
-    if (pic != null && pic != '') {
+    if (pic != null) {
       cover.value = videoItem['pic'] = pic;
     }
   }
