@@ -176,7 +176,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
   /// 未开启自动播放时触发播放
   Future<void> handlePlay() async {
-    await vdCtr.playerInit();
+    await vdCtr.playerInit(autoplay: true);
     plPlayerController = vdCtr.plPlayerController;
     plPlayerController!.addStatusLister(playerListener);
     vdCtr.autoPlay.value = true;
@@ -266,7 +266,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
-    vdCtr.playerInit(autoplay: autoplay);
+    vdCtr.playerInit();
 
     /// 未开启自动播放时，未播放跳转下一页返回/播放后跳转下一页返回
     vdCtr.autoPlay.value = !vdCtr.isShowCover.value;
