@@ -1,7 +1,6 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -529,26 +528,21 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         builder: (BuildContext context, BoxConstraints constraints) {
       return Container(
         margin: const EdgeInsets.only(top: 6, bottom: 4),
-        height: constraints.maxWidth / 5 * 0.8,
-        child: GridView.count(
-          physics: const NeverScrollableScrollPhysics(),
-          primary: false,
-          padding: EdgeInsets.zero,
-          crossAxisCount: 5,
-          childAspectRatio: 1.25,
-          children: <Widget>[
+        height: constraints.maxWidth / 5,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
             Obx(
               () => ActionItem(
-                  icon: const Icon(FontAwesomeIcons.thumbsUp),
-                  selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+                  icon: const Icon(Icons.thumb_up_alt_outlined),
+                  selectIcon: const Icon(Icons.thumb_up),
                   onTap: handleState(videoIntroController.actionLikeVideo),
                   selectStatus: videoIntroController.hasLike.value,
                   text: widget.videoDetail!.stat!.like!.toString()),
             ),
             Obx(
               () => ActionItem(
-                icon: const Icon(FontAwesomeIcons.b),
-                selectIcon: const Icon(FontAwesomeIcons.b),
+                icon: Image.asset('assets/images/coin.png', width: 30),
                 onTap: handleState(videoIntroController.actionCoinVideo),
                 selectStatus: videoIntroController.hasCoin.value,
                 text: widget.videoDetail!.stat!.coin!.toString(),
@@ -556,8 +550,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             Obx(
               () => ActionItem(
-                icon: const Icon(FontAwesomeIcons.star),
-                selectIcon: const Icon(FontAwesomeIcons.solidStar),
+                icon: const Icon(Icons.star_border),
+                selectIcon: const Icon(Icons.star),
                 onTap: () => showFavBottomSheet(),
                 onLongPress: () => showFavBottomSheet(type: 'longPress'),
                 selectStatus: videoIntroController.hasFav.value,
@@ -565,7 +559,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ),
             ),
             ActionItem(
-              icon: const Icon(FontAwesomeIcons.clock),
+              icon: const Icon(Icons.watch_later_outlined),
               onTap: () async {
                 final res =
                     await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
@@ -575,7 +569,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               text: '稍后看',
             ),
             ActionItem(
-              icon: const Icon(FontAwesomeIcons.shareFromSquare),
+              icon: const Icon(Icons.share),
               onTap: () => videoIntroController.actionShareVideo(),
               selectStatus: false,
               text: '分享',
