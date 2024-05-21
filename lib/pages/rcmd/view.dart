@@ -146,6 +146,7 @@ class _RcmdPageState extends State<RcmdPage>
               ? VideoCardV(
                   videoItem: videoList[index],
                   crossAxisCount: crossAxisCount,
+                  blockUserCb: (mid) => ctr.blockUserCb(mid),
                 )
               : const VideoCardVSkeleton();
         },

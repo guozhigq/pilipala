@@ -20,11 +20,13 @@ import 'network_img_layer.dart';
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
   final int crossAxisCount;
+  final Function? blockUserCb;
 
   const VideoCardV({
     Key? key,
     required this.videoItem,
     required this.crossAxisCount,
+    this.blockUserCb,
   }) : super(key: key);
 
   bool isStringNumeric(String str) {
@@ -157,7 +159,11 @@ class VideoCardV extends StatelessWidget {
               );
             }),
           ),
-          VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
+          VideoContent(
+            videoItem: videoItem,
+            crossAxisCount: crossAxisCount,
+            blockUserCb: blockUserCb,
+          )
         ],
       ),
     );
@@ -167,9 +173,14 @@ class VideoCardV extends StatelessWidget {
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
   final int crossAxisCount;
-  const VideoContent(
-      {Key? key, required this.videoItem, required this.crossAxisCount})
-      : super(key: key);
+  final Function? blockUserCb;
+
+  const VideoContent({
+    Key? key,
+    required this.videoItem,
+    required this.crossAxisCount,
+    this.blockUserCb,
+  }) : super(key: key);
 
   Widget _buildBadge(String text, String type, [double fs = 12]) {
     return PBadge(
@@ -241,7 +252,10 @@ class VideoContent extends StatelessWidget {
                         useRootNavigator: true,
                         isScrollControlled: true,
                         builder: (context) {
-                          return MorePanel(videoItem: videoItem);
+                          return MorePanel(
+                            videoItem: videoItem,
+                            blockUserCb: blockUserCb,
+                          );
                         },
                       );
                     },
@@ -297,11 +311,17 @@ class VideoStat extends StatelessWidget {
 
 class MorePanel extends StatelessWidget {
   final dynamic videoItem;
-  const MorePanel({super.key, required this.videoItem});
+  final Function? blockUserCb;
+  const MorePanel({
+    super.key,
+    required this.videoItem,
+    this.blockUserCb,
+  });
 
   Future<dynamic> menuActionHandler(String type) async {
     switch (type) {
       case 'block':
+        Get.back();
         blockUser();
         break;
       case 'watchLater':
@@ -338,7 +358,10 @@ class MorePanel extends StatelessWidget {
                   reSrc: 11,
                 );
                 SmartDialog.dismiss();
-                SmartDialog.showToast(res['msg'] ?? '成功');
+                if (res['status']) {
+                  blockUserCb?.call(videoItem.owner.mid);
+                }
+                SmartDialog.showToast(res['msg']);
               },
               child: const Text('确认'),
             )
