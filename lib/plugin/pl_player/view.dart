@@ -768,37 +768,33 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        SafeArea(
-          top: false,
-          bottom: false,
-          child: Obx(
-            () => Column(
-              children: [
-                if (widget.headerControl != null || _.headerControl != null)
-                  ClipRect(
-                    child: AppBarAni(
-                      controller: animationController,
-                      visible: !_.controlsLock.value && _.showControls.value,
-                      position: 'top',
-                      child: widget.headerControl ?? _.headerControl!,
-                    ),
-                  ),
-                const Spacer(),
+        Obx(
+          () => Column(
+            children: [
+              if (widget.headerControl != null || _.headerControl != null)
                 ClipRect(
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'bottom',
-                    child: widget.bottomControl ??
-                        BottomControl(
-                          controller: widget.controller,
-                          triggerFullScreen: _.triggerFullScreen,
-                          buildBottomControl: buildBottomControl(),
-                        ),
+                    position: 'top',
+                    child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
-              ],
-            ),
+              const Spacer(),
+              ClipRect(
+                child: AppBarAni(
+                  controller: animationController,
+                  visible: !_.controlsLock.value && _.showControls.value,
+                  position: 'bottom',
+                  child: widget.bottomControl ??
+                      BottomControl(
+                        controller: widget.controller,
+                        triggerFullScreen: _.triggerFullScreen,
+                        buildBottomControl: buildBottomControl(),
+                      ),
+                ),
+              ),
+            ],
           ),
         ),
 
