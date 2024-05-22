@@ -18,7 +18,7 @@ class AudioSessionHandler {
     session.configure(const AudioSessionConfiguration.music());
 
     session.interruptionEventStream.listen((event) {
-      final player = PlPlayerController.getInstance(videoType: 'none');
+      final player = PlPlayerController(videoType: 'none');
       if (event.begin) {
         if (!player.playerStatus.playing) return;
         switch (event.type) {
@@ -51,7 +51,7 @@ class AudioSessionHandler {
 
     // 耳机拔出暂停
     session.becomingNoisyEventStream.listen((_) {
-      final player = PlPlayerController.getInstance(videoType: 'none');
+      final player = PlPlayerController(videoType: 'none');
       if (player.playerStatus.playing) {
         player.pause();
       }

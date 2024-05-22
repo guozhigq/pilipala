@@ -74,7 +74,7 @@ class VideoDetailController extends GetxController
   final scaffoldKey = GlobalKey<ScaffoldState>();
   RxString bgCover = ''.obs;
   RxString cover = ''.obs;
-  PlPlayerController plPlayerController = PlPlayerController.getInstance();
+  PlPlayerController plPlayerController = PlPlayerController();
 
   late VideoItem firstVideo;
   late AudioItem firstAudio;
@@ -233,7 +233,7 @@ class VideoDetailController extends GetxController
     audio,
     seekToTime,
     duration,
-    bool autoplay = true,
+    bool? autoplay,
   }) async {
     /// 设置/恢复 屏幕亮度
     if (brightness != null) {
@@ -266,7 +266,7 @@ class VideoDetailController extends GetxController
       cid: cid.value,
       enableHeart: enableHeart,
       isFirstTime: isFirstTime,
-      autoplay: autoplay,
+      autoplay: autoplay ?? autoPlay.value,
     );
 
     /// 开启自动全屏时，在player初始化完成后立即传入headerControl

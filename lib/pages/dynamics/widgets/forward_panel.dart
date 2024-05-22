@@ -238,6 +238,61 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
           ),
         ),
       );
+    case 'DYNAMIC_TYPE_MUSIC':
+      final Map music = item.modules.moduleDynamic.major.music;
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: InkWell(
+          onTap: () {
+            Get.toNamed('/webview', parameters: {
+              'url': "https:${music['jump_url']}",
+              'type': 'url',
+              'pageTitle': music['title']
+            });
+          },
+          child: Container(
+            width: double.infinity,
+            padding:
+                const EdgeInsets.only(left: 12, top: 10, right: 12, bottom: 10),
+            color: Theme.of(context).dividerColor.withOpacity(0.08),
+            child: Row(
+              children: [
+                NetworkImgLayer(
+                  width: 45,
+                  height: 45,
+                  src: music['cover'],
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      music['title'],
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      music['label'],
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize:
+                            Theme.of(context).textTheme.labelMedium!.fontSize,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                )
+              ],
+            ),
+            // TextButton(onPressed: () {}, child: Text('123'))
+          ),
+        ),
+      );
     default:
       return const SizedBox(
         width: double.infinity,
