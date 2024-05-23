@@ -29,6 +29,10 @@ class AppBarAni extends StatelessWidget implements PreferredSizeWidget {
         curve: Curves.linear,
       )),
       child: Container(
+        padding: EdgeInsets.only(
+          left: MediaQuery.of(context).padding.left,
+          right: MediaQuery.of(context).padding.right,
+        ),
         decoration: BoxDecoration(
           gradient: position! == 'top'
               ? const LinearGradient(
