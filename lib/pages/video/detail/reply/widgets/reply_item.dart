@@ -1,3 +1,4 @@
+import 'package:appscheme/appscheme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/preview/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
+import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -643,34 +645,17 @@ InlineSpan buildContent(
                           '',
                         );
                       } else {
-                        final String pathSegment = Uri.parse(matchStr).path;
-                        Map matchRes = IdUtils.matchAvorBv(input: pathSegment);
-                        List matchKeys = matchRes.keys.toList();
-                        if (matchKeys.isNotEmpty) {
-                          UrlUtils.matchUrlPush(
-                            matchRes.containsKey('AV')
-                                ? matchRes['AV']! as int
-                                : matchRes['BV'],
-                            title,
-                            matchStr,
-                          );
-                        } else {
-                          final String redirectUrl =
-                              await UrlUtils.parseRedirectUrl(matchStr);
-                          // if (redirectUrl == matchStr) {
-                          //   Clipboard.setData(ClipboardData(text: matchStr));
-                          //   SmartDialog.showToast('地址可能有误');
-                          //   return;
-                          // }
-                          Get.toNamed(
-                            '/webview',
-                            parameters: {
-                              'url': redirectUrl,
-                              'type': 'url',
-                              'pageTitle': title
-                            },
-                          );
-                        }
+                        Uri uri = Uri.parse(matchStr);
+                        SchemeEntity scheme = SchemeEntity(
+                          scheme: uri.scheme,
+                          host: uri.host,
+                          port: uri.port,
+                          path: uri.path,
+                          query: uri.queryParameters,
+                          source: '',
+                          dataString: matchStr,
+                        );
+                        PiliSchame.fullPathPush(scheme);
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {

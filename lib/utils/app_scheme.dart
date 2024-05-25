@@ -95,7 +95,7 @@ class PiliSchame {
       }
     }
     if (scheme == 'https') {
-      _fullPathPush(value);
+      fullPathPush(value);
     }
   }
 
@@ -126,7 +126,7 @@ class PiliSchame {
     }
   }
 
-  static Future<void> _fullPathPush(SchemeEntity value) async {
+  static Future<void> fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
@@ -135,8 +135,6 @@ class PiliSchame {
     Map<String, String>? query = value.query;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      print('bilibili.com host: $host');
-      print('bilibili.com path: $path');
       final String lastPathSegment = path!.split('/').last;
       if (path.startsWith('/video')) {
         Map matchRes = IdUtils.matchAvorBv(input: path);
@@ -235,6 +233,24 @@ class PiliSchame {
         case 'space':
           print('个人空间');
           Get.toNamed('/member?mid=$area', arguments: {'face': ''});
+          break;
+        default:
+          final Map<String, dynamic> map =
+              IdUtils.matchAvorBv(input: area.split('?').first);
+          if (map.containsKey('AV')) {
+            _videoPush(map['AV']! as int, null);
+          } else if (map.containsKey('BV')) {
+            _videoPush(null, map['BV'] as String);
+          } else {
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': value.dataString ?? "",
+                'type': 'url',
+                'pageTitle': ''
+              },
+            );
+          }
           break;
       }
     }
