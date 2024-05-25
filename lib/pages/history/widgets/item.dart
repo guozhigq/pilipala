@@ -244,7 +244,7 @@ class HistoryItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                          videoItem.progress != 0
+                          videoItem.progress != 0 && videoItem.duration != 0
                               ? Positioned(
                                   left: 3,
                                   right: 3,
