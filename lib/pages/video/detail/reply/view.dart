@@ -67,13 +67,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         vsync: this, duration: const Duration(milliseconds: 300));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
-
+    scrollController = ScrollController();
     fabAnimationCtr.forward();
     scrollListener();
   }
 
   void scrollListener() {
-    scrollController = _videoReplyController.scrollController;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -185,7 +184,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 builder: (BuildContext context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
-                    if (data['status']) {
+                    if (_videoReplyController.replyList.isNotEmpty ||
+                        (data && data['status'])) {
                       // 请求成功
                       return Obx(
                         () => _videoReplyController.isLoadingMore &&
