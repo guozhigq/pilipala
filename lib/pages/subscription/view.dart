@@ -1,6 +1,7 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'controller.dart';
@@ -87,7 +88,12 @@ class _SubPageState extends State<SubPage> {
             }
           } else {
             // 骨架屏
-            return const Text('请求中');
+            return ListView.builder(
+              itemBuilder: (context, index) {
+                return const VideoCardHSkeleton();
+              },
+              itemCount: 10,
+            );
           }
         },
       ),
