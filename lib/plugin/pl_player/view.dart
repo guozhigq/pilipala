@@ -935,7 +935,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekBackwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 200),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(
@@ -978,7 +978,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekForwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 200),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(
