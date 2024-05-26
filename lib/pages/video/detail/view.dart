@@ -612,18 +612,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                           child: videoPlayerPanel,
                                         ),
 
-                                      /// 关闭自动播放时 手动播放
-                                      Obx(
-                                        () => Visibility(
-                                          visible: !vdCtr.autoPlay.value &&
-                                              vdCtr.isShowCover.value,
-                                          child: Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: handlePlayPanel(),
-                                          ),
-                                        ),
+                                  /// 关闭自动播放时 手动播放
+                                  Obx(
+                                    () => Visibility(
+                                      visible: !vdCtr.autoPlay.value &&
+                                          vdCtr.isShowCover.value,
+                                      child: Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: handlePlayPanel(),
                                       ),
                                     ],
                                   ),
