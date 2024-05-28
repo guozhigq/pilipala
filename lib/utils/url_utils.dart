@@ -44,7 +44,7 @@ class UrlUtils {
       final String bv = matchRes['BV'];
       final Map res = await SearchHttp.ab2cWithPic(bvid: bv);
       final int cid = res['cid'];
-      final String pic = res['pic'];
+      final String? pic = res['pic'];
       final String heroTag = Utils.makeHeroTag(bv);
       await Get.toNamed(
         '/video?bvid=$bv&cid=$cid',
