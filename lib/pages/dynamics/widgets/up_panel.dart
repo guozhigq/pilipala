@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -28,6 +29,31 @@ class _UpPanelState extends State<UpPanel> {
     userInfo = widget.upData.myInfo!;
     upList = widget.upData.upList!;
     liveList = widget.upData.liveList!;
+  }
+
+  void onClickUp(data, i) {
+    currentMid = data.mid;
+    Get.find<DynamicsController>().mid.value = data.mid;
+    Get.find<DynamicsController>().upInfo.value = data;
+    Get.find<DynamicsController>().onSelectUp(data.mid);
+    int liveLen = liveList.length;
+    int upLen = upList.length;
+    double itemWidth = contentWidth + itemPadding.horizontal;
+    double screenWidth = MediaQuery.sizeOf(context).width;
+    double moveDistance = 0.0;
+    if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
+    } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+      moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
+    } else {
+      moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
+    }
+    data.hasUpdate = false;
+    scrollController.animateTo(
+      moveDistance,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.linear,
+    );
+    setState(() {});
   }
 
   @override
@@ -120,30 +146,10 @@ class _UpPanelState extends State<UpPanel> {
       onTap: () {
         feedBack();
         if (data.type == 'up') {
-          currentMid = data.mid;
-          Get.find<DynamicsController>().mid.value = data.mid;
-          Get.find<DynamicsController>().upInfo.value = data;
-          Get.find<DynamicsController>().onSelectUp(data.mid);
-          int liveLen = liveList.length;
-          int upLen = upList.length;
-          double itemWidth = contentWidth + itemPadding.horizontal;
-          double screenWidth = MediaQuery.sizeOf(context).width;
-          double moveDistance = 0.0;
-          if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
-          } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
-            moveDistance =
-                (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
-          } else {
-            moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
-          }
-          data.hasUpdate = false;
-          scrollController.animateTo(
-            moveDistance,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-
-          setState(() {});
+          EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
+              () {
+            onClickUp(data, i);
+          });
         } else if (data.type == 'live') {
           LiveItemModel liveItem = LiveItemModel.fromJson({
             'title': data.title,
