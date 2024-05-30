@@ -7,6 +7,7 @@ import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/models/common/gesture_mode.dart';
@@ -909,9 +910,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     colors: [Colors.black26, Colors.transparent],
                   ),
                 ),
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  height: 25,
+                child: Lottie.asset(
+                  'assets/loading.json',
+                  width: 200,
                 ),
               ),
             );
