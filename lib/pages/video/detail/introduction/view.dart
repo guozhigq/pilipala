@@ -746,8 +746,4 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
-
-  // Widget StaffPanel(BuildContext context, videoIntroController) {
-  //   return
-  // }
 }
