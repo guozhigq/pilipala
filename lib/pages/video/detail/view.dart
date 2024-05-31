@@ -99,7 +99,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     fullScreenStatusListener();
     if (Platform.isAndroid) {
       floating = vdCtr.floating!;
-      autoEnterPip();
     }
     WidgetsBinding.instance.addObserver(this);
     lifecycleListener();
@@ -128,8 +127,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   // 播放器状态监听
-  void playerListener(PlayerStatus? status) async {
-    playerStatus.value = status!;
+  void playerListener(PlayerStatus status) async {
+    playerStatus.value = status;
+    autoEnterPip(status: status);
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -181,6 +181,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
+    autoEnterPip(status: PlayerStatus.playing);
   }
 
   void fullScreenStatusListener() {
@@ -287,10 +288,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         .subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
-  void autoEnterPip() {
+  void autoEnterPip({PlayerStatus? status}) {
     final String routePath = Get.currentRoute;
     if (autoPiP && routePath.startsWith('/video')) {
-      floating.toggleAutoPip(autoEnter: autoPiP);
+      floating.toggleAutoPip(
+        autoEnter: autoPiP && status == PlayerStatus.playing,
+      );
     }
   }
 
