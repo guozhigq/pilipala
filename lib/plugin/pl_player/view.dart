@@ -267,29 +267,21 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       BottomControlType.space: const Spacer(),
 
       /// 画面比例
-      BottomControlType.fit: SizedBox(
-        height: 30,
-        child: TextButton(
-          onPressed: () => _.toggleVideoFit(),
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
-          ),
-          child: Obx(
-            () => Text(
-              _.videoFitDEsc.value,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-            ),
-          ),
-        ),
-      ),
-
+      // BottomControlType.fit: ComBtn(
+          // fuc: () => _.toggleVideoFit(),
+          // icon: const Icon(
+            // Icons.fit_screen_outlined,
+            // size: 20,
+            // color: Colors.white,
+          // )),
+// 
       /// 播放速度
       BottomControlType.speed: SizedBox(
         width: 45,
         height: 34,
         child: TextButton(
           style: ButtonStyle(
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            padding: WidgetStateProperty.all(EdgeInsets.zero),
           ),
           onPressed: () {},
           child: Obx(
@@ -322,7 +314,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           BottomControlType.playOrPause,
           BottomControlType.time,
           BottomControlType.space,
-          BottomControlType.fit,
+          // BottomControlType.fit,
           BottomControlType.fullscreen,
         ];
     for (var i = 0; i < userSpecifyItem.length; i++) {
