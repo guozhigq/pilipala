@@ -733,14 +733,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 const double threshold = 7.0; // 滑动阈值
                 final bool flag =
                     fullScreenGestureMode != FullScreenGestureMode.values.last;
-                if (dy > _distance.value && dy > threshold) {
+                if (dy > _distance.value &&
+                    dy > threshold &&
+                    !_.controlsLock.value) {
                   if (_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 下滑退出全屏
                     await widget.controller.triggerFullScreen(status: flag);
                   }
                   _distance.value = 0.0;
-                } else if (dy < _distance.value && dy < -threshold) {
+                } else if (dy < _distance.value &&
+                    dy < -threshold &&
+                    !_.controlsLock.value) {
                   if (!_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 上滑进入全屏
