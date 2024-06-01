@@ -23,7 +23,7 @@ import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
 import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
+import 'package:media_kit/media_kit.dart';
 import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:catcher_2/catcher_2.dart';
 import './services/loggeer.dart';
@@ -31,59 +31,42 @@ import './services/loggeer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
-      .then((_) async {
-    await GStrorage.init();
-    await setupServiceLocator();
-    clearLogs();
-    Request();
-    await Request.setCookie();
-    RecommendFilter();
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  await GStrorage.init();
+  await setupServiceLocator();
+  clearLogs();
+  Request();
+  await Request.setCookie();
 
-    // 异常捕获 logo记录
-    final Catcher2Options debugConfig = Catcher2Options(
-      SilentReportMode(),
-      [
-        FileHandler(await getLogsPath()),
-        ConsoleHandler(
-          enableDeviceParameters: false,
-          enableApplicationParameters: false,
-        )
-      ],
-    );
+  // 异常捕获 logo记录
+  final Catcher2Options releaseConfig = Catcher2Options(
+    SilentReportMode(),
+    [FileHandler(await getLogsPath())],
+  );
 
-    final Catcher2Options releaseConfig = Catcher2Options(
-      SilentReportMode(),
-      [FileHandler(await getLogsPath())],
-    );
+  Catcher2(
+    releaseConfig: releaseConfig,
+    runAppFunction: () {
+      runApp(const MyApp());
+    },
+  );
 
-    Catcher2(
-      debugConfig: debugConfig,
-      releaseConfig: releaseConfig,
-      runAppFunction: () {
-        runApp(const MyApp());
-      },
-    );
-
-    // 小白条、导航栏沉浸
-    if (Platform.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (androidInfo.version.sdkInt >= 29) {
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-      }
-      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-        statusBarColor: Colors.transparent,
-      ));
+  // 小白条、导航栏沉浸
+  if (Platform.isAndroid) {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 29) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarColor: Colors.transparent,
+    ));
+  }
 
-    Data.init();
-    GlobalData();
-    PiliSchame.init();
-    DisableBatteryOpt();
-  });
+  PiliSchame.init();
+  DisableBatteryOpt();
 }
 
 class MyApp extends StatelessWidget {
@@ -124,6 +107,39 @@ class MyApp extends StatelessWidget {
       } catch (_) {}
     }
 
+    if (Platform.isAndroid) {
+      return AndroidApp(
+        brandColor: brandColor,
+        isDynamicColor: isDynamicColor,
+        currentThemeValue: currentThemeValue,
+        textScale: textScale,
+      );
+    } else {
+      return OtherApp(
+        brandColor: brandColor,
+        currentThemeValue: currentThemeValue,
+        textScale: textScale,
+      );
+    }
+  }
+}
+
+class AndroidApp extends StatelessWidget {
+  const AndroidApp({
+    super.key,
+    required this.brandColor,
+    required this.isDynamicColor,
+    required this.currentThemeValue,
+    required this.textScale,
+  });
+
+  final Color brandColor;
+  final bool isDynamicColor;
+  final ThemeType currentThemeValue;
+  final double textScale;
+
+  @override
+  Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         ColorScheme? lightColorScheme;
@@ -143,96 +159,120 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
           );
         }
-
-        // ThemeData themeData = ThemeData(
-        //   colorScheme: currentThemeValue == ThemeType.dark
-        //       ? darkColorScheme
-        //       : lightColorScheme,
-        // );
-
-        // // 小白条、导航栏沉浸
-        // if (Platform.isAndroid) {
-        //   List<String> versionParts = Platform.version.split('.');
-        //   int androidVersion = int.parse(versionParts[0]);
-        //   if (androidVersion >= 29) {
-        //     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-        //   }
-        //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        //     systemNavigationBarColor: GlobalData().enableMYBar
-        //         ? const Color(0x00010000)
-        //         : themeData.canvasColor,
-        //     systemNavigationBarDividerColor: GlobalData().enableMYBar
-        //         ? const Color(0x00010000)
-        //         : themeData.canvasColor,
-        //     systemNavigationBarIconBrightness:
-        //         currentThemeValue == ThemeType.dark
-        //             ? Brightness.light
-        //             : Brightness.dark,
-        //     statusBarColor: Colors.transparent,
-        //   ));
-        // }
-
-        // 图片缓存
-        // PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
-        return GetMaterialApp(
-          title: 'PiliPala',
-          theme: ThemeData(
-            colorScheme: currentThemeValue == ThemeType.dark
-                ? darkColorScheme
-                : lightColorScheme,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: lightColorScheme.primary,
-              backgroundColor: lightColorScheme.secondaryContainer,
-              closeIconColor: lightColorScheme.secondary,
-              contentTextStyle: TextStyle(color: lightColorScheme.secondary),
-              elevation: 20,
-            ),
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: ZoomPageTransitionsBuilder(
-                  allowEnterRouteSnapshotting: false,
-                ),
-              },
-            ),
-          ),
-          darkTheme: ThemeData(
-            colorScheme: currentThemeValue == ThemeType.light
-                ? lightColorScheme
-                : darkColorScheme,
-            snackBarTheme: SnackBarThemeData(
-              actionTextColor: darkColorScheme.primary,
-              backgroundColor: darkColorScheme.secondaryContainer,
-              closeIconColor: darkColorScheme.secondary,
-              contentTextStyle: TextStyle(color: darkColorScheme.secondary),
-              elevation: 20,
-            ),
-          ),
-          localizationsDelegates: const [
-            GlobalCupertinoLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          locale: const Locale("zh", "CN"),
-          supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
-          fallbackLocale: const Locale("zh", "CN"),
-          getPages: Routes.getPages,
-          home: const MainApp(),
-          builder: (BuildContext context, Widget? child) {
-            return FlutterSmartDialog(
-              toastBuilder: (String msg) => CustomToast(msg: msg),
-              child: MediaQuery(
-                data: MediaQuery.of(context)
-                    .copyWith(textScaler: TextScaler.linear(textScale)),
-                child: child!,
-              ),
-            );
-          },
-          navigatorObservers: [
-            VideoDetailPage.routeObserver,
-            SearchPage.routeObserver,
-          ],
+        return BuildMainApp(
+          lightColorScheme: lightColorScheme,
+          darkColorScheme: darkColorScheme,
+          currentThemeValue: currentThemeValue,
+          textScale: textScale,
         );
       }),
+    );
+  }
+}
+
+class OtherApp extends StatelessWidget {
+  const OtherApp({
+    super.key,
+    required this.brandColor,
+    required this.currentThemeValue,
+    required this.textScale,
+  });
+
+  final Color brandColor;
+  final ThemeType currentThemeValue;
+  final double textScale;
+
+  @override
+  Widget build(BuildContext context) {
+    return BuildMainApp(
+      lightColorScheme: ColorScheme.fromSeed(
+        seedColor: brandColor,
+        brightness: Brightness.light,
+      ),
+      darkColorScheme: ColorScheme.fromSeed(
+        seedColor: brandColor,
+        brightness: Brightness.dark,
+      ),
+      currentThemeValue: currentThemeValue,
+      textScale: textScale,
+    );
+  }
+}
+
+class BuildMainApp extends StatelessWidget {
+  const BuildMainApp({
+    super.key,
+    required this.lightColorScheme,
+    required this.darkColorScheme,
+    required this.currentThemeValue,
+    required this.textScale,
+  });
+
+  final ColorScheme lightColorScheme;
+  final ColorScheme darkColorScheme;
+  final ThemeType currentThemeValue;
+  final double textScale;
+
+  @override
+  Widget build(BuildContext context) {
+    final SnackBarThemeData snackBarTheme = SnackBarThemeData(
+      actionTextColor: lightColorScheme.primary,
+      backgroundColor: lightColorScheme.secondaryContainer,
+      closeIconColor: lightColorScheme.secondary,
+      contentTextStyle: TextStyle(color: lightColorScheme.secondary),
+      elevation: 20,
+    );
+
+    return GetMaterialApp(
+      title: 'PiliPala',
+      theme: ThemeData(
+        colorScheme: currentThemeValue == ThemeType.dark
+            ? darkColorScheme
+            : lightColorScheme,
+        snackBarTheme: snackBarTheme,
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: ZoomPageTransitionsBuilder(
+              allowEnterRouteSnapshotting: false,
+            ),
+          },
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: currentThemeValue == ThemeType.light
+            ? lightColorScheme
+            : darkColorScheme,
+        snackBarTheme: snackBarTheme,
+      ),
+      localizationsDelegates: const [
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      locale: const Locale("zh", "CN"),
+      supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
+      fallbackLocale: const Locale("zh", "CN"),
+      getPages: Routes.getPages,
+      home: const MainApp(),
+      builder: (BuildContext context, Widget? child) {
+        return FlutterSmartDialog(
+          toastBuilder: (String msg) => CustomToast(msg: msg),
+          child: MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
+        );
+      },
+      navigatorObservers: [
+        VideoDetailPage.routeObserver,
+        SearchPage.routeObserver,
+      ],
+      onInit: () {
+        RecommendFilter();
+        Data.init();
+        GlobalData();
+      },
     );
   }
 }
