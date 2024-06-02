@@ -3,14 +3,13 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/image_save.dart';
+import 'package:pilipala/utils/route_push.dart';
 import '../../models/model_rec_video_item.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
-import '../../http/search.dart';
 import '../../http/user.dart';
 import '../../http/video.dart';
-import '../../models/common/search_type.dart';
 import '../../utils/id_utils.dart';
 import '../../utils/utils.dart';
 import '../constants.dart';
@@ -21,11 +20,13 @@ import 'network_img_layer.dart';
 class VideoCardV extends StatelessWidget {
   final dynamic videoItem;
   final int crossAxisCount;
+  final Function? blockUserCb;
 
   const VideoCardV({
     Key? key,
     required this.videoItem,
     required this.crossAxisCount,
+    this.blockUserCb,
   }) : super(key: key);
 
   bool isStringNumeric(String str) {
@@ -42,23 +43,11 @@ class VideoCardV extends StatelessWidget {
           return;
         }
         int epId = videoItem.param;
-        SmartDialog.showLoading(msg: '资源获取中');
-        var result = await SearchHttp.bangumiInfo(seasonId: null, epId: epId);
-        if (result['status']) {
-          var bangumiDetail = result['data'];
-          int cid = bangumiDetail.episodes!.first.cid;
-          String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-          SmartDialog.dismiss().then(
-            (value) => Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&epId=$epId',
-              arguments: {
-                'pic': videoItem.pic,
-                'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
-              },
-            ),
-          );
-        }
+        RoutePush.bangumiPush(
+          null,
+          epId,
+          heroTag: heroTag,
+        );
         break;
       case 'av':
         String bvid = videoItem.bvid ?? IdUtils.av2bv(videoItem.aid);
@@ -170,7 +159,11 @@ class VideoCardV extends StatelessWidget {
               );
             }),
           ),
-          VideoContent(videoItem: videoItem, crossAxisCount: crossAxisCount)
+          VideoContent(
+            videoItem: videoItem,
+            crossAxisCount: crossAxisCount,
+            blockUserCb: blockUserCb,
+          )
         ],
       ),
     );
@@ -180,9 +173,14 @@ class VideoCardV extends StatelessWidget {
 class VideoContent extends StatelessWidget {
   final dynamic videoItem;
   final int crossAxisCount;
-  const VideoContent(
-      {Key? key, required this.videoItem, required this.crossAxisCount})
-      : super(key: key);
+  final Function? blockUserCb;
+
+  const VideoContent({
+    Key? key,
+    required this.videoItem,
+    required this.crossAxisCount,
+    this.blockUserCb,
+  }) : super(key: key);
 
   Widget _buildBadge(String text, String type, [double fs = 12]) {
     return PBadge(
@@ -246,6 +244,7 @@ class VideoContent extends StatelessWidget {
                   width: 24,
                   height: 24,
                   child: IconButton(
+                    padding: EdgeInsets.zero,
                     onPressed: () {
                       feedBack();
                       showModalBottomSheet(
@@ -253,7 +252,10 @@ class VideoContent extends StatelessWidget {
                         useRootNavigator: true,
                         isScrollControlled: true,
                         builder: (context) {
-                          return MorePanel(videoItem: videoItem);
+                          return MorePanel(
+                            videoItem: videoItem,
+                            blockUserCb: blockUserCb,
+                          );
                         },
                       );
                     },
@@ -309,11 +311,17 @@ class VideoStat extends StatelessWidget {
 
 class MorePanel extends StatelessWidget {
   final dynamic videoItem;
-  const MorePanel({super.key, required this.videoItem});
+  final Function? blockUserCb;
+  const MorePanel({
+    super.key,
+    required this.videoItem,
+    this.blockUserCb,
+  });
 
   Future<dynamic> menuActionHandler(String type) async {
     switch (type) {
       case 'block':
+        Get.back();
         blockUser();
         break;
       case 'watchLater':
@@ -350,7 +358,10 @@ class MorePanel extends StatelessWidget {
                   reSrc: 11,
                 );
                 SmartDialog.dismiss();
-                SmartDialog.showToast(res['msg'] ?? '成功');
+                if (res['status']) {
+                  blockUserCb?.call(videoItem.owner.mid);
+                }
+                SmartDialog.showToast(res['msg']);
               },
               child: const Text('确认'),
             )
@@ -399,6 +410,15 @@ class MorePanel extends StatelessWidget {
             title:
                 Text('添加至稍后再看', style: Theme.of(context).textTheme.titleSmall),
           ),
+          ListTile(
+            onTap: () =>
+                imageSaveDialog(context, videoItem, SmartDialog.dismiss),
+            minLeadingWidth: 0,
+            leading: const Icon(Icons.photo_outlined, size: 19),
+            title:
+                Text('查看视频封面', style: Theme.of(context).textTheme.titleSmall),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );

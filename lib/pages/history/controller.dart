@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/user/history.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class HistoryController extends GetxController {
@@ -15,14 +16,20 @@ class HistoryController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool enableMultiple = false.obs;
   RxInt checkedCount = 0.obs;
+  Box userInfoCache = GStrorage.userInfo;
+  UserInfoData? userInfo;
 
   @override
   void onInit() {
     super.onInit();
     historyStatus();
+    userInfo = userInfoCache.get('userInfoCache');
   }
 
   Future queryHistoryList({type = 'init'}) async {
+    if (userInfo == null) {
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
+    }
     int max = 0;
     int viewAt = 0;
     if (type == 'onload') {

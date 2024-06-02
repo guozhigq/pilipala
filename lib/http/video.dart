@@ -387,9 +387,15 @@ class VideoHttp {
       'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
-      return {'status': true, 'data': res.data['data']};
+      if (act == 5) {
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        blackMidsList.add(mid);
+        setting.put(SettingBoxKey.blackMidsList, blackMidsList);
+      }
+      return {'status': true, 'data': res.data['data'], 'msg': '成功'};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 

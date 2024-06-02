@@ -1,9 +1,11 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/pages/fav/widgets/item.dart';
+import 'package:pilipala/utils/route_push.dart';
 
 class FavPage extends StatefulWidget {
   const FavPage({super.key});
@@ -57,8 +59,8 @@ class _FavPageState extends State<FavPage> {
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data as Map;
-            if (data['status']) {
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               return Obx(
                 () => ListView.builder(
                   controller: scrollController,
@@ -74,15 +76,30 @@ class _FavPageState extends State<FavPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 slivers: [
                   HttpError(
-                    errMsg: data['msg'],
-                    fn: () => setState(() {}),
+                    errMsg: data?['msg'] ?? '请求异常',
+                    btnText: data?['code'] == -101 ? '去登录' : null,
+                    fn: () {
+                      if (data?['code'] == -101) {
+                        RoutePush.loginRedirectPush();
+                      } else {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _favController.queryFavFolder();
+                        });
+                      }
+                    },
                   ),
                 ],
               );
             }
           } else {
             // 骨架屏
-            return const Text('请求中');
+            return ListView.builder(
+              itemBuilder: (context, index) {
+                return const VideoCardHSkeleton();
+              },
+              itemCount: 10,
+            );
           }
         },
       ),

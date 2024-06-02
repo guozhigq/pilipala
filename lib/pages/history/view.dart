@@ -5,6 +5,7 @@ import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/pages/history/index.dart';
+import 'package:pilipala/utils/route_push.dart';
 
 import 'widgets/item.dart';
 
@@ -183,8 +184,8 @@ class _HistoryPageState extends State<HistoryPage> {
                   if (snapshot.data == null) {
                     return const SliverToBoxAdapter(child: SizedBox());
                   }
-                  Map data = snapshot.data;
-                  if (data['status']) {
+                  Map? data = snapshot.data;
+                  if (data != null && data['status']) {
                     return Obx(
                       () => _historyController.historyList.isNotEmpty
                           ? SliverList(
@@ -209,8 +210,18 @@ class _HistoryPageState extends State<HistoryPage> {
                     );
                   } else {
                     return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => setState(() {}),
+                      errMsg: data?['msg'] ?? '请求异常',
+                      btnText: data?['code'] == -101 ? '去登录' : null,
+                      fn: () {
+                        if (data?['code'] == -101) {
+                          RoutePush.loginRedirectPush();
+                        } else {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _historyController.queryHistoryList();
+                          });
+                        }
+                      },
                     );
                   }
                 } else {

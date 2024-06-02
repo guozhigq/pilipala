@@ -16,7 +16,7 @@ class UrlUtils {
     };
     try {
       final response = await dio.get(url);
-      if (response.statusCode == 302) {
+      if (response.statusCode == 302 || response.statusCode == 301) {
         redirectUrl = response.headers['location']?.first as String;
         if (redirectUrl.endsWith('/')) {
           redirectUrl = redirectUrl.substring(0, redirectUrl.length - 1);
@@ -44,7 +44,7 @@ class UrlUtils {
       final String bv = matchRes['BV'];
       final Map res = await SearchHttp.ab2cWithPic(bvid: bv);
       final int cid = res['cid'];
-      final String pic = res['pic'];
+      final String? pic = res['pic'];
       final String heroTag = Utils.makeHeroTag(bv);
       await Get.toNamed(
         '/video?bvid=$bv&cid=$cid',

@@ -17,10 +17,15 @@ class FavController extends GetxController {
   int pageSize = 60;
   RxBool hasMore = true.obs;
 
-  Future<dynamic> queryFavFolder({type = 'init'}) async {
+  @override
+  void onInit() {
     userInfo = userInfoCache.get('userInfoCache');
+    super.onInit();
+  }
+
+  Future<dynamic> queryFavFolder({type = 'init'}) async {
     if (userInfo == null) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (!hasMore.value) {
       return;
