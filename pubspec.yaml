@@ -144,6 +144,7 @@ dependencies:
   expandable: ^5.0.1
   # 投屏
   dlna_dart: ^0.0.8
+  lottie: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -203,6 +204,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/
     - assets/images/
     - assets/images/lv/
     - assets/images/logo/

@@ -862,6 +862,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.0"
+  lottie:
+    dependency: "direct main"
+    description:
+      name: lottie
+      sha256: "6a24ade5d3d918c306bb1c21a6b9a04aab0489d51a2582522eea820b4093b62b"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.1.2"
   mailer:
     dependency: transitive
     description:
