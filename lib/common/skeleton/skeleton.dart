@@ -13,8 +13,8 @@ class Skeleton extends StatelessWidget {
     var shimmerGradient = LinearGradient(
       colors: [
         Colors.transparent,
-        Theme.of(context).colorScheme.background.withAlpha(10),
-        Theme.of(context).colorScheme.background.withAlpha(10),
+        Theme.of(context).colorScheme.surface.withAlpha(10),
+        Theme.of(context).colorScheme.surface.withAlpha(10),
         Colors.transparent,
       ],
       stops: const [
