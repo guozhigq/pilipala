@@ -71,7 +71,7 @@ class DynamicsController extends GetxController {
 
   Future queryFollowDynamic({type = 'init'}) async {
     if (!userLogin.value) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (type == 'init') {
       dynamicsList.clear();
@@ -229,7 +229,7 @@ class DynamicsController extends GetxController {
 
   Future queryFollowUp({type = 'init'}) async {
     if (!userLogin.value) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (type == 'init') {
       upData.value.upList = <UpItem>[];

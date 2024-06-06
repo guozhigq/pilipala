@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
+import 'package:pilipala/models/user/info.dart';
+import 'package:pilipala/utils/storage.dart';
 
 class LaterController extends GetxController {
   final ScrollController scrollController = ScrollController();
   RxList<HotVideoItemModel> laterList = <HotVideoItemModel>[].obs;
   int count = 0;
   RxBool isLoading = false.obs;
+  Box userInfoCache = GStrorage.userInfo;
+  UserInfoData? userInfo;
+
+  @override
+  void onInit() {
+    super.onInit();
+    userInfo = userInfoCache.get('userInfoCache');
+  }
 
   Future queryLaterList() async {
+    if (userInfo == null) {
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
+    }
     isLoading.value = true;
     var res = await UserHttp.seeYouLater();
     if (res['status']) {

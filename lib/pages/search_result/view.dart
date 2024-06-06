@@ -13,7 +13,7 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage>
     with TickerProviderStateMixin {
-  late SearchResultController? _searchResultController;
+  late SearchResultController _searchResultController;
   late TabController? _tabController;
 
   @override
@@ -25,7 +25,7 @@ class _SearchResultPageState extends State<SearchResultPage>
     _tabController = TabController(
       vsync: this,
       length: SearchType.values.length,
-      initialIndex: _searchResultController!.tabIndex,
+      initialIndex: _searchResultController.tabIndex,
     );
   }
 
@@ -46,7 +46,7 @@ class _SearchResultPageState extends State<SearchResultPage>
           child: SizedBox(
             width: double.infinity,
             child: Text(
-              '${_searchResultController!.keyword}',
+              '${_searchResultController.keyword}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -64,35 +64,39 @@ class _SearchResultPageState extends State<SearchResultPage>
                 splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
                 highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
               ),
-              child: TabBar(
-                controller: _tabController,
-                tabs: [
-                  for (var i in SearchType.values) Tab(text: i.label),
-                ],
-                isScrollable: true,
-                indicatorWeight: 0,
-                indicatorPadding:
-                    const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-                indicator: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                labelStyle: const TextStyle(fontSize: 13),
-                dividerColor: Colors.transparent,
-                unselectedLabelColor: Theme.of(context).colorScheme.outline,
-                tabAlignment: TabAlignment.start,
-                onTap: (index) {
-                  if (index == _searchResultController!.tabIndex) {
-                    Get.find<SearchPanelController>(
-                            tag: SearchType.values[index].type +
-                                _searchResultController!.keyword!)
-                        .animateToTop();
-                  }
+              child: Obx(
+                () => (TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    for (var i in _searchResultController.searchTabs)
+                      Tab(text: "${i['label']} ${i['count'] ?? ''}")
+                  ],
+                  isScrollable: true,
+                  indicatorWeight: 0,
+                  indicatorPadding:
+                      const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+                  indicator: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelColor:
+                      Theme.of(context).colorScheme.onSecondaryContainer,
+                  labelStyle: const TextStyle(fontSize: 13),
+                  dividerColor: Colors.transparent,
+                  unselectedLabelColor: Theme.of(context).colorScheme.outline,
+                  tabAlignment: TabAlignment.start,
+                  onTap: (index) {
+                    if (index == _searchResultController.tabIndex) {
+                      Get.find<SearchPanelController>(
+                              tag: SearchType.values[index].type +
+                                  _searchResultController.keyword!)
+                          .animateToTop();
+                    }
 
-                  _searchResultController!.tabIndex = index;
-                },
+                    _searchResultController.tabIndex = index;
+                  },
+                )),
               ),
             ),
           ),
@@ -102,7 +106,7 @@ class _SearchResultPageState extends State<SearchResultPage>
               children: [
                 for (var i in SearchType.values) ...{
                   SearchPanel(
-                    keyword: _searchResultController!.keyword,
+                    keyword: _searchResultController.keyword,
                     searchType: i,
                     tag: DateTime.now().millisecondsSinceEpoch.toString(),
                   )

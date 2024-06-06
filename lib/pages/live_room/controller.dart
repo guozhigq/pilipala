@@ -17,8 +17,7 @@ class LiveRoomController extends GetxController {
   double volume = 0.0;
   // 静音状态
   RxBool volumeOff = false.obs;
-  PlPlayerController plPlayerController =
-      PlPlayerController.getInstance(videoType: 'live');
+  PlPlayerController plPlayerController = PlPlayerController(videoType: 'live');
   Rx<RoomInfoH5Model> roomInfoH5 = RoomInfoH5Model().obs;
   late bool enableCDN;
   late int currentQn;

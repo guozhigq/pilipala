@@ -4,7 +4,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
-import '../models/common/search_type.dart';
 import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';
@@ -96,7 +95,7 @@ class PiliSchame {
       }
     }
     if (scheme == 'https') {
-      _fullPathPush(value);
+      fullPathPush(value);
     }
   }
 
@@ -127,7 +126,7 @@ class PiliSchame {
     }
   }
 
-  static Future<void> _fullPathPush(SchemeEntity value) async {
+  static Future<void> fullPathPush(SchemeEntity value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
@@ -136,15 +135,15 @@ class PiliSchame {
     Map<String, String>? query = value.query;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      print('bilibili.com host: $host');
-      print('bilibili.com path: $path');
       final String lastPathSegment = path!.split('/').last;
       if (path.startsWith('/video')) {
-        if (lastPathSegment.contains('BV')) {
-          _videoPush(null, lastPathSegment);
-        }
-        if (lastPathSegment.contains('av')) {
-          _videoPush(Utils.matchNum(lastPathSegment)[0], null);
+        Map matchRes = IdUtils.matchAvorBv(input: path);
+        if (matchRes.containsKey('AV')) {
+          _videoPush(matchRes['AV']! as int, null);
+        } else if (matchRes.containsKey('BV')) {
+          _videoPush(null, matchRes['BV'] as String);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
         }
       }
       if (path.startsWith('/bangumi')) {
@@ -234,6 +233,24 @@ class PiliSchame {
         case 'space':
           print('个人空间');
           Get.toNamed('/member?mid=$area', arguments: {'face': ''});
+          break;
+        default:
+          final Map<String, dynamic> map =
+              IdUtils.matchAvorBv(input: area.split('?').first);
+          if (map.containsKey('AV')) {
+            _videoPush(map['AV']! as int, null);
+          } else if (map.containsKey('BV')) {
+            _videoPush(null, map['BV'] as String);
+          } else {
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': value.dataString ?? "",
+                'type': 'url',
+                'pageTitle': ''
+              },
+            );
+          }
           break;
       }
     }
