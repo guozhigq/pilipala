@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:uuid/uuid.dart';
 import '../models/login/index.dart';
 import '../utils/login.dart';
@@ -21,32 +22,32 @@ class LoginHttp {
     }
   }
 
-  static Future sendSmsCode({
-    int? cid,
-    required int tel,
-    required String token,
-    required String challenge,
-    required String validate,
-    required String seccode,
-  }) async {
-    var res = await Request().post(
-      Api.appSmsCode,
-      data: {
-        'cid': cid,
-        'tel': tel,
-        "source": "main_web",
-        'token': token,
-        'challenge': challenge,
-        'validate': validate,
-        'seccode': seccode,
-      },
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-        // headers: {'user-agent': ApiConstants.userAgent}
-      ),
-    );
-    print(res);
-  }
+  // static Future sendSmsCode({
+  //   int? cid,
+  //   required int tel,
+  //   required String token,
+  //   required String challenge,
+  //   required String validate,
+  //   required String seccode,
+  // }) async {
+  //   var res = await Request().post(
+  //     Api.appSmsCode,
+  //     data: {
+  //       'cid': cid,
+  //       'tel': tel,
+  //       "source": "main_web",
+  //       'token': token,
+  //       'challenge': challenge,
+  //       'validate': validate,
+  //       'seccode': seccode,
+  //     },
+  //     options: Options(
+  //       contentType: Headers.formUrlEncodedContentType,
+  //       // headers: {'user-agent': ApiConstants.userAgent}
+  //     ),
+  //   );
+  //   print(res);
+  // }
 
   // web端验证码
   static Future sendWebSmsCode({
@@ -60,6 +61,7 @@ class LoginHttp {
     Map data = {
       'cid': cid,
       'tel': tel,
+      "source": "main_web",
       'token': token,
       'challenge': challenge,
       'validate': validate,
@@ -67,17 +69,56 @@ class LoginHttp {
     };
     FormData formData = FormData.fromMap({...data});
     var res = await Request().post(
-      Api.smsCode,
+      Api.webSmsCode,
       data: formData,
       options: Options(
         contentType: Headers.formUrlEncodedContentType,
       ),
     );
-    print(res);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
   }
 
   // web端验证码登录
-  static Future loginInByWebSmsCode() async {}
+  static Future loginInByWebSmsCode({
+    int? cid,
+    required int tel,
+    required int code,
+    required String captchaKey,
+  }) async {
+    // webSmsLogin
+    Map data = {
+      "cid": cid,
+      "tel": tel,
+      "code": code,
+      "source": "main_mini",
+      "keep": 0,
+      "captcha_key": captchaKey,
+      "go_url": HttpString.baseUrl
+    };
+    FormData formData = FormData.fromMap({...data});
+    var res = await Request().post(
+      Api.webSmsLogin,
+      data: formData,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
 
   // web端密码登录
   static Future liginInByWebPwd() async {}
