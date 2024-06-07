@@ -252,4 +252,31 @@ class LoginHttp {
       return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
+
+  // web端登录二维码
+  static Future getWebQrcode() async {
+    var res = await Request().get(Api.qrCodeApi);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // web端二维码轮询登录状态
+  static Future queryWebQrcodeStatus(String qrcodeKey) async {
+    var res = await Request()
+        .get(Api.loginInByQrcode, data: {'qrcode_key': qrcodeKey});
+    if (res.data['data']['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
 }

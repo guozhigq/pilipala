@@ -42,6 +42,10 @@ class LoginPageController extends GetxController {
   late int tel;
   late int webSmsCode;
 
+  RxInt validSeconds = 180.obs;
+  late Timer validTimer;
+  late String qrcodeKey;
+
   // 监听pageView切换
   void onPageChange(int index) {
     currentIndex.value = index;
@@ -297,5 +301,36 @@ class LoginPageController extends GetxController {
         timer.cancel();
       }
     });
+  }
+
+  // 获取登录二维码
+  Future getWebQrcode() async {
+    var res = await LoginHttp.getWebQrcode();
+    validSeconds.value = 180;
+    if (res['status']) {
+      qrcodeKey = res['data']['qrcode_key'];
+      validTimer = Timer.periodic(const Duration(seconds: 1), (validTimer) {
+        if (validSeconds.value > 0) {
+          validSeconds.value--;
+          queryWebQrcodeStatus();
+        } else {
+          getWebQrcode();
+          validTimer.cancel();
+        }
+      });
+      return res;
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
+  // 轮询二维码登录状态
+  Future queryWebQrcodeStatus() async {
+    var res = await LoginHttp.queryWebQrcodeStatus(qrcodeKey);
+    if (res['status']) {
+      await LoginUtils.confirmLogin('', null);
+      validTimer.cancel();
+      Get.back();
+    }
   }
 }
