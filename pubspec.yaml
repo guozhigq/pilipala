@@ -145,6 +145,8 @@ dependencies:
   # 投屏
   dlna_dart: ^0.0.8
   lottie: ^3.1.2
+  # 二维码
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
