@@ -5,6 +5,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:pilipala/http/login.dart';
 import 'package:gt3_flutter_plugin/gt3_flutter_plugin.dart';
 import 'package:pilipala/models/login/index.dart';
