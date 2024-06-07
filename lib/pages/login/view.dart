@@ -93,9 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (v) {
                         return v!.trim().isNotEmpty ? null : "手机号码不能为空";
                       },
-                      onSaved: (val) {
-                        print(val);
-                      },
+                      onSaved: (val) => _loginPageCtr.tel = int.parse(val!),
                       onEditingComplete: () {
                         _loginPageCtr.nextStep();
                       },
@@ -236,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                       .primary, // 设置按钮背景色
                                 ),
                                 onPressed: () =>
-                                    _loginPageCtr.loginInByAppPassword(),
+                                    _loginPageCtr.loginInByWebPassword(),
                                 child: const Text('确认登录'),
                               )
                             ],
@@ -308,21 +306,28 @@ class _LoginPageState extends State<LoginPage> {
                                         ? null
                                         : "验证码不能为空";
                                   },
-                                  onSaved: (val) {
-                                    print(val);
-                                  },
+                                  onSaved: (val) => _loginPageCtr.webSmsCode =
+                                      int.parse(val!),
                                 ),
-                                Positioned(
-                                  right: 8,
-                                  top: 4,
-                                  child: Center(
-                                    child: TextButton(
-                                      onPressed: () =>
-                                          _loginPageCtr.getMsgCode(),
-                                      child: const Text('获取验证码'),
+                                Obx(() {
+                                  return Positioned(
+                                    right: 8,
+                                    top: 0,
+                                    child: Center(
+                                      child: TextButton(
+                                          onPressed: _loginPageCtr
+                                                  .smsCodeSendStatus.value
+                                              ? null
+                                              : () =>
+                                                  _loginPageCtr.getWebMsgCode(),
+                                          child: _loginPageCtr
+                                                  .smsCodeSendStatus.value
+                                              ? Text(
+                                                  '重新获取(${_loginPageCtr.seconds.value}s)')
+                                              : const Text('获取验证码')),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                })
                               ],
                             ),
                           ),

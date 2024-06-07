@@ -400,12 +400,16 @@ class Api {
       '${HttpString.passBaseUrl}/x/passport-login/captcha?source=main_web';
 
   // web端短信验证码
-  static const String smsCode =
+  static const String webSmsCode =
       '${HttpString.passBaseUrl}/x/passport-login/web/sms/send';
 
   // web端验证码登录
+  static const String webSmsLogin =
+      "${HttpString.passBaseUrl}/x/passport-login/web/login/sms";
 
   // web端密码登录
+  static const String loginInByWebPwd =
+      "${HttpString.passBaseUrl}/x/passport-login/web/login";
 
   // app端短信验证码
   static const String appSmsCode =
