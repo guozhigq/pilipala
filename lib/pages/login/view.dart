@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                       .primary, // 设置按钮背景色
                                 ),
                                 onPressed: () =>
-                                    _loginPageCtr.loginInByAppPassword(),
+                                    _loginPageCtr.loginInByWebPassword(),
                                 child: const Text('确认登录'),
                               )
                             ],

@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:pilipala/http/login.dart';
 import 'package:gt3_flutter_plugin/gt3_flutter_plugin.dart';
 import 'package:pilipala/models/login/index.dart';
-import 'package:pilipala/pages/webview/index.dart';
 import 'package:pilipala/utils/login.dart';
 
 class LoginPageController extends GetxController {
@@ -39,7 +37,7 @@ class LoginPageController extends GetxController {
   // 默认密码登录
   RxInt loginType = 0.obs;
 
-  late String captchaLey;
+  late String captchaKey;
 
   late int tel;
   late int webSmsCode;
@@ -102,6 +100,39 @@ class LoginPageController extends GetxController {
     }
   }
 
+  // web端密码登录
+  void loginInByWebPassword() async {
+    if ((passwordFormKey.currentState as FormState).validate()) {
+      getCaptcha((data) async {
+        CaptchaDataModel captchaData = data;
+        var webKeyRes = await LoginHttp.getWebKey();
+        if (webKeyRes['status']) {
+          String rhash = webKeyRes['data']['hash'];
+          String key = webKeyRes['data']['key'];
+          dynamic publicKey = RSAKeyParser().parse(key);
+          String passwordEncryptyed = Encrypter(RSA(publicKey: publicKey))
+              .encrypt(rhash + passwordTextController.text)
+              .base64;
+          var res = await LoginHttp.loginInByWebPwd(
+            username: tel,
+            password: passwordEncryptyed,
+            token: captchaData.token!,
+            challenge: captchaData.geetest!.challenge!,
+            validate: captchaData.validate!,
+            seccode: captchaData.seccode!,
+          );
+          if (res['status']) {
+            await LoginUtils.confirmLogin('', null);
+          } else {
+            SmartDialog.showToast(res['msg']);
+          }
+        } else {
+          SmartDialog.showToast(webKeyRes['msg']);
+        }
+      });
+    }
+  }
+
   // web端验证码登录
   void loginInByCode() async {
     if ((msgCodeFormKey.currentState as FormState).validate()) {
@@ -110,11 +141,10 @@ class LoginPageController extends GetxController {
         cid: 86,
         tel: tel,
         code: webSmsCode,
-        captchaKey: captchaLey,
+        captchaKey: captchaKey,
       );
       if (res['status']) {
-        log(res.toString());
-        LoginUtils.confirmLogin('', null);
+        await LoginUtils.confirmLogin('', null);
       } else {
         SmartDialog.showToast(res['msg']);
       }
@@ -245,7 +275,7 @@ class LoginPageController extends GetxController {
         seccode: captchaData.seccode!,
       );
       if (res['status']) {
-        captchaLey = res['data']['captcha_key'];
+        captchaKey = res['data']['captcha_key'];
         SmartDialog.showToast('验证码已发送');
         // 倒计时60s
         smsCodeSendStatus.value = true;
@@ -256,6 +286,7 @@ class LoginPageController extends GetxController {
     });
   }
 
+  // 验证码倒计时
   void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (seconds.value > 0) {

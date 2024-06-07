@@ -408,6 +408,8 @@ class Api {
       "${HttpString.passBaseUrl}/x/passport-login/web/login/sms";
 
   // web端密码登录
+  static const String loginInByWebPwd =
+      "${HttpString.passBaseUrl}/x/passport-login/web/login";
 
   // app端短信验证码
   static const String appSmsCode =
