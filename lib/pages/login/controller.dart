@@ -1,11 +1,16 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:pilipala/http/login.dart';
 import 'package:gt3_flutter_plugin/gt3_flutter_plugin.dart';
 import 'package:pilipala/models/login/index.dart';
+import 'package:pilipala/pages/webview/index.dart';
+import 'package:pilipala/utils/login.dart';
 
 class LoginPageController extends GetxController {
   final GlobalKey mobFormKey = GlobalKey<FormState>();
@@ -26,8 +31,18 @@ class LoginPageController extends GetxController {
 
   final Gt3FlutterPlugin captcha = Gt3FlutterPlugin();
 
+  // 倒计时60s
+  RxInt seconds = 60.obs;
+  late Timer timer;
+  RxBool smsCodeSendStatus = false.obs;
+
   // 默认密码登录
   RxInt loginType = 0.obs;
+
+  late String captchaLey;
+
+  late int tel;
+  late int webSmsCode;
 
   // 监听pageView切换
   void onPageChange(int index) {
@@ -43,6 +58,7 @@ class LoginPageController extends GetxController {
         curve: Curves.easeInOut,
       );
       passwordTextFieldNode.requestFocus();
+      (mobFormKey.currentState as FormState).save();
     }
   }
 
@@ -86,18 +102,32 @@ class LoginPageController extends GetxController {
     }
   }
 
-  // 验证码登录
-  void loginInByCode() {
-    if ((msgCodeFormKey.currentState as FormState).validate()) {}
+  // web端验证码登录
+  void loginInByCode() async {
+    if ((msgCodeFormKey.currentState as FormState).validate()) {
+      (msgCodeFormKey.currentState as FormState).save();
+      var res = await LoginHttp.loginInByWebSmsCode(
+        cid: 86,
+        tel: tel,
+        code: webSmsCode,
+        captchaKey: captchaLey,
+      );
+      if (res['status']) {
+        log(res.toString());
+        LoginUtils.confirmLogin('', null);
+      } else {
+        SmartDialog.showToast(res['msg']);
+      }
+    }
   }
 
-  // app端验证码
-  void getMsgCode() async {
+  // 获取app端验证码
+  void getAppMsgCode() async {
     getCaptcha((data) async {
       CaptchaDataModel captchaData = data;
       var res = await LoginHttp.sendAppSmsCode(
         cid: 86,
-        tel: 13734077064,
+        tel: tel,
         token: captchaData.token!,
         challenge: captchaData.geetest!.challenge!,
         validate: captchaData.validate!,
@@ -121,7 +151,7 @@ class LoginPageController extends GetxController {
       captcha.addEventHandler(onShow: (Map<String, dynamic> message) async {
         SmartDialog.dismiss();
       }, onClose: (Map<String, dynamic> message) async {
-        SmartDialog.showToast('关闭验证');
+        SmartDialog.showToast('取消验证');
       }, onResult: (Map<String, dynamic> message) async {
         debugPrint("Captcha result: $message");
         String code = message["code"];
@@ -200,5 +230,41 @@ class LoginPageController extends GetxController {
       });
       captcha.startCaptcha(registerData);
     } else {}
+  }
+
+  // 获取web端验证码
+  void getWebMsgCode() async {
+    getCaptcha((data) async {
+      CaptchaDataModel captchaData = data;
+      var res = await LoginHttp.sendWebSmsCode(
+        cid: 86,
+        tel: tel,
+        token: captchaData.token!,
+        challenge: captchaData.geetest!.challenge!,
+        validate: captchaData.validate!,
+        seccode: captchaData.seccode!,
+      );
+      if (res['status']) {
+        captchaLey = res['data']['captcha_key'];
+        SmartDialog.showToast('验证码已发送');
+        // 倒计时60s
+        smsCodeSendStatus.value = true;
+        startTimer();
+      } else {
+        SmartDialog.showToast(res['msg']);
+      }
+    });
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (seconds.value > 0) {
+        seconds.value--;
+      } else {
+        seconds.value = 60;
+        smsCodeSendStatus.value = false;
+        timer.cancel();
+      }
+    });
   }
 }
