@@ -1,6 +1,7 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/skeleton.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -102,139 +103,152 @@ class _WhisperPageState extends State<WhisperPage> {
               },
               child: SingleChildScrollView(
                 controller: _scrollController,
-                child: Column(
-                  children: [
-                    FutureBuilder(
-                      future: _futureBuilderFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          Map? data = snapshot.data;
-                          if (data != null && data['status']) {
-                            RxList sessionList = _whisperController.sessionList;
-                            return Obx(
-                              () => sessionList.isEmpty
-                                  ? const SizedBox()
-                                  : ListView.separated(
-                                      itemCount: sessionList.length,
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (_, int i) {
-                                        return ListTile(
-                                          onTap: () {
-                                            sessionList[i].unreadCount = 0;
-                                            sessionList.refresh();
-                                            Get.toNamed(
-                                              '/whisperDetail',
-                                              parameters: {
-                                                'talkerId': sessionList[i]
-                                                    .talkerId
-                                                    .toString(),
-                                                'name': sessionList[i]
-                                                    .accountInfo
-                                                    .name,
-                                                'face': sessionList[i]
-                                                    .accountInfo
-                                                    .face,
-                                                'mid': sessionList[i]
-                                                    .accountInfo
-                                                    .mid
-                                                    .toString(),
-                                              },
-                                            );
-                                          },
-                                          leading: Badge(
-                                            isLabelVisible:
-                                                sessionList[i].unreadCount > 0,
-                                            label: Text(sessionList[i]
-                                                .unreadCount
-                                                .toString()),
-                                            alignment: Alignment.topRight,
-                                            child: NetworkImgLayer(
-                                              width: 45,
-                                              height: 45,
-                                              type: 'avatar',
-                                              src: sessionList[i]
-                                                  .accountInfo
-                                                  .face,
-                                            ),
-                                          ),
-                                          title: Text(
-                                              sessionList[i].accountInfo.name),
-                                          subtitle: Text(
-                                              sessionList[i].lastMsg.content !=
-                                                          null &&
-                                                      sessionList[i]
-                                                              .lastMsg
-                                                              .content !=
-                                                          ''
-                                                  ? (sessionList[i]
-                                                          .lastMsg
-                                                          .content['text'] ??
-                                                      sessionList[i]
-                                                          .lastMsg
-                                                          .content['content'] ??
-                                                      sessionList[i]
-                                                          .lastMsg
-                                                          .content['title'] ??
-                                                      sessionList[i]
-                                                              .lastMsg
-                                                              .content[
-                                                          'reply_content'] ??
-                                                      '不支持的消息类型')
-                                                  : '不支持的消息类型',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium!
-                                                  .copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline)),
-                                          trailing: Text(
-                                            Utils.dateFormat(sessionList[i]
-                                                .lastMsg
-                                                .timestamp),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall!
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .outline),
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder:
-                                          (BuildContext context, int index) {
-                                        return Divider(
-                                          indent: 72,
-                                          endIndent: 20,
-                                          height: 6,
-                                          color: Colors.grey.withOpacity(0.1),
-                                        );
-                                      },
-                                    ),
-                            );
-                          } else {
-                            // 请求错误
-                            return Center(
-                              child: Text(data?['msg'] ?? '请求异常'),
-                            );
-                          }
-                        } else {
-                          // 骨架屏
-                          return const SizedBox();
-                        }
-                      },
-                    )
-                  ],
+                child: FutureBuilder(
+                  future: _futureBuilderFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      Map? data = snapshot.data;
+                      if (data != null && data['status']) {
+                        RxList sessionList = _whisperController.sessionList;
+                        return Obx(
+                          () => sessionList.isEmpty
+                              ? const SizedBox()
+                              : ListView.separated(
+                                  itemCount: sessionList.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (_, int i) {
+                                    return SessionItem(
+                                      sessionItem: sessionList[i],
+                                      changeFucCall: () =>
+                                          sessionList.refresh(),
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return Divider(
+                                      indent: 72,
+                                      endIndent: 20,
+                                      height: 6,
+                                      color: Colors.grey.withOpacity(0.1),
+                                    );
+                                  },
+                                ),
+                        );
+                      } else {
+                        // 请求错误
+                        return Center(
+                          child: Text(data?['msg'] ?? '请求异常'),
+                        );
+                      }
+                    } else {
+                      // 骨架屏
+                      return ListView.builder(
+                        itemCount: 15,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, int i) {
+                          return Skeleton(
+                            child: ListTile(
+                              leading: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onInverseSurface,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                              ),
+                              title: Container(
+                                width: 100,
+                                height: 14,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onInverseSurface,
+                              ),
+                              subtitle: Container(
+                                width: 80,
+                                height: 14,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onInverseSurface,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SessionItem extends StatelessWidget {
+  final dynamic sessionItem;
+  final Function changeFucCall;
+
+  const SessionItem({
+    super.key,
+    required this.sessionItem,
+    required this.changeFucCall,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = sessionItem.lastMsg.content;
+    return ListTile(
+      onTap: () {
+        sessionItem.unreadCount = 0;
+        changeFucCall.call();
+        Get.toNamed(
+          '/whisperDetail',
+          parameters: {
+            'talkerId': sessionItem.talkerId.toString(),
+            'name': sessionItem.accountInfo.name,
+            'face': sessionItem.accountInfo.face,
+            'mid': sessionItem.accountInfo.mid.toString(),
+          },
+        );
+      },
+      leading: Badge(
+        isLabelVisible: sessionItem.unreadCount > 0,
+        label: Text(sessionItem.unreadCount.toString()),
+        alignment: Alignment.topRight,
+        child: NetworkImgLayer(
+          width: 45,
+          height: 45,
+          type: 'avatar',
+          src: sessionItem.accountInfo.face,
+        ),
+      ),
+      title: Text(sessionItem.accountInfo.name),
+      subtitle: Text(
+          content != null && content != ''
+              ? (content['text'] ??
+                  content['content'] ??
+                  content['title'] ??
+                  content['reply_content'] ??
+                  '不支持的消息类型')
+              : '不支持的消息类型',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium!
+              .copyWith(color: Theme.of(context).colorScheme.outline)),
+      trailing: Text(
+        Utils.dateFormat(sessionItem.lastMsg.timestamp),
+        style: Theme.of(context)
+            .textTheme
+            .labelSmall!
+            .copyWith(color: Theme.of(context).colorScheme.outline),
       ),
     );
   }
