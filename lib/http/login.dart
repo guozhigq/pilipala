@@ -214,4 +214,42 @@ class LoginHttp {
     );
     print(res);
   }
+
+  // web端密码登录
+  static Future loginInByWebPwd({
+    required int username,
+    required String password,
+    required String token,
+    required String challenge,
+    required String validate,
+    required String seccode,
+  }) async {
+    Map data = {
+      'username': username,
+      'password': password,
+      'keep': 0,
+      'token': token,
+      'challenge': challenge,
+      'validate': validate,
+      'seccode': seccode,
+      'source': 'main-fe-header',
+      "go_url": HttpString.baseUrl
+    };
+    FormData formData = FormData.fromMap({...data});
+    var res = await Request().post(
+      Api.loginInByWebPwd,
+      data: formData,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
 }
