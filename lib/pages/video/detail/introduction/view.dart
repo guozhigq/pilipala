@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
@@ -97,11 +98,14 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             );
           }
         } else {
-          return const SliverToBoxAdapter(
+          return SliverToBoxAdapter(
             child: SizedBox(
               height: 100,
               child: Center(
-                child: CircularProgressIndicator(),
+                child: Lottie.asset(
+                  'assets/loading.json',
+                  width: 200,
+                ),
               ),
             ),
           );
@@ -595,8 +599,4 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       );
     });
   }
-
-  // Widget StaffPanel(BuildContext context, videoIntroController) {
-  //   return
-  // }
 }

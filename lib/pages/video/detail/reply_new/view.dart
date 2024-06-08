@@ -170,7 +170,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

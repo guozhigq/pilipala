@@ -198,7 +198,8 @@ class HistoryItem extends StatelessWidget {
                                 duration: const Duration(milliseconds: 200),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(
+                                        StyleString.imgRadius.x),
                                     color: Colors.black.withOpacity(
                                         ctr!.enableMultiple.value &&
                                                 videoItem.checked
@@ -243,7 +244,7 @@ class HistoryItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                          videoItem.progress != 0
+                          videoItem.progress != 0 && videoItem.duration != 0
                               ? Positioned(
                                   left: 3,
                                   right: 3,
