@@ -75,7 +75,7 @@ class SearchHttp {
     required page,
     String? order,
     int? duration,
-    int? tid,
+    int? tids,
   }) async {
     var reqData = {
       'search_type': searchType.type,
@@ -85,7 +85,7 @@ class SearchHttp {
       'page': page,
       if (order != null) 'order': order,
       if (duration != null) 'duration': duration,
-      if (tid != null) 'tid': tid,
+      if (tids != null && tids != -1) 'tids': tids,
     };
     var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {

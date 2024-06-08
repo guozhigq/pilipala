@@ -323,7 +323,7 @@ class VideoPanelController extends GetxController {
                               SearchPanelController ctr =
                                   Get.find<SearchPanelController>(
                                       tag: 'video${searchPanelCtr.keyword!}');
-                              ctr.tid.value = i['value'];
+                              ctr.tids.value = i['value'];
                               Get.back();
                               SmartDialog.showLoading(msg: '获取中');
                               await ctr.onRefresh();
