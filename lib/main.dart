@@ -17,7 +17,6 @@ import 'package:pilipala/pages/search/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/router/app_pages.dart';
 import 'package:pilipala/pages/main/view.dart';
-import 'package:pilipala/services/disable_battery_opt.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
@@ -66,7 +65,6 @@ void main() async {
   }
 
   PiliSchame.init();
-  DisableBatteryOpt();
 }
 
 class MyApp extends StatelessWidget {
