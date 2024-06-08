@@ -16,8 +16,8 @@ class SearchPanelController extends GetxController {
   RxString order = ''.obs;
   // 视频时长筛选 仅用于搜索视频
   RxInt duration = 0.obs;
-  // 视频分区筛选 仅用于搜索视频
-  RxInt tid = (-1).obs;
+  // 视频分区筛选 仅用于搜索视频 -1时不传
+  RxInt tids = (-1).obs;
 
   Future onSearch({type = 'init'}) async {
     var result = await SearchHttp.searchByType(
@@ -26,7 +26,7 @@ class SearchPanelController extends GetxController {
       page: page.value,
       order: searchType!.type != 'video' ? null : order.value,
       duration: searchType!.type != 'video' ? null : duration.value,
-      tid: searchType!.type != 'video' ? null : tid.value,
+      tids: searchType!.type != 'video' ? null : tids.value,
     );
     if (result['status']) {
       if (type == 'onRefresh') {
