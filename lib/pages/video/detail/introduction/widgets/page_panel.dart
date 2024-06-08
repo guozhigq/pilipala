@@ -106,7 +106,7 @@ class _PagesPanelState extends State<PagesPanel> {
                 height: 34,
                 child: TextButton(
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
                     widget.videoIntroCtr.bottomSheetController =
