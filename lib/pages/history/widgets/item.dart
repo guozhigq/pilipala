@@ -217,11 +217,10 @@ class HistoryItem extends StatelessWidget {
                                         curve: Curves.easeInOut,
                                         child: IconButton(
                                           style: ButtonStyle(
-                                            padding: MaterialStateProperty.all(
+                                            padding: WidgetStateProperty.all(
                                                 EdgeInsets.zero),
                                             backgroundColor:
-                                                MaterialStateProperty
-                                                    .resolveWith(
+                                                WidgetStateProperty.resolveWith(
                                               (states) {
                                                 return Colors.white
                                                     .withOpacity(0.8);
