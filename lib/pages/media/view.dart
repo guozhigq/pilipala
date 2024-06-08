@@ -178,10 +178,10 @@ class _MediaPageState extends State<MediaPage>
                                   child: Center(
                                     child: IconButton(
                                       style: ButtonStyle(
-                                        padding: MaterialStateProperty.all(
+                                        padding: WidgetStateProperty.all(
                                             EdgeInsets.zero),
                                         backgroundColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
                                           return Theme.of(context)
                                               .colorScheme

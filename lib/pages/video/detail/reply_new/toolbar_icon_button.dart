@@ -27,8 +27,8 @@ class ToolbarIconButton extends StatelessWidget {
             ? Theme.of(context).colorScheme.onSecondaryContainer
             : Theme.of(context).colorScheme.outline,
         style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
             return selected
                 ? Theme.of(context).colorScheme.secondaryContainer
                 : null;

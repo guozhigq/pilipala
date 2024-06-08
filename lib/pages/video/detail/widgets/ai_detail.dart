@@ -108,7 +108,7 @@ class AiDetail extends StatelessWidget {
                                           fontSize: 13,
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           height: 1.5,
                                         ),
                                         children: [
