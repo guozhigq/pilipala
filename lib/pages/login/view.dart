@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import 'controller.dart';
 
@@ -37,6 +38,105 @@ class _LoginPageState extends State<LoginPage> {
                   icon: const Icon(Icons.arrow_back),
                 ),
         ),
+        actions: [
+          IconButton(
+            tooltip: '浏览器打开',
+            onPressed: () {
+              Get.offNamed(
+                '/webview',
+                parameters: {
+                  'url': 'https://passport.bilibili.com/h5-app/passport/login',
+                  'type': 'login',
+                  'pageTitle': '登录bilibili',
+                },
+              );
+            },
+            icon: const Icon(Icons.language),
+          ),
+          IconButton(
+            tooltip: '二维码登录',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return StatefulBuilder(
+                      builder: (context, StateSetter setState) {
+                    return AlertDialog(
+                      title: Row(
+                        children: [
+                          const Text('扫码登录'),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.refresh),
+                          ),
+                        ],
+                      ),
+                      contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                      content: AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          width: 200,
+                          padding: const EdgeInsets.all(12),
+                          child: FutureBuilder(
+                            future: _loginPageCtr.getWebQrcode(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                if (snapshot.data == null) {
+                                  return const SizedBox();
+                                }
+                                Map data = snapshot.data as Map;
+                                return QrImageView(
+                                  data: data['data']['url'],
+                                  backgroundColor: Colors.transparent,
+                                );
+                              } else {
+                                return const Center(
+                                  child: SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {},
+                          child: Obx(() {
+                            return Text(
+                              '有效期: ${_loginPageCtr.validSeconds.value}s',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            );
+                          }),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            '检查登录状态',
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .fontSize,
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  });
+                },
+              );
+            },
+            icon: const Icon(Icons.qr_code),
+          ),
+          const SizedBox(width: 22),
+        ],
       ),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
@@ -93,33 +193,10 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (v) {
                         return v!.trim().isNotEmpty ? null : "手机号码不能为空";
                       },
-                      onSaved: (val) {
-                        print(val);
-                      },
+                      onSaved: (val) => _loginPageCtr.tel = int.parse(val!),
                       onEditingComplete: () {
                         _loginPageCtr.nextStep();
                       },
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Get.offNamed(
-                        '/webview',
-                        parameters: {
-                          'url':
-                              'https://passport.bilibili.com/h5-app/passport/login',
-                          'type': 'login',
-                          'pageTitle': '登录bilibili',
-                        },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 2),
-                      child: Text(
-                        '使用网页端登录',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary),
-                      ),
                     ),
                   ),
                   const Spacer(),
@@ -236,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
                                       .primary, // 设置按钮背景色
                                 ),
                                 onPressed: () =>
-                                    _loginPageCtr.loginInByAppPassword(),
+                                    _loginPageCtr.loginInByWebPassword(),
                                 child: const Text('确认登录'),
                               )
                             ],
@@ -308,21 +385,28 @@ class _LoginPageState extends State<LoginPage> {
                                         ? null
                                         : "验证码不能为空";
                                   },
-                                  onSaved: (val) {
-                                    print(val);
-                                  },
+                                  onSaved: (val) => _loginPageCtr.webSmsCode =
+                                      int.parse(val!),
                                 ),
-                                Positioned(
-                                  right: 8,
-                                  top: 4,
-                                  child: Center(
-                                    child: TextButton(
-                                      onPressed: () =>
-                                          _loginPageCtr.getMsgCode(),
-                                      child: const Text('获取验证码'),
+                                Obx(() {
+                                  return Positioned(
+                                    right: 8,
+                                    top: 0,
+                                    child: Center(
+                                      child: TextButton(
+                                          onPressed: _loginPageCtr
+                                                  .smsCodeSendStatus.value
+                                              ? null
+                                              : () =>
+                                                  _loginPageCtr.getWebMsgCode(),
+                                          child: _loginPageCtr
+                                                  .smsCodeSendStatus.value
+                                              ? Text(
+                                                  '重新获取(${_loginPageCtr.seconds.value}s)')
+                                              : const Text('获取验证码')),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                })
                               ],
                             ),
                           ),
