@@ -2,7 +2,6 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
-import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/pages/history/widgets/item.dart';
 
@@ -16,20 +15,19 @@ class HistorySearchPage extends StatefulWidget {
 }
 
 class _HistorySearchPageState extends State<HistorySearchPage> {
-  final HistorySearchController _historySearchCtr =
-      Get.put(HistorySearchController());
+  final HistorySearchController _hisCtr = Get.put(HistorySearchController());
   late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
-    scrollController = _historySearchCtr.scrollController;
+    scrollController = _hisCtr.scrollController;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
           EasyThrottle.throttle('history', const Duration(seconds: 1), () {
-            _historySearchCtr.onLoad();
+            _hisCtr.onLoad();
           });
         }
       },
@@ -50,19 +48,19 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
         titleSpacing: 0,
         actions: [
           IconButton(
-              onPressed: () => _historySearchCtr.submit(),
+              onPressed: () => _hisCtr.submit(),
               icon: const Icon(Icons.search_outlined, size: 22)),
           const SizedBox(width: 10)
         ],
         title: Obx(
           () => TextField(
             autofocus: true,
-            focusNode: _historySearchCtr.searchFocusNode,
-            controller: _historySearchCtr.controller.value,
+            focusNode: _hisCtr.searchFocusNode,
+            controller: _hisCtr.controller.value,
             textInputAction: TextInputAction.search,
-            onChanged: (value) => _historySearchCtr.onChange(value),
+            onChanged: (value) => _hisCtr.onChange(value),
             decoration: InputDecoration(
-              hintText: _historySearchCtr.hintText,
+              hintText: _hisCtr.hintText,
               border: InputBorder.none,
               suffixIcon: IconButton(
                 icon: Icon(
@@ -70,103 +68,61 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
                   size: 22,
                   color: Theme.of(context).colorScheme.outline,
                 ),
-                onPressed: () => _historySearchCtr.onClear(),
+                onPressed: () => _hisCtr.onClear(),
               ),
             ),
-            onSubmitted: (String value) => _historySearchCtr.submit(),
+            onSubmitted: (String value) => _hisCtr.submit(),
           ),
         ),
       ),
       body: Obx(
-        () => Column(
-          children: _historySearchCtr.loadingStatus.value == 'init'
-              ? [const SizedBox()]
-              : [
-                  Expanded(
-                    child: FutureBuilder(
-                      future: _historySearchCtr.searchHistories(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          Map data = snapshot.data as Map;
-                          if (data['status']) {
-                            return Obx(
-                              () => _historySearchCtr.historyList.isNotEmpty
-                                  ? ListView.builder(
-                                      controller: scrollController,
-                                      itemCount:
-                                          _historySearchCtr.historyList.length +
-                                              1,
-                                      itemBuilder: (context, index) {
-                                        if (index ==
-                                            _historySearchCtr
-                                                .historyList.length) {
-                                          return Container(
-                                            height: MediaQuery.of(context)
-                                                    .padding
-                                                    .bottom +
-                                                60,
-                                            padding: EdgeInsets.only(
-                                                bottom: MediaQuery.of(context)
-                                                    .padding
-                                                    .bottom),
-                                            child: Center(
-                                              child: Obx(
-                                                () => Text(
-                                                  _historySearchCtr
-                                                      .loadingText.value,
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .outline,
-                                                      fontSize: 13),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          return HistoryItem(
-                                            videoItem: _historySearchCtr
-                                                .historyList[index],
-                                            ctr: _historySearchCtr,
-                                            onChoose: null,
-                                            onUpdateMultiple: () => null,
-                                          );
-                                        }
-                                      },
-                                    )
-                                  : _historySearchCtr.loadingStatus.value ==
-                                          'loading'
-                                      ? const SizedBox(child: Text('加载中...'))
-                                      : const CustomScrollView(
-                                          slivers: <Widget>[
-                                            NoData(),
-                                          ],
-                                        ),
-                            );
-                          } else {
-                            return CustomScrollView(
-                              slivers: <Widget>[
-                                HttpError(
-                                  errMsg: data['msg'],
-                                  fn: () => setState(() {}),
-                                )
-                              ],
-                            );
-                          }
+        () {
+          return _hisCtr.loadingStatus.value && _hisCtr.historyList.isEmpty
+              ? ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    return const VideoCardHSkeleton();
+                  },
+                )
+              : _hisCtr.historyList.isNotEmpty
+                  ? ListView.builder(
+                      controller: scrollController,
+                      itemCount: _hisCtr.historyList.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == _hisCtr.historyList.length) {
+                          return Container(
+                            height: MediaQuery.of(context).padding.bottom + 60,
+                            padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).padding.bottom),
+                            child: Center(
+                              child: Obx(
+                                () => Text(
+                                  _hisCtr.loadingText.value,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
                         } else {
-                          // 骨架屏
-                          return ListView.builder(
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return const VideoCardHSkeleton();
-                            },
+                          return HistoryItem(
+                            videoItem: _hisCtr.historyList[index],
+                            ctr: _hisCtr,
+                            onChoose: null,
+                            onUpdateMultiple: () => null,
                           );
                         }
                       },
-                    ),
-                  ),
-                ],
-        ),
+                    )
+                  : const CustomScrollView(
+                      slivers: <Widget>[
+                        NoData(),
+                      ],
+                    );
+        },
       ),
     );
   }

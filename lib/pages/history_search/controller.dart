@@ -10,9 +10,8 @@ class HistorySearchController extends GetxController {
   final FocusNode searchFocusNode = FocusNode();
   RxString searchKeyWord = ''.obs;
   String hintText = '搜索';
-  RxString loadingStatus = 'init'.obs;
+  RxBool loadingStatus = false.obs;
   RxString loadingText = '加载中...'.obs;
-  bool hasRequest = false;
   late int mid;
   RxString uname = ''.obs;
   int pn = 1;
@@ -36,8 +35,7 @@ class HistorySearchController extends GetxController {
 
   //  提交搜索内容
   void submit() {
-    loadingStatus.value = 'loading';
-    if (hasRequest) {
+    if (!loadingStatus.value) {
       pn = 1;
       searchHistories();
     }
@@ -48,6 +46,7 @@ class HistorySearchController extends GetxController {
     if (type == 'onLoad' && loadingText.value == '没有更多了') {
       return;
     }
+    loadingStatus.value = true;
     var res = await UserHttp.searchHistory(
       pn: pn,
       keyword: controller.value.text,
@@ -63,9 +62,8 @@ class HistorySearchController extends GetxController {
         loadingText.value = '没有更多了';
       }
       pn += 1;
-      hasRequest = true;
     }
-    loadingStatus.value = 'finish';
+    loadingStatus.value = false;
     return res;
   }
 
@@ -86,6 +84,6 @@ class HistorySearchController extends GetxController {
       historyList.removeWhere((e) => e.kid == kid);
       SmartDialog.showToast(res['msg']);
     }
-    loadingStatus.value = 'finish';
+    // loadingStatus.value = fasle;
   }
 }

@@ -124,7 +124,7 @@ class EpisodeBottomSheet {
       });
       return Container(
         height: sheetHeight,
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: Column(
           children: [
             buildTitle(),

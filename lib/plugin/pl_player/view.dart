@@ -7,6 +7,7 @@ import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/models/common/gesture_mode.dart';
@@ -733,14 +734,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 const double threshold = 7.0; // 滑动阈值
                 final bool flag =
                     fullScreenGestureMode != FullScreenGestureMode.values.last;
-                if (dy > _distance.value && dy > threshold) {
+                if (dy > _distance.value &&
+                    dy > threshold &&
+                    !_.controlsLock.value) {
                   if (_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 下滑退出全屏
                     await widget.controller.triggerFullScreen(status: flag);
                   }
                   _distance.value = 0.0;
-                } else if (dy < _distance.value && dy < -threshold) {
+                } else if (dy < _distance.value &&
+                    dy < -threshold &&
+                    !_.controlsLock.value) {
                   if (!_.isFullScreen.value ^ flag) {
                     lastFullScreenToggleTime = DateTime.now();
                     // 上滑进入全屏
@@ -768,37 +773,33 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ),
 
         // 头部、底部控制条
-        SafeArea(
-          top: false,
-          bottom: false,
-          child: Obx(
-            () => Column(
-              children: [
-                if (widget.headerControl != null || _.headerControl != null)
-                  ClipRect(
-                    child: AppBarAni(
-                      controller: animationController,
-                      visible: !_.controlsLock.value && _.showControls.value,
-                      position: 'top',
-                      child: widget.headerControl ?? _.headerControl!,
-                    ),
-                  ),
-                const Spacer(),
+        Obx(
+          () => Column(
+            children: [
+              if (widget.headerControl != null || _.headerControl != null)
                 ClipRect(
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'bottom',
-                    child: widget.bottomControl ??
-                        BottomControl(
-                          controller: widget.controller,
-                          triggerFullScreen: _.triggerFullScreen,
-                          buildBottomControl: buildBottomControl(),
-                        ),
+                    position: 'top',
+                    child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
-              ],
-            ),
+              const Spacer(),
+              ClipRect(
+                child: AppBarAni(
+                  controller: animationController,
+                  visible: !_.controlsLock.value && _.showControls.value,
+                  position: 'bottom',
+                  child: widget.bottomControl ??
+                      BottomControl(
+                        controller: widget.controller,
+                        triggerFullScreen: _.triggerFullScreen,
+                        buildBottomControl: buildBottomControl(),
+                      ),
+                ),
+              ),
+            ],
           ),
         ),
 
@@ -913,9 +914,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     colors: [Colors.black26, Colors.transparent],
                   ),
                 ),
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  height: 25,
+                child: Lottie.asset(
+                  'assets/loading.json',
+                  width: 200,
                 ),
               ),
             );
@@ -939,7 +940,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekBackwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 200),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(
@@ -982,7 +983,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekForwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 200),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(

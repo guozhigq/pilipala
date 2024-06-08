@@ -99,7 +99,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     fullScreenStatusListener();
     if (Platform.isAndroid) {
       floating = vdCtr.floating!;
-      autoEnterPip();
     }
     WidgetsBinding.instance.addObserver(this);
     lifecycleListener();
@@ -128,8 +127,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   }
 
   // 播放器状态监听
-  void playerListener(PlayerStatus? status) async {
-    playerStatus.value = status!;
+  void playerListener(PlayerStatus status) async {
+    playerStatus.value = status;
+    autoEnterPip(status: status);
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
       if (autoExitFullcreen) {
@@ -181,6 +181,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
+    autoEnterPip(status: PlayerStatus.playing);
   }
 
   void fullScreenStatusListener() {
@@ -287,10 +288,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         .subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
-  void autoEnterPip() {
+  void autoEnterPip({PlayerStatus? status}) {
     final String routePath = Get.currentRoute;
     if (autoPiP && routePath.startsWith('/video')) {
-      floating.toggleAutoPip(autoEnter: autoPiP);
+      floating.toggleAutoPip(
+        autoEnter: autoPiP && status == PlayerStatus.playing,
+      );
     }
   }
 
@@ -313,6 +316,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     switch (name) {
       case 'show' || 'restart':
         plPlayerController?.danmakuController?.clear();
+        break;
+      case 'pause':
+        vdCtr.hiddenReplyReplyPanel();
+        if (vdCtr.videoType == SearchType.video) {
+          videoIntroController.hiddenEpisodeBottomSheet();
+        }
+        if (vdCtr.videoType == SearchType.media_bangumi) {
+          bangumiIntroController.hiddenEpisodeBottomSheet();
+        }
         break;
     }
   }
@@ -525,11 +537,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Scaffold(
             resizeToAvoidBottomInset: false,
             key: vdCtr.scaffoldKey,
-            backgroundColor: Colors.black,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
               child: AppBar(
-                backgroundColor: Colors.transparent,
+                backgroundColor: Colors.black,
                 elevation: 0,
               ),
             ),
@@ -559,8 +570,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       }
                       return SliverAppBar(
                         automaticallyImplyLeading: false,
-                        // 假装使用一个非空变量，避免Obx检测不到而罢工
-                        pinned: vdCtr.autoPlay.value,
+                        pinned: true,
                         elevation: 0,
                         scrolledUnderElevation: 0,
                         forceElevated: innerBoxIsScrolled,
@@ -568,47 +578,42 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         backgroundColor: Colors.black,
                         flexibleSpace: FlexibleSpaceBar(
                           background: PopScope(
-                              canPop: plPlayerController?.isFullScreen.value !=
-                                  true,
-                              onPopInvoked: (bool didPop) {
-                                if (plPlayerController?.isFullScreen.value ==
-                                    true) {
-                                  plPlayerController!
-                                      .triggerFullScreen(status: false);
-                                }
-                                if (MediaQuery.of(context).orientation ==
-                                    Orientation.landscape) {
-                                  verticalScreen();
-                                }
-                              },
-                              child: LayoutBuilder(
-                                builder: (BuildContext context,
-                                    BoxConstraints boxConstraints) {
-                                  return Stack(
-                                    children: <Widget>[
-                                      if (isShowing)
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 0),
-                                          child: videoPlayerPanel,
-                                        ),
+                            canPop:
+                                plPlayerController?.isFullScreen.value != true,
+                            onPopInvoked: (bool didPop) {
+                              if (plPlayerController?.isFullScreen.value ==
+                                  true) {
+                                plPlayerController!
+                                    .triggerFullScreen(status: false);
+                              }
+                              if (MediaQuery.of(context).orientation ==
+                                  Orientation.landscape) {
+                                verticalScreen();
+                              }
+                            },
+                            child: Hero(
+                              tag: heroTag,
+                              child: Stack(
+                                children: <Widget>[
+                                  if (isShowing) videoPlayerPanel,
 
-                                      /// 关闭自动播放时 手动播放
-                                      Obx(
-                                        () => Visibility(
-                                          visible: !vdCtr.autoPlay.value &&
-                                              vdCtr.isShowCover.value,
-                                          child: Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: handlePlayPanel(),
-                                          ),
-                                        ),
+                                  /// 关闭自动播放时 手动播放
+                                  Obx(
+                                    () => Visibility(
+                                      visible: !vdCtr.autoPlay.value &&
+                                          vdCtr.isShowCover.value,
+                                      child: Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: handlePlayPanel(),
                                       ),
-                                    ],
-                                  );
-                                },
-                              )),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -627,55 +632,51 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         : pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
-              body: ColoredBox(
-                key: Key(heroTag),
-                color: Theme.of(context).colorScheme.background,
-                child: Column(
-                  children: [
-                    tabbarBuild(),
-                    Expanded(
-                      child: TabBarView(
-                        controller: vdCtr.tabCtr,
-                        children: <Widget>[
-                          Builder(
-                            builder: (BuildContext context) {
-                              return CustomScrollView(
-                                key: const PageStorageKey<String>('简介'),
-                                slivers: <Widget>[
-                                  if (vdCtr.videoType == SearchType.video) ...[
-                                    VideoIntroPanel(bvid: vdCtr.bvid),
-                                  ] else if (vdCtr.videoType ==
-                                      SearchType.media_bangumi) ...[
-                                    Obx(() => BangumiIntroPanel(
-                                        cid: vdCtr.cid.value)),
-                                  ],
-                                  SliverToBoxAdapter(
-                                    child: Divider(
-                                      indent: 12,
-                                      endIndent: 12,
-                                      color: Theme.of(context)
-                                          .dividerColor
-                                          .withOpacity(0.06),
-                                    ),
-                                  ),
-                                  if (vdCtr.videoType == SearchType.video &&
-                                      vdCtr.enableRelatedVideo)
-                                    const RelatedVideoPanel(),
+              body: Column(
+                children: [
+                  tabbarBuild(),
+                  Expanded(
+                    child: TabBarView(
+                      controller: vdCtr.tabCtr,
+                      children: <Widget>[
+                        Builder(
+                          builder: (BuildContext context) {
+                            return CustomScrollView(
+                              key: const PageStorageKey<String>('简介'),
+                              slivers: <Widget>[
+                                if (vdCtr.videoType == SearchType.video) ...[
+                                  VideoIntroPanel(bvid: vdCtr.bvid),
+                                ] else if (vdCtr.videoType ==
+                                    SearchType.media_bangumi) ...[
+                                  Obx(() =>
+                                      BangumiIntroPanel(cid: vdCtr.cid.value)),
                                 ],
-                              );
-                            },
+                                SliverToBoxAdapter(
+                                  child: Divider(
+                                    indent: 12,
+                                    endIndent: 12,
+                                    color: Theme.of(context)
+                                        .dividerColor
+                                        .withOpacity(0.06),
+                                  ),
+                                ),
+                                if (vdCtr.videoType == SearchType.video &&
+                                    vdCtr.enableRelatedVideo)
+                                  const RelatedVideoPanel(),
+                              ],
+                            );
+                          },
+                        ),
+                        Obx(
+                          () => VideoReplyPanel(
+                            bvid: vdCtr.bvid,
+                            oid: vdCtr.oid.value,
                           ),
-                          Obx(
-                            () => VideoReplyPanel(
-                              bvid: vdCtr.bvid,
-                              oid: vdCtr.oid.value,
-                            ),
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nil/nil.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/main_stream.dart';
@@ -142,10 +141,10 @@ class _BangumiPageState extends State<BangumiPage>
                                       ),
                               );
                             } else {
-                              return nil;
+                              return const SizedBox();
                             }
                           } else {
-                            return nil;
+                            return const SizedBox();
                           }
                         },
                       ),
@@ -216,7 +215,7 @@ class _BangumiPageState extends State<BangumiPage>
         (BuildContext context, int index) {
           return bangumiList!.isNotEmpty
               ? BangumiCardV(bangumiItem: bangumiList[index])
-              : nil;
+              : const SizedBox();
         },
         childCount: bangumiList!.isNotEmpty ? bangumiList!.length : 10,
       ),

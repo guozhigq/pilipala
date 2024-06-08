@@ -14,7 +14,7 @@ class StatDanMu extends StatelessWidget {
     Map<String, Color> colorObject = {
       'white': Colors.white,
       'gray': Theme.of(context).colorScheme.outline,
-      'black': Theme.of(context).colorScheme.onBackground.withOpacity(0.8),
+      'black': Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
     };
     Color color = colorObject[theme]!;
     return Row(

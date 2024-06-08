@@ -29,7 +29,7 @@ class ScrollAppBar extends StatelessWidget {
         opacity: scrollDistance / (videoHeight - kToolbarHeight),
         child: Container(
           height: statusBarHeight + kToolbarHeight,
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           padding: EdgeInsets.only(top: statusBarHeight),
           child: AppBar(
             primary: false,
