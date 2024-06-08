@@ -53,18 +53,25 @@ class _SubPageState extends State<SubPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             Map? data = snapshot.data;
             if (data != null && data['status']) {
-              return Obx(
-                () => ListView.builder(
-                  controller: scrollController,
-                  itemCount: _subController.subFolderData.value.list!.length,
-                  itemBuilder: (context, index) {
-                    return SubItem(
-                        subFolderItem:
-                            _subController.subFolderData.value.list![index],
-                        cancelSub: _subController.cancelSub);
-                  },
-                ),
-              );
+              if (_subController.subFolderData.value.list!.isNotEmpty) {
+                return Obx(
+                  () => ListView.builder(
+                    controller: scrollController,
+                    itemCount: _subController.subFolderData.value.list!.length,
+                    itemBuilder: (context, index) {
+                      return SubItem(
+                          subFolderItem:
+                              _subController.subFolderData.value.list![index],
+                          cancelSub: _subController.cancelSub);
+                    },
+                  ),
+                );
+              } else {
+                return const CustomScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  slivers: [HttpError(errMsg: '', btnText: '没有数据', fn: null)],
+                );
+              }
             } else {
               return CustomScrollView(
                 physics: const NeverScrollableScrollPhysics(),

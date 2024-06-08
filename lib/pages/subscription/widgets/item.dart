@@ -114,16 +114,15 @@ class VideoContent extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(
-                  height: 35,
-                  width: 35,
-                  child: IconButton(
-                    onPressed: () => cancelSub?.call(subFolderItem),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.outline,
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    ),
-                    icon: const Icon(Icons.delete_outline, size: 18),
+                IconButton(
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () => cancelSub?.call(subFolderItem),
+                  icon: Icon(
+                    Icons.clear_outlined,
+                    color: Theme.of(context).colorScheme.outline,
+                    size: 18,
                   ),
                 )
               ],
