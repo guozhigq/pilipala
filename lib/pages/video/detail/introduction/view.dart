@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -15,6 +18,7 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../../../http/user.dart';
@@ -146,13 +150,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   RxBool isExpand = false.obs;
   late ExpandableController _expandableCtr;
 
-  void Function()? handleState(Future Function() action) {
+  // 一键三连动画
+  late AnimationController _controller;
+  late Animation<double> _scaleTransition;
+  final RxDouble _progress = 0.0.obs;
+
+  void Function()? handleState(Future<dynamic> Function() action) {
     return isProcessing
         ? null
         : () async {
-            setState(() => isProcessing = true);
-            await action();
-            setState(() => isProcessing = false);
+            isProcessing = true;
+            await action.call();
+            isProcessing = false;
           };
   }
 
@@ -169,6 +178,25 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     follower = Utils.numFormat(videoIntroController.userStat['follower']);
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     _expandableCtr = ExpandableController(initialExpanded: false);
+
+    /// 一键三连动画
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      reverseDuration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleTransition = Tween<double>(begin: 0.5, end: 1.5).animate(_controller)
+      ..addListener(() async {
+        _progress.value = _scaleTransition.value - 0.5;
+        if (_progress.value == 1) {
+          if (_controller.status == AnimationStatus.completed) {
+            await videoIntroController.actionOneThree();
+          }
+          _progress.value = 0;
+          _scaleTransition.removeListener(() {});
+          _controller.stop();
+        }
+      });
   }
 
   // 收藏
@@ -249,6 +277,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   void dispose() {
     _expandableCtr.dispose();
+    _controller.dispose();
+    _scaleTransition.removeListener(() {});
     super.dispose();
   }
 
@@ -528,6 +558,157 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
+    final actionTypeSort = GlobalData().actionTypeSort;
+
+    Widget progressWidget(progress) {
+      return SizedBox(
+        width: 68,
+        height: 68,
+        child: CircularProgressIndicator(
+          value: progress.value,
+          strokeWidth: 4,
+        ),
+      );
+    }
+
+    Map<String, Widget> menuListWidgets = {
+      'like': Obx(
+        () {
+          bool likeStatus = videoIntroController.hasLike.value;
+          ColorScheme colorScheme = Theme.of(context).colorScheme;
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              progressWidget(_progress),
+              InkWell(
+                onTapDown: (details) {
+                  feedBack();
+                  _controller.forward();
+                },
+                onTapUp: (TapUpDetails details) {
+                  if (_progress.value == 0) {
+                    feedBack();
+                    EasyThrottle.throttle(
+                        'my-throttler', const Duration(milliseconds: 200), () {
+                      videoIntroController.actionLikeVideo();
+                    });
+                  }
+                  _controller.reverse();
+                },
+                borderRadius: StyleString.mdRadius,
+                child: SizedBox(
+                  width: (Get.size.width - 24) / 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 4),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                              scale: animation, child: child);
+                        },
+                        child: Icon(
+                          key: ValueKey<bool>(likeStatus),
+                          likeStatus
+                              ? Icons.thumb_up
+                              : Icons.thumb_up_alt_outlined,
+                          color: likeStatus
+                              ? colorScheme.primary
+                              : colorScheme.outline,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        widget.videoDetail!.stat!.like!.toString(),
+                        style: TextStyle(
+                          color: likeStatus ? colorScheme.primary : null,
+                          fontSize:
+                              Theme.of(context).textTheme.labelSmall!.fontSize,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      'coin': Obx(
+        () => Stack(
+          alignment: Alignment.center,
+          children: [
+            progressWidget(_progress),
+            ActionItem(
+              icon: Image.asset('assets/images/coin.png', width: 30),
+              onTap: handleState(videoIntroController.actionCoinVideo),
+              selectStatus: videoIntroController.hasCoin.value,
+              text: widget.videoDetail!.stat!.coin!.toString(),
+            ),
+          ],
+        ),
+      ),
+      'collect': Obx(
+        () => Stack(
+          alignment: Alignment.center,
+          children: [
+            progressWidget(_progress),
+            ActionItem(
+              icon: const Icon(Icons.star_border),
+              selectIcon: const Icon(Icons.star),
+              onTap: () => showFavBottomSheet(),
+              onLongPress: () => showFavBottomSheet(type: 'longPress'),
+              selectStatus: videoIntroController.hasFav.value,
+              text: widget.videoDetail!.stat!.favorite!.toString(),
+            ),
+          ],
+        ),
+      ),
+      'watchLater': ActionItem(
+        icon: const Icon(Icons.watch_later_outlined),
+        onTap: () async {
+          final res =
+              await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
+          SmartDialog.showToast(res['msg']);
+        },
+        selectStatus: false,
+        text: '稍后看',
+      ),
+      'share': ActionItem(
+        icon: const Icon(Icons.share),
+        onTap: () => videoIntroController.actionShareVideo(),
+        selectStatus: false,
+        text: '分享',
+      ),
+      'dislike': Obx(
+        () => ActionItem(
+          icon: const Icon(Icons.thumb_down_alt_outlined),
+          selectIcon: const Icon(Icons.thumb_down),
+          onTap: () {},
+          selectStatus: videoIntroController.hasDisLike.value,
+          text: '不喜欢',
+        ),
+      ),
+      'downloadCover': ActionItem(
+        icon: const Icon(Icons.image_outlined),
+        onTap: () {},
+        selectStatus: false,
+        text: '下载封面',
+      ),
+      'copyLink': ActionItem(
+        icon: const Icon(Icons.link_outlined),
+        onTap: () {},
+        selectStatus: false,
+        text: '复制链接',
+      ),
+    };
+    final List<Widget> list = [];
+    for (var i = 0; i < actionTypeSort.length; i++) {
+      list.add(menuListWidgets[actionTypeSort[i]]!);
+    }
+
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return Container(
@@ -535,50 +716,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         height: constraints.maxWidth / 5,
         child: ListView(
           scrollDirection: Axis.horizontal,
-          children: [
-            Obx(
-              () => ActionItem(
-                  icon: const Icon(Icons.thumb_up_alt_outlined),
-                  selectIcon: const Icon(Icons.thumb_up),
-                  onTap: handleState(videoIntroController.actionLikeVideo),
-                  selectStatus: videoIntroController.hasLike.value,
-                  text: widget.videoDetail!.stat!.like!.toString()),
-            ),
-            Obx(
-              () => ActionItem(
-                icon: Image.asset('assets/images/coin.png', width: 30),
-                onTap: handleState(videoIntroController.actionCoinVideo),
-                selectStatus: videoIntroController.hasCoin.value,
-                text: widget.videoDetail!.stat!.coin!.toString(),
-              ),
-            ),
-            Obx(
-              () => ActionItem(
-                icon: const Icon(Icons.star_border),
-                selectIcon: const Icon(Icons.star),
-                onTap: () => showFavBottomSheet(),
-                onLongPress: () => showFavBottomSheet(type: 'longPress'),
-                selectStatus: videoIntroController.hasFav.value,
-                text: widget.videoDetail!.stat!.favorite!.toString(),
-              ),
-            ),
-            ActionItem(
-              icon: const Icon(Icons.watch_later_outlined),
-              onTap: () async {
-                final res =
-                    await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
-                SmartDialog.showToast(res['msg']);
-              },
-              selectStatus: false,
-              text: '稍后看',
-            ),
-            ActionItem(
-              icon: const Icon(Icons.share),
-              onTap: () => videoIntroController.actionShareVideo(),
-              selectStatus: false,
-              text: '分享',
-            ),
-          ],
+          children: list,
         ),
       );
     });

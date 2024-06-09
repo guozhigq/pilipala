@@ -11,7 +11,6 @@ enum ActionType {
   dislike,
   downloadCover,
   copyLink,
-  threeAction,
   // backgroundPlay,
   // listenVideo,
   // downloadVideo,

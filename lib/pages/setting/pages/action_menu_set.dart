@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/action_type.dart';
+import 'package:pilipala/utils/global_data.dart';
 import '../../../utils/storage.dart';
 
 class ActionMenuSetPage extends StatefulWidget {
@@ -12,14 +13,14 @@ class ActionMenuSetPage extends StatefulWidget {
 }
 
 class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
-  Box settingStorage = GStrorage.setting;
+  Box setting = GStrorage.setting;
   late List<String> actionTypeSort;
   late List<Map> allLabels;
 
   @override
   void initState() {
     super.initState();
-    actionTypeSort = settingStorage.get(SettingBoxKey.actionTypeSort,
+    actionTypeSort = setting.get(SettingBoxKey.actionTypeSort,
         defaultValue: ['like', 'coin', 'collect', 'watchLater', 'share']);
     allLabels = actionMenuConfig;
     allLabels.sort((a, b) {
@@ -36,8 +37,9 @@ class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
         .where((i) => actionTypeSort.contains((i['value'] as ActionType).value))
         .map<String>((i) => (i['value'] as ActionType).value)
         .toList();
-    settingStorage.put(SettingBoxKey.actionTypeSort, sortedTabbar);
-    SmartDialog.showToast('保存成功，下次启动时生效');
+    setting.put(SettingBoxKey.actionTypeSort, sortedTabbar);
+    GlobalData().actionTypeSort = sortedTabbar;
+    SmartDialog.showToast('操作成功');
   }
 
   void onReorder(int oldIndex, int newIndex) {

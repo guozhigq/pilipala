@@ -38,6 +38,8 @@ class VideoIntroController extends GetxController {
   RxBool hasCoin = false.obs;
   // 是否收藏
   RxBool hasFav = false.obs;
+  // 是否不喜欢
+  RxBool hasDisLike = false.obs;
   Box userInfoCache = GStrorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
@@ -153,36 +155,16 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('🙏 UP已经收到了～');
       return false;
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: const Text('一键三连 给UP送温暖'),
-          actions: [
-            TextButton(
-                onPressed: () => SmartDialog.dismiss(),
-                child: const Text('点错了')),
-            TextButton(
-              onPressed: () async {
-                var result = await VideoHttp.oneThree(bvid: bvid);
-                if (result['status']) {
-                  hasLike.value = result["data"]["like"];
-                  hasCoin.value = result["data"]["coin"];
-                  hasFav.value = result["data"]["fav"];
-                  SmartDialog.showToast('三连成功 🎉');
-                } else {
-                  SmartDialog.showToast(result['msg']);
-                }
-                SmartDialog.dismiss();
-              },
-              child: const Text('确认'),
-            )
-          ],
-        );
-      },
-    );
+    var result = await VideoHttp.oneThree(bvid: bvid);
+    print('🤣🦴：${result["data"]}');
+    if (result['status']) {
+      hasLike.value = result["data"]["like"];
+      hasCoin.value = result["data"]["coin"];
+      hasFav.value = result["data"]["fav"];
+      SmartDialog.showToast('三连成功');
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
   }
 
   // （取消）点赞
@@ -193,9 +175,8 @@ class VideoIntroController extends GetxController {
     }
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
-      // hasLike.value = result["data"] == 1 ? true : false;
       if (!hasLike.value) {
-        SmartDialog.showToast('点赞成功 👍');
+        SmartDialog.showToast('点赞成功');
         hasLike.value = true;
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
       } else if (hasLike.value) {
@@ -213,6 +194,10 @@ class VideoIntroController extends GetxController {
   Future actionCoinVideo() async {
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
+      return;
+    }
+    if (hasCoin.value) {
+      SmartDialog.showToast('已投过币了');
       return;
     }
     showDialog(
@@ -236,7 +221,7 @@ class VideoIntroController extends GetxController {
                           var res = await VideoHttp.coinVideo(
                               bvid: bvid, multiply: _tempThemeValue);
                           if (res['status']) {
-                            SmartDialog.showToast('投币成功 👏');
+                            SmartDialog.showToast('投币成功');
                             hasCoin.value = true;
                             videoDetail.value.stat!.coin =
                                 videoDetail.value.stat!.coin! + _tempThemeValue;
@@ -269,7 +254,7 @@ class VideoIntroController extends GetxController {
       if (result['status']) {
         // 重新获取收藏状态
         await queryHasFavVideo();
-        SmartDialog.showToast('✅ 操作成功');
+        SmartDialog.showToast('操作成功');
       } else {
         SmartDialog.showToast(result['msg']);
       }
@@ -299,7 +284,7 @@ class VideoIntroController extends GetxController {
       Get.back();
       // 重新获取收藏状态
       await queryHasFavVideo();
-      SmartDialog.showToast('✅ 操作成功');
+      SmartDialog.showToast('操作成功');
     } else {
       SmartDialog.showToast(result['msg']);
     }
