@@ -278,8 +278,8 @@ class DefaultUser extends StatelessWidget {
       height: 38,
       child: IconButton(
         style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
             return Theme.of(context).colorScheme.onInverseSurface;
           }),
         ),
@@ -371,8 +371,8 @@ class CustomChip extends StatelessWidget {
       ),
       backgroundColor: secondaryContainer,
       selectedColor: secondaryContainer,
-      color: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
+      color: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) => secondaryContainer.withAlpha(200)),
       padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
       label: Text(label, style: chipTextStyle),
       onPressed: () => onTap(),

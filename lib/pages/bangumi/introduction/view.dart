@@ -232,11 +232,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                               height: 34,
                               child: IconButton(
                                 style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.zero),
+                                  padding:
+                                      WidgetStateProperty.all(EdgeInsets.zero),
                                   backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (Set<MaterialState> states) {
+                                      WidgetStateProperty.resolveWith(
+                                          (Set<WidgetState> states) {
                                     return t.colorScheme.primaryContainer
                                         .withOpacity(0.7);
                                   }),
