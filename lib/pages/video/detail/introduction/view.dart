@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
@@ -576,7 +574,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         height: 68,
         child: CircularProgressIndicator(
           value: progress.value,
-          strokeWidth: 4,
+          strokeWidth: 2,
         ),
       );
     }
@@ -593,6 +591,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               InkWell(
                 onTapDown: (details) {
                   feedBack();
+                  if (videoIntroController.userInfo == null) {
+                    SmartDialog.showToast('账号未登录');
+                    return;
+                  }
                   _controller.forward();
                 },
                 onTapUp: (TapUpDetails details) {
