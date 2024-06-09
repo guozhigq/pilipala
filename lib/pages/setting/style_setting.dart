@@ -289,11 +289,11 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/navbarSetting'),
             title: Text('底部导航栏设置', style: titleStyle),
           ),
-          ListTile(
-            dense: false,
-            onTap: () => Get.toNamed('/actionMenuSet'),
-            title: Text('操作菜单设置', style: titleStyle),
-          ),
+          // ListTile(
+          //   dense: false,
+          //   onTap: () => Get.toNamed('/actionMenuSet'),
+          //   title: Text('操作菜单设置', style: titleStyle),
+          // ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,

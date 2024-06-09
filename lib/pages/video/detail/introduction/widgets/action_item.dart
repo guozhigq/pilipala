@@ -38,20 +38,29 @@ class ActionItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 4),
-            icon is Icon
-                ? Icon(
-                    selectStatus ? selectIcon!.icon ?? icon!.icon : icon!.icon,
-                    color: selectStatus
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline,
-                  )
-                : Image.asset(
-                    'assets/images/coin.png',
-                    width: 25,
-                    color: selectStatus
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline,
-                  ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: icon is Icon
+                  ? Icon(
+                      selectStatus
+                          ? selectIcon!.icon ?? icon!.icon
+                          : icon!.icon,
+                      color: selectStatus
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                    )
+                  : Image.asset(
+                      key: ValueKey<bool>(selectStatus),
+                      'assets/images/coin.png',
+                      width: 25,
+                      color: selectStatus
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                    ),
+            ),
             const SizedBox(height: 6),
             Text(
               text ?? '',
@@ -60,7 +69,7 @@ class ActionItem extends StatelessWidget {
                     selectStatus ? Theme.of(context).colorScheme.primary : null,
                 fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
               ),
-            )
+            ),
           ],
         ),
       ),
