@@ -596,10 +596,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               InkWell(
                 onTapDown: (details) {
                   feedBack();
-                  if (videoIntroController.userInfo == null) {
-                    SmartDialog.showToast('账号未登录');
-                    return;
-                  }
+                  // if (videoIntroController.userInfo == null) {
+                  //   SmartDialog.showToast('账号未登录');
+                  //   return;
+                  // }
                   _controller.forward();
                 },
                 onTapUp: (TapUpDetails details) {
