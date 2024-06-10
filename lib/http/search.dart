@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/search/all.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
 import '../models/bangumi/info.dart';
 import '../models/common/search_type.dart';
 import '../models/search/hot.dart';
@@ -73,6 +75,7 @@ class SearchHttp {
     required page,
     String? order,
     int? duration,
+    int? tids,
   }) async {
     var reqData = {
       'search_type': searchType.type,
@@ -82,6 +85,7 @@ class SearchHttp {
       'page': page,
       if (order != null) 'order': order,
       if (duration != null) 'duration': duration,
+      if (tids != null && tids != -1) 'tids': tids,
     };
     var res = await Request().get(Api.searchByType, data: reqData);
     if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
@@ -154,6 +158,44 @@ class SearchHttp {
       return {
         'status': true,
         'data': BangumiInfoModel.fromJson(res.data['result']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': '请求错误 🙅',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> ab2cWithPic(
+      {int? aid, String? bvid}) async {
+    Map<String, dynamic> data = {};
+    if (aid != null) {
+      data['aid'] = aid;
+    } else if (bvid != null) {
+      data['bvid'] = bvid;
+    }
+    final dynamic res =
+        await Request().get(Api.ab2c, data: <String, dynamic>{...data});
+    return {
+      'cid': res.data['data'].first['cid'],
+      'pic': res.data['data'].first['first_frame'],
+    };
+  }
+
+  static Future<Map<String, dynamic>> searchCount(
+      {required String keyword}) async {
+    Map<String, dynamic> data = {
+      'keyword': keyword,
+      'web_location': 333.999,
+    };
+    Map params = await WbiSign().makSign(data);
+    final dynamic res = await Request().get(Api.searchCount, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': SearchAllModel.fromJson(res.data['data']),
       };
     } else {
       return {

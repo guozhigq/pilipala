@@ -45,7 +45,7 @@
         android:fullBackupContent="false"
         tools:replace="android:allowBackup">
         <activity
-            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:name="com.guozhigq.pilipala.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

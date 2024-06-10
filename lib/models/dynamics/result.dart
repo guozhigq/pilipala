@@ -414,6 +414,8 @@ class DynamicMajorModel {
     this.none,
     this.type,
     this.courses,
+    this.common,
+    this.music,
   });
 
   DynamicArchiveModel? archive;
@@ -429,6 +431,8 @@ class DynamicMajorModel {
   // MAJOR_TYPE_OPUS 图文/文章
   String? type;
   Map? courses;
+  Map? common;
+  Map? music;
 
   DynamicMajorModel.fromJson(Map<String, dynamic> json) {
     archive = json['archive'] != null
@@ -452,6 +456,8 @@ class DynamicMajorModel {
         json['none'] != null ? DynamicNoneModel.fromJson(json['none']) : null;
     type = json['type'];
     courses = json['courses'] ?? {};
+    common = json['common'] ?? {};
+    music = json['music'] ?? {};
   }
 }
 

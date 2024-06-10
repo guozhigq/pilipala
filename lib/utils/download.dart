@@ -15,24 +15,7 @@ class DownloadUtils {
     PermissionStatus status = await Permission.storage.status;
     if (status == PermissionStatus.denied ||
         status == PermissionStatus.permanentlyDenied) {
-      SmartDialog.show(
-        useSystem: true,
-        animationType: SmartAnimationType.centerFade_otherSlide,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('提示'),
-            content: const Text('存储权限未授权'),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  openAppSettings();
-                },
-                child: const Text('去授权'),
-              )
-            ],
-          );
-        },
-      );
+      await permissionDialog('提示', '存储权限未授权');
       return false;
     } else {
       return true;
@@ -45,24 +28,7 @@ class DownloadUtils {
     PermissionStatus status = await Permission.photos.status;
     if (status == PermissionStatus.denied ||
         status == PermissionStatus.permanentlyDenied) {
-      SmartDialog.show(
-        useSystem: true,
-        animationType: SmartAnimationType.centerFade_otherSlide,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('提示'),
-            content: const Text('相册权限未授权'),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  openAppSettings();
-                },
-                child: const Text('去授权'),
-              )
-            ],
-          );
-        },
-      );
+      await permissionDialog('提示', '相册权限未授权');
       return false;
     } else {
       return true;
@@ -72,17 +38,16 @@ class DownloadUtils {
   static Future<bool> downloadImg(String imgUrl,
       {String imgType = 'cover'}) async {
     try {
-      if (!Platform.isAndroid || !await requestPhotoPer()) {
-        return false;
-      }
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (androidInfo.version.sdkInt <= 32) {
-        if (!await requestStoragePer()) {
-          return false;
-        }
-      } else {
-        if (!await requestPhotoPer()) {
-          return false;
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt <= 32) {
+          if (!await requestStoragePer()) {
+            return false;
+          }
+        } else {
+          if (!await requestPhotoPer()) {
+            return false;
+          }
         }
       }
 
@@ -101,13 +66,38 @@ class DownloadUtils {
       );
       SmartDialog.dismiss();
       if (result.isSuccess) {
-        await SmartDialog.showToast('「${'$picName.$imgSuffix'}」已保存 ');
+        SmartDialog.showToast('「${'$picName.$imgSuffix'}」已保存 ');
+        return true;
+      } else {
+        await permissionDialog('保存失败', '相册权限未授权');
+        return false;
       }
-      return true;
     } catch (err) {
       SmartDialog.dismiss();
       SmartDialog.showToast(err.toString());
-      return true;
+      return false;
     }
+  }
+
+  static Future permissionDialog(String title, String content,
+      {Function? onGranted}) async {
+    await SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                openAppSettings();
+              },
+              child: const Text('去授权'),
+            )
+          ],
+        );
+      },
+    );
   }
 }

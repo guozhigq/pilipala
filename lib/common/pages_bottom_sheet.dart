@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../models/common/video_episode_type.dart';
 
@@ -44,27 +45,52 @@ class EpisodeBottomSheet {
         title = '第${episode.title}话  ${episode.longTitle!}';
         break;
     }
-    return ListTile(
-      onTap: () {
-        SmartDialog.showToast('切换至「$title」');
-        changeFucCall.call(episode, index);
-      },
-      dense: false,
-      leading: isCurrentIndex
-          ? Image.asset(
-              'assets/images/live.gif',
-              color: primary,
-              height: 12,
-            )
-          : null,
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14,
-          color: isCurrentIndex ? primary : onSurface,
-        ),
-      ),
-    );
+    return isFullScreen || episode?.cover == null || episode?.cover == ''
+        ? ListTile(
+            onTap: () {
+              SmartDialog.showToast('切换至「$title」');
+              changeFucCall.call(episode, index);
+            },
+            dense: false,
+            leading: isCurrentIndex
+                ? Image.asset(
+                    'assets/images/live.gif',
+                    color: primary,
+                    height: 12,
+                  )
+                : null,
+            title: Text(title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isCurrentIndex ? primary : onSurface,
+                )))
+        : InkWell(
+            onTap: () {
+              SmartDialog.showToast('切换至「$title」');
+              changeFucCall.call(episode, index);
+            },
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 14, right: 14, top: 8, bottom: 8),
+              child: Row(
+                children: [
+                  NetworkImgLayer(
+                      width: 130, height: 75, src: episode?.cover ?? ''),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isCurrentIndex ? primary : onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
   }
 
   Widget buildTitle() {
@@ -98,7 +124,7 @@ class EpisodeBottomSheet {
       });
       return Container(
         height: sheetHeight,
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: Column(
           children: [
             buildTitle(),

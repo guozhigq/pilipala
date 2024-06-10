@@ -124,7 +124,7 @@ class _BottomControlState extends State<BottomControl> {
               height: 34,
               child: IconButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () async {
                   bool canUsePiP = false;
@@ -153,7 +153,8 @@ class _BottomControlState extends State<BottomControl> {
               size: 20,
               color: Colors.white,
             ),
-            fuc: () => widget.controller!.triggerFullScreen(),
+            fuc: () => widget.controller!.triggerFullScreen(
+                status: !(widget.controller!.isFullScreen.value)),
           ),
         ],
       ),

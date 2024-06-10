@@ -1,7 +1,6 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nil/nil.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
@@ -36,7 +35,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               final int max = _.durationSeconds.value;
               final int buffer = _.bufferedSeconds.value;
               if (value > max || max <= 0) {
-                return nil;
+                return const SizedBox();
               }
               return Padding(
                 padding: const EdgeInsets.only(left: 7, right: 7, bottom: 6),

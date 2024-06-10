@@ -194,7 +194,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                     src: widget.bangumiDetail!.cover!,
                   ),
                   PBadge(
-                    text: '评分 ${widget.bangumiDetail!.rating!['score']!}',
+                    text:
+                        '评分 ${widget.bangumiDetail?.rating?['score']! ?? '暂无'}',
                     top: null,
                     right: 6,
                     bottom: 6,
@@ -231,11 +232,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                               height: 34,
                               child: IconButton(
                                 style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.zero),
+                                  padding:
+                                      WidgetStateProperty.all(EdgeInsets.zero),
                                   backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (Set<MaterialState> states) {
+                                      WidgetStateProperty.resolveWith(
+                                          (Set<WidgetState> states) {
                                     return t.colorScheme.primaryContainer
                                         .withOpacity(0.7);
                                   }),
@@ -322,8 +323,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               pages: widget.bangumiDetail!.episodes!,
               cid: cid! ?? widget.bangumiDetail!.episodes!.first.cid!,
               sheetHeight: sheetHeight,
-              changeFuc: (bvid, cid, aid) =>
-                  bangumiIntroController.changeSeasonOrbangu(bvid, cid, aid),
+              changeFuc: (bvid, cid, aid, cover) => bangumiIntroController
+                  .changeSeasonOrbangu(bvid, cid, aid, cover),
               bangumiDetail: bangumiIntroController.bangumiDetail.value,
               bangumiIntroController: bangumiIntroController,
             )

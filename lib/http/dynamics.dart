@@ -41,6 +41,7 @@ class DynamicsHttp {
         'status': false,
         'data': [],
         'msg': res.data['message'],
+        'code': res.data['code'],
       };
     }
   }
@@ -152,16 +153,28 @@ class DynamicsHttp {
   }
 
   static Future dynamicCreate({
-    required String dynIdStr,
     required int mid,
+    required int scene,
+    int? oid,
+    String? dynIdStr,
     String? rawText,
   }) async {
     DateTime now = DateTime.now();
     int timestamp = now.millisecondsSinceEpoch ~/ 1000;
     Random random = Random();
     int randomNumber = random.nextInt(9000) + 1000;
-    String uploadId =
-        mid.toString() + timestamp.toString() + randomNumber.toString();
+    String uploadId = '${mid}_${timestamp}_$randomNumber';
+
+    Map<String, dynamic> webRepostSrc = {
+      'dyn_id_str': dynIdStr ?? '',
+    };
+
+    /// 投稿转发
+    if (scene == 5) {
+      webRepostSrc = {
+        'revs_id': {'dyn_type': 8, 'rid': oid}
+      };
+    }
     var res = await Request().post(Api.dynamicCreate, queryParameters: {
       'platform': 'web',
       'csrf': await Request.getCsrf(),
@@ -174,14 +187,14 @@ class DynamicsHttp {
             {'raw_text': rawText ?? '', 'type': 1, 'biz_id': ''}
           ]
         },
-        'scene': 4,
+        'scene': scene,
         'attach_card': null,
         'upload_id': uploadId,
         'meta': {
           'app_meta': {'from': 'create.dynamic.web', 'mobi_app': 'web'}
         }
       },
-      'web_repost_src': {'dyn_id_str': dynIdStr}
+      'web_repost_src': webRepostSrc
     });
     if (res.data['code'] == 0) {
       return {

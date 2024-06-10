@@ -101,7 +101,7 @@ class PlPlayerController {
   bool _isFirstTime = true;
 
   Timer? _timer;
-  late Timer? _timerForSeek;
+  Timer? _timerForSeek;
   Timer? _timerForVolume;
   Timer? _timerForShowingVolume;
   Timer? _timerForGettingVolume;
@@ -123,6 +123,7 @@ class PlPlayerController {
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
   late RxList subtitles;
+  String videoType = 'archive';
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -220,7 +221,7 @@ class PlPlayerController {
   Rx<int> get playerCount => _playerCount;
 
   ///
-  Rx<String> get videoType => _videoType;
+  // Rx<String> get videoType => _videoType;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
@@ -274,8 +275,7 @@ class PlPlayerController {
   }
 
   // 添加一个私有构造函数
-  PlPlayerController._() {
-    _videoType = videoType;
+  PlPlayerController._internal(this.videoType) {
     isOpenDanmu.value =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
     blockTypes =
@@ -330,13 +330,15 @@ class PlPlayerController {
   }
 
   // 获取实例 传参
-  static PlPlayerController getInstance({
+  factory PlPlayerController({
     String videoType = 'archive',
   }) {
     // 如果实例尚未创建，则创建一个新实例
-    _instance ??= PlPlayerController._();
-    _instance!._playerCount.value += 1;
-    _videoType.value = videoType;
+    _instance ??= PlPlayerController._internal(videoType);
+    if (videoType != 'none') {
+      _instance!._playerCount.value += 1;
+      _videoType.value = videoType;
+    }
     return _instance!;
   }
 
@@ -351,7 +353,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
@@ -393,7 +395,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+          dataSource, _looping, enableHA, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -404,7 +406,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
+      await _initializePlayer(duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -424,6 +426,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
+    Duration seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -440,7 +443,7 @@ class PlPlayerController {
           configuration: PlayerConfiguration(
             // 默认缓存 5M 大小
             bufferSize:
-                videoType.value == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
+                videoType == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
           ),
         );
 
@@ -505,8 +508,9 @@ class PlPlayerController {
         play: false,
       );
     }
-    player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+    await player.open(
+      Media(dataSource.videoSource!,
+          httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
     // 音轨
@@ -519,7 +523,6 @@ class PlPlayerController {
 
   // 开始播放
   Future _initializePlayer({
-    Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
     getVideoFit();
@@ -528,9 +531,9 @@ class PlPlayerController {
     // }
 
     /// 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
 
     /// 自动播放
     if (_autoPlay) {
@@ -538,7 +541,7 @@ class PlPlayerController {
     }
 
     /// 设置倍速
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
       if (_playbackSpeed.value != 1.0) {
@@ -930,7 +933,7 @@ class PlPlayerController {
 
   /// 设置长按倍速状态 live模式下禁用
   void setDoubleSpeedStatus(bool val) {
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     if (controlsLock.value) {
@@ -974,41 +977,8 @@ class PlPlayerController {
       } else {
         await landScape();
       }
-
-      // bool isValid =
-      //     direction.value == 'vertical' || mode == FullScreenMode.vertical
-      //         ? true
-      //         : false;
-      // var result = await showDialog(
-      //   context: Get.context!,
-      //   useSafeArea: false,
-      //   builder: (context) => Dialog.fullscreen(
-      //     backgroundColor: Colors.black,
-      //     child: SafeArea(
-      //       // 忽略手机安全区域
-      //       top: isValid,
-      //       left: false,
-      //       right: false,
-      //       bottom: isValid,
-      //       child: PLVideoPlayer(
-      //         controller: this,
-      //         headerControl: headerControl,
-      //         bottomControl: bottomControl,
-      //         danmuWidget: danmuWidget,
-      //       ),
-      //     ),
-      //   ),
-      // );
-      // if (result == null) {
-      //   // 退出全屏
-      //   StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      //   exitFullScreen();
-      //   await verticalScreen();
-      //   toggleFullScreen(false);
-      // }
-    } else if (isFullScreen.value) {
+    } else if (isFullScreen.value && !status) {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      // Get.back();
       exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);
@@ -1045,7 +1015,7 @@ class PlPlayerController {
     if (!_enableHeart) {
       return false;
     }
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     // 播放状态变化时，更新
@@ -1120,9 +1090,6 @@ class PlPlayerController {
   }
 
   Future<void> dispose({String type = 'single'}) async {
-    print('dispose');
-    print('dispose: ${playerCount.value}');
-
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
@@ -1132,7 +1099,6 @@ class PlPlayerController {
     }
     _playerCount.value = 0;
     try {
-      print('dispose dispose ---------');
       _timer?.cancel();
       _timerForVolume?.cancel();
       _timerForGettingVolume?.cancel();
@@ -1148,7 +1114,6 @@ class PlPlayerController {
       // _buffered.close();
       // _showControls.close();
       // _controlsLock.close();
-
       // playerStatus.status.close();
       // dataStatus.status.close();
 

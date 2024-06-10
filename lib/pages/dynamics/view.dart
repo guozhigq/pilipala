@@ -11,6 +11,7 @@ import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/main_stream.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../mine/controller.dart';
@@ -161,13 +162,12 @@ class _DynamicsPageState extends State<DynamicsPage>
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .surfaceVariant
+                                      .surfaceContainerHighest
                                       .withOpacity(0.7),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 thumbDecoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 duration: const Duration(milliseconds: 300),
@@ -224,8 +224,8 @@ class _DynamicsPageState extends State<DynamicsPage>
                   if (snapshot.data == null) {
                     return const SliverToBoxAdapter(child: SizedBox());
                   }
-                  Map data = snapshot.data;
-                  if (data['status']) {
+                  Map? data = snapshot.data;
+                  if (data != null && data['status']) {
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList;
                     return Obx(
@@ -248,24 +248,21 @@ class _DynamicsPageState extends State<DynamicsPage>
                         }
                       },
                     );
-                  } else if (data['msg'] == "账号未登录") {
-                    return HttpError(
-                      errMsg: data['msg'],
-                      btnText: "去登录",
-                      fn: () {
-                        mineController.onLogin();
-                      },
-                    );
                   } else {
                     return HttpError(
-                      errMsg: data['msg'],
+                      errMsg: data?['msg'] ?? '请求异常',
+                      btnText: data?['code'] == -101 ? '去登录' : null,
                       fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _dynamicsController.queryFollowDynamic();
-                          _futureBuilderFutureUp =
-                              _dynamicsController.queryFollowUp();
-                        });
+                        if (data?['code'] == -101) {
+                          RoutePush.loginRedirectPush();
+                        } else {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _dynamicsController.queryFollowDynamic();
+                            _futureBuilderFutureUp =
+                                _dynamicsController.queryFollowUp();
+                          });
+                        }
                       },
                     );
                   }

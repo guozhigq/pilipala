@@ -5,18 +5,25 @@ class SearchText extends StatelessWidget {
   final Function? onSelect;
   final int? searchTextIdx;
   final Function? onLongSelect;
+  final bool isSelect;
   const SearchText({
     super.key,
     this.searchText,
     this.onSelect,
     this.searchTextIdx,
     this.onLongSelect,
+    this.isSelect = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      color: isSelect
+          ? Theme.of(context).colorScheme.primaryContainer
+          : Theme.of(context)
+              .colorScheme
+              .surfaceContainerHighest
+              .withOpacity(0.5),
       borderRadius: BorderRadius.circular(6),
       child: Padding(
         padding: EdgeInsets.zero,
@@ -34,7 +41,10 @@ class SearchText extends StatelessWidget {
             child: Text(
               searchText!,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: isSelect
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),

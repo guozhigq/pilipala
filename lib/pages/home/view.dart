@@ -214,6 +214,34 @@ class UserInfoWidget extends StatelessWidget {
   final VoidCallback? callback;
   final HomeController? ctr;
 
+  Widget buildLoggedInWidget(context) {
+    return Stack(
+      children: [
+        NetworkImgLayer(
+          type: 'avatar',
+          width: 34,
+          height: 34,
+          src: userFace,
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => callback?.call(),
+              splashColor: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withOpacity(0.3),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(50),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -231,31 +259,7 @@ class UserInfoWidget extends StatelessWidget {
         const SizedBox(width: 8),
         Obx(
           () => userLogin.value
-              ? Stack(
-                  children: [
-                    NetworkImgLayer(
-                      type: 'avatar',
-                      width: 34,
-                      height: 34,
-                      src: userFace,
-                    ),
-                    Positioned.fill(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => callback?.call(),
-                          splashColor: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.3),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(50),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )
+              ? buildLoggedInWidget(context)
               : DefaultUser(callback: () => callback!()),
         ),
       ],
@@ -274,8 +278,8 @@ class DefaultUser extends StatelessWidget {
       height: 38,
       child: IconButton(
         style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
             return Theme.of(context).colorScheme.onInverseSurface;
           }),
         ),
@@ -367,8 +371,8 @@ class CustomChip extends StatelessWidget {
       ),
       backgroundColor: secondaryContainer,
       selectedColor: secondaryContainer,
-      color: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
+      color: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) => secondaryContainer.withAlpha(200)),
       padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
       label: Text(label, style: chipTextStyle),
       onPressed: () => onTap(),
@@ -402,30 +406,27 @@ class SearchBar extends StatelessWidget {
           color: colorScheme.onSecondaryContainer.withOpacity(0.05),
           child: InkWell(
             splashColor: colorScheme.primaryContainer.withOpacity(0.3),
-            onTap: () => Get.toNamed(
-              '/search',
-              parameters: {'hintText': ctr!.defaultSearch.value},
-            ),
-            child: Row(
-              children: [
-                const SizedBox(width: 14),
-                Icon(
-                  Icons.search_outlined,
-                  color: colorScheme.onSecondaryContainer,
-                ),
-                const SizedBox(width: 10),
-                Obx(
-                  () => Expanded(
-                    child: Text(
+            onTap: () => Get.toNamed('/search',
+                parameters: {'hintText': ctr!.defaultSearch.value}),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.search_outlined,
+                    color: colorScheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: 10),
+                  Obx(
+                    () => Text(
                       ctr!.defaultSearch.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: colorScheme.outline),
                     ),
                   ),
-                ),
-                const SizedBox(width: 15),
-              ],
+                ],
+              ),
             ),
           ),
         ),

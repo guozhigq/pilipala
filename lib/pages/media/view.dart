@@ -105,7 +105,7 @@ class _MediaPageState extends State<MediaPage>
           color: Theme.of(context).dividerColor.withOpacity(0.1),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () => Get.toNamed('/fav'),
           leading: null,
           dense: true,
           title: Padding(
@@ -178,10 +178,10 @@ class _MediaPageState extends State<MediaPage>
                                   child: Center(
                                     child: IconButton(
                                       style: ButtonStyle(
-                                        padding: MaterialStateProperty.all(
+                                        padding: WidgetStateProperty.all(
                                             EdgeInsets.zero),
                                         backgroundColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
                                           return Theme.of(context)
                                               .colorScheme

@@ -69,9 +69,10 @@ class RecVideoItemAppModel {
         : null;
     // 由于app端api并不会直接返回与owner的关注状态
     // 所以借用推荐原因是否为“已关注”、“新关注”等判别关注状态，从而与web端接口等效
+    RegExp regex = RegExp(r'已关注|新关注');
     isFollowed = rcmdReason != null &&
             rcmdReason!.content != null &&
-            rcmdReason!.content!.contains('关注')
+            regex.hasMatch(rcmdReason!.content!)
         ? 1
         : 0;
     // 如果是，就无需再显示推荐原因，交由view统一处理即可

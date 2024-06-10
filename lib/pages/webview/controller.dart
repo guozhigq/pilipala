@@ -52,15 +52,19 @@ class WebviewController extends GetxController {
             loadProgress.value = progress;
           },
           onPageStarted: (String url) {
-            final String str = Uri.parse(url).pathSegments[0];
-            final Map matchRes = IdUtils.matchAvorBv(input: str);
-            final List matchKeys = matchRes.keys.toList();
-            if (matchKeys.isNotEmpty) {
-              if (matchKeys.first == 'BV') {
-                Get.offAndToNamed(
-                  '/searchResult',
-                  parameters: {'keyword': matchRes['BV']},
-                );
+            final List pathSegments = Uri.parse(url).pathSegments;
+            if (pathSegments.isNotEmpty &&
+                url != 'https://passport.bilibili.com/h5-app/passport/login') {
+              final String str = pathSegments[0];
+              final Map matchRes = IdUtils.matchAvorBv(input: str);
+              final List matchKeys = matchRes.keys.toList();
+              if (matchKeys.isNotEmpty) {
+                if (matchKeys.first == 'BV') {
+                  Get.offAndToNamed(
+                    '/searchResult',
+                    parameters: {'keyword': matchRes['BV']},
+                  );
+                }
               }
             }
           },
@@ -72,7 +76,7 @@ class WebviewController extends GetxController {
                 (url.startsWith(
                         'https://passport.bilibili.com/web/sso/exchange_cookie') ||
                     url.startsWith('https://m.bilibili.com/'))) {
-              confirmLogin(url);
+              LoginUtils.confirmLogin(url, controller);
             }
           },
           onWebResourceError: (WebResourceError error) {},
@@ -92,52 +96,5 @@ class WebviewController extends GetxController {
         ),
       )
       ..loadRequest(Uri.parse(url));
-  }
-
-  confirmLogin(url) async {
-    var content = '';
-    if (url != null) {
-      content = '${content + url}; \n';
-    }
-    try {
-      await SetCookie.onSet();
-      final result = await UserHttp.userInfo();
-      if (result['status'] && result['data'].isLogin) {
-        SmartDialog.showToast('登录成功');
-        try {
-          Box userInfoCache = GStrorage.userInfo;
-          await userInfoCache.put('userInfoCache', result['data']);
-
-          final HomeController homeCtr = Get.find<HomeController>();
-          homeCtr.updateLoginStatus(true);
-          homeCtr.userFace.value = result['data'].face;
-          final MediaController mediaCtr = Get.find<MediaController>();
-          mediaCtr.mid = result['data'].mid;
-          await LoginUtils.refreshLoginStatus(true);
-        } catch (err) {
-          SmartDialog.show(builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('登录遇到问题'),
-              content: Text(err.toString()),
-              actions: [
-                TextButton(
-                  onPressed: () => controller.reload(),
-                  child: const Text('确认'),
-                )
-              ],
-            );
-          });
-        }
-        Get.back();
-      } else {
-        // 获取用户信息失败
-        SmartDialog.showToast(result['msg']);
-        Clipboard.setData(ClipboardData(text: result['msg']));
-      }
-    } catch (e) {
-      SmartDialog.showNotify(msg: e.toString(), notifyType: NotifyType.warning);
-      content = content + e.toString();
-      Clipboard.setData(ClipboardData(text: content));
-    }
   }
 }

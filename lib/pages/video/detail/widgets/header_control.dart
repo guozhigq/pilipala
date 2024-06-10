@@ -93,7 +93,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 460,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -180,15 +180,16 @@ class _HeaderControlState extends State<HeaderControl> {
                             '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
                             style: subTitleStyle),
                       ),
-                    ListTile(
-                      onTap: () => {Get.back(), showSetDecodeFormats()},
-                      dense: true,
-                      leading: const Icon(Icons.av_timer_outlined, size: 20),
-                      title: const Text('解码格式', style: titleStyle),
-                      subtitle: Text(
-                          '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
-                          style: subTitleStyle),
-                    ),
+                    if (widget.videoDetailCtr!.currentDecodeFormats != null)
+                      ListTile(
+                        onTap: () => {Get.back(), showSetDecodeFormats()},
+                        dense: true,
+                        leading: const Icon(Icons.av_timer_outlined, size: 20),
+                        title: const Text('解码格式', style: titleStyle),
+                        subtitle: Text(
+                            '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats!.description}',
+                            style: subTitleStyle),
+                      ),
                     ListTile(
                       onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
@@ -316,7 +317,7 @@ class _HeaderControlState extends State<HeaderControl> {
             height: 500,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             margin: const EdgeInsets.all(12),
@@ -376,7 +377,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           inactiveThumbColor:
                               Theme.of(context).colorScheme.primaryContainer,
                           inactiveTrackColor:
-                              Theme.of(context).colorScheme.background,
+                              Theme.of(context).colorScheme.surface,
                           splashRadius: 10.0,
                           // boolean variable value
                           value: shutdownTimerService.waitForPlayingCompleted,
@@ -445,7 +446,7 @@ class _HeaderControlState extends State<HeaderControl> {
                       children: [
                         RadioListTile(
                           value: -1,
-                          title: const Text('关闭弹幕'),
+                          title: const Text('关闭字幕'),
                           groupValue: tempThemeValue,
                           onChanged: (value) {
                             tempThemeValue = value!;
@@ -541,14 +542,22 @@ class _HeaderControlState extends State<HeaderControl> {
 
     /// 可用的质量分类
     int userfulQaSam = 0;
-    final List<VideoItem> video = videoInfo.dash!.video!;
-    final Set<int> idSet = {};
-    for (final VideoItem item in video) {
-      final int id = item.id!;
-      if (!idSet.contains(id)) {
-        idSet.add(id);
-        userfulQaSam++;
+    if (videoInfo.dash != null) {
+      // dash格式视频一次请求会返回所有可播放的清晰度video
+      final List<VideoItem> video = videoInfo.dash!.video!;
+      final Set<int> idSet = {};
+      for (final VideoItem item in video) {
+        final int id = item.id!;
+        if (!idSet.contains(id)) {
+          idSet.add(id);
+          userfulQaSam++;
+        }
       }
+    }
+
+    if (videoInfo.durl != null) {
+      // durl格式视频一次请求返回对应清晰度video
+      userfulQaSam = videoFormat.length - 1;
     }
 
     showModalBottomSheet(
@@ -561,7 +570,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 310,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -651,7 +660,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -707,7 +716,7 @@ class _HeaderControlState extends State<HeaderControl> {
   void showSetDecodeFormats() {
     // 当前选中的解码格式
     final VideoDecodeFormats currentDecodeFormats =
-        widget.videoDetailCtr!.currentDecodeFormats;
+        widget.videoDetailCtr!.currentDecodeFormats!;
     final VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
@@ -725,7 +734,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -819,7 +828,7 @@ class _HeaderControlState extends State<HeaderControl> {
             height: 580,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             margin: const EdgeInsets.all(12),
@@ -1075,7 +1084,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -1239,7 +1248,7 @@ class _HeaderControlState extends State<HeaderControl> {
               height: 34,
               child: TextButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () => showShootDanmakuSheet(),
                 child: const Text(
@@ -1254,7 +1263,7 @@ class _HeaderControlState extends State<HeaderControl> {
               child: Obx(
                 () => IconButton(
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
                     _.isOpenDanmu.value = !_.isOpenDanmu.value;
@@ -1277,7 +1286,7 @@ class _HeaderControlState extends State<HeaderControl> {
               height: 34,
               child: IconButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () async {
                   bool canUsePiP = false;
@@ -1321,7 +1330,7 @@ class _HeaderControlState extends State<HeaderControl> {
               height: 34,
               child: TextButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () => showSetSpeedSheet(),
                 child: Text(

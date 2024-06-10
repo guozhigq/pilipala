@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
@@ -154,16 +155,33 @@ class ChatItem extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   SmartDialog.showLoading();
-                  var bvid = content["bvid"];
+                  final String bvid = content["bvid"];
+                  // 16番剧 5投稿
+                  final int source = content["source"];
+                  final String? url = content["url"];
+
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = Utils.makeHeroTag(bvid);
-                  SmartDialog.dismiss<dynamic>().then(
-                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
-                        arguments: <String, String?>{
-                          'pic': content['thumb'],
-                          'heroTag': heroTag,
-                        }),
-                  );
+                  await SmartDialog.dismiss();
+                  if (source == 5) {
+                    Get.toNamed<dynamic>(
+                      '/video?bvid=$bvid&cid=$cid',
+                      arguments: <String, String?>{
+                        'pic': content['thumb'],
+                        'heroTag': heroTag,
+                      },
+                    );
+                  }
+                  if (source == 16) {
+                    if (url != null) {
+                      final String area = url.split('/').last;
+                      if (area.startsWith('ep')) {
+                        RoutePush.bangumiPush(null, Utils.matchNum(area).first);
+                      } else if (area.startsWith('ss')) {
+                        RoutePush.bangumiPush(Utils.matchNum(area).first, null);
+                      }
+                    }
+                  }
                 },
                 child: NetworkImgLayer(
                   width: 220,
@@ -183,7 +201,7 @@ class ChatItem extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                content['author'],
+                content['author'] ?? '',
                 style: TextStyle(
                   letterSpacing: 0.6,
                   height: 1.5,
@@ -206,7 +224,7 @@ class ChatItem extends StatelessWidget {
                   SmartDialog.dismiss<dynamic>().then(
                     (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                         arguments: <String, String?>{
-                          'pic': content['thumb'],
+                          'pic': content['thumb'] ?? '',
                           'heroTag': heroTag,
                         }),
                   );
@@ -241,115 +259,114 @@ class ChatItem extends StatelessWidget {
           );
         case MsgType.auto_reply_push:
           return Container(
-              constraints: const BoxConstraints(
-                maxWidth: 300.0, // 设置最大宽度为200.0
+            constraints: const BoxConstraints(
+              maxWidth: 300.0, // 设置最大宽度为200.0
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withOpacity(0.4),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(16),
               ),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondaryContainer
-                    .withOpacity(0.4),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(6),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    content['main_title'],
-                    style: TextStyle(
-                      letterSpacing: 0.6,
-                      height: 1.5,
-                      color: textColor(context),
-                      fontWeight: FontWeight.bold,
-                    ),
+            ),
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  content['main_title'],
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context),
+                    fontWeight: FontWeight.bold,
                   ),
-                  for (var i in content['sub_cards']) ...<Widget>[
-                    const SizedBox(height: 6),
-                    GestureDetector(
-                        onTap: () async {
-                          RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}',
-                              caseSensitive: false);
-                          Iterable<Match> matches =
-                              bvRegex.allMatches(i['jump_url']);
-                          if (matches.isNotEmpty) {
-                            Match match = matches.first;
-                            String bvid = match.group(0)!;
-                            try {
-                              SmartDialog.showLoading();
-                              final int cid = await SearchHttp.ab2c(bvid: bvid);
-                              final String heroTag = Utils.makeHeroTag(bvid);
-                              SmartDialog.dismiss<dynamic>().then(
-                                (e) => Get.toNamed<dynamic>(
-                                    '/video?bvid=$bvid&cid=$cid',
-                                    arguments: <String, String?>{
-                                      'pic': i['cover_url'],
-                                      'heroTag': heroTag,
-                                    }),
-                              );
-                            } catch (err) {
-                              SmartDialog.dismiss();
-                              SmartDialog.showToast(err.toString());
-                            }
-                          } else {
-                            SmartDialog.showToast('未匹配到 BV 号');
-                            Get.toNamed('/webview',
-                                arguments: {'url': i['jump_url']});
-                          }
-                        },
-                        child: Row(
+                ),
+                for (var i in content['sub_cards']) ...<Widget>[
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      RegExp bvRegex =
+                          RegExp(r'BV[0-9A-Za-z]{10}', caseSensitive: false);
+                      Iterable<Match> matches =
+                          bvRegex.allMatches(i['jump_url']);
+                      if (matches.isNotEmpty) {
+                        Match match = matches.first;
+                        String bvid = match.group(0)!;
+                        try {
+                          SmartDialog.showLoading();
+                          final int cid = await SearchHttp.ab2c(bvid: bvid);
+                          final String heroTag = Utils.makeHeroTag(bvid);
+                          SmartDialog.dismiss<dynamic>().then(
+                            (e) => Get.toNamed<dynamic>(
+                                '/video?bvid=$bvid&cid=$cid',
+                                arguments: <String, String?>{
+                                  'pic': i['cover_url'],
+                                  'heroTag': heroTag,
+                                }),
+                          );
+                        } catch (err) {
+                          SmartDialog.dismiss();
+                          SmartDialog.showToast(err.toString());
+                        }
+                      } else {
+                        SmartDialog.showToast('未匹配到 BV 号');
+                        Get.toNamed('/webview',
+                            arguments: {'url': i['jump_url']});
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        NetworkImgLayer(
+                          width: 130,
+                          height: 130 * 9 / 16,
+                          src: i['cover_url'],
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                            child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            NetworkImgLayer(
-                              width: 130,
-                              height: 130 * 9 / 16,
-                              src: i['cover_url'],
+                            Text(
+                              i['field1'],
+                              maxLines: 2,
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                                child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  i['field1'],
-                                  maxLines: 2,
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  i['field2'],
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context).withOpacity(0.6),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  Utils.timeFormat(int.parse(i['field3'])),
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context).withOpacity(0.6),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            )),
+                            Text(
+                              i['field2'],
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context).withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              i['field3'],
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context).withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         )),
-                  ],
+                      ],
+                    ),
+                  ),
                 ],
-              ));
+              ],
+            ),
+          );
         default:
           return Text(
             content != null && content != ''

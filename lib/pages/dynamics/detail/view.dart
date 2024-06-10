@@ -196,7 +196,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         centerTitle: false,
         titleSpacing: 0,
         title: StreamBuilder(
-          stream: titleStreamC.stream.distinct(),
+          stream: titleStreamC.stream,
           initialData: false,
           builder: (context, AsyncSnapshot snapshot) {
             return AnimatedOpacity(
@@ -369,35 +369,40 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             curve: Curves.easeInOut,
           ),
         ),
-        child: FloatingActionButton(
-          heroTag: null,
-          onPressed: () {
-            feedBack();
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (BuildContext context) {
-                return VideoReplyNewDialog(
-                  oid: _dynamicDetailController.oid ??
-                      IdUtils.bv2av(Get.parameters['bvid']!),
-                  root: 0,
-                  parent: 0,
-                  replyType: ReplyType.values[replyType],
-                );
-              },
-            ).then(
-              (value) => {
-                // 完成评论，数据添加
-                if (value != null && value['data'] != null)
-                  {
-                    _dynamicDetailController.replyList.add(value['data']),
-                    _dynamicDetailController.acount.value++
-                  }
-              },
-            );
-          },
-          tooltip: '评论动态',
-          child: const Icon(Icons.reply),
+        child: Obx(
+          () => _dynamicDetailController.replyReqCode.value == 12061
+              ? const SizedBox()
+              : FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () {
+                    feedBack();
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return VideoReplyNewDialog(
+                          oid: _dynamicDetailController.oid ??
+                              IdUtils.bv2av(Get.parameters['bvid']!),
+                          root: 0,
+                          parent: 0,
+                          replyType: ReplyType.values[replyType],
+                        );
+                      },
+                    ).then(
+                      (value) => {
+                        // 完成评论，数据添加
+                        if (value != null && value['data'] != null)
+                          {
+                            _dynamicDetailController.replyList
+                                .add(value['data']),
+                            _dynamicDetailController.acount.value++
+                          }
+                      },
+                    );
+                  },
+                  tooltip: '评论动态',
+                  child: const Icon(Icons.reply),
+                ),
         ),
       ),
     );

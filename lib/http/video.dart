@@ -35,7 +35,7 @@ class VideoHttp {
         Api.recommendListWeb,
         data: {
           'version': 1,
-          'feed_version': 'V8',
+          'feed_version': 'V3',
           'homepage_ver': 1,
           'ps': ps,
           'fresh_idx': freshIdx,
@@ -192,22 +192,15 @@ class VideoHttp {
   // 视频信息 标题、简介
   static Future videoIntro({required String bvid}) async {
     var res = await Request().get(Api.videoIntro, data: {'bvid': bvid});
-    VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
-    if (result.code == 0) {
+    if (res.data['code'] == 0) {
+      VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
       return {'status': true, 'data': result.data!};
     } else {
-      Map errMap = {
-        -400: '请求错误',
-        -403: '权限不足',
-        -404: '视频资源失效',
-        62002: '稿件不可见',
-        62004: '稿件审核中',
-      };
       return {
         'status': false,
         'data': null,
-        'code': result.code,
-        'msg': errMap[result.code] ?? '请求异常',
+        'code': res.data['code'],
+        'msg': res.data['message'],
       };
     }
   }
@@ -394,9 +387,15 @@ class VideoHttp {
       'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
-      return {'status': true, 'data': res.data['data']};
+      if (act == 5) {
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        blackMidsList.add(mid);
+        setting.put(SettingBoxKey.blackMidsList, blackMidsList);
+      }
+      return {'status': true, 'data': res.data['data'], 'msg': '成功'};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 

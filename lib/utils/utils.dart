@@ -109,7 +109,6 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
-    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {
@@ -383,5 +382,12 @@ class Utils {
   static String base64EncodeRandomString(int minLength, int maxLength) {
     List<int> randomBytes = generateRandomBytes(minLength, maxLength);
     return base64.encode(randomBytes);
+  }
+
+  static List<int> matchNum(String str) {
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
+
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
   }
 }

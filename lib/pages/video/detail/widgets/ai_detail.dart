@@ -23,7 +23,7 @@ class AiDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     sheetHeight = localCache.get('sheetHeight');
     return Container(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(left: 14, right: 14),
       height: sheetHeight,
       child: Column(
@@ -108,7 +108,7 @@ class AiDetail extends StatelessWidget {
                                           fontSize: 13,
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           height: 1.5,
                                         ),
                                         children: [
