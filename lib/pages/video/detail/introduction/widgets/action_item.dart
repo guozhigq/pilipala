@@ -55,7 +55,7 @@ class ActionItem extends StatelessWidget {
                   : Image.asset(
                       key: ValueKey<bool>(selectStatus),
                       'assets/images/coin.png',
-                      width: 25,
+                      width: const IconThemeData.fallback().size,
                       color: selectStatus
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).colorScheme.outline,
