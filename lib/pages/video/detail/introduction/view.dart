@@ -185,7 +185,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     );
     _scaleTransition = Tween<double>(begin: 0.5, end: 1.5).animate(_controller)
       ..addListener(() async {
-        _progress.value = _scaleTransition.value - 0.5;
+        _progress.value =
+            double.parse((_scaleTransition.value - 0.5).toStringAsFixed(3));
         if (_progress.value == 1) {
           if (_controller.status == AnimationStatus.completed) {
             await videoIntroController.actionOneThree();
@@ -560,8 +561,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     Widget progressWidget(progress) {
       return SizedBox(
-        width: 68,
-        height: 68,
+        width: 33,
+        height: 33,
         child: CircularProgressIndicator(
           value: progress.value,
           strokeWidth: 2,
@@ -575,16 +576,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           bool likeStatus = videoIntroController.hasLike.value;
           ColorScheme colorScheme = Theme.of(context).colorScheme;
           return Stack(
-            alignment: Alignment.center,
             children: [
-              progressWidget(_progress),
+              Positioned(child: progressWidget(_progress), top: 15, left: 24),
               InkWell(
                 onTapDown: (details) {
                   feedBack();
-                  if (videoIntroController.userInfo == null) {
-                    SmartDialog.showToast('账号未登录');
-                    return;
-                  }
+                  // if (videoIntroController.userInfo == null) {
+                  //   SmartDialog.showToast('账号未登录');
+                  //   return;
+                  // }
                   _controller.forward();
                 },
                 onTapUp: (TapUpDetails details) {
@@ -640,9 +640,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       ),
       'coin': Obx(
         () => Stack(
-          alignment: Alignment.center,
           children: [
-            progressWidget(_progress),
+            Positioned(child: progressWidget(_progress), top: 15, left: 24),
             ActionItem(
               icon: Image.asset('assets/images/coin.png', width: 30),
               onTap: handleState(videoIntroController.actionCoinVideo),
@@ -654,9 +653,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       ),
       'collect': Obx(
         () => Stack(
-          alignment: Alignment.center,
           children: [
-            progressWidget(_progress),
+            Positioned(child: progressWidget(_progress), top: 15, left: 24),
             ActionItem(
               icon: const Icon(Icons.star_border),
               selectIcon: const Icon(Icons.star),
