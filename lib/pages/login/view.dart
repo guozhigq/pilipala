@@ -15,8 +15,10 @@ class _LoginPageState extends State<LoginPage> {
   final LoginPageController _loginPageCtr = Get.put(LoginPageController());
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _loginPageCtr.validTimer?.cancel();
+    _loginPageCtr.timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -51,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
               );
             },
-            icon: const Icon(Icons.language),
+            icon: const Icon(Icons.language, size: 20),
           ),
           IconButton(
             tooltip: '二维码登录',
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Map data = snapshot.data as Map;
                                 return QrImageView(
                                   data: data['data']['url'],
-                                  backgroundColor: Colors.transparent,
+                                  backgroundColor: Colors.white,
                                 );
                               } else {
                                 return const Center(
@@ -131,9 +133,11 @@ class _LoginPageState extends State<LoginPage> {
                     );
                   });
                 },
-              );
+              ).then((value) {
+                _loginPageCtr.validTimer!.cancel();
+              });
             },
-            icon: const Icon(Icons.qr_code),
+            icon: const Icon(Icons.qr_code, size: 20),
           ),
           const SizedBox(width: 22),
         ],
@@ -164,17 +168,9 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 34,
                         fontWeight: FontWeight.w500),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        '请使用您的 BiliBili 账号登录。',
-                        style: Theme.of(context).textTheme.titleSmall!,
-                      ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Icon(Icons.info_outline, size: 16),
-                      )
-                    ],
+                  Text(
+                    '请使用您的 BiliBili 账号登录。',
+                    style: Theme.of(context).textTheme.titleSmall!,
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 38, bottom: 15),
@@ -253,8 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                               IconButton(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (states) {
+                                      WidgetStateProperty.resolveWith((states) {
                                     return Theme.of(context)
                                         .colorScheme
                                         .primary
@@ -344,8 +339,7 @@ class _LoginPageState extends State<LoginPage> {
                               IconButton(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (states) {
+                                      WidgetStateProperty.resolveWith((states) {
                                     return Theme.of(context)
                                         .colorScheme
                                         .primary

@@ -11,7 +11,8 @@ class GlobalData {
   bool enablePlayerControlAnimation = true;
   final bool enableMYBar =
       setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
-
+  List<String> actionTypeSort = setting.get(SettingBoxKey.actionTypeSort,
+      defaultValue: ['like', 'coin', 'collect', 'watchLater', 'share']);
   // 私有构造函数
   GlobalData._();
 

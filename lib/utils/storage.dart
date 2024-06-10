@@ -149,7 +149,8 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       enableGradientBg = 'enableGradientBg',
-      navBarSort = 'navBarSort';
+      navBarSort = 'navBarSort',
+      actionTypeSort = 'actionTypeSort';
 }
 
 class LocalCacheKey {

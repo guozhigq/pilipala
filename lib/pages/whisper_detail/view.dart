@@ -95,9 +95,9 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                 height: 34,
                 child: IconButton(
                   style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    backgroundColor: MaterialStateProperty.resolveWith(
-                        (Set<MaterialState> states) {
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                        (Set<WidgetState> states) {
                       return Theme.of(context)
                           .colorScheme
                           .primaryContainer

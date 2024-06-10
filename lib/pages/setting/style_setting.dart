@@ -69,10 +69,10 @@ class _StyleSettingState extends State<StyleSetting> {
                 alignment: Alignment.centerRight,
                 scale: 0.8,
                 child: Switch(
-                    thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                        (Set<MaterialState> states) {
+                    thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+                        (Set<WidgetState> states) {
                       if (states.isNotEmpty &&
-                          states.first == MaterialState.selected) {
+                          states.first == WidgetState.selected) {
                         return const Icon(Icons.done);
                       }
                       return null; // All other states will use the default thumbIcon.
@@ -289,6 +289,11 @@ class _StyleSettingState extends State<StyleSetting> {
             onTap: () => Get.toNamed('/navbarSetting'),
             title: Text('底部导航栏设置', style: titleStyle),
           ),
+          // ListTile(
+          //   dense: false,
+          //   onTap: () => Get.toNamed('/actionMenuSet'),
+          //   title: Text('操作菜单设置', style: titleStyle),
+          // ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,

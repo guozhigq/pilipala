@@ -124,7 +124,7 @@ class _BottomControlState extends State<BottomControl> {
               height: 34,
               child: IconButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  padding: WidgetStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () async {
                   bool canUsePiP = false;

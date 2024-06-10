@@ -35,6 +35,7 @@ import '../pages/search/index.dart';
 import '../pages/search_result/index.dart';
 import '../pages/setting/extra_setting.dart';
 import '../pages/setting/index.dart';
+import '../pages/setting/pages/action_menu_set.dart';
 import '../pages/setting/pages/color_select.dart';
 import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
@@ -174,6 +175,9 @@ class Routes {
     // navigation bar
     CustomGetPage(
         name: '/navbarSetting', page: () => const NavigationBarSetPage()),
+    // 操作菜单
+    CustomGetPage(
+        name: '/actionMenuSet', page: () => const ActionMenuSetPage()),
   ];
 }
 
