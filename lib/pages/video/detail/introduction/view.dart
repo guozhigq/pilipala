@@ -561,8 +561,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     Widget progressWidget(progress) {
       return SizedBox(
-        width: 33,
-        height: 33,
+        width: const IconThemeData.fallback().size! + 5,
+        height: const IconThemeData.fallback().size! + 5,
         child: CircularProgressIndicator(
           value: progress.value,
           strokeWidth: 2,
@@ -577,14 +577,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ColorScheme colorScheme = Theme.of(context).colorScheme;
           return Stack(
             children: [
-              Positioned(child: progressWidget(_progress), top: 15, left: 24),
+              Positioned(
+                  top: ((Get.size.width - 24) / 5) / 2 -
+                      (const IconThemeData.fallback().size!),
+                  left: ((Get.size.width - 24) / 5) / 2 -
+                      (const IconThemeData.fallback().size! + 5) / 2,
+                  child: progressWidget(_progress)),
               InkWell(
                 onTapDown: (details) {
                   feedBack();
-                  // if (videoIntroController.userInfo == null) {
-                  //   SmartDialog.showToast('账号未登录');
-                  //   return;
-                  // }
+                  if (videoIntroController.userInfo == null) {
+                    SmartDialog.showToast('账号未登录');
+                    return;
+                  }
                   _controller.forward();
                 },
                 onTapUp: (TapUpDetails details) {
@@ -641,7 +646,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       'coin': Obx(
         () => Stack(
           children: [
-            Positioned(child: progressWidget(_progress), top: 15, left: 24),
+            Positioned(
+                top: ((Get.size.width - 24) / 5) / 2 -
+                    (const IconThemeData.fallback().size!),
+                left: ((Get.size.width - 24) / 5) / 2 -
+                    (const IconThemeData.fallback().size! + 5) / 2,
+                child: progressWidget(_progress)),
             ActionItem(
               icon: Image.asset('assets/images/coin.png', width: 30),
               onTap: handleState(videoIntroController.actionCoinVideo),
@@ -654,7 +664,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       'collect': Obx(
         () => Stack(
           children: [
-            Positioned(child: progressWidget(_progress), top: 15, left: 24),
+            Positioned(
+                top: ((Get.size.width - 24) / 5) / 2 -
+                    (const IconThemeData.fallback().size!),
+                left: ((Get.size.width - 24) / 5) / 2 -
+                    (const IconThemeData.fallback().size! + 5) / 2,
+                child: progressWidget(_progress)),
             ActionItem(
               icon: const Icon(Icons.star_border),
               selectIcon: const Icon(Icons.star),
