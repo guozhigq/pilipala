@@ -214,7 +214,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           ),
           Container(
             height: 52,
-            padding: const EdgeInsets.only(left: 12, right: 12),
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+            ),
+            margin: EdgeInsets.only(
+              bottom: toolbarType == 'input' && keyboardHeight == 0.0
+                  ? MediaQuery.of(context).padding.bottom
+                  : 0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
