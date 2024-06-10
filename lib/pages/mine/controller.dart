@@ -33,8 +33,7 @@ class MineController extends GetxController {
 
   onLogin() async {
     if (!userLogin.value) {
-      // RoutePush.loginPush();
-      Get.toNamed('/loginPage');
+      Get.toNamed('/loginPage', preventDuplicates: false);
     } else {
       int mid = userInfo.value.mid!;
       String face = userInfo.value.face!;

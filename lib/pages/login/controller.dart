@@ -31,7 +31,7 @@ class LoginPageController extends GetxController {
 
   // 倒计时60s
   RxInt seconds = 60.obs;
-  late Timer timer;
+  Timer? timer;
   RxBool smsCodeSendStatus = false.obs;
 
   // 默认密码登录
@@ -43,7 +43,7 @@ class LoginPageController extends GetxController {
   late int webSmsCode;
 
   RxInt validSeconds = 180.obs;
-  late Timer validTimer;
+  Timer? validTimer;
   late String qrcodeKey;
 
   // 监听pageView切换
@@ -329,7 +329,7 @@ class LoginPageController extends GetxController {
     var res = await LoginHttp.queryWebQrcodeStatus(qrcodeKey);
     if (res['status']) {
       await LoginUtils.confirmLogin('', null);
-      validTimer.cancel();
+      validTimer?.cancel();
       Get.back();
     }
   }
