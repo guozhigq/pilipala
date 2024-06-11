@@ -135,6 +135,14 @@ QQ频道: https://pd.qq.com/s/365esodk3
 
 <br/>
 
+### 从 F-Droid 安装
+
+<a href="https://f-droid.org/packages/com.guozhigq.pilipala">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on-zh-cn.png"
+    alt="Get it on F-Droid"
+    height="80">
+</a>
+
 ## 声明
 
 此项目（PiliPala）是个人为了兴趣而开发, 仅用于学习和测试。
