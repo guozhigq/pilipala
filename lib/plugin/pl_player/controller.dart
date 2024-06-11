@@ -1107,6 +1107,16 @@ class PlPlayerController {
     videoStorage.put(VideoBoxKey.playRepeat, type.value);
   }
 
+  /// 缓存本次弹幕选项
+  cacheDanmakuOption() {
+    localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
+    localCache.put(LocalCacheKey.danmakuShowArea, showArea);
+    localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
+    localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
+    localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
+    localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
+  }
+
   Future<void> dispose({String type = 'single'}) async {
     // 每次减1，最后销毁
     if (type == 'single' && playerCount.value > 1) {
@@ -1136,12 +1146,7 @@ class PlPlayerController {
       // dataStatus.status.close();
 
       /// 缓存本次弹幕选项
-      localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
-      localCache.put(LocalCacheKey.danmakuShowArea, showArea);
-      localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
-      localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
-      localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
-      localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
+      cacheDanmakuOption();
       if (_videoPlayerController != null) {
         var pp = _videoPlayerController!.platform as NativePlayer;
         await pp.setProperty('audio-files', '');
