@@ -1069,7 +1069,9 @@ class _HeaderControlState extends State<HeaderControl> {
           );
         });
       },
-    );
+    ).then((value) {
+      widget.controller!.cacheDanmakuOption();
+    });
   }
 
   /// 播放顺序
