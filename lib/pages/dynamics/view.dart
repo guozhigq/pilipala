@@ -162,7 +162,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .surfaceContainerHighest
+                                      .surfaceVariant
                                       .withOpacity(0.7),
                                   borderRadius: BorderRadius.circular(20),
                                 ),

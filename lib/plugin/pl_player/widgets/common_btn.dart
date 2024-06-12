@@ -17,7 +17,7 @@ class ComBtn extends StatelessWidget {
       height: 34,
       child: IconButton(
         style: ButtonStyle(
-          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
         ),
         onPressed: () {
           fuc!();

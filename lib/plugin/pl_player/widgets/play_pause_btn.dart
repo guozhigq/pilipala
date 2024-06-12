@@ -68,7 +68,7 @@ class PlayOrPauseButtonState extends State<PlayOrPauseButton>
       height: 34,
       child: IconButton(
         style: ButtonStyle(
-          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
         ),
         onPressed: player.playOrPause,
         color: Colors.white,
