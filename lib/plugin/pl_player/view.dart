@@ -281,7 +281,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             widget.showEposideCb?.call();
           },
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(EdgeInsets.zero),
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
           child: const Text(
             '选集',
@@ -296,7 +296,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         child: TextButton(
           onPressed: () => _.toggleVideoFit(),
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(EdgeInsets.zero),
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
           child: Obx(
             () => Text(
@@ -313,7 +313,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         height: 34,
         child: TextButton(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(EdgeInsets.zero),
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
           onPressed: () {},
           child: Obx(

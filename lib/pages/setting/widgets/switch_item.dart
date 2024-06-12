@@ -70,9 +70,9 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
         alignment: Alignment.centerRight, // 缩放Switch的大小后保持右侧对齐, 避免右侧空隙过大
         scale: 0.8,
         child: Switch(
-          thumbIcon:
-              WidgetStateProperty.resolveWith<Icon?>((Set<WidgetState> states) {
-            if (states.isNotEmpty && states.first == WidgetState.selected) {
+          thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+              (Set<MaterialState> states) {
+            if (states.isNotEmpty && states.first == MaterialState.selected) {
               return const Icon(Icons.done);
             }
             return null; // All other states will use the default thumbIcon.
