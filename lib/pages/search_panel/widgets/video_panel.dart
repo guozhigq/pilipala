@@ -93,7 +93,7 @@ class SearchVideoPanel extends StatelessWidget {
                 height: 32,
                 child: IconButton(
                   style: ButtonStyle(
-                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () => controller.onShowFilterSheet(ctr),
                   icon: Icon(

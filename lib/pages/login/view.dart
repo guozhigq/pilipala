@@ -249,7 +249,8 @@ class _LoginPageState extends State<LoginPage> {
                               IconButton(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      WidgetStateProperty.resolveWith((states) {
+                                      MaterialStateProperty.resolveWith(
+                                          (states) {
                                     return Theme.of(context)
                                         .colorScheme
                                         .primary
@@ -339,7 +340,8 @@ class _LoginPageState extends State<LoginPage> {
                               IconButton(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      WidgetStateProperty.resolveWith((states) {
+                                      MaterialStateProperty.resolveWith(
+                                          (states) {
                                     return Theme.of(context)
                                         .colorScheme
                                         .primary

@@ -217,7 +217,7 @@ class VideoContent extends StatelessWidget {
                     bottom: -4,
                     child: IconButton(
                       style: ButtonStyle(
-                        padding: WidgetStateProperty.all(EdgeInsets.zero),
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
                       ),
                       onPressed: () {
                         showDialog(

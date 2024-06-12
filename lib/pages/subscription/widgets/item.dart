@@ -116,7 +116,7 @@ class VideoContent extends StatelessWidget {
               children: [
                 IconButton(
                   style: ButtonStyle(
-                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () => cancelSub?.call(subFolderItem),
                   icon: Icon(
