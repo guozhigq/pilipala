@@ -39,7 +39,7 @@ Future imageSaveDialog(context, videoItem, closeFn) {
                           const BorderRadius.all(Radius.circular(20))),
                   child: IconButton(
                     style: ButtonStyle(
-                      padding: WidgetStateProperty.all(EdgeInsets.zero),
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
                     ),
                     onPressed: () => closeFn!(),
                     icon: const Icon(

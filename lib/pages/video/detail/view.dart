@@ -412,7 +412,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       height: 32,
                       child: TextButton(
                         style: ButtonStyle(
-                          padding: WidgetStateProperty.all(EdgeInsets.zero),
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
                         ),
                         onPressed: () => vdCtr.showShootDanmakuSheet(),
                         child:

@@ -305,7 +305,7 @@ class VideoContent extends StatelessWidget {
                 if (source == 'later') ...[
                   IconButton(
                     style: ButtonStyle(
-                      padding: WidgetStateProperty.all(EdgeInsets.zero),
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
                     ),
                     onPressed: () => onPressedFn?.call(),
                     icon: Icon(

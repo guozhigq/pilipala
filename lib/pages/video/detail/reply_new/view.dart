@@ -267,7 +267,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                               size: 22),
                           label: const Text('转发到动态'),
                           style: ButtonStyle(
-                            foregroundColor: WidgetStateProperty.all(
+                            foregroundColor: MaterialStateProperty.all(
                               isForward.value
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.outline,
