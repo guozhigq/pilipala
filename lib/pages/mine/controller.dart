@@ -57,8 +57,6 @@ class MineController extends GetxController {
       } else {
         resetUserInfo();
       }
-    } else {
-      resetUserInfo();
     }
     await queryUserStatOwner();
     return res;
