@@ -39,6 +39,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.customWidget,
     this.customWidgets,
     this.showEposideCb,
+    this.fullScreenCb,
     super.key,
   });
 
@@ -52,6 +53,7 @@ class PLVideoPlayer extends StatefulWidget {
   final Widget? customWidget;
   final List<Widget>? customWidgets;
   final Function? showEposideCb;
+  final Function? fullScreenCb;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -335,7 +337,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             color: Colors.white,
           ),
         ),
-        fuc: () => _.triggerFullScreen(status: !_.isFullScreen.value),
+        fuc: () {
+          _.triggerFullScreen(status: !_.isFullScreen.value);
+          widget.fullScreenCb?.call(!_.isFullScreen.value);
+        },
       ),
     };
     final List<Widget> list = [];
