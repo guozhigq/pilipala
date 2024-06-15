@@ -62,4 +62,13 @@ class WhisperController extends GetxController {
   Future onRefresh() async {
     querySessionList('onRefresh');
   }
+
+  void refreshLastMsg(int talkerId, String content) {
+    final SessionList currentItem =
+        sessionList.where((p0) => p0.talkerId == talkerId).first;
+    currentItem.lastMsg!.content['content'] = content;
+    sessionList.removeWhere((p0) => p0.talkerId == talkerId);
+    sessionList.insert(0, currentItem);
+    sessionList.refresh();
+  }
 }
