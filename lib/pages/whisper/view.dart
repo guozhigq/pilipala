@@ -202,6 +202,7 @@ class SessionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo.mid);
     final content = sessionItem.lastMsg.content;
     return ListTile(
       onTap: () {
@@ -214,6 +215,7 @@ class SessionItem extends StatelessWidget {
             'name': sessionItem.accountInfo.name,
             'face': sessionItem.accountInfo.face,
             'mid': sessionItem.accountInfo.mid.toString(),
+            'heroTag': heroTag,
           },
         );
       },
@@ -221,11 +223,14 @@ class SessionItem extends StatelessWidget {
         isLabelVisible: sessionItem.unreadCount > 0,
         label: Text(sessionItem.unreadCount.toString()),
         alignment: Alignment.topRight,
-        child: NetworkImgLayer(
-          width: 45,
-          height: 45,
-          type: 'avatar',
-          src: sessionItem.accountInfo.face,
+        child: Hero(
+          tag: heroTag,
+          child: NetworkImgLayer(
+            width: 45,
+            height: 45,
+            type: 'avatar',
+            src: sessionItem.accountInfo.face,
+          ),
         ),
       ),
       title: Text(sessionItem.accountInfo.name),
@@ -245,10 +250,10 @@ class SessionItem extends StatelessWidget {
               .copyWith(color: Theme.of(context).colorScheme.outline)),
       trailing: Text(
         Utils.dateFormat(sessionItem.lastMsg.timestamp),
-        style: Theme.of(context)
-            .textTheme
-            .labelSmall!
-            .copyWith(color: Theme.of(context).colorScheme.outline),
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
     );
   }
