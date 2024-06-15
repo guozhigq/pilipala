@@ -225,4 +225,16 @@ class MsgHttp {
       return {'status': false, 'date': [], 'msg': res.data['message']};
     }
   }
+
+  static Future unread() async {
+    var res = await Request().get(Api.unread);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
 }

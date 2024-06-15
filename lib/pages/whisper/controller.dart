@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/msg.dart';
 import 'package:pilipala/models/msg/account.dart';
@@ -7,6 +8,38 @@ class WhisperController extends GetxController {
   RxList<SessionList> sessionList = <SessionList>[].obs;
   RxList<AccountListModel> accountList = <AccountListModel>[].obs;
   bool isLoading = false;
+  RxList noticesList = [
+    {
+      'icon': Icons.message_outlined,
+      'title': '回复我的',
+      'path': '',
+      'count': 0,
+    },
+    {
+      'icon': Icons.alternate_email,
+      'title': '@ 我的',
+      'path': '',
+      'count': 0,
+    },
+    {
+      'icon': Icons.thumb_up_outlined,
+      'title': '收到的赞',
+      'path': '',
+      'count': 0,
+    },
+    {
+      'icon': Icons.notifications_none_outlined,
+      'title': '系统通知',
+      'path': '',
+      'count': 0,
+    }
+  ].obs;
+
+  @override
+  void onInit() {
+    unread();
+    super.onInit();
+  }
 
   Future querySessionList(String? type) async {
     if (isLoading) return;
@@ -76,5 +109,17 @@ class WhisperController extends GetxController {
   void removeSessionMsg(int talkerId) {
     sessionList.removeWhere((p0) => p0.talkerId == talkerId);
     sessionList.refresh();
+  }
+
+  // 消息未读数
+  void unread() async {
+    var res = await MsgHttp.unread();
+    if (res['status']) {
+      noticesList[0]['count'] = res['data']['reply'];
+      noticesList[1]['count'] = res['data']['at'];
+      noticesList[2]['count'] = res['data']['like'];
+      noticesList[3]['count'] = res['data']['sys_msg'];
+      noticesList.refresh();
+    }
   }
 }

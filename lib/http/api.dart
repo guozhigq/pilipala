@@ -539,4 +539,7 @@ class Api {
   /// 关闭会话
   static const String removeSession =
       '${HttpString.tUrl}/session_svr/v1/session_svr/remove_session';
+
+  /// 消息未读数
+  static const String unread = '${HttpString.tUrl}/x/im/web/msgfeed/unread';
 }
