@@ -535,4 +535,8 @@ class Api {
 
   /// 搜索结果计数
   static const String searchCount = '/x/web-interface/wbi/search/all/v2';
+
+  /// 关闭会话
+  static const String removeSession =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/remove_session';
 }

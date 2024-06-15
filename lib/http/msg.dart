@@ -124,13 +124,7 @@ class MsgHttp {
         'data': res.data['data'],
       };
     } else {
-      return {
-        'status': false,
-        'date': [],
-        'msg': "message: ${res.data['message']},"
-            " msg: ${res.data['msg']},"
-            " code: ${res.data['code']}",
-      };
+      return {'status': false, 'date': [], 'msg': res.data['message']};
     }
   }
 
@@ -207,5 +201,28 @@ class MsgHttp {
       }
     }
     return s.join();
+  }
+
+  static Future removeSession({
+    int? talkerId,
+  }) async {
+    String csrf = await Request.getCsrf();
+    Map params = await WbiSign().makSign({
+      'talker_id': talkerId,
+      'session_type': 1,
+      'build': 0,
+      'mobi_app': 'web',
+      'csrf_token': csrf,
+      'csrf': csrf
+    });
+    var res = await Request().get(Api.removeSession, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
   }
 }

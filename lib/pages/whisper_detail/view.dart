@@ -145,7 +145,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                         src: _whisperDetailController.face,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 10),
                     Text(
                       _whisperDetailController.name,
                       style: Theme.of(context).textTheme.titleMedium,
@@ -158,12 +158,14 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.more_vert_outlined,
-              size: 20,
-            ),
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert_outlined, size: 20),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                onTap: () => _whisperDetailController.removeSession(context),
+                child: const Text('关闭会话'),
+              )
+            ],
           ),
           const SizedBox(width: 14)
         ],
