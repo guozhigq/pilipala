@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -104,5 +105,42 @@ class WhisperDetailController extends GetxController {
     } else {
       SmartDialog.showToast(result['msg']);
     }
+  }
+
+  void removeSession(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          clipBehavior: Clip.hardEdge,
+          title: const Text('提示'),
+          content: const Text('确认清空会话内容并移除会话？'),
+          actions: [
+            TextButton(
+              onPressed: Get.back,
+              child: Text(
+                '取消',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                var res = await MsgHttp.removeSession(talkerId: talkerId);
+                if (res['status']) {
+                  SmartDialog.showToast('操作成功');
+                  try {
+                    late final WhisperController whisperController =
+                        Get.find<WhisperController>();
+                    whisperController.removeSessionMsg(talkerId!);
+                    Get.back();
+                  } catch (_) {}
+                }
+              },
+              child: const Text('确认'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -389,8 +389,19 @@ class ChatItem extends StatelessWidget {
         ? messageContent(context)
         : isRevoke
             ? const SizedBox()
-            : Padding(
-                padding: const EdgeInsets.only(top: 12),
+            : Container(
+                padding: const EdgeInsets.only(top: 6, bottom: 6),
+                decoration: BoxDecoration(
+                    border: Border(
+                  left: item.msgStatus == 1 && !isOwner
+                      ? BorderSide(
+                          width: 4, color: Theme.of(context).dividerColor)
+                      : BorderSide.none,
+                  right: item.msgStatus == 1 && isOwner
+                      ? BorderSide(
+                          width: 4, color: Theme.of(context).primaryColor)
+                      : BorderSide.none,
+                )),
                 child: Row(
                   mainAxisAlignment: !isOwner
                       ? MainAxisAlignment.start

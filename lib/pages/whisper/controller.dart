@@ -71,4 +71,10 @@ class WhisperController extends GetxController {
     sessionList.insert(0, currentItem);
     sessionList.refresh();
   }
+
+  // 移除会话
+  void removeSessionMsg(int talkerId) {
+    sessionList.removeWhere((p0) => p0.talkerId == talkerId);
+    sessionList.refresh();
+  }
 }
