@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
 import '../models/msg/account.dart';
 import '../models/msg/session.dart';
@@ -256,7 +257,30 @@ class MsgHttp {
           'data': MessageReplyModel.fromJson(res.data['data']),
         };
       } catch (err) {
-        print(err);
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 收到的赞
+  static Future messageLike({
+    int? id,
+    int? likeTime,
+  }) async {
+    var params = {
+      if (id != null) 'id': id,
+      if (likeTime != null) 'like_time': likeTime,
+    };
+    var res = await Request().get(Api.messageLikeAPi, data: params);
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageLikeModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
         return {'status': false, 'date': [], 'msg': err.toString()};
       }
     } else {
