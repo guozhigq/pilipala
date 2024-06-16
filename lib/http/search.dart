@@ -88,7 +88,11 @@ class SearchHttp {
       if (tids != null && tids != -1) 'tids': tids,
     };
     var res = await Request().get(Api.searchByType, data: reqData);
-    if (res.data['code'] == 0 && res.data['data']['numPages'] > 0) {
+    if (res.data['code'] == 0) {
+      if (res.data['data']['numPages'] == 0) {
+        // 我想返回数据，使得可以通过data.list 取值，结果为[]
+        return {'status': true, 'data': Data()};
+      }
       Object data;
       try {
         switch (searchType) {
@@ -125,9 +129,7 @@ class SearchHttp {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['data'] != null && res.data['data']['numPages'] == 0
-            ? '没有相关数据'
-            : res.data['message'],
+        'msg': res.data['message'],
       };
     }
   }
@@ -205,4 +207,10 @@ class SearchHttp {
       };
     }
   }
+}
+
+class Data {
+  List<dynamic> list;
+
+  Data({this.list = const []});
 }
