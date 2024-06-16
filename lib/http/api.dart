@@ -542,4 +542,7 @@ class Api {
 
   /// 消息未读数
   static const String unread = '${HttpString.tUrl}/x/im/web/msgfeed/unread';
+
+  /// 回复我的
+  static const String messageReplyAPi = '/x/msgfeed/reply';
 }

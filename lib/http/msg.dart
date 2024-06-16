@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:pilipala/models/msg/reply.dart';
 import '../models/msg/account.dart';
 import '../models/msg/session.dart';
 import '../utils/wbi_sign.dart';
@@ -233,6 +234,31 @@ class MsgHttp {
         'status': true,
         'data': res.data['data'],
       };
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 回复我的
+  static Future messageReply({
+    int? id,
+    int? replyTime,
+  }) async {
+    var params = {
+      if (id != null) 'id': id,
+      if (replyTime != null) 'reply_time': replyTime,
+    };
+    var res = await Request().get(Api.messageReplyAPi, data: params);
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageReplyModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        print(err);
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
     } else {
       return {'status': false, 'date': [], 'msg': res.data['message']};
     }

@@ -12,7 +12,7 @@ class WhisperController extends GetxController {
     {
       'icon': Icons.message_outlined,
       'title': '回复我的',
-      'path': '',
+      'path': '/messageReply',
       'count': 0,
     },
     {
