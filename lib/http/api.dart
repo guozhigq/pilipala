@@ -545,4 +545,7 @@ class Api {
 
   /// 回复我的
   static const String messageReplyAPi = '/x/msgfeed/reply';
+
+  /// 收到的赞
+  static const String messageLikeAPi = '/x/msgfeed/like';
 }

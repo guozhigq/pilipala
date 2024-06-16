@@ -18,19 +18,19 @@ class WhisperController extends GetxController {
     {
       'icon': Icons.alternate_email,
       'title': '@ 我的',
-      'path': '',
+      'path': '/messageAt',
       'count': 0,
     },
     {
       'icon': Icons.thumb_up_outlined,
       'title': '收到的赞',
-      'path': '',
+      'path': '/messageLike',
       'count': 0,
     },
     {
       'icon': Icons.notifications_none_outlined,
       'title': '系统通知',
-      'path': '',
+      'path': '/messageSystem',
       'count': 0,
     }
   ].obs;

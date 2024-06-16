@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/message/at/index.dart';
+import 'package:pilipala/pages/message/like/index.dart';
 import 'package:pilipala/pages/message/reply/index.dart';
+import 'package:pilipala/pages/message/system/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -181,6 +184,13 @@ class Routes {
         name: '/actionMenuSet', page: () => const ActionMenuSetPage()),
     // 回复我的
     CustomGetPage(name: '/messageReply', page: () => const MessageReplyPage()),
+    // @我的
+    CustomGetPage(name: '/messageAt', page: () => const MessageAtPage()),
+    // 收到的赞
+    CustomGetPage(name: '/messageLike', page: () => const MessageLikePage()),
+    // 系统通知
+    CustomGetPage(
+        name: '/messageSystem', page: () => const MessageSystemPage()),
   ];
 }
 

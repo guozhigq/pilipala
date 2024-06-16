@@ -113,6 +113,7 @@ class ReplyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color outline = Theme.of(context).colorScheme.outline;
     final String heroTag = Utils.makeHeroTag(item.user!.mid);
     final String bvid = item.item!.uri!.split('/').last;
     // 页码
@@ -167,15 +168,11 @@ class ReplyItem extends StatelessWidget {
                     const TextSpan(text: ' '),
                     if (item.item!.type! == 'video')
                       TextSpan(
-                        text: '对我的视频发表了评论',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline),
-                      ),
+                          text: '对我的视频发表了评论', style: TextStyle(color: outline)),
                     if (item.item!.type! == 'reply')
                       TextSpan(
                         text: '回复了我的评论',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline),
+                        style: TextStyle(color: outline),
                       ),
                   ])),
                   const SizedBox(height: 6),
@@ -188,8 +185,7 @@ class ReplyItem extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       item.item!.targetReplyContent!,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline),
+                      style: TextStyle(color: outline),
                     ),
                   ],
                   const SizedBox(height: 4),
@@ -197,21 +193,15 @@ class ReplyItem extends StatelessWidget {
                     children: [
                       Text(
                         Utils.dateFormat(item.replyTime!, formatType: 'detail'),
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline),
+                        style: TextStyle(color: outline),
                       ),
                       const SizedBox(width: 16),
-                      Text(
-                        '回复',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.outline),
-                      ),
+                      Text('回复', style: TextStyle(color: outline)),
                     ],
                   )
                 ],
               ),
             ),
-            // Spacer(),
             const SizedBox(width: 25),
             if (item.item!.type! == 'reply')
               Container(
@@ -221,10 +211,7 @@ class ReplyItem extends StatelessWidget {
                 child: Text(
                   item.item!.rootReplyContent!,
                   maxLines: 4,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    letterSpacing: 0.3,
-                  ),
+                  style: const TextStyle(fontSize: 12, letterSpacing: 0.3),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
