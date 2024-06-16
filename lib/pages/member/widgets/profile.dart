@@ -208,7 +208,17 @@ class ProfilePanel extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.toNamed(
+                                  '/whisperDetail',
+                                  parameters: {
+                                    'name': memberInfo.name!,
+                                    'face': memberInfo.face!,
+                                    'mid': memberInfo.mid.toString(),
+                                    'heroTag': ctr.heroTag!,
+                                  },
+                                );
+                              },
                               style: TextButton.styleFrom(
                                 backgroundColor: Theme.of(context)
                                     .colorScheme

@@ -535,4 +535,17 @@ class Api {
 
   /// 搜索结果计数
   static const String searchCount = '/x/web-interface/wbi/search/all/v2';
+
+  /// 关闭会话
+  static const String removeSession =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/remove_session';
+
+  /// 消息未读数
+  static const String unread = '${HttpString.tUrl}/x/im/web/msgfeed/unread';
+
+  /// 回复我的
+  static const String messageReplyAPi = '/x/msgfeed/reply';
+
+  /// 收到的赞
+  static const String messageLikeAPi = '/x/msgfeed/like';
 }
