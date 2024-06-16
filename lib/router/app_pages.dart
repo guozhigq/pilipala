@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/message/reply/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -178,6 +179,8 @@ class Routes {
     // 操作菜单
     CustomGetPage(
         name: '/actionMenuSet', page: () => const ActionMenuSetPage()),
+    // 回复我的
+    CustomGetPage(name: '/messageReply', page: () => const MessageReplyPage()),
   ];
 }
 
