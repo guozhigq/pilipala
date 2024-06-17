@@ -9,6 +9,8 @@ enum SubtitleType {
   zhHans,
   // 英文（美国）
   enUS,
+  // 中文繁体
+  zhTW,
 }
 
 extension SubtitleTypeExtension on SubtitleType {
@@ -24,6 +26,8 @@ extension SubtitleTypeExtension on SubtitleType {
         return '中文（简体）';
       case SubtitleType.enUS:
         return '英文（美国）';
+      case SubtitleType.zhTW:
+        return '中文（繁体）';
     }
   }
 }
@@ -41,6 +45,8 @@ extension SubtitleIdExtension on SubtitleType {
         return 'zh-Hans';
       case SubtitleType.enUS:
         return 'en-US';
+      case SubtitleType.zhTW:
+        return 'zh-TW';
     }
   }
 }
@@ -58,6 +64,8 @@ extension SubtitleCodeExtension on SubtitleType {
         return 4;
       case SubtitleType.enUS:
         return 5;
+      case SubtitleType.zhTW:
+        return 6;
     }
   }
 }
