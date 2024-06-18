@@ -436,6 +436,7 @@ class VideoIntroController extends GetxController {
     videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
     videoDetailCtr.getSubtitle();
+    videoDetailCtr.setSubtitleContent();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
