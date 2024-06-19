@@ -20,7 +20,6 @@ class PiliSchame {
 
     /// 完整链接进入 b23.无效
     appScheme.getLatestScheme().then((SchemeEntity? value) {
-      print('getLatestScheme value: $value');
       if (value != null) {
         _routePush(value);
       }
@@ -28,8 +27,6 @@ class PiliSchame {
 
     /// 注册从外部打开的Scheme监听信息 #
     appScheme.registerSchemeListener().listen((SchemeEntity? event) {
-      print('registerSchemeListener event: $event');
-
       if (event != null) {
         _routePush(event);
       }
