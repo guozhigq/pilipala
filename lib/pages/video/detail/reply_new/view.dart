@@ -117,6 +117,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     final String newText = currentText.substring(0, cursorPosition) +
         emote.text! +
         currentText.substring(cursorPosition);
+    message.value = newText;
     _replyContentController.value = TextEditingValue(
       text: newText,
       selection:
@@ -170,7 +171,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -214,7 +215,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           ),
           Container(
             height: 52,
-            padding: const EdgeInsets.only(left: 12, right: 12),
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+            ),
+            margin: EdgeInsets.only(
+              bottom: toolbarType == 'input' && keyboardHeight == 0.0
+                  ? MediaQuery.of(context).padding.bottom
+                  : 0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

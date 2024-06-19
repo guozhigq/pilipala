@@ -30,14 +30,14 @@ class BackwardSeekIndicatorState extends State<BackwardSeekIndicator> {
   @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(milliseconds: 400), () {
+    timer = Timer(const Duration(milliseconds: 200), () {
       widget.onSubmitted.call(value);
     });
   }
 
   void increment() {
     timer?.cancel();
-    timer = Timer(const Duration(milliseconds: 400), () {
+    timer = Timer(const Duration(milliseconds: 200), () {
       widget.onSubmitted.call(value);
     });
     widget.onChanged.call(value);

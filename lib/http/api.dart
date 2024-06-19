@@ -189,7 +189,7 @@ class Api {
       'https://s.search.bilibili.com/main/suggest';
 
   // 分类搜索
-  static const String searchByType = '/x/web-interface/search/type';
+  static const String searchByType = '/x/web-interface/wbi/search/type';
 
   // 记录视频播放进度
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
@@ -400,12 +400,24 @@ class Api {
       '${HttpString.passBaseUrl}/x/passport-login/captcha?source=main_web';
 
   // web端短信验证码
-  static const String smsCode =
+  static const String webSmsCode =
       '${HttpString.passBaseUrl}/x/passport-login/web/sms/send';
 
   // web端验证码登录
+  static const String webSmsLogin =
+      '${HttpString.passBaseUrl}/x/passport-login/web/login/sms';
 
   // web端密码登录
+  static const String loginInByWebPwd =
+      '${HttpString.passBaseUrl}/x/passport-login/web/login';
+
+  // web端二维码
+  static const String qrCodeApi =
+      '${HttpString.passBaseUrl}/x/passport-login/web/qrcode/generate';
+
+  // 扫码登录
+  static const String loginInByQrcode =
+      '${HttpString.passBaseUrl}/x/passport-login/web/qrcode/poll';
 
   // app端短信验证码
   static const String appSmsCode =
@@ -523,4 +535,17 @@ class Api {
 
   /// 搜索结果计数
   static const String searchCount = '/x/web-interface/wbi/search/all/v2';
+
+  /// 关闭会话
+  static const String removeSession =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/remove_session';
+
+  /// 消息未读数
+  static const String unread = '${HttpString.tUrl}/x/im/web/msgfeed/unread';
+
+  /// 回复我的
+  static const String messageReplyAPi = '/x/msgfeed/reply';
+
+  /// 收到的赞
+  static const String messageLikeAPi = '/x/msgfeed/like';
 }

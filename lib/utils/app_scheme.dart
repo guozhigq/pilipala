@@ -205,9 +205,7 @@ class PiliSchame {
           parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
         );
       }
-    }
-
-    if (path != null) {
+    } else if (path != null) {
       final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':

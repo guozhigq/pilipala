@@ -514,6 +514,13 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         showEposideCb: () => vdCtr.videoType == SearchType.video
                             ? videoIntroController.showEposideHandler()
                             : bangumiIntroController.showEposideHandler(),
+                        fullScreenCb: (bool status) {
+                          if (status) {
+                            videoHeight.value = Get.size.height;
+                          } else {
+                            videoHeight.value = defaultVideoHeight;
+                          }
+                        },
                       ),
                     );
             },
@@ -591,27 +598,32 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                 verticalScreen();
                               }
                             },
-                            child: Hero(
-                              tag: heroTag,
-                              child: Stack(
-                                children: <Widget>[
-                                  if (isShowing) videoPlayerPanel,
+                            child: LayoutBuilder(
+                              builder: (BuildContext context,
+                                  BoxConstraints constraints) {
+                                return Hero(
+                                  tag: heroTag,
+                                  child: Stack(
+                                    children: <Widget>[
+                                      if (isShowing) videoPlayerPanel,
 
-                                  /// 关闭自动播放时 手动播放
-                                  Obx(
-                                    () => Visibility(
-                                      visible: !vdCtr.autoPlay.value &&
-                                          vdCtr.isShowCover.value,
-                                      child: Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: handlePlayPanel(),
+                                      /// 关闭自动播放时 手动播放
+                                      Obx(
+                                        () => Visibility(
+                                          visible: !vdCtr.autoPlay.value &&
+                                              vdCtr.isShowCover.value,
+                                          child: Positioned(
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: handlePlayPanel(),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ),
                         ),

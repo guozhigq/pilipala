@@ -7,6 +7,7 @@ import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:pilipala/models/common/gesture_mode.dart';
@@ -38,6 +39,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.customWidget,
     this.customWidgets,
     this.showEposideCb,
+    this.fullScreenCb,
     super.key,
   });
 
@@ -51,6 +53,7 @@ class PLVideoPlayer extends StatefulWidget {
   final Widget? customWidget;
   final List<Widget>? customWidgets;
   final Function? showEposideCb;
+  final Function? fullScreenCb;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -334,7 +337,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             color: Colors.white,
           ),
         ),
-        fuc: () => _.triggerFullScreen(status: !_.isFullScreen.value),
+        fuc: () {
+          _.triggerFullScreen(status: !_.isFullScreen.value);
+          widget.fullScreenCb?.call(!_.isFullScreen.value);
+        },
       ),
     };
     final List<Widget> list = [];
@@ -913,9 +919,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     colors: [Colors.black26, Colors.transparent],
                   ),
                 ),
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  height: 25,
+                child: Lottie.asset(
+                  'assets/loading.json',
+                  width: 200,
                 ),
               ),
             );
@@ -939,7 +945,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekBackwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 150),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(
@@ -982,7 +988,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                               begin: 0.0,
                               end: _hideSeekForwardButton.value ? 0.0 : 1.0,
                             ),
-                            duration: const Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 150),
                             builder: (BuildContext context, double value,
                                     Widget? child) =>
                                 Opacity(

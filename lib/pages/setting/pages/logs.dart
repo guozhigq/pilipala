@@ -41,7 +41,8 @@ class _LogsPageState extends State<LogsPage> {
           .replaceAll('DEVICE INFO', '设备信息')
           .replaceAll('APP INFO', '应用信息')
           .replaceAll('ERROR', '错误信息')
-          .replaceAll('STACK TRACE', '错误堆栈');
+          .replaceAll('STACK TRACE', '错误堆栈')
+          .replaceAll('#', 'Line');
     }).toList();
     List<Map<String, dynamic>> result = [];
     for (String i in contentList) {
@@ -50,7 +51,7 @@ class _LogsPageState extends State<LogsPage> {
           .split("\n")
           .map((l) {
             if (l.startsWith("Crash occurred on")) {
-              date = DateTime.parse(
+              date = DateTime.tryParse(
                 l.split("Crash occurred on")[1].trim().split('.')[0],
               );
               return "";

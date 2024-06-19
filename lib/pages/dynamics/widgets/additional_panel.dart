@@ -19,7 +19,7 @@ Widget addWidget(item, context, type, {floor = 1}) {
   };
   Color bgColor = floor == 1
       ? Theme.of(context).dividerColor.withOpacity(0.08)
-      : Theme.of(context).colorScheme.background;
+      : Theme.of(context).colorScheme.surface;
   switch (type) {
     case 'ADDITIONAL_TYPE_UGC':
       // 转发的投稿
