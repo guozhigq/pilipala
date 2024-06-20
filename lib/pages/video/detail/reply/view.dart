@@ -19,12 +19,14 @@ class VideoReplyPanel extends StatefulWidget {
   final int? oid;
   final int rpid;
   final String? replyLevel;
+  final Function(ScrollController)? onControllerCreated;
 
   const VideoReplyPanel({
     this.bvid,
     this.oid,
     this.rpid = 0,
     this.replyLevel,
+    this.onControllerCreated,
     super.key,
   });
 
@@ -68,6 +70,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
     scrollController = ScrollController();
+    widget.onControllerCreated?.call(scrollController);
     fabAnimationCtr.forward();
     scrollListener();
   }
