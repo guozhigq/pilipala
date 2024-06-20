@@ -387,6 +387,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   dividerColor: Colors.transparent,
                   tabs:
                       vdCtr.tabs.map((String name) => Tab(text: name)).toList(),
+                  onTap: (index) => vdCtr.onTapTabbar(index),
                 ),
               ),
             ),
@@ -683,6 +684,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           () => VideoReplyPanel(
                             bvid: vdCtr.bvid,
                             oid: vdCtr.oid.value,
+                            onControllerCreated: vdCtr.onControllerCreated,
                           ),
                         )
                       ],
