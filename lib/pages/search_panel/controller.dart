@@ -30,9 +30,9 @@ class SearchPanelController extends GetxController {
     );
     if (result['status']) {
       if (type == 'onRefresh') {
-        resultList.value = result['data'].list;
+        resultList.value = result['data'].list ?? [];
       } else {
-        resultList.addAll(result['data'].list);
+        resultList.addAll(result['data'].list ?? []);
       }
       page.value++;
       onPushDetail(keyword, resultList);
