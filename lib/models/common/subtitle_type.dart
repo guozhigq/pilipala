@@ -9,6 +9,14 @@ enum SubtitleType {
   zhHans,
   // 英文（美国）
   enUS,
+  // 中文繁体
+  zhTW,
+  //
+  en,
+  //
+  pt,
+  //
+  es,
 }
 
 extension SubtitleTypeExtension on SubtitleType {
@@ -24,6 +32,14 @@ extension SubtitleTypeExtension on SubtitleType {
         return '中文（简体）';
       case SubtitleType.enUS:
         return '英文（美国）';
+      case SubtitleType.zhTW:
+        return '中文（繁体）';
+      case SubtitleType.en:
+        return '英文';
+      case SubtitleType.pt:
+        return '葡萄牙语';
+      case SubtitleType.es:
+        return '西班牙语';
     }
   }
 }
@@ -41,6 +57,14 @@ extension SubtitleIdExtension on SubtitleType {
         return 'zh-Hans';
       case SubtitleType.enUS:
         return 'en-US';
+      case SubtitleType.zhTW:
+        return 'zh-TW';
+      case SubtitleType.en:
+        return 'en';
+      case SubtitleType.pt:
+        return 'pt';
+      case SubtitleType.es:
+        return 'es';
     }
   }
 }
@@ -58,6 +82,14 @@ extension SubtitleCodeExtension on SubtitleType {
         return 4;
       case SubtitleType.enUS:
         return 5;
+      case SubtitleType.zhTW:
+        return 6;
+      case SubtitleType.en:
+        return 7;
+      case SubtitleType.pt:
+        return 8;
+      case SubtitleType.es:
+        return 9;
     }
   }
 }
