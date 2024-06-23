@@ -69,7 +69,14 @@ class _WhisperPageState extends State<WhisperPage> {
                           children: [
                             ..._whisperController.noticesList.map((element) {
                               return InkWell(
-                                onTap: () => Get.toNamed(element['path']),
+                                onTap: () {
+                                  Get.toNamed(element['path']);
+
+                                  if (element['count'] > 0) {
+                                    element['count'] = 0;
+                                  }
+                                  _whisperController.noticesList.refresh();
+                                },
                                 onLongPress: () {},
                                 borderRadius: StyleString.mdRadius,
                                 child: Column(
