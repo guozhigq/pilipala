@@ -1,4 +1,5 @@
 // ignore_for_file: must_be_immutable
+// ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
-
 import '../../../http/search.dart';
 
 enum MsgType {
@@ -409,12 +409,6 @@ class ChatItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(width: safeDistanceval),
-                    if (isOwner)
-                      Text(
-                        Utils.dateFormat(item.timestamp),
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.outline),
-                      ),
                     Container(
                       constraints: const BoxConstraints(
                         maxWidth: 300.0, // 设置最大宽度为200.0
@@ -444,51 +438,45 @@ class ChatItem extends StatelessWidget {
                         right: 8,
                       ),
                       padding: const EdgeInsets.all(paddingVal),
-                      child: messageContent(context),
-                      // child: Column(
-                      //   crossAxisAlignment: isOwner
-                      //       ? CrossAxisAlignment.end
-                      //       : CrossAxisAlignment.start,
-                      //   children: [
-                      //     messageContent(context),
-                      //     SizedBox(height: isPic ? 7 : 2),
-                      //     Row(
-                      //       mainAxisSize: MainAxisSize.min,
-                      //       children: [
-                      //         Text(
-                      //           Utils.dateFormat(item.timestamp),
-                      //           style: Theme.of(context)
-                      //               .textTheme
-                      //               .labelSmall!
-                      //               .copyWith(
-                      //                   color: isOwner
-                      //                       ? Theme.of(context)
-                      //                           .colorScheme
-                      //                           .onPrimary
-                      //                           .withOpacity(0.8)
-                      //                       : Theme.of(context)
-                      //                           .colorScheme
-                      //                           .onSecondaryContainer
-                      //                           .withOpacity(0.8)),
-                      //         ),
-                      //         item.msgStatus == 1
-                      //             ? Text(
-                      //                 '  已撤回',
-                      //                 style:
-                      //                     Theme.of(context).textTheme.labelSmall!,
-                      //               )
-                      //             : const SizedBox()
-                      //       ],
-                      //     )
-                      //   ],
-                      // ),
-                    ),
-                    if (!isOwner)
-                      Text(
-                        Utils.dateFormat(item.timestamp),
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.outline),
+                      child: Column(
+                        crossAxisAlignment: isOwner
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          messageContent(context),
+                          SizedBox(height: isPic ? 7 : 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                Utils.dateFormat(item.timestamp),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .copyWith(
+                                        color: isOwner
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                                .withOpacity(0.8)
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSecondaryContainer
+                                                .withOpacity(0.8)),
+                              ),
+                              item.msgStatus == 1
+                                  ? Text(
+                                      '  已撤回',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!,
+                                    )
+                                  : const SizedBox()
+                            ],
+                          )
+                        ],
                       ),
+                    ),
                     const SizedBox(width: safeDistanceval),
                   ],
                 ),
