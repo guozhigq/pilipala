@@ -102,6 +102,8 @@ class SettingBoxKey {
       autoPiP = 'autoPiP',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',
       enablePlayerControlAnimation = 'enablePlayerControlAnimation',
+      // 默认音频输出方式
+      defaultAoOutput = 'defaultAoOutput',
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
