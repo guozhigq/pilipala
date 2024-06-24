@@ -13,6 +13,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
@@ -459,7 +460,13 @@ class PlPlayerController {
     //  音量不一致
     if (Platform.isAndroid) {
       await pp.setProperty("volume-max", "100");
-      await pp.setProperty("ao", "audiotrack,opensles");
+      String defaultAoOutput =
+          setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
+      await pp.setProperty(
+          "ao",
+          aoOutputList
+              .where((e) => e['value'] == defaultAoOutput)
+              .first['title']);
     }
 
     await player.setAudioTrack(
