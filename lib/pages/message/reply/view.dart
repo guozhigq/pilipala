@@ -196,7 +196,7 @@ class ReplyItem extends StatelessWidget {
                         style: TextStyle(color: outline),
                       ),
                       const SizedBox(width: 16),
-                      Text('回复', style: TextStyle(color: outline)),
+                      // Text('回复', style: TextStyle(color: outline)),
                     ],
                   )
                 ],
