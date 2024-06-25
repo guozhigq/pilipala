@@ -433,42 +433,47 @@ class _HeaderControlState extends State<HeaderControl> {
           return AlertDialog(
             title: const Text('选择字幕'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return len == 0
-                  ? const SizedBox(
-                      height: 60,
-                      child: Center(
-                        child: Text('没有字幕'),
-                      ),
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RadioListTile(
-                          value: -1,
-                          title: const Text('关闭字幕'),
-                          groupValue: tempThemeValue,
-                          onChanged: (value) {
-                            tempThemeValue = value!;
-                            widget.controller?.toggleSubtitle(value);
-                            Get.back();
-                          },
+            content: StatefulBuilder(
+              builder: (context, StateSetter setState) {
+                return len == 0
+                    ? const SizedBox(
+                        height: 60,
+                        child: Center(
+                          child: Text('没有字幕'),
                         ),
-                        ...widget.videoDetailCtr!.subtitles
-                            .map((e) => RadioListTile(
-                                  value: e.code,
-                                  title: Text(e.title),
-                                  groupValue: tempThemeValue,
-                                  onChanged: (value) {
-                                    tempThemeValue = value!;
-                                    widget.controller?.toggleSubtitle(value);
-                                    Get.back();
-                                  },
-                                ))
-                            .toList(),
-                      ],
-                    );
-            }),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile(
+                              value: -1,
+                              title: const Text('关闭字幕'),
+                              groupValue: tempThemeValue,
+                              onChanged: (value) {
+                                tempThemeValue = value!;
+                                widget.controller?.toggleSubtitle(value);
+                                Get.back();
+                              },
+                            ),
+                            ...widget.videoDetailCtr!.subtitles
+                                .map((e) => RadioListTile(
+                                      value: e.code,
+                                      title: Text(e.title),
+                                      groupValue: tempThemeValue,
+                                      onChanged: (value) {
+                                        tempThemeValue = value!;
+                                        widget.controller
+                                            ?.toggleSubtitle(value);
+                                        Get.back();
+                                      },
+                                    ))
+                                .toList(),
+                          ],
+                        ),
+                      );
+              },
+            ),
           );
         });
   }

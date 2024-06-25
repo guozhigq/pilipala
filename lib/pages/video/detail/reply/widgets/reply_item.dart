@@ -645,7 +645,7 @@ InlineSpan buildContent(
                           '',
                         );
                       } else {
-                        Uri uri = Uri.parse(matchStr);
+                        Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
                         SchemeEntity scheme = SchemeEntity(
                           scheme: uri.scheme,
                           host: uri.host,

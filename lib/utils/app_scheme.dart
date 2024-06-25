@@ -1,5 +1,6 @@
 import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/utils/route_push.dart';
@@ -38,60 +39,82 @@ class PiliSchame {
     final String host = value.host;
     final String path = value.path;
     if (scheme == 'bilibili') {
-      if (host == 'root') {
-        Navigator.popUntil(
-            Get.context!, (Route<dynamic> route) => route.isFirst);
-      } else if (host == 'space') {
-        final String mid = path.split('/').last;
-        Get.toNamed<dynamic>(
-          '/member?mid=$mid',
-          arguments: <String, dynamic>{'face': null},
-        );
-      } else if (host == 'video') {
-        String pathQuery = path.split('/').last;
-        final numericRegex = RegExp(r'^[0-9]+$');
-        if (numericRegex.hasMatch(pathQuery)) {
-          pathQuery = 'AV$pathQuery';
-        }
-        Map map = IdUtils.matchAvorBv(input: pathQuery);
-        if (map.containsKey('AV')) {
-          _videoPush(map['AV'], null);
-        } else if (map.containsKey('BV')) {
-          _videoPush(null, map['BV']);
-        } else {
-          SmartDialog.showToast('投稿匹配失败');
-        }
-      } else if (host == 'live') {
-        final String roomId = path.split('/').last;
-        Get.toNamed<dynamic>('/liveRoom?roomid=$roomId',
-            arguments: <String, String?>{'liveItem': null, 'heroTag': roomId});
-      } else if (host == 'bangumi') {
-        if (path.startsWith('/season')) {
-          final String seasonId = path.split('/').last;
-          RoutePush.bangumiPush(int.parse(seasonId), null);
-        }
-      } else if (host == 'opus') {
-        if (path.startsWith('/detail')) {
-          var opusId = path.split('/').last;
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': 'https://www.bilibili.com/opus/$opusId',
-              'type': 'url',
-              'pageTitle': '',
-            },
+      switch (host) {
+        case 'root':
+          Navigator.popUntil(
+              Get.context!, (Route<dynamic> route) => route.isFirst);
+          break;
+        case 'space':
+          final String mid = path.split('/').last;
+          Get.toNamed<dynamic>(
+            '/member?mid=$mid',
+            arguments: <String, dynamic>{'face': null},
           );
-        }
-      } else if (host == 'search') {
-        Get.toNamed('/searchResult', parameters: {'keyword': ''});
-      } else if (host == 'article') {
-        final String id = path.split('/').last.split('?').first;
-        Get.toNamed('/htmlRender', parameters: {
-          'url': 'https://www.bilibili.com/read/cv$id',
-          'title': 'cv$id',
-          'id': 'cv$id',
-          'dynamicType': 'read'
-        });
+          break;
+        case 'video':
+          String pathQuery = path.split('/').last;
+          final numericRegex = RegExp(r'^[0-9]+$');
+          if (numericRegex.hasMatch(pathQuery)) {
+            pathQuery = 'AV$pathQuery';
+          }
+          Map map = IdUtils.matchAvorBv(input: pathQuery);
+          if (map.containsKey('AV')) {
+            _videoPush(map['AV'], null);
+          } else if (map.containsKey('BV')) {
+            _videoPush(null, map['BV']);
+          } else {
+            SmartDialog.showToast('投稿匹配失败');
+          }
+          break;
+        case 'live':
+          final String roomId = path.split('/').last;
+          Get.toNamed<dynamic>(
+            '/liveRoom?roomid=$roomId',
+            arguments: <String, String?>{'liveItem': null, 'heroTag': roomId},
+          );
+          break;
+        case 'bangumi':
+          if (path.startsWith('/season')) {
+            final String seasonId = path.split('/').last;
+            RoutePush.bangumiPush(int.parse(seasonId), null);
+          }
+          break;
+        case 'opus':
+          if (path.startsWith('/detail')) {
+            var opusId = path.split('/').last;
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': 'https://www.bilibili.com/opus/$opusId',
+                'type': 'url',
+                'pageTitle': '',
+              },
+            );
+          }
+          break;
+        case 'search':
+          Get.toNamed('/searchResult', parameters: {'keyword': ''});
+          break;
+        case 'article':
+          final String id = path.split('/').last.split('?').first;
+          Get.toNamed('/htmlRender', parameters: {
+            'url': 'https://www.bilibili.com/read/cv$id',
+            'title': 'cv$id',
+            'id': 'cv$id',
+            'dynamicType': 'read'
+          });
+          break;
+        case 'pgc':
+          if (path.contains('ep')) {
+            final String lastPathSegment = path.split('/').last;
+            RoutePush.bangumiPush(
+                null, int.parse(lastPathSegment.split('?').first));
+          }
+          break;
+        default:
+          SmartDialog.showToast('未匹配地址，请联系开发者');
+          Clipboard.setData(ClipboardData(text: value.toJson().toString()));
+          break;
       }
     }
     if (scheme == 'https') {
@@ -196,9 +219,7 @@ class PiliSchame {
           parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
         );
       }
-    }
-
-    if (path != null) {
+    } else if (path != null) {
       final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':

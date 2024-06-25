@@ -117,6 +117,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     final String newText = currentText.substring(0, cursorPosition) +
         emote.text! +
         currentText.substring(cursorPosition);
+    message.value = newText;
     _replyContentController.value = TextEditingValue(
       text: newText,
       selection:
