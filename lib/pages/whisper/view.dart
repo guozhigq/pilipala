@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/skeleton.dart';
@@ -70,6 +71,11 @@ class _WhisperPageState extends State<WhisperPage> {
                             ..._whisperController.noticesList.map((element) {
                               return InkWell(
                                 onTap: () {
+                                  if (['/messageAt', '/messageSystem']
+                                      .contains(element['path'])) {
+                                    SmartDialog.showToast('功能开发中');
+                                    return;
+                                  }
                                   Get.toNamed(element['path']);
 
                                   if (element['count'] > 0) {

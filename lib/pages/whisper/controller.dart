@@ -17,7 +17,7 @@ class WhisperController extends GetxController {
     },
     {
       'icon': Icons.alternate_email,
-      'title': '@ 我的',
+      'title': '@我的',
       'path': '/messageAt',
       'count': 0,
     },
