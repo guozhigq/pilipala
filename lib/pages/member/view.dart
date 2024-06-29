@@ -9,6 +9,7 @@ import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'widgets/conis.dart';
+import 'widgets/like.dart';
 import 'widgets/profile.dart';
 import 'widgets/seasons.dart';
 
@@ -26,6 +27,7 @@ class _MemberPageState extends State<MemberPage>
   late Future _futureBuilderFuture;
   late Future _memberSeasonsFuture;
   late Future _memberCoinsFuture;
+  late Future _memberLikeFuture;
   final ScrollController _extendNestCtr = ScrollController();
   final StreamController<bool> appbarStream = StreamController<bool>();
   late int mid;
@@ -39,6 +41,7 @@ class _MemberPageState extends State<MemberPage>
     _futureBuilderFuture = _memberController.getInfo();
     _memberSeasonsFuture = _memberController.getMemberSeasons();
     _memberCoinsFuture = _memberController.getRecentCoinVideo();
+    _memberLikeFuture = _memberController.getRecentLikeVideo();
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
@@ -162,6 +165,7 @@ class _MemberPageState extends State<MemberPage>
                       trailing:
                           const Icon(Icons.arrow_forward_outlined, size: 19),
                     ),
+                    const Divider(height: 1, thickness: 0.1),
 
                     /// 视频
                     ListTile(
@@ -170,45 +174,41 @@ class _MemberPageState extends State<MemberPage>
                       trailing:
                           const Icon(Icons.arrow_forward_outlined, size: 19),
                     ),
+                    const Divider(height: 1, thickness: 0.1),
 
                     /// 专栏
-                    ListTile(
-                      onTap: () {},
-                      title: const Text('Ta的专栏'),
-                    ),
+                    const ListTile(title: Text('Ta的专栏')),
+                    const Divider(height: 1, thickness: 0.1),
+
+                    /// 合集
+                    const ListTile(title: Text('Ta的合集')),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,
                       context: context,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: StyleString.safeSpace,
-                          right: StyleString.safeSpace,
-                        ),
-                        child: FutureBuilder(
-                          future: _memberSeasonsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.data == null) {
-                                return const SizedBox();
-                              }
-                              if (snapshot.data['status']) {
-                                Map data = snapshot.data as Map;
-                                if (data['data'].seasonsList.isEmpty) {
-                                  return commenWidget('用户没有设置专栏');
-                                } else {
-                                  return MemberSeasonsPanel(data: data['data']);
-                                }
-                              } else {
-                                // 请求错误
-                                return const SizedBox();
-                              }
-                            } else {
+                      child: FutureBuilder(
+                        future: _memberSeasonsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == null) {
                               return const SizedBox();
                             }
-                          },
-                        ),
+                            if (snapshot.data['status']) {
+                              Map data = snapshot.data as Map;
+                              if (data['data'].seasonsList.isEmpty) {
+                                return commenWidget('用户没有设置合集');
+                              } else {
+                                return MemberSeasonsPanel(data: data['data']);
+                              }
+                            } else {
+                              // 请求错误
+                              return const SizedBox();
+                            }
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
                       ),
                     ),
 
@@ -218,12 +218,7 @@ class _MemberPageState extends State<MemberPage>
                     /// 最近投币
                     Obx(
                       () => _memberController.recentCoinsList.isNotEmpty
-                          ? ListTile(
-                              onTap: () {},
-                              title: const Text('最近投币的视频'),
-                              // trailing: const Icon(Icons.arrow_forward_outlined,
-                              //     size: 19),
-                            )
+                          ? const ListTile(title: Text('最近投币的视频'))
                           : const SizedBox(),
                     ),
                     MediaQuery.removePadding(
@@ -257,13 +252,44 @@ class _MemberPageState extends State<MemberPage>
                         ),
                       ),
                     ),
-                    // 最近点赞
-                    // ListTile(
-                    //   onTap: () {},
-                    //   title: const Text('最近点赞的视频'),
-                    //   trailing:
-                    //       const Icon(Icons.arrow_forward_outlined, size: 19),
-                    // ),
+
+                    /// 最近点赞
+                    Obx(
+                      () => _memberController.recentLikeList.isNotEmpty
+                          ? const ListTile(title: Text('最近点赞的视频'))
+                          : const SizedBox(),
+                    ),
+                    MediaQuery.removePadding(
+                      removeTop: true,
+                      removeBottom: true,
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: StyleString.safeSpace,
+                          right: StyleString.safeSpace,
+                        ),
+                        child: FutureBuilder(
+                          future: _memberLikeFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data == null) {
+                                return const SizedBox();
+                              }
+                              if (snapshot.data['status']) {
+                                Map data = snapshot.data as Map;
+                                return MemberLikePanel(data: data['data']);
+                              } else {
+                                // 请求错误
+                                return const SizedBox();
+                              }
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

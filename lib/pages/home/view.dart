@@ -357,25 +357,29 @@ class CustomChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorTheme = Theme.of(context).colorScheme;
     final Color secondaryContainer = colorTheme.secondaryContainer;
+    final Color onPrimary = colorTheme.onPrimary;
+    final Color primary = colorTheme.primary;
     final TextStyle chipTextStyle = selected
-        ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)
-        : const TextStyle(fontSize: 13);
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+        ? TextStyle(fontSize: 13, color: onPrimary)
+        : TextStyle(fontSize: 13, color: colorTheme.onSecondaryContainer);
     const VisualDensity visualDensity =
         VisualDensity(horizontal: -4.0, vertical: -2.0);
     return InputChip(
-      side: BorderSide(
-        color: selected
-            ? colorScheme.onSecondaryContainer.withOpacity(0.2)
-            : Colors.transparent,
-      ),
+      side: BorderSide.none,
       backgroundColor: secondaryContainer,
-      selectedColor: secondaryContainer,
-      color: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
-      padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
+      color: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected) ||
+            states.contains(MaterialState.hovered)) {
+          return primary;
+        }
+        return colorTheme.secondaryContainer;
+      }),
+      padding: const EdgeInsets.fromLTRB(6, 1, 6, 1),
       label: Text(label, style: chipTextStyle),
       onPressed: () => onTap(),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+      ),
       selected: selected,
       showCheckmark: false,
       visualDensity: visualDensity,

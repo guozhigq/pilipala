@@ -109,6 +109,7 @@ class VideoDetailController extends GetxController
   ].obs;
   RxDouble sheetHeight = 0.0.obs;
   RxString archiveSourceType = 'dash'.obs;
+  ScrollController? replyScrillController;
 
   @override
   void onInit() {
@@ -549,6 +550,17 @@ class VideoDetailController extends GetxController
   void updateCover(String? pic) {
     if (pic != null) {
       cover.value = videoItem['pic'] = pic;
+    }
+  }
+
+  void onControllerCreated(ScrollController controller) {
+    replyScrillController = controller;
+  }
+
+  void onTapTabbar(int index) {
+    if (index == 1 && tabCtr.index == 1) {
+      replyScrillController?.animateTo(0,
+          duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
 }

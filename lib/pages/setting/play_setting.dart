@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
@@ -28,6 +29,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late dynamic defaultDecode;
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
+  late String defaultAoOutput;
 
   @override
   void initState() {
@@ -44,6 +46,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: FullScreenMode.values.first.code);
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
+    defaultAoOutput =
+        setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
   }
 
   @override
@@ -259,6 +263,31 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultDecode = result;
                 setting.put(SettingBoxKey.defaultDecode, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('音频输出方式', style: titleStyle),
+            subtitle: Text(
+              '当前输出方式 ${aoOutputList.firstWhere((element) => element['value'] == defaultAoOutput)['title']}',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(
+                    title: '音频输出方式',
+                    value: defaultAoOutput,
+                    values: aoOutputList,
+                  );
+                },
+              );
+              if (result != null) {
+                defaultAoOutput = result;
+                setting.put(SettingBoxKey.defaultAoOutput, result);
                 setState(() {});
               }
             },

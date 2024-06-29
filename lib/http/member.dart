@@ -1,5 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/member/like.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
@@ -328,7 +329,9 @@ class MemberHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+        'data': res.data['data']['list']
+            .map<MemberLikeDataModel>((e) => MemberLikeDataModel.fromJson(e))
+            .toList(),
       };
     } else {
       return {
