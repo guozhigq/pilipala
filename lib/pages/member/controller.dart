@@ -8,6 +8,7 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
+import 'package:pilipala/models/member/like.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -25,6 +26,7 @@ class MemberController extends GetxController {
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
+  RxList<MemberLikeDataModel> recentLikeList = <MemberLikeDataModel>[].obs;
 
   @override
   void onInit() {
@@ -190,12 +192,17 @@ class MemberController extends GetxController {
     Share.share('${memberInfo.value.name} - https://space.bilibili.com/$mid');
   }
 
-  // 请求专栏
+  // 请求合集
   Future getMemberSeasons() async {
     if (userInfo == null) return;
     var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
     if (!res['status']) {
       SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
+    } else {
+      // 只取前四个专栏
+      res['data'].seasonsList.map((e) {
+        e.archives = e.archives!.sublist(0, 4);
+      }).toList();
     }
     return res;
   }
@@ -205,6 +212,14 @@ class MemberController extends GetxController {
     if (userInfo == null) return;
     var res = await MemberHttp.getRecentCoinVideo(mid: mid);
     recentCoinsList.value = res['data'];
+    return res;
+  }
+
+  // 请求点赞视频
+  Future getRecentLikeVideo() async {
+    if (userInfo == null) return;
+    var res = await MemberHttp.getRecentLikeVideo(mid: mid);
+    recentLikeList.value = res['data'];
     return res;
   }
 

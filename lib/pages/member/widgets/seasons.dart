@@ -25,7 +25,7 @@ class MemberSeasonsPanel extends StatelessWidget {
             children: [
               ListTile(
                 onTap: () => Get.toNamed(
-                    '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}'),
+                    '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}&seasonName=${item.meta!.name}'),
                 title: Text(
                   item.meta!.name!,
                   maxLines: 1,
@@ -44,24 +44,30 @@ class MemberSeasonsPanel extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              LayoutBuilder(
-                builder: (context, boxConstraints) {
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Use a fixed count for GridView
-                      crossAxisSpacing: StyleString.safeSpace,
-                      mainAxisSpacing: StyleString.safeSpace,
-                      childAspectRatio: 0.94,
-                    ),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: item.archives!.length,
-                    itemBuilder: (context, i) {
-                      return MemberSeasonsItem(seasonItem: item.archives![i]);
-                    },
-                  );
-                },
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: StyleString.safeSpace,
+                  right: StyleString.safeSpace,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, boxConstraints) {
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Use a fixed count for GridView
+                        crossAxisSpacing: StyleString.safeSpace,
+                        mainAxisSpacing: StyleString.safeSpace,
+                        childAspectRatio: 0.94,
+                      ),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: item.archives!.length,
+                      itemBuilder: (context, i) {
+                        return MemberSeasonsItem(seasonItem: item.archives![i]);
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
