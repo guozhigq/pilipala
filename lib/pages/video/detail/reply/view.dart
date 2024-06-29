@@ -188,7 +188,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
                     if (_videoReplyController.replyList.isNotEmpty ||
-                        (data && data['status'])) {
+                        (data != null && data['status'])) {
                       // 请求成功
                       return Obx(
                         () => _videoReplyController.isLoadingMore &&
