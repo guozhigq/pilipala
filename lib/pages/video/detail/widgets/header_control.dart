@@ -1295,6 +1295,13 @@ class _HeaderControlState extends State<HeaderControl> {
           //     ),
           //   ),
           // ),
+
+          ComBtn(
+            icon: const Icon(Icons.settings_overscan,
+                size: 20, color: Colors.white),
+            fuc: () => _.toggleVideoFit(),
+          ),
+          SizedBox(width: buttonSpace),
           ComBtn(
             icon: const Icon(
               Icons.closed_caption_off,
