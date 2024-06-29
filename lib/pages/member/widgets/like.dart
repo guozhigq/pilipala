@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pilipala/common/constants.dart';
-import 'package:pilipala/models/member/coin.dart';
-import 'package:pilipala/pages/member_coin/widgets/item.dart';
+import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/pages/member_like/widgets/item.dart';
 
-class MemberCoinsPanel extends StatelessWidget {
-  final List<MemberCoinsDataModel> data;
-  const MemberCoinsPanel({super.key, required this.data});
+class MemberLikePanel extends StatelessWidget {
+  final List<MemberLikeDataModel> data;
+  const MemberLikePanel({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class MemberCoinsPanel extends StatelessWidget {
           shrinkWrap: true,
           itemCount: data.length,
           itemBuilder: (context, i) {
-            return MemberCoinsItem(coinItem: data[i]);
+            return MemberLikeItem(likeItem: data[i]);
           },
         );
       },

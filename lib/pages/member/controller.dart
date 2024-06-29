@@ -8,6 +8,7 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
+import 'package:pilipala/models/member/like.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -25,6 +26,7 @@ class MemberController extends GetxController {
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
+  RxList<MemberLikeDataModel> recentLikeList = <MemberLikeDataModel>[].obs;
 
   @override
   void onInit() {
@@ -205,6 +207,14 @@ class MemberController extends GetxController {
     if (userInfo == null) return;
     var res = await MemberHttp.getRecentCoinVideo(mid: mid);
     recentCoinsList.value = res['data'];
+    return res;
+  }
+
+  // 请求点赞视频
+  Future getRecentLikeVideo() async {
+    if (userInfo == null) return;
+    var res = await MemberHttp.getRecentLikeVideo(mid: mid);
+    recentLikeList.value = res['data'];
     return res;
   }
 
