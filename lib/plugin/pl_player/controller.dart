@@ -123,7 +123,7 @@ class PlPlayerController {
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
-  late RxList subtitles;
+  RxList subtitles = [].obs;
   String videoType = 'archive';
 
   /// 数据加载监听
@@ -660,10 +660,6 @@ class PlPlayerController {
               const Duration(seconds: 1),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
-
-        // onSubTitleOpenChanged.listen((bool event) {
-        //   toggleSubtitle(event ? subTitleCode.value : -1);
-        // })
       ],
     );
   }
@@ -1067,25 +1063,6 @@ class PlPlayerController {
   void toggleSubtitle(int code) {
     _subTitleOpen.value = code != -1;
     _subTitleCode.value = code;
-    // if (code == -1) {
-    //   // 关闭字幕
-    //   _subTitleOpen.value = false;
-    //   _subTitleCode.value = code;
-    //   _videoPlayerController?.setSubtitleTrack(SubtitleTrack.no());
-    //   return;
-    // }
-    // final SubTitlteItemModel? subtitle = subtitles?.firstWhereOrNull(
-    //   (element) => element.code == code,
-    // );
-    // _subTitleOpen.value = true;
-    // _subTitleCode.value = code;
-    // _videoPlayerController?.setSubtitleTrack(
-    //   SubtitleTrack.data(
-    //     subtitle!.content!,
-    //     title: subtitle.title,
-    //     language: subtitle.lan,
-    //   ),
-    // );
   }
 
   void querySubtitleContent(double progress) {
@@ -1097,7 +1074,7 @@ class PlPlayerController {
       return;
     }
     final SubTitlteItemModel? subtitle = subtitles.firstWhereOrNull(
-      (element) => element.code == subTitleCode.value,
+      (element) => element.id == subTitleCode.value,
     );
     if (subtitle != null && subtitle.body!.isNotEmpty) {
       for (var content in subtitle.body!) {

@@ -446,15 +446,6 @@ class VideoDetailController extends GetxController
     }
   }
 
-  // 获取字幕内容
-  // Future getSubtitleContent(String url) async {
-  //   var res = await Request().get('https:$url');
-  //   subtitleContents.value = res.data['body'].map<SubTitileContentModel>((e) {
-  //     return SubTitileContentModel.fromJson(e);
-  //   }).toList();
-  //   setSubtitleContent();
-  // }
-
   setSubtitleContent() {
     plPlayerController.subtitleContent.value = '';
     plPlayerController.subtitles.value = subtitles;
