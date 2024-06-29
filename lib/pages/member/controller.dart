@@ -192,12 +192,17 @@ class MemberController extends GetxController {
     Share.share('${memberInfo.value.name} - https://space.bilibili.com/$mid');
   }
 
-  // 请求专栏
+  // 请求合集
   Future getMemberSeasons() async {
     if (userInfo == null) return;
     var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
     if (!res['status']) {
       SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
+    } else {
+      // 只取前四个专栏
+      res['data'].seasonsList.map((e) {
+        e.archives = e.archives!.sublist(0, 4);
+      }).toList();
     }
     return res;
   }
