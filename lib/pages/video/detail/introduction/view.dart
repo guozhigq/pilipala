@@ -2,6 +2,7 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -629,11 +630,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                         child: Icon(
                           key: ValueKey<bool>(likeStatus),
                           likeStatus
-                              ? Icons.thumb_up
-                              : Icons.thumb_up_alt_outlined,
+                              ? FontAwesomeIcons.solidThumbsUp
+                              : FontAwesomeIcons.thumbsUp,
                           color: likeStatus
                               ? colorScheme.primary
                               : colorScheme.outline,
+                          size: 21,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -663,7 +665,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     (const IconThemeData.fallback().size! + 5) / 2,
                 child: progressWidget(_progress)),
             ActionItem(
-              icon: Image.asset('assets/images/coin.png', width: 30),
+              icon: const Icon(FontAwesomeIcons.b),
+              selectIcon: const Icon(FontAwesomeIcons.b),
               onTap: handleState(videoIntroController.actionCoinVideo),
               selectStatus: videoIntroController.hasCoin.value,
               text: widget.videoDetail!.stat!.coin!.toString(),
@@ -681,8 +684,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     (const IconThemeData.fallback().size! + 5) / 2,
                 child: progressWidget(_progress)),
             ActionItem(
-              icon: const Icon(Icons.star_border),
-              selectIcon: const Icon(Icons.star),
+              icon: const Icon(FontAwesomeIcons.star),
+              selectIcon: const Icon(FontAwesomeIcons.solidStar),
               onTap: () => showFavBottomSheet(),
               onLongPress: () => showFavBottomSheet(type: 'longPress'),
               selectStatus: videoIntroController.hasFav.value,
@@ -692,7 +695,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         ),
       ),
       'watchLater': ActionItem(
-        icon: const Icon(Icons.watch_later_outlined),
+        icon: const Icon(FontAwesomeIcons.clock),
         onTap: () async {
           final res =
               await UserHttp.toViewLater(bvid: widget.videoDetail!.bvid);
@@ -702,15 +705,15 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         text: '稍后看',
       ),
       'share': ActionItem(
-        icon: const Icon(Icons.share),
+        icon: const Icon(FontAwesomeIcons.shareFromSquare),
         onTap: () => videoIntroController.actionShareVideo(),
         selectStatus: false,
         text: '分享',
       ),
       'dislike': Obx(
         () => ActionItem(
-          icon: const Icon(Icons.thumb_down_alt_outlined),
-          selectIcon: const Icon(Icons.thumb_down),
+          icon: const Icon(FontAwesomeIcons.thumbsDown),
+          selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
           onTap: () {},
           selectStatus: videoIntroController.hasDisLike.value,
           text: '不喜欢',
