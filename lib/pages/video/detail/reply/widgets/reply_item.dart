@@ -700,9 +700,10 @@ InlineSpan buildContent(
           );
           // 只显示一次
           matchedStrs.add(matchStr);
-        } else if (content
-                .topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
-            null) {
+        } else if (content.topicsMeta.keys.isNotEmpty &&
+            matchStr.length > 1 &&
+            content.topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
+                null) {
           spanChilds.add(
             TextSpan(
               text: matchStr,
