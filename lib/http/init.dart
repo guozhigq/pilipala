@@ -27,11 +27,13 @@ class Request {
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
-  static final RegExp spmPrefixExp = RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
+  static final RegExp spmPrefixExp =
+      RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
 
   /// 设置cookie
   static setCookie() async {
     Box userInfoCache = GStrorage.userInfo;
+    Box setting = GStrorage.setting;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -54,7 +56,11 @@ class Request {
       }
     }
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
-
+    String baseUrlType = 'default';
+    if (setting.get(SettingBoxKey.enableGATMode, defaultValue: false)) {
+      baseUrlType = 'bangumi';
+    }
+    setBaseUrl(type: baseUrlType);
     try {
       await buvidActivate();
     } catch (e) {
@@ -98,8 +104,7 @@ class Request {
         List<int>.generate(32, (_) => rand.nextInt(256)) +
             List<int>.filled(4, 0) +
             [73, 69, 78, 68] +
-      List<int>.generate(4, (_) => rand.nextInt(256))
-    );
+            List<int>.generate(4, (_) => rand.nextInt(256)));
 
     String jsonData = json.encode({
       '3064': 1,
@@ -110,11 +115,9 @@ class Request {
       },
     });
 
-    await Request().post(
-      Api.activateBuvidApi,
+    await Request().post(Api.activateBuvidApi,
         data: {'payload': jsonData},
-      options: Options(contentType: 'application/json')
-    );
+        options: Options(contentType: 'application/json'));
   }
 
   /*
@@ -302,5 +305,18 @@ class Request {
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
     }
     return headerUa;
+  }
+
+  static setBaseUrl({String type = 'default'}) {
+    switch (type) {
+      case 'default':
+        dio.options.baseUrl = HttpString.apiBaseUrl;
+        break;
+      case 'bangumi':
+        dio.options.baseUrl = HttpString.bangumiBaseUrl;
+        break;
+      default:
+        dio.options.baseUrl = HttpString.apiBaseUrl;
+    }
   }
 }
