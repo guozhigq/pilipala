@@ -426,7 +426,12 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择字幕
   void showSubtitleDialog() async {
     int tempThemeValue = widget.controller!.subTitleCode.value;
-    int len = widget.videoDetailCtr!.subtitles.length;
+    final List subtitles = widget.videoDetailCtr!.subtitles;
+    int len = subtitles.length;
+    if (subtitles.firstWhereOrNull((element) => element.id == tempThemeValue) ==
+        null) {
+      tempThemeValue = -1;
+    }
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -458,7 +463,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             ),
                             ...widget.videoDetailCtr!.subtitles
                                 .map((e) => RadioListTile(
-                                      value: e.code,
+                                      value: e.id,
                                       title: Text(e.title),
                                       groupValue: tempThemeValue,
                                       onChanged: (value) {
