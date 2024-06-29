@@ -178,39 +178,37 @@ class _MemberPageState extends State<MemberPage>
 
                     /// 专栏
                     const ListTile(title: Text('Ta的专栏')),
+                    const Divider(height: 1, thickness: 0.1),
+
+                    /// 合集
+                    const ListTile(title: Text('Ta的合集')),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,
                       context: context,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: StyleString.safeSpace,
-                          right: StyleString.safeSpace,
-                        ),
-                        child: FutureBuilder(
-                          future: _memberSeasonsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.data == null) {
-                                return const SizedBox();
-                              }
-                              if (snapshot.data['status']) {
-                                Map data = snapshot.data as Map;
-                                if (data['data'].seasonsList.isEmpty) {
-                                  return commenWidget('用户没有设置专栏');
-                                } else {
-                                  return MemberSeasonsPanel(data: data['data']);
-                                }
-                              } else {
-                                // 请求错误
-                                return const SizedBox();
-                              }
-                            } else {
+                      child: FutureBuilder(
+                        future: _memberSeasonsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == null) {
                               return const SizedBox();
                             }
-                          },
-                        ),
+                            if (snapshot.data['status']) {
+                              Map data = snapshot.data as Map;
+                              if (data['data'].seasonsList.isEmpty) {
+                                return commenWidget('用户没有设置合集');
+                              } else {
+                                return MemberSeasonsPanel(data: data['data']);
+                              }
+                            } else {
+                              // 请求错误
+                              return const SizedBox();
+                            }
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
                       ),
                     ),
 
