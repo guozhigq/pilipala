@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
@@ -163,6 +164,14 @@ class _PlaySettingState extends State<PlaySetting> {
               callFn: (bool val) {
                 GlobalData().enablePlayerControlAnimation = val;
               }),
+          SetSwitchItem(
+            title: '港澳台模式',
+            setKey: SettingBoxKey.enableGATMode,
+            defaultVal: false,
+            callFn: (bool val) {
+              Request.setBaseUrl(type: val ? 'bangumi' : 'default');
+            },
+          ),
           ListTile(
             dense: false,
             title: Text('默认视频画质', style: titleStyle),

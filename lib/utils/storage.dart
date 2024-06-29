@@ -104,6 +104,8 @@ class SettingBoxKey {
       enablePlayerControlAnimation = 'enablePlayerControlAnimation',
       // 默认音频输出方式
       defaultAoOutput = 'defaultAoOutput',
+      // 港澳台模式
+      enableGATMode = 'enableGATMode',
 
       // youtube 双击快进快退
       enableQuickDouble = 'enableQuickDouble',
