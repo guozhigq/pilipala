@@ -141,13 +141,7 @@ class VideoDetailController extends GetxController
     if (Platform.isAndroid) {
       floating = Floating();
     }
-    headerControl = HeaderControl(
-      controller: plPlayerController,
-      videoDetailCtr: this,
-      floating: floating,
-      bvid: bvid,
-      videoType: videoType,
-    );
+
     // CDN优化
     enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
     // 预设的画质
@@ -158,7 +152,18 @@ class VideoDetailController extends GetxController
     defaultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
-    getSubtitle();
+    getSubtitle().then(
+      (subtitles) {
+        headerControl = HeaderControl(
+          controller: plPlayerController,
+          videoDetailCtr: this,
+          floating: floating,
+          bvid: bvid,
+          videoType: videoType,
+          showSubtitleBtn: subtitles.isNotEmpty,
+        );
+      },
+    );
   }
 
   showReplyReplyPanel(oid, fRpid, firstFloor) {
@@ -432,17 +437,22 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       if (result['data'].subtitles.isNotEmpty) {
         subtitles = result['data'].subtitles;
-        if (subtitles.isNotEmpty) {
-          for (var i in subtitles) {
-            final Map<String, dynamic> res = await VideoHttp.getSubtitleContent(
-              i.subtitleUrl,
-            );
-            i.content = res['content'];
-            i.body = res['body'];
-          }
-        }
+        getDanmaku(subtitles);
       }
-      return result['data'];
+      return subtitles;
+    }
+  }
+
+  // 获取弹幕
+  Future getDanmaku(List subtitles) async {
+    if (subtitles.isNotEmpty) {
+      for (var i in subtitles) {
+        final Map<String, dynamic> res = await VideoHttp.getSubtitleContent(
+          i.subtitleUrl,
+        );
+        i.content = res['content'];
+        i.body = res['body'];
+      }
     }
   }
 
