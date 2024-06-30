@@ -71,7 +71,7 @@ class _WhisperPageState extends State<WhisperPage> {
                             ..._whisperController.noticesList.map((element) {
                               return InkWell(
                                 onTap: () {
-                                  if (['/messageAt', '/messageSystem']
+                                  if (['/messageAt']
                                       .contains(element['path'])) {
                                     SmartDialog.showToast('功能开发中');
                                     return;
