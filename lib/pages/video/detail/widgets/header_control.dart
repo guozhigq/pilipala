@@ -30,6 +30,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.floating,
     this.bvid,
     this.videoType,
+    this.showSubtitleBtn,
     super.key,
   });
   final PlPlayerController? controller;
@@ -37,6 +38,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final Floating? floating;
   final String? bvid;
   final SearchType? videoType;
+  final bool? showSubtitleBtn;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -426,7 +428,12 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择字幕
   void showSubtitleDialog() async {
     int tempThemeValue = widget.controller!.subTitleCode.value;
-    int len = widget.videoDetailCtr!.subtitles.length;
+    final List subtitles = widget.videoDetailCtr!.subtitles;
+    int len = subtitles.length;
+    if (subtitles.firstWhereOrNull((element) => element.id == tempThemeValue) ==
+        null) {
+      tempThemeValue = -1;
+    }
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -458,7 +465,7 @@ class _HeaderControlState extends State<HeaderControl> {
                             ),
                             ...widget.videoDetailCtr!.subtitles
                                 .map((e) => RadioListTile(
-                                      value: e.code,
+                                      value: e.id,
                                       title: Text(e.title),
                                       groupValue: tempThemeValue,
                                       onChanged: (value) {
@@ -1322,14 +1329,15 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          ComBtn(
-            icon: const Icon(
-              Icons.closed_caption_off,
-              size: 22,
-              color: Colors.white,
+          if (widget.showSubtitleBtn!)
+            ComBtn(
+              icon: const Icon(
+                Icons.closed_caption_off,
+                size: 22,
+                color: Colors.white,
+              ),
+              fuc: () => showSubtitleDialog(),
             ),
-            fuc: () => showSubtitleDialog(),
-          ),
           SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(
