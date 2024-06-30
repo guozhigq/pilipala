@@ -548,4 +548,8 @@ class Api {
 
   /// 收到的赞
   static const String messageLikeAPi = '/x/msgfeed/like';
+
+  /// 系统通知
+  static const String messageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 }
