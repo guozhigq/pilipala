@@ -5,6 +5,8 @@ class HttpString {
   static const String appBaseUrl = 'https://app.bilibili.com';
   static const String liveBaseUrl = 'https://api.live.bilibili.com';
   static const String passBaseUrl = 'https://passport.bilibili.com';
+  static const String messageBaseUrl = 'https://message.bilibili.com';
+  static const String bangumiBaseUrl = 'https://bili.meark.me';
   static const List<int> validateStatusCodes = [
     302,
     304,

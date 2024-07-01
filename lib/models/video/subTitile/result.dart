@@ -1,6 +1,3 @@
-import 'package:get/get.dart';
-import '../../common/subtitle_type.dart';
-
 class SubTitlteModel {
   SubTitlteModel({
     this.aid,
@@ -78,11 +75,6 @@ class SubTitlteItemModel {
         aiType: json["ai_type"],
         aiStatus: json["ai_status"],
         title: json["lan_doc"],
-        code: SubtitleType.values
-                .firstWhereOrNull(
-                    (element) => element.id.toString() == json["lan"])
-                ?.index ??
-            -1,
         content: '',
         body: [],
       );
