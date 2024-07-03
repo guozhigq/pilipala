@@ -17,7 +17,11 @@ class PlDanmakuController {
       int segCount = (videoDuration / segmentLength).ceil();
       requestedSeg = List<bool>.generate(segCount, (index) => false);
     }
-    queryDanmaku(calcSegment(progress));
+    try {
+      queryDanmaku(calcSegment(progress));
+    } catch (e) {
+      print(e);
+    }
   }
 
   void dispose() {
@@ -31,16 +35,18 @@ class PlDanmakuController {
 
   void queryDanmaku(int segmentIndex) async {
     assert(requestedSeg[segmentIndex] == false);
-    requestedSeg[segmentIndex] = true;
-    final DmSegMobileReply result = await DanmakaHttp.queryDanmaku(
-        cid: cid, segmentIndex: segmentIndex + 1);
-    if (result.elems.isNotEmpty) {
-      for (var element in result.elems) {
-        int pos = element.progress ~/ 100; //每0.1秒存储一次
-        if (dmSegMap[pos] == null) {
-          dmSegMap[pos] = [];
+    if (requestedSeg.length > segmentIndex) {
+      requestedSeg[segmentIndex] = true;
+      final DmSegMobileReply result = await DanmakaHttp.queryDanmaku(
+          cid: cid, segmentIndex: segmentIndex + 1);
+      if (result.elems.isNotEmpty) {
+        for (var element in result.elems) {
+          int pos = element.progress ~/ 100; //每0.1秒存储一次
+          if (dmSegMap[pos] == null) {
+            dmSegMap[pos] = [];
+          }
+          dmSegMap[pos]!.add(element);
         }
-        dmSegMap[pos]!.add(element);
       }
     }
   }
