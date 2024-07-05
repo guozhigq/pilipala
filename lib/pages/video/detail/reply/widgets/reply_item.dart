@@ -644,6 +644,15 @@ InlineSpan buildContent(
                           title,
                           '',
                         );
+                      } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
+                        Get.toNamed(
+                          '/webview',
+                          parameters: {
+                            'url': 'https://www.bilibili.com/read/$matchStr',
+                            'type': 'url',
+                            'pageTitle': title
+                          },
+                        );
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
                         SchemeEntity scheme = SchemeEntity(
