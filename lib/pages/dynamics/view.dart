@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
@@ -77,10 +78,14 @@ class _DynamicsPageState extends State<DynamicsPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
-        titleSpacing: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         title: SizedBox(
           height: 34,
           child: Stack(

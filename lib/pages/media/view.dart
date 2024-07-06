@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
@@ -46,7 +46,16 @@ class _MediaPageState extends State<MediaPage>
     super.build(context);
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 30),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 30,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+      ),
       body: SingleChildScrollView(
         controller: mediaController.scrollController,
         child: Column(

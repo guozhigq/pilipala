@@ -46,104 +46,66 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    // 设置状态栏图标的亮度
-    if (_homeController.enableGradientBg) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarIconBrightness: currentBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light,
-      ));
-    }
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: _homeController.enableGradientBg
-          ? null
-          : AppBar(toolbarHeight: 0, elevation: 0),
-      body: Stack(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+      ),
+      body: Column(
         children: [
-          // gradient background
-          if (_homeController.enableGradientBg) ...[
-            Align(
-              alignment: Alignment.topLeft,
-              child: Opacity(
-                opacity: 0.6,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.4),
-                          Theme.of(context)
-                              .colorScheme
-                              .surface
-                              .withOpacity(0.5),
-                          Theme.of(context).colorScheme.surface
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: const [0.1, 0.3, 0.5]),
+          CustomAppBar(
+            stream: _homeController.hideSearchBar
+                ? stream
+                : StreamController<bool>.broadcast().stream,
+            ctr: _homeController,
+            callback: showUserBottomSheet,
+          ),
+          if (_homeController.tabs.length > 1) ...[
+            if (_homeController.enableGradientBg) ...[
+              const CustomTabs(),
+            ] else ...[
+              Container(
+                width: double.infinity,
+                height: 42,
+                padding: const EdgeInsets.only(top: 4),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: TabBar(
+                    controller: _homeController.tabController,
+                    tabs: [
+                      for (var i in _homeController.tabs) Tab(text: i['label'])
+                    ],
+                    isScrollable: true,
+                    dividerColor: Colors.transparent,
+                    enableFeedback: true,
+                    splashBorderRadius: BorderRadius.circular(10),
+                    tabAlignment: TabAlignment.center,
+                    onTap: (value) {
+                      feedBack();
+                      if (_homeController.initialIndex.value == value) {
+                        _homeController.tabsCtrList[value]().animateToTop();
+                      }
+                      _homeController.initialIndex.value = value;
+                    },
                   ),
-                ),
-              ),
-            ),
-          ],
-          Column(
-            children: [
-              CustomAppBar(
-                stream: _homeController.hideSearchBar
-                    ? stream
-                    : StreamController<bool>.broadcast().stream,
-                ctr: _homeController,
-                callback: showUserBottomSheet,
-              ),
-              if (_homeController.tabs.length > 1) ...[
-                if (_homeController.enableGradientBg) ...[
-                  const CustomTabs(),
-                ] else ...[
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 42,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: TabBar(
-                        controller: _homeController.tabController,
-                        tabs: [
-                          for (var i in _homeController.tabs)
-                            Tab(text: i['label'])
-                        ],
-                        isScrollable: true,
-                        dividerColor: Colors.transparent,
-                        enableFeedback: true,
-                        splashBorderRadius: BorderRadius.circular(10),
-                        tabAlignment: TabAlignment.center,
-                        onTap: (value) {
-                          feedBack();
-                          if (_homeController.initialIndex.value == value) {
-                            _homeController.tabsCtrList[value]().animateToTop();
-                          }
-                          _homeController.initialIndex.value = value;
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ] else ...[
-                const SizedBox(height: 6),
-              ],
-              Expanded(
-                child: TabBarView(
-                  controller: _homeController.tabController,
-                  children: _homeController.tabsPageList,
                 ),
               ),
             ],
+          ] else ...[
+            const SizedBox(height: 6),
+          ],
+          Expanded(
+            child: TabBarView(
+              controller: _homeController.tabController,
+              children: _homeController.tabsPageList,
+            ),
           ),
         ],
       ),
@@ -280,7 +242,10 @@ class DefaultUser extends StatelessWidget {
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
           backgroundColor: MaterialStateProperty.resolveWith((states) {
-            return Theme.of(context).colorScheme.onInverseSurface;
+            return Theme.of(context)
+                .colorScheme
+                .onSecondaryContainer
+                .withOpacity(0.05);
           }),
         ),
         onPressed: () => callback?.call(),
@@ -317,7 +282,7 @@ class _CustomTabsState extends State<CustomTabs> {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      margin: const EdgeInsets.only(top: 4),
+      margin: const EdgeInsets.only(top: 8),
       child: Obx(
         () => ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14.0),

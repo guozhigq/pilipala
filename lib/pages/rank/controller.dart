@@ -17,13 +17,10 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
   Box setting = GStrorage.setting;
   late final StreamController<bool> searchBarStream =
       StreamController<bool>.broadcast();
-  late bool enableGradientBg;
 
   @override
   void onInit() {
     super.onInit();
-    enableGradientBg =
-        setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
     // 进行tabs配置
     setTabConfig();
   }
