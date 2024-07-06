@@ -159,29 +159,47 @@ class _MemberPageState extends State<MemberPage>
                     profileWidget(),
 
                     /// 动态链接
-                    ListTile(
-                      onTap: _memberController.pushDynamicsPage,
-                      title: const Text('Ta的动态'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
+                    Obx(
+                      () => ListTile(
+                        onTap: _memberController.pushDynamicsPage,
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的动态'),
+                        trailing:
+                            const Icon(Icons.arrow_forward_outlined, size: 19),
+                      ),
                     ),
                     const Divider(height: 1, thickness: 0.1),
 
                     /// 视频
-                    ListTile(
-                      onTap: _memberController.pushArchivesPage,
-                      title: const Text('Ta的投稿'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
-                    ),
+                    Obx(() => ListTile(
+                          onTap: _memberController.pushArchivesPage,
+                          title: Text(
+                              '${_memberController.isOwner.value ? '我' : 'Ta'}的投稿'),
+                          trailing: const Icon(Icons.arrow_forward_outlined,
+                              size: 19),
+                        )),
+                    const Divider(height: 1, thickness: 0.1),
+
+                    /// 他的收藏夹
+                    Obx(() => ListTile(
+                          onTap: _memberController.pushfavPage,
+                          title: Text(
+                              '${_memberController.isOwner.value ? '我' : 'Ta'}的收藏'),
+                          trailing: const Icon(Icons.arrow_forward_outlined,
+                              size: 19),
+                        )),
                     const Divider(height: 1, thickness: 0.1),
 
                     /// 专栏
-                    const ListTile(title: Text('Ta的专栏')),
+                    Obx(() => ListTile(
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的专栏'))),
                     const Divider(height: 1, thickness: 0.1),
 
                     /// 合集
-                    const ListTile(title: Text('Ta的合集')),
+                    Obx(() => ListTile(
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的合集'))),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,
@@ -211,8 +229,6 @@ class _MemberPageState extends State<MemberPage>
                         },
                       ),
                     ),
-
-                    /// 收藏
 
                     /// 追番
                     /// 最近投币

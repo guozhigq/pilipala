@@ -16,11 +16,17 @@ class SubController extends GetxController {
   int currentPage = 1;
   int pageSize = 20;
   RxBool hasMore = true.obs;
+  late int mid;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+    mid = int.parse(Get.parameters['mid'] ?? '-1');
     userInfo = userInfoCache.get('userInfoCache');
+    ownerMid = userInfo != null ? userInfo!.mid! : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
   Future<dynamic> querySubFolder({type = 'init'}) async {
@@ -30,7 +36,7 @@ class SubController extends GetxController {
     var res = await UserHttp.userSubFolder(
       pn: currentPage,
       ps: pageSize,
-      mid: userInfo!.mid!,
+      mid: isOwner.value ? ownerMid : mid,
     );
     if (res['status']) {
       if (type == 'init') {
