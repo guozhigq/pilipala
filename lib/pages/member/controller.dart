@@ -27,6 +27,7 @@ class MemberController extends GetxController {
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
   RxList<MemberLikeDataModel> recentLikeList = <MemberLikeDataModel>[].obs;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
@@ -34,6 +35,7 @@ class MemberController extends GetxController {
     mid = int.parse(Get.parameters['mid']!);
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo.mid : -1;
+    isOwner.value = mid == ownerMid;
     face.value = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';
     relationSearch();
@@ -197,11 +199,12 @@ class MemberController extends GetxController {
     if (userInfo == null) return;
     var res = await MemberHttp.getMemberSeasons(mid, 1, 10);
     if (!res['status']) {
-      SmartDialog.showToast("用户专栏请求异常：${res['msg']}");
+      SmartDialog.showToast("用户合集请求异常：${res['msg']}");
     } else {
       // 只取前四个专栏
       res['data'].seasonsList.map((e) {
-        e.archives = e.archives!.sublist(0, 4);
+        e.archives =
+            e.archives!.length > 4 ? e.archives!.sublist(0, 4) : e.archives!;
       }).toList();
     }
     return res;
@@ -235,4 +238,6 @@ class MemberController extends GetxController {
   void pushRecentCoinsPage() async {
     if (recentCoinsList.isNotEmpty) {}
   }
+
+  void pushfavPage() => Get.toNamed('/fav?mid=$mid');
 }

@@ -100,6 +100,7 @@ class _FavSearchPageState extends State<FavSearchPage> {
                         return FavVideoCardH(
                           videoItem: _favSearchCtr.favList[index],
                           searchType: searchType,
+                          isOwner: '0',
                           callFn: () => searchType != 1
                               ? _favSearchCtr
                                   .onCancelFav(_favSearchCtr.favList[index].id!)

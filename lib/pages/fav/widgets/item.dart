@@ -7,7 +7,9 @@ import 'package:pilipala/utils/utils.dart';
 class FavItem extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final favFolderItem;
-  const FavItem({super.key, required this.favFolderItem});
+  final bool isOwner;
+  const FavItem(
+      {super.key, required this.favFolderItem, required this.isOwner});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,7 @@ class FavItem extends StatelessWidget {
           parameters: {
             'heroTag': heroTag,
             'mediaId': favFolderItem.id.toString(),
+            'isOwner': isOwner ? '1' : '0',
           },
         );
       },
