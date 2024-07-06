@@ -78,16 +78,16 @@ class _HomePageState extends State<HomePage>
                           Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.9),
+                              .withOpacity(0.4),
                           Theme.of(context)
                               .colorScheme
-                              .primary
+                              .surface
                               .withOpacity(0.5),
                           Theme.of(context).colorScheme.surface
                         ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: const [0, 0.0034, 0.34]),
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const [0.1, 0.3, 0.5]),
                   ),
                 ),
               ),
