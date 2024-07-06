@@ -26,6 +26,7 @@ class MainController extends GetxController {
   Box userInfoCache = GStrorage.userInfo;
   RxBool userLogin = false.obs;
   late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
+  late bool enableGradientBg;
 
   @override
   void onInit() {
@@ -44,6 +45,8 @@ class MainController extends GetxController {
     if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
       getUnreadDynamic();
     }
+    enableGradientBg =
+        setting.get(SettingBoxKey.enableGradientBg, defaultValue: true);
   }
 
   void onBackPressed(BuildContext context) {
