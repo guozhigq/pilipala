@@ -9,11 +9,18 @@ class MemberSeasonsDataModel {
 
   MemberSeasonsDataModel.fromJson(Map<String, dynamic> json) {
     page = json['page'];
-    seasonsList = json['seasons_list'] != null
+    var tempList1 = json['seasons_list'] != null
         ? json['seasons_list']
             .map<MemberSeasonsList>((e) => MemberSeasonsList.fromJson(e))
             .toList()
         : [];
+    var tempList2 = json['series_list'] != null
+        ? json['series_list']
+            .map<MemberSeasonsList>((e) => MemberSeasonsList.fromJson(e))
+            .toList()
+        : [];
+
+    seasonsList = [...tempList1, ...tempList2];
   }
 }
 
