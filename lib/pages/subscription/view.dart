@@ -42,10 +42,10 @@ class _SubPageState extends State<SubPage> {
       appBar: AppBar(
         centerTitle: false,
         titleSpacing: 0,
-        title: Text(
-          '我的订阅',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Obx(() => Text(
+              '${_subController.isOwner.value ? '我' : 'Ta'}的订阅',
+              style: Theme.of(context).textTheme.titleMedium,
+            )),
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,
@@ -62,6 +62,7 @@ class _SubPageState extends State<SubPage> {
                       return SubItem(
                           subFolderItem:
                               _subController.subFolderData.value.list![index],
+                          isOwner: _subController.isOwner.value,
                           cancelSub: _subController.cancelSub);
                     },
                   ),
