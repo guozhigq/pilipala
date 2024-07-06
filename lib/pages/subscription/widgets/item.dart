@@ -8,10 +8,12 @@ import '../../../models/user/sub_folder.dart';
 
 class SubItem extends StatelessWidget {
   final SubFolderItemData subFolderItem;
+  final bool isOwner;
   final Function(SubFolderItemData) cancelSub;
   const SubItem({
     super.key,
     required this.subFolderItem,
+    required this.isOwner,
     required this.cancelSub,
   });
 
@@ -59,6 +61,7 @@ class SubItem extends StatelessWidget {
                   ),
                   VideoContent(
                     subFolderItem: subFolderItem,
+                    isOwner: isOwner,
                     cancelSub: cancelSub,
                   )
                 ],
@@ -73,8 +76,14 @@ class SubItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final SubFolderItemData subFolderItem;
+  final bool isOwner;
   final Function(SubFolderItemData)? cancelSub;
-  const VideoContent({super.key, required this.subFolderItem, this.cancelSub});
+  const VideoContent({
+    super.key,
+    required this.subFolderItem,
+    required this.isOwner,
+    this.cancelSub,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,22 +120,24 @@ class VideoContent extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  ),
-                  onPressed: () => cancelSub?.call(subFolderItem),
-                  icon: Icon(
-                    Icons.clear_outlined,
-                    color: Theme.of(context).colorScheme.outline,
-                    size: 18,
-                  ),
-                )
-              ],
-            )
+            isOwner
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
+                        onPressed: () => cancelSub?.call(subFolderItem),
+                        icon: Icon(
+                          Icons.clear_outlined,
+                          color: Theme.of(context).colorScheme.outline,
+                          size: 18,
+                        ),
+                      )
+                    ],
+                  )
+                : const SizedBox()
           ],
         ),
       ),

@@ -212,6 +212,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                   SliverChildBuilderDelegate((context, index) {
                                 return FavVideoCardH(
                                   videoItem: favList[index],
+                                  isOwner: _favDetailController.isOwner,
                                   callFn: () => _favDetailController
                                       .onCancelFav(favList[index].id),
                                 );
