@@ -492,7 +492,7 @@ class VideoHttp {
         return {'status': false, 'data': [], 'msg': res.data['msg']};
       }
     } catch (err) {
-      print(err);
+      return {'status': false, 'data': [], 'msg': res.data['msg']};
     }
   }
 

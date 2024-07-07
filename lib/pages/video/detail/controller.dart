@@ -440,6 +440,8 @@ class VideoDetailController extends GetxController
         getDanmaku(subtitles);
       }
       return subtitles;
+    } else {
+      return [];
     }
   }
 
