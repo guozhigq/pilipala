@@ -117,14 +117,47 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       },
       child: Scaffold(
         extendBody: true,
-        body: PageView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _mainController.pageController,
-          onPageChanged: (index) {
-            _mainController.selectedIndex = index;
-            setState(() {});
-          },
-          children: _mainController.pages,
+        body: Stack(
+          children: [
+            if (_mainController.enableGradientBg)
+              Align(
+                alignment: Alignment.topLeft,
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    // height: MediaQuery.of(context).size.height,
+                    height: MediaQuery.of(context).padding.top + 400,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.6),
+                            Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withOpacity(0.3),
+                            Theme.of(context).colorScheme.surface
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.1, 0.8, 1]),
+                    ),
+                  ),
+                ),
+              ),
+            PageView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _mainController.pageController,
+              onPageChanged: (index) {
+                _mainController.selectedIndex = index;
+                setState(() {});
+              },
+              children: _mainController.pages,
+            ),
+          ],
         ),
         bottomNavigationBar: _mainController.navigationBars.length > 1
             ? StreamBuilder(

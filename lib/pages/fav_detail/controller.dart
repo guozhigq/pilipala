@@ -19,6 +19,7 @@ class FavDetailController extends GetxController {
   RxList favList = [].obs;
   RxString loadingText = '加载中...'.obs;
   RxInt mediaCount = 0.obs;
+  late String isOwner;
 
   @override
   void onInit() {
@@ -26,6 +27,7 @@ class FavDetailController extends GetxController {
     if (Get.parameters.keys.isNotEmpty) {
       mediaId = int.parse(Get.parameters['mediaId']!);
       heroTag = Get.parameters['heroTag']!;
+      isOwner = Get.parameters['isOwner']!;
     }
     super.onInit();
   }

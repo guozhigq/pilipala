@@ -42,17 +42,25 @@ class _FavPageState extends State<FavPage> {
       appBar: AppBar(
         centerTitle: false,
         titleSpacing: 0,
-        title: Text(
-          '我的收藏',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Obx(() => Text(
+              '${_favController.isOwner.value ? '我' : 'Ta'}的收藏',
+              style: Theme.of(context).textTheme.titleMedium,
+            )),
         actions: [
+          Obx(() => !_favController.isOwner.value
+              ? IconButton(
+                  onPressed: () =>
+                      Get.toNamed('/subscription?mid=${_favController.mid}'),
+                  icon: const Icon(Icons.subscriptions_outlined, size: 21),
+                  tooltip: 'Ta的订阅',
+                )
+              : const SizedBox.shrink()),
           IconButton(
             onPressed: () => Get.toNamed(
                 '/favSearch?searchType=1&mediaId=${_favController.favFolderData.value.list!.first.id}'),
             icon: const Icon(Icons.search_outlined),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 14),
         ],
       ),
       body: FutureBuilder(
@@ -67,7 +75,9 @@ class _FavPageState extends State<FavPage> {
                   itemCount: _favController.favFolderList.length,
                   itemBuilder: (context, index) {
                     return FavItem(
-                        favFolderItem: _favController.favFolderList[index]);
+                      favFolderItem: _favController.favFolderList[index],
+                      isOwner: _favController.isOwner.value,
+                    );
                   },
                 ),
               );
