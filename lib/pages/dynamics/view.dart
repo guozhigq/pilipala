@@ -78,14 +78,9 @@ class _DynamicsPageState extends State<DynamicsPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: Colors.transparent,
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: Colors.transparent,
-        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
         title: SizedBox(
           height: 34,
           child: Stack(
