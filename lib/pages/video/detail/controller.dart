@@ -152,17 +152,13 @@ class VideoDetailController extends GetxController
     defaultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.hiRes.code);
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
-    getSubtitle().then(
-      (subtitles) {
-        headerControl = HeaderControl(
-          controller: plPlayerController,
-          videoDetailCtr: this,
-          floating: floating,
-          bvid: bvid,
-          videoType: videoType,
-          showSubtitleBtn: subtitles.isNotEmpty,
-        );
-      },
+    getSubtitle();
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+      bvid: bvid,
+      videoType: videoType,
     );
   }
 
@@ -439,9 +435,6 @@ class VideoDetailController extends GetxController
         subtitles = result['data'].subtitles;
         getDanmaku(subtitles);
       }
-      return subtitles;
-    } else {
-      return [];
     }
   }
 

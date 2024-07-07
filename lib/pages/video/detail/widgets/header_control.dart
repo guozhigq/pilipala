@@ -1329,7 +1329,7 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          if (widget.showSubtitleBtn!)
+          if (widget.showSubtitleBtn ?? true)
             ComBtn(
               icon: const Icon(
                 Icons.closed_caption_off,
