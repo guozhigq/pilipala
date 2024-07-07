@@ -46,16 +46,7 @@ class _MediaPageState extends State<MediaPage>
     super.build(context);
     Color primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        toolbarHeight: 30,
-        backgroundColor: Colors.transparent,
-        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
-      ),
+      appBar: AppBar(toolbarHeight: 30),
       body: SingleChildScrollView(
         controller: mediaController.scrollController,
         child: Column(
