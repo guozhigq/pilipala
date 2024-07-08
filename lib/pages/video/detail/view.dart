@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -29,6 +28,7 @@ import 'package:status_bar_control/status_bar_control.dart';
 import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
+import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -494,45 +494,77 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       exitFullScreen();
     }
 
+    Widget buildLoadingWidget() {
+      return Center(child: Lottie.asset('assets/loading.json', width: 200));
+    }
+
+    Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
+      return Obx(() => !vdCtr.autoPlay.value
+          ? const SizedBox()
+          : PLVideoPlayer(
+              controller: plPlayerController!,
+              headerControl: vdCtr.headerControl,
+              danmuWidget: PlDanmaku(
+                key: Key(vdCtr.danmakuCid.value.toString()),
+                cid: vdCtr.danmakuCid.value,
+                playerController: plPlayerController!,
+              ),
+              bottomList: vdCtr.bottomList,
+              showEposideCb: () => vdCtr.videoType == SearchType.video
+                  ? videoIntroController.showEposideHandler()
+                  : bangumiIntroController.showEposideHandler(),
+              fullScreenCb: (bool status) {
+                videoHeight.value =
+                    status ? Get.size.height : defaultVideoHeight;
+              },
+            ));
+    }
+
+    Widget buildErrorWidget(dynamic error) {
+      return Obx(
+        () => SizedBox(
+          height: videoHeight.value,
+          width: Get.size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('加载失败', style: TextStyle(color: Colors.white)),
+              Text('$error', style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 10),
+              IconButton.filled(
+                onPressed: () {
+                  setState(() {
+                    _futureBuilderFuture = vdCtr.queryVideoUrl();
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
     /// 播放器面板
-    Widget videoPlayerPanel = FutureBuilder(
-      future: _futureBuilderFuture,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData && snapshot.data['status']) {
-          return Obx(
-            () {
-              return !vdCtr.autoPlay.value
-                  ? const SizedBox()
-                  : Obx(
-                      () => PLVideoPlayer(
-                        controller: plPlayerController!,
-                        headerControl: vdCtr.headerControl,
-                        danmuWidget: PlDanmaku(
-                          key: Key(vdCtr.danmakuCid.value.toString()),
-                          cid: vdCtr.danmakuCid.value,
-                          playerController: plPlayerController!,
-                        ),
-                        bottomList: vdCtr.bottomList,
-                        showEposideCb: () => vdCtr.videoType == SearchType.video
-                            ? videoIntroController.showEposideHandler()
-                            : bangumiIntroController.showEposideHandler(),
-                        fullScreenCb: (bool status) {
-                          if (status) {
-                            videoHeight.value = Get.size.height;
-                          } else {
-                            videoHeight.value = defaultVideoHeight;
-                          }
-                        },
-                      ),
-                    );
-            },
-          );
-        } else {
-          // 加载失败异常处理
-          return const SizedBox();
-        }
-      },
-    );
+    Widget buildVideoPlayerPanel() {
+      return FutureBuilder(
+        future: _futureBuilderFuture,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return buildLoadingWidget();
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData && snapshot.data['status']) {
+              return buildVideoPlayerWidget(snapshot);
+            } else {
+              return buildErrorWidget(snapshot.error);
+            }
+          } else {
+            return buildErrorWidget('未知错误');
+          }
+        },
+      );
+    }
 
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait &&
@@ -721,7 +753,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (Platform.isAndroid) {
       return PiPSwitcher(
         childWhenDisabled: childWhenDisabled,
-        childWhenEnabled: videoPlayerPanel,
+        childWhenEnabled: buildVideoPlayerPanel(),
         floating: floating,
       );
     } else {
