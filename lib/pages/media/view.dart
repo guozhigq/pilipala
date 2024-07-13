@@ -245,9 +245,11 @@ class FavFolderItem extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
       child: GestureDetector(
-        onTap: () => Get.toNamed('/favDetail',
-            arguments: item,
-            parameters: {'mediaId': item!.id.toString(), 'heroTag': heroTag}),
+        onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
+          'mediaId': item!.id.toString(),
+          'heroTag': heroTag,
+          'isOwner': '1',
+        }),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
