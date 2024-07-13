@@ -15,6 +15,7 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/danmaku/view.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
@@ -240,6 +241,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
+    final MainController mainController = Get.find<MainController>();
+    if (mainController.imgPreviewStatus) {
+      return;
+    }
+
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
         as bool) {
@@ -259,6 +265,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 返回当前页面时
   void didPopNext() async {
+    final MainController mainController = Get.find<MainController>();
+    if (mainController.imgPreviewStatus) {
+      return;
+    }
+
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
       setState(() {
