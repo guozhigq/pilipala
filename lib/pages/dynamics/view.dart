@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/route_push.dart';
@@ -18,6 +18,7 @@ import 'package:pilipala/utils/storage.dart';
 import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
+import 'up_dynamic/route_panel.dart';
 import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -202,7 +203,21 @@ class _DynamicsPageState extends State<DynamicsPage>
                   }
                   Map data = snapshot.data;
                   if (data['status']) {
-                    return Obx(() => UpPanel(_dynamicsController.upData.value));
+                    return Obx(
+                      () => UpPanel(
+                        upData: _dynamicsController.upData.value,
+                        onClickUpCb: (data) {
+                          // _dynamicsController.onTapUp(data);
+                          Navigator.push(
+                            context,
+                            PlPopupRoute(
+                              child: OverlayPanel(
+                                  ctr: _dynamicsController, upInfo: data),
+                            ),
+                          );
+                        },
+                      ),
+                    );
                   } else {
                     return const SliverToBoxAdapter(
                       child: SizedBox(height: 80),

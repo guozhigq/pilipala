@@ -6,9 +6,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
-import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
@@ -16,7 +14,6 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -281,5 +278,12 @@ class DynamicsController extends GetxController {
     SmartDialog.showToast('还原默认加载');
     dynamicsList.value = <DynamicItemModel>[];
     queryFollowDynamic();
+  }
+
+  // 点击up主
+  void onTapUp(data) {
+    mid.value = data.mid;
+    upInfo.value = data;
+    onSelectUp(data.mid);
   }
 }
