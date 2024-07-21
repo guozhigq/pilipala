@@ -112,7 +112,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply, loadMore) {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
@@ -120,7 +120,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
       videoDetailCtr.showReplyReplyPanel(
-          replyItem.oid, replyItem.rpid!, replyItem);
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply, loadMore);
     }
   }
 
@@ -232,8 +232,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem) =>
-                                            replyReply(replyItem),
+                                        replyReply: (replyItem, currentReply,
+                                                loadMore) =>
+                                            replyReply(replyItem, currentReply,
+                                                loadMore),
                                         replyType: ReplyType.video,
                                       );
                                     }

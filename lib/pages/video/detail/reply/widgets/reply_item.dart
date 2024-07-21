@@ -49,7 +49,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem);
+            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
           }
         },
         onLongPress: () {
@@ -362,9 +362,13 @@ class ReplyItemRow extends StatelessWidget {
               for (int i = 0; i < replies!.length; i++) ...[
                 InkWell(
                   // 一楼点击评论展开评论详情
-                  // onTap: () {
-                  //   replyReply?.call(replyItem);
-                  // },
+                  onTap: () {
+                    replyReply?.call(
+                      replyItem,
+                      replies![i],
+                      replyItem!.replies!.isNotEmpty,
+                    );
+                  },
                   onLongPress: () {
                     feedBack();
                     showModalBottomSheet(
@@ -535,9 +539,12 @@ InlineSpan buildContent(
     spanChilds.add(
       TextSpan(
         text: str,
-        recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
+        // recognizer: TapGestureRecognizer()
+        //   ..onTap = () => replyReply?.call(
+        //         replyItem.root == 0 ? replyItem : fReplyItem,
+        //         replyItem,
+        //         fReplyItem!.replies!.isNotEmpty,
+        //       ),
       ),
     );
   }
