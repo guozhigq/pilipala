@@ -175,6 +175,8 @@ class VideoDetailController extends GetxController
         replyType: ReplyType.video,
         source: 'videoDetail',
         sheetHeight: sheetHeight.value,
+        currentReply: currentReply,
+        loadMore: loadMore,
       );
     });
     replyReplyBottomSheetCtr?.closed.then((value) {
