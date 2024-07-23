@@ -228,7 +228,7 @@ class SessionItem extends StatelessWidget {
             'talkerId': sessionItem.talkerId.toString(),
             'name': sessionItem.accountInfo.name,
             'face': sessionItem.accountInfo.face,
-            'mid': sessionItem.accountInfo.mid.toString(),
+            'mid': (sessionItem.accountInfo?.mid ?? 0).toString(),
             'heroTag': heroTag,
           },
         );
