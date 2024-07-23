@@ -1,4 +1,5 @@
 import 'package:appscheme/appscheme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +10,10 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/pages/preview/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
@@ -47,7 +49,7 @@ class ReplyItem extends StatelessWidget {
         onTap: () {
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem);
+            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
           }
         },
         onLongPress: () {
@@ -360,9 +362,13 @@ class ReplyItemRow extends StatelessWidget {
               for (int i = 0; i < replies!.length; i++) ...[
                 InkWell(
                   // 一楼点击评论展开评论详情
-                  // onTap: () {
-                  //   replyReply?.call(replyItem);
-                  // },
+                  onTap: () {
+                    replyReply?.call(
+                      replyItem,
+                      replies![i],
+                      replyItem!.replies!.isNotEmpty,
+                    );
+                  },
                   onLongPress: () {
                     feedBack();
                     showModalBottomSheet(
@@ -533,9 +539,59 @@ InlineSpan buildContent(
     spanChilds.add(
       TextSpan(
         text: str,
-        recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
+        // recognizer: TapGestureRecognizer()
+        //   ..onTap = () => replyReply?.call(
+        //         replyItem.root == 0 ? replyItem : fReplyItem,
+        //         replyItem,
+        //         fReplyItem!.replies!.isNotEmpty,
+        //       ),
+      ),
+    );
+  }
+
+  void onPreviewImg(picList, initIndex) {
+    final MainController mainController = Get.find<MainController>();
+    mainController.imgPreviewStatus = true;
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          itemBuilder: (
+            BuildContext context,
+            int index,
+            bool isFocus,
+            bool enablePageView,
+          ) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (enablePageView) {
+                  Navigator.of(context).pop();
+                  final MainController mainController =
+                      Get.find<MainController>();
+                  mainController.imgPreviewStatus = false;
+                }
+              },
+              child: Center(
+                child: Hero(
+                  tag: picList[index],
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 0),
+                    imageUrl: picList[index],
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            );
+          },
+          onPageChanged: (int pageIndex) {},
+          onDismissed: (int value) {
+            print('onDismissed');
+            final MainController mainController = Get.find<MainController>();
+            mainController.imgPreviewStatus = false;
+          },
+        ),
       ),
     );
   }
@@ -831,38 +887,33 @@ InlineSpan buildContent(
                     .truncateToDouble();
               } catch (_) {}
 
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ImagePreview(initialPage: 0, imgList: picList);
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(top: 4),
-                  constraints: BoxConstraints(maxHeight: maxHeight),
-                  width: box.maxWidth / 2,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: NetworkImgLayer(
-                          src: pictureItem['img_src'],
-                          width: box.maxWidth / 2,
-                          height: height,
+              return Hero(
+                tag: picList[0],
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, 0),
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    constraints: BoxConstraints(maxHeight: maxHeight),
+                    width: box.maxWidth / 2,
+                    height: height,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: picList[0],
+                            width: box.maxWidth / 2,
+                            height: height,
+                          ),
                         ),
-                      ),
-                      height > Get.size.height * 0.9
-                          ? const PBadge(
-                              text: '长图',
-                              right: 8,
-                              bottom: 8,
-                            )
-                          : const SizedBox(),
-                    ],
+                        height > Get.size.height * 0.9
+                            ? const PBadge(
+                                text: '长图',
+                                right: 8,
+                                bottom: 8,
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -874,25 +925,22 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
+      }
+      for (var i = 0; i < len; i++) {
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: i, imgList: picList);
-                    },
-                  );
-                },
-                child: NetworkImgLayer(
-                    src: content.pictures[i]['img_src'],
-                    width: box.maxWidth,
-                    height: box.maxWidth,
-                    origAspectRatio: content.pictures[i]['img_width'] /
-                        content.pictures[i]['img_height']),
+              return Hero(
+                tag: picList[i],
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, i),
+                  child: NetworkImgLayer(
+                      src: picList[i],
+                      width: box.maxWidth,
+                      height: box.maxWidth,
+                      origAspectRatio: content.pictures[i]['img_width'] /
+                          content.pictures[i]['img_height']),
+                ),
               );
             },
           ),

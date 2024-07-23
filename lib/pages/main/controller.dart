@@ -27,6 +27,7 @@ class MainController extends GetxController {
   RxBool userLogin = false.obs;
   late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
   late bool enableGradientBg;
+  bool imgPreviewStatus = false;
 
   @override
   void onInit() {
