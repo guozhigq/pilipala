@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pilipala/models/model_owner.dart';
-import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/user/info.dart';
 import '../models/common/gesture_mode.dart';
 import 'global_data.dart';
@@ -54,11 +52,8 @@ class GStrorage {
   }
 
   static void regAdapter() {
-    Hive.registerAdapter(OwnerAdapter());
     Hive.registerAdapter(UserInfoDataAdapter());
     Hive.registerAdapter(LevelInfoAdapter());
-    Hive.registerAdapter(HotSearchModelAdapter());
-    Hive.registerAdapter(HotSearchItemAdapter());
   }
 
   static Future<void> close() async {

@@ -215,9 +215,8 @@ class VideoContent extends StatelessWidget {
             children: [
               if (videoItem.goto == 'bangumi')
                 _buildBadge(videoItem.bangumiBadge, 'line', 9),
-              if (videoItem.rcmdReason?.content != null &&
-                  videoItem.rcmdReason.content != '')
-                _buildBadge(videoItem.rcmdReason.content, 'color'),
+              if (videoItem.rcmdReason != null)
+                _buildBadge(videoItem.rcmdReason, 'color'),
               if (videoItem.goto == 'picture') _buildBadge('动态', 'line', 9),
               if (videoItem.isFollowed == 1) _buildBadge('已关注', 'color'),
               Expanded(
