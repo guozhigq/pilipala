@@ -1,14 +1,8 @@
-import 'package:hive/hive.dart';
-
-part 'hot.g.dart';
-
-@HiveType(typeId: 6)
 class HotSearchModel {
   HotSearchModel({
     this.list,
   });
 
-  @HiveField(0)
   List<HotSearchItem>? list;
 
   HotSearchModel.fromJson(Map<String, dynamic> json) {
@@ -18,7 +12,6 @@ class HotSearchModel {
   }
 }
 
-@HiveType(typeId: 7)
 class HotSearchItem {
   HotSearchItem({
     this.keyword,
@@ -27,14 +20,10 @@ class HotSearchItem {
     this.icon,
   });
 
-  @HiveField(0)
   String? keyword;
-  @HiveField(1)
   String? showName;
   // 4/5热 11话题 8普通 7直播
-  @HiveField(2)
   int? wordType;
-  @HiveField(3)
   String? icon;
 
   HotSearchItem.fromJson(Map<String, dynamic> json) {

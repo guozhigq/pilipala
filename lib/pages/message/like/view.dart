@@ -209,7 +209,7 @@ class LikeItem extends StatelessWidget {
                             style: TextStyle(color: outline),
                           ),
                         TextSpan(
-                          text: '赞了我的评论',
+                          text: '赞了我的${item.item!.business}',
                           style: TextStyle(color: outline),
                         ),
                       ])),

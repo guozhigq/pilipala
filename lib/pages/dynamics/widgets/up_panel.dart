@@ -4,13 +4,18 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
-import 'package:pilipala/pages/dynamics/controller.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
   final FollowUpModel upData;
-  const UpPanel(this.upData, {Key? key}) : super(key: key);
+  final Function? onClickUpCb;
+
+  const UpPanel({
+    super.key,
+    required this.upData,
+    this.onClickUpCb,
+  });
 
   @override
   State<UpPanel> createState() => _UpPanelState();
@@ -33,27 +38,25 @@ class _UpPanelState extends State<UpPanel> {
 
   void onClickUp(data, i) {
     currentMid = data.mid;
-    Get.find<DynamicsController>().mid.value = data.mid;
-    Get.find<DynamicsController>().upInfo.value = data;
-    Get.find<DynamicsController>().onSelectUp(data.mid);
-    int liveLen = liveList.length;
-    int upLen = upList.length;
-    double itemWidth = contentWidth + itemPadding.horizontal;
-    double screenWidth = MediaQuery.sizeOf(context).width;
-    double moveDistance = 0.0;
-    if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
-    } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
-      moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
-    } else {
-      moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
-    }
-    data.hasUpdate = false;
-    scrollController.animateTo(
-      moveDistance,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.linear,
-    );
-    setState(() {});
+    widget.onClickUpCb?.call(data);
+    // int liveLen = liveList.length;
+    // int upLen = upList.length;
+    // double itemWidth = contentWidth + itemPadding.horizontal;
+    // double screenWidth = MediaQuery.sizeOf(context).width;
+    // double moveDistance = 0.0;
+    // if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
+    // } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+    //   moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
+    // } else {
+    //   moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
+    // }
+    // data.hasUpdate = false;
+    // scrollController.animateTo(
+    //   moveDistance,
+    //   duration: const Duration(milliseconds: 200),
+    //   curve: Curves.linear,
+    // );
+    // setState(() {});
   }
 
   @override

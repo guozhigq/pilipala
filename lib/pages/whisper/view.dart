@@ -214,7 +214,7 @@ class SessionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo.mid);
+    final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo?.mid ?? 0);
     final content = sessionItem.lastMsg.content;
     final msgStatus = sessionItem.lastMsg.msgStatus;
 
@@ -228,7 +228,7 @@ class SessionItem extends StatelessWidget {
             'talkerId': sessionItem.talkerId.toString(),
             'name': sessionItem.accountInfo.name,
             'face': sessionItem.accountInfo.face,
-            'mid': sessionItem.accountInfo.mid.toString(),
+            'mid': (sessionItem.accountInfo?.mid ?? 0).toString(),
             'heroTag': heroTag,
           },
         );
