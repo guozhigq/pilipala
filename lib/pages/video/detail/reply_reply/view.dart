@@ -21,7 +21,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
     this.replyType,
     this.sheetHeight,
     this.currentReply,
-    this.loadMore,
+    this.loadMore = true,
     super.key,
   });
   final int? oid;
@@ -32,7 +32,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
   final ReplyType? replyType;
   final double? sheetHeight;
   final dynamic currentReply;
-  final bool? loadMore;
+  final bool loadMore;
 
   @override
   State<VideoReplyReplyPanel> createState() => _VideoReplyReplyPanelState();
@@ -142,7 +142,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
                       ),
                     ),
                   ],
-                  widget.loadMore != null && widget.loadMore!
+                  widget.loadMore
                       ? FutureBuilder(
                           future: _futureBuilderFuture,
                           builder: (BuildContext context, snapshot) {
