@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
@@ -196,45 +197,38 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    if (hasCoin.value) {
-      SmartDialog.showToast('已投过币了');
-      return;
-    }
     showDialog(
         context: Get.context!,
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [1, 2]
-                    .map(
-                      (e) => RadioListTile(
-                        value: e,
-                        title: Text('$e枚'),
-                        groupValue: _tempThemeValue,
-                        onChanged: (value) async {
-                          _tempThemeValue = value!;
-                          setState(() {});
-                          var res = await VideoHttp.coinVideo(
-                              bvid: bvid, multiply: _tempThemeValue);
-                          if (res['status']) {
-                            SmartDialog.showToast('投币成功');
-                            hasCoin.value = true;
-                            videoDetail.value.stat!.coin =
-                                videoDetail.value.stat!.coin! + _tempThemeValue;
-                          } else {
-                            SmartDialog.showToast(res['msg']);
-                          }
-                          Get.back();
-                        },
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [1, 2]
+                  .map(
+                    (e) => ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Text('$e 枚'),
                       ),
-                    )
-                    .toList(),
-              );
-            }),
+                      onTap: () async {
+                        var res =
+                            await VideoHttp.coinVideo(bvid: bvid, multiply: e);
+                        if (res['status']) {
+                          SmartDialog.showToast('投币成功');
+                          hasCoin.value = true;
+                          videoDetail.value.stat!.coin =
+                              videoDetail.value.stat!.coin! + e;
+                        } else {
+                          SmartDialog.showToast(res['msg']);
+                        }
+                        Get.back();
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
           );
         });
   }

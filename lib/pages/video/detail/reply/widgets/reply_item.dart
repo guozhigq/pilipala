@@ -16,7 +16,6 @@ import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -436,7 +435,8 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1)
               InkWell(
                 // 一楼点击【共xx条回复】展开评论详情
-                onTap: () => replyReply!(replyItem),
+                onTap: () => replyReply?.call(replyItem, null, true),
+                onLongPress: () => {},
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
