@@ -14,11 +14,13 @@ import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
 import 'package:pilipala/plugin/pl_gallery/index.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'reply_save.dart';
 import 'zan.dart';
 
 Box setting = GStrorage.setting;
@@ -58,7 +60,10 @@ class ReplyItem extends StatelessWidget {
             useRootNavigator: true,
             isScrollControlled: true,
             builder: (context) {
-              return MorePanel(item: replyItem);
+              return MorePanel(
+                item: replyItem,
+                mainFloor: true,
+              );
             },
           );
         },
@@ -1004,7 +1009,12 @@ InlineSpan buildContent(
 
 class MorePanel extends StatelessWidget {
   final dynamic item;
-  const MorePanel({super.key, required this.item});
+  final bool mainFloor;
+  const MorePanel({
+    super.key,
+    required this.item,
+    this.mainFloor = false,
+  });
 
   Future<dynamic> menuActionHandler(String type) async {
     String message = item.content.message ?? item.content;
@@ -1024,6 +1034,13 @@ class MorePanel extends StatelessWidget {
               content: SelectableText(message),
             );
           },
+        );
+        break;
+      case 'save':
+        Get.back();
+        Navigator.push(
+          Get.context!,
+          PlPopupRoute(child: ReplySave(replyItem: item)),
         );
         break;
       // case 'block':
@@ -1076,6 +1093,13 @@ class MorePanel extends StatelessWidget {
             leading: const Icon(Icons.copy_outlined, size: 19),
             title: Text('自由复制', style: textTheme.titleSmall),
           ),
+          if (mainFloor)
+            ListTile(
+              onTap: () async => await menuActionHandler('save'),
+              minLeadingWidth: 0,
+              leading: const Icon(Icons.save_alt_rounded, size: 19),
+              title: Text('本地保存', style: textTheme.titleSmall),
+            ),
           // ListTile(
           //   onTap: () async => await menuActionHandler('block'),
           //   minLeadingWidth: 0,
