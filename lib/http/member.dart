@@ -520,4 +520,40 @@ class MemberHttp {
       };
     }
   }
+
+  static Future getSeriesDetail({
+    required int mid,
+    required int currentMid,
+    required int seriesId,
+    required int pn,
+  }) async {
+    var res = await Request().get(
+      Api.getSeriesDetailApi,
+      data: {
+        'mid': mid,
+        'series_id': seriesId,
+        'only_normal': true,
+        'sort': 'desc',
+        'pn': pn,
+        'ps': 30,
+        'current_mid': currentMid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MemberSeasonsDataModel.fromJson(res.data['data'])
+        };
+      } catch (err) {
+        print(err);
+      }
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

@@ -24,8 +24,27 @@ class MemberSeasonsPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                onTap: () => Get.toNamed(
-                    '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}&seasonName=${item.meta!.name}'),
+                onTap: () {
+                  final int category = item.meta!.category!;
+                  Map<String, String> parameters = {};
+                  if (category == 0) {
+                    parameters = {
+                      'category': '0',
+                      'mid': item.meta!.mid.toString(),
+                      'seasonId': item.meta!.seasonId.toString(),
+                      'seasonName': item.meta!.name!,
+                    };
+                  }
+                  if (category == 1) {
+                    parameters = {
+                      'category': '1',
+                      'mid': item.meta!.mid.toString(),
+                      'seriesId': item.meta!.seriesId.toString(),
+                      'seasonName': item.meta!.name!,
+                    };
+                  }
+                  Get.toNamed('/memberSeasons', parameters: parameters);
+                },
                 title: Text(
                   item.meta!.name!,
                   maxLines: 1,
