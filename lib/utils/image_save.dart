@@ -57,7 +57,7 @@ Future imageSaveDialog(context, videoItem, closeFn) {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
+                  child: SelectableText(
                     videoItem.title! as String,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
