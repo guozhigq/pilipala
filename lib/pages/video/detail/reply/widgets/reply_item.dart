@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:appscheme/appscheme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
@@ -549,7 +551,7 @@ InlineSpan buildContent(
     );
   }
 
-  void onPreviewImg(picList, initIndex) {
+  void onPreviewImg(picList, initIndex, randomInt) {
     final MainController mainController = Get.find<MainController>();
     mainController.imgPreviewStatus = true;
     Navigator.of(context).push(
@@ -575,7 +577,7 @@ InlineSpan buildContent(
               },
               child: Center(
                 child: Hero(
-                  tag: picList[index],
+                  tag: picList[index] + randomInt,
                   child: CachedNetworkImage(
                     fadeInDuration: const Duration(milliseconds: 0),
                     imageUrl: picList[index],
@@ -886,11 +888,12 @@ InlineSpan buildContent(
                         pictureItem['img_width']))
                     .truncateToDouble();
               } catch (_) {}
+              String randomInt = Random().nextInt(101).toString();
 
               return Hero(
-                tag: picList[0],
+                tag: picList[0] + randomInt,
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, 0),
+                  onTap: () => onPreviewImg(picList, 0, randomInt),
                   child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
@@ -927,13 +930,14 @@ InlineSpan buildContent(
         picList.add(content.pictures[i]['img_src']);
       }
       for (var i = 0; i < len; i++) {
+        String randomInt = Random().nextInt(101).toString();
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
               return Hero(
-                tag: picList[i],
+                tag: picList[i] + randomInt,
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, i),
+                  onTap: () => onPreviewImg(picList, i, randomInt),
                   child: NetworkImgLayer(
                       src: picList[i],
                       width: box.maxWidth,
