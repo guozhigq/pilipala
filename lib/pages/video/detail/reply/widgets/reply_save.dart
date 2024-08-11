@@ -76,64 +76,72 @@ class _ReplySaveState extends State<ReplySave> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      height: Get.height,
-      margin: EdgeInsets.fromLTRB(
-        0,
-        MediaQuery.of(context).padding.top + 4,
-        0,
-        MediaQuery.of(context).padding.bottom + 4,
-      ),
-      color: Colors.transparent,
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: RepaintBoundary(
-                    key: _boundaryKey,
-                    child: IntrinsicHeight(
-                      child: Stack(
-                        children: [
-                          ReplyItem(
-                            replyItem: widget.replyItem,
-                            showReplyRow: false,
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+        child: Container(
+          width: Get.width,
+          height: Get.height,
+          padding: EdgeInsets.fromLTRB(
+            0,
+            MediaQuery.of(context).padding.top + 4,
+            0,
+            MediaQuery.of(context).padding.bottom + 4,
+          ),
+          color: Colors.black54,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: RepaintBoundary(
+                        key: _boundaryKey,
+                        child: IntrinsicHeight(
+                          child: Stack(
+                            children: [
+                              ReplyItem(
+                                replyItem: widget.replyItem,
+                                showReplyRow: false,
+                                replySave: true,
+                              ),
+                              Positioned.fill(
+                                child: Column(
+                                  children: _createColumnWidgets(),
+                                ),
+                              ),
+                            ],
                           ),
-                          Positioned.fill(
-                            child: Column(
-                              children: _createColumnWidgets(),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FilledButton(
-                onPressed: () => Get.back(),
-                child: const Text('取消'),
-              ),
-              const SizedBox(width: 40),
-              FilledButton(
-                onPressed: _generatePicWidget,
-                child: const Text('保存'),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilledButton(
+                    onPressed: () => Get.back(),
+                    child: const Text('取消'),
+                  ),
+                  const SizedBox(width: 40),
+                  FilledButton(
+                    onPressed: _generatePicWidget,
+                    child: const Text('保存'),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

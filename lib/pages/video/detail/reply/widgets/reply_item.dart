@@ -17,6 +17,7 @@ import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -33,6 +34,7 @@ class ReplyItem extends StatelessWidget {
     this.showReplyRow = true,
     this.replyReply,
     this.replyType,
+    this.replySave = false,
     super.key,
   });
   final ReplyItemModel? replyItem;
@@ -41,6 +43,7 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
+  final bool? replySave;
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +51,18 @@ class ReplyItem extends StatelessWidget {
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           if (replyReply != null) {
             replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
           }
         },
         onLongPress: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           showModalBottomSheet(
             context: context,
@@ -236,7 +245,7 @@ class ReplyItem extends StatelessWidget {
           ),
         ),
         // 操作区域
-        bottonAction(context, replyItem!.replyControl),
+        bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
         if ((replyItem!.replyControl!.isShow! ||
                 replyItem!.replies!.isNotEmpty) &&
@@ -257,7 +266,7 @@ class ReplyItem extends StatelessWidget {
   }
 
   // 感谢、回复、复制
-  Widget bottonAction(BuildContext context, replyControl) {
+  Widget bottonAction(BuildContext context, replyControl, replySave) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
     return Row(
@@ -290,16 +299,26 @@ class ReplyItem extends StatelessWidget {
                   });
             },
             child: Row(children: [
-              Icon(Icons.reply,
-                  size: 18, color: colorScheme.outline.withOpacity(0.8)),
-              const SizedBox(width: 3),
-              Text(
-                '回复',
-                style: TextStyle(
-                  fontSize: textTheme.labelMedium!.fontSize,
-                  color: colorScheme.outline,
+              if (!replySave!) ...[
+                Icon(Icons.reply,
+                    size: 18, color: colorScheme.outline.withOpacity(0.8)),
+                const SizedBox(width: 3),
+                Text(
+                  '回复',
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
+                )
+              ],
+              if (replySave!)
+                Text(
+                  IdUtils.av2bv(replyItem!.oid!),
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
                 ),
-              ),
             ]),
           ),
         ),
@@ -1093,7 +1112,7 @@ class MorePanel extends StatelessWidget {
             leading: const Icon(Icons.copy_outlined, size: 19),
             title: Text('自由复制', style: textTheme.titleSmall),
           ),
-          if (mainFloor)
+          if (mainFloor && item.content.pictures.isEmpty)
             ListTile(
               onTap: () async => await menuActionHandler('save'),
               minLeadingWidth: 0,
