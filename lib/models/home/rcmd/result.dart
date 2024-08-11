@@ -62,7 +62,7 @@ class RecVideoItemAppModel {
     duration =
         json['player_args'] != null ? json['player_args']['duration'] : -1;
     //duration = json['cover_right_text'];
-    title = json['title'];
+    title = json['title'] ?? '获取标题失败';
     owner = RcmdOwner.fromJson(json);
     rcmdReason = json['bottom_rcmd_reason'] ?? json['top_rcmd_reason'];
     // 由于app端api并不会直接返回与owner的关注状态
@@ -74,7 +74,7 @@ class RecVideoItemAppModel {
       rcmdReason = null;
     }
     goto = json['goto'];
-    param = int.parse(json['param']);
+    param = int.parse(json['param'] ?? '-1');
     uri = json['uri'];
     talkBack = json['talk_back'];
 

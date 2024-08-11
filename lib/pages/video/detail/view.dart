@@ -330,12 +330,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController?.danmakuController?.clear();
         break;
       case 'pause':
-        vdCtr.hiddenReplyReplyPanel();
-        if (vdCtr.videoType == SearchType.video) {
-          videoIntroController.hiddenEpisodeBottomSheet();
-        }
-        if (vdCtr.videoType == SearchType.media_bangumi) {
-          bangumiIntroController.hiddenEpisodeBottomSheet();
+        if (autoPiP) {
+          vdCtr.hiddenReplyReplyPanel();
+          if (vdCtr.videoType == SearchType.video) {
+            videoIntroController.hiddenEpisodeBottomSheet();
+          }
+          if (vdCtr.videoType == SearchType.media_bangumi) {
+            bangumiIntroController.hiddenEpisodeBottomSheet();
+          }
         }
         break;
     }

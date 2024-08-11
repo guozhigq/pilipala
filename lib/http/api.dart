@@ -487,6 +487,8 @@ class Api {
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
 
+  static const getSeriesDetailApi = '/x/series/archives';
+
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
 
