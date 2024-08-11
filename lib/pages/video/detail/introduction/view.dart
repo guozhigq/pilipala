@@ -613,6 +613,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   }
                   _controller.reverse();
                 },
+                onTapCancel: () {
+                  _controller.reverse();
+                },
                 borderRadius: StyleString.mdRadius,
                 child: SizedBox(
                   width: (Get.size.width - 24) / 5,
