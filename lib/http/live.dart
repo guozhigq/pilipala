@@ -65,4 +65,23 @@ class LiveHttp {
       };
     }
   }
+
+  // 获取弹幕信息
+  static Future liveDanmakuInfo({roomId}) async {
+    var res = await Request().get(Api.getDanmuInfo, data: {
+      'id': roomId,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }
