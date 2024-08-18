@@ -554,4 +554,8 @@ class Api {
   /// 系统通知
   static const String messageSystemAPi =
       '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  /// 直播间弹幕信息
+  static const String getDanmuInfo =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';
 }

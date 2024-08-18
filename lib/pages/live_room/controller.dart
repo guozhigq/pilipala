@@ -1,10 +1,16 @@
+import 'dart:convert';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/live.dart';
+import 'package:pilipala/models/live/message.dart';
 import 'package:pilipala/models/live/quality.dart';
 import 'package:pilipala/models/live/room_info.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/plugin/pl_socket/index.dart';
+import 'package:pilipala/utils/live.dart';
 import '../../models/live/room_info_h5.dart';
 import '../../utils/storage.dart';
 import '../../utils/video_utils.dart';
@@ -24,6 +30,13 @@ class LiveRoomController extends GetxController {
   int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
+  Box userInfoCache = GStrorage.userInfo;
+  int userId = 0;
+  PlSocket? plSocket;
+  List<String> danmuHostList = [];
+  String token = '';
+  // 弹幕消息列表
+  RxList<LiveMessageModel> messageList = <LiveMessageModel>[].obs;
 
   @override
   void onInit() {
@@ -43,6 +56,11 @@ class LiveRoomController extends GetxController {
     }
     // CDN优化
     enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    final userInfo = userInfoCache.get('userInfoCache');
+    if (userInfo != null && userInfo.mid != null) {
+      userId = userInfo.mid;
+    }
+    liveDanmakuInfo().then((value) => initSocket());
   }
 
   playerInit(source) async {
@@ -126,5 +144,65 @@ class LiveRoomController extends GetxController {
         .firstWhere((element) => element.code == currentQn)
         .description;
     await queryLiveInfo();
+  }
+
+  Future liveDanmakuInfo() async {
+    var res = await LiveHttp.liveDanmakuInfo(roomId: roomId);
+    if (res['status']) {
+      danmuHostList = (res["data"]["host_list"] as List)
+          .map<String>((e) => '${e["host"]}:${e['wss_port']}')
+          .toList();
+      token = res["data"]["token"];
+      return res;
+    }
+  }
+
+  // 建立socket
+  void initSocket() async {
+    final wsUrl = danmuHostList.isNotEmpty
+        ? danmuHostList.first
+        : "broadcastlv.chat.bilibili.com";
+    plSocket = PlSocket(
+      url: 'wss://$wsUrl/sub',
+      heartTime: 30,
+      onReadyCb: () {
+        joinRoom();
+      },
+      onMessageCb: (message) {
+        final List<LiveMessageModel>? liveMsg =
+            LiveUtils.decodeMessage(message);
+        if (liveMsg != null) {
+          messageList.addAll(liveMsg
+              .where((msg) => msg.type == LiveMessageType.chat)
+              .toList());
+        }
+      },
+      onErrorCb: (e) {
+        print('error: $e');
+      },
+    );
+    await plSocket?.connect();
+  }
+
+  void joinRoom() async {
+    var joinData = LiveUtils.encodeData(
+      json.encode({
+        "uid": userId,
+        "roomid": roomId,
+        "protover": 3,
+        "buvid": Request.buvid,
+        "platform": "web",
+        "type": 2,
+        "key": token,
+      }),
+      7,
+    );
+    plSocket?.sendMessage(joinData);
+  }
+
+  @override
+  void onClose() {
+    plSocket?.onClose();
+    super.onClose();
   }
 }
