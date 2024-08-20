@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/live/message.dart';
+import 'package:pilipala/pages/danmaku/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 
 import 'controller.dart';
@@ -22,7 +23,7 @@ class LiveRoomPage extends StatefulWidget {
 class _LiveRoomPageState extends State<LiveRoomPage>
     with TickerProviderStateMixin {
   final LiveRoomController _liveRoomController = Get.put(LiveRoomController());
-  PlPlayerController? plPlayerController;
+  late PlPlayerController plPlayerController;
   late Future? _futureBuilder;
   late Future? _futureBuilderFuture;
 
@@ -32,6 +33,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   final ScrollController _scrollController = ScrollController();
   late AnimationController fabAnimationCtr;
   bool _shouldAutoScroll = true;
+  final int roomId = int.parse(Get.parameters['roomid']!);
 
   @override
   void initState() {
@@ -110,8 +112,9 @@ class _LiveRoomPageState extends State<LiveRoomPage>
       future: _futureBuilderFuture,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData && snapshot.data['status']) {
+          plPlayerController = _liveRoomController.plPlayerController;
           return PLVideoPlayer(
-            controller: plPlayerController!,
+            controller: plPlayerController,
             bottomControl: BottomControl(
               controller: plPlayerController,
               liveRoomCtr: _liveRoomController,
@@ -120,6 +123,14 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                 setState(() {
                   _futureBuilderFuture = _liveRoomController.queryLiveInfo();
                 });
+              },
+            ),
+            danmuWidget: PlDanmaku(
+              cid: roomId,
+              playerController: plPlayerController,
+              type: 'live',
+              createdController: (e) {
+                _liveRoomController.danmakuController = e;
               },
             ),
           );
