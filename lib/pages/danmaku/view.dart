@@ -129,7 +129,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
       // double initDuration = box.maxWidth / 12;
       return Obx(
         () => AnimatedOpacity(
-          opacity: playerController.isOpenDanmu.value ? 1 : 0,
+          opacity: playerController.isOpenDanmu.value ? 1 : 1,
           duration: const Duration(milliseconds: 100),
           child: DanmakuView(
             createdController: (DanmakuController e) async {
