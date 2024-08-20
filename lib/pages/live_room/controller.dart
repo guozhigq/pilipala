@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/live.dart';
@@ -37,6 +39,7 @@ class LiveRoomController extends GetxController {
   String token = '';
   // 弹幕消息列表
   RxList<LiveMessageModel> messageList = <LiveMessageModel>[].obs;
+  DanmakuController? danmakuController;
 
   @override
   void onInit() {
@@ -172,9 +175,28 @@ class LiveRoomController extends GetxController {
         final List<LiveMessageModel>? liveMsg =
             LiveUtils.decodeMessage(message);
         if (liveMsg != null) {
-          messageList.addAll(liveMsg
-              .where((msg) => msg.type == LiveMessageType.chat)
-              .toList());
+          // 过滤出聊天消息
+          var chatMessages =
+              liveMsg.where((msg) => msg.type == LiveMessageType.chat).toList();
+
+          // 添加到 messageList
+          messageList.addAll(chatMessages);
+
+          // 将 chatMessages 转换为 danmakuItems 列表
+          List<DanmakuItem> danmakuItems = chatMessages.map<DanmakuItem>((e) {
+            return DanmakuItem(
+              e.message ?? '',
+              color: Color.fromARGB(
+                255,
+                e.color.r,
+                e.color.g,
+                e.color.b,
+              ),
+            );
+          }).toList();
+
+          // 添加到 danmakuController
+          danmakuController?.addItems(danmakuItems);
         }
       },
       onErrorCb: (e) {
