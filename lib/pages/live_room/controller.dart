@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -42,6 +43,8 @@ class LiveRoomController extends GetxController {
   DanmakuController? danmakuController;
   // 输入控制器
   TextEditingController inputController = TextEditingController();
+  // 加入直播间提示
+  RxMap<String, String> joinRoomTip = {'userName': '', 'message': ''}.obs;
 
   @override
   void onInit() {
@@ -176,7 +179,29 @@ class LiveRoomController extends GetxController {
       onMessageCb: (message) {
         final List<LiveMessageModel>? liveMsg =
             LiveUtils.decodeMessage(message);
-        if (liveMsg != null) {
+        if (liveMsg != null && liveMsg.isNotEmpty) {
+          if (liveMsg.first.type == LiveMessageType.online) {
+            print('当前直播间人气：${liveMsg.first.data}');
+          } else if (liveMsg.first.type == LiveMessageType.join ||
+              liveMsg.first.type == LiveMessageType.follow) {
+            // 每隔一秒依次liveMsg中的每一项赋给activeUserName
+            int index = 0;
+            Timer.periodic(const Duration(seconds: 2), (timer) {
+              if (index < liveMsg.length) {
+                if (liveMsg[index].type == LiveMessageType.join ||
+                    liveMsg[index].type == LiveMessageType.follow) {
+                  joinRoomTip.value = {
+                    'userName': liveMsg[index].userName,
+                    'message': liveMsg[index].message!,
+                  };
+                }
+                index++;
+              } else {
+                timer.cancel();
+              }
+            });
+            return;
+          }
           // 过滤出聊天消息
           var chatMessages =
               liveMsg.where((msg) => msg.type == LiveMessageType.chat).toList();

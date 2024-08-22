@@ -179,6 +179,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AppBar(
                 centerTitle: false,
@@ -263,6 +264,49 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                 _liveRoomController,
                 _scrollController,
               ),
+              // Container(
+              //   padding: const EdgeInsets.only(
+              //       left: 14, right: 14, top: 4, bottom: 4),
+              //   margin: const EdgeInsets.only(
+              //     bottom: 6,
+              //     left: 14,
+              //   ),
+              //   decoration: BoxDecoration(
+              //     color: Colors.grey.withOpacity(0.1),
+              //     borderRadius: const BorderRadius.all(Radius.circular(20)),
+              //   ),
+              //   child: Obx(
+              //     () => AnimatedSwitcher(
+              //       duration: const Duration(milliseconds: 300),
+              //       transitionBuilder:
+              //           (Widget child, Animation<double> animation) {
+              //         return FadeTransition(opacity: animation, child: child);
+              //       },
+              //       child: Text.rich(
+              //         key:
+              //             ValueKey(_liveRoomController.joinRoomTip['userName']),
+              //         TextSpan(
+              //           style: const TextStyle(color: Colors.white),
+              //           children: [
+              //             TextSpan(
+              //               text:
+              //                   '${_liveRoomController.joinRoomTip['userName']} ',
+              //               style: TextStyle(
+              //                 color: Colors.white.withOpacity(0.6),
+              //               ),
+              //             ),
+              //             TextSpan(
+              //               text:
+              //                   '${_liveRoomController.joinRoomTip['message']}',
+              //               style: const TextStyle(color: Colors.white),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 10),
               // 弹幕输入框
               Container(
                 padding: EdgeInsets.only(
@@ -271,7 +315,8 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                     top: 4,
                     bottom: MediaQuery.of(context).padding.bottom + 20),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
                   border: Border(
                     top: BorderSide(
                       color: Colors.white.withOpacity(0.1),
@@ -280,6 +325,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                 ),
                 child: Row(
                   children: [
+                    const SizedBox(width: 4),
                     Expanded(
                       child: TextField(
                         controller: _liveRoomController.inputController,
@@ -309,10 +355,10 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           // 定位 快速滑动到底部
           Positioned(
             right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 20,
+            bottom: MediaQuery.of(context).padding.bottom + 80,
             child: SlideTransition(
               position: Tween<Offset>(
-                begin: const Offset(0, 2),
+                begin: const Offset(0, 4),
                 end: const Offset(0, 0),
               ).animate(CurvedAnimation(
                 parent: fabAnimationCtr,
