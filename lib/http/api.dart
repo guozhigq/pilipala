@@ -558,4 +558,7 @@ class Api {
   /// 直播间弹幕信息
   static const String getDanmuInfo =
       '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';
+
+  /// 直播间发送弹幕
+  static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
 }

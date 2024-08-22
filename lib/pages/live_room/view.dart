@@ -97,7 +97,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
-    plPlayerController!.dispose();
+    plPlayerController.dispose();
     if (floating != null) {
       floating!.dispose();
     }
@@ -238,10 +238,10 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                 ),
               ),
               PopScope(
-                canPop: plPlayerController?.isFullScreen.value != true,
+                canPop: plPlayerController.isFullScreen.value != true,
                 onPopInvoked: (bool didPop) {
-                  if (plPlayerController?.isFullScreen.value == true) {
-                    plPlayerController!.triggerFullScreen(status: false);
+                  if (plPlayerController.isFullScreen.value == true) {
+                    plPlayerController.triggerFullScreen(status: false);
                   }
                   if (MediaQuery.of(context).orientation ==
                       Orientation.landscape) {
@@ -257,17 +257,53 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                   child: videoPlayerPanel,
                 ),
               ),
-              const SizedBox(height: 20),
               // 显示消息的列表
               buildMessageListUI(
                 context,
                 _liveRoomController,
                 _scrollController,
               ),
-              // 底部安全距离
-              SizedBox(
-                height: MediaQuery.of(context).padding.bottom + 20,
-              )
+              // 弹幕输入框
+              Container(
+                padding: EdgeInsets.only(
+                    left: 14,
+                    right: 14,
+                    top: 4,
+                    bottom: MediaQuery.of(context).padding.bottom + 20),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _liveRoomController.inputController,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: '发送弹幕',
+                          hintStyle: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _liveRoomController.sendMsg(),
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           // 定位 快速滑动到底部
@@ -324,15 +360,15 @@ Widget buildMessageListUI(
         removeBottom: true,
         child: ShaderMask(
           shaderCallback: (Rect bounds) {
-            return const LinearGradient(
+            return LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
                 Colors.transparent,
-                Colors.black,
+                Colors.black.withOpacity(0.5),
                 Colors.black,
               ],
-              stops: [0.0, 0.1, 1.0],
+              stops: const [0.01, 0.05, 0.2],
             ).createShader(bounds);
           },
           blendMode: BlendMode.dstIn,
@@ -342,35 +378,46 @@ Widget buildMessageListUI(
             itemBuilder: (context, index) {
               final LiveMessageModel liveMsgItem =
                   liveRoomController.messageList[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  top: index == 0 ? 40.0 : 4.0,
-                  bottom: 4.0,
-                  left: 20.0,
-                  right: 20.0,
-                ),
-                child: Text.rich(
-                  TextSpan(
-                    style: const TextStyle(color: Colors.white),
-                    children: [
-                      TextSpan(
-                        text: '${liveMsgItem.userName}: ',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  margin: EdgeInsets.only(
+                    top: index == 0 ? 20.0 : 0.0,
+                    bottom: 6.0,
+                    left: 14.0,
+                    right: 14.0,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 3.0,
+                    horizontal: 10.0,
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      style: const TextStyle(color: Colors.white),
+                      children: [
+                        TextSpan(
+                          text: '${liveMsgItem.userName}: ',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // 处理点击事件
+                              print('Text clicked');
+                            },
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            // 处理点击事件
-                            print('Text clicked');
-                          },
-                      ),
-                      TextSpan(
-                        children: [
-                          ...buildMessageTextSpan(context, liveMsgItem)
-                        ],
-                        // text: liveMsgItem.message,
-                      ),
-                    ],
+                        TextSpan(
+                          children: [
+                            ...buildMessageTextSpan(context, liveMsgItem)
+                          ],
+                          // text: liveMsgItem.message,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -392,23 +439,7 @@ List<InlineSpan> buildMessageTextSpan(
   if (liveMsgItem.emots == null) {
     // 没有表情包的消息
     inlineSpanList.add(
-      TextSpan(
-        text: liveMsgItem.message ?? '',
-        style: const TextStyle(
-          shadows: [
-            Shadow(
-              offset: Offset(2.0, 2.0),
-              blurRadius: 3.0,
-              color: Colors.black,
-            ),
-            Shadow(
-              offset: Offset(-1.0, -1.0),
-              blurRadius: 3.0,
-              color: Colors.black,
-            ),
-          ],
-        ),
-      ),
+      TextSpan(text: liveMsgItem.message ?? ''),
     );
   } else {
     // 有表情包的消息 使用正则匹配 表情包用图片渲染
@@ -435,23 +466,7 @@ List<InlineSpan> buildMessageTextSpan(
       },
       onNonMatch: (String nonMatch) {
         inlineSpanList.add(
-          TextSpan(
-            text: nonMatch,
-            style: const TextStyle(
-              shadows: [
-                Shadow(
-                  offset: Offset(2.0, 2.0),
-                  blurRadius: 3.0,
-                  color: Colors.black,
-                ),
-                Shadow(
-                  offset: Offset(-1.0, -1.0),
-                  blurRadius: 3.0,
-                  color: Colors.black,
-                ),
-              ],
-            ),
-          ),
+          TextSpan(text: nonMatch),
         );
         return nonMatch;
       },
