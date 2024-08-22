@@ -35,7 +35,8 @@ class MemberSeasonsPanel extends StatelessWidget {
                       'seasonName': item.meta!.name!,
                     };
                   }
-                  if (category == 1) {
+                  // 2为直播回放
+                  if (category == 1 || category == 2) {
                     parameters = {
                       'category': '1',
                       'mid': item.meta!.mid.toString(),
