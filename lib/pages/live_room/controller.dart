@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -40,6 +40,8 @@ class LiveRoomController extends GetxController {
   // 弹幕消息列表
   RxList<LiveMessageModel> messageList = <LiveMessageModel>[].obs;
   DanmakuController? danmakuController;
+  // 输入控制器
+  TextEditingController inputController = TextEditingController();
 
   @override
   void onInit() {
@@ -220,6 +222,23 @@ class LiveRoomController extends GetxController {
       7,
     );
     plSocket?.sendMessage(joinData);
+  }
+
+  // 发送弹幕
+  void sendMsg() async {
+    final msg = inputController.text;
+    if (msg.isEmpty) {
+      return;
+    }
+    final res = await LiveHttp.sendDanmaku(
+      roomId: roomId,
+      msg: msg,
+    );
+    if (res['status']) {
+      inputController.clear();
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
   }
 
   @override
