@@ -325,7 +325,33 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                 ),
                 child: Row(
                   children: [
-                    const SizedBox(width: 4),
+                    SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Obx(
+                        () => IconButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                            backgroundColor: MaterialStateProperty.resolveWith(
+                                (Set<MaterialState> states) {
+                              return Colors.grey.withOpacity(0.1);
+                            }),
+                          ),
+                          onPressed: () {
+                            _liveRoomController.danmakuSwitch.value =
+                                !_liveRoomController.danmakuSwitch.value;
+                          },
+                          icon: Icon(
+                            _liveRoomController.danmakuSwitch.value
+                                ? Icons.subtitles_outlined
+                                : Icons.subtitles_off_outlined,
+                            size: 19,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
                         controller: _liveRoomController.inputController,
@@ -340,11 +366,19 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => _liveRoomController.sendMsg(),
-                      icon: const Icon(
-                        Icons.send,
-                        color: Colors.white,
+                    SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: IconButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
+                        onPressed: () => _liveRoomController.sendMsg(),
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ],
@@ -418,56 +452,62 @@ Widget buildMessageListUI(
             ).createShader(bounds);
           },
           blendMode: BlendMode.dstIn,
-          child: ListView.builder(
-            controller: scrollController,
-            itemCount: liveRoomController.messageList.length,
-            itemBuilder: (context, index) {
-              final LiveMessageModel liveMsgItem =
-                  liveRoomController.messageList[index];
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  ),
-                  margin: EdgeInsets.only(
-                    top: index == 0 ? 20.0 : 0.0,
-                    bottom: 6.0,
-                    left: 14.0,
-                    right: 14.0,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 3.0,
-                    horizontal: 10.0,
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: Colors.white),
-                      children: [
-                        TextSpan(
-                          text: '${liveMsgItem.userName}: ',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
+          child: GestureDetector(
+            onTap: () {
+              // 键盘失去焦点
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: liveRoomController.messageList.length,
+              itemBuilder: (context, index) {
+                final LiveMessageModel liveMsgItem =
+                    liveRoomController.messageList[index];
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    ),
+                    margin: EdgeInsets.only(
+                      top: index == 0 ? 20.0 : 0.0,
+                      bottom: 6.0,
+                      left: 14.0,
+                      right: 14.0,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 3.0,
+                      horizontal: 10.0,
+                    ),
+                    child: Text.rich(
+                      TextSpan(
+                        style: const TextStyle(color: Colors.white),
+                        children: [
+                          TextSpan(
+                            text: '${liveMsgItem.userName}: ',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // 处理点击事件
+                                print('Text clicked');
+                              },
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              // 处理点击事件
-                              print('Text clicked');
-                            },
-                        ),
-                        TextSpan(
-                          children: [
-                            ...buildMessageTextSpan(context, liveMsgItem)
-                          ],
-                          // text: liveMsgItem.message,
-                        ),
-                      ],
+                          TextSpan(
+                            children: [
+                              ...buildMessageTextSpan(context, liveMsgItem)
+                            ],
+                            // text: liveMsgItem.message,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

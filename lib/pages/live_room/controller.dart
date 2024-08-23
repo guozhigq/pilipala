@@ -45,6 +45,8 @@ class LiveRoomController extends GetxController {
   TextEditingController inputController = TextEditingController();
   // 加入直播间提示
   RxMap<String, String> joinRoomTip = {'userName': '', 'message': ''}.obs;
+  // 直播间弹幕开关 默认打开
+  RxBool danmakuSwitch = true.obs;
 
   @override
   void onInit() {
@@ -69,6 +71,9 @@ class LiveRoomController extends GetxController {
       userId = userInfo.mid;
     }
     liveDanmakuInfo().then((value) => initSocket());
+    danmakuSwitch.listen((p0) {
+      plPlayerController.isOpenDanmu.value = p0;
+    });
   }
 
   playerInit(source) async {
@@ -87,6 +92,7 @@ class LiveRoomController extends GetxController {
       enableHA: true,
       autoplay: true,
     );
+    plPlayerController.isOpenDanmu.value = danmakuSwitch.value;
   }
 
   Future queryLiveInfo() async {
@@ -185,6 +191,7 @@ class LiveRoomController extends GetxController {
           } else if (liveMsg.first.type == LiveMessageType.join ||
               liveMsg.first.type == LiveMessageType.follow) {
             // 每隔一秒依次liveMsg中的每一项赋给activeUserName
+
             int index = 0;
             Timer.periodic(const Duration(seconds: 2), (timer) {
               if (index < liveMsg.length) {
@@ -200,6 +207,7 @@ class LiveRoomController extends GetxController {
                 timer.cancel();
               }
             });
+
             return;
           }
           // 过滤出聊天消息
@@ -223,7 +231,9 @@ class LiveRoomController extends GetxController {
           }).toList();
 
           // 添加到 danmakuController
-          danmakuController?.addItems(danmakuItems);
+          if (danmakuSwitch.value) {
+            danmakuController?.addItems(danmakuItems);
+          }
         }
       },
       onErrorCb: (e) {
