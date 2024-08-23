@@ -84,7 +84,7 @@ class ChatItem extends StatelessWidget {
           emojiMap[e['text']] = e['url'];
         }
         text.splitMapJoin(
-          RegExp(r"\[.+?\]"),
+          RegExp(r"\[[^\[\]]+\]"),
           onMatch: (Match match) {
             final String emojiKey = match[0]!;
             if (emojiMap.containsKey(emojiKey)) {
@@ -95,6 +95,17 @@ class ChatItem extends StatelessWidget {
                   src: emojiMap[emojiKey]!,
                 ),
               ));
+            } else {
+              children.add(
+                TextSpan(
+                  text: emojiKey,
+                  style: TextStyle(
+                    color: textColor(context),
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                  ),
+                ),
+              );
             }
             return '';
           },
@@ -109,13 +120,13 @@ class ChatItem extends StatelessWidget {
             return '';
           },
         );
-        return RichText(
-          text: TextSpan(
+        return SelectableText.rich(
+          TextSpan(
             children: children,
           ),
         );
       } else {
-        return Text(
+        return SelectableText(
           text,
           style: TextStyle(
             letterSpacing: 0.6,
@@ -133,7 +144,7 @@ class ChatItem extends StatelessWidget {
         case MsgType.pic_card:
           return SystemNotice2(item: item);
         case MsgType.notify_text:
-          return Text(
+          return SelectableText(
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
@@ -530,7 +541,7 @@ class SystemNotice extends StatelessWidget {
               Divider(
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               ),
-              Text(
+              SelectableText(
                 content['text'],
               )
             ],
