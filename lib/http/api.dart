@@ -554,4 +554,8 @@ class Api {
   /// 系统通知
   static const String messageSystemAPi =
       '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  /// 系统通知标记已读
+  static const String systemMarkRead =
+      '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
 }
