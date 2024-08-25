@@ -113,6 +113,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.1"
+  bottom_inset_observer:
+    dependency: transitive
+    description:
+      name: bottom_inset_observer
+      sha256: cbfb01e0e07cc4922052701786d5e607765a6f54e1844f41061abf8744519a7d
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.1.0"
+  bottom_sheet:
+    dependency: "direct main"
+    description:
+      name: bottom_sheet
+      sha256: efd28f52357d23e1c01eaeb45466b407f1e29318305bd6d10baf814fda18bd7e
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.0.4"
   build:
     dependency: transitive
     description:
