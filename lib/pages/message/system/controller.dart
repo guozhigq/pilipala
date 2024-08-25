@@ -8,8 +8,20 @@ class MessageSystemController extends GetxController {
   Future queryMessageSystem({String type = 'init'}) async {
     var res = await MsgHttp.messageSystem();
     if (res['status']) {
-      systemItems.addAll(res['data']);
+      if (type == 'init') {
+        systemItems.value = res['data'];
+      } else {
+        systemItems.addAll(res['data']);
+      }
+      if (systemItems.isNotEmpty) {
+        systemMarkRead(systemItems.first.cursor!);
+      }
     }
     return res;
+  }
+
+  // 标记已读
+  void systemMarkRead(int cursor) async {
+    await MsgHttp.systemMarkRead(cursor);
   }
 }

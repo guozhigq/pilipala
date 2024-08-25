@@ -298,7 +298,6 @@ class MsgHttp {
     });
     if (res.data['code'] == 0) {
       try {
-        print(res.data['data']['system_notify_list']);
         return {
           'status': true,
           'data': res.data['data']['system_notify_list']
@@ -310,6 +309,25 @@ class MsgHttp {
       }
     } else {
       return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 系统消息标记已读
+  static Future systemMarkRead(int cursor) async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.systemMarkRead, data: {
+      'csrf': csrf,
+      'cursor': cursor,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
     }
   }
 }
