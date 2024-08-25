@@ -6,8 +6,9 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
-  const FavPanel({super.key, this.ctr});
+  const FavPanel({super.key, this.ctr, this.scrollController});
   final dynamic ctr;
+  final ScrollController? scrollController;
 
   @override
   State<FavPanel> createState() => _FavPanelState();
@@ -15,31 +16,39 @@ class FavPanel extends StatefulWidget {
 
 class _FavPanelState extends State<FavPanel> {
   final Box<dynamic> localCache = GStrorage.localCache;
-  late double sheetHeight;
   late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
-    sheetHeight = localCache.get('sheetHeight');
     _futureBuilderFuture = widget.ctr!.queryVideoInFolder();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: sheetHeight,
-      color: Theme.of(context).colorScheme.surface,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
       child: Column(
         children: [
           AppBar(
             centerTitle: false,
             elevation: 0,
-            leading: IconButton(
-                onPressed: () => Get.back(),
-                icon: const Icon(Icons.close_outlined)),
-            title:
-                Text('添加到收藏夹', style: Theme.of(context).textTheme.titleMedium),
+            automaticallyImplyLeading: false,
+            leadingWidth: 0,
+            title: Text(
+              '选择收藏夹',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
           ),
           Expanded(
             child: Material(
@@ -51,22 +60,22 @@ class _FavPanelState extends State<FavPanel> {
                     if (data['status']) {
                       return Obx(
                         () => ListView.builder(
+                          controller: widget.scrollController,
                           itemCount:
                               widget.ctr!.favFolderData.value.list!.length,
                           itemBuilder: (context, index) {
+                            final item =
+                                widget.ctr!.favFolderData.value.list![index];
                             return ListTile(
-                              onTap: () => widget.ctr!.onChoose(
-                                  widget.ctr!.favFolderData.value.list![index]
-                                          .favState !=
-                                      1,
-                                  index),
+                              onTap: () => widget.ctr!
+                                  .onChoose(item.favState != 1, index),
                               dense: true,
                               leading: const Icon(Icons.folder_outlined),
                               minLeadingWidth: 0,
                               title: Text(widget.ctr!.favFolderData.value
                                   .list![index].title!),
                               subtitle: Text(
-                                '${widget.ctr!.favFolderData.value.list![index].mediaCount}个内容',
+                                '${item.mediaCount}个内容 ',
                               ),
                               trailing: Transform.scale(
                                 scale: 0.9,
@@ -132,7 +141,7 @@ class _FavPanelState extends State<FavPanel> {
                     backgroundColor:
                         Theme.of(context).colorScheme.primary, // 设置按钮背景色
                   ),
-                  child: const Text('完成'),
+                  child: const Text('确认选择'),
                 ),
               ],
             ),

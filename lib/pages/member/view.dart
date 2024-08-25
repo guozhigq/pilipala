@@ -168,7 +168,6 @@ class _MemberPageState extends State<MemberPage>
                             const Icon(Icons.arrow_forward_outlined, size: 19),
                       ),
                     ),
-                    const Divider(height: 1, thickness: 0.1),
 
                     /// 视频
                     Obx(() => ListTile(
@@ -178,7 +177,6 @@ class _MemberPageState extends State<MemberPage>
                           trailing: const Icon(Icons.arrow_forward_outlined,
                               size: 19),
                         )),
-                    const Divider(height: 1, thickness: 0.1),
 
                     /// 他的收藏夹
                     Obx(() => ListTile(
@@ -188,13 +186,11 @@ class _MemberPageState extends State<MemberPage>
                           trailing: const Icon(Icons.arrow_forward_outlined,
                               size: 19),
                         )),
-                    const Divider(height: 1, thickness: 0.1),
 
                     /// 专栏
                     Obx(() => ListTile(
                         title: Text(
                             '${_memberController.isOwner.value ? '我' : 'Ta'}的专栏'))),
-                    const Divider(height: 1, thickness: 0.1),
 
                     /// 合集
                     Obx(() => ListTile(
