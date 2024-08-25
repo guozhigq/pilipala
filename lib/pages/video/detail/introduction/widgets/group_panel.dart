@@ -10,7 +10,8 @@ import 'package:pilipala/utils/storage.dart';
 
 class GroupPanel extends StatefulWidget {
   final int? mid;
-  const GroupPanel({super.key, this.mid});
+  final ScrollController scrollController;
+  const GroupPanel({super.key, this.mid, required this.scrollController});
 
   @override
   State<GroupPanel> createState() => _GroupPanelState();
@@ -18,7 +19,6 @@ class GroupPanel extends StatefulWidget {
 
 class _GroupPanelState extends State<GroupPanel> {
   final Box<dynamic> localCache = GStrorage.localCache;
-  late double sheetHeight;
   late Future _futureBuilderFuture;
   late List<MemberTagItemModel> tagsList;
   bool showDefault = true;
@@ -26,7 +26,6 @@ class _GroupPanelState extends State<GroupPanel> {
   @override
   void initState() {
     super.initState();
-    sheetHeight = localCache.get('sheetHeight');
     _futureBuilderFuture = MemberHttp.followUpTags();
   }
 
@@ -56,8 +55,14 @@ class _GroupPanelState extends State<GroupPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: sheetHeight,
-      color: Theme.of(context).colorScheme.surface,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
       child: Column(
         children: <Widget>[
           AppBar(
@@ -79,6 +84,7 @@ class _GroupPanelState extends State<GroupPanel> {
                     if (data['status']) {
                       tagsList = data['data'];
                       return ListView.builder(
+                        controller: widget.scrollController,
                         itemCount: data['data'].length,
                         itemBuilder: (context, index) {
                           return ListTile(
