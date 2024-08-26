@@ -230,7 +230,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   void _showFavPanel() {
     showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
       minHeight: 0.6,
       initHeight: 0.6,
       maxHeight: 1,

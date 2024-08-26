@@ -49,7 +49,10 @@ class FollowItem extends StatelessWidget {
               child: TextButton(
                 onPressed: () async {
                   await showFlexibleBottomSheet(
-                    bottomSheetColor: Colors.transparent,
+                    bottomSheetBorderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
                     minHeight: 1,
                     initHeight: 1,
                     maxHeight: 1,

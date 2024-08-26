@@ -525,7 +525,10 @@ class VideoIntroController extends GetxController {
   // 设置关注分组
   void setFollowGroup() {
     showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
       minHeight: 0.6,
       initHeight: 0.6,
       maxHeight: 1,
