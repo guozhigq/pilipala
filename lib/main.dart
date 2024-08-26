@@ -20,7 +20,7 @@ import 'package:pilipala/pages/main/view.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/data.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:pilipala/utils/recommend_filter.dart';
@@ -33,7 +33,6 @@ void main() async {
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await GStrorage.init();
-  await setupServiceLocator();
   clearLogs();
   Request();
   await Request.setCookie();
@@ -266,10 +265,11 @@ class BuildMainApp extends StatelessWidget {
         VideoDetailPage.routeObserver,
         SearchPage.routeObserver,
       ],
-      onInit: () {
+      onReady: () async {
         RecommendFilter();
         Data.init();
-        GlobalData();
+        await GlobalDataCache().initialize();
+        setupServiceLocator();
       },
     );
   }

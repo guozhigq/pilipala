@@ -20,7 +20,7 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../../../http/user.dart';
@@ -569,7 +569,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    final actionTypeSort = GlobalData().actionTypeSort;
+    final actionTypeSort = GlobalDataCache().actionTypeSort;
 
     Widget progressWidget(progress) {
       return SizedBox(

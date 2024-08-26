@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/action_type.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import '../../../utils/storage.dart';
 
 class ActionMenuSetPage extends StatefulWidget {
@@ -38,7 +38,7 @@ class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
         .map<String>((i) => (i['value'] as ActionType).value)
         .toList();
     setting.put(SettingBoxKey.actionTypeSort, sortedTabbar);
-    GlobalData().actionTypeSort = sortedTabbar;
+    GlobalDataCache().actionTypeSort = sortedTabbar;
     SmartDialog.showToast('操作成功');
   }
 
