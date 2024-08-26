@@ -29,6 +29,7 @@ class Request {
   late String systemProxyPort;
   static final RegExp spmPrefixExp =
       RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
+  static late String buvid;
 
   /// 设置cookie
   static setCookie() async {
@@ -70,6 +71,8 @@ class Request {
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
+
+    buvid = cookie.firstWhere((e) => e.name == 'buvid3').value;
     dio.options.headers['cookie'] = cookieString;
   }
 

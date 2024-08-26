@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
@@ -215,35 +218,33 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         if (!videoIntroController.hasFav.value) {
           videoIntroController.actionFavVideo(type: 'default');
         } else {
-          showModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return FavPanel(ctr: videoIntroController);
-            },
-          );
+          _showFavPanel();
         }
       } else {
-        showModalBottomSheet(
-          context: context,
-          useRootNavigator: true,
-          isScrollControlled: true,
-          builder: (BuildContext context) {
-            return FavPanel(ctr: videoIntroController);
-          },
-        );
+        _showFavPanel();
       }
     } else if (type != 'longPress') {
-      showModalBottomSheet(
-        context: context,
-        useRootNavigator: true,
-        isScrollControlled: true,
-        builder: (BuildContext context) {
-          return FavPanel(ctr: videoIntroController);
-        },
-      );
+      _showFavPanel();
     }
+  }
+
+  void _showFavPanel() {
+    showFlexibleBottomSheet(
+      bottomSheetColor: Colors.transparent,
+      minHeight: 0.6,
+      initHeight: 0.6,
+      maxHeight: 1,
+      context: context,
+      builder: (BuildContext context, ScrollController scrollController,
+          double offset) {
+        return FavPanel(
+          ctr: videoIntroController,
+          scrollController: scrollController,
+        );
+      },
+      anchors: [0.6, 1],
+      isSafeArea: true,
+    );
   }
 
   // 视频介绍
@@ -611,6 +612,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       videoIntroController.actionLikeVideo();
                     });
                   }
+                  _controller.reverse();
+                },
+                onTapCancel: () {
                   _controller.reverse();
                 },
                 borderRadius: StyleString.mdRadius,

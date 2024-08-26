@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -517,9 +518,21 @@ class VideoIntroController extends GetxController {
 
   // 设置关注分组
   void setFollowGroup() {
-    Get.bottomSheet(
-      GroupPanel(mid: videoDetail.value.owner!.mid!),
-      isScrollControlled: true,
+    showFlexibleBottomSheet(
+      bottomSheetColor: Colors.transparent,
+      minHeight: 0.6,
+      initHeight: 0.6,
+      maxHeight: 1,
+      context: Get.context!,
+      builder: (BuildContext context, ScrollController scrollController,
+          double offset) {
+        return GroupPanel(
+          mid: videoDetail.value.owner!.mid!,
+          scrollController: scrollController,
+        );
+      },
+      anchors: [0.6, 1],
+      isSafeArea: true,
     );
   }
 
