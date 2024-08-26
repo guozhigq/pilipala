@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/models/user/info.dart';
-import '../models/common/gesture_mode.dart';
-import 'global_data.dart';
 
 class GStrorage {
   static late final Box<dynamic> userInfo;
@@ -42,13 +40,6 @@ class GStrorage {
     );
     // 视频设置
     video = await Hive.openBox('video');
-    GlobalData().imgQuality =
-        setting.get(SettingBoxKey.defaultPicQa, defaultValue: 10); // 设置全局变量
-    GlobalData().fullScreenGestureMode = FullScreenGestureMode.values[
-        setting.get(SettingBoxKey.fullScreenGestureMode,
-            defaultValue: FullScreenGestureMode.values.last.index) as int];
-    GlobalData().enablePlayerControlAnimation = setting
-        .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
   }
 
   static void regAdapter() {
