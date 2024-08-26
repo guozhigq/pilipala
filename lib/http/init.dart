@@ -29,7 +29,7 @@ class Request {
   late String systemProxyPort;
   static final RegExp spmPrefixExp =
       RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
-  static late String buvid;
+  static String? buvid;
 
   /// 设置cookie
   static setCookie() async {
@@ -72,7 +72,6 @@ class Request {
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
 
-    buvid = cookie.firstWhere((e) => e.name == 'buvid3').value;
     dio.options.headers['cookie'] = cookieString;
   }
 
@@ -85,6 +84,30 @@ class Request {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
     }
     return token;
+  }
+
+  static Future<String> getBuvid() async {
+    if (buvid != null) {
+      return buvid!;
+    }
+
+    final List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.baseUrl));
+    buvid = cookies.firstWhere((cookie) => cookie.name == 'buvid3').value;
+    if (buvid == null) {
+      try {
+        var result = await Request().get(
+          "${HttpString.apiBaseUrl}/x/frontend/finger/spi",
+        );
+        buvid = result["data"]["b_3"].toString();
+      } catch (e) {
+        // 处理请求错误
+        buvid = '';
+        print("Error fetching buvid: $e");
+      }
+    }
+
+    return buvid!;
   }
 
   static setOptionsHeaders(userInfo, bool status) {
