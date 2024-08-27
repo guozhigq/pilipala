@@ -64,6 +64,7 @@ void main() async {
   }
 
   PiliSchame.init();
+  await GlobalDataCache().initialize();
 }
 
 class MyApp extends StatelessWidget {
@@ -268,7 +269,6 @@ class BuildMainApp extends StatelessWidget {
       onReady: () async {
         RecommendFilter();
         Data.init();
-        await GlobalDataCache().initialize();
         setupServiceLocator();
       },
     );
