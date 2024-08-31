@@ -47,6 +47,7 @@ class LiveRoomController extends GetxController {
   RxMap<String, String> joinRoomTip = {'userName': '', 'message': ''}.obs;
   // 直播间弹幕开关 默认打开
   RxBool danmakuSwitch = true.obs;
+  late String buvid;
 
   @override
   void onInit() {
@@ -63,6 +64,7 @@ class LiveRoomController extends GetxController {
       if (liveItem != null && liveItem.cover != null && liveItem.cover != '') {
         cover = liveItem.cover;
       }
+      Request.getBuvid().then((value) => buvid = value);
     }
     // CDN优化
     enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
@@ -249,7 +251,7 @@ class LiveRoomController extends GetxController {
         "uid": userId,
         "roomid": roomId,
         "protover": 3,
-        "buvid": Request.buvid,
+        "buvid": buvid,
         "platform": "web",
         "type": 2,
         "key": token,
