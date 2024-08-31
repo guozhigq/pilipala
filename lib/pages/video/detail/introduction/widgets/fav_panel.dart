@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -60,19 +61,21 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: const Icon(Icons.folder_outlined),
+                            leading: Icon([23, 1].contains(item.attr)
+                                ? Icons.lock_outline
+                                : Icons.folder_outlined),
                             minLeadingWidth: 0,
-                            title: Text(widget
-                                .ctr!.favFolderData.value.list![index].title!),
+                            title: Text(item.title!),
                             subtitle: Text(
-                              '${item.mediaCount}个内容 ',
+                              '${item.mediaCount}个内容 - ${[
+                                23,
+                                1
+                              ].contains(item.attr) ? '私密' : '公开'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
                               child: Checkbox(
-                                value: widget.ctr!.favFolderData.value
-                                        .list![index].favState ==
-                                    1,
+                                value: item.favState == 1,
                                 onChanged: (bool? checkValue) =>
                                     widget.ctr!.onChoose(checkValue!, index),
                               ),
