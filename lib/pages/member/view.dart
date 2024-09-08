@@ -406,7 +406,7 @@ class _MemberPageState extends State<MemberPage>
                                   ? '个人认证：'
                                   : '企业认证：',
                               style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               children: [
                                 TextSpan(
