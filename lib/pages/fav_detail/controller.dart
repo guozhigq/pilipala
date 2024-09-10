@@ -115,4 +115,17 @@ class FavDetailController extends GetxController {
       },
     );
   }
+
+  onEditFavFolder() async {
+    Get.toNamed(
+      '/favEdit',
+      arguments: {
+        'mediaId': mediaId.toString(),
+        'title': item!.title,
+        'intro': item!.intro,
+        'cover': item!.cover,
+        'privacy': item!.attr,
+      },
+    );
+  }
 }
