@@ -552,4 +552,14 @@ class Api {
   /// 系统通知
   static const String messageSystemAPi =
       '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  /// 系统通知标记已读
+  static const String systemMarkRead =
+      '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
 }
