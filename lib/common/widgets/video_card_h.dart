@@ -266,17 +266,11 @@ class VideoContent extends StatelessWidget {
             Row(
               children: [
                 if (showView) ...[
-                  StatView(
-                    theme: 'gray',
-                    view: videoItem.stat.view as int,
-                  ),
+                  StatView(view: videoItem.stat.view as int),
                   const SizedBox(width: 8),
                 ],
                 if (showDanmaku)
-                  StatDanMu(
-                    theme: 'gray',
-                    danmu: videoItem.stat.danmaku as int,
-                  ),
+                  StatDanMu(danmu: videoItem.stat.danmaku as int),
                 const Spacer(),
                 if (source == 'normal')
                   SizedBox(
