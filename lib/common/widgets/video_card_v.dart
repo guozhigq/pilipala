@@ -287,9 +287,9 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        StatView(theme: 'gray', view: videoItem.stat.view),
+        StatView(view: videoItem.stat.view),
         const SizedBox(width: 8),
-        StatDanMu(theme: 'gray', danmu: videoItem.stat.danmu),
+        StatDanMu(danmu: videoItem.stat.danmu),
         if (videoItem is RecVideoItemModel) ...<Widget>[
           crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
           RichText(
