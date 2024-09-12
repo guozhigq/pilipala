@@ -255,13 +255,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                         Row(
                           children: [
                             StatView(
-                              theme: 'gray',
                               view: widget.bangumiDetail!.stat!['views'],
                               size: 'medium',
                             ),
                             const SizedBox(width: 6),
                             StatDanMu(
-                              theme: 'gray',
                               danmu: widget.bangumiDetail!.stat!['danmakus'],
                               size: 'medium',
                             ),
