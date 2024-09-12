@@ -57,6 +57,8 @@ class UserHttp {
       if (res.data['data'] != null) {
         data = FavFolderData.fromJson(res.data['data']);
         return {'status': true, 'data': data};
+      } else {
+        return {'status': false, 'msg': '收藏夹为空'};
       }
     } else {
       return {
