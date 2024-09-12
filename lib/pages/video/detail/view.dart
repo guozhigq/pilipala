@@ -63,7 +63,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoPlayEnable;
   late bool autoPiP;
   late Floating floating;
-  bool isShowing = true;
+  RxBool isShowing = true.obs;
   // 生命周期监听
   late final AppLifecycleListener _lifecycleListener;
   late double statusHeight;
@@ -183,6 +183,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
+    isShowing.value = true;
     autoEnterPip(status: PlayerStatus.playing);
   }
 
@@ -258,7 +259,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.pause();
       vdCtr.clearSubtitleContent();
     }
-    setState(() => isShowing = false);
+    isShowing.value = false;
     super.didPushNext();
   }
 
@@ -272,10 +273,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() {
-        vdCtr.setSubtitleContent();
-        isShowing = true;
-      });
+      vdCtr.setSubtitleContent();
+      isShowing.value = true;
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
@@ -330,12 +329,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController?.danmakuController?.clear();
         break;
       case 'pause':
-        vdCtr.hiddenReplyReplyPanel();
-        if (vdCtr.videoType == SearchType.video) {
-          videoIntroController.hiddenEpisodeBottomSheet();
-        }
-        if (vdCtr.videoType == SearchType.media_bangumi) {
-          bangumiIntroController.hiddenEpisodeBottomSheet();
+        if (autoPiP) {
+          vdCtr.hiddenReplyReplyPanel();
+          if (vdCtr.videoType == SearchType.video) {
+            videoIntroController.hiddenEpisodeBottomSheet();
+          }
+          if (vdCtr.videoType == SearchType.media_bangumi) {
+            bangumiIntroController.hiddenEpisodeBottomSheet();
+          }
         }
         break;
     }
@@ -650,7 +651,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   tag: heroTag,
                                   child: Stack(
                                     children: <Widget>[
-                                      if (isShowing) buildVideoPlayerPanel(),
+                                      Obx(
+                                        () => isShowing.value
+                                            ? buildVideoPlayerPanel()
+                                            : const SizedBox(),
+                                      ),
 
                                       /// 关闭自动播放时 手动播放
                                       Obx(

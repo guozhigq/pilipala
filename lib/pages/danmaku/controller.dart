@@ -2,8 +2,9 @@ import 'package:pilipala/http/danmaku.dart';
 import 'package:pilipala/models/danmaku/dm.pb.dart';
 
 class PlDanmakuController {
-  PlDanmakuController(this.cid);
+  PlDanmakuController(this.cid, this.type);
   final int cid;
+  final String type;
   Map<int, List<DanmakuElem>> dmSegMap = {};
   // 已请求的段落标记
   List<bool> requestedSeg = [];
