@@ -26,6 +26,7 @@ import 'widgets/app_bar_ani.dart';
 import 'widgets/backward_seek.dart';
 import 'widgets/bottom_control.dart';
 import 'widgets/common_btn.dart';
+import 'widgets/control_bar.dart';
 import 'widgets/forward_seek.dart';
 import 'widgets/play_pause_btn.dart';
 
@@ -484,104 +485,27 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
         /// 音量🔊 控制条展示
         Obx(
-          () => Align(
-            child: AnimatedOpacity(
-              curve: Curves.easeInOut,
-              opacity: _volumeIndicator.value ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 150),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: const Color(0x88000000),
-                  borderRadius: BorderRadius.circular(64.0),
-                ),
-                height: 34.0,
-                width: 70.0,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      height: 34.0,
-                      width: 28.0,
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        _volumeValue.value == 0.0
-                            ? Icons.volume_off
-                            : _volumeValue.value < 0.5
-                                ? Icons.volume_down
-                                : Icons.volume_up,
-                        color: const Color(0xFFFFFFFF),
-                        size: 20.0,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${(_volumeValue.value * 100.0).round()}%',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          color: Color(0xFFFFFFFF),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6.0),
-                  ],
-                ),
-              ),
-            ),
+          () => ControlBar(
+            visible: _volumeIndicator.value,
+            icon: _volumeValue.value < 1.0 / 3.0
+                ? Icons.volume_mute
+                : _volumeValue.value < 2.0 / 3.0
+                    ? Icons.volume_down
+                    : Icons.volume_up,
+            value: _volumeValue.value,
           ),
         ),
 
         /// 亮度🌞 控制条展示
         Obx(
-          () => Align(
-            child: AnimatedOpacity(
-              curve: Curves.easeInOut,
-              opacity: _brightnessIndicator.value ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 150),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: const Color(0x88000000),
-                  borderRadius: BorderRadius.circular(64.0),
-                ),
-                height: 34.0,
-                width: 70.0,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      height: 30.0,
-                      width: 28.0,
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        _brightnessValue.value < 1.0 / 3.0
-                            ? Icons.brightness_low
-                            : _brightnessValue.value < 2.0 / 3.0
-                                ? Icons.brightness_medium
-                                : Icons.brightness_high,
-                        color: const Color(0xFFFFFFFF),
-                        size: 18.0,
-                      ),
-                    ),
-                    const SizedBox(width: 2.0),
-                    Expanded(
-                      child: Text(
-                        '${(_brightnessValue.value * 100.0).round()}%',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          color: Color(0xFFFFFFFF),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6.0),
-                  ],
-                ),
-              ),
-            ),
+          () => ControlBar(
+            visible: _brightnessIndicator.value,
+            icon: _brightnessValue.value < 1.0 / 3.0
+                ? Icons.brightness_low
+                : _brightnessValue.value < 2.0 / 3.0
+                    ? Icons.brightness_medium
+                    : Icons.brightness_high,
+            value: _brightnessValue.value,
           ),
         ),
 
