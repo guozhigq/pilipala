@@ -9,7 +9,7 @@ import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/services/service_locator.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../../models/live/quality.dart';
@@ -162,7 +162,7 @@ class _PlaySettingState extends State<PlaySetting> {
               setKey: SettingBoxKey.enablePlayerControlAnimation,
               defaultVal: true,
               callFn: (bool val) {
-                GlobalData().enablePlayerControlAnimation = val;
+                GlobalDataCache().enablePlayerControlAnimation = val;
               }),
           SetSwitchItem(
             title: '港澳台模式',
