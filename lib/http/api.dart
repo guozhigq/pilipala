@@ -565,4 +565,7 @@ class Api {
 
   /// 直播间发送弹幕
   static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 删除评论
+  static const String replyDel = '/x/v2/reply/del';
 }
