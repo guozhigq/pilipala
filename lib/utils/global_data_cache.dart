@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/plugin/pl_player/models/play_speed.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -7,6 +8,7 @@ import '../models/common/index.dart';
 Box setting = GStrorage.setting;
 Box localCache = GStrorage.localCache;
 Box videoStorage = GStrorage.video;
+Box userInfoCache = GStrorage.userInfo;
 
 class GlobalDataCache {
   late int imgQuality;
@@ -39,6 +41,8 @@ class GlobalDataCache {
   late double longPressSpeed;
   // 播放器速度列表
   late List<double> speedsList;
+  // 用户信息
+  UserInfoData? userInfo;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -96,5 +100,7 @@ class GlobalDataCache {
     final List<double> playSpeedSystem = await videoStorage
         .get(VideoBoxKey.playSpeedSystem, defaultValue: playSpeed);
     speedsList.addAll(playSpeedSystem);
+
+    userInfo = userInfoCache.get('userInfoCache');
   }
 }
