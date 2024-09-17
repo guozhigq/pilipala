@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamic_badge_mode.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
+import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
@@ -25,7 +25,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final HomeController _homeController = Get.put(HomeController());
   final RankController _rankController = Get.put(RankController());
   final DynamicsController _dynamicController = Get.put(DynamicsController());
-  final MediaController _mediaController = Get.put(MediaController());
+  final MineController _mineController = Get.put(MineController());
 
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
@@ -90,8 +90,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       _dynamicController.flag = false;
     }
 
-    if (currentPage is MediaPage) {
-      _mediaController.queryFavFolder();
+    if (currentPage is MinePage) {
+      _mineController.queryFavFolder();
+      _mineController.queryUserInfo();
     }
   }
 

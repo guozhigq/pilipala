@@ -10,7 +10,6 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -31,9 +30,6 @@ class LoginUtils {
 
       DynamicsController dynamicsCtr = Get.find<DynamicsController>();
       dynamicsCtr.userLogin.value = status;
-
-      MediaController mediaCtr = Get.find<MediaController>();
-      mediaCtr.userLogin.value = status;
     } catch (err) {
       SmartDialog.showToast('refreshLoginStatus error: ${err.toString()}');
     }
@@ -84,8 +80,6 @@ class LoginUtils {
           final HomeController homeCtr = Get.find<HomeController>();
           homeCtr.updateLoginStatus(true);
           homeCtr.userFace.value = result['data'].face;
-          final MediaController mediaCtr = Get.find<MediaController>();
-          mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
         } catch (err) {
           SmartDialog.show(builder: (BuildContext context) {

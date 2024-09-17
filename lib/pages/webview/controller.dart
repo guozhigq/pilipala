@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/id_utils.dart';
