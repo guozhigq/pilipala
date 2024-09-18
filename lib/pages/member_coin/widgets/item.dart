@@ -69,10 +69,7 @@ class MemberCoinsItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      StatView(
-                        view: coinItem.view,
-                        theme: 'gray',
-                      ),
+                      StatView(view: coinItem.view),
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(
