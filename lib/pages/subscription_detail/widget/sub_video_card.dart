@@ -154,13 +154,9 @@ class VideoContent extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 2),
                   child: Row(
                     children: [
-                      StatView(
-                        theme: 'gray',
-                        view: videoItem.cntInfo['play'],
-                      ),
+                      StatView(view: videoItem.cntInfo['play']),
                       const SizedBox(width: 8),
-                      StatDanMu(
-                          theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
+                      StatDanMu(danmu: videoItem.cntInfo['danmaku']),
                       const Spacer(),
                     ],
                   ),

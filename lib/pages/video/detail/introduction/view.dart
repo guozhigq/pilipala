@@ -346,13 +346,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       StatView(
-                        theme: 'gray',
                         view: widget.videoDetail!.stat!.view,
                         size: 'medium',
                       ),
                       const SizedBox(width: 10),
                       StatDanMu(
-                        theme: 'gray',
                         danmu: widget.videoDetail!.stat!.danmaku,
                         size: 'medium',
                       ),
