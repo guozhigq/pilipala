@@ -366,16 +366,18 @@ class _MinePageState extends State<MinePage>
               } else {
                 // 骨架屏
                 return Obx(
-                  () => ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: ctr.favFolderData.value.list!.length,
-                    itemBuilder: (context, index) {
-                      return FavFolderItem(
-                        item: ctr.favFolderData.value.list![index],
-                        index: index,
-                      );
-                    },
-                  ),
+                  () => ctr.favFolderData.value.list != null
+                      ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: ctr.favFolderData.value.list!.length,
+                          itemBuilder: (context, index) {
+                            return FavFolderItem(
+                              item: ctr.favFolderData.value.list![index],
+                              index: index,
+                            );
+                          },
+                        )
+                      : const SizedBox(),
                 );
               }
             },
@@ -391,7 +393,7 @@ class _MinePageState extends State<MinePage>
     String title,
   ) {
     return ListTile(
-      onTap: () {},
+      onTap: () => Get.toNamed('/fav'),
       leading: null,
       dense: true,
       title: Padding(
