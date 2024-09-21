@@ -144,7 +144,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   final Box<dynamic> setting = GStrorage.setting;
   late double sheetHeight;
   late final dynamic owner;
-  late final dynamic follower;
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
@@ -177,7 +176,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     sheetHeight = localCache.get('sheetHeight');
 
     owner = widget.videoDetail!.owner;
-    follower = Utils.numFormat(videoIntroController.userStat['follower']);
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     _expandableCtr = ExpandableController(initialExpanded: false);
 
@@ -467,13 +465,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fadeOutDuration: Duration.zero,
                     ),
                     const SizedBox(width: 10),
-                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    Text(widget.videoDetail!.owner!.name!,
+                        style: const TextStyle(fontSize: 13)),
                     const SizedBox(width: 6),
-                    Text(
-                      follower,
-                      style: TextStyle(
-                        fontSize: t.textTheme.labelSmall!.fontSize,
-                        color: outline,
+                    Obx(
+                      () => Text(
+                        Utils.numFormat(videoIntroController.follower.value),
+                        style: TextStyle(
+                          fontSize: t.textTheme.labelSmall!.fontSize,
+                          color: outline,
+                        ),
                       ),
                     ),
                     const Spacer(),

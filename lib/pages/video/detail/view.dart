@@ -68,6 +68,10 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late final AppLifecycleListener _lifecycleListener;
   late double statusHeight;
 
+  // 稍后再看控制器
+  // late AnimationController _laterCtr;
+  // late Animation<Offset> _laterOffsetAni;
+
   @override
   void initState() {
     super.initState();
@@ -104,6 +108,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     WidgetsBinding.instance.addObserver(this);
     lifecycleListener();
+    // watchLaterControllerInit();
   }
 
   // 获取视频资源，初始化播放器
@@ -211,6 +216,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           vdCtr.bottomList.removeAt(3);
         }
       }
+      vdCtr.toggeleWatchLaterVisible(!isFullScreen);
     });
   }
 
@@ -236,6 +242,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStream.close();
     WidgetsBinding.instance.removeObserver(this);
     _lifecycleListener.dispose();
+    // _laterCtr.dispose();
+    // _laterOffsetAni.removeListener(() {});
     super.dispose();
   }
 
@@ -482,6 +490,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     );
   }
 
+  /// 稍后再看控制器初始化
+  // void watchLaterControllerInit() {
+  //   _laterCtr = AnimationController(
+  //     duration: const Duration(milliseconds: 300),
+  //     vsync: this,
+  //   );
+  //   _laterOffsetAni = Tween<Offset>(
+  //     begin: const Offset(0.0, 1.0),
+  //     end: Offset.zero,
+  //   ).animate(CurvedAnimation(
+  //     parent: _laterCtr,
+  //     curve: Curves.easeInOut,
+  //   ));
+  // }
+
   @override
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
@@ -595,6 +618,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               child: AppBar(
                 backgroundColor: Colors.black,
                 elevation: 0,
+                scrolledUnderElevation: 0,
               ),
             ),
             body: ExtendedNestedScrollView(
@@ -757,6 +781,62 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 null,
               );
             }),
+          ),
+
+          /// 稍后再看列表
+          Obx(
+            () => Visibility(
+              visible: vdCtr.sourceType.value == 'watchLater' ||
+                  vdCtr.sourceType.value == 'fav',
+              child: AnimatedPositioned(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+                left: 12,
+                bottom: vdCtr.isWatchLaterVisible.value
+                    ? MediaQuery.of(context).padding.bottom + 12
+                    : -100,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      vdCtr.toggeleWatchLaterVisible(
+                          !vdCtr.isWatchLaterVisible.value);
+                      vdCtr.showMediaListPanel();
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                    child: Container(
+                      width: Get.width - 24,
+                      height: 54,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer
+                            .withOpacity(0.95),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(14)),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.playlist_play, size: 24),
+                        const SizedBox(width: 10),
+                        Text(
+                          vdCtr.watchLaterTitle.value,
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.keyboard_arrow_up_rounded, size: 26),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           )
         ],
       ),
