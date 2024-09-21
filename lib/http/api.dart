@@ -559,6 +559,12 @@ class Api {
   static const String systemMarkRead =
       '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
 
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
+
   /// 直播间弹幕信息
   static const String getDanmuInfo =
       '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';

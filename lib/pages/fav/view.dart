@@ -55,6 +55,22 @@ class _FavPageState extends State<FavPage> {
                   tooltip: 'Ta的订阅',
                 )
               : const SizedBox.shrink()),
+
+          // 新建收藏夹
+          Obx(() => _favController.isOwner.value
+              ? IconButton(
+                  onPressed: () async {
+                    await Get.toNamed('/favEdit');
+                    _favController.hasMore.value = true;
+                    _favController.currentPage = 1;
+                    setState(() {
+                      _futureBuilderFuture = _favController.queryFavFolder();
+                    });
+                  },
+                  icon: const Icon(Icons.add_outlined),
+                  tooltip: '新建收藏夹',
+                )
+              : const SizedBox.shrink()),
           IconButton(
             onPressed: () => Get.toNamed(
                 '/favSearch?searchType=1&mediaId=${_favController.favFolderData.value.list!.first.id}'),

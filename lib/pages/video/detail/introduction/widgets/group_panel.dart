@@ -54,112 +54,101 @@ class _GroupPanelState extends State<GroupPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
+    return Column(
+      children: <Widget>[
+        AppBar(
+          centerTitle: false,
+          elevation: 0,
+          leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: const Icon(Icons.close_outlined)),
+          title: Text('设置关注分组', style: Theme.of(context).textTheme.titleMedium),
         ),
-      ),
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            centerTitle: false,
-            elevation: 0,
-            leading: IconButton(
-                onPressed: () => Get.back(),
-                icon: const Icon(Icons.close_outlined)),
-            title:
-                Text('设置关注分组', style: Theme.of(context).textTheme.titleMedium),
-          ),
-          Expanded(
-            child: Material(
-              child: FutureBuilder(
-                future: _futureBuilderFuture,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      tagsList = data['data'];
-                      return ListView.builder(
-                        controller: widget.scrollController,
-                        itemCount: data['data'].length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              data['data'][index].checked =
-                                  !data['data'][index].checked;
-                              showDefault =
-                                  !data['data'].any((e) => e.checked == true);
-                              setState(() {});
-                            },
-                            dense: true,
-                            leading: const Icon(Icons.group_outlined),
-                            minLeadingWidth: 0,
-                            title: Text(data['data'][index].name),
-                            subtitle: data['data'][index].tip != ''
-                                ? Text(data['data'][index].tip)
-                                : null,
-                            trailing: Transform.scale(
-                              scale: 0.9,
-                              child: Checkbox(
-                                value: data['data'][index].checked,
-                                onChanged: (bool? checkValue) {
-                                  data['data'][index].checked = checkValue;
-                                  showDefault = !data['data']
-                                      .any((e) => e.checked == true);
-                                  setState(() {});
-                                },
-                              ),
+        Expanded(
+          child: Material(
+            child: FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map data = snapshot.data as Map;
+                  if (data['status']) {
+                    tagsList = data['data'];
+                    return ListView.builder(
+                      controller: widget.scrollController,
+                      itemCount: data['data'].length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          onTap: () {
+                            data['data'][index].checked =
+                                !data['data'][index].checked;
+                            showDefault =
+                                !data['data'].any((e) => e.checked == true);
+                            setState(() {});
+                          },
+                          dense: true,
+                          leading: const Icon(Icons.group_outlined),
+                          minLeadingWidth: 0,
+                          title: Text(data['data'][index].name),
+                          subtitle: data['data'][index].tip != ''
+                              ? Text(data['data'][index].tip)
+                              : null,
+                          trailing: Transform.scale(
+                            scale: 0.9,
+                            child: Checkbox(
+                              value: data['data'][index].checked,
+                              onChanged: (bool? checkValue) {
+                                data['data'][index].checked = checkValue;
+                                showDefault =
+                                    !data['data'].any((e) => e.checked == true);
+                                setState(() {});
+                              },
                             ),
-                          );
-                        },
-                      );
-                    } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () => setState(() {}),
-                      );
-                    }
+                          ),
+                        );
+                      },
+                    );
                   } else {
-                    // 骨架屏
-                    return const Text('请求中');
+                    return HttpError(
+                      errMsg: data['msg'],
+                      fn: () => setState(() {}),
+                    );
                   }
-                },
-              ),
+                } else {
+                  // 骨架屏
+                  return const Text('请求中');
+                }
+              },
             ),
           ),
-          Divider(
-            height: 1,
-            color: Theme.of(context).disabledColor.withOpacity(0.08),
+        ),
+        Divider(
+          height: 1,
+          color: Theme.of(context).disabledColor.withOpacity(0.08),
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 12,
+            bottom: MediaQuery.of(context).padding.bottom + 12,
           ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 12,
-              bottom: MediaQuery.of(context).padding.bottom + 12,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => onSave(),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary, // 设置按钮背景色
-                  ),
-                  child: Text(showDefault ? '保存至默认分组' : '保存'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => onSave(),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.only(left: 30, right: 30),
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary, // 设置按钮背景色
                 ),
-              ],
-            ),
+                child: Text(showDefault ? '保存至默认分组' : '保存'),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
