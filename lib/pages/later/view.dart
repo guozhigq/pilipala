@@ -128,6 +128,15 @@ class _LaterPageState extends State<LaterPage> {
           )
         ],
       ),
+      floatingActionButton: Obx(
+        () => _laterController.laterList.isNotEmpty
+            ? FloatingActionButton.extended(
+                onPressed: _laterController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
+      ),
     );
   }
 }

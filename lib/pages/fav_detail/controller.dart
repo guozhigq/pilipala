@@ -6,17 +6,17 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
-  Rx<FavDetailData> favDetailData = FavDetailData().obs;
 
   int? mediaId;
   late String heroTag;
   int currentPage = 1;
   bool isLoadingMore = false;
   RxMap favInfo = {}.obs;
-  RxList favList = [].obs;
+  RxList<FavDetailItemData> favList = <FavDetailItemData>[].obs;
   RxString loadingText = '加载中...'.obs;
   RxInt mediaCount = 0.obs;
   late String isOwner;
