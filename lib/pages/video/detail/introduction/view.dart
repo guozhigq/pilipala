@@ -230,7 +230,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   void _showFavPanel() {
     showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
       minHeight: 0.6,
       initHeight: 0.6,
       maxHeight: 1,
@@ -346,13 +349,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       StatView(
-                        theme: 'gray',
                         view: widget.videoDetail!.stat!.view,
                         size: 'medium',
                       ),
                       const SizedBox(width: 10),
                       StatDanMu(
-                        theme: 'gray',
                         danmu: widget.videoDetail!.stat!.danmaku,
                         size: 'medium',
                       ),

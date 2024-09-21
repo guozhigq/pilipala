@@ -107,6 +107,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 onSelected: (String type) {},
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   PopupMenuItem<String>(
+                    onTap: () => _favDetailController.onEditFavFolder(),
+                    value: 'edit',
+                    child: const Text('编辑收藏夹'),
+                  ),
+                  PopupMenuItem<String>(
                     onTap: () => _favDetailController.onDelFavFolder(),
                     value: 'pause',
                     child: const Text('删除收藏夹'),

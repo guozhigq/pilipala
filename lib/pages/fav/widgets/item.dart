@@ -74,7 +74,7 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
+        padding: const EdgeInsets.fromLTRB(10, 2, 6, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -88,6 +88,15 @@ class VideoContent extends StatelessWidget {
             ),
             Text(
               '${favFolderItem.mediaCount}个内容',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              [23, 1].contains(favFolderItem.attr) ? '私密' : '公开',
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
