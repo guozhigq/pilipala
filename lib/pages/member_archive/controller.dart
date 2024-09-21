@@ -27,10 +27,13 @@ class MemberArchiveController extends GetxController {
 
   // 获取用户投稿
   Future getMemberArchive(type) async {
+    if (isLoading.value) {
+      return;
+    }
+    isLoading.value = true;
     if (type == 'init') {
       pn = 1;
       archivesList.clear();
-      isLoading.value = true;
     }
     var res = await MemberHttp.memberArchive(
       mid: mid,
