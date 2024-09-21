@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
@@ -45,7 +46,15 @@ class _MinePageState extends State<MinePage>
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.dark_mode_outlined),
+            icon: const Icon(Icons.search_outlined),
+            onPressed: () => Get.toNamed('/search'),
+          ),
+          IconButton(
+            icon: Icon(
+              ctr.themeType.value == ThemeType.dark
+                  ? Icons.wb_sunny_outlined
+                  : Icons.dark_mode_outlined,
+            ),
             onPressed: () => ctr.onChangeTheme(),
           ),
           IconButton(
