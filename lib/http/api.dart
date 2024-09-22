@@ -571,4 +571,8 @@ class Api {
 
   /// 直播间发送弹幕
   static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
 }
