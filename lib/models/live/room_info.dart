@@ -1,11 +1,13 @@
 class RoomInfoModel {
   RoomInfoModel({
     this.roomId,
+    this.isPortrait,
     this.liveStatus,
     this.liveTime,
     this.playurlInfo,
   });
   int? roomId;
+  bool? isPortrait;
   int? liveStatus;
   int? liveTime;
   PlayurlInfo? playurlInfo;
@@ -13,6 +15,7 @@ class RoomInfoModel {
   RoomInfoModel.fromJson(Map<String, dynamic> json) {
     roomId = json['room_id'];
     liveStatus = json['live_status'];
+    isPortrait = json['is_portrait'];
     liveTime = json['live_time'];
     playurlInfo = PlayurlInfo.fromJson(json['playurl_info']);
   }
