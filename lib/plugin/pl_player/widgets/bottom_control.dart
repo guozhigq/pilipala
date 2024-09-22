@@ -1,7 +1,6 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nil/nil.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
@@ -36,7 +35,7 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               final int max = _.durationSeconds.value;
               final int buffer = _.bufferedSeconds.value;
               if (value > max || max <= 0) {
-                return nil;
+                return const SizedBox();
               }
               return Padding(
                 padding: const EdgeInsets.only(left: 7, right: 7, bottom: 6),
@@ -68,91 +67,8 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
               );
             },
           ),
-          Row(
-            children: [...buildBottomControl!],
-          ),
-          // Row(
-          //   children: [
-          //     PlayOrPauseButton(
-          //       controller: _,
-          //     ),
-          //     const SizedBox(width: 4),
-          //     // 播放时间
-          //     Obx(() {
-          //       return Text(
-          //         _.durationSeconds.value >= 3600
-          //             ? printDurationWithHours(
-          //                 Duration(seconds: _.positionSeconds.value))
-          //             : printDuration(
-          //                 Duration(seconds: _.positionSeconds.value)),
-          //         style: textStyle,
-          //       );
-          //     }),
-          //     const SizedBox(width: 2),
-          //     const Text('/', style: textStyle),
-          //     const SizedBox(width: 2),
-          //     Obx(
-          //       () => Text(
-          //         _.durationSeconds.value >= 3600
-          //             ? printDurationWithHours(
-          //                 Duration(seconds: _.durationSeconds.value))
-          //             : printDuration(
-          //                 Duration(seconds: _.durationSeconds.value)),
-          //         style: textStyle,
-          //       ),
-          //     ),
-          //     const Spacer(),
-          //     // 倍速
-          //     // Obx(
-          //     //   () => SizedBox(
-          //     //     width: 45,
-          //     //     height: 34,
-          //     //     child: TextButton(
-          //     //       style: ButtonStyle(
-          //     //         padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     //       ),
-          //     //       onPressed: () {
-          //     //         _.togglePlaybackSpeed();
-          //     //       },
-          //     //       child: Text(
-          //     //         '${_.playbackSpeed.toString()}X',
-          //     //         style: textStyle,
-          //     //       ),
-          //     //     ),
-          //     //   ),
-          //     // ),
-          //     SizedBox(
-          //       height: 30,
-          //       child: TextButton(
-          //         onPressed: () => _.toggleVideoFit(),
-          //         style: ButtonStyle(
-          //           padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //         ),
-          //         child: Obx(
-          //           () => Text(
-          //             _.videoFitDEsc.value,
-          //             style: const TextStyle(color: Colors.white, fontSize: 13),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //     const SizedBox(width: 10),
-          //     // 全屏
-          //     Obx(
-          //       () => ComBtn(
-          //         icon: Icon(
-          //           _.isFullScreen.value
-          //               ? FontAwesomeIcons.compress
-          //               : FontAwesomeIcons.expand,
-          //           size: 15,
-          //           color: Colors.white,
-          //         ),
-          //         fuc: () => triggerFullScreen!(),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          const SizedBox(height: 12),
+          Row(children: [...buildBottomControl!]),
+          const SizedBox(height: 10),
         ],
       ),
     );

@@ -15,6 +15,10 @@ import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../common/pages_bottom_sheet.dart';
+import '../../../models/common/video_episode_type.dart';
+import '../../../utils/drawer.dart';
+
 class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
@@ -52,6 +56,7 @@ class BangumiIntroController extends GetxController {
   RxMap followStatus = {}.obs;
   int _tempThemeValue = -1;
   var userInfo;
+  PersistentBottomSheetController? bottomSheetController;
 
   @override
   void onInit() {
@@ -126,51 +131,37 @@ class BangumiIntroController extends GetxController {
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
-            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: StatefulBuilder(builder: (context, StateSetter setState) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: 1,
-                    title: const Text('1枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                  RadioListTile(
-                    value: 2,
-                    title: const Text('2枚'),
-                    groupValue: _tempThemeValue,
-                    onChanged: (value) {
-                      _tempThemeValue = value!;
-                      Get.appUpdate();
-                    },
-                  ),
-                ],
+                children: [1, 2]
+                    .map(
+                      (e) => RadioListTile(
+                        value: e,
+                        title: Text('$e枚'),
+                        groupValue: _tempThemeValue,
+                        onChanged: (value) async {
+                          _tempThemeValue = value!;
+                          setState(() {});
+                          var res = await VideoHttp.coinVideo(
+                              bvid: bvid, multiply: _tempThemeValue);
+                          if (res['status']) {
+                            SmartDialog.showToast('投币成功 👏');
+                            hasCoin.value = true;
+                            bangumiDetail.value.stat!['coins'] =
+                                bangumiDetail.value.stat!['coins'] +
+                                    _tempThemeValue;
+                          } else {
+                            SmartDialog.showToast(res['msg']);
+                          }
+                          Get.back();
+                        },
+                      ),
+                    )
+                    .toList(),
               );
             }),
-            actions: [
-              TextButton(onPressed: () => Get.back(), child: const Text('取消')),
-              TextButton(
-                onPressed: () async {
-                  var res = await VideoHttp.coinVideo(
-                      bvid: bvid, multiply: _tempThemeValue);
-                  if (res['status']) {
-                    SmartDialog.showToast('投币成功 👏');
-                    hasCoin.value = true;
-                    bangumiDetail.value.stat!['coins'] =
-                        bangumiDetail.value.stat!['coins'] + _tempThemeValue;
-                  } else {
-                    SmartDialog.showToast(res['msg']);
-                  }
-                  Get.back();
-                },
-                child: const Text('确定'),
-              )
-            ],
           );
         });
   }
@@ -224,14 +215,18 @@ class BangumiIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid) async {
+  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
     // 重新获取视频资源
     VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
     videoDetailCtr.bvid = bvid;
     videoDetailCtr.cid.value = cid;
     videoDetailCtr.danmakuCid.value = cid;
+    videoDetailCtr.oid.value = aid;
+    videoDetailCtr.cover.value = cover;
     videoDetailCtr.queryVideoUrl();
+    videoDetailCtr.getSubtitle();
+    videoDetailCtr.setSubtitleContent();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
@@ -289,6 +284,36 @@ class BangumiIntroController extends GetxController {
     int cid = episodes[nextIndex].cid!;
     String bvid = episodes[nextIndex].bvid!;
     int aid = episodes[nextIndex].aid!;
-    changeSeasonOrbangu(bvid, cid, aid);
+    String cover = episodes[nextIndex].cover!;
+    changeSeasonOrbangu(bvid, cid, aid, cover);
+  }
+
+  // 播放器底栏 选集 回调
+  void showEposideHandler() {
+    late List episodes = bangumiDetail.value.episodes!;
+    VideoEpidoesType dataType = VideoEpidoesType.bangumiEpisode;
+    if (episodes.isEmpty) {
+      return;
+    }
+    VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: Get.arguments['heroTag']);
+    DrawerUtils.showRightDialog(
+      child: EpisodeBottomSheet(
+        episodes: episodes,
+        currentCid: videoDetailCtr.cid.value,
+        dataType: dataType,
+        context: Get.context!,
+        sheetHeight: Get.size.height,
+        isFullScreen: true,
+        changeFucCall: (item, index) {
+          changeSeasonOrbangu(item.bvid, item.cid, item.aid, item.cover);
+          SmartDialog.dismiss();
+        },
+      ).buildShowContent(Get.context!),
+    );
+  }
+
+  hiddenEpisodeBottomSheet() {
+    bottomSheetController?.close();
   }
 }

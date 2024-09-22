@@ -4,7 +4,9 @@ enum BottomControlType {
   next,
   time,
   space,
+  episode,
   fit,
   speed,
   fullscreen,
+  custom,
 }

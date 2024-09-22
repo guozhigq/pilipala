@@ -2,18 +2,32 @@ class MemberSeasonsDataModel {
   MemberSeasonsDataModel({
     this.page,
     this.seasonsList,
+    this.seriesList,
   });
 
   Map? page;
   List<MemberSeasonsList>? seasonsList;
+  List<MemberArchiveItem>? seriesList;
 
   MemberSeasonsDataModel.fromJson(Map<String, dynamic> json) {
     page = json['page'];
-    seasonsList = json['seasons_list'] != null
+    var tempList1 = json['seasons_list'] != null
         ? json['seasons_list']
             .map<MemberSeasonsList>((e) => MemberSeasonsList.fromJson(e))
             .toList()
         : [];
+    var tempList2 = json['series_list'] != null
+        ? json['series_list']
+            .map<MemberSeasonsList>((e) => MemberSeasonsList.fromJson(e))
+            .toList()
+        : [];
+    seriesList = json['archives'] != null
+        ? json['archives']
+            .map<MemberArchiveItem>((e) => MemberArchiveItem.fromJson(e))
+            .toList()
+        : [];
+
+    seasonsList = [...tempList1, ...tempList2];
   }
 }
 
@@ -86,6 +100,8 @@ class MamberMeta {
     this.ptime,
     this.seasonId,
     this.total,
+    this.seriesId,
+    this.category,
   });
 
   String? cover;
@@ -95,6 +111,8 @@ class MamberMeta {
   int? ptime;
   int? seasonId;
   int? total;
+  int? seriesId;
+  int? category;
 
   MamberMeta.fromJson(Map<String, dynamic> json) {
     cover = json['cover'];
@@ -104,5 +122,7 @@ class MamberMeta {
     ptime = json['ptime'];
     seasonId = json['season_id'];
     total = json['total'];
+    seriesId = json['series_id'];
+    category = json['category'];
   }
 }

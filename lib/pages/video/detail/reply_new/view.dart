@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/emote.dart';
@@ -40,6 +41,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   double keyboardHeight = 0.0; // 键盘高度
   final _debouncer = Debouncer(milliseconds: 200); // 设置延迟时间
   String toolbarType = 'input';
+  RxBool isForward = false.obs;
+  RxBool showForward = false.obs;
+  RxString message = ''.obs;
 
   @override
   void initState() {
@@ -52,6 +56,10 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     _autoFocus();
     // 监听聚焦状态
     _focuslistener();
+    final String routePath = Get.currentRoute;
+    if (routePath.startsWith('/video')) {
+      showForward.value = true;
+    }
   }
 
   _autoFocus() async {
@@ -73,21 +81,31 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   Future submitReplyAdd() async {
     feedBack();
-    String message = _replyContentController.text;
+    // String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
       type: widget.replyType ?? ReplyType.video,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,
       message: widget.replyItem != null && widget.replyItem!.root != 0
-          ? ' 回复 @${widget.replyItem!.member!.uname!} : $message'
-          : message,
+          ? ' 回复 @${widget.replyItem!.member!.uname!} : ${message.value}'
+          : message.value,
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
       Get.back(result: {
         'data': ReplyItemModel.fromJson(result['data']['reply'], ''),
       });
+
+      /// 投稿、番剧页面
+      if (isForward.value) {
+        await DynamicsHttp.dynamicCreate(
+          mid: 0,
+          rawText: message.value,
+          oid: widget.oid!,
+          scene: 5,
+        );
+      }
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -99,6 +117,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     final String newText = currentText.substring(0, cursorPosition) +
         emote.text! +
         currentText.substring(cursorPosition);
+    message.value = newText;
     _replyContentController.value = TextEditingValue(
       text: newText,
       selection:
@@ -142,7 +161,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   @override
   Widget build(BuildContext context) {
-    double keyboardHeight = EdgeInsets.fromViewPadding(
+    double _keyboardHeight = EdgeInsets.fromViewPadding(
             View.of(context).viewInsets, View.of(context).devicePixelRatio)
         .bottom;
     return Container(
@@ -152,7 +171,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -171,7 +190,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: TextField(
                     controller: _replyContentController,
-                    minLines: 1,
+                    minLines: 3,
                     maxLines: null,
                     autofocus: false,
                     focusNode: replyContentFocusNode,
@@ -182,6 +201,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                           fontSize: 14,
                         )),
                     style: Theme.of(context).textTheme.bodyLarge,
+                    onChanged: (text) {
+                      message.value = text;
+                    },
                   ),
                 ),
               ),
@@ -193,7 +215,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           ),
           Container(
             height: 52,
-            padding: const EdgeInsets.only(left: 12, right: 12),
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+            ),
+            margin: EdgeInsets.only(
+              bottom: toolbarType == 'input' && keyboardHeight == 0.0
+                  ? MediaQuery.of(context).padding.bottom
+                  : 0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -224,9 +254,39 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'emote',
                 ),
+                const SizedBox(width: 6),
+                Obx(
+                  () => showForward.value
+                      ? TextButton.icon(
+                          onPressed: () {
+                            isForward.value = !isForward.value;
+                          },
+                          icon: Icon(
+                              isForward.value
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              size: 22),
+                          label: const Text('转发到动态'),
+                          style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(
+                              isForward.value
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
                 const Spacer(),
-                TextButton(
-                    onPressed: () => submitReplyAdd(), child: const Text('发送'))
+                SizedBox(
+                  height: 36,
+                  child: Obx(
+                    () => FilledButton(
+                      onPressed: message.isNotEmpty ? submitReplyAdd : null,
+                      child: const Text('发送'),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -235,7 +295,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
             duration: const Duration(milliseconds: 300),
             child: SizedBox(
               width: double.infinity,
-              height: toolbarType == 'input' ? keyboardHeight : emoteHeight,
+              height: toolbarType == 'input'
+                  ? (_keyboardHeight > keyboardHeight
+                      ? _keyboardHeight
+                      : keyboardHeight)
+                  : emoteHeight,
               child: EmotePanel(
                 onChoose: (package, emote) => onChooseEmote(package, emote),
               ),

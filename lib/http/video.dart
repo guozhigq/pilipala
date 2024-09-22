@@ -8,9 +8,11 @@ import '../models/model_rec_video_item.dart';
 import '../models/user/fav_folder.dart';
 import '../models/video/ai.dart';
 import '../models/video/play/url.dart';
+import '../models/video/subTitile/result.dart';
 import '../models/video_detail_res.dart';
 import '../utils/recommend_filter.dart';
 import '../utils/storage.dart';
+import '../utils/subtitle.dart';
 import '../utils/wbi_sign.dart';
 import 'api.dart';
 import 'init.dart';
@@ -33,7 +35,7 @@ class VideoHttp {
         Api.recommendListWeb,
         data: {
           'version': 1,
-          'feed_version': 'V8',
+          'feed_version': 'V3',
           'homepage_ver': 1,
           'ps': ps,
           'fresh_idx': freshIdx,
@@ -68,47 +70,43 @@ class VideoHttp {
   // 添加额外的loginState变量模拟未登录状态
   static Future rcmdVideoListApp(
       {bool loginStatus = true, required int freshIdx}) async {
-    try {
-      var res = await Request().get(
-        Api.recommendListApp,
-        data: {
-          'idx': freshIdx,
-          'flush': '5',
-          'column': '4',
-          'device': 'pad',
-          'device_type': 0,
-          'device_name': 'vivo',
-          'pull': freshIdx == 0 ? 'true' : 'false',
-          'appkey': Constants.appKey,
-          'access_key': loginStatus
-              ? (localCache.get(LocalCacheKey.accessKey,
-                      defaultValue: {})['value'] ??
-                  '')
-              : ''
-        },
-      );
-      if (res.data['code'] == 0) {
-        List<RecVideoItemAppModel> list = [];
-        List<int> blackMidsList =
-            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
-        for (var i in res.data['data']['items']) {
-          // 屏蔽推广和拉黑用户
-          if (i['card_goto'] != 'ad_av' &&
-              (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
-              (i['args'] != null &&
-                  !blackMidsList.contains(i['args']['up_mid']))) {
-            RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
-            if (!RecommendFilter.filter(videoItem)) {
-              list.add(videoItem);
-            }
+    var res = await Request().get(
+      Api.recommendListApp,
+      data: {
+        'idx': freshIdx,
+        'flush': '5',
+        'column': '4',
+        'device': 'pad',
+        'device_type': 0,
+        'device_name': 'vivo',
+        'pull': freshIdx == 0 ? 'true' : 'false',
+        'appkey': Constants.appKey,
+        'access_key': loginStatus
+            ? (localCache
+                    .get(LocalCacheKey.accessKey, defaultValue: {})['value'] ??
+                '')
+            : ''
+      },
+    );
+    if (res.data['code'] == 0) {
+      List<RecVideoItemAppModel> list = [];
+      List<int> blackMidsList =
+          setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+      for (var i in res.data['data']['items']) {
+        // 屏蔽推广和拉黑用户
+        if (i['card_goto'] != 'ad_av' &&
+            (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
+            (i['args'] != null &&
+                !blackMidsList.contains(i['args']['up_mid']))) {
+          RecVideoItemAppModel videoItem = RecVideoItemAppModel.fromJson(i);
+          if (!RecommendFilter.filter(videoItem)) {
+            list.add(videoItem);
           }
         }
-        return {'status': true, 'data': list};
-      } else {
-        return {'status': false, 'data': [], 'msg': res.data['message']};
       }
-    } catch (err) {
-      return {'status': false, 'data': [], 'msg': err.toString()};
+      return {'status': true, 'data': list};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -190,22 +188,15 @@ class VideoHttp {
   // 视频信息 标题、简介
   static Future videoIntro({required String bvid}) async {
     var res = await Request().get(Api.videoIntro, data: {'bvid': bvid});
-    VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
-    if (result.code == 0) {
+    if (res.data['code'] == 0) {
+      VideoDetailResponse result = VideoDetailResponse.fromJson(res.data);
       return {'status': true, 'data': result.data!};
     } else {
-      Map errMap = {
-        -400: '请求错误',
-        -403: '权限不足',
-        -404: '视频资源失效',
-        62002: '稿件不可见',
-        62004: '稿件审核中',
-      };
       return {
         'status': false,
         'data': null,
-        'code': result.code,
-        'msg': errMap[result.code] ?? '请求异常',
+        'code': res.data['code'],
+        'msg': res.data['message'],
       };
     }
   }
@@ -392,9 +383,15 @@ class VideoHttp {
       'csrf': await Request.getCsrf(),
     });
     if (res.data['code'] == 0) {
-      return {'status': true, 'data': res.data['data']};
+      if (act == 5) {
+        List<int> blackMidsList =
+            setting.get(SettingBoxKey.blackMidsList, defaultValue: [-1]);
+        blackMidsList.add(mid);
+        setting.put(SettingBoxKey.blackMidsList, blackMidsList);
+      }
+      return {'status': true, 'data': res.data['data'], 'msg': '成功'};
     } else {
-      return {'status': false, 'data': []};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -476,6 +473,25 @@ class VideoHttp {
     }
   }
 
+  static Future getSubtitle({int? cid, String? bvid}) async {
+    var res = await Request().get(Api.getSubtitleConfig, data: {
+      'cid': cid,
+      'bvid': bvid,
+    });
+    try {
+      if (res.data['code'] == 0) {
+        return {
+          'status': true,
+          'data': SubTitlteModel.fromJson(res.data['data']),
+        };
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['msg']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': res.data['msg']};
+    }
+  }
+
   // 视频排行
   static Future getRankVideoList(int rid) async {
     try {
@@ -497,5 +513,13 @@ class VideoHttp {
     } catch (err) {
       return {'status': false, 'data': [], 'msg': err};
     }
+  }
+
+  // 获取字幕内容
+  static Future<Map<String, dynamic>> getSubtitleContent(url) async {
+    var res = await Request().get('https:$url');
+    final String content = SubTitleUtils.convertToWebVTT(res.data['body']);
+    final List body = res.data['body'];
+    return {'content': content, 'body': body};
   }
 }

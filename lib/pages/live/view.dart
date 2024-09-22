@@ -2,15 +2,13 @@ import 'dart:async';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_card_v.dart';
-import 'package:pilipala/common/widgets/animated_dialog.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/common/widgets/overlay_pop.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/live/follow.dart';
+import 'package:pilipala/utils/main_stream.dart';
 
 import 'controller.dart';
 import 'widgets/live_item.dart';
@@ -26,6 +24,7 @@ class _LivePageState extends State<LivePage>
     with AutomaticKeepAliveClientMixin {
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
+  late Future _futureBuilderFuture2;
   late ScrollController scrollController;
 
   @override
@@ -35,11 +34,8 @@ class _LivePageState extends State<LivePage>
   void initState() {
     super.initState();
     _futureBuilderFuture = _liveController.queryLiveList('init');
+    _futureBuilderFuture2 = _liveController.fetchLiveFollowing();
     scrollController = _liveController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-    StreamController<bool> searchBarStream =
-        Get.find<HomeController>().searchBarStream;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -49,16 +45,7 @@ class _LivePageState extends State<LivePage>
             _liveController.onLoad();
           });
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-          searchBarStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-          searchBarStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
   }
@@ -86,6 +73,7 @@ class _LivePageState extends State<LivePage>
         child: CustomScrollView(
           controller: _liveController.scrollController,
           slivers: [
+            buildFollowingList(),
             SliverPadding(
               // 单列布局 EdgeInsets.zero
               padding:
@@ -127,16 +115,6 @@ class _LivePageState extends State<LivePage>
     );
   }
 
-  OverlayEntry _createPopupDialog(liveItem) {
-    return OverlayEntry(
-      builder: (context) => AnimatedDialog(
-        closeFn: _liveController.popupDialog?.remove,
-        child: OverlayPop(
-            videoItem: liveItem, closeFn: _liveController.popupDialog?.remove),
-      ),
-    );
-  }
-
   Widget contentGrid(ctr, liveList) {
     // double maxWidth = Get.size.width;
     // int baseWidth = 500;
@@ -167,18 +145,150 @@ class _LivePageState extends State<LivePage>
               ? LiveCardV(
                   liveItem: liveList[index],
                   crossAxisCount: crossAxisCount,
-                  longPress: () {
-                    _liveController.popupDialog =
-                        _createPopupDialog(liveList[index]);
-                    Overlay.of(context).insert(_liveController.popupDialog!);
-                  },
-                  longPressEnd: () {
-                    _liveController.popupDialog?.remove();
-                  },
                 )
               : const VideoCardVSkeleton();
         },
         childCount: liveList!.isNotEmpty ? liveList!.length : 10,
+      ),
+    );
+  }
+
+  // 关注的up直播
+  Widget buildFollowingList() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: 16),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Obx(
+              () => Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: ' 我的关注 ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' ${_liveController.liveFollowingList.length}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '人正在直播',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            FutureBuilder(
+              future: _futureBuilderFuture2,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
+                  Map? data = snapshot.data;
+                  if (data?['status']) {
+                    RxList list = _liveController.liveFollowingList;
+                    return Obx(() => LiveFollowingListView(list: list.value));
+                  } else {
+                    return HttpError(
+                      errMsg: data?['msg'] ?? '',
+                      fn: () {
+                        setState(() {
+                          _futureBuilderFuture2 =
+                              _liveController.fetchLiveFollowing();
+                        });
+                      },
+                    );
+                  }
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LiveFollowingListView extends StatelessWidget {
+  final List list;
+
+  const LiveFollowingListView({super.key, required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          final LiveFollowingItemModel item = list[index];
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(3, 12, 3, 0),
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(
+                      '/liveRoom?roomid=${item.roomId}',
+                      arguments: {
+                        'liveItem': item,
+                        'heroTag': item.roomId.toString()
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: 54,
+                    height: 54,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(27),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: NetworkImgLayer(
+                      width: 50,
+                      height: 50,
+                      type: 'avatar',
+                      src: list[index].face,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: 62,
+                  child: Text(
+                    list[index].uname,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        itemCount: list.length,
       ),
     );
   }

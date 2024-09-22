@@ -153,7 +153,8 @@ class _BottomControlState extends State<BottomControl> {
               size: 20,
               color: Colors.white,
             ),
-            fuc: () => widget.controller!.triggerFullScreen(),
+            fuc: () => widget.controller!.triggerFullScreen(
+                status: !(widget.controller!.isFullScreen.value)),
           ),
         ],
       ),

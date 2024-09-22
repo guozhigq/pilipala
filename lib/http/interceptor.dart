@@ -45,10 +45,14 @@ class ApiInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // 处理网络请求错误
     // handler.next(err);
-    SmartDialog.showToast(
-      await dioError(err),
-      displayType: SmartToastType.onlyRefresh,
-    );
+    String url = err.requestOptions.uri.toString();
+    final excludedPatterns = RegExp(r'heartbeat|seg\.so|online/total');
+    if (!excludedPatterns.hasMatch(url)) {
+      SmartDialog.showToast(
+        await dioError(err),
+        displayType: SmartToastType.onlyRefresh,
+      );
+    }
     super.onError(err, handler);
   }
 
@@ -75,23 +79,24 @@ class ApiInterceptor extends Interceptor {
   }
 
   static Future<String> checkConnect() async {
-    final ConnectivityResult connectivityResult =
+    final List<ConnectivityResult> connectivityResult =
         await Connectivity().checkConnectivity();
-    switch (connectivityResult) {
-      case ConnectivityResult.mobile:
-        return '正在使用移动流量';
-      case ConnectivityResult.wifi:
-        return '正在使用wifi';
-      case ConnectivityResult.ethernet:
-        return '正在使用局域网';
-      case ConnectivityResult.vpn:
-        return '正在使用代理网络';
-      case ConnectivityResult.other:
-        return '正在使用其他网络';
-      case ConnectivityResult.none:
-        return '未连接到任何网络';
-      default:
-        return '';
+    if (connectivityResult.contains(ConnectivityResult.mobile)) {
+      return '正在使用移动流量';
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      return '正在使用wifi';
+    } else if (connectivityResult.contains(ConnectivityResult.ethernet)) {
+      return '正在使用局域网';
+    } else if (connectivityResult.contains(ConnectivityResult.vpn)) {
+      return '正在使用代理网络';
+    } else if (connectivityResult.contains(ConnectivityResult.bluetooth)) {
+      return '正在使用蓝牙网络';
+    } else if (connectivityResult.contains(ConnectivityResult.other)) {
+      return '正在使用其他网络';
+    } else if (connectivityResult.contains(ConnectivityResult.none)) {
+      return '未连接到任何网络';
+    } else {
+      return '';
     }
   }
 }

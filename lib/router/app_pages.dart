@@ -3,7 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/pages/fav_edit/index.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/message/at/index.dart';
+import 'package:pilipala/pages/message/like/index.dart';
+import 'package:pilipala/pages/message/reply/index.dart';
+import 'package:pilipala/pages/message/system/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -35,10 +40,12 @@ import '../pages/search/index.dart';
 import '../pages/search_result/index.dart';
 import '../pages/setting/extra_setting.dart';
 import '../pages/setting/index.dart';
+import '../pages/setting/pages/action_menu_set.dart';
 import '../pages/setting/pages/color_select.dart';
 import '../pages/setting/pages/display_mode.dart';
 import '../pages/setting/pages/font_size_select.dart';
 import '../pages/setting/pages/home_tabbar_set.dart';
+import '../pages/setting/pages/navigation_bar_set.dart';
 import '../pages/setting/pages/play_gesture_set.dart';
 import '../pages/setting/pages/play_speed_set.dart';
 import '../pages/setting/recommend_setting.dart';
@@ -64,14 +71,6 @@ class Routes {
     CustomGetPage(name: '/hot', page: () => const HotPage()),
     // 视频详情
     CustomGetPage(name: '/video', page: () => const VideoDetailPage()),
-    // 图片预览
-    // GetPage(
-    //   name: '/preview',
-    //   page: () => const ImagePreview(),
-    //   transition: Transition.fade,
-    //   transitionDuration: const Duration(milliseconds: 300),
-    //   showCupertinoParallax: false,
-    // ),
     //
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
@@ -170,6 +169,23 @@ class Routes {
     // 播放器手势
     CustomGetPage(
         name: '/playerGestureSet', page: () => const PlayGesturePage()),
+    // navigation bar
+    CustomGetPage(
+        name: '/navbarSetting', page: () => const NavigationBarSetPage()),
+    // 操作菜单
+    CustomGetPage(
+        name: '/actionMenuSet', page: () => const ActionMenuSetPage()),
+    // 回复我的
+    CustomGetPage(name: '/messageReply', page: () => const MessageReplyPage()),
+    // @我的
+    CustomGetPage(name: '/messageAt', page: () => const MessageAtPage()),
+    // 收到的赞
+    CustomGetPage(name: '/messageLike', page: () => const MessageLikePage()),
+    // 系统通知
+    CustomGetPage(
+        name: '/messageSystem', page: () => const MessageSystemPage()),
+    // 收藏夹编辑
+    CustomGetPage(name: '/favEdit', page: () => const FavEditPage()),
   ];
 }
 

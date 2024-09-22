@@ -1,15 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:pilipala/common/widgets/stat/danmu.dart';
-import 'package:pilipala/common/widgets/stat/view.dart';
-import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
-
-Box localCache = GStrorage.localCache;
-late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {
   const IntroDetail({
@@ -20,105 +15,60 @@ class IntroDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    sheetHeight = localCache.get('sheetHeight');
-    return Container(
-        color: Theme.of(context).colorScheme.background,
-        padding: EdgeInsets.only(
-            left: 14,
-            right: 14,
-            bottom: MediaQuery.of(context).padding.bottom + 20),
-        height: sheetHeight,
-        child: Column(
-          children: [
-            InkWell(
-              onTap: () => Get.back(),
-              child: Container(
-                height: 35,
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Center(
-                  child: Container(
-                    width: 32,
-                    height: 3,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(3))),
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
+                  SmartDialog.showToast('已复制');
+                },
+                child: Text(
+                  videoDetail!.bvid!,
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  Clipboard.setData(
+                      ClipboardData(text: videoDetail!.aid!.toString()));
+                  SmartDialog.showToast('已复制');
+                },
+                child: Text(
+                  videoDetail!.aid!.toString(),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.primary),
+                ),
+              )
+            ],
+          ),
+          const SizedBox(height: 4),
+          SelectableRegion(
+            focusNode: FocusNode(),
+            selectionControls: MaterialTextSelectionControls(),
+            child: Text.rich(
+              style: const TextStyle(height: 1.4),
+              TextSpan(
+                children: [
+                  buildContent(context, videoDetail!),
+                ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      videoDetail!.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        StatView(
-                          theme: 'gray',
-                          view: videoDetail!.stat!.view,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        StatDanMu(
-                          theme: 'gray',
-                          danmu: videoDetail!.stat!.danmaku,
-                          size: 'medium',
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          Utils.dateFormat(videoDetail!.pubdate,
-                              formatType: 'detail'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: SelectableRegion(
-                        focusNode: FocusNode(),
-                        selectionControls: MaterialTextSelectionControls(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              videoDetail!.bvid!,
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            const SizedBox(height: 4),
-                            Text.rich(
-                              style: const TextStyle(
-                                height: 1.4,
-                                // fontSize: 13,
-                              ),
-                              TextSpan(
-                                children: [
-                                  buildContent(context, videoDetail!),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   InlineSpan buildContent(BuildContext context, content) {

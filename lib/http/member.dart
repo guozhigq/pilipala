@@ -1,5 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/member/like.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
@@ -95,7 +96,14 @@ class MemberHttp {
       'dm_img_str': dmImgStr.substring(0, dmImgStr.length - 2),
       'dm_cover_img_str': dmCoverImgStr.substring(0, dmCoverImgStr.length - 2),
       'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
+      ...order == 'charge'
+          ? {
+              'order': 'pubdate',
+              'special_type': 'charging',
+            }
+          : {}
     });
+
     var res = await Request().get(
       Api.memberArchive,
       data: params,
@@ -328,7 +336,9 @@ class MemberHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': MemberSeasonsDataModel.fromJson(res.data['data']['items_lists'])
+        'data': res.data['data']['list']
+            .map<MemberLikeDataModel>((e) => MemberLikeDataModel.fromJson(e))
+            .toList(),
       };
     } else {
       return {
@@ -502,6 +512,42 @@ class MemberHttp {
         'status': true,
         'data': FollowDataModel.fromJson(res.data['data'])
       };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future getSeriesDetail({
+    required int mid,
+    required int currentMid,
+    required int seriesId,
+    required int pn,
+  }) async {
+    var res = await Request().get(
+      Api.getSeriesDetailApi,
+      data: {
+        'mid': mid,
+        'series_id': seriesId,
+        'only_normal': true,
+        'sort': 'desc',
+        'pn': pn,
+        'ps': 30,
+        'current_mid': currentMid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MemberSeasonsDataModel.fromJson(res.data['data'])
+        };
+      } catch (err) {
+        print(err);
+      }
     } else {
       return {
         'status': false,

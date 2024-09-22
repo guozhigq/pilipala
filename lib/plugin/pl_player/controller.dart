@@ -13,14 +13,18 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 import 'package:universal_platform/universal_platform.dart';
+import '../../models/video/subTitile/content.dart';
+import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
 Box videoStorage = GStrorage.video;
@@ -73,6 +77,8 @@ class PlPlayerController {
   final Rx<bool> _doubleSpeedStatus = false.obs;
   final Rx<bool> _controlsLock = false.obs;
   final Rx<bool> _isFullScreen = false.obs;
+  final Rx<bool> _subTitleOpen = false.obs;
+  final Rx<int> _subTitleCode = (-1).obs;
   // 默认投稿视频格式
   static Rx<String> _videoType = 'archive'.obs;
 
@@ -118,6 +124,8 @@ class PlPlayerController {
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
+  RxList subtitles = [].obs;
+  String videoType = 'archive';
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -146,6 +154,11 @@ class PlPlayerController {
   // 视频静音
   Rx<bool> get mute => _mute;
   Stream<bool> get onMuteChanged => _mute.stream;
+
+  /// 字幕开启状态
+  Rx<bool> get subTitleOpen => _subTitleOpen;
+  Rx<int> get subTitleCode => _subTitleCode;
+  // Stream<bool> get onSubTitleOpenChanged => _subTitleOpen.stream;
 
   /// [videoPlayerController] instace of Player
   Player? get videoPlayerController => _videoPlayerController;
@@ -210,7 +223,7 @@ class PlPlayerController {
   Rx<int> get playerCount => _playerCount;
 
   ///
-  Rx<String> get videoType => _videoType;
+  // Rx<String> get videoType => _videoType;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
@@ -230,6 +243,10 @@ class PlPlayerController {
 
   // 播放顺序相关
   PlayRepeat playRepeat = PlayRepeat.pause;
+
+  RxList<SubTitileContentModel> subtitleContents =
+      <SubTitileContentModel>[].obs;
+  RxString subtitleContent = ''.obs;
 
   void updateSliderPositionSecond() {
     int newSecond = _sliderPosition.value.inSeconds;
@@ -260,52 +277,20 @@ class PlPlayerController {
   }
 
   // 添加一个私有构造函数
-  PlPlayerController._() {
-    _videoType = videoType;
-    isOpenDanmu.value =
-        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    blockTypes =
-        localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
-    showArea = localCache.get(LocalCacheKey.danmakuShowArea, defaultValue: 0.5);
-    // 不透明度
-    opacityVal =
-        localCache.get(LocalCacheKey.danmakuOpacity, defaultValue: 1.0);
-    // 字体大小
-    fontSizeVal =
-        localCache.get(LocalCacheKey.danmakuFontScale, defaultValue: 1.0);
-    // 弹幕时间
-    danmakuDurationVal =
-        localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
-    // 描边粗细
-    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
-    playRepeat = PlayRepeat.values.toList().firstWhere(
-          (e) =>
-              e.value ==
-              videoStorage.get(VideoBoxKey.playRepeat,
-                  defaultValue: PlayRepeat.pause.value),
-        );
-    _playbackSpeed.value =
-        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
-    enableAutoLongPressSpeed = setting
-        .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
-    if (!enableAutoLongPressSpeed) {
-      _longPressSpeed.value = videoStorage
-          .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
-    }
-    // 自定义倍速集合
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
-    // 默认倍速
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
-    //playSpeedSystem
-    final List<double> playSpeedSystem =
-        videoStorage.get(VideoBoxKey.playSpeedSystem, defaultValue: playSpeed);
-
-    // for (final PlaySpeed i in PlaySpeed.values) {
-    speedsList.addAll(playSpeedSystem);
-    // }
-
+  PlPlayerController._internal(this.videoType) {
+    final cache = GlobalDataCache();
+    isOpenDanmu.value = cache.isOpenDanmu;
+    blockTypes = cache.blockTypes;
+    showArea = cache.showArea;
+    opacityVal = cache.opacityVal;
+    fontSizeVal = cache.fontSizeVal;
+    danmakuDurationVal = cache.danmakuDurationVal;
+    strokeWidth = cache.strokeWidth;
+    playRepeat = cache.playRepeat;
+    _playbackSpeed.value = cache.playbackSpeed;
+    enableAutoLongPressSpeed = cache.enableAutoLongPressSpeed;
+    _longPressSpeed.value = cache.longPressSpeed;
+    speedsList = cache.speedsList;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -316,13 +301,15 @@ class PlPlayerController {
   }
 
   // 获取实例 传参
-  static PlPlayerController getInstance({
+  factory PlPlayerController({
     String videoType = 'archive',
   }) {
     // 如果实例尚未创建，则创建一个新实例
-    _instance ??= PlPlayerController._();
-    _instance!._playerCount.value += 1;
-    _videoType.value = videoType;
+    _instance ??= PlPlayerController._internal(videoType);
+    if (videoType != 'none') {
+      _instance!._playerCount.value += 1;
+      _videoType.value = videoType;
+    }
     return _instance!;
   }
 
@@ -337,7 +324,7 @@ class PlPlayerController {
     // 初始化播放速度
     double speed = 1.0,
     // 硬件加速
-    bool enableHA = true,
+    bool enableHA = false,
     double? width,
     double? height,
     Duration? duration,
@@ -350,6 +337,8 @@ class PlPlayerController {
     bool enableHeart = true,
     // 是否首次加载
     bool isFirstTime = true,
+    //  是否开启字幕
+    bool enableSubTitle = false,
   }) async {
     try {
       _autoPlay = autoplay;
@@ -364,7 +353,9 @@ class PlPlayerController {
       _cid = cid;
       _enableHeart = enableHeart;
       _isFirstTime = isFirstTime;
-
+      _subTitleOpen.value = enableSubTitle;
+      subtitles = [].obs;
+      subtitleContent.value = '';
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
         await pause(notify: false);
@@ -375,7 +366,7 @@ class PlPlayerController {
       }
       // 配置Player 音轨、字幕等等
       _videoPlayerController = await _createVideoController(
-          dataSource, _looping, enableHA, width, height);
+          dataSource, _looping, enableHA, width, height, seekTo);
       // 获取视频时长 00:00
       _duration.value = duration ?? _videoPlayerController!.state.duration;
       updateDurationSecond();
@@ -386,7 +377,7 @@ class PlPlayerController {
       if (!_listenersInitialized) {
         startListeners();
       }
-      await _initializePlayer(seekTo: seekTo, duration: _duration.value);
+      await _initializePlayer(duration: _duration.value);
       bool autoEnterFullcreen =
           setting.get(SettingBoxKey.enableAutoEnter, defaultValue: false);
       if (autoEnterFullcreen && _isFirstTime) {
@@ -406,6 +397,7 @@ class PlPlayerController {
     bool enableHA,
     double? width,
     double? height,
+    Duration seekTo,
   ) async {
     // 每次配置时先移除监听
     removeListeners();
@@ -422,7 +414,7 @@ class PlPlayerController {
           configuration: PlayerConfiguration(
             // 默认缓存 5M 大小
             bufferSize:
-                videoType.value == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
+                videoType == 'live' ? 32 * 1024 * 1024 : 5 * 1024 * 1024,
           ),
         );
 
@@ -432,7 +424,13 @@ class PlPlayerController {
     //  音量不一致
     if (Platform.isAndroid) {
       await pp.setProperty("volume-max", "100");
-      await pp.setProperty("ao", "audiotrack,opensles");
+      String defaultAoOutput =
+          setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
+      await pp.setProperty(
+          "ao",
+          aoOutputList
+              .where((e) => e['value'] == defaultAoOutput)
+              .first['title']);
     }
 
     await player.setAudioTrack(
@@ -455,17 +453,17 @@ class PlPlayerController {
     }
 
     // 字幕
-    if (dataSource.subFiles != '' && dataSource.subFiles != null) {
-      await pp.setProperty(
-        'sub-files',
-        UniversalPlatform.isWindows
-            ? dataSource.subFiles!.replaceAll(';', '\\;')
-            : dataSource.subFiles!.replaceAll(':', '\\:'),
-      );
-      await pp.setProperty("subs-with-matching-audio", "no");
-      await pp.setProperty("sub-forced-only", "yes");
-      await pp.setProperty("blend-subtitles", "video");
-    }
+    // if (dataSource.subFiles != '' && dataSource.subFiles != null) {
+    //   await pp.setProperty(
+    //     'sub-files',
+    //     UniversalPlatform.isWindows
+    //         ? dataSource.subFiles!.replaceAll(';', '\\;')
+    //         : dataSource.subFiles!.replaceAll(':', '\\:'),
+    //   );
+    //   await pp.setProperty("subs-with-matching-audio", "no");
+    //   await pp.setProperty("sub-forced-only", "yes");
+    //   await pp.setProperty("blend-subtitles", "video");
+    // }
 
     _videoController = _videoController ??
         VideoController(
@@ -487,8 +485,9 @@ class PlPlayerController {
         play: false,
       );
     }
-    player.open(
-      Media(dataSource.videoSource!, httpHeaders: dataSource.httpHeaders),
+    await player.open(
+      Media(dataSource.videoSource!,
+          httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
     // 音轨
@@ -501,11 +500,25 @@ class PlPlayerController {
 
   // 开始播放
   Future _initializePlayer({
-    Duration seekTo = Duration.zero,
     Duration? duration,
   }) async {
-    // 设置倍速
-    if (videoType.value == 'live') {
+    getVideoFit();
+    // if (_looping) {
+    //   await setLooping(_looping);
+    // }
+
+    /// 跳转播放
+    // if (seekTo != Duration.zero) {
+    //   await this.seekTo(seekTo);
+    // }
+
+    /// 自动播放
+    if (_autoPlay) {
+      await play(duration: duration);
+    }
+
+    /// 设置倍速
+    if (videoType == 'live') {
       await setPlaybackSpeed(1.0);
     } else {
       if (_playbackSpeed.value != 1.0) {
@@ -513,20 +526,6 @@ class PlPlayerController {
       } else {
         await setPlaybackSpeed(1.0);
       }
-    }
-    getVideoFit();
-    // if (_looping) {
-    //   await setLooping(_looping);
-    // }
-
-    // 跳转播放
-    if (seekTo != Duration.zero) {
-      await this.seekTo(seekTo);
-    }
-
-    // 自动播放
-    if (_autoPlay) {
-      await play(duration: duration);
     }
   }
 
@@ -575,6 +574,8 @@ class PlPlayerController {
             _sliderPosition.value = event;
             updateSliderPositionSecond();
           }
+          querySubtitleContent(
+              videoPlayerController!.state.position.inSeconds.toDouble());
 
           /// 触发回调事件
           for (var element in _positionListeners) {
@@ -583,7 +584,9 @@ class PlPlayerController {
           makeHeartBeat(event.inSeconds);
         }),
         videoPlayerController!.stream.duration.listen((event) {
-          duration.value = event;
+          if (event > Duration.zero) {
+            duration.value = event;
+          }
         }),
         videoPlayerController!.stream.buffer.listen((event) {
           _buffered.value = event;
@@ -622,41 +625,36 @@ class PlPlayerController {
 
   /// 跳转至指定位置
   Future<void> seekTo(Duration position, {type = 'seek'}) async {
-    // if (position >= duration.value) {
-    //   position = duration.value - const Duration(milliseconds: 100);
-    // }
-    if (position < Duration.zero) {
-      position = Duration.zero;
-    }
-    _position.value = position;
-    updatePositionSecond();
-    _heartDuration = position.inSeconds;
-    if (duration.value.inSeconds != 0) {
-      if (type != 'slider') {
-        /// 拖动进度条调节时，不等待第一帧，防止抖动
-        await _videoPlayerController?.stream.buffer.first;
+    try {
+      if (position < Duration.zero) {
+        position = Duration.zero;
       }
-      await _videoPlayerController?.seek(position);
-      // if (playerStatus.stopped) {
-      //   play();
-      // }
-    } else {
-      print('seek duration else');
-      _timerForSeek?.cancel();
-      _timerForSeek =
-          Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
-        //_timerForSeek = null;
-        if (duration.value.inSeconds != 0) {
-          await _videoPlayerController!.stream.buffer.first;
-          await _videoPlayerController?.seek(position);
-          // if (playerStatus.status.value == PlayerStatus.paused) {
-          //   play();
-          // }
-          t.cancel();
-          _timerForSeek = null;
+      _position.value = position;
+      updatePositionSecond();
+      _heartDuration = position.inSeconds;
+      if (duration.value.inSeconds != 0) {
+        if (type != 'slider') {
+          await _videoPlayerController?.stream.buffer.first;
         }
-      });
+        await _videoPlayerController?.seek(position);
+      } else {
+        _timerForSeek?.cancel();
+        _timerForSeek ??= _startSeekTimer(position);
+      }
+    } catch (err) {
+      print('Error while seeking: $err');
     }
+  }
+
+  Timer? _startSeekTimer(Duration position) {
+    return Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
+      if (duration.value.inSeconds != 0) {
+        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.seek(position);
+        t.cancel();
+        _timerForSeek = null;
+      }
+    });
   }
 
   /// 设置倍速
@@ -695,11 +693,10 @@ class PlPlayerController {
       await seekTo(Duration.zero);
     }
     await _videoPlayerController?.play();
-
+    playerStatus.status.value = PlayerStatus.playing;
     await getCurrentVolume();
     await getCurrentBrightness();
 
-    playerStatus.status.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
 
     /// 临时fix _duration.value丢失
@@ -909,7 +906,7 @@ class PlPlayerController {
 
   /// 设置长按倍速状态 live模式下禁用
   void setDoubleSpeedStatus(bool val) {
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     if (controlsLock.value) {
@@ -953,41 +950,8 @@ class PlPlayerController {
       } else {
         await landScape();
       }
-
-      // bool isValid =
-      //     direction.value == 'vertical' || mode == FullScreenMode.vertical
-      //         ? true
-      //         : false;
-      // var result = await showDialog(
-      //   context: Get.context!,
-      //   useSafeArea: false,
-      //   builder: (context) => Dialog.fullscreen(
-      //     backgroundColor: Colors.black,
-      //     child: SafeArea(
-      //       // 忽略手机安全区域
-      //       top: isValid,
-      //       left: false,
-      //       right: false,
-      //       bottom: isValid,
-      //       child: PLVideoPlayer(
-      //         controller: this,
-      //         headerControl: headerControl,
-      //         bottomControl: bottomControl,
-      //         danmuWidget: danmuWidget,
-      //       ),
-      //     ),
-      //   ),
-      // );
-      // if (result == null) {
-      //   // 退出全屏
-      //   StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      //   exitFullScreen();
-      //   await verticalScreen();
-      //   toggleFullScreen(false);
-      // }
-    } else if (isFullScreen.value) {
+    } else if (isFullScreen.value && !status) {
       StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
-      // Get.back();
       exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);
@@ -1024,7 +988,7 @@ class PlPlayerController {
     if (!_enableHeart) {
       return false;
     }
-    if (videoType.value == 'live') {
+    if (videoType == 'live') {
       return;
     }
     // 播放状态变化时，更新
@@ -1047,9 +1011,46 @@ class PlPlayerController {
     }
   }
 
+  /// 字幕
+  void toggleSubtitle(int code) {
+    _subTitleOpen.value = code != -1;
+    _subTitleCode.value = code;
+  }
+
+  void querySubtitleContent(double progress) {
+    if (subTitleCode.value == -1) {
+      subtitleContent.value = '';
+      return;
+    }
+    if (subtitles.isEmpty) {
+      return;
+    }
+    final SubTitlteItemModel? subtitle = subtitles.firstWhereOrNull(
+      (element) => element.id == subTitleCode.value,
+    );
+    if (subtitle != null && subtitle.body!.isNotEmpty) {
+      for (var content in subtitle.body!) {
+        if (progress >= content['from']! && progress <= content['to']!) {
+          subtitleContent.value = content['content']!;
+          return;
+        }
+      }
+    }
+  }
+
   setPlayRepeat(PlayRepeat type) {
     playRepeat = type;
     videoStorage.put(VideoBoxKey.playRepeat, type.value);
+  }
+
+  /// 缓存本次弹幕选项
+  cacheDanmakuOption() {
+    localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
+    localCache.put(LocalCacheKey.danmakuShowArea, showArea);
+    localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
+    localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
+    localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
+    localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
   }
 
   Future<void> dispose({String type = 'single'}) async {
@@ -1077,17 +1078,11 @@ class PlPlayerController {
       // _buffered.close();
       // _showControls.close();
       // _controlsLock.close();
-
       // playerStatus.status.close();
       // dataStatus.status.close();
 
       /// 缓存本次弹幕选项
-      localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
-      localCache.put(LocalCacheKey.danmakuShowArea, showArea);
-      localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);
-      localCache.put(LocalCacheKey.danmakuFontScale, fontSizeVal);
-      localCache.put(LocalCacheKey.danmakuDuration, danmakuDurationVal);
-      localCache.put(LocalCacheKey.strokeWidth, strokeWidth);
+      cacheDanmakuOption();
       if (_videoPlayerController != null) {
         var pp = _videoPlayerController!.platform as NativePlayer;
         await pp.setProperty('audio-files', '');

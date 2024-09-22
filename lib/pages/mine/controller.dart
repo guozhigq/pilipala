@@ -33,15 +33,7 @@ class MineController extends GetxController {
 
   onLogin() async {
     if (!userLogin.value) {
-      Get.toNamed(
-        '/webview',
-        parameters: {
-          'url': 'https://passport.bilibili.com/h5-app/passport/login',
-          'type': 'login',
-          'pageTitle': '登录bilibili',
-        },
-      );
-      // Get.toNamed('/loginPage');
+      Get.toNamed('/loginPage', preventDuplicates: false);
     } else {
       int mid = userInfo.value.mid!;
       String face = userInfo.value.face!;
@@ -65,8 +57,6 @@ class MineController extends GetxController {
       } else {
         resetUserInfo();
       }
-    } else {
-      resetUserInfo();
     }
     await queryUserStatOwner();
     return res;

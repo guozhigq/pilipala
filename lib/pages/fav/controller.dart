@@ -10,16 +10,28 @@ import 'package:pilipala/utils/storage.dart';
 class FavController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
   Box userInfoCache = GStrorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
-  int pageSize = 10;
+  int pageSize = 60;
   RxBool hasMore = true.obs;
+  late int mid;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
+
+  @override
+  void onInit() {
+    mid = int.parse(Get.parameters['mid'] ?? '-1');
+    userInfo = userInfoCache.get('userInfoCache');
+    ownerMid = userInfo != null ? userInfo!.mid! : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
+    super.onInit();
+  }
 
   Future<dynamic> queryFavFolder({type = 'init'}) async {
-    userInfo = userInfoCache.get('userInfoCache');
     if (userInfo == null) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (!hasMore.value) {
       return;
@@ -27,14 +39,15 @@ class FavController extends GetxController {
     var res = await UserHttp.userfavFolder(
       pn: currentPage,
       ps: pageSize,
-      mid: userInfo!.mid!,
+      mid: isOwner.value ? ownerMid : mid,
     );
     if (res['status']) {
       if (type == 'init') {
         favFolderData.value = res['data'];
+        favFolderList.value = res['data'].list;
       } else {
         if (res['data'].list.isNotEmpty) {
-          favFolderData.value.list!.addAll(res['data'].list);
+          favFolderList.addAll(res['data'].list);
           favFolderData.update((val) {});
         }
       }
@@ -48,5 +61,14 @@ class FavController extends GetxController {
 
   Future onLoad() async {
     queryFavFolder(type: 'onload');
+  }
+
+  removeFavFolder({required int mediaIds}) async {
+    for (var i in favFolderList) {
+      if (i.id == mediaIds) {
+        favFolderList.remove(i);
+        break;
+      }
+    }
   }
 }

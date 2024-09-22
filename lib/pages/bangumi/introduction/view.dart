@@ -138,6 +138,9 @@ class _BangumiInfoState extends State<BangumiInfo> {
     cid = widget.cid!;
     videoDetailCtr.cid.listen((p0) {
       cid = p0;
+      if (!mounted) {
+        return;
+      }
       setState(() {});
     });
   }
@@ -191,7 +194,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
                     src: widget.bangumiDetail!.cover!,
                   ),
                   PBadge(
-                    text: '评分 ${widget.bangumiDetail!.rating!['score']!}',
+                    text:
+                        '评分 ${widget.bangumiDetail?.rating?['score']! ?? '暂无'}',
                     top: null,
                     right: 6,
                     bottom: 6,
@@ -251,13 +255,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                         Row(
                           children: [
                             StatView(
-                              theme: 'gray',
                               view: widget.bangumiDetail!.stat!['views'],
                               size: 'medium',
                             ),
                             const SizedBox(width: 6),
                             StatDanMu(
-                              theme: 'gray',
                               danmu: widget.bangumiDetail!.stat!['danmakus'],
                               size: 'medium',
                             ),
@@ -317,11 +319,12 @@ class _BangumiInfoState extends State<BangumiInfo> {
           if (widget.bangumiDetail!.episodes!.isNotEmpty) ...[
             BangumiPanel(
               pages: widget.bangumiDetail!.episodes!,
-              cid: cid ?? widget.bangumiDetail!.episodes!.first.cid,
+              cid: cid! ?? widget.bangumiDetail!.episodes!.first.cid!,
               sheetHeight: sheetHeight,
-              changeFuc: (bvid, cid, aid) =>
-                  bangumiIntroController.changeSeasonOrbangu(bvid, cid, aid),
+              changeFuc: (bvid, cid, aid, cover) => bangumiIntroController
+                  .changeSeasonOrbangu(bvid, cid, aid, cover),
               bangumiDetail: bangumiIntroController.bangumiDetail.value,
+              bangumiIntroController: bangumiIntroController,
             )
           ],
         ],

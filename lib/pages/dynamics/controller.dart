@@ -6,16 +6,14 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
-import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -70,7 +68,7 @@ class DynamicsController extends GetxController {
 
   Future queryFollowDynamic({type = 'init'}) async {
     if (!userLogin.value) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (type == 'init') {
       dynamicsList.clear();
@@ -220,25 +218,7 @@ class DynamicsController extends GetxController {
         print('DYNAMIC_TYPE_PGC_UNION 番剧');
         DynamicArchiveModel pgc = item.modules.moduleDynamic.major.pgc;
         if (pgc.epid != null) {
-          SmartDialog.showLoading(msg: '获取中...');
-          var res = await SearchHttp.bangumiInfo(epId: pgc.epid);
-          SmartDialog.dismiss();
-          if (res['status']) {
-            EpisodeItem episode = res['data'].episodes.first;
-            String bvid = episode.bvid!;
-            int cid = episode.cid!;
-            String pic = episode.cover!;
-            String heroTag = Utils.makeHeroTag(cid);
-            Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
-              arguments: {
-                'pic': pic,
-                'heroTag': heroTag,
-                'videoType': SearchType.media_bangumi,
-                'bangumiItem': res['data'],
-              },
-            );
-          }
+          RoutePush.bangumiPush(null, pgc.epid);
         }
         break;
     }
@@ -246,7 +226,7 @@ class DynamicsController extends GetxController {
 
   Future queryFollowUp({type = 'init'}) async {
     if (!userLogin.value) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     if (type == 'init') {
       upData.value.upList = <UpItem>[];
@@ -298,5 +278,12 @@ class DynamicsController extends GetxController {
     SmartDialog.showToast('还原默认加载');
     dynamicsList.value = <DynamicItemModel>[];
     queryFollowDynamic();
+  }
+
+  // 点击up主
+  void onTapUp(data) {
+    mid.value = data.mid;
+    upInfo.value = data;
+    onSelectUp(data.mid);
   }
 }

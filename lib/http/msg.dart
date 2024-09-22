@@ -1,4 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:dio/dio.dart';
+import 'package:pilipala/models/msg/like.dart';
+import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/models/msg/system.dart';
 import '../models/msg/account.dart';
 import '../models/msg/session.dart';
 import '../utils/wbi_sign.dart';
@@ -122,68 +127,48 @@ class MsgHttp {
         'data': res.data['data'],
       };
     } else {
-      return {
-        'status': false,
-        'date': [],
-        'msg': "message: ${res.data['message']},"
-            " msg: ${res.data['msg']},"
-            " code: ${res.data['code']}",
-      };
+      return {'status': false, 'date': [], 'msg': res.data['message']};
     }
   }
 
   // 发送私信
   static Future sendMsg({
-    int? senderUid,
-    int? receiverId,
+    required int senderUid,
+    required int receiverId,
     int? receiverType,
     int? msgType,
     dynamic content,
   }) async {
     String csrf = await Request.getCsrf();
-    Map<String, dynamic> params = await WbiSign().makSign({
-      'msg[sender_uid]': senderUid,
-      'msg[receiver_id]': receiverId,
-      'msg[receiver_type]': receiverType ?? 1,
-      'msg[msg_type]': msgType ?? 1,
-      'msg[msg_status]': 0,
-      'msg[dev_id]': getDevId(),
-      'msg[timestamp]': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'msg[new_face_version]': 0,
-      'msg[content]': content,
-      'from_firework': 0,
-      'build': 0,
-      'mobi_app': 'web',
-      'csrf_token': csrf,
-      'csrf': csrf,
-    });
-    var res =
-        await Request().post(Api.sendMsg, queryParameters: <String, dynamic>{
-      ...params,
-      'csrf_token': csrf,
-      'csrf': csrf,
-    }, data: {
-      'w_sender_uid': params['msg[sender_uid]'],
-      'w_receiver_id': params['msg[receiver_id]'],
-      'w_dev_id': params['msg[dev_id]'],
-      'w_rid': params['w_rid'],
-      'wts': params['wts'],
-      'csrf_token': csrf,
-      'csrf': csrf,
-    });
+    var res = await Request().post(
+      Api.sendMsg,
+      data: {
+        'msg[sender_uid]': senderUid,
+        'msg[receiver_id]': receiverId,
+        'msg[receiver_type]': 1,
+        'msg[msg_type]': 1,
+        'msg[msg_status]': 0,
+        'msg[content]': jsonEncode(content),
+        'msg[timestamp]': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        'msg[new_face_version]': 1,
+        'msg[dev_id]': getDevId(),
+        'from_firework': 0,
+        'build': 0,
+        'mobi_app': 'web',
+        'csrf_token': csrf,
+        'csrf': csrf,
+      },
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
     if (res.data['code'] == 0) {
       return {
         'status': true,
         'data': res.data['data'],
       };
     } else {
-      return {
-        'status': false,
-        'date': [],
-        'msg': "message: ${res.data['message']},"
-            " msg: ${res.data['msg']},"
-            " code: ${res.data['code']}",
-      };
+      return {'status': false, 'date': [], 'msg': res.data['message']};
     }
   }
 
@@ -219,5 +204,130 @@ class MsgHttp {
       }
     }
     return s.join();
+  }
+
+  static Future removeSession({
+    int? talkerId,
+  }) async {
+    String csrf = await Request.getCsrf();
+    Map params = await WbiSign().makSign({
+      'talker_id': talkerId,
+      'session_type': 1,
+      'build': 0,
+      'mobi_app': 'web',
+      'csrf_token': csrf,
+      'csrf': csrf
+    });
+    var res = await Request().get(Api.removeSession, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future unread() async {
+    var res = await Request().get(Api.unread);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 回复我的
+  static Future messageReply({
+    int? id,
+    int? replyTime,
+  }) async {
+    var params = {
+      if (id != null) 'id': id,
+      if (replyTime != null) 'reply_time': replyTime,
+    };
+    var res = await Request().get(Api.messageReplyAPi, data: params);
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageReplyModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 收到的赞
+  static Future messageLike({
+    int? id,
+    int? likeTime,
+  }) async {
+    var params = {
+      if (id != null) 'id': id,
+      if (likeTime != null) 'like_time': likeTime,
+    };
+    var res = await Request().get(Api.messageLikeAPi, data: params);
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageLikeModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future messageSystem() async {
+    var res = await Request().get(Api.messageSystemAPi, data: {
+      'csrf': await Request.getCsrf(),
+      'page_size': 20,
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 系统消息标记已读
+  static Future systemMarkRead(int cursor) async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.systemMarkRead, data: {
+      'csrf': csrf,
+      'cursor': cursor,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
   }
 }

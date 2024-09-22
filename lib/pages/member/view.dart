@@ -9,6 +9,7 @@ import 'package:pilipala/pages/member/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'widgets/conis.dart';
+import 'widgets/like.dart';
 import 'widgets/profile.dart';
 import 'widgets/seasons.dart';
 
@@ -26,6 +27,7 @@ class _MemberPageState extends State<MemberPage>
   late Future _futureBuilderFuture;
   late Future _memberSeasonsFuture;
   late Future _memberCoinsFuture;
+  late Future _memberLikeFuture;
   final ScrollController _extendNestCtr = ScrollController();
   final StreamController<bool> appbarStream = StreamController<bool>();
   late int mid;
@@ -39,6 +41,7 @@ class _MemberPageState extends State<MemberPage>
     _futureBuilderFuture = _memberController.getInfo();
     _memberSeasonsFuture = _memberController.getMemberSeasons();
     _memberCoinsFuture = _memberController.getRecentCoinVideo();
+    _memberLikeFuture = _memberController.getRecentLikeVideo();
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
@@ -54,6 +57,7 @@ class _MemberPageState extends State<MemberPage>
   @override
   void dispose() {
     _extendNestCtr.removeListener(() {});
+    appbarStream.close();
     super.dispose();
   }
 
@@ -65,7 +69,7 @@ class _MemberPageState extends State<MemberPage>
         children: [
           AppBar(
             title: StreamBuilder(
-              stream: appbarStream.stream,
+              stream: appbarStream.stream.distinct(),
               initialData: false,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
@@ -89,9 +93,8 @@ class _MemberPageState extends State<MemberPage>
                             () => Text(
                               _memberController.memberInfo.value.name ?? '',
                               style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14),
                             ),
                           ),
@@ -156,74 +159,78 @@ class _MemberPageState extends State<MemberPage>
                     profileWidget(),
 
                     /// 动态链接
-                    ListTile(
-                      onTap: _memberController.pushDynamicsPage,
-                      title: const Text('Ta的动态'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
+                    Obx(
+                      () => ListTile(
+                        onTap: _memberController.pushDynamicsPage,
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的动态'),
+                        trailing:
+                            const Icon(Icons.arrow_forward_outlined, size: 19),
+                      ),
                     ),
 
                     /// 视频
-                    ListTile(
-                      onTap: _memberController.pushArchivesPage,
-                      title: const Text('Ta的投稿'),
-                      trailing:
-                          const Icon(Icons.arrow_forward_outlined, size: 19),
-                    ),
+                    Obx(() => ListTile(
+                          onTap: _memberController.pushArchivesPage,
+                          title: Text(
+                              '${_memberController.isOwner.value ? '我' : 'Ta'}的投稿'),
+                          trailing: const Icon(Icons.arrow_forward_outlined,
+                              size: 19),
+                        )),
+
+                    /// 他的收藏夹
+                    Obx(() => ListTile(
+                          onTap: _memberController.pushfavPage,
+                          title: Text(
+                              '${_memberController.isOwner.value ? '我' : 'Ta'}的收藏'),
+                          trailing: const Icon(Icons.arrow_forward_outlined,
+                              size: 19),
+                        )),
 
                     /// 专栏
-                    ListTile(
-                      onTap: () {},
-                      title: const Text('Ta的专栏'),
-                    ),
+                    Obx(() => ListTile(
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的专栏'))),
+
+                    /// 合集
+                    Obx(() => ListTile(
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的合集'))),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,
                       context: context,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: StyleString.safeSpace,
-                          right: StyleString.safeSpace,
-                        ),
-                        child: FutureBuilder(
-                          future: _memberSeasonsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.data == null) {
-                                return const SizedBox();
-                              }
-                              if (snapshot.data['status']) {
-                                Map data = snapshot.data as Map;
-                                if (data['data'].seasonsList.isEmpty) {
-                                  return commenWidget('用户没有设置专栏');
-                                } else {
-                                  return MemberSeasonsPanel(data: data['data']);
-                                }
-                              } else {
-                                // 请求错误
-                                return const SizedBox();
-                              }
-                            } else {
+                      child: FutureBuilder(
+                        future: _memberSeasonsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == null) {
                               return const SizedBox();
                             }
-                          },
-                        ),
+                            if (snapshot.data['status']) {
+                              Map data = snapshot.data as Map;
+                              if (data['data'].seasonsList.isEmpty) {
+                                return commenWidget('用户没有设置合集');
+                              } else {
+                                return MemberSeasonsPanel(data: data['data']);
+                              }
+                            } else {
+                              // 请求错误
+                              return const SizedBox();
+                            }
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
                       ),
                     ),
-
-                    /// 收藏
 
                     /// 追番
                     /// 最近投币
                     Obx(
                       () => _memberController.recentCoinsList.isNotEmpty
-                          ? ListTile(
-                              onTap: () {},
-                              title: const Text('最近投币的视频'),
-                              // trailing: const Icon(Icons.arrow_forward_outlined,
-                              //     size: 19),
-                            )
+                          ? const ListTile(title: Text('最近投币的视频'))
                           : const SizedBox(),
                     ),
                     MediaQuery.removePadding(
@@ -257,13 +264,44 @@ class _MemberPageState extends State<MemberPage>
                         ),
                       ),
                     ),
-                    // 最近点赞
-                    // ListTile(
-                    //   onTap: () {},
-                    //   title: const Text('最近点赞的视频'),
-                    //   trailing:
-                    //       const Icon(Icons.arrow_forward_outlined, size: 19),
-                    // ),
+
+                    /// 最近点赞
+                    Obx(
+                      () => _memberController.recentLikeList.isNotEmpty
+                          ? const ListTile(title: Text('最近点赞的视频'))
+                          : const SizedBox(),
+                    ),
+                    MediaQuery.removePadding(
+                      removeTop: true,
+                      removeBottom: true,
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: StyleString.safeSpace,
+                          right: StyleString.safeSpace,
+                        ),
+                        child: FutureBuilder(
+                          future: _memberLikeFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data == null) {
+                                return const SizedBox();
+                              }
+                              if (snapshot.data['status']) {
+                                Map data = snapshot.data as Map;
+                                return MemberLikePanel(data: data['data']);
+                              } else {
+                                // 请求错误
+                                return const SizedBox();
+                              }
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -281,8 +319,8 @@ class _MemberPageState extends State<MemberPage>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            Map data = snapshot.data!;
-            if (data['status']) {
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               return Obx(
                 () => Stack(
                   alignment: AlignmentDirectional.center,
@@ -302,7 +340,14 @@ class _MemberPageState extends State<MemberPage>
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _memberController.memberInfo.value
+                                                  .vip!.nicknameColor !=
+                                              null
+                                          ? Color(_memberController.memberInfo
+                                              .value.vip!.nicknameColor!)
+                                          : null),
                             )),
                             const SizedBox(width: 2),
                             if (_memberController.memberInfo.value.sex == '女')
@@ -361,7 +406,7 @@ class _MemberPageState extends State<MemberPage>
                                   ? '个人认证：'
                                   : '企业认证：',
                               style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               children: [
                                 TextSpan(

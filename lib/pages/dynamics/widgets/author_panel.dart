@@ -52,7 +52,7 @@ class AuthorPanel extends StatelessWidget {
                     color: item.modules.moduleAuthor!.vip != null &&
                             item.modules.moduleAuthor!.vip['status'] > 0
                         ? const Color.fromARGB(255, 251, 100, 163)
-                        : Theme.of(context).colorScheme.onBackground,
+                        : Theme.of(context).colorScheme.onSurface,
                     fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                   ),
                 ),

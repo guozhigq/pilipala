@@ -20,10 +20,10 @@ class IntroDetail extends StatelessWidget {
     sheetHeight = localCache.get('sheetHeight');
     TextStyle smallTitle = TextStyle(
       fontSize: 12,
-      color: Theme.of(context).colorScheme.onBackground,
+      color: Theme.of(context).colorScheme.onSurface,
     );
     return Container(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(left: 14, right: 14),
       height: sheetHeight,
       child: Column(
@@ -60,13 +60,11 @@ class IntroDetail extends StatelessWidget {
                   Row(
                     children: [
                       StatView(
-                        theme: 'gray',
                         view: bangumiDetail!.stat!['views'],
                         size: 'medium',
                       ),
                       const SizedBox(width: 6),
                       StatDanMu(
-                        theme: 'gray',
                         danmu: bangumiDetail!.stat!['danmakus'],
                         size: 'medium',
                       ),
