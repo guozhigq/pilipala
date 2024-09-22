@@ -204,14 +204,17 @@ class _LivePageState extends State<LivePage>
                     // ignore: invalid_use_of_protected_member
                     return Obx(() => LiveFollowingListView(list: list.value));
                   } else {
-                    return HttpError(
-                      errMsg: data?['msg'] ?? '',
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture2 =
-                              _liveController.fetchLiveFollowing();
-                        });
-                      },
+                    return SizedBox(
+                      height: 80,
+                      child: Center(
+                        child: Text(
+                          data?['msg'] ?? '',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
                     );
                   }
                 } else {
