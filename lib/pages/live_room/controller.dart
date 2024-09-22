@@ -58,11 +58,12 @@ class LiveRoomController extends GetxController {
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
-      if (liveItem != null && liveItem.pic != null && liveItem.pic != '') {
-        cover = liveItem.pic;
-      }
-      if (liveItem != null && liveItem.cover != null && liveItem.cover != '') {
-        cover = liveItem.cover;
+      if (liveItem != null) {
+        cover = (liveItem.pic != null && liveItem.pic != '')
+            ? liveItem.pic
+            : (liveItem.cover != null && liveItem.cover != '')
+                ? liveItem.cover
+                : null;
       }
       Request.getBuvid().then((value) => buvid = value);
     }
