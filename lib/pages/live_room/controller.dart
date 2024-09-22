@@ -48,6 +48,7 @@ class LiveRoomController extends GetxController {
   // 直播间弹幕开关 默认打开
   RxBool danmakuSwitch = true.obs;
   late String buvid;
+  RxBool isPortrait = false.obs;
 
   @override
   void onInit() {
@@ -58,11 +59,12 @@ class LiveRoomController extends GetxController {
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
-      if (liveItem != null && liveItem.pic != null && liveItem.pic != '') {
-        cover = liveItem.pic;
-      }
-      if (liveItem != null && liveItem.cover != null && liveItem.cover != '') {
-        cover = liveItem.cover;
+      if (liveItem != null) {
+        cover = (liveItem.pic != null && liveItem.pic != '')
+            ? liveItem.pic
+            : (liveItem.cover != null && liveItem.cover != '')
+                ? liveItem.cover
+                : null;
       }
       Request.getBuvid().then((value) => buvid = value);
     }
@@ -100,6 +102,7 @@ class LiveRoomController extends GetxController {
   Future queryLiveInfo() async {
     var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: currentQn);
     if (res['status']) {
+      isPortrait.value = res['data'].isPortrait;
       List<CodecItem> codec =
           res['data'].playurlInfo.playurl.stream.first.format.first.codec;
       CodecItem item = codec.first;

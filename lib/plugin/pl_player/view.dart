@@ -19,7 +19,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
-import '../../utils/global_data.dart';
+import '../../utils/global_data_cache.dart';
 import 'models/bottom_control_type.dart';
 import 'models/bottom_progress_behavior.dart';
 import 'widgets/app_bar_ani.dart';
@@ -41,6 +41,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.customWidgets,
     this.showEposideCb,
     this.fullScreenCb,
+    this.alignment = Alignment.center,
     super.key,
   });
 
@@ -55,6 +56,7 @@ class PLVideoPlayer extends StatefulWidget {
   final List<Widget>? customWidgets;
   final Function? showEposideCb;
   final Function? fullScreenCb;
+  final Alignment? alignment;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -88,7 +90,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late bool enableBackgroundPlay;
   late double screenWidth;
   final FullScreenGestureMode fullScreenGestureMode =
-      GlobalData().fullScreenGestureMode;
+      GlobalDataCache().fullScreenGestureMode;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
@@ -133,7 +135,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     screenWidth = Get.size.width;
     animationController = AnimationController(
       vsync: this,
-      duration: GlobalData().enablePlayerControlAnimation
+      duration: GlobalDataCache().enablePlayerControlAnimation
           ? const Duration(milliseconds: 150)
           : const Duration(milliseconds: 10),
     );
@@ -393,6 +395,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             key: ValueKey(_.videoFit.value),
             controller: videoController,
             controls: NoVideoControls,
+            alignment: widget.alignment!,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
             resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: const SubtitleViewConfiguration(

@@ -1,3 +1,5 @@
+import 'package:pilipala/models/live/follow.dart';
+
 import '../models/live/item.dart';
 import '../models/live/room_info.dart';
 import '../models/live/room_info_h5.dart';
@@ -108,6 +110,29 @@ class LiveHttp {
       return {
         'status': true,
         'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 我的关注 正在直播
+  static Future liveFollowing({int? pn, int? ps}) async {
+    var res = await Request().get(Api.getFollowingLive, data: {
+      'page': pn,
+      'page_size': ps,
+      'platform': 'web',
+      'ignoreRecord': 1,
+      'hit_ab': true,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': LiveFollowingModel.fromJson(res.data['data'])
       };
     } else {
       return {

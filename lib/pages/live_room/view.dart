@@ -115,6 +115,9 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           plPlayerController = _liveRoomController.plPlayerController;
           return PLVideoPlayer(
             controller: plPlayerController,
+            alignment: _liveRoomController.isPortrait.value
+                ? Alignment.topCenter
+                : Alignment.center,
             bottomControl: BottomControl(
               controller: plPlayerController,
               liveRoomCtr: _liveRoomController,
@@ -178,64 +181,18 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                     ),
             ),
           ),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBar(
-                centerTitle: false,
-                titleSpacing: 0,
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                toolbarHeight:
-                    MediaQuery.of(context).orientation == Orientation.portrait
-                        ? 56
-                        : 0,
-                title: FutureBuilder(
-                  future: _futureBuilder,
-                  builder: (context, snapshot) {
-                    if (snapshot.data == null) {
-                      return const SizedBox();
-                    }
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      return Obx(
-                        () => Row(
-                          children: [
-                            NetworkImgLayer(
-                              width: 34,
-                              height: 34,
-                              type: 'avatar',
-                              src: _liveRoomController
-                                  .roomInfoH5.value.anchorInfo!.baseInfo!.face,
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _liveRoomController.roomInfoH5.value
-                                      .anchorInfo!.baseInfo!.uname!,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                const SizedBox(height: 1),
-                                if (_liveRoomController
-                                        .roomInfoH5.value.watchedShow !=
-                                    null)
-                                  Text(
-                                    _liveRoomController.roomInfoH5.value
-                                            .watchedShow!['text_large'] ??
-                                        '',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
+              Obx(
+                () => SizedBox(
+                  height: MediaQuery.of(context).padding.top +
+                      (_liveRoomController.isPortrait.value ||
+                              MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                          ? 0
+                          : kToolbarHeight),
                 ),
               ),
               PopScope(
@@ -249,66 +206,141 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                     verticalScreen();
                   }
                 },
-                child: SizedBox(
-                  width: Get.size.width,
-                  height: MediaQuery.of(context).orientation ==
-                          Orientation.landscape
-                      ? Get.size.height
-                      : Get.size.width * 9 / 16,
-                  child: videoPlayerPanel,
+                child: Obx(
+                  () => Container(
+                    width: Get.size.width,
+                    height: MediaQuery.of(context).orientation ==
+                            Orientation.landscape
+                        ? Get.size.height
+                        : !_liveRoomController.isPortrait.value
+                            ? Get.size.width * 9 / 16
+                            : Get.size.height -
+                                MediaQuery.of(context).padding.top,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                    ),
+                    child: videoPlayerPanel,
+                  ),
                 ),
               ),
-              // 显示消息的列表
-              buildMessageListUI(
+            ],
+          ),
+          // 定位 快速滑动到底部
+          Positioned(
+            right: 20,
+            bottom: MediaQuery.of(context).padding.bottom + 80,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 4),
+                end: const Offset(0, 0),
+              ).animate(CurvedAnimation(
+                parent: fabAnimationCtr,
+                curve: Curves.easeInOut,
+              )),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _scrollToBottom();
+                },
+                icon: const Icon(Icons.keyboard_arrow_down), // 图标
+                label: const Text('新消息'), // 文字
+                style: ElevatedButton.styleFrom(
+                  // primary: Colors.blue, // 按钮背景颜色
+                  // onPrimary: Colors.white, // 按钮文字颜色
+                  padding: const EdgeInsets.fromLTRB(14, 12, 20, 12), // 按钮内边距
+                ),
+              ),
+            ),
+          ),
+          // 顶栏
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              centerTitle: false,
+              titleSpacing: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              toolbarHeight:
+                  MediaQuery.of(context).orientation == Orientation.portrait
+                      ? 56
+                      : 0,
+              title: FutureBuilder(
+                future: _futureBuilder,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
+                  Map data = snapshot.data as Map;
+                  if (data['status']) {
+                    return Obx(
+                      () => Row(
+                        children: [
+                          NetworkImgLayer(
+                            width: 34,
+                            height: 34,
+                            type: 'avatar',
+                            src: _liveRoomController
+                                .roomInfoH5.value.anchorInfo!.baseInfo!.face,
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _liveRoomController.roomInfoH5.value.anchorInfo!
+                                    .baseInfo!.uname!,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              const SizedBox(height: 1),
+                              if (_liveRoomController
+                                      .roomInfoH5.value.watchedShow !=
+                                  null)
+                                Text(
+                                  _liveRoomController.roomInfoH5.value
+                                          .watchedShow!['text_large'] ??
+                                      '',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
+              ),
+            ),
+          ),
+          // 消息列表
+          Obx(
+            () => Positioned(
+              top: MediaQuery.of(context).padding.top +
+                  kToolbarHeight +
+                  (_liveRoomController.isPortrait.value
+                      ? Get.size.width
+                      : Get.size.width * 9 / 16),
+              bottom: 90 + MediaQuery.of(context).padding.bottom,
+              left: 0,
+              right: 0,
+              child: buildMessageListUI(
                 context,
                 _liveRoomController,
                 _scrollController,
               ),
-              // Container(
-              //   padding: const EdgeInsets.only(
-              //       left: 14, right: 14, top: 4, bottom: 4),
-              //   margin: const EdgeInsets.only(
-              //     bottom: 6,
-              //     left: 14,
-              //   ),
-              //   decoration: BoxDecoration(
-              //     color: Colors.grey.withOpacity(0.1),
-              //     borderRadius: const BorderRadius.all(Radius.circular(20)),
-              //   ),
-              //   child: Obx(
-              //     () => AnimatedSwitcher(
-              //       duration: const Duration(milliseconds: 300),
-              //       transitionBuilder:
-              //           (Widget child, Animation<double> animation) {
-              //         return FadeTransition(opacity: animation, child: child);
-              //       },
-              //       child: Text.rich(
-              //         key:
-              //             ValueKey(_liveRoomController.joinRoomTip['userName']),
-              //         TextSpan(
-              //           style: const TextStyle(color: Colors.white),
-              //           children: [
-              //             TextSpan(
-              //               text:
-              //                   '${_liveRoomController.joinRoomTip['userName']} ',
-              //               style: TextStyle(
-              //                 color: Colors.white.withOpacity(0.6),
-              //               ),
-              //             ),
-              //             TextSpan(
-              //               text:
-              //                   '${_liveRoomController.joinRoomTip['message']}',
-              //               style: const TextStyle(color: Colors.white),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              const SizedBox(height: 10),
-              // 弹幕输入框
-              Container(
+            ),
+          ),
+          // 消息输入框
+          Visibility(
+            visible: MediaQuery.of(context).orientation == Orientation.portrait,
+            child: Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
                 padding: EdgeInsets.only(
                     left: 14,
                     right: 14,
@@ -384,32 +416,6 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                   ],
                 ),
               ),
-            ],
-          ),
-          // 定位 快速滑动到底部
-          Positioned(
-            right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 80,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 4),
-                end: const Offset(0, 0),
-              ).animate(CurvedAnimation(
-                parent: fabAnimationCtr,
-                curve: Curves.easeInOut,
-              )),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  _scrollToBottom();
-                },
-                icon: const Icon(Icons.keyboard_arrow_down), // 图标
-                label: const Text('新消息'), // 文字
-                style: ElevatedButton.styleFrom(
-                  // primary: Colors.blue, // 按钮背景颜色
-                  // onPrimary: Colors.white, // 按钮文字颜色
-                  padding: const EdgeInsets.fromLTRB(14, 12, 20, 12), // 按钮内边距
-                ),
-              ),
             ),
           ),
         ],
@@ -467,7 +473,9 @@ Widget buildMessageListUI(
                   alignment: Alignment.centerLeft,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: liveRoomController.isPortrait.value
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.1),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
                     margin: EdgeInsets.only(

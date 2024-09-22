@@ -21,7 +21,7 @@ class MemberSeasonsController extends GetxController {
     mid = int.parse(Get.parameters['mid']!);
     category = Get.parameters['category']!;
     if (category == '0') {
-      seasonId = int.parse(Get.parameters['seriesId']!);
+      seasonId = int.parse(Get.parameters['seasonId']!);
     }
     if (category == '1') {
       seriesId = int.parse(Get.parameters['seriesId']!);
