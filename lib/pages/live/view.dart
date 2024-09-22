@@ -201,6 +201,7 @@ class _LivePageState extends State<LivePage>
                   Map? data = snapshot.data;
                   if (data?['status']) {
                     RxList list = _liveController.liveFollowingList;
+                    // ignore: invalid_use_of_protected_member
                     return Obx(() => LiveFollowingListView(list: list.value));
                   } else {
                     return HttpError(
