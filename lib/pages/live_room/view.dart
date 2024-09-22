@@ -323,7 +323,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                   (_liveRoomController.isPortrait.value
                       ? Get.size.width
                       : Get.size.width * 9 / 16),
-              bottom: 110,
+              bottom: 90 + MediaQuery.of(context).padding.bottom,
               left: 0,
               right: 0,
               child: buildMessageListUI(
@@ -473,7 +473,9 @@ Widget buildMessageListUI(
                   alignment: Alignment.centerLeft,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
+                      color: liveRoomController.isPortrait.value
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.1),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
                     margin: EdgeInsets.only(
