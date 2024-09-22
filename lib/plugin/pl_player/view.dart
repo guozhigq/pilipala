@@ -41,6 +41,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.customWidgets,
     this.showEposideCb,
     this.fullScreenCb,
+    this.alignment = Alignment.center,
     super.key,
   });
 
@@ -55,6 +56,7 @@ class PLVideoPlayer extends StatefulWidget {
   final List<Widget>? customWidgets;
   final Function? showEposideCb;
   final Function? fullScreenCb;
+  final Alignment? alignment;
 
   @override
   State<PLVideoPlayer> createState() => _PLVideoPlayerState();
@@ -393,6 +395,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             key: ValueKey(_.videoFit.value),
             controller: videoController,
             controls: NoVideoControls,
+            alignment: widget.alignment!,
             pauseUponEnteringBackgroundMode: !enableBackgroundPlay,
             resumeUponEnteringForegroundMode: true,
             subtitleViewConfiguration: const SubtitleViewConfiguration(
