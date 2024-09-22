@@ -70,11 +70,11 @@ class LiveController extends GetxController {
   Future fetchLiveFollowing() async {
     var res = await LiveHttp.liveFollowing(pn: 1, ps: 20);
     if (res['status']) {
-      liveFollowingList.value = (res['data'].list
-              as List<LiveFollowingItemModel>)
-          .where(
-              (LiveFollowingItemModel item) => item.liveStatus == 1) // 根据条件过滤
-          .toList();
+      liveFollowingList.value =
+          (res['data'].list as List<LiveFollowingItemModel>)
+              .where((LiveFollowingItemModel item) =>
+                  item.liveStatus == 1 && item.recordLiveTime == 0) // 根据条件过滤
+              .toList();
     }
     return res;
   }
