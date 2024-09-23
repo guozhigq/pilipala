@@ -260,6 +260,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
           )
         ],
       ),
+      floatingActionButton: Obx(
+        () => _favDetailController.mediaCount > 0
+            ? FloatingActionButton.extended(
+                onPressed: _favDetailController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
+      ),
     );
   }
 }
