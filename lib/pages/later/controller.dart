@@ -6,6 +6,7 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class LaterController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -48,7 +49,7 @@ class LaterController extends GetxController {
               aid != null ? '即将移除该视频，确定是否移除' : '即将删除所有已观看视频，此操作不可恢复。确定是否删除？'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: SmartDialog.dismiss,
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -87,7 +88,7 @@ class LaterController extends GetxController {
           content: const Text('确定要清空你的稍后再看列表吗？'),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
+              onPressed: SmartDialog.dismiss,
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -106,6 +107,21 @@ class LaterController extends GetxController {
             )
           ],
         );
+      },
+    );
+  }
+
+  // 稍后再看播放全部
+  Future toViewPlayAll() async {
+    final HotVideoItemModel firstItem = laterList.first;
+    final String heroTag = Utils.makeHeroTag(firstItem.bvid);
+    Get.toNamed(
+      '/video?bvid=${firstItem.bvid}&cid=${firstItem.cid}',
+      arguments: {
+        'videoItem': firstItem,
+        'heroTag': heroTag,
+        'sourceType': 'watchLater',
+        'count': laterList.length,
       },
     );
   }

@@ -7,9 +7,11 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -24,7 +26,10 @@ import '../../../models/video/subTitile/content.dart';
 import '../../../http/danmaku.dart';
 import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../utils/id_utils.dart';
+import 'introduction/controller.dart';
+import 'reply/controller.dart';
 import 'widgets/header_control.dart';
+import 'widgets/watch_later_list.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -37,9 +42,10 @@ class VideoDetailController extends GetxController
   Map videoItem = {};
   // 视频类型 默认投稿视频
   SearchType videoType = Get.arguments['videoType'] ?? SearchType.video;
+  // 页面来源 稍后再看 收藏夹
+  RxString sourceType = 'normal'.obs;
 
   /// tabs相关配置
-  int tabInitialIndex = 0;
   late TabController tabCtr;
   RxList<String> tabs = <String>['简介', '评论'].obs;
 
@@ -110,6 +116,9 @@ class VideoDetailController extends GetxController
   RxDouble sheetHeight = 0.0.obs;
   RxString archiveSourceType = 'dash'.obs;
   ScrollController? replyScrillController;
+  List<MediaVideoItemModel> mediaList = <MediaVideoItemModel>[];
+  RxBool isWatchLaterVisible = false.obs;
+  RxString watchLaterTitle = ''.obs;
 
   @override
   void onInit() {
@@ -119,9 +128,7 @@ class VideoDetailController extends GetxController
     if (argMap.containsKey('videoItem')) {
       var args = argMap['videoItem'];
       updateCover(args.pic);
-    }
-
-    if (argMap.containsKey('pic')) {
+    } else if (argMap.containsKey('pic')) {
       updateCover(argMap['pic']);
     }
 
@@ -160,6 +167,21 @@ class VideoDetailController extends GetxController
       bvid: bvid,
       videoType: videoType,
     );
+
+    sourceType.value = argMap['sourceType'] ?? 'normal';
+    isWatchLaterVisible.value =
+        sourceType.value == 'watchLater' || sourceType.value == 'fav';
+    if (sourceType.value == 'watchLater') {
+      watchLaterTitle.value = '稍后再看';
+      fetchMediaList();
+    }
+    if (sourceType.value == 'fav') {
+      watchLaterTitle.value = argMap['favTitle'];
+      queryFavVideoList();
+    }
+    tabCtr.addListener(() {
+      onTabChanged();
+    });
   }
 
   showReplyReplyPanel(oid, fRpid, firstFloor, currentReply, loadMore) {
@@ -560,5 +582,102 @@ class VideoDetailController extends GetxController
       replyScrillController?.animateTo(0,
           duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
+  }
+
+  void toggeleWatchLaterVisible(bool val) {
+    if (sourceType.value == 'watchLater' || sourceType.value == 'fav') {
+      isWatchLaterVisible.value = !isWatchLaterVisible.value;
+    }
+  }
+
+  // 获取稍后再看列表
+  Future fetchMediaList() async {
+    final Map argMap = Get.arguments;
+    var count = argMap['count'];
+    var res = await UserHttp.getMediaList(
+      type: 2,
+      bizId: userInfo.mid,
+      ps: count,
+    );
+    if (res['status']) {
+      mediaList = res['data'].reversed.toList();
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
+  // 稍后再看面板展开
+  showMediaListPanel() {
+    replyReplyBottomSheetCtr =
+        scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
+      return MediaListPanel(
+        sheetHeight: sheetHeight.value,
+        mediaList: mediaList,
+        changeMediaList: changeMediaList,
+        panelTitle: watchLaterTitle.value,
+        bvid: bvid,
+        mediaId: Get.arguments['mediaId'],
+        hasMore: mediaList.length != Get.arguments['count'],
+      );
+    });
+    replyReplyBottomSheetCtr?.closed.then((value) {
+      isWatchLaterVisible.value = true;
+    });
+  }
+
+  // 切换稍后再看
+  Future changeMediaList(bvidVal, cidVal, aidVal, coverVal) async {
+    final VideoIntroController videoIntroCtr =
+        Get.find<VideoIntroController>(tag: heroTag);
+    bvid = bvidVal;
+    oid.value = aidVal ?? IdUtils.bv2av(bvid);
+    cid.value = cidVal;
+    danmakuCid.value = cidVal;
+    cover.value = coverVal;
+    queryVideoUrl();
+    clearSubtitleContent();
+    await getSubtitle();
+    setSubtitleContent();
+    // 重新请求评论
+    try {
+      /// 未渲染回复组件时可能异常
+      final VideoReplyController videoReplyCtr =
+          Get.find<VideoReplyController>(tag: heroTag);
+      videoReplyCtr.aid = aidVal;
+      videoReplyCtr.queryReplyList(type: 'init');
+    } catch (_) {}
+    videoIntroCtr.lastPlayCid.value = cidVal;
+    videoIntroCtr.bvid = bvidVal;
+    replyReplyBottomSheetCtr!.close();
+    await videoIntroCtr.queryVideoIntro();
+  }
+
+  // 获取收藏夹视频列表
+  Future queryFavVideoList() async {
+    final Map argMap = Get.arguments;
+    var mediaId = argMap['mediaId'];
+    var oid = argMap['oid'];
+    var res = await UserHttp.parseFavVideo(
+      mediaId: mediaId,
+      oid: oid,
+      bvid: bvid,
+    );
+    if (res['status']) {
+      mediaList = res['data'];
+    }
+  }
+
+  // 监听tabBarView切换
+  void onTabChanged() {
+    isWatchLaterVisible.value = tabCtr.index == 0;
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    plPlayerController.dispose();
+    tabCtr.removeListener(() {
+      onTabChanged();
+    });
   }
 }

@@ -575,4 +575,7 @@ class Api {
   /// 我的关注 - 正在直播
   static const String getFollowingLive =
       '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
 }
