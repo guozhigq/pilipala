@@ -530,7 +530,6 @@ class UserHttp {
     String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
     // 解析JSON字符串为Map
     Map<String, dynamic> jsonData = json.decode(jsonContent);
-    log('jsonData;${jsonData["resourceList"].first}');
     return {
       'status': true,
       'data': jsonData['resourceList']
