@@ -146,20 +146,29 @@ class DynamicsController extends GetxController {
       /// 专栏文章查看
       case 'DYNAMIC_TYPE_ARTICLE':
         String title = item.modules.moduleDynamic.major.opus.title;
-        String url = item.modules.moduleDynamic.major.opus.jumpUrl;
-        if (url.contains('opus') || url.contains('read')) {
+        String jumpUrl = item.modules.moduleDynamic.major.opus.jumpUrl;
+        String url =
+            jumpUrl.startsWith('//') ? jumpUrl.split('//').last : jumpUrl;
+        if (jumpUrl.contains('opus') || jumpUrl.contains('read')) {
           RegExp digitRegExp = RegExp(r'\d+');
-          Iterable<Match> matches = digitRegExp.allMatches(url);
+          Iterable<Match> matches = digitRegExp.allMatches(jumpUrl);
           String number = matches.first.group(0)!;
-          if (url.contains('read')) {
+          if (jumpUrl.contains('read')) {
             number = 'cv$number';
+            Get.toNamed('/htmlRender', parameters: {
+              'url': url,
+              'title': title,
+              'id': number,
+              'dynamicType': url.split('/')[1]
+            });
+          } else {
+            Get.toNamed('/opus', parameters: {
+              'url': url,
+              'title': title,
+              'id': number,
+              'dynamicType': url.split('/')[1]
+            });
           }
-          Get.toNamed('/htmlRender', parameters: {
-            'url': url.startsWith('//') ? url.split('//').last : url,
-            'title': title,
-            'id': number,
-            'dynamicType': url.split('//').last.split('/')[1]
-          });
         } else {
           Get.toNamed(
             '/webview',
