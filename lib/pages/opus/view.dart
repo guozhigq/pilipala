@@ -109,6 +109,15 @@ class _OpusPageState extends State<OpusPage> {
                     } else {
                       print('No moduleContent found');
                     }
+                    // 获取所有的图片链接
+                    final List<String> picList = [];
+                    for (var paragraph in moduleContent.paragraphs!) {
+                      if (paragraph.paraType == 2) {
+                        for (var pic in paragraph.pic!.pics!) {
+                          picList.add(pic.url!);
+                        }
+                      }
+                    }
                     return Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16,
                           MediaQuery.of(context).padding.bottom + 40),
@@ -170,14 +179,10 @@ class _OpusPageState extends State<OpusPage> {
                                               child: InkWell(
                                                 onTap: () {
                                                   onPreviewImg(
-                                                      paragraph.pic!.pics!
-                                                          .map((pic) => pic.url)
-                                                          .toList(),
-                                                      paragraph.pic!.pics!
-                                                          .indexWhere((pic) =>
-                                                              pic.url ==
-                                                              pic.url),
-                                                      context);
+                                                    picList,
+                                                    picList.indexOf(pic.url!),
+                                                    context,
+                                                  );
                                                 },
                                                 child: NetworkImgLayer(
                                                   src: pic.url,
