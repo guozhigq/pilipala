@@ -29,7 +29,8 @@ class _MemberPageState extends State<MemberPage>
   late Future _memberCoinsFuture;
   late Future _memberLikeFuture;
   final ScrollController _extendNestCtr = ScrollController();
-  final StreamController<bool> appbarStream = StreamController<bool>();
+  final StreamController<bool> appbarStream =
+      StreamController<bool>.broadcast();
   late int mid;
 
   @override
