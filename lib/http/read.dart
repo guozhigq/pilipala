@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/read/opus.dart';
+import 'package:pilipala/models/read/read.dart';
 import 'init.dart';
 
 class ReadHttp {
@@ -30,6 +32,25 @@ class ReadHttp {
     return {
       'status': true,
       'data': OpusDataModel.fromJson(jsonData),
+    };
+  }
+
+  // 解析专栏 cv格式
+  static Future parseArticleCv({required String id}) async {
+    var res = await Request().get(
+      'https://www.bilibili.com/read/cv$id',
+      extra: {'ua': 'pc'},
+    );
+    String scriptContent =
+        extractScriptContents(parse(res.data).body!.outerHtml)[0];
+    int startIndex = scriptContent.indexOf('{');
+    int endIndex = scriptContent.lastIndexOf('};');
+    String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
+    // 解析JSON字符串为Map
+    Map<String, dynamic> jsonData = json.decode(jsonContent);
+    return {
+      'status': true,
+      'data': ReadDataModel.fromJson(jsonData),
     };
   }
 }

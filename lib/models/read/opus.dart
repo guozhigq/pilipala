@@ -302,14 +302,17 @@ class ModuleParagraphText {
 class ModuleParagraphTextNode {
   ModuleParagraphTextNode({
     this.type,
+    this.nodeType,
     this.word,
   });
 
   String? type;
+  int? nodeType;
   ModuleParagraphTextNodeWord? word;
 
   ModuleParagraphTextNode.fromJson(Map<String, dynamic> json) {
     type = json['type'];
+    nodeType = json['node_type'];
     word = json['word'] != null
         ? ModuleParagraphTextNodeWord.fromJson(json['word'])
         : null;
