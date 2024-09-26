@@ -149,16 +149,19 @@ class ModuleAuthor {
     this.face,
     this.mid,
     this.name,
+    this.pubTime,
   });
 
   String? face;
   int? mid;
   String? name;
+  String? pubTime;
 
   ModuleAuthor.fromJson(Map<String, dynamic> json) {
     face = json['face'];
     mid = json['mid'];
     name = json['name'];
+    pubTime = json['pub_time'];
   }
 }
 
