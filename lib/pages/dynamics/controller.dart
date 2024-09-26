@@ -163,10 +163,9 @@ class DynamicsController extends GetxController {
             });
           } else {
             Get.toNamed('/opus', parameters: {
-              'url': url,
               'title': title,
               'id': number,
-              'dynamicType': url.split('/')[1]
+              'articleType': 'opus'
             });
           }
         } else {

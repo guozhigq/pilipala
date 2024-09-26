@@ -82,14 +82,11 @@ class PiliSchame {
         case 'opus':
           if (path.startsWith('/detail')) {
             var opusId = path.split('/').last;
-            Get.toNamed(
-              '/webview',
-              parameters: {
-                'url': 'https://www.bilibili.com/opus/$opusId',
-                'type': 'url',
-                'pageTitle': '',
-              },
-            );
+            Get.toNamed('/opus', arguments: {
+              'title': '',
+              'id': opusId,
+              'articleType': 'opus',
+            });
           }
           break;
         case 'search':
