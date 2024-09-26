@@ -94,12 +94,14 @@ class PiliSchame {
           break;
         case 'article':
           final String id = path.split('/').last.split('?').first;
-          Get.toNamed('/htmlRender', parameters: {
-            'url': 'https://www.bilibili.com/read/cv$id',
-            'title': 'cv$id',
-            'id': 'cv$id',
-            'dynamicType': 'read'
-          });
+          Get.toNamed(
+            '/read',
+            parameters: {
+              'title': 'cv$id',
+              'id': id,
+              'dynamicType': 'read',
+            },
+          );
           break;
         case 'pgc':
           if (path.contains('ep')) {
@@ -240,12 +242,12 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = 'cv${Utils.matchNum(query!['id']!).first}';
-          Get.toNamed('/htmlRender', parameters: {
+          String id = Utils.matchNum(query!['id']!).first.toString();
+          Get.toNamed('/read', parameters: {
             'url': value.dataString!,
             'title': '',
             'id': id,
-            'dynamicType': 'read'
+            'articleType': 'read'
           });
           break;
         case 'space':
