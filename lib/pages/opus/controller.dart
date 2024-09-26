@@ -6,16 +6,18 @@ class OpusController extends GetxController {
   late String url;
   late String title;
   late String id;
-  late String dynamicType;
+  late String articleType;
   Rx<OpusDataModel> opusData = OpusDataModel().obs;
 
   @override
   void onInit() {
     super.onInit();
-    url = Get.parameters['url']!;
     title = Get.parameters['title']!;
     id = Get.parameters['id']!;
-    dynamicType = Get.parameters['dynamicType']!;
+    articleType = Get.parameters['articleType']!;
+    if (articleType == 'opus') {
+      url = 'https://www.bilibili.com/opus/$id';
+    }
   }
 
   Future fetchOpusData() async {
