@@ -14,7 +14,7 @@ class ReadPageController extends GetxController {
   late String articleType;
   Rx<ReadDataModel> cvData = ReadDataModel().obs;
   final ScrollController scrollController = ScrollController();
-  final StreamController<bool> appbarStream = StreamController<bool>();
+  late StreamController<bool> appbarStream = StreamController<bool>.broadcast();
 
   @override
   void onInit() {
