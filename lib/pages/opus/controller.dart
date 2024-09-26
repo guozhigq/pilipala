@@ -14,7 +14,7 @@ class OpusController extends GetxController {
   late String articleType;
   Rx<OpusDataModel> opusData = OpusDataModel().obs;
   final ScrollController scrollController = ScrollController();
-  final StreamController<bool> appbarStream = StreamController<bool>();
+  late StreamController<bool> appbarStream = StreamController<bool>.broadcast();
 
   @override
   void onInit() {
