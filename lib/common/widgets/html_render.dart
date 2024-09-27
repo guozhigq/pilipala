@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
 import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
+import 'package:pilipala/utils/highlight.dart';
 import 'network_img_layer.dart';
 
 // ignore: must_be_immutable
@@ -25,6 +26,20 @@ class HtmlRender extends StatelessWidget {
       data: htmlContent,
       onLinkTap: (String? url, Map<String, String> buildContext, attributes) {},
       extensions: [
+        TagExtension(
+          tagsToExtend: <String>{'pre'},
+          builder: (ExtensionContext extensionContext) {
+            final Map<String, dynamic> attributes = extensionContext.attributes;
+            final String lang = attributes['data-lang'] as String;
+            final String code = attributes['codecontent'] as String;
+            List<String> selectedLanguages = [lang.split('@').first];
+            TextSpan? result = highlightExistingText(code, selectedLanguages);
+            if (result == null) {
+              return const Center(child: Text('代码块渲染失败'));
+            }
+            return SelectableText.rich(result);
+          },
+        ),
         TagExtension(
           tagsToExtend: <String>{'img'},
           builder: (ExtensionContext extensionContext) {
