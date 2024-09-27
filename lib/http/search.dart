@@ -143,7 +143,11 @@ class SearchHttp {
     }
     final dynamic res =
         await Request().get(Api.ab2c, data: <String, dynamic>{...data});
-    return res.data['data'].first['cid'];
+    if (res.data['code'] == 0) {
+      return res.data['data'].first['cid'];
+    } else {
+      return -1;
+    }
   }
 
   static Future<Map<String, dynamic>> bangumiInfo(
