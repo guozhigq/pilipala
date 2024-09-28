@@ -240,4 +240,6 @@ class MemberController extends GetxController {
   }
 
   void pushfavPage() => Get.toNamed('/fav?mid=$mid');
+  // 跳转图文专栏
+  void pushArticlePage() => Get.toNamed('/memberArticle?mid=$mid');
 }
