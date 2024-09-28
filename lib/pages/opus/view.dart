@@ -107,6 +107,9 @@ class _OpusPageState extends State<OpusPage> {
   }
 
   Widget _buildContent(OpusDataModel opusData) {
+    if (opusData.detail == null) {
+      return const SizedBox();
+    }
     final modules = opusData.detail!.modules!;
     late ModuleContent moduleContent;
     // 获取所有的图片链接
