@@ -170,32 +170,44 @@ class _MemberPageState extends State<MemberPage>
                     ),
 
                     /// 视频
-                    Obx(() => ListTile(
-                          onTap: _memberController.pushArchivesPage,
-                          title: Text(
-                              '${_memberController.isOwner.value ? '我' : 'Ta'}的投稿'),
-                          trailing: const Icon(Icons.arrow_forward_outlined,
-                              size: 19),
-                        )),
+                    Obx(
+                      () => ListTile(
+                        onTap: _memberController.pushArchivesPage,
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的投稿'),
+                        trailing:
+                            const Icon(Icons.arrow_forward_outlined, size: 19),
+                      ),
+                    ),
 
                     /// 他的收藏夹
-                    Obx(() => ListTile(
-                          onTap: _memberController.pushfavPage,
-                          title: Text(
-                              '${_memberController.isOwner.value ? '我' : 'Ta'}的收藏'),
-                          trailing: const Icon(Icons.arrow_forward_outlined,
-                              size: 19),
-                        )),
+                    Obx(
+                      () => ListTile(
+                        onTap: _memberController.pushfavPage,
+                        title: Text(
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的收藏'),
+                        trailing:
+                            const Icon(Icons.arrow_forward_outlined, size: 19),
+                      ),
+                    ),
 
                     /// 专栏
-                    Obx(() => ListTile(
+                    Obx(
+                      () => ListTile(
+                        onTap: _memberController.pushArticlePage,
                         title: Text(
-                            '${_memberController.isOwner.value ? '我' : 'Ta'}的专栏'))),
+                            '${_memberController.isOwner.value ? '我' : 'Ta'}的专栏'),
+                        trailing:
+                            const Icon(Icons.arrow_forward_outlined, size: 19),
+                      ),
+                    ),
 
                     /// 合集
-                    Obx(() => ListTile(
-                        title: Text(
-                            '${_memberController.isOwner.value ? '我' : 'Ta'}的合集'))),
+                    Obx(
+                      () => ListTile(
+                          title: Text(
+                              '${_memberController.isOwner.value ? '我' : 'Ta'}的合集')),
+                    ),
                     MediaQuery.removePadding(
                       removeTop: true,
                       removeBottom: true,

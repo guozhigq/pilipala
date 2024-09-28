@@ -578,4 +578,7 @@ class Api {
 
   /// 稍后再看&收藏夹视频列表
   static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
 }
