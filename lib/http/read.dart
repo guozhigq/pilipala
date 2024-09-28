@@ -22,6 +22,29 @@ class ReadHttp {
     var res = await Request().get('https://www.bilibili.com/opus/$id', extra: {
       'ua': 'pc',
     });
+    String? headContent = parse(res.data).head?.outerHtml;
+    var document = parse(headContent);
+    var linkTags = document.getElementsByTagName('link');
+    bool isCv = false;
+    String cvId = '';
+    for (var linkTag in linkTags) {
+      var attributes = linkTag.attributes;
+      if (attributes.containsKey('rel') &&
+          attributes['rel'] == 'canonical' &&
+          attributes.containsKey('data-vue-meta') &&
+          attributes['data-vue-meta'] == 'true') {
+        final String cvHref = linkTag.attributes['href']!;
+        RegExp regex = RegExp(r'cv(\d+)');
+        RegExpMatch? match = regex.firstMatch(cvHref);
+        if (match != null) {
+          cvId = match.group(1)!;
+        } else {
+          print('No match found.');
+        }
+        isCv = true;
+        break;
+      }
+    }
     String scriptContent =
         extractScriptContents(parse(res.data).body!.outerHtml)[0];
     int startIndex = scriptContent.indexOf('{');
@@ -32,6 +55,8 @@ class ReadHttp {
     return {
       'status': true,
       'data': OpusDataModel.fromJson(jsonData),
+      'isCv': isCv,
+      'cvId': cvId,
     };
   }
 

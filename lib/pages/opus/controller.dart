@@ -31,7 +31,16 @@ class OpusController extends GetxController {
   Future fetchOpusData() async {
     var res = await ReadHttp.parseArticleOpus(id: id);
     if (res['status']) {
-      opusData.value = res['data'];
+      List<String> keys = res.keys.toList();
+      if (keys.contains('isCv') && res['isCv']) {
+        Get.offNamed('/read', parameters: {
+          'id': res['cvId'],
+          'title': title.value,
+          'articleType': 'cv',
+        });
+      } else {
+        opusData.value = res['data'];
+      }
     }
     return res;
   }
