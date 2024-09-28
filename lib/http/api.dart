@@ -571,4 +571,17 @@ class Api {
 
   /// 直播间发送弹幕
   static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
 }

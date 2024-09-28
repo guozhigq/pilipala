@@ -22,7 +22,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
   late final ScrollController _controller = ScrollController();
   final FavDetailController _favDetailController =
       Get.put(FavDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   Future? _futureBuilderFuture;
   late String mediaId;
 
@@ -31,7 +32,6 @@ class _FavDetailPageState extends State<FavDetailPage> {
     super.initState();
     mediaId = Get.parameters['mediaId']!;
     _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
-    titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
@@ -259,6 +259,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
           )
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _favDetailController.mediaCount > 0
+            ? FloatingActionButton.extended(
+                onPressed: _favDetailController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }

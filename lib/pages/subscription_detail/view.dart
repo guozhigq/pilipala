@@ -24,14 +24,14 @@ class _SubDetailPageState extends State<SubDetailPage> {
   late final ScrollController _controller = ScrollController();
   final SubDetailController _subDetailController =
       Get.put(SubDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _subDetailController.queryUserSeasonList();
-    titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
