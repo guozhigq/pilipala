@@ -14,11 +14,10 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
     itemBuilder: (context, index) {
       return InkWell(
         onTap: () {
-          Get.toNamed('/htmlRender', parameters: {
-            'url': 'www.bilibili.com/read/cv${list[index].id}',
+          Get.toNamed('/read', parameters: {
             'title': list[index].subTitle,
-            'id': 'cv${list[index].id}',
-            'dynamicType': 'read'
+            'id': list[index].id.toString(),
+            'articleType': 'read'
           });
         },
         child: Padding(

@@ -43,14 +43,17 @@ class HistoryItem extends StatelessWidget {
         }
         if (videoItem.history.business.contains('article')) {
           int cid = videoItem.history.cid ??
-              // videoItem.history.oid ??
+              videoItem.history.oid ??
               await SearchHttp.ab2c(aid: aid, bvid: bvid);
+          if (cid == -1) {
+            return SmartDialog.showToast('无法获取文章内容');
+          }
           Get.toNamed(
-            '/webview',
+            '/read',
             parameters: {
-              'url': 'https://www.bilibili.com/read/cv$cid',
-              'type': 'note',
-              'pageTitle': videoItem.title
+              'title': videoItem.title,
+              'id': cid.toString(),
+              'articleType': 'read',
             },
           );
         } else if (videoItem.history.business == 'live') {
