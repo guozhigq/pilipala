@@ -330,4 +330,27 @@ class MsgHttp {
       };
     }
   }
+
+  static Future messageSystemAccount() async {
+    var res = await Request().get(Api.userMessageSystemAPi, data: {
+      'csrf': await Request.getCsrf(),
+      'page_size': 20,
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
 }
