@@ -1052,7 +1052,7 @@ class MorePanel extends StatelessWidget {
       //   break;
       case 'delete':
         // 删除评论提示
-        bool? isConfirm = await showDialog(
+        await showDialog(
           context: Get.context!,
           builder: (context) {
             return AlertDialog(
@@ -1060,15 +1060,25 @@ class MorePanel extends StatelessWidget {
               content: const Text('删除评论后，评论下所有回复将被删除，确定删除吗？'),
               actions: <Widget>[
                 TextButton(
-                  onPressed: () => Get.back(result: false),
+                  onPressed: () => Get.back(),
                   child: Text('取消',
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.outline)),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Get.back(result: true);
-                    SmartDialog.showToast('删除成功');
+                  onPressed: () async {
+                    Get.back();
+                    var result = await ReplyHttp.replyDel(
+                      type: item.type!,
+                      oid: item.oid!,
+                      rpid: item.rpid!,
+                    );
+                    if (result['status']) {
+                      SmartDialog.showToast('评论删除成功，需手动刷新');
+                      Get.back();
+                    } else {
+                      SmartDialog.showToast(result['msg']);
+                    }
                   },
                   child: const Text('确定'),
                 ),
@@ -1076,18 +1086,6 @@ class MorePanel extends StatelessWidget {
             );
           },
         );
-        if (isConfirm == null || !isConfirm) {
-          return;
-        }
-        SmartDialog.showLoading(msg: '删除中...');
-        var result = await ReplyHttp.replyDel(
-          type: item.type!,
-          oid: item.oid!,
-          rpid: item.rpid!,
-        );
-        SmartDialog.dismiss();
-        SmartDialog.showToast(result["msg"]);
-
         break;
       default:
     }
