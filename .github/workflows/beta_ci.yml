@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "main"
+      - "never"
     paths-ignore:
       - "**.md"
       - "**.txt"
       - ".github/**"
       - ".idea/**"
       - "!.github/workflows/**"
+
 
 jobs:
   update_version:
@@ -205,4 +206,4 @@ jobs:
           method: sendFile
           path: Pilipala-Beta/*
           parse_mode: Markdown
-          context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}](${{ github.event.head_commit.url }})"
+          context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}]"

@@ -7,13 +7,13 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
-import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/business_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/pages/history_search/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class HistoryItem extends StatelessWidget {
@@ -43,14 +43,17 @@ class HistoryItem extends StatelessWidget {
         }
         if (videoItem.history.business.contains('article')) {
           int cid = videoItem.history.cid ??
-              // videoItem.history.oid ??
+              videoItem.history.oid ??
               await SearchHttp.ab2c(aid: aid, bvid: bvid);
+          if (cid == -1) {
+            return SmartDialog.showToast('无法获取文章内容');
+          }
           Get.toNamed(
-            '/webview',
+            '/read',
             parameters: {
-              'url': 'https://www.bilibili.com/read/cv$cid',
-              'type': 'note',
-              'pageTitle': videoItem.title
+              'title': videoItem.title,
+              'id': cid.toString(),
+              'articleType': 'read',
             },
           );
         } else if (videoItem.history.business == 'live') {
@@ -101,26 +104,11 @@ class HistoryItem extends StatelessWidget {
             }
           } else {
             if (videoItem.history.epid != '') {
-              SmartDialog.showLoading(msg: '获取中...');
-              var res =
-                  await SearchHttp.bangumiInfo(epId: videoItem.history.epid);
-              SmartDialog.dismiss();
-              if (res['status']) {
-                EpisodeItem episode = res['data'].episodes.first;
-                String bvid = episode.bvid!;
-                int cid = episode.cid!;
-                String pic = episode.cover!;
-                String heroTag = Utils.makeHeroTag(cid);
-                Get.toNamed(
-                  '/video?bvid=$bvid&cid=$cid&seasonId=${res['data'].seasonId}',
-                  arguments: {
-                    'pic': pic,
-                    'heroTag': heroTag,
-                    'videoType': SearchType.media_bangumi,
-                    'bangumiItem': res['data'],
-                  },
-                );
-              }
+              RoutePush.bangumiPush(
+                null,
+                videoItem.history.epid,
+                heroTag: heroTag,
+              );
             }
           }
         } else {
@@ -185,7 +173,7 @@ class HistoryItem extends StatelessWidget {
                                             ? '已看完'
                                             : '${Utils.timeFormat(videoItem.progress!)}/${Utils.timeFormat(videoItem.duration!)}',
                                         right: 6.0,
-                                        bottom: 6.0,
+                                        bottom: 8.0,
                                         type: 'gray',
                                       ),
                                     // 右上角
@@ -213,7 +201,8 @@ class HistoryItem extends StatelessWidget {
                                 duration: const Duration(milliseconds: 200),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(
+                                        StyleString.imgRadius.x),
                                     color: Colors.black.withOpacity(
                                         ctr!.enableMultiple.value &&
                                                 videoItem.checked
@@ -258,6 +247,27 @@ class HistoryItem extends StatelessWidget {
                               ),
                             ),
                           ),
+                          videoItem.progress != 0 && videoItem.duration != 0
+                              ? Positioned(
+                                  left: 3,
+                                  right: 3,
+                                  bottom: 0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(
+                                          StyleString.imgRadius.x),
+                                      bottomRight: Radius.circular(
+                                          StyleString.imgRadius.x),
+                                    ),
+                                    child: LinearProgressIndicator(
+                                      value: videoItem.progress == -1
+                                          ? 100
+                                          : videoItem.progress /
+                                              videoItem.duration,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox()
                         ],
                       ),
                       VideoContent(videoItem: videoItem, ctr: ctr)

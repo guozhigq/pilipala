@@ -50,6 +50,9 @@ class Utils {
       return time;
     }
     if (time < 3600) {
+      if (time == 0) {
+        return '00:00';
+      }
       final int minute = time ~/ 60;
       final double res = time / 60;
       if (minute != res) {
@@ -87,6 +90,9 @@ class Utils {
 
   // 时间显示，刚刚，x分钟前
   static String dateFormat(timeStamp, {formatType = 'list'}) {
+    if (timeStamp == 0 || timeStamp == null || timeStamp == '') {
+      return '';
+    }
     // 当前时间
     int time = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     // 对比
@@ -201,17 +207,38 @@ class Utils {
 
   static int findClosestNumber(int target, List<int> numbers) {
     int minDiff = 127;
-    late int closestNumber;
+    int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
+
+    if (numbers.contains(target)) {
+      return target;
+    }
+    // 向下查找
     try {
       for (int number in numbers) {
-        int diff = (number - target).abs();
-
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestNumber = number;
+        if (number < target) {
+          int diff = target - number; // 计算目标值与当前整数的差值
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+            return closestNumber;
+          }
         }
       }
     } catch (_) {}
+
+    // 向上查找
+    if (closestNumber == 0) {
+      try {
+        for (int number in numbers) {
+          int diff = (number - target).abs();
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestNumber = number;
+          }
+        }
+      } catch (_) {}
+    }
     return closestNumber;
   }
 
@@ -236,6 +263,10 @@ class Utils {
     SmartDialog.dismiss();
     var currentInfo = await PackageInfo.fromPlatform();
     var result = await Request().get(Api.latestApp, extra: {'ua': 'mob'});
+    if (result.data == null || result.data.isEmpty) {
+      SmartDialog.showToast('获取远程版本失败，请检查网络');
+      return false;
+    }
     LatestDataModel data = LatestDataModel.fromJson(result.data);
     bool isUpdate = Utils.needUpdate(currentInfo.version, data.tagName!);
     if (isUpdate) {
@@ -344,13 +375,19 @@ class Utils {
   }
 
   static List<int> generateRandomBytes(int minLength, int maxLength) {
-    return List<int>.generate(
-      random.nextInt(maxLength-minLength+1), (_) => random.nextInt(0x60) + 0x20
-    );
+    return List<int>.generate(random.nextInt(maxLength - minLength + 1),
+        (_) => random.nextInt(0x60) + 0x20);
   }
 
   static String base64EncodeRandomString(int minLength, int maxLength) {
     List<int> randomBytes = generateRandomBytes(minLength, maxLength);
     return base64.encode(randomBytes);
+  }
+
+  static List<int> matchNum(String str) {
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
+
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
   }
 }

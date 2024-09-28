@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:appscheme/appscheme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,14 +12,18 @@ import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/pages/preview/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
+import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'reply_save.dart';
 import 'zan.dart';
 
 Box setting = GStrorage.setting;
@@ -28,6 +36,7 @@ class ReplyItem extends StatelessWidget {
     this.showReplyRow = true,
     this.replyReply,
     this.replyType,
+    this.replySave = false,
     super.key,
   });
   final ReplyItemModel? replyItem;
@@ -36,6 +45,7 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
+  final bool? replySave;
 
   @override
   Widget build(BuildContext context) {
@@ -43,44 +53,48 @@ class ReplyItem extends StatelessWidget {
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem);
+            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
           }
         },
         onLongPress: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           showModalBottomSheet(
             context: context,
             useRootNavigator: true,
             isScrollControlled: true,
             builder: (context) {
-              return MorePanel(item: replyItem);
+              return MorePanel(
+                item: replyItem,
+                mainFloor: true,
+              );
             },
           );
         },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 14, 8, 5),
-              child: content(context),
-            ),
-            Divider(
-              indent: 55,
-              endIndent: 15,
-              height: 0.3,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onInverseSurface
-                  .withOpacity(0.5),
-            )
-          ],
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 14, 8, 5),
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+            width: 1,
+            color:
+                Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.5),
+          ))),
+          child: content(context),
         ),
       ),
     );
   }
 
   Widget lfAvtar(BuildContext context, String heroTag) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Stack(
       children: [
         Hero(
@@ -100,11 +114,11 @@ class ReplyItem extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(7),
-                color: Theme.of(context).colorScheme.background,
+                color: colorScheme.surface,
               ),
               child: Icon(
                 Icons.offline_bolt,
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
                 size: 16,
               ),
             ),
@@ -117,7 +131,7 @@ class ReplyItem extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(7),
-                color: Theme.of(context).colorScheme.background,
+                color: colorScheme.background,
               ),
               child: Image.asset(
                 'assets/images/big-vip.png',
@@ -131,6 +145,8 @@ class ReplyItem extends StatelessWidget {
 
   Widget content(BuildContext context) {
     final String heroTag = Utils.makeHeroTag(replyItem!.mid);
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -160,16 +176,17 @@ class ReplyItem extends StatelessWidget {
                         style: TextStyle(
                           color: replyItem!.member!.vip!['vipStatus'] > 0
                               ? const Color.fromARGB(255, 251, 100, 163)
-                              : Theme.of(context).colorScheme.outline,
+                              : colorScheme.outline,
                           fontSize: 13,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Image.asset(
-                        'assets/images/lv/lv${replyItem!.member!.level}.png',
-                        height: 11,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6, right: 6),
+                        child: Image.asset(
+                          'assets/images/lv/lv${replyItem!.member!.level}.png',
+                          height: 11,
+                        ),
                       ),
-                      const SizedBox(width: 6),
                       if (replyItem!.isUp!)
                         const PBadge(
                           text: 'UP',
@@ -184,9 +201,8 @@ class ReplyItem extends StatelessWidget {
                       Text(
                         Utils.dateFormat(replyItem!.ctime),
                         style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: textTheme.labelSmall!.fontSize,
+                          color: colorScheme.outline,
                         ),
                       ),
                       if (replyItem!.replyControl != null &&
@@ -194,11 +210,8 @@ class ReplyItem extends StatelessWidget {
                         Text(
                           ' • ${replyItem!.replyControl!.location!}',
                           style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall!
-                                  .fontSize,
-                              color: Theme.of(context).colorScheme.outline),
+                              fontSize: textTheme.labelSmall!.fontSize,
+                              color: colorScheme.outline),
                         ),
                     ],
                   )
@@ -234,7 +247,7 @@ class ReplyItem extends StatelessWidget {
           ),
         ),
         // 操作区域
-        bottonAction(context, replyItem!.replyControl),
+        bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
         if ((replyItem!.replyControl!.isShow! ||
                 replyItem!.replies!.isNotEmpty) &&
@@ -255,7 +268,9 @@ class ReplyItem extends StatelessWidget {
   }
 
   // 感谢、回复、复制
-  Widget bottonAction(BuildContext context, replyControl) {
+  Widget bottonAction(BuildContext context, replyControl, replySave) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
     return Row(
       children: <Widget>[
         const SizedBox(width: 32),
@@ -286,18 +301,26 @@ class ReplyItem extends StatelessWidget {
                   });
             },
             child: Row(children: [
-              Icon(Icons.reply,
-                  size: 18,
-                  color:
-                      Theme.of(context).colorScheme.outline.withOpacity(0.8)),
-              const SizedBox(width: 3),
-              Text(
-                '回复',
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                  color: Theme.of(context).colorScheme.outline,
+              if (!replySave!) ...[
+                Icon(Icons.reply,
+                    size: 18, color: colorScheme.outline.withOpacity(0.8)),
+                const SizedBox(width: 3),
+                Text(
+                  '回复',
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
+                )
+              ],
+              if (replySave!)
+                Text(
+                  IdUtils.av2bv(replyItem!.oid!),
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
                 ),
-              ),
             ]),
           ),
         ),
@@ -306,8 +329,8 @@ class ReplyItem extends StatelessWidget {
           Text(
             'up主觉得很赞',
             style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+                color: colorScheme.primary,
+                fontSize: textTheme.labelMedium!.fontSize),
           ),
           const SizedBox(width: 2),
         ],
@@ -316,8 +339,8 @@ class ReplyItem extends StatelessWidget {
           Text(
             '热评',
             style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+                color: colorScheme.primary,
+                fontSize: textTheme.labelMedium!.fontSize),
           ),
         const Spacer(),
         ZanButton(replyItem: replyItem, replyType: replyType),
@@ -347,10 +370,13 @@ class ReplyItemRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isShow = replyControl!.isShow!;
     final int extraRow = replyControl != null && isShow ? 1 : 0;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     return Container(
       margin: const EdgeInsets.only(left: 42, right: 4, top: 0),
       child: Material(
-        color: Theme.of(context).colorScheme.onInverseSurface,
+        color: colorScheme.onInverseSurface,
         borderRadius: BorderRadius.circular(6),
         clipBehavior: Clip.hardEdge,
         animationDuration: Duration.zero,
@@ -361,7 +387,13 @@ class ReplyItemRow extends StatelessWidget {
               for (int i = 0; i < replies!.length; i++) ...[
                 InkWell(
                   // 一楼点击评论展开评论详情
-                  onTap: () => replyReply!(replyItem),
+                  onTap: () {
+                    replyReply?.call(
+                      replyItem,
+                      replies![i],
+                      replyItem!.replies!.isNotEmpty,
+                    );
+                  },
                   onLongPress: () {
                     feedBack();
                     showModalBottomSheet(
@@ -379,7 +411,7 @@ class ReplyItemRow extends StatelessWidget {
                       8,
                       i == 0 && (extraRow == 1 || replies!.length > 1) ? 8 : 5,
                       8,
-                      i == 0 && (extraRow == 1 || replies!.length > 1) ? 5 : 6,
+                      6,
                     ),
                     child: Text.rich(
                       overflow: TextOverflow.ellipsis,
@@ -393,7 +425,7 @@ class ReplyItemRow extends StatelessWidget {
                                   .textTheme
                                   .titleSmall!
                                   .fontSize,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: colorScheme.primary,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
@@ -429,15 +461,15 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1)
               InkWell(
                 // 一楼点击【共xx条回复】展开评论详情
-                onTap: () => replyReply!(replyItem),
+                onTap: () => replyReply?.call(replyItem, null, true),
+                onLongPress: () => {},
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
                   child: Text.rich(
                     TextSpan(
                       style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium!.fontSize,
+                        fontSize: textTheme.labelMedium!.fontSize,
                       ),
                       children: [
                         if (replyControl!.upReply!)
@@ -445,7 +477,7 @@ class ReplyItemRow extends StatelessWidget {
                         TextSpan(
                           text: replyControl!.entryText!,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
+                            color: colorScheme.primary,
                           ),
                         )
                       ],
@@ -464,6 +496,7 @@ InlineSpan buildContent(
     BuildContext context, replyItem, replyReply, fReplyItem) {
   final String routePath = Get.currentRoute;
   bool isVideoPage = routePath.startsWith('/video');
+  ColorScheme colorScheme = Theme.of(context).colorScheme;
 
   // replyItem 当前回复内容
   // replyReply 查看二楼回复（回复详情）回调
@@ -498,7 +531,7 @@ InlineSpan buildContent(
       return str;
     });
   }
-  // content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
+  content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
   content.message = content.message
       .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')
@@ -525,14 +558,68 @@ InlineSpan buildContent(
   if (jumpUrlKeysList.isNotEmpty) {
     patternStr += '|${jumpUrlKeysList.join('|')}';
   }
+  RegExp bv23Regex = RegExp(r'https://b23\.tv/[a-zA-Z0-9]{7}');
   final RegExp pattern = RegExp(patternStr);
   List<String> matchedStrs = [];
   void addPlainTextSpan(str) {
-    spanChilds.add(TextSpan(
+    spanChilds.add(
+      TextSpan(
         text: str,
-        recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem)));
+        // recognizer: TapGestureRecognizer()
+        //   ..onTap = () => replyReply?.call(
+        //         replyItem.root == 0 ? replyItem : fReplyItem,
+        //         replyItem,
+        //         fReplyItem!.replies!.isNotEmpty,
+        //       ),
+      ),
+    );
+  }
+
+  void onPreviewImg(picList, initIndex, randomInt) {
+    final MainController mainController = Get.find<MainController>();
+    mainController.imgPreviewStatus = true;
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          itemBuilder: (
+            BuildContext context,
+            int index,
+            bool isFocus,
+            bool enablePageView,
+          ) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (enablePageView) {
+                  Navigator.of(context).pop();
+                  final MainController mainController =
+                      Get.find<MainController>();
+                  mainController.imgPreviewStatus = false;
+                }
+              },
+              child: Center(
+                child: Hero(
+                  tag: picList[index] + randomInt,
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 0),
+                    imageUrl: picList[index],
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            );
+          },
+          onPageChanged: (int pageIndex) {},
+          onDismissed: (int value) {
+            print('onDismissed');
+            final MainController mainController = Get.find<MainController>();
+            mainController.imgPreviewStatus = false;
+          },
+        ),
+      ),
+    );
   }
 
   // 分割文本并处理每个部分
@@ -560,7 +647,7 @@ InlineSpan buildContent(
           TextSpan(
             text: matchStr,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
+              color: colorScheme.primary,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
@@ -580,7 +667,7 @@ InlineSpan buildContent(
             text: ' $matchStr ',
             style: isVideoPage
                 ? TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: colorScheme.primary,
                   )
                 : null,
             recognizer: TapGestureRecognizer()
@@ -620,14 +707,14 @@ InlineSpan buildContent(
                   child: Image.network(
                     content.jumpUrl[matchStr]['prefix_icon'],
                     height: 19,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: colorScheme.primary,
                   ),
                 )
               ],
               TextSpan(
                 text: content.jumpUrl[matchStr]['title'],
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.primary,
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () async {
@@ -639,33 +726,27 @@ InlineSpan buildContent(
                           title,
                           '',
                         );
+                      } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
+                        Get.toNamed(
+                          '/webview',
+                          parameters: {
+                            'url': 'https://www.bilibili.com/read/$matchStr',
+                            'type': 'url',
+                            'pageTitle': title
+                          },
+                        );
                       } else {
-                        final String redirectUrl =
-                            await UrlUtils.parseRedirectUrl(matchStr);
-                        if (redirectUrl == matchStr) {
-                          Clipboard.setData(ClipboardData(text: matchStr));
-                          SmartDialog.showToast('地址可能有误');
-                          return;
-                        }
-                        final String pathSegment = Uri.parse(redirectUrl).path;
-                        final String lastPathSegment =
-                            pathSegment.split('/').last;
-                        if (lastPathSegment.startsWith('BV')) {
-                          UrlUtils.matchUrlPush(
-                            lastPathSegment,
-                            title,
-                            redirectUrl,
-                          );
-                        } else {
-                          Get.toNamed(
-                            '/webview',
-                            parameters: {
-                              'url': redirectUrl,
-                              'type': 'url',
-                              'pageTitle': title
-                            },
-                          );
-                        }
+                        Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
+                        SchemeEntity scheme = SchemeEntity(
+                          scheme: uri.scheme,
+                          host: uri.host,
+                          port: uri.port,
+                          path: uri.path,
+                          query: uri.queryParameters,
+                          source: '',
+                          dataString: matchStr,
+                        );
+                        PiliSchame.fullPathPush(scheme);
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {
@@ -710,14 +791,15 @@ InlineSpan buildContent(
           );
           // 只显示一次
           matchedStrs.add(matchStr);
-        } else if (content
-                .topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
-            null) {
+        } else if (content.topicsMeta.keys.isNotEmpty &&
+            matchStr.length > 1 &&
+            content.topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
+                null) {
           spanChilds.add(
             TextSpan(
               text: matchStr,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
@@ -734,8 +816,36 @@ InlineSpan buildContent(
       return '';
     },
     onNonMatch: (String nonMatchStr) {
-      addPlainTextSpan(nonMatchStr);
-      return nonMatchStr;
+      return nonMatchStr.splitMapJoin(
+        bv23Regex,
+        onMatch: (Match match) {
+          String matchStr = match[0]!;
+          spanChilds.add(
+            TextSpan(
+              text: ' $matchStr ',
+              style: isVideoPage
+                  ? TextStyle(
+                      color: colorScheme.primary,
+                    )
+                  : null,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => Get.toNamed(
+                      '/webview',
+                      parameters: {
+                        'url': matchStr,
+                        'type': 'url',
+                        'pageTitle': matchStr
+                      },
+                    ),
+            ),
+          );
+          return '';
+        },
+        onNonMatch: (String nonMatchOtherStr) {
+          addPlainTextSpan(nonMatchOtherStr);
+          return nonMatchOtherStr;
+        },
+      );
     },
   );
 
@@ -754,14 +864,14 @@ InlineSpan buildContent(
                 child: Image.network(
                   content.jumpUrl[patternStr]['prefix_icon'],
                   height: 19,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.primary,
                 ),
               )
             ],
             TextSpan(
               text: content.jumpUrl[patternStr]['title'],
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
@@ -802,39 +912,35 @@ InlineSpan buildContent(
                         pictureItem['img_width']))
                     .truncateToDouble();
               } catch (_) {}
+              String randomInt = Random().nextInt(101).toString();
 
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ImagePreview(initialPage: 0, imgList: picList);
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(top: 4),
-                  constraints: BoxConstraints(maxHeight: maxHeight),
-                  width: box.maxWidth / 2,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: NetworkImgLayer(
-                          src: pictureItem['img_src'],
-                          width: box.maxWidth / 2,
-                          height: height,
+              return Hero(
+                tag: picList[0] + randomInt,
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, 0, randomInt),
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    constraints: BoxConstraints(maxHeight: maxHeight),
+                    width: box.maxWidth / 2,
+                    height: height,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: picList[0],
+                            width: box.maxWidth / 2,
+                            height: height,
+                          ),
                         ),
-                      ),
-                      height > Get.size.height * 0.9
-                          ? const PBadge(
-                              text: '长图',
-                              right: 8,
-                              bottom: 8,
-                            )
-                          : const SizedBox(),
-                    ],
+                        height > Get.size.height * 0.9
+                            ? const PBadge(
+                                text: '长图',
+                                right: 8,
+                                bottom: 8,
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -846,25 +952,23 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
+      }
+      for (var i = 0; i < len; i++) {
+        String randomInt = Random().nextInt(101).toString();
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: i, imgList: picList);
-                    },
-                  );
-                },
-                child: NetworkImgLayer(
-                    src: content.pictures[i]['img_src'],
-                    width: box.maxWidth,
-                    height: box.maxWidth,
-                    origAspectRatio: content.pictures[i]['img_width'] /
-                        content.pictures[i]['img_height']),
+              return Hero(
+                tag: picList[i] + randomInt,
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, i, randomInt),
+                  child: NetworkImgLayer(
+                      src: picList[i],
+                      width: box.maxWidth,
+                      height: box.maxWidth,
+                      origAspectRatio: content.pictures[i]['img_width'] /
+                          content.pictures[i]['img_height']),
+                ),
               );
             },
           ),
@@ -928,7 +1032,12 @@ InlineSpan buildContent(
 
 class MorePanel extends StatelessWidget {
   final dynamic item;
-  const MorePanel({super.key, required this.item});
+  final bool mainFloor;
+  const MorePanel({
+    super.key,
+    required this.item,
+    this.mainFloor = false,
+  });
 
   Future<dynamic> menuActionHandler(String type) async {
     String message = item.content.message ?? item.content;
@@ -950,6 +1059,13 @@ class MorePanel extends StatelessWidget {
           },
         );
         break;
+      case 'save':
+        Get.back();
+        Navigator.push(
+          Get.context!,
+          PlPopupRoute(child: ReplySave(replyItem: item)),
+        );
+        break;
       // case 'block':
       //   SmartDialog.showToast('加入黑名单');
       //   break;
@@ -965,7 +1081,8 @@ class MorePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color errorColor = Theme.of(context).colorScheme.error;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
@@ -981,7 +1098,7 @@ class MorePanel extends StatelessWidget {
                   width: 32,
                   height: 3,
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.outline,
+                      color: colorScheme.outline,
                       borderRadius: const BorderRadius.all(Radius.circular(3))),
                 ),
               ),
@@ -991,14 +1108,21 @@ class MorePanel extends StatelessWidget {
             onTap: () async => await menuActionHandler('copyAll'),
             minLeadingWidth: 0,
             leading: const Icon(Icons.copy_all_outlined, size: 19),
-            title: Text('复制全部', style: Theme.of(context).textTheme.titleSmall),
+            title: Text('复制全部', style: textTheme.titleSmall),
           ),
           ListTile(
             onTap: () async => await menuActionHandler('copyFreedom'),
             minLeadingWidth: 0,
             leading: const Icon(Icons.copy_outlined, size: 19),
-            title: Text('自由复制', style: Theme.of(context).textTheme.titleSmall),
+            title: Text('自由复制', style: textTheme.titleSmall),
           ),
+          if (mainFloor && item.content.pictures.isEmpty)
+            ListTile(
+              onTap: () async => await menuActionHandler('save'),
+              minLeadingWidth: 0,
+              leading: const Icon(Icons.save_alt_rounded, size: 19),
+              title: Text('本地保存', style: textTheme.titleSmall),
+            ),
           // ListTile(
           //   onTap: () async => await menuActionHandler('block'),
           //   minLeadingWidth: 0,

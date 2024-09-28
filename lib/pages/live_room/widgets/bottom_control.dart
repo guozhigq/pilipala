@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/pages/live_room/index.dart';
@@ -13,10 +14,12 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final LiveRoomController? liveRoomCtr;
   final Floating? floating;
+  final Function? onRefresh;
   const BottomControl({
     this.controller,
     this.liveRoomCtr,
     this.floating,
+    this.onRefresh,
     Key? key,
   }) : super(key: key);
 
@@ -29,7 +32,6 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
 
 class _BottomControlState extends State<BottomControl> {
   late PlayUrlModel videoInfo;
-  List<PlaySpeed> playSpeed = PlaySpeed.values;
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
@@ -61,6 +63,14 @@ class _BottomControlState extends State<BottomControl> {
           //   ),
           //   fuc: () => Get.back(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.refresh_outlined,
+              size: 18,
+              color: Colors.white,
+            ),
+            fuc: widget.onRefresh,
+          ),
           const Spacer(),
           // ComBtn(
           //   icon: const Icon(
@@ -84,6 +94,30 @@ class _BottomControlState extends State<BottomControl> {
           //   ),
           // ),
           // const SizedBox(width: 4),
+          SizedBox(
+            width: 30,
+            child: PopupMenuButton<int>(
+              padding: EdgeInsets.zero,
+              onSelected: (value) {
+                widget.liveRoomCtr!.changeQn(value);
+              },
+              child: Obx(
+                () => Text(
+                  widget.liveRoomCtr!.currentQnDesc.value,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+              itemBuilder: (BuildContext context) {
+                return widget.liveRoomCtr!.acceptQnList.map((e) {
+                  return PopupMenuItem<int>(
+                    value: e['code'],
+                    child: Text(e['desc']),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
           if (Platform.isAndroid) ...[
             SizedBox(
               width: 34,
@@ -111,7 +145,7 @@ class _BottomControlState extends State<BottomControl> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 10),
           ],
           ComBtn(
             icon: const Icon(
@@ -119,28 +153,11 @@ class _BottomControlState extends State<BottomControl> {
               size: 20,
               color: Colors.white,
             ),
-            fuc: () => widget.controller!.triggerFullScreen(),
+            fuc: () => widget.controller!.triggerFullScreen(
+                status: !(widget.controller!.isFullScreen.value)),
           ),
         ],
       ),
     );
-  }
-}
-
-class MSliderTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    SliderThemeData? sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    const double trackHeight = 3;
-    final double trackLeft = offset.dx;
-    final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2 + 4;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

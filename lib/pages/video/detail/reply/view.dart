@@ -19,12 +19,14 @@ class VideoReplyPanel extends StatefulWidget {
   final int? oid;
   final int rpid;
   final String? replyLevel;
+  final Function(ScrollController)? onControllerCreated;
 
   const VideoReplyPanel({
     this.bvid,
     this.oid,
     this.rpid = 0,
     this.replyLevel,
+    this.onControllerCreated,
     super.key,
   });
 
@@ -67,13 +69,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         vsync: this, duration: const Duration(milliseconds: 300));
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
-
+    scrollController = ScrollController();
+    widget.onControllerCreated?.call(scrollController);
     fabAnimationCtr.forward();
     scrollListener();
   }
 
   void scrollListener() {
-    scrollController = _videoReplyController.scrollController;
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >=
@@ -110,14 +112,15 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply, loadMore) {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
       videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
-      videoDetailCtr.showReplyReplyPanel();
+      videoDetailCtr.showReplyReplyPanel(
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply, loadMore);
     }
   }
 
@@ -148,34 +151,16 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 floating: true,
                 delegate: _MySliverPersistentHeaderDelegate(
                   child: Container(
-                    height: 45,
+                    height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withOpacity(0.1)),
-                      ),
-                    ),
+                    color: Theme.of(context).colorScheme.surface,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Obx(
-                          () => AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                              '共${_videoReplyController.count.value}条回复',
-                              key: ValueKey<int>(
-                                  _videoReplyController.count.value),
-                            ),
+                          () => Text(
+                            '${_videoReplyController.sortTypeLabel.value}评论',
+                            style: const TextStyle(fontSize: 13),
                           ),
                         ),
                         SizedBox(
@@ -184,10 +169,12 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                             onPressed: () =>
                                 _videoReplyController.queryBySort(),
                             icon: const Icon(Icons.sort, size: 16),
-                            label: Obx(() => Text(
-                                  _videoReplyController.sortTypeLabel.value,
-                                  style: const TextStyle(fontSize: 13),
-                                )),
+                            label: Obx(
+                              () => Text(
+                                _videoReplyController.sortTypeLabel.value,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -200,7 +187,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 builder: (BuildContext context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
-                    if (data['status']) {
+                    if (_videoReplyController.replyList.isNotEmpty ||
+                        (data != null && data['status'])) {
                       // 请求成功
                       return Obx(
                         () => _videoReplyController.isLoadingMore &&
@@ -244,8 +232,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem) =>
-                                            replyReply(replyItem),
+                                        replyReply: (replyItem, currentReply,
+                                                loadMore) =>
+                                            replyReply(replyItem, currentReply,
+                                                loadMore),
                                         replyType: ReplyType.video,
                                       );
                                     }
@@ -292,32 +282,39 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 parent: fabAnimationCtr,
                 curve: Curves.easeInOut,
               )),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () {
-                  feedBack();
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return VideoReplyNewDialog(
-                        oid: _videoReplyController.aid ??
-                            IdUtils.bv2av(Get.parameters['bvid']!),
-                        root: 0,
-                        parent: 0,
-                        replyType: ReplyType.video,
-                      );
-                    },
-                  ).then(
-                    (value) => {
-                      // 完成评论，数据添加
-                      if (value != null && value['data'] != null)
-                        {_videoReplyController.replyList.add(value['data'])}
-                    },
-                  );
-                },
-                tooltip: '发表评论',
-                child: const Icon(Icons.reply),
+              child: Obx(
+                () => _videoReplyController.replyReqCode.value == 12061
+                    ? const SizedBox()
+                    : FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () {
+                          feedBack();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              return VideoReplyNewDialog(
+                                oid: _videoReplyController.aid ??
+                                    IdUtils.bv2av(Get.parameters['bvid']!),
+                                root: 0,
+                                parent: 0,
+                                replyType: ReplyType.video,
+                              );
+                            },
+                          ).then(
+                            (value) => {
+                              // 完成评论，数据添加
+                              if (value != null && value['data'] != null)
+                                {
+                                  _videoReplyController.replyList
+                                      .add(value['data'])
+                                }
+                            },
+                          );
+                        },
+                        tooltip: '发表评论',
+                        child: const Icon(Icons.reply),
+                      ),
               ),
             ),
           ),
@@ -329,8 +326,8 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
 class _MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   _MySliverPersistentHeaderDelegate({required this.child});
-  final double _minExtent = 45;
-  final double _maxExtent = 45;
+  final double _minExtent = 40;
+  final double _maxExtent = 40;
   final Widget child;
 
   @override

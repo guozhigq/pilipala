@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/extension.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import '../../utils/storage.dart';
 import '../constants.dart';
 
@@ -33,10 +33,12 @@ class NetworkImgLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int defaultImgQuality = GlobalData().imgQuality;
+    final int defaultImgQuality = GlobalDataCache().imgQuality;
+    if (src == '' || src == null) {
+      return placeholder(context);
+    }
     final String imageUrl =
         '${src!.startsWith('//') ? 'https:${src!}' : src!}@${quality ?? defaultImgQuality}q.webp';
-    print(imageUrl);
     int? memCacheWidth, memCacheHeight;
     double aspectRatio = (width / height).toDouble();
 

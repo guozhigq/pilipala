@@ -21,16 +21,23 @@ class ForwardSeekIndicatorState extends State<ForwardSeekIndicator> {
   Timer? timer;
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(milliseconds: 400), () {
+    timer = Timer(const Duration(milliseconds: 200), () {
       widget.onSubmitted.call(value);
     });
   }
 
   void increment() {
     timer?.cancel();
-    timer = Timer(const Duration(milliseconds: 400), () {
+    timer = Timer(const Duration(milliseconds: 200), () {
       widget.onSubmitted.call(value);
     });
     widget.onChanged.call(value);

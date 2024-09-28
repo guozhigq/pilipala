@@ -1,14 +1,14 @@
 // ignore_for_file: must_be_immutable
+// ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
-
 import '../../../http/search.dart';
 
 enum MsgType {
@@ -68,8 +68,12 @@ class ChatItem extends StatelessWidget {
     Color textColor(BuildContext context) {
       return isOwner
           ? Theme.of(context).colorScheme.onPrimary
-          : Theme.of(context).colorScheme.onSecondaryContainer;
+          : Theme.of(context).colorScheme.onBackground;
     }
+
+    const double safeDistanceval = 6;
+    const double borderRadiusVal = 12;
+    const double paddingVal = 10;
 
     Widget richTextMessage(BuildContext context) {
       var text = content['content'];
@@ -80,7 +84,7 @@ class ChatItem extends StatelessWidget {
           emojiMap[e['text']] = e['url'];
         }
         text.splitMapJoin(
-          RegExp(r"\[.+?\]"),
+          RegExp(r"\[[^\[\]]+\]"),
           onMatch: (Match match) {
             final String emojiKey = match[0]!;
             if (emojiMap.containsKey(emojiKey)) {
@@ -91,6 +95,17 @@ class ChatItem extends StatelessWidget {
                   src: emojiMap[emojiKey]!,
                 ),
               ));
+            } else {
+              children.add(
+                TextSpan(
+                  text: emojiKey,
+                  style: TextStyle(
+                    color: textColor(context),
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                  ),
+                ),
+              );
             }
             return '';
           },
@@ -105,13 +120,13 @@ class ChatItem extends StatelessWidget {
             return '';
           },
         );
-        return RichText(
-          text: TextSpan(
+        return SelectableText.rich(
+          TextSpan(
             children: children,
           ),
         );
       } else {
-        return Text(
+        return SelectableText(
           text,
           style: TextStyle(
             letterSpacing: 0.6,
@@ -129,7 +144,7 @@ class ChatItem extends StatelessWidget {
         case MsgType.pic_card:
           return SystemNotice2(item: item);
         case MsgType.notify_text:
-          return Text(
+          return SelectableText(
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
@@ -154,16 +169,33 @@ class ChatItem extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   SmartDialog.showLoading();
-                  var bvid = content["bvid"];
+                  final String bvid = content["bvid"];
+                  // 16番剧 5投稿
+                  final int source = content["source"];
+                  final String? url = content["url"];
+
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = Utils.makeHeroTag(bvid);
-                  SmartDialog.dismiss<dynamic>().then(
-                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
-                        arguments: <String, String?>{
-                          'pic': content['thumb'],
-                          'heroTag': heroTag,
-                        }),
-                  );
+                  await SmartDialog.dismiss();
+                  if (source == 5) {
+                    Get.toNamed<dynamic>(
+                      '/video?bvid=$bvid&cid=$cid',
+                      arguments: <String, String?>{
+                        'pic': content['thumb'],
+                        'heroTag': heroTag,
+                      },
+                    );
+                  }
+                  if (source == 16) {
+                    if (url != null) {
+                      final String area = url.split('/').last;
+                      if (area.startsWith('ep')) {
+                        RoutePush.bangumiPush(null, Utils.matchNum(area).first);
+                      } else if (area.startsWith('ss')) {
+                        RoutePush.bangumiPush(Utils.matchNum(area).first, null);
+                      }
+                    }
+                  }
                 },
                 child: NetworkImgLayer(
                   width: 220,
@@ -183,7 +215,7 @@ class ChatItem extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                content['author'],
+                content['author'] ?? '',
                 style: TextStyle(
                   letterSpacing: 0.6,
                   height: 1.5,
@@ -206,7 +238,7 @@ class ChatItem extends StatelessWidget {
                   SmartDialog.dismiss<dynamic>().then(
                     (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
                         arguments: <String, String?>{
-                          'pic': content['thumb'],
+                          'pic': content['thumb'] ?? '',
                           'heroTag': heroTag,
                         }),
                   );
@@ -241,115 +273,114 @@ class ChatItem extends StatelessWidget {
           );
         case MsgType.auto_reply_push:
           return Container(
-              constraints: const BoxConstraints(
-                maxWidth: 300.0, // 设置最大宽度为200.0
+            constraints: const BoxConstraints(
+              maxWidth: 300.0, // 设置最大宽度为200.0
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withOpacity(0.4),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(16),
               ),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondaryContainer
-                    .withOpacity(0.4),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(6),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    content['main_title'],
-                    style: TextStyle(
-                      letterSpacing: 0.6,
-                      height: 1.5,
-                      color: textColor(context),
-                      fontWeight: FontWeight.bold,
-                    ),
+            ),
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  content['main_title'],
+                  style: TextStyle(
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                    color: textColor(context),
+                    fontWeight: FontWeight.bold,
                   ),
-                  for (var i in content['sub_cards']) ...<Widget>[
-                    const SizedBox(height: 6),
-                    GestureDetector(
-                        onTap: () async {
-                          RegExp bvRegex = RegExp(r'BV[0-9A-Za-z]{10}',
-                              caseSensitive: false);
-                          Iterable<Match> matches =
-                              bvRegex.allMatches(i['jump_url']);
-                          if (matches.isNotEmpty) {
-                            Match match = matches.first;
-                            String bvid = match.group(0)!;
-                            try {
-                              SmartDialog.showLoading();
-                              final int cid = await SearchHttp.ab2c(bvid: bvid);
-                              final String heroTag = Utils.makeHeroTag(bvid);
-                              SmartDialog.dismiss<dynamic>().then(
-                                (e) => Get.toNamed<dynamic>(
-                                    '/video?bvid=$bvid&cid=$cid',
-                                    arguments: <String, String?>{
-                                      'pic': i['cover_url'],
-                                      'heroTag': heroTag,
-                                    }),
-                              );
-                            } catch (err) {
-                              SmartDialog.dismiss();
-                              SmartDialog.showToast(err.toString());
-                            }
-                          } else {
-                            SmartDialog.showToast('未匹配到 BV 号');
-                            Get.toNamed('/webview',
-                                arguments: {'url': i['jump_url']});
-                          }
-                        },
-                        child: Row(
+                ),
+                for (var i in content['sub_cards']) ...<Widget>[
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      RegExp bvRegex =
+                          RegExp(r'BV[0-9A-Za-z]{10}', caseSensitive: false);
+                      Iterable<Match> matches =
+                          bvRegex.allMatches(i['jump_url']);
+                      if (matches.isNotEmpty) {
+                        Match match = matches.first;
+                        String bvid = match.group(0)!;
+                        try {
+                          SmartDialog.showLoading();
+                          final int cid = await SearchHttp.ab2c(bvid: bvid);
+                          final String heroTag = Utils.makeHeroTag(bvid);
+                          SmartDialog.dismiss<dynamic>().then(
+                            (e) => Get.toNamed<dynamic>(
+                                '/video?bvid=$bvid&cid=$cid',
+                                arguments: <String, String?>{
+                                  'pic': i['cover_url'],
+                                  'heroTag': heroTag,
+                                }),
+                          );
+                        } catch (err) {
+                          SmartDialog.dismiss();
+                          SmartDialog.showToast(err.toString());
+                        }
+                      } else {
+                        SmartDialog.showToast('未匹配到 BV 号');
+                        Get.toNamed('/webview',
+                            arguments: {'url': i['jump_url']});
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        NetworkImgLayer(
+                          width: 130,
+                          height: 130 * 9 / 16,
+                          src: i['cover_url'],
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                            child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            NetworkImgLayer(
-                              width: 130,
-                              height: 130 * 9 / 16,
-                              src: i['cover_url'],
+                            Text(
+                              i['field1'],
+                              maxLines: 2,
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                                child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  i['field1'],
-                                  maxLines: 2,
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  i['field2'],
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context).withOpacity(0.6),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  Utils.timeFormat(int.parse(i['field3'])),
-                                  style: TextStyle(
-                                    letterSpacing: 0.6,
-                                    height: 1.5,
-                                    color: textColor(context).withOpacity(0.6),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            )),
+                            Text(
+                              i['field2'],
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context).withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              i['field3'],
+                              style: TextStyle(
+                                letterSpacing: 0.6,
+                                height: 1.5,
+                                color: textColor(context).withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         )),
-                  ],
+                      ],
+                    ),
+                  ),
                 ],
-              ));
+              ],
+            ),
+          );
         default:
           return Text(
             content != null && content != ''
@@ -369,73 +400,97 @@ class ChatItem extends StatelessWidget {
         ? messageContent(context)
         : isRevoke
             ? const SizedBox()
-            : Row(
-                children: [
-                  if (!isOwner) const SizedBox(width: 12),
-                  if (isOwner) const Spacer(),
-                  Container(
-                    constraints: const BoxConstraints(
-                      maxWidth: 300.0, // 设置最大宽度为200.0
-                    ),
-                    decoration: BoxDecoration(
-                      color: isOwner
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(16),
-                        topRight: const Radius.circular(16),
-                        bottomLeft: Radius.circular(isOwner ? 16 : 6),
-                        bottomRight: Radius.circular(isOwner ? 6 : 16),
+            : Container(
+                padding: const EdgeInsets.only(top: 6, bottom: 6),
+                decoration: BoxDecoration(
+                    border: Border(
+                  left: item.msgStatus == 1 && !isOwner
+                      ? BorderSide(
+                          width: 4, color: Theme.of(context).dividerColor)
+                      : BorderSide.none,
+                  right: item.msgStatus == 1 && isOwner
+                      ? BorderSide(
+                          width: 4, color: Theme.of(context).primaryColor)
+                      : BorderSide.none,
+                )),
+                child: Row(
+                  mainAxisAlignment: !isOwner
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: safeDistanceval),
+                    Container(
+                      constraints: const BoxConstraints(
+                        maxWidth: 300.0, // 设置最大宽度为200.0
+                      ),
+                      decoration: BoxDecoration(
+                        color: isOwner
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withAlpha(180)
+                            : Theme.of(context)
+                                .colorScheme
+                                .outlineVariant
+                                .withOpacity(0.6)
+                                .withAlpha(125),
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(borderRadiusVal),
+                          topRight: const Radius.circular(borderRadiusVal),
+                          bottomLeft:
+                              Radius.circular(isOwner ? borderRadiusVal : 2),
+                          bottomRight:
+                              Radius.circular(isOwner ? 2 : borderRadiusVal),
+                        ),
+                      ),
+                      margin: const EdgeInsets.only(
+                        left: 8,
+                        right: 8,
+                      ),
+                      padding: const EdgeInsets.all(paddingVal),
+                      child: Column(
+                        crossAxisAlignment: isOwner
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          messageContent(context),
+                          SizedBox(height: isPic ? 7 : 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                Utils.dateFormat(item.timestamp),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .copyWith(
+                                        color: isOwner
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                                .withOpacity(0.8)
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSecondaryContainer
+                                                .withOpacity(0.8)),
+                              ),
+                              item.msgStatus == 1
+                                  ? Text(
+                                      '  已撤回',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!,
+                                    )
+                                  : const SizedBox()
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                    margin: const EdgeInsets.only(top: 12),
-                    padding: EdgeInsets.only(
-                      top: 8,
-                      bottom: 6,
-                      left: isPic ? 8 : 12,
-                      right: isPic ? 8 : 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: isOwner
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        messageContent(context),
-                        SizedBox(height: isPic ? 7 : 2),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              Utils.dateFormat(item.timestamp),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall!
-                                  .copyWith(
-                                      color: isOwner
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                              .withOpacity(0.8)
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSecondaryContainer
-                                              .withOpacity(0.8)),
-                            ),
-                            item.msgStatus == 1
-                                ? Text(
-                                    '  已撤回',
-                                    style:
-                                        Theme.of(context).textTheme.labelSmall!,
-                                  )
-                                : const SizedBox()
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  if (!isOwner) const Spacer(),
-                  if (isOwner) const SizedBox(width: 12),
-                ],
+                    const SizedBox(width: safeDistanceval),
+                  ],
+                ),
               );
   }
 }
@@ -486,7 +541,7 @@ class SystemNotice extends StatelessWidget {
               Divider(
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               ),
-              Text(
+              SelectableText(
                 content['text'],
               )
             ],

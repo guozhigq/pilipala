@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
-import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -29,26 +28,11 @@ class _MediaPageState extends State<MediaPage>
     super.initState();
     mediaController = Get.put(MediaController());
     _futureBuilderFuture = mediaController.queryFavFolder();
-    ScrollController scrollController = mediaController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-
     mediaController.userLogin.listen((status) {
       setState(() {
         _futureBuilderFuture = mediaController.queryFavFolder();
       });
     });
-    scrollController.addListener(
-      () {
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-        }
-      },
-    );
   }
 
   @override
@@ -102,7 +86,11 @@ class _MediaPageState extends State<MediaPage>
             ],
             Obx(() => mediaController.userLogin.value
                 ? favFolder(mediaController, context)
-                : const SizedBox())
+                : const SizedBox()),
+            SizedBox(
+              height: MediaQuery.of(context).padding.bottom +
+                  kBottomNavigationBarHeight,
+            )
           ],
         ),
       ),
@@ -117,7 +105,7 @@ class _MediaPageState extends State<MediaPage>
           color: Theme.of(context).dividerColor.withOpacity(0.1),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () => Get.toNamed('/fav'),
           leading: null,
           dense: true,
           title: Padding(
@@ -248,9 +236,11 @@ class FavFolderItem extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
       child: GestureDetector(
-        onTap: () => Get.toNamed('/favDetail',
-            arguments: item,
-            parameters: {'mediaId': item!.id.toString(), 'heroTag': heroTag}),
+        onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
+          'mediaId': item!.id.toString(),
+          'heroTag': heroTag,
+          'isOwner': '1',
+        }),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

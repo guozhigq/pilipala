@@ -189,7 +189,7 @@ class Api {
       'https://s.search.bilibili.com/main/suggest';
 
   // 分类搜索
-  static const String searchByType = '/x/web-interface/search/type';
+  static const String searchByType = '/x/web-interface/wbi/search/type';
 
   // 记录视频播放进度
   // https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/report.md
@@ -400,12 +400,24 @@ class Api {
       '${HttpString.passBaseUrl}/x/passport-login/captcha?source=main_web';
 
   // web端短信验证码
-  static const String smsCode =
+  static const String webSmsCode =
       '${HttpString.passBaseUrl}/x/passport-login/web/sms/send';
 
   // web端验证码登录
+  static const String webSmsLogin =
+      '${HttpString.passBaseUrl}/x/passport-login/web/login/sms';
 
   // web端密码登录
+  static const String loginInByWebPwd =
+      '${HttpString.passBaseUrl}/x/passport-login/web/login';
+
+  // web端二维码
+  static const String qrCodeApi =
+      '${HttpString.passBaseUrl}/x/passport-login/web/qrcode/generate';
+
+  // 扫码登录
+  static const String loginInByQrcode =
+      '${HttpString.passBaseUrl}/x/passport-login/web/qrcode/poll';
 
   // app端短信验证码
   static const String appSmsCode =
@@ -475,6 +487,8 @@ class Api {
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
 
+  static const getSeriesDetailApi = '/x/series/archives';
+
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
 
@@ -484,11 +498,17 @@ class Api {
   /// 激活buvid3
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 
+  /// 获取字幕配置
+  static const getSubtitleConfig = '/x/player/v2';
+
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
 
-  /// 我的订阅详情
-  static const userSubFolderDetail = '/x/space/fav/season/list';
+  /// 我的订阅详情 type 21
+  static const userSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅详情 type 11
+  static const userResourceList = '/x/v3/fav/resource/list';
 
   /// 表情
   static const emojiList = '/x/emote/user/panel/web';
@@ -499,4 +519,69 @@ class Api {
 
   /// 发送私信
   static const String sendMsg = '${HttpString.tUrl}/web_im/v1/web_im/send_msg';
+
+  /// 排行榜
+  static const String getRankApi = "/x/web-interface/ranking/v2";
+
+  /// 取消订阅
+  static const String cancelSub = '/x/v3/fav/season/unfav';
+
+  /// 动态转发
+  static const String dynamicForwardUrl = '/x/dynamic/feed/create/submit_check';
+
+  /// 创建动态
+  static const String dynamicCreate = '/x/dynamic/feed/create/dyn';
+
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
+
+  /// 搜索结果计数
+  static const String searchCount = '/x/web-interface/wbi/search/all/v2';
+
+  /// 关闭会话
+  static const String removeSession =
+      '${HttpString.tUrl}/session_svr/v1/session_svr/remove_session';
+
+  /// 消息未读数
+  static const String unread = '${HttpString.tUrl}/x/im/web/msgfeed/unread';
+
+  /// 回复我的
+  static const String messageReplyAPi = '/x/msgfeed/reply';
+
+  /// 收到的赞
+  static const String messageLikeAPi = '/x/msgfeed/like';
+
+  /// 系统通知
+  static const String messageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  /// 系统通知标记已读
+  static const String systemMarkRead =
+      '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
+
+  /// 直播间弹幕信息
+  static const String getDanmuInfo =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';
+
+  /// 直播间发送弹幕
+  static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
 }

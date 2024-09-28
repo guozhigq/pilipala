@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,104 +47,73 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    // 设置状态栏图标的亮度
-    if (_homeController.enableGradientBg) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarIconBrightness: currentBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light,
-      ));
-    }
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: _homeController.enableGradientBg
-          ? null
-          : AppBar(toolbarHeight: 0, elevation: 0),
-      body: Stack(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Platform.isAndroid
+            ? SystemUiOverlayStyle(
+                statusBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Brightness.light
+                        : Brightness.dark,
+              )
+            : Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+      ),
+      body: Column(
         children: [
-          // gradient background
-          if (_homeController.enableGradientBg) ...[
-            Align(
-              alignment: Alignment.topLeft,
-              child: Opacity(
-                opacity: 0.6,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.9),
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5),
-                          Theme.of(context).colorScheme.surface
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: const [0, 0.0034, 0.34]),
+          CustomAppBar(
+            stream: _homeController.hideSearchBar
+                ? stream
+                : StreamController<bool>.broadcast().stream,
+            ctr: _homeController,
+            callback: showUserBottomSheet,
+          ),
+          if (_homeController.tabs.length > 1) ...[
+            if (_homeController.enableGradientBg) ...[
+              const CustomTabs(),
+            ] else ...[
+              Container(
+                width: double.infinity,
+                height: 42,
+                padding: const EdgeInsets.only(top: 4),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: TabBar(
+                    controller: _homeController.tabController,
+                    tabs: [
+                      for (var i in _homeController.tabs) Tab(text: i['label'])
+                    ],
+                    isScrollable: true,
+                    dividerColor: Colors.transparent,
+                    enableFeedback: true,
+                    splashBorderRadius: BorderRadius.circular(10),
+                    tabAlignment: TabAlignment.center,
+                    onTap: (value) {
+                      feedBack();
+                      if (_homeController.initialIndex.value == value) {
+                        _homeController.tabsCtrList[value]().animateToTop();
+                      }
+                      _homeController.initialIndex.value = value;
+                    },
                   ),
-                ),
-              ),
-            ),
-          ],
-          Column(
-            children: [
-              CustomAppBar(
-                stream: _homeController.hideSearchBar
-                    ? stream
-                    : StreamController<bool>.broadcast().stream,
-                ctr: _homeController,
-                callback: showUserBottomSheet,
-              ),
-              if (_homeController.tabs.length > 1) ...[
-                if (_homeController.enableGradientBg) ...[
-                  const CustomTabs(),
-                ] else ...[
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 42,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: TabBar(
-                        controller: _homeController.tabController,
-                        tabs: [
-                          for (var i in _homeController.tabs)
-                            Tab(text: i['label'])
-                        ],
-                        isScrollable: true,
-                        dividerColor: Colors.transparent,
-                        enableFeedback: true,
-                        splashBorderRadius: BorderRadius.circular(10),
-                        tabAlignment: TabAlignment.center,
-                        onTap: (value) {
-                          feedBack();
-                          if (_homeController.initialIndex.value == value) {
-                            _homeController.tabsCtrList[value]().animateToTop();
-                          }
-                          _homeController.initialIndex.value = value;
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ] else ...[
-                const SizedBox(height: 6),
-              ],
-              Expanded(
-                child: TabBarView(
-                  controller: _homeController.tabController,
-                  children: _homeController.tabsPageList,
                 ),
               ),
             ],
+          ] else ...[
+            const SizedBox(height: 6),
+          ],
+          Expanded(
+            child: TabBarView(
+              controller: _homeController.tabController,
+              children: _homeController.tabsPageList,
+            ),
           ),
         ],
       ),
@@ -171,7 +141,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: stream,
+      stream: stream!.distinct(),
       initialData: true,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         final RxBool isUserLoggedIn = ctr!.userLogin;
@@ -214,6 +184,34 @@ class UserInfoWidget extends StatelessWidget {
   final VoidCallback? callback;
   final HomeController? ctr;
 
+  Widget buildLoggedInWidget(context) {
+    return Stack(
+      children: [
+        NetworkImgLayer(
+          type: 'avatar',
+          width: 34,
+          height: 34,
+          src: userFace,
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => callback?.call(),
+              splashColor: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withOpacity(0.3),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(50),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -231,31 +229,7 @@ class UserInfoWidget extends StatelessWidget {
         const SizedBox(width: 8),
         Obx(
           () => userLogin.value
-              ? Stack(
-                  children: [
-                    NetworkImgLayer(
-                      type: 'avatar',
-                      width: 34,
-                      height: 34,
-                      src: userFace,
-                    ),
-                    Positioned.fill(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => callback?.call(),
-                          splashColor: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.3),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(50),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )
+              ? buildLoggedInWidget(context)
               : DefaultUser(callback: () => callback!()),
         ),
       ],
@@ -276,7 +250,10 @@ class DefaultUser extends StatelessWidget {
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
           backgroundColor: MaterialStateProperty.resolveWith((states) {
-            return Theme.of(context).colorScheme.onInverseSurface;
+            return Theme.of(context)
+                .colorScheme
+                .onSecondaryContainer
+                .withOpacity(0.05);
           }),
         ),
         onPressed: () => callback?.call(),
@@ -313,7 +290,7 @@ class _CustomTabsState extends State<CustomTabs> {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      margin: const EdgeInsets.only(top: 4),
+      margin: const EdgeInsets.only(top: 8),
       child: Obx(
         () => ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14.0),
@@ -353,25 +330,29 @@ class CustomChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorTheme = Theme.of(context).colorScheme;
     final Color secondaryContainer = colorTheme.secondaryContainer;
+    final Color onPrimary = colorTheme.onPrimary;
+    final Color primary = colorTheme.primary;
     final TextStyle chipTextStyle = selected
-        ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)
-        : const TextStyle(fontSize: 13);
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+        ? TextStyle(fontSize: 13, color: onPrimary)
+        : TextStyle(fontSize: 13, color: colorTheme.onSecondaryContainer);
     const VisualDensity visualDensity =
         VisualDensity(horizontal: -4.0, vertical: -2.0);
     return InputChip(
-      side: BorderSide(
-        color: selected
-            ? colorScheme.onSecondaryContainer.withOpacity(0.2)
-            : Colors.transparent,
-      ),
+      side: BorderSide.none,
       backgroundColor: secondaryContainer,
-      selectedColor: secondaryContainer,
-      color: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) => secondaryContainer.withAlpha(200)),
-      padding: const EdgeInsets.fromLTRB(7, 1, 7, 1),
+      color: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected) ||
+            states.contains(MaterialState.hovered)) {
+          return primary;
+        }
+        return colorTheme.secondaryContainer;
+      }),
+      padding: const EdgeInsets.fromLTRB(6, 1, 6, 1),
       label: Text(label, style: chipTextStyle),
       onPressed: () => onTap(),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+      ),
       selected: selected,
       showCheckmark: false,
       visualDensity: visualDensity,
@@ -402,30 +383,27 @@ class SearchBar extends StatelessWidget {
           color: colorScheme.onSecondaryContainer.withOpacity(0.05),
           child: InkWell(
             splashColor: colorScheme.primaryContainer.withOpacity(0.3),
-            onTap: () => Get.toNamed(
-              '/search',
-              parameters: {'hintText': ctr!.defaultSearch.value},
-            ),
-            child: Row(
-              children: [
-                const SizedBox(width: 14),
-                Icon(
-                  Icons.search_outlined,
-                  color: colorScheme.onSecondaryContainer,
-                ),
-                const SizedBox(width: 10),
-                Obx(
-                  () => Expanded(
-                    child: Text(
+            onTap: () => Get.toNamed('/search',
+                parameters: {'hintText': ctr!.defaultSearch.value}),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.search_outlined,
+                    color: colorScheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: 10),
+                  Obx(
+                    () => Text(
                       ctr!.defaultSearch.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: colorScheme.outline),
                     ),
                   ),
-                ),
-                const SizedBox(width: 15),
-              ],
+                ],
+              ),
             ),
           ),
         ),

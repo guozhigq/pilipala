@@ -180,7 +180,9 @@ class ProfilePanel extends StatelessWidget {
                           Obx(
                             () => Expanded(
                               child: TextButton(
-                                onPressed: () => ctr.actionRelationMod(),
+                                onPressed: () => loadingStatus
+                                    ? null
+                                    : ctr.actionRelationMod(),
                                 style: TextButton.styleFrom(
                                   foregroundColor: ctr.attribute.value == -1
                                       ? Colors.transparent
@@ -206,7 +208,17 @@ class ProfilePanel extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.toNamed(
+                                  '/whisperDetail',
+                                  parameters: {
+                                    'name': memberInfo.name!,
+                                    'face': memberInfo.face!,
+                                    'mid': memberInfo.mid.toString(),
+                                    'heroTag': ctr.heroTag!,
+                                  },
+                                );
+                              },
                               style: TextButton.styleFrom(
                                 backgroundColor: Theme.of(context)
                                     .colorScheme

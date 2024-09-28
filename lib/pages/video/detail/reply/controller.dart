@@ -1,5 +1,4 @@
 import 'package:easy_debounce/easy_throttle.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/reply.dart';
@@ -15,7 +14,6 @@ class VideoReplyController extends GetxController {
     this.rpid,
     this.replyLevel,
   );
-  final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
   int? aid;
   // 层级 2为楼中楼
@@ -37,6 +35,7 @@ class VideoReplyController extends GetxController {
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
   Box setting = GStrorage.setting;
+  RxInt replyReqCode = 200.obs;
 
   @override
   void onInit() {
@@ -106,6 +105,7 @@ class VideoReplyController extends GetxController {
         replyList.addAll(replies);
       }
     }
+    replyReqCode.value = res['code'];
     isLoadingMore = false;
     return res;
   }

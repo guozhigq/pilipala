@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/image_save.dart';
 import 'package:pilipala/utils/utils.dart';
 
 Widget searchLivePanel(BuildContext context, ctr, list) {
@@ -42,15 +44,15 @@ class LiveItem extends StatelessWidget {
           Get.toNamed('/liveRoom?roomid=${liveItem.roomid}',
               arguments: {'liveItem': liveItem, 'heroTag': heroTag});
         },
+        onLongPress: () => imageSaveDialog(
+          context,
+          liveItem,
+          SmartDialog.dismiss,
+        ),
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: StyleString.imgRadius,
-                topRight: StyleString.imgRadius,
-                bottomLeft: StyleString.imgRadius,
-                bottomRight: StyleString.imgRadius,
-              ),
+              borderRadius: const BorderRadius.all(StyleString.imgRadius),
               child: AspectRatio(
                 aspectRatio: StyleString.aspectRatio,
                 child: LayoutBuilder(builder: (context, boxConstraints) {
@@ -108,7 +110,7 @@ class LiveContent extends StatelessWidget {
             RichText(
               text: TextSpan(
                 children: [
-                  for (var i in liveItem.title) ...[
+                  for (var i in liveItem.titleList) ...[
                     TextSpan(
                       text: i['text'],
                       style: TextStyle(

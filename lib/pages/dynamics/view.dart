@@ -3,19 +3,22 @@ import 'dart:async';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/main_stream.dart';
+import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
+import 'up_dynamic/route_panel.dart';
 import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -28,6 +31,7 @@ class DynamicsPage extends StatefulWidget {
 class _DynamicsPageState extends State<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
   final DynamicsController _dynamicsController = Get.put(DynamicsController());
+  final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
   Box userInfoCache = GStrorage.userInfo;
@@ -42,8 +46,6 @@ class _DynamicsPageState extends State<DynamicsPage>
     _futureBuilderFuture = _dynamicsController.queryFollowDynamic();
     _futureBuilderFutureUp = _dynamicsController.queryFollowUp();
     scrollController = _dynamicsController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
     scrollController.addListener(
       () async {
         if (scrollController.position.pixels >=
@@ -53,14 +55,7 @@ class _DynamicsPageState extends State<DynamicsPage>
             _dynamicsController.queryFollowDynamic(type: 'onLoad');
           });
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
 
@@ -87,7 +82,6 @@ class _DynamicsPageState extends State<DynamicsPage>
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
-        titleSpacing: 0,
         title: SizedBox(
           height: 34,
           child: Stack(
@@ -174,8 +168,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 thumbDecoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 duration: const Duration(milliseconds: 300),
@@ -210,7 +203,21 @@ class _DynamicsPageState extends State<DynamicsPage>
                   }
                   Map data = snapshot.data;
                   if (data['status']) {
-                    return Obx(() => UpPanel(_dynamicsController.upData.value));
+                    return Obx(
+                      () => UpPanel(
+                        upData: _dynamicsController.upData.value,
+                        onClickUpCb: (data) {
+                          // _dynamicsController.onTapUp(data);
+                          Navigator.push(
+                            context,
+                            PlPopupRoute(
+                              child: OverlayPanel(
+                                  ctr: _dynamicsController, upInfo: data),
+                            ),
+                          );
+                        },
+                      ),
+                    );
                   } else {
                     return const SliverToBoxAdapter(
                       child: SizedBox(height: 80),
@@ -232,8 +239,8 @@ class _DynamicsPageState extends State<DynamicsPage>
                   if (snapshot.data == null) {
                     return const SliverToBoxAdapter(child: SizedBox());
                   }
-                  Map data = snapshot.data;
-                  if (data['status']) {
+                  Map? data = snapshot.data;
+                  if (data != null && data['status']) {
                     List<DynamicItemModel> list =
                         _dynamicsController.dynamicsList;
                     return Obx(
@@ -258,14 +265,19 @@ class _DynamicsPageState extends State<DynamicsPage>
                     );
                   } else {
                     return HttpError(
-                      errMsg: data['msg'],
+                      errMsg: data?['msg'] ?? '请求异常',
+                      btnText: data?['code'] == -101 ? '去登录' : null,
                       fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _dynamicsController.queryFollowDynamic();
-                          _futureBuilderFutureUp =
-                              _dynamicsController.queryFollowUp();
-                        });
+                        if (data?['code'] == -101) {
+                          RoutePush.loginRedirectPush();
+                        } else {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _dynamicsController.queryFollowDynamic();
+                            _futureBuilderFutureUp =
+                                _dynamicsController.queryFollowUp();
+                          });
+                        }
                       },
                     );
                   }

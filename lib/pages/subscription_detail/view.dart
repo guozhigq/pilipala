@@ -24,16 +24,14 @@ class _SubDetailPageState extends State<SubDetailPage> {
   late final ScrollController _controller = ScrollController();
   final SubDetailController _subDetailController =
       Get.put(SubDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   late Future _futureBuilderFuture;
-  late String seasonId;
 
   @override
   void initState() {
     super.initState();
-    seasonId = Get.parameters['seasonId']!;
-    _futureBuilderFuture = _subDetailController.queryUserSubFolderDetail();
-    titleStreamC = StreamController<bool>();
+    _futureBuilderFuture = _subDetailController.queryUserSeasonList();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
@@ -55,6 +53,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
   @override
   void dispose() {
     _controller.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 
@@ -69,7 +68,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             pinned: true,
             titleSpacing: 0,
             title: StreamBuilder(
-              stream: titleStreamC.stream,
+              stream: titleStreamC.stream.distinct(),
               initialData: false,
               builder: (context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
@@ -161,15 +160,18 @@ class _SubDetailPageState extends State<SubDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${Utils.numFormat(_subDetailController.item.viewCount)}次播放',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline),
-                            ),
+                            Obx(
+                              () => Text(
+                                '${Utils.numFormat(_subDetailController.subInfo.value.cntInfo?['play'])}次播放',
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .fontSize,
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -182,14 +184,12 @@ class _SubDetailPageState extends State<SubDetailPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
-              child: Obx(
-                () => Text(
-                  '共${_subDetailController.subList.length}条视频',
-                  style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium!.fontSize,
-                      color: Theme.of(context).colorScheme.outline,
-                      letterSpacing: 1),
+              child: Text(
+                '共${_subDetailController.item.mediaCount}条视频',
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  color: Theme.of(context).colorScheme.outline,
+                  letterSpacing: 1,
                 ),
               ),
             ),
@@ -198,8 +198,8 @@ class _SubDetailPageState extends State<SubDetailPage> {
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data;
-                if (data['status']) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
                   if (_subDetailController.item.mediaCount == 0) {
                     return const NoData();
                   } else {
@@ -219,7 +219,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: data['msg'],
+                    errMsg: data?['msg'] ?? '请求异常',
                     fn: () => setState(() {}),
                   );
                 }

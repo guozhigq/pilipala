@@ -3,13 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/init.dart';
+import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/services/service_locator.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
+import '../../models/live/quality.dart';
 import 'widgets/switch_item.dart';
 
 class PlaySetting extends StatefulWidget {
@@ -22,16 +25,20 @@ class PlaySetting extends StatefulWidget {
 class _PlaySettingState extends State<PlaySetting> {
   Box setting = GStrorage.setting;
   late dynamic defaultVideoQa;
+  late dynamic defaultLiveQa;
   late dynamic defaultAudioQa;
   late dynamic defaultDecode;
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
+  late String defaultAoOutput;
 
   @override
   void initState() {
     super.initState();
     defaultVideoQa = setting.get(SettingBoxKey.defaultVideoQa,
         defaultValue: VideoQuality.values.last.code);
+    defaultLiveQa = setting.get(SettingBoxKey.defaultLiveQa,
+        defaultValue: LiveQuality.values.last.code);
     defaultAudioQa = setting.get(SettingBoxKey.defaultAudioQa,
         defaultValue: AudioQuality.values.last.code);
     defaultDecode = setting.get(SettingBoxKey.defaultDecode,
@@ -40,6 +47,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: FullScreenMode.values.first.code);
     defaultBtmProgressBehavior = setting.get(SettingBoxKey.btmProgressBehavior,
         defaultValue: BtmProgresBehavior.values.first.code);
+    defaultAoOutput =
+        setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
   }
 
   @override
@@ -127,7 +136,7 @@ class _PlaySettingState extends State<PlaySetting> {
             title: '开启硬解',
             subTitle: '以较低功耗播放视频',
             setKey: SettingBoxKey.enableHA,
-            defaultVal: true,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '观看人数',
@@ -153,13 +162,21 @@ class _PlaySettingState extends State<PlaySetting> {
               setKey: SettingBoxKey.enablePlayerControlAnimation,
               defaultVal: true,
               callFn: (bool val) {
-                GlobalData().enablePlayerControlAnimation = val;
+                GlobalDataCache().enablePlayerControlAnimation = val;
               }),
+          SetSwitchItem(
+            title: '港澳台模式',
+            setKey: SettingBoxKey.enableGATMode,
+            defaultVal: false,
+            callFn: (bool val) {
+              Request.setBaseUrl(type: val ? 'bangumi' : 'default');
+            },
+          ),
           ListTile(
             dense: false,
-            title: Text('默认画质', style: titleStyle),
+            title: Text('默认视频画质', style: titleStyle),
             subtitle: Text(
-              '当前画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
+              '当前默认画质${VideoQualityCode.fromCode(defaultVideoQa)!.description!}',
               style: subTitleStyle,
             ),
             onTap: () async {
@@ -167,7 +184,7 @@ class _PlaySettingState extends State<PlaySetting> {
                 context: context,
                 builder: (context) {
                   return SelectDialog<int>(
-                      title: '默认画质',
+                      title: '默认视频画质',
                       value: defaultVideoQa,
                       values: VideoQuality.values.reversed.map((e) {
                         return {'title': e.description, 'value': e.code};
@@ -177,6 +194,32 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultVideoQa = result;
                 setting.put(SettingBoxKey.defaultVideoQa, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('默认直播画质', style: titleStyle),
+            subtitle: Text(
+              '当前默认画质${LiveQualityCode.fromCode(defaultLiveQa)!.description!}',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<int>(
+                      title: '默认直播画质',
+                      value: defaultLiveQa,
+                      values: LiveQuality.values.reversed.map((e) {
+                        return {'title': e.description, 'value': e.code};
+                      }).toList());
+                },
+              );
+              if (result != null) {
+                defaultLiveQa = result;
+                setting.put(SettingBoxKey.defaultLiveQa, result);
                 setState(() {});
               }
             },
@@ -229,6 +272,31 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultDecode = result;
                 setting.put(SettingBoxKey.defaultDecode, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('音频输出方式', style: titleStyle),
+            subtitle: Text(
+              '当前输出方式 ${aoOutputList.firstWhere((element) => element['value'] == defaultAoOutput)['title']}',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(
+                    title: '音频输出方式',
+                    value: defaultAoOutput,
+                    values: aoOutputList,
+                  );
+                },
+              );
+              if (result != null) {
+                defaultAoOutput = result;
+                setting.put(SettingBoxKey.defaultAoOutput, result);
                 setState(() {});
               }
             },

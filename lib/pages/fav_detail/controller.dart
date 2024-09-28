@@ -1,22 +1,25 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
-  Rx<FavDetailData> favDetailData = FavDetailData().obs;
 
   int? mediaId;
   late String heroTag;
   int currentPage = 1;
   bool isLoadingMore = false;
   RxMap favInfo = {}.obs;
-  RxList favList = [].obs;
+  RxList<FavDetailItemData> favList = <FavDetailItemData>[].obs;
   RxString loadingText = '加载中...'.obs;
-  int mediaCount = 0;
+  RxInt mediaCount = 0.obs;
+  late String isOwner;
 
   @override
   void onInit() {
@@ -24,12 +27,13 @@ class FavDetailController extends GetxController {
     if (Get.parameters.keys.isNotEmpty) {
       mediaId = int.parse(Get.parameters['mediaId']!);
       heroTag = Get.parameters['heroTag']!;
+      isOwner = Get.parameters['isOwner']!;
     }
     super.onInit();
   }
 
   Future<dynamic> queryUserFavFolderDetail({type = 'init'}) async {
-    if (type == 'onLoad' && favList.length >= mediaCount) {
+    if (type == 'onLoad' && favList.length >= mediaCount.value) {
       loadingText.value = '没有更多了';
       return;
     }
@@ -43,11 +47,11 @@ class FavDetailController extends GetxController {
       favInfo.value = res['data'].info;
       if (currentPage == 1 && type == 'init') {
         favList.value = res['data'].medias;
-        mediaCount = res['data'].info['media_count'];
+        mediaCount.value = res['data'].info['media_count'];
       } else if (type == 'onLoad') {
         favList.addAll(res['data'].medias);
       }
-      if (favList.length >= mediaCount) {
+      if (favList.length >= mediaCount.value) {
         loadingText.value = '没有更多了';
       }
     }
@@ -73,5 +77,73 @@ class FavDetailController extends GetxController {
 
   onLoad() {
     queryUserFavFolderDetail(type: 'onLoad');
+  }
+
+  onDelFavFolder() async {
+    SmartDialog.show(
+      useSystem: true,
+      animationType: SmartAnimationType.centerFade_otherSlide,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('确定删除这个收藏夹吗？'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                SmartDialog.dismiss();
+              },
+              child: Text(
+                '点错了',
+                style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                var res = await UserHttp.delFavFolder(mediaIds: mediaId!);
+                SmartDialog.dismiss();
+                SmartDialog.showToast(res['status'] ? '操作成功' : res['msg']);
+                if (res['status']) {
+                  FavController favController = Get.find<FavController>();
+                  await favController.removeFavFolder(mediaIds: mediaId!);
+                  Get.back();
+                }
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  onEditFavFolder() async {
+    Get.toNamed(
+      '/favEdit',
+      arguments: {
+        'mediaId': mediaId.toString(),
+        'title': item!.title,
+        'intro': item!.intro,
+        'cover': item!.cover,
+        'privacy': item!.attr,
+      },
+    );
+  }
+
+  Future toViewPlayAll() async {
+    final FavDetailItemData firstItem = favList.first;
+    final String heroTag = Utils.makeHeroTag(firstItem.bvid);
+    Get.toNamed(
+      '/video?bvid=${firstItem.bvid}&cid=${firstItem.cid}',
+      arguments: {
+        'videoItem': firstItem,
+        'heroTag': heroTag,
+        'sourceType': 'fav',
+        'mediaId': favInfo['id'],
+        'oid': firstItem.id,
+        'favTitle': favInfo['title'],
+        'favInfo': favInfo,
+        'count': favInfo['media_count'],
+      },
+    );
   }
 }

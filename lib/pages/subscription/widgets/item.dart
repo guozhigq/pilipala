@@ -8,7 +8,14 @@ import '../../../models/user/sub_folder.dart';
 
 class SubItem extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const SubItem({super.key, required this.subFolderItem});
+  final bool isOwner;
+  final Function(SubFolderItemData) cancelSub;
+  const SubItem({
+    super.key,
+    required this.subFolderItem,
+    required this.isOwner,
+    required this.cancelSub,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +27,7 @@ class SubItem extends StatelessWidget {
         parameters: {
           'heroTag': heroTag,
           'seasonId': subFolderItem.id.toString(),
+          'type': subFolderItem.type.toString(),
         },
       ),
       child: Padding(
@@ -51,7 +59,11 @@ class SubItem extends StatelessWidget {
                       },
                     ),
                   ),
-                  VideoContent(subFolderItem: subFolderItem)
+                  VideoContent(
+                    subFolderItem: subFolderItem,
+                    isOwner: isOwner,
+                    cancelSub: cancelSub,
+                  )
                 ],
               ),
             );
@@ -64,7 +76,14 @@ class SubItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final SubFolderItemData subFolderItem;
-  const VideoContent({super.key, required this.subFolderItem});
+  final bool isOwner;
+  final Function(SubFolderItemData)? cancelSub;
+  const VideoContent({
+    super.key,
+    required this.subFolderItem,
+    required this.isOwner,
+    this.cancelSub,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +119,25 @@ class VideoContent extends StatelessWidget {
                 color: Theme.of(context).colorScheme.outline,
               ),
             ),
+            const Spacer(),
+            isOwner
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        ),
+                        onPressed: () => cancelSub?.call(subFolderItem),
+                        icon: Icon(
+                          Icons.clear_outlined,
+                          color: Theme.of(context).colorScheme.outline,
+                          size: 18,
+                        ),
+                      )
+                    ],
+                  )
+                : const SizedBox()
           ],
         ),
       ),
