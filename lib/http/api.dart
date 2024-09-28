@@ -565,4 +565,8 @@ class Api {
 
   /// 直播间发送弹幕
   static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
 }

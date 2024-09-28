@@ -95,6 +95,7 @@ class LiveRoomController extends GetxController {
       autoplay: true,
     );
     plPlayerController.isOpenDanmu.value = danmakuSwitch.value;
+    heartBeat();
   }
 
   Future queryLiveInfo() async {
@@ -278,8 +279,20 @@ class LiveRoomController extends GetxController {
     }
   }
 
+  // 历史记录
+  void heartBeat() {
+    LiveHttp.liveRoomEntry(roomId: roomId);
+  }
+
+  String encodeToBase64(String input) {
+    List<int> bytes = utf8.encode(input);
+    String base64Str = base64.encode(bytes);
+    return base64Str;
+  }
+
   @override
   void onClose() {
+    heartBeat();
     plSocket?.onClose();
     super.onClose();
   }
