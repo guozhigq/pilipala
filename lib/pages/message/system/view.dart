@@ -20,7 +20,7 @@ class _MessageSystemPageState extends State<MessageSystemPage> {
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _messageSystemCtr.queryMessageSystem();
+    _futureBuilderFuture = _messageSystemCtr.queryAndProcessMessages();
   }
 
   @override
@@ -31,7 +31,7 @@ class _MessageSystemPageState extends State<MessageSystemPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await _messageSystemCtr.queryMessageSystem();
+          await _messageSystemCtr.queryAndProcessMessages();
         },
         child: FutureBuilder(
           future: _futureBuilderFuture,
@@ -42,7 +42,6 @@ class _MessageSystemPageState extends State<MessageSystemPage> {
               }
               if (snapshot.data['status']) {
                 final systemItems = _messageSystemCtr.systemItems;
-                print(systemItems.length);
                 return Obx(
                   () => ListView.separated(
                     controller: scrollController,
@@ -115,7 +114,7 @@ class SystemItem extends StatelessWidget {
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ),
           const SizedBox(height: 6),
-          Text(item.content!['web']),
+          Text(item.content is String ? item.content : item.content!['web']),
         ],
       ),
     );
