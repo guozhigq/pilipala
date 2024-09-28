@@ -32,7 +32,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   late DynamicDetailController _dynamicDetailController;
   late AnimationController fabAnimationCtr;
   Future? _futureBuilderFuture;
-  late StreamController<bool> titleStreamC; // appBar title
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // appBar title
   late ScrollController scrollController;
   bool _visibleTitle = false;
   String? action;
@@ -48,7 +49,6 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     super.initState();
     // floor 1原创 2转发
     init();
-    titleStreamC = StreamController<bool>();
     if (action == 'comment') {
       _visibleTitle = true;
       titleStreamC.add(true);
