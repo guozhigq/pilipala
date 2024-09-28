@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/read/opus.dart';
 import 'package:pilipala/models/read/read.dart';
-import 'init.dart';
+import 'package:pilipala/utils/wbi_sign.dart';
+import 'index.dart';
 
 class ReadHttp {
   static List<String> extractScriptContents(String htmlContent) {
@@ -52,5 +52,40 @@ class ReadHttp {
       'status': true,
       'data': ReadDataModel.fromJson(jsonData),
     };
+  }
+
+  //
+  static Future getViewInfo({required String id}) async {
+    Map params = await WbiSign().makSign({
+      'id': id,
+      'mobi_app': 'pc',
+      'from': 'web',
+      'gaia_source': 'main_web',
+      'web_location': 333.976,
+    });
+    var res = await Request().get(
+      Api.getViewInfo,
+      data: {
+        'id': id,
+        'mobi_app': 'pc',
+        'from': 'web',
+        'gaia_source': 'main_web',
+        'web_location': 333.976,
+        'w_rid': params['w_rid'],
+        'wts': params['wts'],
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
   }
 }

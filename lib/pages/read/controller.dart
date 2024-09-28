@@ -23,6 +23,7 @@ class ReadPageController extends GetxController {
     id = Get.parameters['id']!;
     articleType = Get.parameters['articleType']!;
     scrollController.addListener(_scrollListener);
+    fetchViewInfo();
   }
 
   Future fetchCvData() async {
@@ -78,6 +79,10 @@ class ReadPageController extends GetxController {
         ),
       ),
     );
+  }
+
+  void fetchViewInfo() {
+    ReadHttp.getViewInfo(id: id);
   }
 
   @override
