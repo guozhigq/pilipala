@@ -581,4 +581,7 @@ class Api {
 
   /// 用户专栏
   static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
 }
