@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/fav_edit/index.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/member_article/index.dart';
 import 'package:pilipala/pages/message/at/index.dart';
 import 'package:pilipala/pages/message/like/index.dart';
 import 'package:pilipala/pages/message/reply/index.dart';
@@ -186,6 +187,9 @@ class Routes {
         name: '/messageSystem', page: () => const MessageSystemPage()),
     // 收藏夹编辑
     CustomGetPage(name: '/favEdit', page: () => const FavEditPage()),
+    // 用户专栏
+    CustomGetPage(
+        name: '/memberArticle', page: () => const MemberArticlePage()),
   ];
 }
 
