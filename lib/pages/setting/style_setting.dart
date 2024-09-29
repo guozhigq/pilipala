@@ -8,7 +8,7 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../../models/common/dynamic_badge_mode.dart';
@@ -176,7 +176,7 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
-                              GlobalData().imgQuality = picQuality;
+                              GlobalDataCache().imgQuality = picQuality;
                               SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),

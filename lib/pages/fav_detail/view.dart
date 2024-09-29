@@ -107,6 +107,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 onSelected: (String type) {},
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   PopupMenuItem<String>(
+                    onTap: () => _favDetailController.onEditFavFolder(),
+                    value: 'edit',
+                    child: const Text('编辑收藏夹'),
+                  ),
+                  PopupMenuItem<String>(
                     onTap: () => _favDetailController.onDelFavFolder(),
                     value: 'pause',
                     child: const Text('删除收藏夹'),
@@ -254,6 +259,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
           )
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _favDetailController.mediaCount > 0
+            ? FloatingActionButton.extended(
+                onPressed: _favDetailController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }

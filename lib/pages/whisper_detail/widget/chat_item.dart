@@ -2,14 +2,18 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../../../http/search.dart';
+import '../controller.dart';
 
 enum MsgType {
   invalid(value: 0, label: "空空的~"),
@@ -42,10 +46,12 @@ enum MsgType {
 class ChatItem extends StatelessWidget {
   dynamic item;
   List? e_infos;
+  WhisperDetailController ctr;
 
   ChatItem({
     super.key,
-    this.item,
+    required this.item,
+    required this.ctr,
     this.e_infos,
   });
 
@@ -157,10 +163,48 @@ class ChatItem extends StatelessWidget {
         case MsgType.text:
           return richTextMessage(context);
         case MsgType.pic:
-          return NetworkImgLayer(
-            width: 220,
-            height: 220 * content['height'] / content['width'],
-            src: content['url'],
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                HeroDialogRoute<void>(
+                  builder: (BuildContext context) => InteractiveviewerGallery(
+                    sources: ctr.picList,
+                    initIndex: ctr.picList.indexOf(content['url']),
+                    itemBuilder: (
+                      BuildContext context,
+                      int index,
+                      bool isFocus,
+                      bool enablePageView,
+                    ) {
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          if (enablePageView) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: Center(
+                          child: Hero(
+                            tag: ctr.picList[index],
+                            child: CachedNetworkImage(
+                              fadeInDuration: const Duration(milliseconds: 0),
+                              imageUrl: ctr.picList[index],
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    onPageChanged: (int pageIndex) {},
+                  ),
+                ),
+              );
+            },
+            child: NetworkImgLayer(
+              width: 220,
+              height: 220 * content['height'] / content['width'],
+              src: content['url'],
+            ),
           );
         case MsgType.share_v2:
           return Column(

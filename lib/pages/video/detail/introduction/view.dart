@@ -20,7 +20,7 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../../../http/user.dart';
@@ -144,7 +144,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   final Box<dynamic> setting = GStrorage.setting;
   late double sheetHeight;
   late final dynamic owner;
-  late final dynamic follower;
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
@@ -177,7 +176,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     sheetHeight = localCache.get('sheetHeight');
 
     owner = widget.videoDetail!.owner;
-    follower = Utils.numFormat(videoIntroController.userStat['follower']);
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     _expandableCtr = ExpandableController(initialExpanded: false);
 
@@ -230,7 +228,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
   void _showFavPanel() {
     showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
       minHeight: 0.6,
       initHeight: 0.6,
       maxHeight: 1,
@@ -321,7 +322,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               expanded: Text(
                 widget.videoDetail!.title!,
                 softWrap: true,
-                maxLines: 4,
+                maxLines: 10,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -346,13 +347,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       StatView(
-                        theme: 'gray',
                         view: widget.videoDetail!.stat!.view,
                         size: 'medium',
                       ),
                       const SizedBox(width: 10),
                       StatDanMu(
-                        theme: 'gray',
                         danmu: widget.videoDetail!.stat!.danmaku,
                         size: 'medium',
                       ),
@@ -469,13 +468,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fadeOutDuration: Duration.zero,
                     ),
                     const SizedBox(width: 10),
-                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    Text(widget.videoDetail!.owner!.name!,
+                        style: const TextStyle(fontSize: 13)),
                     const SizedBox(width: 6),
-                    Text(
-                      follower,
-                      style: TextStyle(
-                        fontSize: t.textTheme.labelSmall!.fontSize,
-                        color: outline,
+                    Obx(
+                      () => Text(
+                        Utils.numFormat(videoIntroController.follower.value),
+                        style: TextStyle(
+                          fontSize: t.textTheme.labelSmall!.fontSize,
+                          color: outline,
+                        ),
                       ),
                     ),
                     const Spacer(),
@@ -569,7 +571,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    final actionTypeSort = GlobalData().actionTypeSort;
+    final actionTypeSort = GlobalDataCache().actionTypeSort;
 
     Widget progressWidget(progress) {
       return SizedBox(

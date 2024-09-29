@@ -33,7 +33,7 @@ class VideoIntroController extends GetxController {
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
   // up主粉丝数
-  Map userStat = {'follower': '-'};
+  RxInt follower = 0.obs;
   // 是否点赞
   RxBool hasLike = false.obs;
   // 是否投币
@@ -115,7 +115,7 @@ class VideoIntroController extends GetxController {
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
-      userStat = result['data'];
+      follower.value = result['data']['follower'];
     }
   }
 
@@ -519,7 +519,10 @@ class VideoIntroController extends GetxController {
   // 设置关注分组
   void setFollowGroup() {
     showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
       minHeight: 0.6,
       initHeight: 0.6,
       maxHeight: 1,

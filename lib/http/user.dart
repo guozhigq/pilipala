@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:html/parser.dart';
+import 'package:pilipala/models/video/later.dart';
 import '../common/constants.dart';
 import '../models/model_hot_video_item.dart';
 import '../models/user/fav_detail.dart';
@@ -57,6 +62,8 @@ class UserHttp {
       if (res.data['data'] != null) {
         data = FavFolderData.fromJson(res.data['data']);
         return {'status': true, 'data': data};
+      } else {
+        return {'status': false, 'msg': '收藏夹为空'};
       }
     } else {
       return {
@@ -427,5 +434,107 @@ class UserHttp {
     } else {
       return {'status': false, 'msg': res.data['message']};
     }
+  }
+
+  // 稍后再看播放全部
+  // static Future toViewPlayAll({required int oid, required String bvid}) async {
+  //   var res = await Request().get(
+  //     Api.watchLaterHtml,
+  //     data: {
+  //       'oid': oid,
+  //       'bvid': bvid,
+  //     },
+  //   );
+  //   String scriptContent =
+  //       extractScriptContents(parse(res.data).body!.outerHtml)[0];
+  //   int startIndex = scriptContent.indexOf('{');
+  //   int endIndex = scriptContent.lastIndexOf('};');
+  //   String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
+  //   // 解析JSON字符串为Map
+  //   Map<String, dynamic> jsonData = json.decode(jsonContent);
+  //   // 输出解析后的数据
+  //   return {
+  //     'status': true,
+  //     'data': jsonData['resourceList']
+  //         .map((e) => MediaVideoItemModel.fromJson(e))
+  //         .toList()
+  //   };
+  // }
+
+  static List<String> extractScriptContents(String htmlContent) {
+    RegExp scriptRegExp = RegExp(r'<script>([\s\S]*?)<\/script>');
+    Iterable<Match> matches = scriptRegExp.allMatches(htmlContent);
+    List<String> scriptContents = [];
+    for (Match match in matches) {
+      String scriptContent = match.group(1)!;
+      scriptContents.add(scriptContent);
+    }
+    return scriptContents;
+  }
+
+  // 稍后再看列表
+  static Future getMediaList({
+    required int type,
+    required int bizId,
+    required int ps,
+    int? oid,
+  }) async {
+    var res = await Request().get(
+      Api.mediaList,
+      data: {
+        'mobi_app': 'web',
+        'type': type,
+        'biz_id': bizId,
+        'oid': oid ?? '',
+        'otype': 2,
+        'ps': ps,
+        'direction': false,
+        'desc': true,
+        'sort_field': 1,
+        'tid': 0,
+        'with_current': false,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data']['media_list'] != null
+            ? res.data['data']['media_list']
+                .map<MediaVideoItemModel>(
+                    (e) => MediaVideoItemModel.fromJson(e))
+                .toList()
+            : []
+      };
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 解析收藏夹视频
+  static Future parseFavVideo({
+    required int mediaId,
+    required int oid,
+    required String bvid,
+  }) async {
+    var res = await Request().get(
+      'https://www.bilibili.com/list/ml$mediaId',
+      data: {
+        'oid': mediaId,
+        'bvid': bvid,
+      },
+    );
+    String scriptContent =
+        extractScriptContents(parse(res.data).body!.outerHtml)[0];
+    int startIndex = scriptContent.indexOf('{');
+    int endIndex = scriptContent.lastIndexOf('};');
+    String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
+    // 解析JSON字符串为Map
+    Map<String, dynamic> jsonData = json.decode(jsonContent);
+    return {
+      'status': true,
+      'data': jsonData['resourceList']
+          .map<MediaVideoItemModel>((e) => MediaVideoItemModel.fromJson(e))
+          .toList()
+    };
   }
 }
