@@ -324,7 +324,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               expanded: Text(
                 widget.videoDetail!.title!,
                 softWrap: true,
-                maxLines: 4,
+                maxLines: 10,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
