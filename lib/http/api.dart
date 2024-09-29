@@ -588,4 +588,8 @@ class Api {
 
   ///
   static const String getViewInfo = '/x/article/viewinfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
 }
