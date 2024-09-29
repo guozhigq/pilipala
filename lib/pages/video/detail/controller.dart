@@ -115,7 +115,7 @@ class VideoDetailController extends GetxController
   ].obs;
   RxDouble sheetHeight = 0.0.obs;
   RxString archiveSourceType = 'dash'.obs;
-  ScrollController? replyScrillController;
+  ScrollController? replyScrollController;
   List<MediaVideoItemModel> mediaList = <MediaVideoItemModel>[];
   RxBool isWatchLaterVisible = false.obs;
   RxString watchLaterTitle = ''.obs;
@@ -574,12 +574,12 @@ class VideoDetailController extends GetxController
   }
 
   void onControllerCreated(ScrollController controller) {
-    replyScrillController = controller;
+    replyScrollController = controller;
   }
 
   void onTapTabbar(int index) {
     if (index == 1 && tabCtr.index == 1) {
-      replyScrillController?.animateTo(0,
+      replyScrollController?.animateTo(0,
           duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
