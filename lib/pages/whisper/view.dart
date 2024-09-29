@@ -217,6 +217,7 @@ class SessionItem extends StatelessWidget {
     final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo?.mid ?? 0);
     final content = sessionItem.lastMsg.content;
     final msgStatus = sessionItem.lastMsg.msgStatus;
+    final int msgType = sessionItem.lastMsg.msgType;
 
     return ListTile(
       onTap: () {
@@ -251,13 +252,15 @@ class SessionItem extends StatelessWidget {
       subtitle: Text(
           msgStatus == 1
               ? '你撤回了一条消息'
-              : content != null && content != ''
-                  ? (content['text'] ??
-                      content['content'] ??
-                      content['title'] ??
-                      content['reply_content'] ??
-                      '不支持的消息类型')
-                  : '不支持的消息类型',
+              : msgType == 2
+                  ? '[图片]'
+                  : content != null && content != ''
+                      ? (content['text'] ??
+                          content['content'] ??
+                          content['title'] ??
+                          content['reply_content'] ??
+                          '不支持的消息类型')
+                      : '不支持的消息类型',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context)
