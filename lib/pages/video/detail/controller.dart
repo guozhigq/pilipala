@@ -578,7 +578,7 @@ class VideoDetailController extends GetxController
   }
 
   void onTapTabbar(int index) {
-    if (index == 1 && tabCtr.index == 1) {
+    if (tabCtr.animation!.isCompleted && index == 1 && tabCtr.index == 1) {
       replyScrollController?.animateTo(0,
           duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
