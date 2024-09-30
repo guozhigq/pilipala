@@ -541,7 +541,7 @@ class VideoIntroController extends GetxController {
 
   // ai总结
   Future aiConclusion() async {
-    SmartDialog.showLoading(msg: '正在生产ai总结');
+    SmartDialog.showLoading(msg: '正在生成ai总结');
     final res = await VideoHttp.aiConclusion(
       bvid: bvid,
       cid: lastPlayCid.value,
@@ -551,7 +551,7 @@ class VideoIntroController extends GetxController {
     if (res['status']) {
       modelResult = res['data'].modelResult;
     } else {
-      SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
+      SmartDialog.showToast("当前视频暂不支持AI视频总结");
     }
     return res;
   }
