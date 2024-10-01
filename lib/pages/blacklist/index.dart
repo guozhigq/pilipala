@@ -61,7 +61,7 @@ class _BlackListPageState extends State<BlackListPage> {
         centerTitle: false,
         title: Obx(
           () => Text(
-            '黑名单管理 - ${_blackListController.total.value}',
+            '黑名单管理 ${_blackListController.total.value == 0 ? '' : '- ${_blackListController.total.value}'}',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -76,8 +76,12 @@ class _BlackListPageState extends State<BlackListPage> {
               if (data['status']) {
                 List<BlackListItem> list = _blackListController.blackList;
                 return Obx(
-                  () => list.length == 1
-                      ? const SizedBox()
+                  () => list.isEmpty
+                      ? CustomScrollView(
+                          slivers: [
+                            HttpError(errMsg: '你没有拉黑任何人哦～_～', fn: () => {})
+                          ],
+                        )
                       : ListView.builder(
                           controller: scrollController,
                           itemCount: list.length,

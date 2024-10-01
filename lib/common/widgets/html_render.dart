@@ -1,11 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
 import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/highlight.dart';
-import 'network_img_layer.dart';
 
 // ignore: must_be_immutable
 class HtmlRender extends StatelessWidget {
@@ -85,11 +83,11 @@ class HtmlRender extends StatelessWidget {
                             },
                             child: Center(
                               child: Hero(
-                                tag: imgUrl,
+                                tag: imgList?[index] ?? imgUrl,
                                 child: CachedNetworkImage(
                                   fadeInDuration:
                                       const Duration(milliseconds: 0),
-                                  imageUrl: imgUrl,
+                                  imageUrl: imgList?[index] ?? imgUrl,
                                   fit: BoxFit.contain,
                                 ),
                               ),

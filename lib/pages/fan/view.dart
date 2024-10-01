@@ -103,9 +103,17 @@ class _FansPageState extends State<FansPage> {
                         ),
                 );
               } else {
-                return HttpError(
-                  errMsg: data['msg'],
-                  fn: () => _fansController.queryFans('init'),
+                return CustomScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  slivers: [
+                    HttpError(
+                      errMsg: data['msg'],
+                      fn: () {
+                        _futureBuilderFuture =
+                            _fansController.queryFans('init');
+                      },
+                    )
+                  ],
                 );
               }
             } else {

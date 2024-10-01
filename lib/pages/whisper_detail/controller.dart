@@ -22,6 +22,7 @@ class WhisperDetailController extends GetxController {
   final TextEditingController replyContentController = TextEditingController();
   Box userInfoCache = GStrorage.userInfo;
   List emoteList = [];
+  List<String> picList = [];
 
   @override
   void onInit() {
@@ -41,6 +42,18 @@ class WhisperDetailController extends GetxController {
     var res = await MsgHttp.sessionMsg(talkerId: talkerId);
     if (res['status']) {
       messageList.value = res['data'].messages;
+      // 找出图片
+      try {
+        for (var item in messageList) {
+          if (item.msgType == 2) {
+            picList.add(item.content['url']);
+          }
+        }
+        picList = picList.reversed.toList();
+      } catch (e) {
+        print('e: $e');
+      }
+
       if (messageList.isNotEmpty) {
         ackSessionMsg();
         if (res['data'].eInfos != null) {
