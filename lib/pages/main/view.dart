@@ -181,20 +181,21 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                               destinations: <Widget>[
                                 ..._mainController.navigationBars.map((e) {
                                   return NavigationDestination(
-                                    icon: Badge(
-                                      label: _mainController
-                                                  .dynamicBadgeType.value ==
-                                              DynamicBadgeMode.number
-                                          ? Text(e['count'].toString())
-                                          : null,
-                                      padding:
-                                          const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                                      isLabelVisible: _mainController
-                                                  .dynamicBadgeType.value !=
-                                              DynamicBadgeMode.hidden &&
-                                          e['count'] > 0,
-                                      child: e['icon'],
-                                    ),
+                                    icon: _mainController
+                                                .dynamicBadgeType.value ==
+                                            DynamicBadgeMode.number
+                                        ? Badge(
+                                            label: Text(e['count'].toString()),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                6, 0, 6, 0),
+                                            isLabelVisible: _mainController
+                                                        .dynamicBadgeType
+                                                        .value !=
+                                                    DynamicBadgeMode.hidden &&
+                                                e['count'] > 0,
+                                            child: e['icon'],
+                                          )
+                                        : e['icon'],
                                     selectedIcon: e['selectIcon'],
                                     label: e['label'],
                                   );
