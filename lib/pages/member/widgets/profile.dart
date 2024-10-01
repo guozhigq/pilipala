@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/live/item.dart';
@@ -233,7 +232,7 @@ class ProfilePanel extends StatelessWidget {
                     if (ctr.ownerMid == ctr.mid && ctr.ownerMid != -1) ...[
                       TextButton(
                         onPressed: () {
-                          SmartDialog.showToast('功能开发中 💪');
+                          Get.toNamed('/mineEdit');
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.only(left: 80, right: 80),

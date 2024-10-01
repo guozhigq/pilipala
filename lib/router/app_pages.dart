@@ -11,6 +11,7 @@ import 'package:pilipala/pages/message/like/index.dart';
 import 'package:pilipala/pages/message/reply/index.dart';
 import 'package:pilipala/pages/message/system/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/pages/mine_edit/index.dart';
 import 'package:pilipala/pages/opus/index.dart';
 import 'package:pilipala/pages/read/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
@@ -196,6 +197,8 @@ class Routes {
     // 用户专栏
     CustomGetPage(
         name: '/memberArticle', page: () => const MemberArticlePage()),
+    // 用户信息编辑
+    CustomGetPage(name: '/mineEdit', page: () => const MineEditPage()),
   ];
 }
 

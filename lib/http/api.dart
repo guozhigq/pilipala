@@ -592,4 +592,10 @@ class Api {
   /// 直播间记录
   static const String liveRoomEntry =
       '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
+
+  /// 用户信息
+  static const String accountInfo = '/x/member/web/account';
+
+  /// 更新用户信息
+  static const String updateAccountInfo = '/x/member/web/update';
 }

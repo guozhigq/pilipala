@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/video/later.dart';
@@ -536,5 +537,54 @@ class UserHttp {
           .map<MediaVideoItemModel>((e) => MediaVideoItemModel.fromJson(e))
           .toList()
     };
+  }
+
+  static Future getAccountInfo() async {
+    var res = await Request().get(
+      Api.accountInfo,
+      data: {'web_location': 333.33},
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': {},
+        'mag': res.data['message'],
+      };
+    }
+  }
+
+  static Future updateAccountInfo({
+    required String uname,
+    required String sign,
+    required String sex,
+    required String birthday,
+  }) async {
+    var res = await Request().post(
+      Api.updateAccountInfo,
+      data: {
+        'uname': uname,
+        'usersign': sign,
+        'sex': sex,
+        'birthday': birthday,
+        'csrf': await Request.getCsrf(),
+      },
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'msg': '更新成功',
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
   }
 }
