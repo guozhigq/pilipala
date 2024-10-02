@@ -244,12 +244,25 @@ class LoginHttp {
       ),
     );
     if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': res.data['data'],
-      };
+      if (res.data['data']['status'] == 0) {
+        return {
+          'status': true,
+          'data': res.data['data'],
+        };
+      } else {
+        return {
+          'status': false,
+          'code': 1,
+          'data': res.data['data'],
+          'msg': res.data['data']['message'],
+        };
+      }
     } else {
-      return {'status': false, 'data': [], 'msg': res.data['message']};
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
     }
   }
 
