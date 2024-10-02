@@ -45,6 +45,7 @@ class LoginPageController extends GetxController {
   RxInt validSeconds = 180.obs;
   Timer? validTimer;
   late String qrcodeKey;
+  RxBool passwordVisible = false.obs;
 
   // 监听pageView切换
   void onPageChange(int index) {
@@ -128,7 +129,14 @@ class LoginPageController extends GetxController {
           if (res['status']) {
             await LoginUtils.confirmLogin('', null);
           } else {
-            SmartDialog.showToast(res['msg']);
+            await SmartDialog.showToast(res['msg']);
+            if (res.containsKey('code') && res['code'] == 1) {
+              Get.toNamed('/webview', parameters: {
+                'url': res['data']['data']['url'],
+                'type': 'url',
+                'pageTitle': '登录验证',
+              });
+            }
           }
         } else {
           SmartDialog.showToast(webKeyRes['msg']);
