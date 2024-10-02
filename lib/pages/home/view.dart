@@ -36,10 +36,10 @@ class _HomePageState extends State<HomePage>
   showUserBottomSheet() {
     feedBack();
     final MainController mainController = Get.put(MainController());
-    if (mainController.navigationBars
-        .where((item) => item['label'] == "我的")
-        .isNotEmpty) {
-      mainController.pageController.jumpToPage(2);
+    int mineItemIndex = mainController.navigationBars
+        .indexWhere((item) => item['label'] == "我的");
+    if (mineItemIndex != -1) {
+      mainController.pageController.jumpToPage(mineItemIndex);
     } else {
       Get.toNamed('/mine');
     }

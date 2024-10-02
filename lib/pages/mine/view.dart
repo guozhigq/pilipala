@@ -98,9 +98,14 @@ class _MinePageState extends State<MinePage>
               },
             ),
             _buildMenuSection(context),
-            Divider(
-              height: 25,
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+            Obx(
+              () => Visibility(
+                visible: ctr.userLogin.value,
+                child: Divider(
+                  height: 25,
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                ),
+              ),
             ),
             Obx(
               () => ctr.userLogin.value
@@ -320,8 +325,8 @@ class _MinePageState extends State<MinePage>
             future: ctr.queryFavFolder(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data as Map;
-                if (data['status']) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
                   List favFolderList = ctr.favFolderData.value.list!;
                   int favFolderCount = ctr.favFolderData.value.count!;
                   bool flag = favFolderCount > favFolderList.length;
@@ -369,7 +374,7 @@ class _MinePageState extends State<MinePage>
                 } else {
                   return SizedBox(
                     height: 110,
-                    child: Center(child: Text(data['msg'])),
+                    child: Center(child: Text(data?['msg'] ?? '')),
                   );
                 }
               } else {
