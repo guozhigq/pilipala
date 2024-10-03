@@ -5,7 +5,7 @@ class MessageSystemModel {
   int? cursor;
   int? type;
   String? title;
-  Map? content;
+  dynamic content;
   Source? source;
   String? timeAt;
   int? cardType;
@@ -45,7 +45,9 @@ class MessageSystemModel {
         cursor: jsons["cursor"],
         type: jsons["type"],
         title: jsons["title"],
-        content: json.decode(jsons["content"]),
+        content: isValidJson(jsons["content"])
+            ? json.decode(jsons["content"])
+            : jsons["content"],
         source: Source.fromJson(jsons["source"]),
         timeAt: jsons["time_at"],
         cardType: jsons["card_type"],
@@ -74,4 +76,13 @@ class Source {
         name: json["name"],
         logo: json["logo"],
       );
+}
+
+bool isValidJson(String str) {
+  try {
+    json.decode(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }

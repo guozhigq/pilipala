@@ -555,6 +555,10 @@ class Api {
   static const String messageSystemAPi =
       '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 
+  /// 系统通知 个人
+  static const String userMessageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
+
   /// 系统通知标记已读
   static const String systemMarkRead =
       '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
@@ -575,4 +579,17 @@ class Api {
   /// 我的关注 - 正在直播
   static const String getFollowingLive =
       '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
 }

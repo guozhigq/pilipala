@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:html/parser.dart';
+import 'package:pilipala/models/member/article.dart';
 import 'package:pilipala/models/member/like.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
@@ -553,6 +556,62 @@ class MemberHttp {
         'status': false,
         'data': [],
         'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future getWWebid({required int mid}) async {
+    var res = await Request().get('https://space.bilibili.com/$mid/article');
+    String? headContent = parse(res.data).head?.outerHtml;
+    final regex = RegExp(
+        r'<script id="__RENDER_DATA__" type="application/json">(.*?)</script>');
+    if (headContent != null) {
+      final match = regex.firstMatch(headContent);
+      if (match != null && match.groupCount >= 1) {
+        final content = match.group(1);
+        String decodedString = Uri.decodeComponent(content!);
+        Map<String, dynamic> map = jsonDecode(decodedString);
+        return {'status': true, 'data': map['access_id']};
+      } else {
+        return {'status': false, 'data': '请检查登录状态'};
+      }
+    }
+    return {'status': false, 'data': '请检查登录状态'};
+  }
+
+  // 获取用户专栏
+  static Future getMemberArticle({
+    required int mid,
+    required int pn,
+    required String wWebid,
+    String? offset,
+  }) async {
+    Map params = await WbiSign().makSign({
+      'host_mid': mid,
+      'page': pn,
+      'offset': offset,
+      'web_location': 333.999,
+      'w_webid': wWebid,
+    });
+    var res = await Request().get(Api.opusList, data: {
+      'host_mid': mid,
+      'page': pn,
+      'offset': offset,
+      'web_location': 333.999,
+      'w_webid': wWebid,
+      'w_rid': params['w_rid'],
+      'wts': params['wts'],
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MemberArticleDataModel.fromJson(res.data['data'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'] ?? '请求异常',
       };
     }
   }

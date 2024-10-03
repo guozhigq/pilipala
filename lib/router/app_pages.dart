@@ -5,10 +5,13 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/fav_edit/index.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/member_article/index.dart';
 import 'package:pilipala/pages/message/at/index.dart';
 import 'package:pilipala/pages/message/like/index.dart';
 import 'package:pilipala/pages/message/reply/index.dart';
 import 'package:pilipala/pages/message/system/index.dart';
+import 'package:pilipala/pages/opus/index.dart';
+import 'package:pilipala/pages/read/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
 
 import '../pages/about/index.dart';
@@ -186,6 +189,13 @@ class Routes {
         name: '/messageSystem', page: () => const MessageSystemPage()),
     // 收藏夹编辑
     CustomGetPage(name: '/favEdit', page: () => const FavEditPage()),
+
+    // 专栏
+    CustomGetPage(name: '/opus', page: () => const OpusPage()),
+    CustomGetPage(name: '/read', page: () => const ReadPage()),
+    // 用户专栏
+    CustomGetPage(
+        name: '/memberArticle', page: () => const MemberArticlePage()),
   ];
 }
 
