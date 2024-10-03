@@ -198,13 +198,15 @@ class MemberHttp {
 
   // 设置分组
   static Future addUsers(int? fids, String? tagids) async {
-    var res = await Request().post(Api.addUsers, queryParameters: {
-      'fids': fids,
-      'tagids': tagids ?? '0',
-      'csrf': await Request.getCsrf(),
-    }, data: {
-      'cross_domain': true
-    });
+    var res = await Request().post(
+      Api.addUsers,
+      data: {
+        'fids': fids,
+        'tagids': tagids ?? '0',
+        'csrf': await Request.getCsrf(),
+      },
+      queryParameters: {'cross_domain': true},
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': [], 'msg': '操作成功'};
     } else {
@@ -422,11 +424,14 @@ class MemberHttp {
   static Future cookieToKey() async {
     var authCodeRes = await getTVCode();
     if (authCodeRes['status']) {
-      var res = await Request().post(Api.cookieToKey, queryParameters: {
-        'auth_code': authCodeRes['data'],
-        'build': 708200,
-        'csrf': await Request.getCsrf(),
-      });
+      var res = await Request().post(
+        Api.cookieToKey,
+        data: {
+          'auth_code': authCodeRes['data'],
+          'build': 708200,
+          'csrf': await Request.getCsrf(),
+        },
+      );
       await Future.delayed(const Duration(milliseconds: 300));
       await qrcodePoll(authCodeRes['data']);
       if (res.data['code'] == 0) {

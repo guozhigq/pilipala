@@ -11,7 +11,7 @@ class FavHttp {
   }) async {
     var res = await Request().post(
       Api.editFavFolder,
-      queryParameters: {
+      data: {
         'title': title,
         'intro': intro,
         'media_id': mediaId,
@@ -43,7 +43,7 @@ class FavHttp {
   }) async {
     var res = await Request().post(
       Api.addFavFolder,
-      queryParameters: {
+      data: {
         'title': title,
         'intro': intro,
         'cover': cover ?? '',

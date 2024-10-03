@@ -243,7 +243,7 @@ class VideoHttp {
   static Future coinVideo({required String bvid, required int multiply}) async {
     var res = await Request().post(
       Api.coinVideo,
-      queryParameters: {
+      data: {
         'bvid': bvid,
         'multiply': multiply,
         'select_like': 0,
@@ -271,7 +271,7 @@ class VideoHttp {
   static Future oneThree({required String bvid}) async {
     var res = await Request().post(
       Api.oneThree,
-      queryParameters: {
+      data: {
         'bvid': bvid,
         'csrf': await Request.getCsrf(),
       },
@@ -287,7 +287,7 @@ class VideoHttp {
   static Future likeVideo({required String bvid, required bool type}) async {
     var res = await Request().post(
       Api.likeVideo,
-      queryParameters: {
+      data: {
         'bvid': bvid,
         'like': type ? 1 : 2,
         'csrf': await Request.getCsrf(),
@@ -303,13 +303,16 @@ class VideoHttp {
   // （取消）收藏
   static Future favVideo(
       {required int aid, String? addIds, String? delIds}) async {
-    var res = await Request().post(Api.favVideo, queryParameters: {
-      'rid': aid,
-      'type': 2,
-      'add_media_ids': addIds ?? '',
-      'del_media_ids': delIds ?? '',
-      'csrf': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.favVideo,
+      data: {
+        'rid': aid,
+        'type': 2,
+        'add_media_ids': addIds ?? '',
+        'del_media_ids': delIds ?? '',
+        'csrf': await Request.getCsrf(),
+      },
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
     } else {
@@ -347,14 +350,17 @@ class VideoHttp {
     if (message == '') {
       return {'status': false, 'data': [], 'msg': '请输入评论内容'};
     }
-    var res = await Request().post(Api.replyAdd, queryParameters: {
-      'type': type.index,
-      'oid': oid,
-      'root': root == null || root == 0 ? '' : root,
-      'parent': parent == null || parent == 0 ? '' : parent,
-      'message': message,
-      'csrf': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.replyAdd,
+      data: {
+        'type': type.index,
+        'oid': oid,
+        'root': root == null || root == 0 ? '' : root,
+        'parent': parent == null || parent == 0 ? '' : parent,
+        'message': message,
+        'csrf': await Request.getCsrf(),
+      },
+    );
     log(res.toString());
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data']};
@@ -376,12 +382,15 @@ class VideoHttp {
   // 操作用户关系
   static Future relationMod(
       {required int mid, required int act, required int reSrc}) async {
-    var res = await Request().post(Api.relationMod, queryParameters: {
-      'fid': mid,
-      'act': act,
-      're_src': reSrc,
-      'csrf': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.relationMod,
+      data: {
+        'fid': mid,
+        'act': act,
+        're_src': reSrc,
+        'csrf': await Request.getCsrf(),
+      },
+    );
     if (res.data['code'] == 0) {
       if (act == 5) {
         List<int> blackMidsList =
@@ -397,27 +406,33 @@ class VideoHttp {
 
   // 视频播放进度
   static Future heartBeat({bvid, cid, progress, realtime}) async {
-    await Request().post(Api.heartBeat, queryParameters: {
-      // 'aid': aid,
-      'bvid': bvid,
-      'cid': cid,
-      // 'epid': '',
-      // 'sid': '',
-      // 'mid': '',
-      'played_time': progress,
-      // 'realtime': realtime,
-      // 'type': '',
-      // 'sub_type': '',
-      'csrf': await Request.getCsrf(),
-    });
+    await Request().post(
+      Api.heartBeat,
+      data: {
+        // 'aid': aid,
+        'bvid': bvid,
+        'cid': cid,
+        // 'epid': '',
+        // 'sid': '',
+        // 'mid': '',
+        'played_time': progress,
+        // 'realtime': realtime,
+        // 'type': '',
+        // 'sub_type': '',
+        'csrf': await Request.getCsrf(),
+      },
+    );
   }
 
   // 添加追番
   static Future bangumiAdd({int? seasonId}) async {
-    var res = await Request().post(Api.bangumiAdd, queryParameters: {
-      'season_id': seasonId,
-      'csrf': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.bangumiAdd,
+      data: {
+        'season_id': seasonId,
+        'csrf': await Request.getCsrf(),
+      },
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': res.data['result']['toast']};
     } else {
@@ -427,10 +442,13 @@ class VideoHttp {
 
   // 取消追番
   static Future bangumiDel({int? seasonId}) async {
-    var res = await Request().post(Api.bangumiDel, queryParameters: {
-      'season_id': seasonId,
-      'csrf': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.bangumiDel,
+      data: {
+        'season_id': seasonId,
+        'csrf': await Request.getCsrf(),
+      },
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': res.data['result']['toast']};
     } else {
