@@ -67,9 +67,6 @@ class DanmakaHttp {
     var response = await Request().post(
       Api.shootDanmaku,
       data: params,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (response.statusCode != 200) {
       return {

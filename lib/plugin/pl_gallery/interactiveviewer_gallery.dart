@@ -2,10 +2,12 @@ library interactiveviewer_gallery;
 
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/utils/download.dart';
 import 'package:share_plus/share_plus.dart';
@@ -32,7 +34,7 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
   const InteractiveviewerGallery({
     required this.sources,
     required this.initIndex,
-    required this.itemBuilder,
+    this.itemBuilder,
     this.maxScale = 4.5,
     this.minScale = 1.0,
     this.onPageChanged,
@@ -47,7 +49,7 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
   final int initIndex;
 
   /// The item content
-  final IndexedFocusedWidgetBuilder itemBuilder;
+  final IndexedFocusedWidgetBuilder? itemBuilder;
 
   final double maxScale;
 
@@ -246,12 +248,15 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                   _doubleTapLocalPosition = details.localPosition;
                 },
                 onDoubleTap: onDoubleTap,
-                child: widget.itemBuilder(
-                  context,
-                  index,
-                  index == currentIndex,
-                  _enablePageView,
-                ),
+                onLongPress: onLongPress,
+                child: widget.itemBuilder != null
+                    ? widget.itemBuilder!(
+                        context,
+                        index,
+                        index == currentIndex,
+                        _enablePageView,
+                      )
+                    : _itemBuilder(widget.sources, index),
               );
             },
           ),
@@ -302,17 +307,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                       PopupMenuItem(
                         value: 1,
                         onTap: () {
-                          Clipboard.setData(ClipboardData(
-                                  text:
-                                      widget.sources[currentIndex!].toString()))
-                              .then((value) {
-                            SmartDialog.showToast('已复制到粘贴板');
-                          }).catchError((err) {
-                            SmartDialog.showNotify(
-                              msg: err.toString(),
-                              notifyType: NotifyType.error,
-                            );
-                          });
+                          onCopyImg(widget.sources[currentIndex!].toString());
                         },
                         child: const Text("复制图片"),
                       ),
@@ -348,6 +343,41 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
     var path = '${temp.path}/$imgName';
     File(path).writeAsBytesSync(response.data);
     Share.shareXFiles([XFile(path)], subject: imgUrl);
+  }
+
+  // 复制图片
+  void onCopyImg(String imgUrl) {
+    Clipboard.setData(
+            ClipboardData(text: widget.sources[currentIndex!].toString()))
+        .then((value) {
+      SmartDialog.showToast('已复制到粘贴板');
+    }).catchError((err) {
+      SmartDialog.showNotify(
+        msg: err.toString(),
+        notifyType: NotifyType.error,
+      );
+    });
+  }
+
+  Widget _itemBuilder(sources, index) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (_enablePageView) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Center(
+        child: Hero(
+          tag: sources[index],
+          child: CachedNetworkImage(
+            fadeInDuration: const Duration(milliseconds: 0),
+            imageUrl: sources[index],
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 
   onDoubleTap() {
@@ -395,5 +425,62 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
     _animationController
         .forward(from: 0)
         .whenComplete(() => _onScaleChanged(targetScale));
+  }
+
+  onLongPress() {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InkWell(
+                onTap: () => Get.back(),
+                child: Container(
+                  height: 35,
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Center(
+                    child: Container(
+                      width: 32,
+                      height: 3,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.outline,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(3))),
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  onShareImg(widget.sources[currentIndex!]);
+                  Navigator.of(context).pop();
+                },
+                title: const Text('分享图片'),
+              ),
+              ListTile(
+                onTap: () {
+                  onCopyImg(widget.sources[currentIndex!].toString());
+                  Navigator.of(context).pop();
+                },
+                title: const Text('复制图片'),
+              ),
+              ListTile(
+                onTap: () {
+                  DownloadUtils.downloadImg(widget.sources[currentIndex!]);
+                  Navigator.of(context).pop();
+                },
+                title: const Text('保存图片'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
