@@ -899,8 +899,8 @@ packages:
     description:
       path: media_kit
       ref: HEAD
-      resolved-ref: "77a130b1d7ce733b47d2133b57563716090450d0"
-      url: "https://github.com/media-kit/media-kit.git"
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
     source: git
     version: "1.1.10+1"
   media_kit_libs_android_video:
@@ -940,8 +940,8 @@ packages:
     description:
       path: "libs/universal/media_kit_libs_video"
       ref: HEAD
-      resolved-ref: "77a130b1d7ce733b47d2133b57563716090450d0"
-      url: "https://github.com/media-kit/media-kit.git"
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
     source: git
     version: "1.0.4"
   media_kit_libs_windows_video:
@@ -965,8 +965,8 @@ packages:
     description:
       path: media_kit_video
       ref: HEAD
-      resolved-ref: "77a130b1d7ce733b47d2133b57563716090450d0"
-      url: "https://github.com/media-kit/media-kit.git"
+      resolved-ref: "285f7919bbf4a7d89a62615b14a3766a171ad575"
+      url: "https://github.com/media-kit/media-kit"
     source: git
     version: "1.2.4"
   meta:

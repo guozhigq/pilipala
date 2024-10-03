@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.23+1023
+version: 1.0.24+1024
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -178,20 +178,6 @@ dependency_overrides:
   media_kit_libs_video:
     git:
       url: https://github.com/media-kit/media-kit
-      path: libs/universal/media_kit_libs_video
-
-dependency_overrides:
-  media_kit:
-    git:
-      url: https://github.com/media-kit/media-kit.git
-      path: media_kit
-  media_kit_video:
-    git:
-      url: https://github.com/media-kit/media-kit.git
-      path: media_kit_video
-  media_kit_libs_video:
-    git:
-      url: https://github.com/media-kit/media-kit.git
       path: libs/universal/media_kit_libs_video
 
 flutter_launcher_icons:

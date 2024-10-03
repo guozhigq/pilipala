@@ -466,6 +466,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fadeInDuration: Duration.zero,
                       fadeOutDuration: Duration.zero,
                     ),
+                    const SizedBox(width: 10),
+                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 6),
+                    Text(
+                      follower,
+                      style: TextStyle(
+                        fontSize: t.textTheme.labelSmall!.fontSize,
+                        color: outline,
+                      ),
+                    ),
                     const Spacer(),
                     Obx(
                       () {
