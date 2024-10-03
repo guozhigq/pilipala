@@ -22,6 +22,7 @@ class ReadPageController extends GetxController {
     title.value = Get.parameters['title'] ?? '';
     id = Get.parameters['id']!;
     articleType = Get.parameters['articleType']!;
+    url = 'https://www.bilibili.com/read/cv$id';
     scrollController.addListener(_scrollListener);
     fetchViewInfo();
   }
@@ -83,6 +84,15 @@ class ReadPageController extends GetxController {
 
   void fetchViewInfo() {
     ReadHttp.getViewInfo(id: id);
+  }
+
+  // 跳转webview
+  void onJumpWebview() {
+    Get.toNamed('/webview', parameters: {
+      'url': url,
+      'type': 'webview',
+      'pageTitle': title.value,
+    });
   }
 
   @override
