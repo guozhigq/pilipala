@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
@@ -12,31 +11,6 @@ void onPreviewImg(currentUrl, picList, initIndex, context) {
       builder: (BuildContext context) => InteractiveviewerGallery(
         sources: picList,
         initIndex: initIndex,
-        itemBuilder: (
-          BuildContext context,
-          int index,
-          bool isFocus,
-          bool enablePageView,
-        ) {
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              if (enablePageView) {
-                Navigator.of(context).pop();
-              }
-            },
-            child: Center(
-              child: Hero(
-                tag: picList[index],
-                child: CachedNetworkImage(
-                  fadeInDuration: const Duration(milliseconds: 0),
-                  imageUrl: picList[index],
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          );
-        },
         onPageChanged: (int pageIndex) {},
       ),
     ),

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:appscheme/appscheme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -583,34 +582,6 @@ InlineSpan buildContent(
         builder: (BuildContext context) => InteractiveviewerGallery(
           sources: picList,
           initIndex: initIndex,
-          itemBuilder: (
-            BuildContext context,
-            int index,
-            bool isFocus,
-            bool enablePageView,
-          ) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (enablePageView) {
-                  Navigator.of(context).pop();
-                  final MainController mainController =
-                      Get.find<MainController>();
-                  mainController.imgPreviewStatus = false;
-                }
-              },
-              child: Center(
-                child: Hero(
-                  tag: picList[index] + randomInt,
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 0),
-                    imageUrl: picList[index],
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            );
-          },
           onPageChanged: (int pageIndex) {},
           onDismissed: (int value) {
             print('onDismissed');
