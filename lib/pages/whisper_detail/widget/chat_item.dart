@@ -2,7 +2,6 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -170,31 +169,6 @@ class ChatItem extends StatelessWidget {
                   builder: (BuildContext context) => InteractiveviewerGallery(
                     sources: ctr.picList,
                     initIndex: ctr.picList.indexOf(content['url']),
-                    itemBuilder: (
-                      BuildContext context,
-                      int index,
-                      bool isFocus,
-                      bool enablePageView,
-                    ) {
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          if (enablePageView) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        child: Center(
-                          child: Hero(
-                            tag: ctr.picList[index],
-                            child: CachedNetworkImage(
-                              fadeInDuration: const Duration(milliseconds: 0),
-                              imageUrl: ctr.picList[index],
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
                     onPageChanged: (int pageIndex) {},
                   ),
                 ),
