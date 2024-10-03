@@ -39,6 +39,7 @@ class OpusController extends GetxController {
           'articleType': 'cv',
         });
       } else {
+        title.value = res['data'].detail!.basic!.title!;
         opusData.value = res['data'];
       }
     }
@@ -89,6 +90,15 @@ class OpusController extends GetxController {
         ),
       ),
     );
+  }
+
+  // 跳转webview
+  void onJumpWebview() {
+    Get.toNamed('/webview', parameters: {
+      'url': url,
+      'type': 'webview',
+      'pageTitle': title.value,
+    });
   }
 
   @override

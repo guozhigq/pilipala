@@ -72,9 +72,14 @@ class _ReadPageState extends State<ReadPage> {
         },
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.more_vert_rounded),
-          onPressed: () {},
+        PopupMenuButton(
+          icon: const Icon(Icons.more_vert_outlined),
+          itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+            PopupMenuItem(
+              onTap: controller.onJumpWebview,
+              child: const Text('查看原网页'),
+            )
+          ],
         ),
         const SizedBox(width: 16),
       ],

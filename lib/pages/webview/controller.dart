@@ -1,19 +1,8 @@
-// ignore_for_file: avoid_print
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/http/init.dart';
-import 'package:pilipala/http/user.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/login.dart';
-import 'package:pilipala/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewController extends GetxController {
