@@ -578,4 +578,7 @@ class Api {
 
   /// 稍后再看&收藏夹视频列表
   static const String mediaList = '/x/v2/medialist/resource/list';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
 }

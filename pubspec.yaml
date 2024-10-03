@@ -149,6 +149,8 @@ dependencies:
   bottom_sheet: ^4.0.4
   web_socket_channel: ^2.4.5
   brotli: ^0.6.0
+  # 文本语法高亮
+  re_highlight: ^0.0.3
 
 dev_dependencies:
   flutter_test:

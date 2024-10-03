@@ -154,12 +154,10 @@ class DynamicsController extends GetxController {
           Iterable<Match> matches = digitRegExp.allMatches(jumpUrl);
           String number = matches.first.group(0)!;
           if (jumpUrl.contains('read')) {
-            number = 'cv$number';
-            Get.toNamed('/htmlRender', parameters: {
-              'url': url,
+            Get.toNamed('/read', parameters: {
               'title': title,
               'id': number,
-              'dynamicType': url.split('/')[1]
+              'articleType': url.split('/')[1]
             });
           } else {
             Get.toNamed('/opus', parameters: {
