@@ -153,7 +153,7 @@ class UserHttp {
     // 暂停switchStatus传true 否则false
     var res = await Request().post(
       Api.pauseHistory,
-      queryParameters: {
+      data: {
         'switch': switchStatus,
         'jsonp': 'jsonp',
         'csrf': await Request.getCsrf(),
@@ -172,7 +172,7 @@ class UserHttp {
   static Future clearHistory() async {
     var res = await Request().post(
       Api.clearHistory,
-      queryParameters: {
+      data: {
         'jsonp': 'jsonp',
         'csrf': await Request.getCsrf(),
       },
@@ -190,7 +190,7 @@ class UserHttp {
     }
     var res = await Request().post(
       Api.toViewLater,
-      queryParameters: data,
+      data: data,
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': 'yeah！稍后再看'};
@@ -209,7 +209,7 @@ class UserHttp {
     params[aid != null ? 'aid' : 'viewed'] = aid ?? true;
     var res = await Request().post(
       Api.toViewDel,
-      queryParameters: params,
+      data: params,
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'msg': 'yeah！成功移除'};
@@ -241,7 +241,7 @@ class UserHttp {
   static Future toViewClear() async {
     var res = await Request().post(
       Api.toViewClear,
-      queryParameters: {
+      data: {
         'jsonp': 'jsonp',
         'csrf': await Request.getCsrf(),
       },
@@ -257,7 +257,7 @@ class UserHttp {
   static Future delHistory(kid) async {
     var res = await Request().post(
       Api.delHistory,
-      queryParameters: {
+      data: {
         'kid': kid,
         'jsonp': 'jsonp',
         'csrf': await Request.getCsrf(),
@@ -406,7 +406,7 @@ class UserHttp {
   static Future cancelSub({required int seasonId}) async {
     var res = await Request().post(
       Api.cancelSub,
-      queryParameters: {
+      data: {
         'platform': 'web',
         'season_id': seasonId,
         'csrf': await Request.getCsrf(),
@@ -423,7 +423,7 @@ class UserHttp {
   static Future delFavFolder({required int mediaIds}) async {
     var res = await Request().post(
       Api.delFavFolder,
-      queryParameters: {
+      data: {
         'media_ids': mediaIds,
         'platform': 'web',
         'csrf': await Request.getCsrf(),

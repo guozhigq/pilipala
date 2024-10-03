@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
 import 'package:pilipala/models/msg/system.dart';
@@ -158,9 +157,6 @@ class MsgHttp {
         'csrf_token': csrf,
         'csrf': csrf,
       },
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       return {

@@ -71,9 +71,6 @@ class LoginHttp {
     var res = await Request().post(
       Api.webSmsCode,
       data: formData,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       return {
@@ -106,9 +103,6 @@ class LoginHttp {
     var res = await Request().post(
       Api.webSmsLogin,
       data: formData,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       return {
@@ -155,9 +149,6 @@ class LoginHttp {
     var res = await Request().post(
       Api.appSmsCode,
       data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     print(res);
   }
@@ -208,9 +199,6 @@ class LoginHttp {
     var res = await Request().post(
       Api.loginInByPwdApi,
       data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     print(res);
   }
@@ -239,9 +227,6 @@ class LoginHttp {
     var res = await Request().post(
       Api.loginInByWebPwd,
       data: formData,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       if (res.data['data']['status'] == 0) {
