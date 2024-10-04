@@ -10,6 +10,7 @@ import 'package:pilipala/utils/utils.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
+  RxString title = ''.obs;
 
   int? mediaId;
   late String heroTag;
@@ -24,6 +25,7 @@ class FavDetailController extends GetxController {
   @override
   void onInit() {
     item = Get.arguments;
+    title.value = item!.title!;
     if (Get.parameters.keys.isNotEmpty) {
       mediaId = int.parse(Get.parameters['mediaId']!);
       heroTag = Get.parameters['heroTag']!;
@@ -117,16 +119,18 @@ class FavDetailController extends GetxController {
   }
 
   onEditFavFolder() async {
-    Get.toNamed(
+    var res = await Get.toNamed(
       '/favEdit',
       arguments: {
         'mediaId': mediaId.toString(),
         'title': item!.title,
         'intro': item!.intro,
         'cover': item!.cover,
-        'privacy': item!.attr,
+        'privacy': [23, 1].contains(item!.attr) ? 1 : 0,
       },
     );
+    title.value = res['title'];
+    print(title);
   }
 
   Future toViewPlayAll() async {

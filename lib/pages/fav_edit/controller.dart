@@ -56,7 +56,7 @@ class FavEditController extends GetxController {
     );
     if (res['status']) {
       SmartDialog.showToast('编辑成功');
-      Get.back();
+      Get.back(result: {'title': title});
     } else {
       SmartDialog.showToast(res['msg']);
     }
