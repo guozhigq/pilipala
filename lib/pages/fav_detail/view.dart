@@ -80,9 +80,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _favDetailController.item!.title!,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => Text(
+                              _favDetailController.title.value,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                           Text(
                             '共${_favDetailController.mediaCount}条视频',
@@ -156,14 +158,16 @@ class _FavDetailPageState extends State<FavDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text(
-                              _favDetailController.item!.title!,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .fontSize,
-                                  fontWeight: FontWeight.bold),
+                            Obx(
+                              () => Text(
+                                _favDetailController.title.value,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .fontSize,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
