@@ -28,7 +28,7 @@ extension SearchTypeExtension on SearchType {
   String get label => ['视频', '番剧', '直播间', '用户', '专栏'][index];
 }
 
-// 搜索类型为视频、专栏及相簿时
+// 搜索类型为视频时
 enum ArchiveFilterType {
   totalrank,
   click,
@@ -43,4 +43,22 @@ enum ArchiveFilterType {
 extension ArchiveFilterTypeExtension on ArchiveFilterType {
   String get description =>
       ['默认排序', '播放多', '新发布', '弹幕多', '收藏多', '评论多', '最多喜欢'][index];
+}
+
+// 搜索类型为专栏时
+enum ArticleFilterType {
+  // 综合排序
+  totalrank,
+  // 最新发布
+  pubdate,
+  // 最多点击
+  click,
+  // 最多喜欢
+  attention,
+  // 最多评论
+  scores,
+}
+
+extension ArticleFilterTypeExtension on ArticleFilterType {
+  String get description => ['综合排序', '最新发布', '最多点击', '最多喜欢', '最多评论'][index];
 }
