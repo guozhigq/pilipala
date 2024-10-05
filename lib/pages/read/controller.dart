@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/read.dart';
@@ -22,6 +21,7 @@ class ReadPageController extends GetxController {
     title.value = Get.parameters['title'] ?? '';
     id = Get.parameters['id']!;
     articleType = Get.parameters['articleType']!;
+    url = 'https://www.bilibili.com/read/cv$id';
     scrollController.addListener(_scrollListener);
     fetchViewInfo();
   }
@@ -50,31 +50,6 @@ class ReadPageController extends GetxController {
         builder: (BuildContext context) => InteractiveviewerGallery(
           sources: picList,
           initIndex: initIndex,
-          itemBuilder: (
-            BuildContext context,
-            int index,
-            bool isFocus,
-            bool enablePageView,
-          ) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (enablePageView) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Center(
-                child: Hero(
-                  tag: picList[index],
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 0),
-                    imageUrl: picList[index],
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            );
-          },
           onPageChanged: (int pageIndex) {},
         ),
       ),
@@ -83,6 +58,15 @@ class ReadPageController extends GetxController {
 
   void fetchViewInfo() {
     ReadHttp.getViewInfo(id: id);
+  }
+
+  // 跳转webview
+  void onJumpWebview() {
+    Get.toNamed('/webview', parameters: {
+      'url': url,
+      'type': 'webview',
+      'pageTitle': title.value,
+    });
   }
 
   @override

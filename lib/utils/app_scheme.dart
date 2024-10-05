@@ -82,7 +82,7 @@ class PiliSchame {
         case 'opus':
           if (path.startsWith('/detail')) {
             var opusId = path.split('/').last;
-            Get.toNamed('/opus', arguments: {
+            Get.toNamed('/opus', parameters: {
               'title': '',
               'id': opusId,
               'articleType': 'opus',

@@ -78,7 +78,7 @@ class ReplyHttp {
   }) async {
     var res = await Request().post(
       Api.likeReply,
-      queryParameters: {
+      data: {
         'type': type,
         'oid': oid,
         'rpid': rpid,
