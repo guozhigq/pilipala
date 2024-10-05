@@ -177,12 +177,18 @@ class _MinePageState extends State<MinePage>
                   ),
                   const SizedBox(height: 2),
                 ],
-                Text(
-                  '硬币: ${userInfo.money ?? '-'}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                ),
+                Text.rich(
+                  TextSpan(children: [
+                    TextSpan(
+                        text: '硬币: ',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline)),
+                    TextSpan(
+                        text: (userInfo.money ?? '-').toString(),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary)),
+                  ]),
+                )
               ],
             ),
             const Spacer(),
