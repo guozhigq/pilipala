@@ -44,6 +44,8 @@ class _MinePageState extends State<MinePage>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined),
@@ -64,59 +66,71 @@ class _MinePageState extends State<MinePage>
           const SizedBox(width: 22),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Obx(() => _buildProfileSection(context, ctr.userInfo.value)),
-            const SizedBox(height: 10),
-            FutureBuilder(
-              future: _futureBuilderFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data == null) {
-                    return const SizedBox();
-                  }
-                  if (snapshot.data['status']) {
-                    return Obx(
-                      () => _buildStatsSection(
-                        context,
-                        ctr.userStat.value,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ctr.queryUserInfo();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 110),
+            child: Expanded(
+              child: Column(
+                children: [
+                  Obx(() => _buildProfileSection(context, ctr.userInfo.value)),
+                  const SizedBox(height: 10),
+                  FutureBuilder(
+                    future: _futureBuilderFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == null) {
+                          return const SizedBox();
+                        }
+                        if (snapshot.data['status']) {
+                          return Obx(
+                            () => _buildStatsSection(
+                              context,
+                              ctr.userStat.value,
+                            ),
+                          );
+                        } else {
+                          return _buildStatsSection(
+                            context,
+                            ctr.userStat.value,
+                          );
+                        }
+                      } else {
+                        return _buildStatsSection(
+                          context,
+                          ctr.userStat.value,
+                        );
+                      }
+                    },
+                  ),
+                  _buildMenuSection(context),
+                  Obx(
+                    () => Visibility(
+                      visible: ctr.userLogin.value,
+                      child: Divider(
+                        height: 25,
+                        color: Theme.of(context).dividerColor.withOpacity(0.1),
                       ),
-                    );
-                  } else {
-                    return _buildStatsSection(
-                      context,
-                      ctr.userStat.value,
-                    );
-                  }
-                } else {
-                  return _buildStatsSection(
-                    context,
-                    ctr.userStat.value,
-                  );
-                }
-              },
-            ),
-            _buildMenuSection(context),
-            Obx(
-              () => Visibility(
-                visible: ctr.userLogin.value,
-                child: Divider(
-                  height: 25,
-                  color: Theme.of(context).dividerColor.withOpacity(0.1),
-                ),
+                    ),
+                  ),
+                  Obx(
+                    () => ctr.userLogin.value
+                        ? _buildFavoritesSection(context)
+                        : const SizedBox(),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).padding.bottom +
+                        kBottomNavigationBarHeight,
+                  )
+                ],
               ),
             ),
-            Obx(
-              () => ctr.userLogin.value
-                  ? _buildFavoritesSection(context)
-                  : const SizedBox(),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).padding.bottom +
-                  kBottomNavigationBarHeight,
-            )
-          ],
+          ),
         ),
       ),
     );
@@ -326,7 +340,7 @@ class _MinePageState extends State<MinePage>
         const SizedBox(height: 4),
         SizedBox(
           width: double.infinity,
-          height: MediaQuery.textScalerOf(context).scale(110),
+          height: MediaQuery.textScalerOf(context).scale(180),
           child: FutureBuilder(
             future: ctr.queryFavFolder(),
             builder: (context, snapshot) {
@@ -459,71 +473,41 @@ class FavFolderItem extends StatelessWidget {
     String heroTag = Utils.makeHeroTag(item!.fid);
     return Container(
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
-      child: InkWell(
-        onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
-          'mediaId': item!.id.toString(),
-          'heroTag': heroTag,
-          'isOwner': '1',
-        }),
-        borderRadius: StyleString.mdRadius,
-        child: Stack(
-          children: [
-            NetworkImgLayer(
-              src: item!.cover,
-              width: 175,
-              height: 110,
-            ),
-            // 渐变
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 60,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 8, left: 10, right: 2),
-                decoration: BoxDecoration(
-                  borderRadius: StyleString.mdRadius,
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withOpacity(0),
-                      Colors.black.withOpacity(0.6),
-                    ],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    RichText(
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      text: TextSpan(
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall!
-                            .copyWith(color: Colors.white),
-                        children: [
-                          TextSpan(text: item!.title!),
-                          const TextSpan(text: ' '),
-                          if (item!.mediaCount! > 0)
-                            TextSpan(
-                              text: item!.mediaCount!.toString(),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () =>
+                Get.toNamed('/favDetail', arguments: item, parameters: {
+              'mediaId': item!.id.toString(),
+              'heroTag': heroTag,
+              'isOwner': '1',
+            }),
+            borderRadius: StyleString.mdRadius,
+            child: Hero(
+              tag: heroTag,
+              child: NetworkImgLayer(
+                src: item!.cover,
+                width: 180,
+                height: 110,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            ' ${item!.title}',
+            overflow: TextOverflow.fade,
+            maxLines: 1,
+          ),
+          Text(
+            ' 共${item!.mediaCount}条视频',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: Theme.of(context).colorScheme.outline),
+          )
+        ],
       ),
     );
   }
