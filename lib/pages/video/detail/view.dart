@@ -290,6 +290,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController?.play();
     }
     plPlayerController?.addStatusLister(playerListener);
+    appbarStream.add(0);
     super.didPopNext();
   }
 

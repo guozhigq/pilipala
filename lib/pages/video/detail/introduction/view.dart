@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:bottom_sheet/bottom_sheet.dart';
-import 'package:easy_debounce/easy_throttle.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -151,11 +148,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   RxBool isExpand = false.obs;
   late ExpandableController _expandableCtr;
 
-  // 一键三连动画
-  late AnimationController _controller;
-  late Animation<double> _scaleTransition;
-  final RxDouble _progress = 0.0.obs;
-
   void Function()? handleState(Future<dynamic> Function() action) {
     return isProcessing
         ? null
@@ -178,26 +170,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
     _expandableCtr = ExpandableController(initialExpanded: false);
-
-    /// 一键三连动画
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      reverseDuration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _scaleTransition = Tween<double>(begin: 0.5, end: 1.5).animate(_controller)
-      ..addListener(() async {
-        _progress.value =
-            double.parse((_scaleTransition.value - 0.5).toStringAsFixed(3));
-        if (_progress.value == 1) {
-          if (_controller.status == AnimationStatus.completed) {
-            await videoIntroController.actionOneThree();
-          }
-          _progress.value = 0;
-          _scaleTransition.removeListener(() {});
-          _controller.stop();
-        }
-      });
   }
 
   // 收藏
@@ -279,8 +251,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   void dispose() {
     _expandableCtr.dispose();
-    _controller.dispose();
-    _scaleTransition.removeListener(() {});
     super.dispose();
   }
 
@@ -573,131 +543,34 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget actionGrid(BuildContext context, videoIntroController) {
     final actionTypeSort = GlobalDataCache().actionTypeSort;
 
-    Widget progressWidget(progress) {
-      return SizedBox(
-        width: const IconThemeData.fallback().size! + 5,
-        height: const IconThemeData.fallback().size! + 5,
-        child: CircularProgressIndicator(
-          value: progress.value,
-          strokeWidth: 2,
-        ),
-      );
-    }
-
     Map<String, Widget> menuListWidgets = {
       'like': Obx(
-        () {
-          bool likeStatus = videoIntroController.hasLike.value;
-          ColorScheme colorScheme = Theme.of(context).colorScheme;
-          return Stack(
-            children: [
-              Positioned(
-                  top: ((Get.size.width - 24) / 5) / 2 -
-                      (const IconThemeData.fallback().size!),
-                  left: ((Get.size.width - 24) / 5) / 2 -
-                      (const IconThemeData.fallback().size! + 5) / 2,
-                  child: progressWidget(_progress)),
-              InkWell(
-                onTapDown: (details) {
-                  feedBack();
-                  if (videoIntroController.userInfo == null) {
-                    SmartDialog.showToast('账号未登录');
-                    return;
-                  }
-                  _controller.forward();
-                },
-                onTapUp: (TapUpDetails details) {
-                  if (_progress.value == 0) {
-                    feedBack();
-                    EasyThrottle.throttle(
-                        'my-throttler', const Duration(milliseconds: 200), () {
-                      videoIntroController.actionLikeVideo();
-                    });
-                  }
-                  _controller.reverse();
-                },
-                onTapCancel: () {
-                  _controller.reverse();
-                },
-                borderRadius: StyleString.mdRadius,
-                child: SizedBox(
-                  width: (Get.size.width - 24) / 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 4),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return ScaleTransition(
-                              scale: animation, child: child);
-                        },
-                        child: Icon(
-                          key: ValueKey<bool>(likeStatus),
-                          likeStatus
-                              ? FontAwesomeIcons.solidThumbsUp
-                              : FontAwesomeIcons.thumbsUp,
-                          color: likeStatus
-                              ? colorScheme.primary
-                              : colorScheme.outline,
-                          size: 21,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.videoDetail!.stat!.like!.toString(),
-                        style: TextStyle(
-                          color: likeStatus ? colorScheme.primary : null,
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.thumbsUp),
+          selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+          onTap: handleState(videoIntroController.actionLikeVideo),
+          onLongPress: () => videoIntroController.oneThreeDialog(),
+          selectStatus: videoIntroController.hasLike.value,
+          text: widget.videoDetail!.stat!.like!.toString(),
+        ),
       ),
       'coin': Obx(
-        () => Stack(
-          children: [
-            Positioned(
-                top: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size!),
-                left: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size! + 5) / 2,
-                child: progressWidget(_progress)),
-            ActionItem(
-              icon: const Icon(FontAwesomeIcons.b),
-              selectIcon: const Icon(FontAwesomeIcons.b),
-              onTap: handleState(videoIntroController.actionCoinVideo),
-              selectStatus: videoIntroController.hasCoin.value,
-              text: widget.videoDetail!.stat!.coin!.toString(),
-            ),
-          ],
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.b),
+          selectIcon: const Icon(FontAwesomeIcons.b),
+          onTap: handleState(videoIntroController.actionCoinVideo),
+          selectStatus: videoIntroController.hasCoin.value,
+          text: widget.videoDetail!.stat!.coin!.toString(),
         ),
       ),
       'collect': Obx(
-        () => Stack(
-          children: [
-            Positioned(
-                top: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size!),
-                left: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size! + 5) / 2,
-                child: progressWidget(_progress)),
-            ActionItem(
-              icon: const Icon(FontAwesomeIcons.star),
-              selectIcon: const Icon(FontAwesomeIcons.solidStar),
-              onTap: () => showFavBottomSheet(),
-              onLongPress: () => showFavBottomSheet(type: 'longPress'),
-              selectStatus: videoIntroController.hasFav.value,
-              text: widget.videoDetail!.stat!.favorite!.toString(),
-            ),
-          ],
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.star),
+          selectIcon: const Icon(FontAwesomeIcons.solidStar),
+          onTap: () => showFavBottomSheet(),
+          onLongPress: () => showFavBottomSheet(type: 'longPress'),
+          selectStatus: videoIntroController.hasFav.value,
+          text: widget.videoDetail!.stat!.favorite!.toString(),
         ),
       ),
       'watchLater': ActionItem(
