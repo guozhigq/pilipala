@@ -260,7 +260,8 @@ class Request {
         url,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options:
+            options ?? Options(contentType: Headers.formUrlEncodedContentType),
         cancelToken: cancelToken,
       );
       // print('post success: ${response.data}');

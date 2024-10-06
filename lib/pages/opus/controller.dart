@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/read.dart';
 import 'package:pilipala/models/read/opus.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
 import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 
@@ -39,6 +38,7 @@ class OpusController extends GetxController {
           'articleType': 'cv',
         });
       } else {
+        title.value = res['data'].detail!.basic!.title!;
         opusData.value = res['data'];
       }
     }
@@ -60,35 +60,19 @@ class OpusController extends GetxController {
         builder: (BuildContext context) => InteractiveviewerGallery(
           sources: picList,
           initIndex: initIndex,
-          itemBuilder: (
-            BuildContext context,
-            int index,
-            bool isFocus,
-            bool enablePageView,
-          ) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (enablePageView) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Center(
-                child: Hero(
-                  tag: picList[index],
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 0),
-                    imageUrl: picList[index],
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            );
-          },
           onPageChanged: (int pageIndex) {},
         ),
       ),
     );
+  }
+
+  // 跳转webview
+  void onJumpWebview() {
+    Get.toNamed('/webview', parameters: {
+      'url': url,
+      'type': 'webview',
+      'pageTitle': title.value,
+    });
   }
 
   @override

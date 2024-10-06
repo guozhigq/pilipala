@@ -89,23 +89,26 @@ class LiveHttp {
 
   // 发送弹幕
   static Future sendDanmaku({roomId, msg}) async {
-    var res = await Request().post(Api.sendLiveMsg, queryParameters: {
-      'bubble': 0,
-      'msg': msg,
-      'color': 16777215, // 颜色
-      'mode': 1, // 模式
-      'room_type': 0,
-      'jumpfrom': 71001, // 直播间来源
-      'reply_mid': 0,
-      'reply_attr': 0,
-      'replay_dmid': '',
-      'statistics': {"appId": 100, "platform": 5},
-      'fontsize': 25, // 字体大小
-      'rnd': DateTime.now().millisecondsSinceEpoch ~/ 1000, // 时间戳
-      'roomid': roomId,
-      'csrf': await Request.getCsrf(),
-      'csrf_token': await Request.getCsrf(),
-    });
+    var res = await Request().post(
+      Api.sendLiveMsg,
+      data: {
+        'bubble': 0,
+        'msg': msg,
+        'color': 16777215, // 颜色
+        'mode': 1, // 模式
+        'room_type': 0,
+        'jumpfrom': 71001, // 直播间来源
+        'reply_mid': 0,
+        'reply_attr': 0,
+        'replay_dmid': '',
+        'statistics': {"appId": 100, "platform": 5},
+        'fontsize': 25, // 字体大小
+        'rnd': DateTime.now().millisecondsSinceEpoch ~/ 1000, // 时间戳
+        'roomid': roomId,
+        'csrf': await Request.getCsrf(),
+        'csrf_token': await Request.getCsrf(),
+      },
+    );
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -145,12 +148,15 @@ class LiveHttp {
 
   // 直播历史记录
   static Future liveRoomEntry({required int roomId}) async {
-    await Request().post(Api.liveRoomEntry, queryParameters: {
-      'room_id': roomId,
-      'platform': 'pc',
-      'csrf_token': await Request.getCsrf(),
-      'csrf': await Request.getCsrf(),
-      'visit_id': '',
-    });
+    await Request().post(
+      Api.liveRoomEntry,
+      data: {
+        'room_id': roomId,
+        'platform': 'pc',
+        'csrf_token': await Request.getCsrf(),
+        'csrf': await Request.getCsrf(),
+        'visit_id': '',
+      },
+    );
   }
 }

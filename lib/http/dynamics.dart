@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:dio/dio.dart';
 import '../models/dynamics/result.dart';
 import '../models/dynamics/up.dart';
 import 'index.dart';
@@ -69,7 +70,7 @@ class DynamicsHttp {
   }) async {
     var res = await Request().post(
       Api.likeDynamic,
-      queryParameters: {
+      data: {
         'dynamic_id': dynamicId,
         'up': up,
         'csrf': await Request.getCsrf(),
@@ -175,27 +176,32 @@ class DynamicsHttp {
         'revs_id': {'dyn_type': 8, 'rid': oid}
       };
     }
-    var res = await Request().post(Api.dynamicCreate, queryParameters: {
-      'platform': 'web',
-      'csrf': await Request.getCsrf(),
-      'x-bili-device-req-json': {'platform': 'web', 'device': 'pc'},
-      'x-bili-web-req-json': {'spm_id': '333.999'},
-    }, data: {
-      'dyn_req': {
-        'content': {
-          'contents': [
-            {'raw_text': rawText ?? '', 'type': 1, 'biz_id': ''}
-          ]
-        },
-        'scene': scene,
-        'attach_card': null,
-        'upload_id': uploadId,
-        'meta': {
-          'app_meta': {'from': 'create.dynamic.web', 'mobi_app': 'web'}
-        }
+    var res = await Request().post(
+      Api.dynamicCreate,
+      queryParameters: {
+        'platform': 'web',
+        'csrf': await Request.getCsrf(),
+        'x-bili-device-req-json': {'platform': 'web', 'device': 'pc'},
+        'x-bili-web-req-json': {'spm_id': '333.999'},
       },
-      'web_repost_src': webRepostSrc
-    });
+      data: {
+        'dyn_req': {
+          'content': {
+            'contents': [
+              {'raw_text': rawText ?? '', 'type': 1, 'biz_id': ''}
+            ]
+          },
+          'scene': scene,
+          'attach_card': null,
+          'upload_id': uploadId,
+          'meta': {
+            'app_meta': {'from': 'create.dynamic.web', 'mobi_app': 'web'}
+          }
+        },
+        'web_repost_src': webRepostSrc
+      },
+      options: Options(contentType: 'application/json'),
+    );
     if (res.data['code'] == 0) {
       return {
         'status': true,
