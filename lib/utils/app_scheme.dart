@@ -175,6 +175,11 @@ class PiliSchame {
         if (lastPathSegment.contains('ep')) {
           RoutePush.bangumiPush(null, Utils.matchNum(lastPathSegment).first);
         }
+      } else if (path.startsWith('/BV')) {
+        final String bvid = path.split('?').first.split('/').last;
+        _videoPush(null, bvid);
+      } else if (path.startsWith('/av')) {
+        _videoPush(Utils.matchNum(path.split('?').first).first, null);
       }
     } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
