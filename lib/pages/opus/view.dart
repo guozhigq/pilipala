@@ -157,7 +157,7 @@ class _OpusPageState extends State<OpusPage> {
                     Container(
                       alignment: TextHelper.getAlignment(paragraph.align),
                       margin: const EdgeInsets.only(bottom: 10),
-                      child: Text.rich(
+                      child: SelectableText.rich(
                         TextSpan(
                           children: paragraph.text?.nodes?.map((node) {
                                 return TextHelper.buildTextSpan(
