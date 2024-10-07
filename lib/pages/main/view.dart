@@ -22,10 +22,10 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
-  final HomeController _homeController = Get.put(HomeController());
-  final RankController _rankController = Get.put(RankController());
-  final DynamicsController _dynamicController = Get.put(DynamicsController());
-  final MediaController _mediaController = Get.put(MediaController());
+  late HomeController _homeController;
+  RankController? _rankController;
+  DynamicsController? _dynamicController;
+  MediaController? _mediaController;
 
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
@@ -38,6 +38,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _mainController.pageController =
         PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
+    controllerInit();
   }
 
   void setIndex(int value) async {
@@ -60,38 +61,51 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     }
 
     if (currentPage is RankPage) {
-      if (_rankController.flag) {
+      if (_rankController!.flag) {
         // 单击返回顶部 双击并刷新
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
-          _rankController.onRefresh();
+          _rankController!.onRefresh();
         } else {
-          _rankController.animateToTop();
+          _rankController!.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
-      _rankController.flag = true;
+      _rankController!.flag = true;
     } else {
-      _rankController.flag = false;
+      _rankController?.flag = false;
     }
 
     if (currentPage is DynamicsPage) {
-      if (_dynamicController.flag) {
+      if (_dynamicController!.flag) {
         // 单击返回顶部 双击并刷新
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
-          _dynamicController.onRefresh();
+          _dynamicController!.onRefresh();
         } else {
-          _dynamicController.animateToTop();
+          _dynamicController!.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
-      _dynamicController.flag = true;
+      _dynamicController!.flag = true;
       _mainController.clearUnread();
     } else {
-      _dynamicController.flag = false;
+      _dynamicController?.flag = false;
     }
 
     if (currentPage is MediaPage) {
-      _mediaController.queryFavFolder();
+      _mediaController!.queryFavFolder();
+    }
+  }
+
+  void controllerInit() {
+    _homeController = Get.put(HomeController());
+    if (_mainController.pagesIds.contains(1)) {
+      _rankController = Get.put(RankController());
+    }
+    if (_mainController.pagesIds.contains(2)) {
+      _dynamicController = Get.put(DynamicsController());
+    }
+    if (_mainController.pagesIds.contains(3)) {
+      _mediaController = Get.put(MediaController());
     }
   }
 
