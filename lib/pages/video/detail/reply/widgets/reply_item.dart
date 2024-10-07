@@ -727,14 +727,11 @@ InlineSpan buildContent(
                           '',
                         );
                       } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
-                        Get.toNamed(
-                          '/webview',
-                          parameters: {
-                            'url': 'https://www.bilibili.com/read/$matchStr',
-                            'type': 'url',
-                            'pageTitle': title
-                          },
-                        );
+                        Get.toNamed('/read', parameters: {
+                          'title': title,
+                          'id': Utils.matchNum(matchStr).first.toString(),
+                          'articleType': 'read',
+                        });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
                         SchemeEntity scheme = SchemeEntity(
