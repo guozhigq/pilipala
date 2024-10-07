@@ -115,4 +115,25 @@ class ReplyHttp {
       };
     }
   }
+
+  static Future replyDel({
+    required int type, //replyType
+    required int oid,
+    required int rpid,
+  }) async {
+    var res = await Request().post(
+      Api.replyDel,
+      queryParameters: {
+        'type': type, //type.index
+        'oid': oid,
+        'rpid': rpid,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '删除成功'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }

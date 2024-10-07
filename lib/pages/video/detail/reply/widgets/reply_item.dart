@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/main/index.dart';
@@ -18,6 +19,7 @@ import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
@@ -48,6 +50,8 @@ class ReplyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isOwner = int.parse(replyItem!.member!.mid!) ==
+        (GlobalDataCache().userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
@@ -73,6 +77,7 @@ class ReplyItem extends StatelessWidget {
               return MorePanel(
                 item: replyItem,
                 mainFloor: true,
+                isOwner: isOwner,
               );
             },
           );
@@ -1004,10 +1009,12 @@ InlineSpan buildContent(
 class MorePanel extends StatelessWidget {
   final dynamic item;
   final bool mainFloor;
+  final bool isOwner;
   const MorePanel({
     super.key,
     required this.item,
     this.mainFloor = false,
+    this.isOwner = false,
   });
 
   Future<dynamic> menuActionHandler(String type) async {
@@ -1043,9 +1050,43 @@ class MorePanel extends StatelessWidget {
       // case 'report':
       //   SmartDialog.showToast('举报');
       //   break;
-      // case 'delete':
-      //   SmartDialog.showToast('删除');
-      //   break;
+      case 'delete':
+        // 删除评论提示
+        await showDialog(
+          context: Get.context!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('删除评论'),
+              content: const Text('删除评论后，评论下所有回复将被删除，确定删除吗？'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('取消',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Get.back();
+                    var result = await ReplyHttp.replyDel(
+                      type: item.type!,
+                      oid: item.oid!,
+                      rpid: item.rpid!,
+                    );
+                    if (result['status']) {
+                      SmartDialog.showToast('评论删除成功，需手动刷新');
+                      Get.back();
+                    } else {
+                      SmartDialog.showToast(result['msg']);
+                    }
+                  },
+                  child: const Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+        break;
       default:
     }
   }
@@ -1054,6 +1095,7 @@ class MorePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
+    Color errorColor = colorScheme.error;
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
@@ -1106,12 +1148,14 @@ class MorePanel extends StatelessWidget {
           //   leading: Icon(Icons.report_outlined, color: errorColor),
           //   title: Text('举报', style: TextStyle(color: errorColor)),
           // ),
-          // ListTile(
-          //   onTap: () async => await menuActionHandler('del'),
-          //   minLeadingWidth: 0,
-          //   leading: Icon(Icons.delete_outline, color: errorColor),
-          //   title: Text('删除', style: TextStyle(color: errorColor)),
-          // ),
+          if (isOwner)
+            ListTile(
+              onTap: () async => await menuActionHandler('delete'),
+              minLeadingWidth: 0,
+              leading: Icon(Icons.delete_outline, color: errorColor),
+              title: Text('删除评论',
+                  style: textTheme.titleSmall!.copyWith(color: errorColor)),
+            ),
         ],
       ),
     );
