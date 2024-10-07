@@ -189,8 +189,8 @@ class _BangumiInfoState extends State<BangumiInfo> {
               Stack(
                 children: [
                   NetworkImgLayer(
-                    width: 105,
-                    height: 160,
+                    width: 115,
+                    height: 115 / 0.75,
                     src: widget.bangumiDetail!.cover!,
                   ),
                   PBadge(
@@ -208,7 +208,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
                 child: InkWell(
                   onTap: () => showIntroDetail(),
                   child: SizedBox(
-                    height: 158,
+                    height: 115 / 0.75,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
