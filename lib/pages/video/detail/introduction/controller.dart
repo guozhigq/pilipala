@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
@@ -154,11 +153,10 @@ class VideoIntroController extends GetxController {
     }
     if (hasLike.value && hasCoin.value && hasFav.value) {
       // 已点赞、投币、收藏
-      SmartDialog.showToast('🙏 UP已经收到了～');
+      SmartDialog.showToast('UP已经收到了～');
       return false;
     }
     var result = await VideoHttp.oneThree(bvid: bvid);
-    print('🤣🦴：${result["data"]}');
     if (result['status']) {
       hasLike.value = result["data"]["like"];
       hasCoin.value = result["data"]["coin"];
@@ -602,6 +600,36 @@ class VideoIntroController extends GetxController {
           SmartDialog.dismiss();
         },
       ).buildShowContent(Get.context!),
+    );
+  }
+
+  //
+  oneThreeDialog() {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('是否一键三连'),
+          actions: [
+            TextButton(
+              onPressed: () => navigator!.pop(),
+              child: Text(
+                '取消',
+                style: TextStyle(
+                    color: Theme.of(Get.context!).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                actionOneThree();
+                navigator!.pop();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
     );
   }
 }

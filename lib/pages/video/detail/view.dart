@@ -68,10 +68,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late final AppLifecycleListener _lifecycleListener;
   late double statusHeight;
 
-  // 稍后再看控制器
-  // late AnimationController _laterCtr;
-  // late Animation<Offset> _laterOffsetAni;
-
   @override
   void initState() {
     super.initState();
@@ -108,7 +104,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
     WidgetsBinding.instance.addObserver(this);
     lifecycleListener();
-    // watchLaterControllerInit();
   }
 
   // 获取视频资源，初始化播放器
@@ -242,8 +237,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStream.close();
     WidgetsBinding.instance.removeObserver(this);
     _lifecycleListener.dispose();
-    // _laterCtr.dispose();
-    // _laterOffsetAni.removeListener(() {});
     super.dispose();
   }
 
@@ -297,6 +290,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController?.play();
     }
     plPlayerController?.addStatusLister(playerListener);
+    appbarStream.add(0);
     super.didPopNext();
   }
 
@@ -489,21 +483,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       ),
     );
   }
-
-  /// 稍后再看控制器初始化
-  // void watchLaterControllerInit() {
-  //   _laterCtr = AnimationController(
-  //     duration: const Duration(milliseconds: 300),
-  //     vsync: this,
-  //   );
-  //   _laterOffsetAni = Tween<Offset>(
-  //     begin: const Offset(0.0, 1.0),
-  //     end: Offset.zero,
-  //   ).animate(CurvedAnimation(
-  //     parent: _laterCtr,
-  //     curve: Curves.easeInOut,
-  //   ));
-  // }
 
   @override
   Widget build(BuildContext context) {
