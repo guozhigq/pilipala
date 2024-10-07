@@ -21,7 +21,7 @@ class ReadPageController extends GetxController {
     super.onInit();
     title.value = Get.parameters['title'] ?? '';
     id = Get.parameters['id']!;
-    articleType = Get.parameters['articleType']!;
+    articleType = Get.parameters['articleType'] ?? 'read';
     url = 'https://www.bilibili.com/read/cv$id';
     scrollController.addListener(_scrollListener);
     fetchViewInfo();
