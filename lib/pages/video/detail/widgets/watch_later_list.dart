@@ -109,7 +109,7 @@ class _MediaListPanelState extends State<MediaListPanel> {
                     var item = mediaList[index];
                     return InkWell(
                       onTap: () async {
-                        String bvid = item.bvId!;
+                        String bvid = item.bvid!;
                         int? aid = item.id;
                         String cover = item.cover ?? '';
                         final int cid =
@@ -173,7 +173,7 @@ class _MediaListPanelState extends State<MediaListPanel> {
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w500,
-                                              color: item.bvId == widget.bvid
+                                              color: item.bvid == widget.bvid
                                                   ? Theme.of(context)
                                                       .colorScheme
                                                       .primary
