@@ -536,7 +536,8 @@ class VideoHttp {
   // 获取字幕内容
   static Future<Map<String, dynamic>> getSubtitleContent(url) async {
     var res = await Request().get('https:$url');
-    final String content = SubTitleUtils.convertToWebVTT(res.data['body']);
+    final String content =
+        await SubTitleUtils.convertToWebVTT(res.data['body']);
     final List body = res.data['body'];
     return {'content': content, 'body': body};
   }
