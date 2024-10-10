@@ -82,14 +82,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController.videoDetail.listen((value) {
       videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
     });
-    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
-    bangumiIntroController.bangumiDetail.listen((value) {
-      videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
-    });
-    vdCtr.cid.listen((p0) {
-      videoPlayerServiceHandler.onVideoDetailChange(
-          bangumiIntroController.bangumiDetail.value, p0);
-    });
+    if (vdCtr.videoType == SearchType.media_bangumi) {
+      bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+      bangumiIntroController.bangumiDetail.listen((value) {
+        videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
+      });
+      vdCtr.cid.listen((p0) {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            bangumiIntroController.bangumiDetail.value, p0);
+      });
+    }
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
