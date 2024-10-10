@@ -96,7 +96,8 @@ class _BangumiPageState extends State<BangumiPage>
                       ),
                     ),
                     SizedBox(
-                      height: 268,
+                      height: Get.size.width / 3 / 0.75 +
+                          MediaQuery.textScalerOf(context).scale(50.0),
                       child: FutureBuilder(
                         future: _futureBuilderFutureFollow,
                         builder:
@@ -117,7 +118,6 @@ class _BangumiPageState extends State<BangumiPage>
                                         itemBuilder: (context, index) {
                                           return Container(
                                             width: Get.size.width / 3,
-                                            height: 254,
                                             margin: EdgeInsets.only(
                                                 left: StyleString.safeSpace,
                                                 right: index ==
@@ -208,8 +208,8 @@ class _BangumiPageState extends State<BangumiPage>
         crossAxisSpacing: StyleString.cardSpace,
         // 列数
         crossAxisCount: 3,
-        mainAxisExtent: Get.size.width / 3 / 0.65 +
-            MediaQuery.textScalerOf(context).scale(32.0),
+        mainAxisExtent: Get.size.width / 3 / 0.75 +
+            MediaQuery.textScalerOf(context).scale(42.0),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

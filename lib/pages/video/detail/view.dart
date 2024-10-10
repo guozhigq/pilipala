@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -81,14 +82,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController.videoDetail.listen((value) {
       videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
     });
-    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
-    bangumiIntroController.bangumiDetail.listen((value) {
-      videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
-    });
-    vdCtr.cid.listen((p0) {
-      videoPlayerServiceHandler.onVideoDetailChange(
-          bangumiIntroController.bangumiDetail.value, p0);
-    });
+    if (vdCtr.videoType == SearchType.media_bangumi) {
+      bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+      bangumiIntroController.bangumiDetail.listen((value) {
+        videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
+      });
+      vdCtr.cid.listen((p0) {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            bangumiIntroController.bangumiDetail.value, p0);
+      });
+    }
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -594,10 +597,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             key: vdCtr.scaffoldKey,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
-              child: AppBar(
-                backgroundColor: Colors.black,
-                elevation: 0,
-                scrolledUnderElevation: 0,
+              child: StreamBuilder(
+                stream: appbarStream.stream.distinct(),
+                initialData: 0,
+                builder: ((context, snapshot) {
+                  return AppBar(
+                    backgroundColor: Colors.black,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    systemOverlayStyle: Get.isDarkMode
+                        ? SystemUiOverlayStyle.light
+                        : snapshot.data!.toDouble() > kToolbarHeight
+                            ? SystemUiOverlayStyle.dark
+                            : SystemUiOverlayStyle.light,
+                  );
+                }),
               ),
             ),
             body: ExtendedNestedScrollView(

@@ -200,25 +200,36 @@ class ReplyItem extends StatelessWidget {
                         ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        Utils.dateFormat(replyItem!.ctime),
-                        style: TextStyle(
-                          fontSize: textTheme.labelSmall!.fontSize,
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      if (replyItem!.replyControl != null &&
-                          replyItem!.replyControl!.location != '')
-                        Text(
-                          ' • ${replyItem!.replyControl!.location!}',
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: Utils.dateFormat(replyItem!.ctime),
                           style: TextStyle(
-                              fontSize: textTheme.labelSmall!.fontSize,
-                              color: colorScheme.outline),
+                            fontSize: textTheme.labelSmall!.fontSize,
+                            color: colorScheme.outline,
+                          ),
                         ),
-                    ],
-                  )
+                        if (replyItem!.replyControl != null &&
+                            replyItem!.replyControl!.location != '')
+                          TextSpan(
+                            text: ' • ${replyItem!.replyControl!.location!}',
+                            style: TextStyle(
+                              fontSize: textTheme.labelSmall!.fontSize,
+                              color: colorScheme.outline,
+                            ),
+                          ),
+                        if (replyItem!.invisible!)
+                          TextSpan(
+                            text: ' • 隐藏的评论',
+                            style: TextStyle(
+                              color: colorScheme.outline,
+                              fontSize: textTheme.labelSmall!.fontSize,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -703,14 +714,11 @@ InlineSpan buildContent(
                           '',
                         );
                       } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
-                        Get.toNamed(
-                          '/webview',
-                          parameters: {
-                            'url': 'https://www.bilibili.com/read/$matchStr',
-                            'type': 'url',
-                            'pageTitle': title
-                          },
-                        );
+                        Get.toNamed('/read', parameters: {
+                          'title': title,
+                          'id': Utils.matchNum(matchStr).first.toString(),
+                          'articleType': 'read',
+                        });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
                         SchemeEntity scheme = SchemeEntity(
