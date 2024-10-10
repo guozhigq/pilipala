@@ -24,8 +24,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
   late HomeController _homeController;
   RankController? _rankController;
-  DynamicsController? _dynamicController;
-  MediaController? _mediaController;
+  late DynamicsController _dynamicController;
+  late MediaController _mediaController;
 
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
@@ -76,28 +76,30 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     }
 
     if (currentPage is DynamicsPage) {
-      if (_dynamicController!.flag) {
+      if (_dynamicController.flag) {
         // 单击返回顶部 双击并刷新
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
-          _dynamicController!.onRefresh();
+          _dynamicController.onRefresh();
         } else {
-          _dynamicController!.animateToTop();
+          _dynamicController.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
-      _dynamicController!.flag = true;
+      _dynamicController.flag = true;
       _mainController.clearUnread();
     } else {
-      _dynamicController?.flag = false;
+      _dynamicController.flag = false;
     }
 
     if (currentPage is MediaPage) {
-      _mediaController!.queryFavFolder();
+      _mediaController.queryFavFolder();
     }
   }
 
   void controllerInit() {
     _homeController = Get.put(HomeController());
+    _dynamicController = Get.put(DynamicsController());
+    _mediaController = Get.put(MediaController());
     if (_mainController.pagesIds.contains(1)) {
       _rankController = Get.put(RankController());
     }
