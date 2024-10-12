@@ -64,7 +64,7 @@ class LiveRoomController extends GetxController {
             ? liveItem.pic
             : (liveItem.cover != null && liveItem.cover != '')
                 ? liveItem.cover
-                : null;
+                : '';
       }
       Request.getBuvid().then((value) => buvid = value);
     }

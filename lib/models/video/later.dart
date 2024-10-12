@@ -1,6 +1,7 @@
 class MediaVideoItemModel {
   MediaVideoItemModel({
     this.id,
+    this.aid,
     this.offset,
     this.index,
     this.intro,
@@ -14,12 +15,13 @@ class MediaVideoItemModel {
     this.likeState,
     this.favState,
     this.page,
+    this.cid,
     this.pages,
     this.title,
     this.type,
     this.upper,
     this.link,
-    this.bvId,
+    this.bvid,
     this.shortLink,
     this.rights,
     this.elecInfo,
@@ -32,6 +34,7 @@ class MediaVideoItemModel {
   });
 
   int? id;
+  int? aid;
   int? offset;
   int? index;
   String? intro;
@@ -45,12 +48,13 @@ class MediaVideoItemModel {
   int? likeState;
   int? favState;
   int? page;
+  int? cid;
   List<Page>? pages;
   String? title;
   int? type;
   Upper? upper;
   String? link;
-  String? bvId;
+  String? bvid;
   String? shortLink;
   Rights? rights;
   dynamic elecInfo;
@@ -64,6 +68,7 @@ class MediaVideoItemModel {
   factory MediaVideoItemModel.fromJson(Map<String, dynamic> json) =>
       MediaVideoItemModel(
         id: json["id"],
+        aid: json["id"],
         offset: json["offset"],
         index: json["index"],
         intro: json["intro"],
@@ -77,6 +82,7 @@ class MediaVideoItemModel {
         likeState: json["like_state"],
         favState: json["fav_state"],
         page: json["page"],
+        cid: json["pages"] == null ? -1 : json["pages"].first['id'],
         // json["pages"] 可能为null
         pages: json["pages"] == null
             ? []
@@ -85,7 +91,7 @@ class MediaVideoItemModel {
         type: json["type"],
         upper: Upper.fromJson(json["upper"]),
         link: json["link"],
-        bvId: json["bv_id"],
+        bvid: json["bv_id"],
         shortLink: json["short_link"],
         rights: Rights.fromJson(json["rights"]),
         elecInfo: json["elec_info"],
