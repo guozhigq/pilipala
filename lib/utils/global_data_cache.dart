@@ -15,6 +15,7 @@ class GlobalDataCache {
   late FullScreenGestureMode fullScreenGestureMode;
   late bool enablePlayerControlAnimation;
   late List<String> actionTypeSort;
+  String? wWebid;
 
   /// 播放器相关
   // 弹幕开关
