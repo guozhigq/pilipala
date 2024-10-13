@@ -125,21 +125,29 @@ class LikeItem extends StatelessWidget {
     Color outline = Theme.of(context).colorScheme.outline;
     final nickNameList = item.users!.map((e) => e.nickname).take(2).toList();
     int usersLen = item.users!.length > 3 ? 3 : item.users!.length;
-    final String bvid = item.item!.uri!.split('/').last;
+    final Uri uri = Uri.parse(item.item!.uri!);
+    final String path = uri.path;
+    final String bvid = path.split('/').last;
+
+    /// bilibili://
+    final Uri nativeUri = Uri.parse(item.item!.nativeUri!);
+    final Map<String, String> queryParameters = nativeUri.queryParameters;
+    final String type = item.item!.type!;
+    // cid
+    final String? argCid = queryParameters['cid'];
     // 页码
-    final String page =
-        item.item!.nativeUri!.split('page=').last.split('&').first;
+    final String? page = queryParameters['page'];
     // 根评论id
-    final String commentRootId =
-        item.item!.nativeUri!.split('comment_root_id=').last.split('&').first;
+    final String? commentRootId = queryParameters['comment_root_id'];
     // 二级评论id
-    final String commentSecondaryId =
-        item.item!.nativeUri!.split('comment_secondary_id=').last;
+    final String? commentSecondaryId = queryParameters['comment_secondary_id'];
 
     return InkWell(
       onTap: () async {
         try {
-          final int cid = await SearchHttp.ab2c(bvid: bvid);
+          final int cid = argCid != null
+              ? int.parse(argCid)
+              : await SearchHttp.ab2c(bvid: bvid);
           final String heroTag = Utils.makeHeroTag(bvid);
           Get.toNamed<dynamic>(
             '/video?bvid=$bvid&cid=$cid',
@@ -148,8 +156,8 @@ class LikeItem extends StatelessWidget {
               'heroTag': heroTag,
             },
           );
-        } catch (_) {
-          SmartDialog.showToast('视频可能失效了');
+        } catch (e) {
+          SmartDialog.showToast('视频可能失效了$e');
         }
       },
       child: Stack(
@@ -222,7 +230,7 @@ class LikeItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 25),
-                if (item.item!.type! == 'reply')
+                if (type == 'reply' || type == 'danmu')
                   Container(
                     width: 60,
                     height: 60,
@@ -234,7 +242,7 @@ class LikeItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                if (item.item!.type! == 'video')
+                if (type == 'video')
                   NetworkImgLayer(
                     width: 60,
                     height: 60,

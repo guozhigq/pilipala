@@ -60,7 +60,7 @@ class GlobalDataCache {
         defaultValue: 10); // 设置全局变量
     fullScreenGestureMode = FullScreenGestureMode.values[setting.get(
         SettingBoxKey.fullScreenGestureMode,
-        defaultValue: FullScreenGestureMode.values.last.index) as int];
+        defaultValue: FullScreenGestureMode.fromBottomtoTop.index)];
     enablePlayerControlAnimation = setting
         .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
     actionTypeSort = await setting.get(SettingBoxKey.actionTypeSort,
