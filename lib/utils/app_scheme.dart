@@ -304,8 +304,13 @@ class PiliSchame {
         break;
       case 'member':
         if (arg != '') {
+          final int? mid = int.tryParse(arg);
+          if (mid == null) {
+            SmartDialog.showToast('用户id有误');
+            return;
+          }
           Get.toNamed<dynamic>(
-            '/member?mid=$arg',
+            '/member?mid=$mid',
             arguments: <String, dynamic>{'face': null},
           );
         } else {
@@ -314,7 +319,8 @@ class PiliSchame {
         break;
       case 'search':
         if (arg != '') {
-          Get.toNamed('/searchResult', parameters: {'keyword': arg});
+          final String encodedArg = Uri.decodeComponent(arg);
+          Get.toNamed('/searchResult', parameters: {'keyword': encodedArg});
         } else {
           Get.toNamed('/search');
         }
