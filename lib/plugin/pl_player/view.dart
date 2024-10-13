@@ -204,6 +204,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     widget.controller.brightness.value = value;
   }
 
+  bool isUsingFullScreenGestures(double tapPosition, double sectionWidth) {
+    if (fullScreenGestureMode == FullScreenGestureMode.none) {
+      return false;
+    } else {
+      return tapPosition < sectionWidth * 2;
+    }
+  }
+
   @override
   void dispose() {
     animationController.dispose();
@@ -660,12 +668,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     _brightnessValue.value - delta / level;
                 final double result = brightness.clamp(0.0, 1.0);
                 setBrightness(result);
-              } else if (tapPosition < sectionWidth * 2) {
+              } else if (isUsingFullScreenGestures(tapPosition, sectionWidth)) {
                 // 全屏
                 final double dy = details.delta.dy;
                 const double threshold = 7.0; // 滑动阈值
-                final bool flag =
-                    fullScreenGestureMode != FullScreenGestureMode.values.last;
+                final bool flag = fullScreenGestureMode !=
+                    FullScreenGestureMode.fromBottomtoTop;
                 if (dy > _distance.value &&
                     dy > threshold &&
                     !_.controlsLock.value) {
