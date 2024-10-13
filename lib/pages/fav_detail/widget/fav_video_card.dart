@@ -18,12 +18,14 @@ class FavVideoCardH extends StatelessWidget {
   final dynamic videoItem;
   final Function? callFn;
   final int? searchType;
+  final String isOwner;
 
   const FavVideoCardH({
     Key? key,
     required this.videoItem,
     this.callFn,
     this.searchType,
+    required this.isOwner,
   }) : super(key: key);
 
   @override
@@ -123,6 +125,7 @@ class FavVideoCardH extends StatelessWidget {
                         videoItem: videoItem,
                         callFn: callFn,
                         searchType: searchType,
+                        isOwner: isOwner,
                       )
                     ],
                   ),
@@ -140,11 +143,13 @@ class VideoContent extends StatelessWidget {
   final dynamic videoItem;
   final Function? callFn;
   final int? searchType;
+  final String isOwner;
   const VideoContent({
     super.key,
     required this.videoItem,
     this.callFn,
     this.searchType,
+    required this.isOwner,
   });
 
   @override
@@ -198,20 +203,16 @@ class VideoContent extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 2),
                   child: Row(
                     children: [
-                      StatView(
-                        theme: 'gray',
-                        view: videoItem.cntInfo['play'],
-                      ),
+                      StatView(view: videoItem.cntInfo['play']),
                       const SizedBox(width: 8),
-                      StatDanMu(
-                          theme: 'gray', danmu: videoItem.cntInfo['danmaku']),
+                      StatDanMu(danmu: videoItem.cntInfo['danmaku']),
                       const Spacer(),
                     ],
                   ),
                 ),
               ],
             ),
-            searchType != 1
+            searchType != 1 && isOwner == '1'
                 ? Positioned(
                     right: 0,
                     bottom: -4,

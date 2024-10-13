@@ -51,6 +51,7 @@ class ActionItem extends StatelessWidget {
                       color: selectStatus
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).colorScheme.outline,
+                      size: 20,
                     )
                   : Image.asset(
                       key: ValueKey<bool>(selectStatus),

@@ -203,13 +203,13 @@ class LikeItem extends StatelessWidget {
                       Text.rich(TextSpan(children: [
                         TextSpan(text: nickNameList.join('、')),
                         const TextSpan(text: ' '),
-                        if (item.users!.length > 1)
+                        if (item.counts! > 1)
                           TextSpan(
-                            text: '等总计${item.users!.length}人',
+                            text: '等总计${item.counts}人',
                             style: TextStyle(color: outline),
                           ),
                         TextSpan(
-                          text: '赞了我的评论',
+                          text: '赞了我的${item.item!.business}',
                           style: TextStyle(color: outline),
                         ),
                       ])),

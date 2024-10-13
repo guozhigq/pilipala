@@ -3,7 +3,19 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/preview/index.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
+
+void onPreviewImg(currentUrl, picList, initIndex, context) {
+  Navigator.of(context).push(
+    HeroDialogRoute<void>(
+      builder: (BuildContext context) => InteractiveviewerGallery(
+        sources: picList,
+        initIndex: initIndex,
+        onPageChanged: (int pageIndex) {},
+      ),
+    ),
+  );
+}
 
 Widget picWidget(item, context) {
   String type = item.modules.moduleDynamic.major.type;
@@ -21,25 +33,25 @@ Widget picWidget(item, context) {
   List<Widget> list = [];
   for (var i = 0; i < len; i++) {
     picList.add(pictures[i].src ?? pictures[i].url);
+  }
+  for (var i = 0; i < len; i++) {
     list.add(
       LayoutBuilder(
         builder: (context, BoxConstraints box) {
-          return GestureDetector(
-            onTap: () {
-              showDialog(
-                useSafeArea: false,
-                context: context,
-                builder: (context) {
-                  return ImagePreview(initialPage: i, imgList: picList);
-                },
-              );
+          return Hero(
+            tag: picList[i],
+            placeholderBuilder:
+                (BuildContext context, Size heroSize, Widget child) {
+              return child;
             },
-            child: NetworkImgLayer(
-              src: pictures[i].src ?? pictures[i].url,
-              width: box.maxWidth,
-              height: box.maxWidth,
+            child: GestureDetector(
+              onTap: () => onPreviewImg(picList[i], picList, i, context),
+              child: NetworkImgLayer(
+                src: pictures[i].src ?? pictures[i].url,
+                width: box.maxWidth,
+                height: box.maxWidth,
+              ),
             ),
-            // ),
           );
         },
       ),

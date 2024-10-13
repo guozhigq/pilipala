@@ -5,10 +5,12 @@ class SearchVideoModel {
   SearchVideoModel({this.list});
   List<SearchVideoItemModel>? list;
   SearchVideoModel.fromJson(Map<String, dynamic> json) {
-    list = json['result']
-        .where((e) => e['available'] == true)
-        .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
-        .toList();
+    list = json['result'] == null
+        ? []
+        : json['result']
+            .where((e) => e['available'] == true)
+            .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
+            .toList();
   }
 }
 

@@ -60,17 +60,13 @@ class VideoCardV extends StatelessWidget {
       // 动态
       case 'picture':
         try {
-          String dynamicType = 'picture';
           String uri = videoItem.uri;
-          String id = '';
           if (videoItem.uri.startsWith('bilibili://article/')) {
             // https://www.bilibili.com/read/cv27063554
-            dynamicType = 'read';
             RegExp regex = RegExp(r'\d+');
             Match match = regex.firstMatch(videoItem.uri)!;
             String matchedNumber = match.group(0)!;
             videoItem.param = int.parse(matchedNumber);
-            id = 'cv${videoItem.param}';
           }
           if (uri.startsWith('http')) {
             String path = Uri.parse(uri).path;
@@ -88,11 +84,10 @@ class VideoCardV extends StatelessWidget {
               return;
             }
           }
-          Get.toNamed('/htmlRender', parameters: {
-            'url': uri,
+          Get.toNamed('/read', parameters: {
             'title': videoItem.title,
-            'id': id,
-            'dynamicType': dynamicType
+            'id': videoItem.param,
+            'articleType': 'read'
           });
         } catch (err) {
           SmartDialog.showToast(err.toString());
@@ -215,9 +210,8 @@ class VideoContent extends StatelessWidget {
             children: [
               if (videoItem.goto == 'bangumi')
                 _buildBadge(videoItem.bangumiBadge, 'line', 9),
-              if (videoItem.rcmdReason?.content != null &&
-                  videoItem.rcmdReason.content != '')
-                _buildBadge(videoItem.rcmdReason.content, 'color'),
+              if (videoItem.rcmdReason != null)
+                _buildBadge(videoItem.rcmdReason, 'color'),
               if (videoItem.goto == 'picture') _buildBadge('动态', 'line', 9),
               if (videoItem.isFollowed == 1) _buildBadge('已关注', 'color'),
               Expanded(
@@ -288,9 +282,9 @@ class VideoStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        StatView(theme: 'gray', view: videoItem.stat.view),
+        StatView(view: videoItem.stat.view),
         const SizedBox(width: 8),
-        StatDanMu(theme: 'gray', danmu: videoItem.stat.danmu),
+        StatDanMu(danmu: videoItem.stat.danmu),
         if (videoItem is RecVideoItemModel) ...<Widget>[
           crossAxisCount > 1 ? const Spacer() : const SizedBox(width: 8),
           RichText(

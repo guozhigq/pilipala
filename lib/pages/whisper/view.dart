@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/skeleton.dart';
@@ -69,7 +70,19 @@ class _WhisperPageState extends State<WhisperPage> {
                           children: [
                             ..._whisperController.noticesList.map((element) {
                               return InkWell(
-                                onTap: () => Get.toNamed(element['path']),
+                                onTap: () {
+                                  if (['/messageAt']
+                                      .contains(element['path'])) {
+                                    SmartDialog.showToast('功能开发中');
+                                    return;
+                                  }
+                                  Get.toNamed(element['path']);
+
+                                  if (element['count'] > 0) {
+                                    element['count'] = 0;
+                                  }
+                                  _whisperController.noticesList.refresh();
+                                },
                                 onLongPress: () {},
                                 borderRadius: StyleString.mdRadius,
                                 child: Column(
@@ -201,9 +214,10 @@ class SessionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo.mid);
+    final String heroTag = Utils.makeHeroTag(sessionItem.accountInfo?.mid ?? 0);
     final content = sessionItem.lastMsg.content;
     final msgStatus = sessionItem.lastMsg.msgStatus;
+    final int msgType = sessionItem.lastMsg.msgType;
 
     return ListTile(
       onTap: () {
@@ -215,7 +229,7 @@ class SessionItem extends StatelessWidget {
             'talkerId': sessionItem.talkerId.toString(),
             'name': sessionItem.accountInfo.name,
             'face': sessionItem.accountInfo.face,
-            'mid': sessionItem.accountInfo.mid.toString(),
+            'mid': (sessionItem.accountInfo?.mid ?? 0).toString(),
             'heroTag': heroTag,
           },
         );
@@ -238,13 +252,15 @@ class SessionItem extends StatelessWidget {
       subtitle: Text(
           msgStatus == 1
               ? '你撤回了一条消息'
-              : content != null && content != ''
-                  ? (content['text'] ??
-                      content['content'] ??
-                      content['title'] ??
-                      content['reply_content'] ??
-                      '不支持的消息类型')
-                  : '不支持的消息类型',
+              : msgType == 2
+                  ? '[图片]'
+                  : content != null && content != ''
+                      ? (content['text'] ??
+                          content['content'] ??
+                          content['title'] ??
+                          content['reply_content'] ??
+                          '不支持的消息类型')
+                      : '不支持的消息类型',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context)

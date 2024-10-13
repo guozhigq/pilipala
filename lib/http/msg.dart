@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/models/msg/system.dart';
 import '../models/msg/account.dart';
 import '../models/msg/session.dart';
 import '../utils/wbi_sign.dart';
@@ -149,7 +149,7 @@ class MsgHttp {
         'msg[msg_status]': 0,
         'msg[content]': jsonEncode(content),
         'msg[timestamp]': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-        'msg[new_face_version]': 0,
+        'msg[new_face_version]': 1,
         'msg[dev_id]': getDevId(),
         'from_firework': 0,
         'build': 0,
@@ -157,9 +157,6 @@ class MsgHttp {
         'csrf_token': csrf,
         'csrf': csrf,
       },
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       return {
@@ -279,6 +276,71 @@ class MsgHttp {
         return {
           'status': true,
           'data': MessageLikeModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future messageSystem() async {
+    var res = await Request().get(Api.messageSystemAPi, data: {
+      'csrf': await Request.getCsrf(),
+      'page_size': 20,
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 系统消息标记已读
+  static Future systemMarkRead(int cursor) async {
+    String csrf = await Request.getCsrf();
+    var res = await Request().get(Api.systemMarkRead, data: {
+      'csrf': csrf,
+      'cursor': cursor,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future messageSystemAccount() async {
+    var res = await Request().get(Api.userMessageSystemAPi, data: {
+      'csrf': await Request.getCsrf(),
+      'page_size': 20,
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
         };
       } catch (err) {
         return {'status': false, 'date': [], 'msg': err.toString()};

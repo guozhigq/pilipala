@@ -1,20 +1,22 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/bangumi/introduction/index.dart';
 import 'package:pilipala/pages/danmaku/view.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
@@ -28,6 +30,7 @@ import 'package:status_bar_control/status_bar_control.dart';
 import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
+import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);
@@ -61,7 +64,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   late bool autoPlayEnable;
   late bool autoPiP;
   late Floating floating;
-  bool isShowing = true;
+  RxBool isShowing = true.obs;
   // 生命周期监听
   late final AppLifecycleListener _lifecycleListener;
   late double statusHeight;
@@ -79,14 +82,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     videoIntroController.videoDetail.listen((value) {
       videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
     });
-    bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
-    bangumiIntroController.bangumiDetail.listen((value) {
-      videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
-    });
-    vdCtr.cid.listen((p0) {
-      videoPlayerServiceHandler.onVideoDetailChange(
-          bangumiIntroController.bangumiDetail.value, p0);
-    });
+    if (vdCtr.videoType == SearchType.media_bangumi) {
+      bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
+      bangumiIntroController.bangumiDetail.listen((value) {
+        videoPlayerServiceHandler.onVideoDetailChange(value, vdCtr.cid.value);
+      });
+      vdCtr.cid.listen((p0) {
+        videoPlayerServiceHandler.onVideoDetailChange(
+            bangumiIntroController.bangumiDetail.value, p0);
+      });
+    }
     statusBarHeight = localCache.get('statusBarHeight');
     autoExitFullcreen =
         setting.get(SettingBoxKey.enableAutoExit, defaultValue: false);
@@ -181,6 +186,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     plPlayerController!.addStatusLister(playerListener);
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
+    isShowing.value = true;
     autoEnterPip(status: PlayerStatus.playing);
   }
 
@@ -208,6 +214,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           vdCtr.bottomList.removeAt(3);
         }
       }
+      vdCtr.toggeleWatchLaterVisible(!isFullScreen);
     });
   }
 
@@ -239,6 +246,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   // 离开当前页面时
   void didPushNext() async {
+    final MainController mainController = Get.find<MainController>();
+    if (mainController.imgPreviewStatus) {
+      return;
+    }
+
     /// 开启
     if (setting.get(SettingBoxKey.enableAutoBrightness, defaultValue: false)
         as bool) {
@@ -251,19 +263,22 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController!.pause();
       vdCtr.clearSubtitleContent();
     }
-    setState(() => isShowing = false);
+    isShowing.value = false;
     super.didPushNext();
   }
 
   @override
   // 返回当前页面时
   void didPopNext() async {
+    final MainController mainController = Get.find<MainController>();
+    if (mainController.imgPreviewStatus) {
+      return;
+    }
+
     if (plPlayerController != null &&
         plPlayerController!.videoPlayerController != null) {
-      setState(() {
-        vdCtr.setSubtitleContent();
-        isShowing = true;
-      });
+      vdCtr.setSubtitleContent();
+      isShowing.value = true;
     }
     vdCtr.isFirstTime = false;
     final bool autoplay = autoPlayEnable;
@@ -278,6 +293,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       plPlayerController?.play();
     }
     plPlayerController?.addStatusLister(playerListener);
+    appbarStream.add(0);
     super.didPopNext();
   }
 
@@ -318,12 +334,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
         plPlayerController?.danmakuController?.clear();
         break;
       case 'pause':
-        vdCtr.hiddenReplyReplyPanel();
-        if (vdCtr.videoType == SearchType.video) {
-          videoIntroController.hiddenEpisodeBottomSheet();
-        }
-        if (vdCtr.videoType == SearchType.media_bangumi) {
-          bangumiIntroController.hiddenEpisodeBottomSheet();
+        if (autoPiP) {
+          vdCtr.hiddenReplyReplyPanel();
+          if (vdCtr.videoType == SearchType.video) {
+            videoIntroController.hiddenEpisodeBottomSheet();
+          }
+          if (vdCtr.videoType == SearchType.media_bangumi) {
+            bangumiIntroController.hiddenEpisodeBottomSheet();
+          }
         }
         break;
     }
@@ -387,6 +405,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                   dividerColor: Colors.transparent,
                   tabs:
                       vdCtr.tabs.map((String name) => Tab(text: name)).toList(),
+                  onTap: (index) => vdCtr.onTapTabbar(index),
                 ),
               ),
             ),
@@ -492,45 +511,85 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       exitFullScreen();
     }
 
-    /// 播放器面板
-    Widget videoPlayerPanel = FutureBuilder(
-      future: _futureBuilderFuture,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData && snapshot.data['status']) {
-          return Obx(
-            () {
-              return !vdCtr.autoPlay.value
-                  ? const SizedBox()
-                  : Obx(
-                      () => PLVideoPlayer(
-                        controller: plPlayerController!,
-                        headerControl: vdCtr.headerControl,
-                        danmuWidget: PlDanmaku(
-                          key: Key(vdCtr.danmakuCid.value.toString()),
-                          cid: vdCtr.danmakuCid.value,
-                          playerController: plPlayerController!,
-                        ),
-                        bottomList: vdCtr.bottomList,
-                        showEposideCb: () => vdCtr.videoType == SearchType.video
-                            ? videoIntroController.showEposideHandler()
-                            : bangumiIntroController.showEposideHandler(),
-                        fullScreenCb: (bool status) {
-                          if (status) {
-                            videoHeight.value = Get.size.height;
-                          } else {
-                            videoHeight.value = defaultVideoHeight;
-                          }
-                        },
-                      ),
-                    );
-            },
-          );
-        } else {
-          // 加载失败异常处理
-          return const SizedBox();
-        }
-      },
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            Get.isDarkMode ? Brightness.light : Brightness.dark,
+      ),
     );
+
+    Widget buildLoadingWidget() {
+      return Center(child: Lottie.asset('assets/loading.json', width: 200));
+    }
+
+    Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
+      return Obx(() => !vdCtr.autoPlay.value
+          ? const SizedBox()
+          : PLVideoPlayer(
+              controller: plPlayerController!,
+              headerControl: vdCtr.headerControl,
+              danmuWidget: PlDanmaku(
+                key: Key(vdCtr.danmakuCid.value.toString()),
+                cid: vdCtr.danmakuCid.value,
+                playerController: plPlayerController!,
+              ),
+              bottomList: vdCtr.bottomList,
+              showEposideCb: () => vdCtr.videoType == SearchType.video
+                  ? videoIntroController.showEposideHandler()
+                  : bangumiIntroController.showEposideHandler(),
+              fullScreenCb: (bool status) {
+                videoHeight.value =
+                    status ? Get.size.height : defaultVideoHeight;
+              },
+            ));
+    }
+
+    Widget buildErrorWidget(dynamic error) {
+      return Obx(
+        () => SizedBox(
+          height: videoHeight.value,
+          width: Get.size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('加载失败', style: TextStyle(color: Colors.white)),
+              Text('$error', style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 10),
+              IconButton.filled(
+                onPressed: () {
+                  setState(() {
+                    _futureBuilderFuture = vdCtr.queryVideoUrl();
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
+    /// 播放器面板
+    Widget buildVideoPlayerPanel() {
+      return FutureBuilder(
+        future: _futureBuilderFuture,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return buildLoadingWidget();
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData && snapshot.data['status']) {
+              return buildVideoPlayerWidget(snapshot);
+            } else {
+              return buildErrorWidget(snapshot.error);
+            }
+          } else {
+            return buildErrorWidget('未知错误');
+          }
+        },
+      );
+    }
 
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait &&
@@ -546,9 +605,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             key: vdCtr.scaffoldKey,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
-              child: AppBar(
-                backgroundColor: Colors.black,
-                elevation: 0,
+              child: StreamBuilder(
+                stream: appbarStream.stream.distinct(),
+                initialData: 0,
+                builder: ((context, snapshot) {
+                  return AppBar(
+                    backgroundColor: Colors.black,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                  );
+                }),
               ),
             ),
             body: ExtendedNestedScrollView(
@@ -605,7 +671,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   tag: heroTag,
                                   child: Stack(
                                     children: <Widget>[
-                                      if (isShowing) videoPlayerPanel,
+                                      Obx(
+                                        () => isShowing.value
+                                            ? buildVideoPlayerPanel()
+                                            : const SizedBox(),
+                                      ),
 
                                       /// 关闭自动播放时 手动播放
                                       Obx(
@@ -683,6 +753,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                           () => VideoReplyPanel(
                             bvid: vdCtr.bvid,
                             oid: vdCtr.oid.value,
+                            onControllerCreated: vdCtr.onControllerCreated,
                           ),
                         )
                       ],
@@ -706,6 +777,62 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 null,
               );
             }),
+          ),
+
+          /// 稍后再看列表
+          Obx(
+            () => Visibility(
+              visible: vdCtr.sourceType.value == 'watchLater' ||
+                  vdCtr.sourceType.value == 'fav',
+              child: AnimatedPositioned(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+                left: 12,
+                bottom: vdCtr.isWatchLaterVisible.value
+                    ? MediaQuery.of(context).padding.bottom + 12
+                    : -100,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      vdCtr.toggeleWatchLaterVisible(
+                          !vdCtr.isWatchLaterVisible.value);
+                      vdCtr.showMediaListPanel();
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                    child: Container(
+                      width: Get.width - 24,
+                      height: 54,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer
+                            .withOpacity(0.95),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(14)),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.playlist_play, size: 24),
+                        const SizedBox(width: 10),
+                        Text(
+                          vdCtr.watchLaterTitle.value,
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.keyboard_arrow_up_rounded, size: 26),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           )
         ],
       ),
@@ -714,7 +841,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     if (Platform.isAndroid) {
       return PiPSwitcher(
         childWhenDisabled: childWhenDisabled,
-        childWhenEnabled: videoPlayerPanel,
+        childWhenEnabled: buildVideoPlayerPanel(),
         floating: floating,
       );
     } else {

@@ -6,26 +6,30 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/fav/index.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
-  Rx<FavDetailData> favDetailData = FavDetailData().obs;
+  RxString title = ''.obs;
 
   int? mediaId;
   late String heroTag;
   int currentPage = 1;
   bool isLoadingMore = false;
   RxMap favInfo = {}.obs;
-  RxList favList = [].obs;
+  RxList<FavDetailItemData> favList = <FavDetailItemData>[].obs;
   RxString loadingText = '加载中...'.obs;
   RxInt mediaCount = 0.obs;
+  late String isOwner;
 
   @override
   void onInit() {
     item = Get.arguments;
+    title.value = item!.title!;
     if (Get.parameters.keys.isNotEmpty) {
       mediaId = int.parse(Get.parameters['mediaId']!);
       heroTag = Get.parameters['heroTag']!;
+      isOwner = Get.parameters['isOwner']!;
     }
     super.onInit();
   }
@@ -110,6 +114,39 @@ class FavDetailController extends GetxController {
             )
           ],
         );
+      },
+    );
+  }
+
+  onEditFavFolder() async {
+    var res = await Get.toNamed(
+      '/favEdit',
+      arguments: {
+        'mediaId': mediaId.toString(),
+        'title': item!.title,
+        'intro': item!.intro,
+        'cover': item!.cover,
+        'privacy': [23, 1].contains(item!.attr) ? 1 : 0,
+      },
+    );
+    title.value = res['title'];
+    print(title);
+  }
+
+  Future toViewPlayAll() async {
+    final FavDetailItemData firstItem = favList.first;
+    final String heroTag = Utils.makeHeroTag(firstItem.bvid);
+    Get.toNamed(
+      '/video?bvid=${firstItem.bvid}&cid=${firstItem.cid}',
+      arguments: {
+        'videoItem': firstItem,
+        'heroTag': heroTag,
+        'sourceType': 'fav',
+        'mediaId': favInfo['id'],
+        'oid': firstItem.id,
+        'favTitle': favInfo['title'],
+        'favInfo': favInfo,
+        'count': favInfo['media_count'],
       },
     );
   }

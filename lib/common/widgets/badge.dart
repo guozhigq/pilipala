@@ -66,7 +66,7 @@ class PBadge extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: Text(
-        text!,
+        text ?? '',
         style: TextStyle(fontSize: fs ?? fontSize, color: color),
       ),
     );

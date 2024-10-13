@@ -6,9 +6,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
-import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
@@ -16,7 +14,6 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:pilipala/utils/utils.dart';
 
 class DynamicsController extends GetxController {
   int page = 1;
@@ -149,20 +146,26 @@ class DynamicsController extends GetxController {
       /// 专栏文章查看
       case 'DYNAMIC_TYPE_ARTICLE':
         String title = item.modules.moduleDynamic.major.opus.title;
-        String url = item.modules.moduleDynamic.major.opus.jumpUrl;
-        if (url.contains('opus') || url.contains('read')) {
+        String jumpUrl = item.modules.moduleDynamic.major.opus.jumpUrl;
+        String url =
+            jumpUrl.startsWith('//') ? jumpUrl.split('//').last : jumpUrl;
+        if (jumpUrl.contains('opus') || jumpUrl.contains('read')) {
           RegExp digitRegExp = RegExp(r'\d+');
-          Iterable<Match> matches = digitRegExp.allMatches(url);
+          Iterable<Match> matches = digitRegExp.allMatches(jumpUrl);
           String number = matches.first.group(0)!;
-          if (url.contains('read')) {
-            number = 'cv$number';
+          if (jumpUrl.contains('read')) {
+            Get.toNamed('/read', parameters: {
+              'title': title,
+              'id': number,
+              'articleType': url.split('/')[1]
+            });
+          } else {
+            Get.toNamed('/opus', parameters: {
+              'title': title,
+              'id': number,
+              'articleType': 'opus'
+            });
           }
-          Get.toNamed('/htmlRender', parameters: {
-            'url': url.startsWith('//') ? url.split('//').last : url,
-            'title': title,
-            'id': number,
-            'dynamicType': url.split('//').last.split('/')[1]
-          });
         } else {
           Get.toNamed(
             '/webview',
@@ -281,5 +284,12 @@ class DynamicsController extends GetxController {
     SmartDialog.showToast('还原默认加载');
     dynamicsList.value = <DynamicItemModel>[];
     queryFollowDynamic();
+  }
+
+  // 点击up主
+  void onTapUp(data) {
+    mid.value = data.mid;
+    upInfo.value = data;
+    onSelectUp(data.mid);
   }
 }

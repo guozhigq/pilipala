@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -31,7 +32,7 @@ class VideoIntroController extends GetxController {
   // 视频详情 请求返回
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
   // up主粉丝数
-  Map userStat = {'follower': '-'};
+  RxInt follower = 0.obs;
   // 是否点赞
   RxBool hasLike = false.obs;
   // 是否投币
@@ -113,7 +114,7 @@ class VideoIntroController extends GetxController {
   Future queryUserStat() async {
     var result = await UserHttp.userStat(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
-      userStat = result['data'];
+      follower.value = result['data']['follower'];
     }
   }
 
@@ -152,11 +153,10 @@ class VideoIntroController extends GetxController {
     }
     if (hasLike.value && hasCoin.value && hasFav.value) {
       // 已点赞、投币、收藏
-      SmartDialog.showToast('🙏 UP已经收到了～');
+      SmartDialog.showToast('UP已经收到了～');
       return false;
     }
     var result = await VideoHttp.oneThree(bvid: bvid);
-    print('🤣🦴：${result["data"]}');
     if (result['status']) {
       hasLike.value = result["data"]["like"];
       hasCoin.value = result["data"]["coin"];
@@ -196,45 +196,38 @@ class VideoIntroController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    if (hasCoin.value) {
-      SmartDialog.showToast('已投过币了');
-      return;
-    }
     showDialog(
         context: Get.context!,
         builder: (context) {
           return AlertDialog(
             title: const Text('选择投币个数'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [1, 2]
-                    .map(
-                      (e) => RadioListTile(
-                        value: e,
-                        title: Text('$e枚'),
-                        groupValue: _tempThemeValue,
-                        onChanged: (value) async {
-                          _tempThemeValue = value!;
-                          setState(() {});
-                          var res = await VideoHttp.coinVideo(
-                              bvid: bvid, multiply: _tempThemeValue);
-                          if (res['status']) {
-                            SmartDialog.showToast('投币成功');
-                            hasCoin.value = true;
-                            videoDetail.value.stat!.coin =
-                                videoDetail.value.stat!.coin! + _tempThemeValue;
-                          } else {
-                            SmartDialog.showToast(res['msg']);
-                          }
-                          Get.back();
-                        },
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [1, 2]
+                  .map(
+                    (e) => ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Text('$e 枚'),
                       ),
-                    )
-                    .toList(),
-              );
-            }),
+                      onTap: () async {
+                        var res =
+                            await VideoHttp.coinVideo(bvid: bvid, multiply: e);
+                        if (res['status']) {
+                          SmartDialog.showToast('投币成功');
+                          hasCoin.value = true;
+                          videoDetail.value.stat!.coin =
+                              videoDetail.value.stat!.coin! + e;
+                        } else {
+                          SmartDialog.showToast(res['msg']);
+                        }
+                        Get.back();
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
           );
         });
   }
@@ -418,7 +411,12 @@ class VideoIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
+  Future changeSeasonOrbangu(
+    String bvid,
+    int cid,
+    int? aid,
+    String? cover,
+  ) async {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
@@ -429,13 +427,16 @@ class VideoIntroController extends GetxController {
       releatedCtr.queryRelatedVideo();
     }
 
-    videoDetailCtr.bvid = bvid;
-    videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
-    videoDetailCtr.cid.value = cid;
-    videoDetailCtr.danmakuCid.value = cid;
-    videoDetailCtr.cover.value = cover;
-    videoDetailCtr.queryVideoUrl();
-    videoDetailCtr.getSubtitle();
+    videoDetailCtr
+      ..bvid = bvid
+      ..oid.value = aid ?? IdUtils.bv2av(bvid)
+      ..cid.value = cid
+      ..danmakuCid.value = cid
+      ..cover.value = cover ?? ''
+      ..queryVideoUrl()
+      ..clearSubtitleContent();
+    await videoDetailCtr.getSubtitle();
+    videoDetailCtr.setSubtitleContent();
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
@@ -483,7 +484,13 @@ class VideoIntroController extends GetxController {
     final List episodes = [];
     bool isPages = false;
     late String cover;
-    if (videoDetail.value.ugcSeason != null) {
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+
+    /// 优先稍后再看、收藏夹
+    if (videoDetailCtr.isWatchLaterVisible.value) {
+      episodes.addAll(videoDetailCtr.mediaList);
+    } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
@@ -500,9 +507,14 @@ class VideoIntroController extends GetxController {
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
     cover = episodes[nextIndex].cover;
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
     final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    int cid = episodes[nextIndex].cid!;
+    while (cid == -1) {
+      nextIndex += 1;
+      SmartDialog.showToast('当前视频暂不支持播放，自动跳过');
+      cid = episodes[nextIndex].cid!;
+    }
 
     // 列表循环
     if (nextIndex >= episodes.length) {
@@ -513,7 +525,6 @@ class VideoIntroController extends GetxController {
         return;
       }
     }
-    final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid, cover);
@@ -521,15 +532,30 @@ class VideoIntroController extends GetxController {
 
   // 设置关注分组
   void setFollowGroup() {
-    Get.bottomSheet(
-      GroupPanel(mid: videoDetail.value.owner!.mid!),
-      isScrollControlled: true,
+    showFlexibleBottomSheet(
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
+      minHeight: 0.6,
+      initHeight: 0.6,
+      maxHeight: 1,
+      context: Get.context!,
+      builder: (BuildContext context, ScrollController scrollController,
+          double offset) {
+        return GroupPanel(
+          mid: videoDetail.value.owner!.mid!,
+          scrollController: scrollController,
+        );
+      },
+      anchors: [0.6, 1],
+      isSafeArea: true,
     );
   }
 
   // ai总结
   Future aiConclusion() async {
-    SmartDialog.showLoading(msg: '正在生产ai总结');
+    SmartDialog.showLoading(msg: '正在生成ai总结');
     final res = await VideoHttp.aiConclusion(
       bvid: bvid,
       cid: lastPlayCid.value,
@@ -539,7 +565,7 @@ class VideoIntroController extends GetxController {
     if (res['status']) {
       modelResult = res['data'].modelResult;
     } else {
-      SmartDialog.showToast("当前视频可能暂不支持AI视频总结");
+      SmartDialog.showToast("当前视频暂不支持AI视频总结");
     }
     return res;
   }
@@ -590,6 +616,36 @@ class VideoIntroController extends GetxController {
           SmartDialog.dismiss();
         },
       ).buildShowContent(Get.context!),
+    );
+  }
+
+  //
+  oneThreeDialog() {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('是否一键三连'),
+          actions: [
+            TextButton(
+              onPressed: () => navigator!.pop(),
+              child: Text(
+                '取消',
+                style: TextStyle(
+                    color: Theme.of(Get.context!).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                actionOneThree();
+                navigator!.pop();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
     );
   }
 }

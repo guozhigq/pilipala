@@ -48,7 +48,7 @@ class FollowSearchController extends GetxController {
       return {'status': true, 'data': <FollowItemModel>[].obs};
     }
     if (type == 'init') {
-      ps = 1;
+      pn = 1;
     }
     var res = await MemberHttp.getfollowSearch(
       mid: mid,

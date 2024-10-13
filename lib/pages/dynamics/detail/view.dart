@@ -32,7 +32,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   late DynamicDetailController _dynamicDetailController;
   late AnimationController fabAnimationCtr;
   Future? _futureBuilderFuture;
-  late StreamController<bool> titleStreamC; // appBar title
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // appBar title
   late ScrollController scrollController;
   bool _visibleTitle = false;
   String? action;
@@ -48,7 +49,6 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     super.initState();
     // floor 1原创 2转发
     init();
-    titleStreamC = StreamController<bool>();
     if (action == 'comment') {
       _visibleTitle = true;
       titleStreamC.add(true);
@@ -106,7 +106,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   }
 
   // 查看二级评论
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply, loadMore) {
     int oid = replyItem.oid;
     int rpid = replyItem.rpid!;
     Get.to(
@@ -125,6 +125,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
           source: 'dynamic',
           replyType: ReplyType.values[replyType],
           firstFloor: replyItem,
+          loadMore: loadMore,
         ),
       ),
     );
@@ -324,8 +325,10 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                       replyItem: replyList[index],
                                       showReplyRow: true,
                                       replyLevel: '1',
-                                      replyReply: (replyItem) =>
-                                          replyReply(replyItem),
+                                      replyReply:
+                                          (replyItem, currentReply, loadMore) =>
+                                              replyReply(replyItem,
+                                                  currentReply, loadMore),
                                       replyType: ReplyType.values[replyType],
                                       addReply: (replyItem) {
                                         replyList[index]

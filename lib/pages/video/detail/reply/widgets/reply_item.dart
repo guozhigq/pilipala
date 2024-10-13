@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:appscheme/appscheme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,17 +9,22 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
-import 'package:pilipala/pages/preview/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/index.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
 import 'package:pilipala/utils/utils.dart';
+import 'reply_save.dart';
 import 'zan.dart';
 
 Box setting = GStrorage.setting;
@@ -30,6 +37,7 @@ class ReplyItem extends StatelessWidget {
     this.showReplyRow = true,
     this.replyReply,
     this.replyType,
+    this.replySave = false,
     super.key,
   });
   final ReplyItemModel? replyItem;
@@ -38,26 +46,39 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
+  final bool? replySave;
 
   @override
   Widget build(BuildContext context) {
+    final bool isOwner = int.parse(replyItem!.member!.mid!) ==
+        (GlobalDataCache().userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           if (replyReply != null) {
-            replyReply!(replyItem);
+            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
           }
         },
         onLongPress: () {
+          if (replySave!) {
+            return;
+          }
           feedBack();
           showModalBottomSheet(
             context: context,
             useRootNavigator: true,
             isScrollControlled: true,
             builder: (context) {
-              return MorePanel(item: replyItem);
+              return MorePanel(
+                item: replyItem,
+                mainFloor: true,
+                isOwner: isOwner,
+              );
             },
           );
         },
@@ -179,25 +200,36 @@ class ReplyItem extends StatelessWidget {
                         ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        Utils.dateFormat(replyItem!.ctime),
-                        style: TextStyle(
-                          fontSize: textTheme.labelSmall!.fontSize,
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      if (replyItem!.replyControl != null &&
-                          replyItem!.replyControl!.location != '')
-                        Text(
-                          ' • ${replyItem!.replyControl!.location!}',
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: Utils.dateFormat(replyItem!.ctime),
                           style: TextStyle(
-                              fontSize: textTheme.labelSmall!.fontSize,
-                              color: colorScheme.outline),
+                            fontSize: textTheme.labelSmall!.fontSize,
+                            color: colorScheme.outline,
+                          ),
                         ),
-                    ],
-                  )
+                        if (replyItem!.replyControl != null &&
+                            replyItem!.replyControl!.location != '')
+                          TextSpan(
+                            text: ' • ${replyItem!.replyControl!.location!}',
+                            style: TextStyle(
+                              fontSize: textTheme.labelSmall!.fontSize,
+                              color: colorScheme.outline,
+                            ),
+                          ),
+                        if (replyItem!.invisible!)
+                          TextSpan(
+                            text: ' • 隐藏的评论',
+                            style: TextStyle(
+                              color: colorScheme.outline,
+                              fontSize: textTheme.labelSmall!.fontSize,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -230,7 +262,7 @@ class ReplyItem extends StatelessWidget {
           ),
         ),
         // 操作区域
-        bottonAction(context, replyItem!.replyControl),
+        bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
         if ((replyItem!.replyControl!.isShow! ||
                 replyItem!.replies!.isNotEmpty) &&
@@ -251,7 +283,7 @@ class ReplyItem extends StatelessWidget {
   }
 
   // 感谢、回复、复制
-  Widget bottonAction(BuildContext context, replyControl) {
+  Widget bottonAction(BuildContext context, replyControl, replySave) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
     return Row(
@@ -284,16 +316,26 @@ class ReplyItem extends StatelessWidget {
                   });
             },
             child: Row(children: [
-              Icon(Icons.reply,
-                  size: 18, color: colorScheme.outline.withOpacity(0.8)),
-              const SizedBox(width: 3),
-              Text(
-                '回复',
-                style: TextStyle(
-                  fontSize: textTheme.labelMedium!.fontSize,
-                  color: colorScheme.outline,
+              if (!replySave!) ...[
+                Icon(Icons.reply,
+                    size: 18, color: colorScheme.outline.withOpacity(0.8)),
+                const SizedBox(width: 3),
+                Text(
+                  '回复',
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
+                )
+              ],
+              if (replySave!)
+                Text(
+                  IdUtils.av2bv(replyItem!.oid!),
+                  style: TextStyle(
+                    fontSize: textTheme.labelMedium!.fontSize,
+                    color: colorScheme.outline,
+                  ),
                 ),
-              ),
             ]),
           ),
         ),
@@ -360,9 +402,13 @@ class ReplyItemRow extends StatelessWidget {
               for (int i = 0; i < replies!.length; i++) ...[
                 InkWell(
                   // 一楼点击评论展开评论详情
-                  // onTap: () {
-                  //   replyReply?.call(replyItem);
-                  // },
+                  onTap: () {
+                    replyReply?.call(
+                      replyItem,
+                      replies![i],
+                      replyItem!.replies!.isNotEmpty,
+                    );
+                  },
                   onLongPress: () {
                     feedBack();
                     showModalBottomSheet(
@@ -430,7 +476,8 @@ class ReplyItemRow extends StatelessWidget {
             if (extraRow == 1)
               InkWell(
                 // 一楼点击【共xx条回复】展开评论详情
-                onTap: () => replyReply!(replyItem),
+                onTap: () => replyReply?.call(replyItem, null, true),
+                onLongPress: () => {},
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(8, 5, 8, 8),
@@ -533,9 +580,31 @@ InlineSpan buildContent(
     spanChilds.add(
       TextSpan(
         text: str,
-        recognizer: TapGestureRecognizer()
-          ..onTap = () =>
-              replyReply?.call(replyItem.root == 0 ? replyItem : fReplyItem),
+        // recognizer: TapGestureRecognizer()
+        //   ..onTap = () => replyReply?.call(
+        //         replyItem.root == 0 ? replyItem : fReplyItem,
+        //         replyItem,
+        //         fReplyItem!.replies!.isNotEmpty,
+        //       ),
+      ),
+    );
+  }
+
+  void onPreviewImg(picList, initIndex, randomInt) {
+    final MainController mainController = Get.find<MainController>();
+    mainController.imgPreviewStatus = true;
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          onPageChanged: (int pageIndex) {},
+          onDismissed: (int value) {
+            print('onDismissed');
+            final MainController mainController = Get.find<MainController>();
+            mainController.imgPreviewStatus = false;
+          },
+        ),
       ),
     );
   }
@@ -644,8 +713,14 @@ InlineSpan buildContent(
                           title,
                           '',
                         );
+                      } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
+                        Get.toNamed('/read', parameters: {
+                          'title': title,
+                          'id': Utils.matchNum(matchStr).first.toString(),
+                          'articleType': 'read',
+                        });
                       } else {
-                        Uri uri = Uri.parse(matchStr);
+                        Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
                         SchemeEntity scheme = SchemeEntity(
                           scheme: uri.scheme,
                           host: uri.host,
@@ -700,9 +775,10 @@ InlineSpan buildContent(
           );
           // 只显示一次
           matchedStrs.add(matchStr);
-        } else if (content
-                .topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
-            null) {
+        } else if (content.topicsMeta.keys.isNotEmpty &&
+            matchStr.length > 1 &&
+            content.topicsMeta[matchStr.substring(1, matchStr.length - 1)] !=
+                null) {
           spanChilds.add(
             TextSpan(
               text: matchStr,
@@ -820,39 +896,35 @@ InlineSpan buildContent(
                         pictureItem['img_width']))
                     .truncateToDouble();
               } catch (_) {}
+              String randomInt = Random().nextInt(101).toString();
 
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ImagePreview(initialPage: 0, imgList: picList);
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(top: 4),
-                  constraints: BoxConstraints(maxHeight: maxHeight),
-                  width: box.maxWidth / 2,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: NetworkImgLayer(
-                          src: pictureItem['img_src'],
-                          width: box.maxWidth / 2,
-                          height: height,
+              return Hero(
+                tag: picList[0] + randomInt,
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, 0, randomInt),
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    constraints: BoxConstraints(maxHeight: maxHeight),
+                    width: box.maxWidth / 2,
+                    height: height,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: picList[0],
+                            width: box.maxWidth / 2,
+                            height: height,
+                          ),
                         ),
-                      ),
-                      height > Get.size.height * 0.9
-                          ? const PBadge(
-                              text: '长图',
-                              right: 8,
-                              bottom: 8,
-                            )
-                          : const SizedBox(),
-                    ],
+                        height > Get.size.height * 0.9
+                            ? const PBadge(
+                                text: '长图',
+                                right: 8,
+                                bottom: 8,
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -864,25 +936,23 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
+      }
+      for (var i = 0; i < len; i++) {
+        String randomInt = Random().nextInt(101).toString();
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: i, imgList: picList);
-                    },
-                  );
-                },
-                child: NetworkImgLayer(
-                    src: content.pictures[i]['img_src'],
-                    width: box.maxWidth,
-                    height: box.maxWidth,
-                    origAspectRatio: content.pictures[i]['img_width'] /
-                        content.pictures[i]['img_height']),
+              return Hero(
+                tag: picList[i] + randomInt,
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, i, randomInt),
+                  child: NetworkImgLayer(
+                      src: picList[i],
+                      width: box.maxWidth,
+                      height: box.maxWidth,
+                      origAspectRatio: content.pictures[i]['img_width'] /
+                          content.pictures[i]['img_height']),
+                ),
               );
             },
           ),
@@ -946,7 +1016,14 @@ InlineSpan buildContent(
 
 class MorePanel extends StatelessWidget {
   final dynamic item;
-  const MorePanel({super.key, required this.item});
+  final bool mainFloor;
+  final bool isOwner;
+  const MorePanel({
+    super.key,
+    required this.item,
+    this.mainFloor = false,
+    this.isOwner = false,
+  });
 
   Future<dynamic> menuActionHandler(String type) async {
     String message = item.content.message ?? item.content;
@@ -968,15 +1045,56 @@ class MorePanel extends StatelessWidget {
           },
         );
         break;
+      case 'save':
+        Get.back();
+        Navigator.push(
+          Get.context!,
+          PlPopupRoute(child: ReplySave(replyItem: item)),
+        );
+        break;
       // case 'block':
       //   SmartDialog.showToast('加入黑名单');
       //   break;
       // case 'report':
       //   SmartDialog.showToast('举报');
       //   break;
-      // case 'delete':
-      //   SmartDialog.showToast('删除');
-      //   break;
+      case 'delete':
+        // 删除评论提示
+        await showDialog(
+          context: Get.context!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('删除评论'),
+              content: const Text('删除评论后，评论下所有回复将被删除，确定删除吗？'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('取消',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Get.back();
+                    var result = await ReplyHttp.replyDel(
+                      type: item.type!,
+                      oid: item.oid!,
+                      rpid: item.rpid!,
+                    );
+                    if (result['status']) {
+                      SmartDialog.showToast('评论删除成功，需手动刷新');
+                      Get.back();
+                    } else {
+                      SmartDialog.showToast(result['msg']);
+                    }
+                  },
+                  child: const Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+        break;
       default:
     }
   }
@@ -985,6 +1103,7 @@ class MorePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
+    Color errorColor = colorScheme.error;
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
@@ -1018,6 +1137,13 @@ class MorePanel extends StatelessWidget {
             leading: const Icon(Icons.copy_outlined, size: 19),
             title: Text('自由复制', style: textTheme.titleSmall),
           ),
+          if (mainFloor && item.content.pictures.isEmpty)
+            ListTile(
+              onTap: () async => await menuActionHandler('save'),
+              minLeadingWidth: 0,
+              leading: const Icon(Icons.save_alt_rounded, size: 19),
+              title: Text('本地保存', style: textTheme.titleSmall),
+            ),
           // ListTile(
           //   onTap: () async => await menuActionHandler('block'),
           //   minLeadingWidth: 0,
@@ -1030,12 +1156,14 @@ class MorePanel extends StatelessWidget {
           //   leading: Icon(Icons.report_outlined, color: errorColor),
           //   title: Text('举报', style: TextStyle(color: errorColor)),
           // ),
-          // ListTile(
-          //   onTap: () async => await menuActionHandler('del'),
-          //   minLeadingWidth: 0,
-          //   leading: Icon(Icons.delete_outline, color: errorColor),
-          //   title: Text('删除', style: TextStyle(color: errorColor)),
-          // ),
+          if (isOwner)
+            ListTile(
+              onTap: () async => await menuActionHandler('delete'),
+              minLeadingWidth: 0,
+              leading: Icon(Icons.delete_outline, color: errorColor),
+              title: Text('删除评论',
+                  style: textTheme.titleSmall!.copyWith(color: errorColor)),
+            ),
         ],
       ),
     );

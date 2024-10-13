@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,6 +47,11 @@ class _SearchPanelState extends State<SearchPanel>
       ),
       tag: widget.searchType!.type + widget.keyword!,
     );
+
+    /// 专栏默认排序
+    if (widget.searchType == SearchType.article) {
+      _searchPanelController.order.value = 'totalrank';
+    }
     scrollController = _searchPanelController.scrollController;
     scrollController.addListener(() async {
       if (scrollController.position.pixels >=
@@ -84,7 +91,6 @@ class _SearchPanelState extends State<SearchPanel>
                     case SearchType.video:
                       return SearchVideoPanel(
                         ctr: _searchPanelController,
-                        // ignore: invalid_use_of_protected_member
                         list: list.value,
                       );
                     case SearchType.media_bangumi:
@@ -94,7 +100,10 @@ class _SearchPanelState extends State<SearchPanel>
                     case SearchType.live_room:
                       return searchLivePanel(context, ctr, list);
                     case SearchType.article:
-                      return searchArticlePanel(context, ctr, list);
+                      return SearchArticlePanel(
+                        ctr: _searchPanelController,
+                        list: list.value,
+                      );
                     default:
                       return const SizedBox();
                   }

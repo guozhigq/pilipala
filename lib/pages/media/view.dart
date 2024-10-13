@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/media/index.dart';
-import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class MediaPage extends StatefulWidget {
@@ -236,9 +236,11 @@ class FavFolderItem extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
       child: GestureDetector(
-        onTap: () => Get.toNamed('/favDetail',
-            arguments: item,
-            parameters: {'mediaId': item!.id.toString(), 'heroTag': heroTag}),
+        onTap: () => Get.toNamed('/favDetail', arguments: item, parameters: {
+          'mediaId': item!.id.toString(),
+          'heroTag': heroTag,
+          'isOwner': '1',
+        }),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

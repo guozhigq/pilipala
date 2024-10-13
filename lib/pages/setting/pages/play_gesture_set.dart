@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 import '../../../models/common/gesture_mode.dart';
 import '../../../utils/storage.dart';
@@ -22,7 +23,7 @@ class _PlayGesturePageState extends State<PlayGesturePage> {
   void initState() {
     super.initState();
     fullScreenGestureMode = setting.get(SettingBoxKey.fullScreenGestureMode,
-        defaultValue: FullScreenGestureMode.values.last.index);
+        defaultValue: FullScreenGestureMode.fromBottomtoTop.index);
   }
 
   @override
@@ -64,13 +65,14 @@ class _PlayGesturePageState extends State<PlayGesturePage> {
                 },
               );
               if (result != null) {
-                GlobalData().fullScreenGestureMode = FullScreenGestureMode
+                GlobalDataCache().fullScreenGestureMode = FullScreenGestureMode
                     .values
                     .firstWhere((element) => element.values == result);
                 fullScreenGestureMode =
-                    GlobalData().fullScreenGestureMode.index;
+                    GlobalDataCache().fullScreenGestureMode.index;
                 setting.put(
                     SettingBoxKey.fullScreenGestureMode, fullScreenGestureMode);
+                SmartDialog.showToast('设置成功');
                 setState(() {});
               }
             },

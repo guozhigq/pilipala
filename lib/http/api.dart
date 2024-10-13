@@ -487,6 +487,8 @@ class Api {
   static const getSeasonDetailApi =
       '/x/polymer/web-space/seasons_archives_list';
 
+  static const getSeriesDetailApi = '/x/series/archives';
+
   /// 获取未读动态数
   static const getUnreadDynamic = '/x/web-interface/dynamic/entrance';
 
@@ -548,4 +550,49 @@ class Api {
 
   /// 收到的赞
   static const String messageLikeAPi = '/x/msgfeed/like';
+
+  /// 系统通知
+  static const String messageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
+
+  /// 系统通知 个人
+  static const String userMessageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
+
+  /// 系统通知标记已读
+  static const String systemMarkRead =
+      '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
+
+  /// 直播间弹幕信息
+  static const String getDanmuInfo =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';
+
+  /// 直播间发送弹幕
+  static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
+
+  /// 删除评论
+  static const String replyDel = '/x/v2/reply/del';
 }

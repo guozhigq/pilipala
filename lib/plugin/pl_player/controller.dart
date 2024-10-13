@@ -13,10 +13,12 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/http/video.dart';
+import 'package:pilipala/models/video/play/ao_output.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:status_bar_control/status_bar_control.dart';
@@ -122,7 +124,7 @@ class PlPlayerController {
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
-  late RxList subtitles;
+  RxList subtitles = [].obs;
   String videoType = 'archive';
 
   /// 数据加载监听
@@ -276,50 +278,19 @@ class PlPlayerController {
 
   // 添加一个私有构造函数
   PlPlayerController._internal(this.videoType) {
-    isOpenDanmu.value =
-        setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    blockTypes =
-        localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
-    showArea = localCache.get(LocalCacheKey.danmakuShowArea, defaultValue: 0.5);
-    // 不透明度
-    opacityVal =
-        localCache.get(LocalCacheKey.danmakuOpacity, defaultValue: 1.0);
-    // 字体大小
-    fontSizeVal =
-        localCache.get(LocalCacheKey.danmakuFontScale, defaultValue: 1.0);
-    // 弹幕时间
-    danmakuDurationVal =
-        localCache.get(LocalCacheKey.danmakuDuration, defaultValue: 4.0);
-    // 描边粗细
-    strokeWidth = localCache.get(LocalCacheKey.strokeWidth, defaultValue: 1.5);
-    playRepeat = PlayRepeat.values.toList().firstWhere(
-          (e) =>
-              e.value ==
-              videoStorage.get(VideoBoxKey.playRepeat,
-                  defaultValue: PlayRepeat.pause.value),
-        );
-    _playbackSpeed.value =
-        videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
-    enableAutoLongPressSpeed = setting
-        .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
-    if (!enableAutoLongPressSpeed) {
-      _longPressSpeed.value = videoStorage
-          .get(VideoBoxKey.longPressSpeedDefault, defaultValue: 2.0);
-    }
-    // 自定义倍速集合
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
-    // 默认倍速
-    speedsList = List<double>.from(videoStorage
-        .get(VideoBoxKey.customSpeedsList, defaultValue: <double>[]));
-    //playSpeedSystem
-    final List<double> playSpeedSystem =
-        videoStorage.get(VideoBoxKey.playSpeedSystem, defaultValue: playSpeed);
-
-    // for (final PlaySpeed i in PlaySpeed.values) {
-    speedsList.addAll(playSpeedSystem);
-    // }
-
+    final cache = GlobalDataCache();
+    isOpenDanmu.value = cache.isOpenDanmu;
+    blockTypes = cache.blockTypes;
+    showArea = cache.showArea;
+    opacityVal = cache.opacityVal;
+    fontSizeVal = cache.fontSizeVal;
+    danmakuDurationVal = cache.danmakuDurationVal;
+    strokeWidth = cache.strokeWidth;
+    playRepeat = cache.playRepeat;
+    _playbackSpeed.value = cache.playbackSpeed;
+    enableAutoLongPressSpeed = cache.enableAutoLongPressSpeed;
+    _longPressSpeed.value = cache.longPressSpeed;
+    speedsList = cache.speedsList;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -453,7 +424,13 @@ class PlPlayerController {
     //  音量不一致
     if (Platform.isAndroid) {
       await pp.setProperty("volume-max", "100");
-      await pp.setProperty("ao", "audiotrack,opensles");
+      String defaultAoOutput =
+          setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
+      await pp.setProperty(
+          "ao",
+          aoOutputList
+              .where((e) => e['value'] == defaultAoOutput)
+              .first['title']);
     }
 
     await player.setAudioTrack(
@@ -635,10 +612,6 @@ class PlPlayerController {
               const Duration(seconds: 1),
               () => videoPlayerServiceHandler.onPositionChange(event));
         }),
-
-        // onSubTitleOpenChanged.listen((bool event) {
-        //   toggleSubtitle(event ? subTitleCode.value : -1);
-        // })
       ],
     );
   }
@@ -1042,25 +1015,6 @@ class PlPlayerController {
   void toggleSubtitle(int code) {
     _subTitleOpen.value = code != -1;
     _subTitleCode.value = code;
-    // if (code == -1) {
-    //   // 关闭字幕
-    //   _subTitleOpen.value = false;
-    //   _subTitleCode.value = code;
-    //   _videoPlayerController?.setSubtitleTrack(SubtitleTrack.no());
-    //   return;
-    // }
-    // final SubTitlteItemModel? subtitle = subtitles?.firstWhereOrNull(
-    //   (element) => element.code == code,
-    // );
-    // _subTitleOpen.value = true;
-    // _subTitleCode.value = code;
-    // _videoPlayerController?.setSubtitleTrack(
-    //   SubtitleTrack.data(
-    //     subtitle!.content!,
-    //     title: subtitle.title,
-    //     language: subtitle.lan,
-    //   ),
-    // );
   }
 
   void querySubtitleContent(double progress) {
@@ -1072,7 +1026,7 @@ class PlPlayerController {
       return;
     }
     final SubTitlteItemModel? subtitle = subtitles.firstWhereOrNull(
-      (element) => element.code == subTitleCode.value,
+      (element) => element.id == subTitleCode.value,
     );
     if (subtitle != null && subtitle.body!.isNotEmpty) {
       for (var content in subtitle.body!) {
@@ -1091,6 +1045,14 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
+    final cache = GlobalDataCache();
+    cache.blockTypes = blockTypes;
+    cache.showArea = showArea;
+    cache.opacityVal = opacityVal;
+    cache.fontSizeVal = fontSizeVal;
+    cache.danmakuDurationVal = danmakuDurationVal;
+    cache.strokeWidth = strokeWidth;
+
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
     localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);

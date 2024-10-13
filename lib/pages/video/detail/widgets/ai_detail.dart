@@ -49,15 +49,18 @@ class AiDetail extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  SelectableText(
-                    modelResult!.summary!,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      height: 1.5,
+                  if (modelResult!.resultType != 0 &&
+                      modelResult!.summary != '') ...[
+                    SelectableText(
+                      modelResult!.summary!,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                  ],
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

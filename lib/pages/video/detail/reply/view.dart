@@ -19,12 +19,14 @@ class VideoReplyPanel extends StatefulWidget {
   final int? oid;
   final int rpid;
   final String? replyLevel;
+  final Function(ScrollController)? onControllerCreated;
 
   const VideoReplyPanel({
     this.bvid,
     this.oid,
     this.rpid = 0,
     this.replyLevel,
+    this.onControllerCreated,
     super.key,
   });
 
@@ -68,6 +70,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
     _futureBuilderFuture = _videoReplyController.queryReplyList();
     scrollController = ScrollController();
+    widget.onControllerCreated?.call(scrollController);
     fabAnimationCtr.forward();
     scrollListener();
   }
@@ -109,7 +112,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
   }
 
   // 展示二级回复
-  void replyReply(replyItem) {
+  void replyReply(replyItem, currentReply, loadMore) {
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
     if (replyItem != null) {
@@ -117,7 +120,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
       videoDetailCtr.showReplyReplyPanel(
-          replyItem.oid, replyItem.rpid!, replyItem);
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply, loadMore);
     }
   }
 
@@ -150,7 +153,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   child: Container(
                     height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    color: Theme.of(context).colorScheme.surface,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.surface,
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                          offset: const Offset(2, 0),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -185,7 +198,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
                     if (_videoReplyController.replyList.isNotEmpty ||
-                        (data && data['status'])) {
+                        (data != null && data['status'])) {
                       // 请求成功
                       return Obx(
                         () => _videoReplyController.isLoadingMore &&
@@ -229,8 +242,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem) =>
-                                            replyReply(replyItem),
+                                        replyReply: (replyItem, currentReply,
+                                                loadMore) =>
+                                            replyReply(replyItem, currentReply,
+                                                loadMore),
                                         replyType: ReplyType.video,
                                       );
                                     }

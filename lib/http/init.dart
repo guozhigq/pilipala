@@ -27,11 +27,14 @@ class Request {
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
-  static final RegExp spmPrefixExp = RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
+  static final RegExp spmPrefixExp =
+      RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
+  static String? buvid;
 
   /// 设置cookie
   static setCookie() async {
     Box userInfoCache = GStrorage.userInfo;
+    Box setting = GStrorage.setting;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -54,7 +57,11 @@ class Request {
       }
     }
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
-
+    String baseUrlType = 'default';
+    if (setting.get(SettingBoxKey.enableGATMode, defaultValue: false)) {
+      baseUrlType = 'bangumi';
+    }
+    setBaseUrl(type: baseUrlType);
     try {
       await buvidActivate();
     } catch (e) {
@@ -64,6 +71,7 @@ class Request {
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
+
     dio.options.headers['cookie'] = cookieString;
   }
 
@@ -76,6 +84,30 @@ class Request {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
     }
     return token;
+  }
+
+  static Future<String> getBuvid() async {
+    if (buvid != null) {
+      return buvid!;
+    }
+
+    final List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(HttpString.baseUrl));
+    buvid = cookies.firstWhere((cookie) => cookie.name == 'buvid3').value;
+    if (buvid == null) {
+      try {
+        var result = await Request().get(
+          "${HttpString.apiBaseUrl}/x/frontend/finger/spi",
+        );
+        buvid = result["data"]["b_3"].toString();
+      } catch (e) {
+        // 处理请求错误
+        buvid = '';
+        print("Error fetching buvid: $e");
+      }
+    }
+
+    return buvid!;
   }
 
   static setOptionsHeaders(userInfo, bool status) {
@@ -95,11 +127,10 @@ class Request {
     String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
     Random rand = Random();
     String rand_png_end = base64.encode(
-      List<int>.generate(32, (_) => rand.nextInt(256)) +
-      List<int>.filled(4, 0) +
-      [73, 69, 78, 68] +
-      List<int>.generate(4, (_) => rand.nextInt(256))
-    );
+        List<int>.generate(32, (_) => rand.nextInt(256)) +
+            List<int>.filled(4, 0) +
+            [73, 69, 78, 68] +
+            List<int>.generate(4, (_) => rand.nextInt(256)));
 
     String jsonData = json.encode({
       '3064': 1,
@@ -110,11 +141,9 @@ class Request {
       },
     });
 
-    await Request().post(
-      Api.activateBuvidApi,
-      data: {'payload': jsonData},
-      options: Options(contentType: 'application/json')
-    );
+    await Request().post(Api.activateBuvidApi,
+        data: {'payload': jsonData},
+        options: Options(contentType: 'application/json'));
   }
 
   /*
@@ -188,12 +217,13 @@ class Request {
   /*
    * get请求
    */
-  get(url, {data, options, cancelToken, extra}) async {
+  get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    final Options options = Options();
+    options ??= Options(); // 如果 options 为 null，则初始化一个新的 Options 对象
     ResponseType resType = ResponseType.json;
+
     if (extra != null) {
-      resType = extra!['resType'] ?? ResponseType.json;
+      resType = extra['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
       }
@@ -209,14 +239,11 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      Response errResponse = Response(
-        data: {
-          'message': await ApiInterceptor.dioError(e)
-        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+      return Response(
+        data: {'message': await ApiInterceptor.dioError(e)},
         statusCode: 200,
         requestOptions: RequestOptions(),
       );
-      return errResponse;
     }
   }
 
@@ -231,7 +258,8 @@ class Request {
         url,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options:
+            options ?? Options(contentType: Headers.formUrlEncodedContentType),
         cancelToken: cancelToken,
       );
       // print('post success: ${response.data}');
@@ -293,5 +321,18 @@ class Request {
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
     }
     return headerUa;
+  }
+
+  static setBaseUrl({String type = 'default'}) {
+    switch (type) {
+      case 'default':
+        dio.options.baseUrl = HttpString.apiBaseUrl;
+        break;
+      case 'bangumi':
+        dio.options.baseUrl = HttpString.bangumiBaseUrl;
+        break;
+      default:
+        dio.options.baseUrl = HttpString.apiBaseUrl;
+    }
   }
 }

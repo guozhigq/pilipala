@@ -193,27 +193,21 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                             ? const SizedBox()
                             : Align(
                                 alignment: Alignment.topCenter,
-                                child: ListView.builder(
+                                child: ListView.separated(
                                   itemCount: messageList.length,
                                   shrinkWrap: true,
                                   reverse: true,
                                   itemBuilder: (_, int i) {
-                                    if (i == 0) {
-                                      return Column(
-                                        children: [
-                                          ChatItem(
-                                              item: messageList[i],
-                                              e_infos: _whisperDetailController
-                                                  .eInfos),
-                                          const SizedBox(height: 20),
-                                        ],
-                                      );
-                                    } else {
-                                      return ChatItem(
-                                          item: messageList[i],
-                                          e_infos:
-                                              _whisperDetailController.eInfos);
-                                    }
+                                    return ChatItem(
+                                      item: messageList[i],
+                                      e_infos: _whisperDetailController.eInfos,
+                                      ctr: _whisperDetailController,
+                                    );
+                                  },
+                                  separatorBuilder: (_, int i) {
+                                    return i == 0
+                                        ? const SizedBox(height: 20)
+                                        : const SizedBox.shrink();
                                   },
                                 ),
                               ),

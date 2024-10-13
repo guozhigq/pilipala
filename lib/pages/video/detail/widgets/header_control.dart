@@ -30,6 +30,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.floating,
     this.bvid,
     this.videoType,
+    this.showSubtitleBtn,
     super.key,
   });
   final PlPlayerController? controller;
@@ -37,6 +38,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final Floating? floating;
   final String? bvid;
   final SearchType? videoType;
+  final bool? showSubtitleBtn;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -426,49 +428,59 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择字幕
   void showSubtitleDialog() async {
     int tempThemeValue = widget.controller!.subTitleCode.value;
-    int len = widget.videoDetailCtr!.subtitles.length;
+    final List subtitles = widget.videoDetailCtr!.subtitles;
+    int len = subtitles.length;
+    if (subtitles.firstWhereOrNull((element) => element.id == tempThemeValue) ==
+        null) {
+      tempThemeValue = -1;
+    }
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('选择字幕'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return len == 0
-                  ? const SizedBox(
-                      height: 60,
-                      child: Center(
-                        child: Text('没有字幕'),
-                      ),
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RadioListTile(
-                          value: -1,
-                          title: const Text('关闭字幕'),
-                          groupValue: tempThemeValue,
-                          onChanged: (value) {
-                            tempThemeValue = value!;
-                            widget.controller?.toggleSubtitle(value);
-                            Get.back();
-                          },
+            content: StatefulBuilder(
+              builder: (context, StateSetter setState) {
+                return len == 0
+                    ? const SizedBox(
+                        height: 60,
+                        child: Center(
+                          child: Text('没有字幕'),
                         ),
-                        ...widget.videoDetailCtr!.subtitles
-                            .map((e) => RadioListTile(
-                                  value: e.code,
-                                  title: Text(e.title),
-                                  groupValue: tempThemeValue,
-                                  onChanged: (value) {
-                                    tempThemeValue = value!;
-                                    widget.controller?.toggleSubtitle(value);
-                                    Get.back();
-                                  },
-                                ))
-                            .toList(),
-                      ],
-                    );
-            }),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile(
+                              value: -1,
+                              title: const Text('关闭字幕'),
+                              groupValue: tempThemeValue,
+                              onChanged: (value) {
+                                tempThemeValue = value!;
+                                widget.controller?.toggleSubtitle(value);
+                                Get.back();
+                              },
+                            ),
+                            ...widget.videoDetailCtr!.subtitles
+                                .map((e) => RadioListTile(
+                                      value: e.id,
+                                      title: Text(e.title),
+                                      groupValue: tempThemeValue,
+                                      onChanged: (value) {
+                                        tempThemeValue = value!;
+                                        widget.controller
+                                            ?.toggleSubtitle(value);
+                                        Get.back();
+                                      },
+                                    ))
+                                .toList(),
+                          ],
+                        ),
+                      );
+              },
+            ),
           );
         });
   }
@@ -1317,14 +1329,15 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          ComBtn(
-            icon: const Icon(
-              Icons.closed_caption_off,
-              size: 22,
-              color: Colors.white,
+          if (widget.showSubtitleBtn ?? true)
+            ComBtn(
+              icon: const Icon(
+                Icons.closed_caption_off,
+                size: 22,
+                color: Colors.white,
+              ),
+              fuc: () => showSubtitleDialog(),
             ),
-            fuc: () => showSubtitleDialog(),
-          ),
           SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(

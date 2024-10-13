@@ -82,14 +82,11 @@ class PiliSchame {
         case 'opus':
           if (path.startsWith('/detail')) {
             var opusId = path.split('/').last;
-            Get.toNamed(
-              '/webview',
-              parameters: {
-                'url': 'https://www.bilibili.com/opus/$opusId',
-                'type': 'url',
-                'pageTitle': '',
-              },
-            );
+            Get.toNamed('/opus', parameters: {
+              'title': '',
+              'id': opusId,
+              'articleType': 'opus',
+            });
           }
           break;
         case 'search':
@@ -97,12 +94,14 @@ class PiliSchame {
           break;
         case 'article':
           final String id = path.split('/').last.split('?').first;
-          Get.toNamed('/htmlRender', parameters: {
-            'url': 'https://www.bilibili.com/read/cv$id',
-            'title': 'cv$id',
-            'id': 'cv$id',
-            'dynamicType': 'read'
-          });
+          Get.toNamed(
+            '/read',
+            parameters: {
+              'title': 'cv$id',
+              'id': id,
+              'dynamicType': 'read',
+            },
+          );
           break;
         case 'pgc':
           if (path.contains('ep')) {
@@ -176,6 +175,11 @@ class PiliSchame {
         if (lastPathSegment.contains('ep')) {
           RoutePush.bangumiPush(null, Utils.matchNum(lastPathSegment).first);
         }
+      } else if (path.startsWith('/BV')) {
+        final String bvid = path.split('?').first.split('/').last;
+        _videoPush(null, bvid);
+      } else if (path.startsWith('/av')) {
+        _videoPush(Utils.matchNum(path.split('?').first).first, null);
       }
     } else if (host.contains('live')) {
       int roomId = int.parse(path!.split('/').last);
@@ -243,12 +247,12 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = 'cv${Utils.matchNum(query!['id']!).first}';
-          Get.toNamed('/htmlRender', parameters: {
+          String id = Utils.matchNum(query!['id']!).first.toString();
+          Get.toNamed('/read', parameters: {
             'url': value.dataString!,
             'title': '',
             'id': id,
-            'dynamicType': 'read'
+            'articleType': 'read'
           });
           break;
         case 'space':

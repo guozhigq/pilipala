@@ -1,15 +1,18 @@
 // ignore_for_file: must_be_immutable
+// ignore_for_file: constant_identifier_names
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
-
 import '../../../http/search.dart';
+import '../controller.dart';
 
 enum MsgType {
   invalid(value: 0, label: "空空的~"),
@@ -42,10 +45,12 @@ enum MsgType {
 class ChatItem extends StatelessWidget {
   dynamic item;
   List? e_infos;
+  WhisperDetailController ctr;
 
   ChatItem({
     super.key,
-    this.item,
+    required this.item,
+    required this.ctr,
     this.e_infos,
   });
 
@@ -84,7 +89,7 @@ class ChatItem extends StatelessWidget {
           emojiMap[e['text']] = e['url'];
         }
         text.splitMapJoin(
-          RegExp(r"\[.+?\]"),
+          RegExp(r"\[[^\[\]]+\]"),
           onMatch: (Match match) {
             final String emojiKey = match[0]!;
             if (emojiMap.containsKey(emojiKey)) {
@@ -95,6 +100,17 @@ class ChatItem extends StatelessWidget {
                   src: emojiMap[emojiKey]!,
                 ),
               ));
+            } else {
+              children.add(
+                TextSpan(
+                  text: emojiKey,
+                  style: TextStyle(
+                    color: textColor(context),
+                    letterSpacing: 0.6,
+                    height: 1.5,
+                  ),
+                ),
+              );
             }
             return '';
           },
@@ -109,13 +125,13 @@ class ChatItem extends StatelessWidget {
             return '';
           },
         );
-        return RichText(
-          text: TextSpan(
+        return SelectableText.rich(
+          TextSpan(
             children: children,
           ),
         );
       } else {
-        return Text(
+        return SelectableText(
           text,
           style: TextStyle(
             letterSpacing: 0.6,
@@ -133,7 +149,7 @@ class ChatItem extends StatelessWidget {
         case MsgType.pic_card:
           return SystemNotice2(item: item);
         case MsgType.notify_text:
-          return Text(
+          return SelectableText(
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
@@ -146,10 +162,23 @@ class ChatItem extends StatelessWidget {
         case MsgType.text:
           return richTextMessage(context);
         case MsgType.pic:
-          return NetworkImgLayer(
-            width: 220,
-            height: 220 * content['height'] / content['width'],
-            src: content['url'],
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                HeroDialogRoute<void>(
+                  builder: (BuildContext context) => InteractiveviewerGallery(
+                    sources: ctr.picList,
+                    initIndex: ctr.picList.indexOf(content['url']),
+                    onPageChanged: (int pageIndex) {},
+                  ),
+                ),
+              );
+            },
+            child: NetworkImgLayer(
+              width: 220,
+              height: 220 * content['height'] / content['width'],
+              src: content['url'],
+            ),
           );
         case MsgType.share_v2:
           return Column(
@@ -409,12 +438,6 @@ class ChatItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(width: safeDistanceval),
-                    if (isOwner)
-                      Text(
-                        Utils.dateFormat(item.timestamp),
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.outline),
-                      ),
                     Container(
                       constraints: const BoxConstraints(
                         maxWidth: 300.0, // 设置最大宽度为200.0
@@ -444,51 +467,45 @@ class ChatItem extends StatelessWidget {
                         right: 8,
                       ),
                       padding: const EdgeInsets.all(paddingVal),
-                      child: messageContent(context),
-                      // child: Column(
-                      //   crossAxisAlignment: isOwner
-                      //       ? CrossAxisAlignment.end
-                      //       : CrossAxisAlignment.start,
-                      //   children: [
-                      //     messageContent(context),
-                      //     SizedBox(height: isPic ? 7 : 2),
-                      //     Row(
-                      //       mainAxisSize: MainAxisSize.min,
-                      //       children: [
-                      //         Text(
-                      //           Utils.dateFormat(item.timestamp),
-                      //           style: Theme.of(context)
-                      //               .textTheme
-                      //               .labelSmall!
-                      //               .copyWith(
-                      //                   color: isOwner
-                      //                       ? Theme.of(context)
-                      //                           .colorScheme
-                      //                           .onPrimary
-                      //                           .withOpacity(0.8)
-                      //                       : Theme.of(context)
-                      //                           .colorScheme
-                      //                           .onSecondaryContainer
-                      //                           .withOpacity(0.8)),
-                      //         ),
-                      //         item.msgStatus == 1
-                      //             ? Text(
-                      //                 '  已撤回',
-                      //                 style:
-                      //                     Theme.of(context).textTheme.labelSmall!,
-                      //               )
-                      //             : const SizedBox()
-                      //       ],
-                      //     )
-                      //   ],
-                      // ),
-                    ),
-                    if (!isOwner)
-                      Text(
-                        Utils.dateFormat(item.timestamp),
-                        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.outline),
+                      child: Column(
+                        crossAxisAlignment: isOwner
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          messageContent(context),
+                          SizedBox(height: isPic ? 7 : 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                Utils.dateFormat(item.timestamp),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall!
+                                    .copyWith(
+                                        color: isOwner
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                                .withOpacity(0.8)
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSecondaryContainer
+                                                .withOpacity(0.8)),
+                              ),
+                              item.msgStatus == 1
+                                  ? Text(
+                                      '  已撤回',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!,
+                                    )
+                                  : const SizedBox()
+                            ],
+                          )
+                        ],
                       ),
+                    ),
                     const SizedBox(width: safeDistanceval),
                   ],
                 ),
@@ -542,7 +559,7 @@ class SystemNotice extends StatelessWidget {
               Divider(
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               ),
-              Text(
+              SelectableText(
                 content['text'],
               )
             ],

@@ -24,15 +24,17 @@ class SearchPanelController extends GetxController {
       searchType: searchType!,
       keyword: keyword!,
       page: page.value,
-      order: searchType!.type != 'video' ? null : order.value,
+      order: !['video', 'article'].contains(searchType!.type)
+          ? null
+          : (order.value == '' ? null : order.value),
       duration: searchType!.type != 'video' ? null : duration.value,
       tids: searchType!.type != 'video' ? null : tids.value,
     );
     if (result['status']) {
       if (type == 'onRefresh') {
-        resultList.value = result['data'].list;
+        resultList.value = result['data'].list ?? [];
       } else {
-        resultList.addAll(result['data'].list);
+        resultList.addAll(result['data'].list ?? []);
       }
       page.value++;
       onPushDetail(keyword, resultList);

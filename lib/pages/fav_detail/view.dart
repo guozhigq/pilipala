@@ -22,7 +22,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
   late final ScrollController _controller = ScrollController();
   final FavDetailController _favDetailController =
       Get.put(FavDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   Future? _futureBuilderFuture;
   late String mediaId;
 
@@ -31,7 +32,6 @@ class _FavDetailPageState extends State<FavDetailPage> {
     super.initState();
     mediaId = Get.parameters['mediaId']!;
     _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
-    titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
@@ -80,9 +80,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _favDetailController.item!.title!,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => Text(
+                              _favDetailController.title.value,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                           Text(
                             '共${_favDetailController.mediaCount}条视频',
@@ -106,6 +108,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                 position: PopupMenuPosition.under,
                 onSelected: (String type) {},
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    onTap: () => _favDetailController.onEditFavFolder(),
+                    value: 'edit',
+                    child: const Text('编辑收藏夹'),
+                  ),
                   PopupMenuItem<String>(
                     onTap: () => _favDetailController.onDelFavFolder(),
                     value: 'pause',
@@ -151,14 +158,16 @@ class _FavDetailPageState extends State<FavDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text(
-                              _favDetailController.item!.title!,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .fontSize,
-                                  fontWeight: FontWeight.bold),
+                            Obx(
+                              () => Text(
+                                _favDetailController.title.value,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .fontSize,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -212,6 +221,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                   SliverChildBuilderDelegate((context, index) {
                                 return FavVideoCardH(
                                   videoItem: favList[index],
+                                  isOwner: _favDetailController.isOwner,
                                   callFn: () => _favDetailController
                                       .onCancelFav(favList[index].id),
                                 );
@@ -253,6 +263,15 @@ class _FavDetailPageState extends State<FavDetailPage> {
             ),
           )
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _favDetailController.mediaCount > 0
+            ? FloatingActionButton.extended(
+                onPressed: _favDetailController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }
