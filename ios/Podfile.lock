@@ -1,4 +1,6 @@
 PODS:
+  - app_links (0.0.2):
+    - Flutter
   - appscheme (1.0.4):
     - Flutter
   - audio_service (0.0.1):
@@ -66,6 +68,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_links (from `.symlinks/plugins/app_links/ios`)
   - appscheme (from `.symlinks/plugins/appscheme/ios`)
   - audio_service (from `.symlinks/plugins/audio_service/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
@@ -102,6 +105,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
   appscheme:
     :path: ".symlinks/plugins/appscheme/ios"
   audio_service:
@@ -160,6 +165,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
+  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   appscheme: b1c3f8862331cb20430cf9e0e4af85dbc1572ad8
   audio_service: f509d65da41b9521a61f1c404dd58651f265a567
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345

@@ -730,7 +730,7 @@ InlineSpan buildContent(
                           source: '',
                           dataString: matchStr,
                         );
-                        PiliSchame.fullPathPush(scheme);
+                        PiliSchame.httpsScheme(scheme);
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {
