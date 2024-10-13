@@ -1045,6 +1045,14 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
+    final cache = GlobalDataCache();
+    cache.blockTypes = blockTypes;
+    cache.showArea = showArea;
+    cache.opacityVal = opacityVal;
+    cache.fontSizeVal = fontSizeVal;
+    cache.danmakuDurationVal = danmakuDurationVal;
+    cache.strokeWidth = strokeWidth;
+
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
     localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);

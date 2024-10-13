@@ -511,6 +511,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       exitFullScreen();
     }
 
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            Get.isDarkMode ? Brightness.light : Brightness.dark,
+      ),
+    );
+
     Widget buildLoadingWidget() {
       return Center(child: Lottie.asset('assets/loading.json', width: 200));
     }
@@ -605,11 +613,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                     backgroundColor: Colors.black,
                     elevation: 0,
                     scrolledUnderElevation: 0,
-                    systemOverlayStyle: Get.isDarkMode
-                        ? SystemUiOverlayStyle.light
-                        : snapshot.data!.toDouble() > kToolbarHeight
-                            ? SystemUiOverlayStyle.dark
-                            : SystemUiOverlayStyle.light,
                   );
                 }),
               ),

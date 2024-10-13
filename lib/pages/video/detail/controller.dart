@@ -675,7 +675,6 @@ class VideoDetailController extends GetxController
   @override
   void onClose() {
     super.onClose();
-    plPlayerController.dispose();
     tabCtr.removeListener(() {
       onTabChanged();
     });

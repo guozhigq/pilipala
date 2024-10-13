@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -50,13 +51,17 @@ class CacheManage {
   Future<double> getTotalSizeOfFilesInDir(final FileSystemEntity file) async {
     if (file is File) {
       int length = await file.length();
-      return double.parse(length.toString());
+      return length.toDouble();
     }
     if (file is Directory) {
-      final List<FileSystemEntity> children = file.listSync();
       double total = 0;
-      for (final FileSystemEntity child in children) {
-        total += await getTotalSizeOfFilesInDir(child);
+      try {
+        await for (final FileSystemEntity child in file.list()) {
+          total += await getTotalSizeOfFilesInDir(child);
+        }
+      } catch (e) {
+        // 处理错误，例如记录日志或显示错误消息
+        print('读取目录时出错: $e');
       }
       return total;
     }
@@ -77,16 +82,17 @@ class CacheManage {
 
   // 清除缓存
   Future<bool> clearCacheAll() async {
-    bool cleanStatus = await SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
+    bool? cleanStatus = await showDialog<bool>(
+      context: Get.context!,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('提示'),
           content: const Text('该操作将清除图片及网络请求缓存数据，确认清除？'),
           actions: [
             TextButton(
-              onPressed: (() => {SmartDialog.dismiss()}),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
               child: Text(
                 '取消',
                 style: TextStyle(color: Theme.of(context).colorScheme.outline),
@@ -94,40 +100,45 @@ class CacheManage {
             ),
             TextButton(
               onPressed: () async {
-                SmartDialog.dismiss();
-                SmartDialog.showLoading(msg: '正在清除...');
-                try {
-                  // 清除缓存 图片缓存
-                  await clearLibraryCache();
-                  SmartDialog.dismiss().then((res) {
-                    SmartDialog.showToast('清除完成');
-                  });
-                } catch (err) {
-                  SmartDialog.dismiss();
-                  SmartDialog.showToast(err.toString());
-                }
+                Navigator.of(context).pop(true);
               },
               child: const Text('确认'),
-            )
+            ),
           ],
         );
       },
-    ).then((res) {
-      return true;
-    });
-    return cleanStatus;
+    );
+    if (cleanStatus != null && cleanStatus) {
+      SmartDialog.showLoading(msg: '正在清除...');
+      try {
+        // 清除缓存 图片缓存
+        await clearLibraryCache();
+        SmartDialog.dismiss().then((res) {
+          SmartDialog.showToast('清除完成');
+        });
+      } catch (err) {
+        SmartDialog.dismiss();
+        SmartDialog.showToast(err.toString());
+      }
+    }
+    return cleanStatus!;
   }
 
   /// 清除 Documents 目录下的 DioCache.db
-  Future clearApplicationCache() async {
-    Directory directory = await getApplicationDocumentsDirectory();
-    if (directory.existsSync()) {
-      String dioCacheFileName =
-          '${directory.path}${Platform.pathSeparator}DioCache.db';
-      var dioCacheFile = File(dioCacheFileName);
-      if (dioCacheFile.existsSync()) {
-        dioCacheFile.delete();
+  Future<void> clearApplicationCache() async {
+    try {
+      Directory directory = await getApplicationDocumentsDirectory();
+      if (directory.existsSync()) {
+        String dioCacheFileName =
+            '${directory.path}${Platform.pathSeparator}DioCache.db';
+        File dioCacheFile = File(dioCacheFileName);
+        if (await dioCacheFile.exists()) {
+          await dioCacheFile.delete();
+        }
       }
+    } catch (e) {
+      // 处理错误，例如记录日志或显示错误消息
+      print('清除缓存时出错: $e');
     }
   }
 
