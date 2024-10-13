@@ -205,11 +205,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   bool isUsingFullScreenGestures(double tapPosition, double sectionWidth) {
-    if (fullScreenGestureMode == FullScreenGestureMode.none) {
-      return false;
-    } else {
-      return tapPosition < sectionWidth * 2;
-    }
+    return fullScreenGestureMode != FullScreenGestureMode.none &&
+        tapPosition < sectionWidth * 2;
   }
 
   @override
@@ -646,7 +643,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             onVerticalDragUpdate: (DragUpdateDetails details) async {
               final double totalWidth = MediaQuery.sizeOf(context).width;
               final double tapPosition = details.localPosition.dx;
-              final double sectionWidth = totalWidth / 3;
+              final double sectionWidth =
+                  fullScreenGestureMode == FullScreenGestureMode.none
+                      ? totalWidth / 2
+                      : totalWidth / 3;
               final double delta = details.delta.dy;
 
               /// 锁定时禁用
