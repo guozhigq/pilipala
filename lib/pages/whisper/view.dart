@@ -228,7 +228,7 @@ class SessionItem extends StatelessWidget {
           parameters: {
             'talkerId': sessionItem.talkerId.toString(),
             'name': sessionItem.accountInfo.name,
-            'face': sessionItem.accountInfo.face,
+            'face': sessionItem.accountInfo.face ?? '',
             'mid': (sessionItem.accountInfo?.mid ?? 0).toString(),
             'heroTag': heroTag,
           },
@@ -244,7 +244,7 @@ class SessionItem extends StatelessWidget {
             width: 45,
             height: 45,
             type: 'avatar',
-            src: sessionItem.accountInfo.face,
+            src: sessionItem.accountInfo.face ?? '',
           ),
         ),
       ),
