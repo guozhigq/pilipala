@@ -112,6 +112,7 @@ dependencies:
   flutter_displaymode: ^0.6.0
   # scheme跳转
   appscheme: ^1.0.8
+  app_links: ^6.3.2
   # 弹幕
   ns_danmaku:
     git:
