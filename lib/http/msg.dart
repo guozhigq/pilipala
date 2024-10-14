@@ -278,10 +278,10 @@ class MsgHttp {
           'data': MessageLikeModel.fromJson(res.data['data']),
         };
       } catch (err) {
-        return {'status': false, 'date': [], 'msg': err.toString()};
+        return {'status': false, 'data': [], 'msg': err.toString()};
       }
     } else {
-      return {'status': false, 'date': [], 'msg': res.data['message']};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
