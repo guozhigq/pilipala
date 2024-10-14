@@ -15,6 +15,7 @@ class GlobalDataCache {
   late FullScreenGestureMode fullScreenGestureMode;
   late bool enablePlayerControlAnimation;
   late List<String> actionTypeSort;
+  late double sheetHeight;
   String? wWebid;
 
   /// 播放器相关
@@ -103,5 +104,6 @@ class GlobalDataCache {
     speedsList.addAll(playSpeedSystem);
 
     userInfo = userInfoCache.get('userInfoCache');
+    sheetHeight = localCache.get('sheetHeight');
   }
 }

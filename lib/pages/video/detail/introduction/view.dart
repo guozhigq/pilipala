@@ -242,6 +242,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     showBottomSheet(
       context: context,
       enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
       builder: (BuildContext context) {
         return AiDetail(modelResult: videoIntroController.modelResult);
       },
