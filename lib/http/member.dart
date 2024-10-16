@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/member/article.dart';
 import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
@@ -19,14 +20,20 @@ import 'index.dart';
 
 class MemberHttp {
   static Future memberInfo({
-    int? mid,
+    required int mid,
     String token = '',
   }) async {
+    String? wWebid;
+    if ((await getWWebid(mid: mid))['status']) {
+      wWebid = GlobalDataCache().wWebid;
+    }
+
     Map params = await WbiSign().makSign({
       'mid': mid,
       'token': token,
       'platform': 'web',
       'web_location': 1550101,
+      ...wWebid != null ? {'w_webid': wWebid} : {},
     });
     var res = await Request().get(
       Api.memberInfo,
@@ -566,6 +573,10 @@ class MemberHttp {
   }
 
   static Future getWWebid({required int mid}) async {
+    String? wWebid = GlobalDataCache().wWebid;
+    if (wWebid != null) {
+      return {'status': true, 'data': wWebid};
+    }
     var res = await Request().get('https://space.bilibili.com/$mid/article');
     String? headContent = parse(res.data).head?.outerHtml;
     final regex = RegExp(
@@ -576,6 +587,7 @@ class MemberHttp {
         final content = match.group(1);
         String decodedString = Uri.decodeComponent(content!);
         Map<String, dynamic> map = jsonDecode(decodedString);
+        GlobalDataCache().wWebid = map['access_id'];
         return {'status': true, 'data': map['access_id']};
       } else {
         return {'status': false, 'data': '请检查登录状态'};
@@ -588,25 +600,20 @@ class MemberHttp {
   static Future getMemberArticle({
     required int mid,
     required int pn,
-    required String wWebid,
     String? offset,
   }) async {
+    String? wWebid;
+    if ((await getWWebid(mid: mid))['status']) {
+      wWebid = GlobalDataCache().wWebid;
+    }
     Map params = await WbiSign().makSign({
       'host_mid': mid,
       'page': pn,
       'offset': offset,
       'web_location': 333.999,
-      'w_webid': wWebid,
+      ...wWebid != null ? {'w_webid': wWebid} : {},
     });
-    var res = await Request().get(Api.opusList, data: {
-      'host_mid': mid,
-      'page': pn,
-      'offset': offset,
-      'web_location': 333.999,
-      'w_webid': wWebid,
-      'w_rid': params['w_rid'],
-      'wts': params['wts'],
-    });
+    var res = await Request().get(Api.opusList, data: params);
     if (res.data['code'] == 0) {
       return {
         'status': true,

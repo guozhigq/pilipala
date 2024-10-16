@@ -10,7 +10,6 @@ class MemberArticleController extends GetxController {
   int pn = 1;
   String? offset;
   bool hasMore = true;
-  String? wWebid;
   RxBool isLoading = false.obs;
   RxList<MemberArticleItemModel> articleList = <MemberArticleItemModel>[].obs;
 
@@ -20,25 +19,11 @@ class MemberArticleController extends GetxController {
     mid = int.parse(Get.parameters['mid']!);
   }
 
-  // 获取wWebid
-  Future getWWebid() async {
-    var res = await MemberHttp.getWWebid(mid: mid);
-    if (res['status']) {
-      wWebid = res['data'];
-    } else {
-      wWebid = '-1';
-      SmartDialog.showToast(res['msg']);
-    }
-  }
-
   Future getMemberArticle(type) async {
     if (isLoading.value) {
       return;
     }
     isLoading.value = true;
-    if (wWebid == null) {
-      await getWWebid();
-    }
     if (type == 'init') {
       pn = 1;
       articleList.clear();
@@ -47,7 +32,6 @@ class MemberArticleController extends GetxController {
       mid: mid,
       pn: pn,
       offset: offset,
-      wWebid: wWebid!,
     );
     if (res['status']) {
       offset = res['data'].offset;

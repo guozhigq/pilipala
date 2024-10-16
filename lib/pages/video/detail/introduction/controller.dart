@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/constants.dart';
@@ -154,11 +153,10 @@ class VideoIntroController extends GetxController {
     }
     if (hasLike.value && hasCoin.value && hasFav.value) {
       // 已点赞、投币、收藏
-      SmartDialog.showToast('🙏 UP已经收到了～');
+      SmartDialog.showToast('UP已经收到了～');
       return false;
     }
     var result = await VideoHttp.oneThree(bvid: bvid);
-    print('🤣🦴：${result["data"]}');
     if (result['status']) {
       hasLike.value = result["data"]["like"];
       hasCoin.value = result["data"]["coin"];
@@ -413,7 +411,12 @@ class VideoIntroController extends GetxController {
   }
 
   // 修改分P或番剧分集
-  Future changeSeasonOrbangu(bvid, cid, aid, cover) async {
+  Future changeSeasonOrbangu(
+    String bvid,
+    int cid,
+    int? aid,
+    String? cover,
+  ) async {
     // 重新获取视频资源
     final VideoDetailController videoDetailCtr =
         Get.find<VideoDetailController>(tag: heroTag);
@@ -424,13 +427,14 @@ class VideoIntroController extends GetxController {
       releatedCtr.queryRelatedVideo();
     }
 
-    videoDetailCtr.bvid = bvid;
-    videoDetailCtr.oid.value = aid ?? IdUtils.bv2av(bvid);
-    videoDetailCtr.cid.value = cid;
-    videoDetailCtr.danmakuCid.value = cid;
-    videoDetailCtr.cover.value = cover;
-    videoDetailCtr.queryVideoUrl();
-    videoDetailCtr.clearSubtitleContent();
+    videoDetailCtr
+      ..bvid = bvid
+      ..oid.value = aid ?? IdUtils.bv2av(bvid)
+      ..cid.value = cid
+      ..danmakuCid.value = cid
+      ..cover.value = cover ?? ''
+      ..queryVideoUrl()
+      ..clearSubtitleContent();
     await videoDetailCtr.getSubtitle();
     videoDetailCtr.setSubtitleContent();
     // 重新请求评论
@@ -480,7 +484,13 @@ class VideoIntroController extends GetxController {
     final List episodes = [];
     bool isPages = false;
     late String cover;
-    if (videoDetail.value.ugcSeason != null) {
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+
+    /// 优先稍后再看、收藏夹
+    if (videoDetailCtr.isWatchLaterVisible.value) {
+      episodes.addAll(videoDetailCtr.mediaList);
+    } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
       final List<SectionItem> sections = ugcSeason.sections!;
       for (int i = 0; i < sections.length; i++) {
@@ -497,9 +507,14 @@ class VideoIntroController extends GetxController {
         episodes.indexWhere((e) => e.cid == lastPlayCid.value);
     int nextIndex = currentIndex + 1;
     cover = episodes[nextIndex].cover;
-    final VideoDetailController videoDetailCtr =
-        Get.find<VideoDetailController>(tag: heroTag);
     final PlayRepeat platRepeat = videoDetailCtr.plPlayerController.playRepeat;
+
+    int cid = episodes[nextIndex].cid!;
+    while (cid == -1) {
+      nextIndex += 1;
+      SmartDialog.showToast('当前视频暂不支持播放，自动跳过');
+      cid = episodes[nextIndex].cid!;
+    }
 
     // 列表循环
     if (nextIndex >= episodes.length) {
@@ -510,7 +525,6 @@ class VideoIntroController extends GetxController {
         return;
       }
     }
-    final int cid = episodes[nextIndex].cid!;
     final String rBvid = isPages ? bvid : episodes[nextIndex].bvid;
     final int rAid = isPages ? IdUtils.bv2av(bvid) : episodes[nextIndex].aid!;
     changeSeasonOrbangu(rBvid, cid, rAid, cover);
@@ -602,6 +616,36 @@ class VideoIntroController extends GetxController {
           SmartDialog.dismiss();
         },
       ).buildShowContent(Get.context!),
+    );
+  }
+
+  //
+  oneThreeDialog() {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('是否一键三连'),
+          actions: [
+            TextButton(
+              onPressed: () => navigator!.pop(),
+              child: Text(
+                '取消',
+                style: TextStyle(
+                    color: Theme.of(Get.context!).colorScheme.outline),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                actionOneThree();
+                navigator!.pop();
+              },
+              child: const Text('确认'),
+            )
+          ],
+        );
+      },
     );
   }
 }

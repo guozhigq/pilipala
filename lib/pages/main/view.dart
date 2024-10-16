@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamic_badge_mode.dart';
@@ -22,10 +23,10 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   final MainController _mainController = Get.put(MainController());
-  final HomeController _homeController = Get.put(HomeController());
-  final RankController _rankController = Get.put(RankController());
-  final DynamicsController _dynamicController = Get.put(DynamicsController());
-  final MineController _mineController = Get.put(MineController());
+  late HomeController _homeController;
+  RankController? _rankController;
+  late DynamicsController _dynamicController;
+  late MineController _mineController;
 
   int? _lastSelectTime; //上次点击时间
   Box setting = GStrorage.setting;
@@ -38,6 +39,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     _mainController.pageController =
         PageController(initialPage: _mainController.selectedIndex);
     enableMYBar = setting.get(SettingBoxKey.enableMYBar, defaultValue: true);
+    controllerInit();
   }
 
   void setIndex(int value) async {
@@ -60,18 +62,18 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     }
 
     if (currentPage is RankPage) {
-      if (_rankController.flag) {
+      if (_rankController!.flag) {
         // 单击返回顶部 双击并刷新
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
-          _rankController.onRefresh();
+          _rankController!.onRefresh();
         } else {
-          _rankController.animateToTop();
+          _rankController!.animateToTop();
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
-      _rankController.flag = true;
+      _rankController!.flag = true;
     } else {
-      _rankController.flag = false;
+      _rankController?.flag = false;
     }
 
     if (currentPage is DynamicsPage) {
@@ -96,6 +98,18 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     }
   }
 
+  void controllerInit() {
+    _homeController = Get.put(HomeController());
+    _dynamicController = Get.put(DynamicsController());
+    _mineController = Get.put(MineController());
+    if (_mainController.pagesIds.contains(1)) {
+      _rankController = Get.put(RankController());
+    }
+    if (_mainController.pagesIds.contains(2)) {
+      _dynamicController = Get.put(DynamicsController());
+    }
+  }
+
   @override
   void dispose() async {
     await GStrorage.close();
@@ -112,6 +126,14 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         MediaQuery.sizeOf(context).width * 9 / 16;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            Get.isDarkMode ? Brightness.light : Brightness.dark,
+      ),
+    );
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {

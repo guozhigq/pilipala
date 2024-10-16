@@ -14,6 +14,7 @@ import '../../models/common/nav_bar_config.dart';
 
 class MainController extends GetxController {
   List<Widget> pages = <Widget>[];
+  List<int> pagesIds = <int>[];
   RxList navigationBars = [].obs;
   late List defaultNavTabs;
   late List<int> navBarSort;
@@ -45,7 +46,8 @@ class MainController extends GetxController {
         SettingBoxKey.dynamicBadgeMode,
         defaultValue: DynamicBadgeMode.number.code)];
     setNavBarConfig();
-    if (dynamicBadgeType.value != DynamicBadgeMode.hidden) {
+    if (dynamicBadgeType.value != DynamicBadgeMode.hidden &&
+        pagesIds.contains(2)) {
       getUnreadDynamic();
     }
     enableGradientBg =
@@ -114,6 +116,7 @@ class MainController extends GetxController {
     // 如果找不到匹配项，默认索引设置为0或其他合适的值
     selectedIndex = defaultIndex != -1 ? defaultIndex : 0;
     pages = navigationBars.map<Widget>((e) => e['page']).toList();
+    pagesIds = navigationBars.map<int>((e) => e['id']).toList();
   }
 
   @override

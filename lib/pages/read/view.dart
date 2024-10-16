@@ -126,7 +126,6 @@ class _ReadPageState extends State<ReadPage> {
   Widget _buildContent(ReadDataModel cvData) {
     final List<String> picList = _extractPicList(cvData);
     final List<String> imgList = extractDataSrc(cvData.readInfo!.content!);
-
     return Padding(
       padding: EdgeInsets.fromLTRB(
           16, 0, 16, MediaQuery.of(context).padding.bottom + 40),
@@ -163,9 +162,11 @@ class _ReadPageState extends State<ReadPage> {
           padding: const EdgeInsets.only(bottom: 20),
           child: _buildAuthorWidget(cvData),
         ),
-        HtmlRender(
-          htmlContent: cvData.readInfo!.content!,
-          imgList: imgList,
+        SelectionArea(
+          child: HtmlRender(
+            htmlContent: cvData.readInfo!.content!,
+            imgList: imgList,
+          ),
         ),
       ],
     );
@@ -206,7 +207,7 @@ class _ReadPageState extends State<ReadPage> {
     return Container(
       alignment: TextHelper.getAlignment(paragraph.align),
       margin: const EdgeInsets.only(bottom: 10),
-      child: Text.rich(
+      child: SelectableText.rich(
         TextSpan(
           children: paragraph.text?.nodes?.map((node) {
                 return TextHelper.buildTextSpan(node, paragraph.align, context);

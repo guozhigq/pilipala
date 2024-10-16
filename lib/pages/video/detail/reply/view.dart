@@ -153,7 +153,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   child: Container(
                     height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    color: Theme.of(context).colorScheme.surface,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.surface,
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                          offset: const Offset(2, 0),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
