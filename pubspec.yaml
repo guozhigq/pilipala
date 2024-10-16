@@ -151,6 +151,8 @@ dependencies:
   brotli: ^0.6.0
   # 文本语法高亮
   re_highlight: ^0.0.3
+  # 图片选择器
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

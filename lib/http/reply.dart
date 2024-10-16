@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/video/reply/data.dart';
 import '../models/video/reply/emote.dart';
 import 'api.dart';
@@ -114,5 +117,45 @@ class ReplyHttp {
         'msg': res.data['message'],
       };
     }
+  }
+
+  // 图片上传
+  static Future uploadImage({required XFile xFile, String type = 'im'}) async {
+    var formData = FormData.fromMap({
+      'file_up': await xFileToMultipartFile(xFile),
+      'biz': type,
+      'csrf': await Request.getCsrf(),
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    var res = await Request().post(
+      Api.uploadImage,
+      data: formData,
+    );
+    if (res.data['code'] == 0) {
+      var data = res.data['data'];
+      data['img_src'] = data['image_url'];
+      data['img_width'] = data['image_width'];
+      data['img_height'] = data['image_height'];
+      data.remove('image_url');
+      data.remove('image_width');
+      data.remove('image_height');
+      return {
+        'status': true,
+        'data': data,
+      };
+    } else {
+      return {
+        'status': false,
+        'date': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future<MultipartFile> xFileToMultipartFile(XFile xFile) async {
+    var file = File(xFile.path);
+    var bytes = await file.readAsBytes();
+    return MultipartFile.fromBytes(bytes, filename: xFile.name);
   }
 }
