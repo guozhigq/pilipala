@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
@@ -36,7 +37,7 @@ class _MemberPageState extends State<MemberPage>
   @override
   void initState() {
     super.initState();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = int.tryParse(Get.parameters['mid']!) ?? -1;
     heroTag = Get.arguments['heroTag'] ?? Utils.makeHeroTag(mid);
     _memberController = Get.put(MemberController(), tag: heroTag);
     _futureBuilderFuture = _memberController.getInfo();
@@ -100,8 +101,14 @@ class _MemberPageState extends State<MemberPage>
         ),
         actions: [
           IconButton(
-            onPressed: () => Get.toNamed(
-                '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.name!}'),
+            onPressed: () {
+              if (mid == -1) {
+                SmartDialog.showToast('用户ID获取异常');
+                return;
+              }
+              Get.toNamed(
+                  '/memberSearch?mid=$mid&uname=${_memberController.memberInfo.value.name ?? ''}');
+            },
             icon: const Icon(Icons.search_outlined),
           ),
           PopupMenuButton(
