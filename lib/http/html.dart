@@ -21,7 +21,6 @@ class HtmlHttp {
     }
     try {
       Document rootTree = parse(response.data);
-      // log(response.data.body.toString());
       Element body = rootTree.body!;
       Element appDom = body.querySelector('#app')!;
       Element authorHeader = appDom.querySelector('.fixed-author-header')!;
@@ -52,7 +51,6 @@ class HtmlHttp {
           .className
           .split(' ')[1]
           .split('-')[2];
-      // List imgList = opusDetail.querySelectorAll('bili-album__preview__picture__img');
       return {
         'status': true,
         'avatar': avatar,
@@ -76,20 +74,10 @@ class HtmlHttp {
     Element body = rootTree.body!;
     Element appDom = body.querySelector('#app')!;
     Element authorHeader = appDom.querySelector('.up-left')!;
-    // 头像
-    // String avatar =
-    //     authorHeader.querySelector('.bili-avatar-img')!.attributes['data-src']!;
-    // print(avatar);
-    // avatar = 'https:${avatar.split('@')[0]}';
     String uname = authorHeader.querySelector('.up-name')!.text.trim();
     // 动态详情
     Element opusDetail = appDom.querySelector('.article-content')!;
     // 发布时间
-    // String updateTime =
-    //     opusDetail.querySelector('.opus-module-author__pub__text')!.text;
-    // print(updateTime);
-
-    //
     String opusContent =
         opusDetail.querySelector('#read-article-holder')!.innerHtml;
     RegExp digitRegExp = RegExp(r'\d+');
