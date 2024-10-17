@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../models/video/reply/data.dart';
 import '../models/video/reply/emote.dart';
 import 'api.dart';
@@ -6,17 +8,16 @@ import 'init.dart';
 class ReplyHttp {
   static Future replyList({
     required int oid,
-    required int pageNum,
+    required String nextOffset,
     required int type,
     int? ps,
     int sort = 1,
   }) async {
     var res = await Request().get(Api.replyList, data: {
       'oid': oid,
-      'pn': pageNum,
       'type': type,
-      'sort': sort,
-      'ps': ps ?? 20
+      'pagination_str': jsonEncode({'offset': nextOffset}),
+      'mode': sort + 2,
     });
     if (res.data['code'] == 0) {
       return {
@@ -52,19 +53,13 @@ class ReplyHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-        'data': ReplyData.fromJson(res.data['data']),
+        'data': ReplyReplyData.fromJson(res.data['data']),
       };
     } else {
-      Map errMap = {
-        -400: '请求错误',
-        -404: '无此项',
-        12002: '评论区已关闭',
-        12009: '评论主体的type不合法',
-      };
       return {
         'status': false,
         'date': [],
-        'msg': errMap[res.data['code']] ?? '请求异常',
+        'msg': res.data['message'],
       };
     }
   }
