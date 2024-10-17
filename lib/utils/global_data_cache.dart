@@ -15,6 +15,7 @@ class GlobalDataCache {
   late FullScreenGestureMode fullScreenGestureMode;
   late bool enablePlayerControlAnimation;
   late List<String> actionTypeSort;
+  String? wWebid;
 
   /// 播放器相关
   // 弹幕开关
@@ -59,7 +60,7 @@ class GlobalDataCache {
         defaultValue: 10); // 设置全局变量
     fullScreenGestureMode = FullScreenGestureMode.values[setting.get(
         SettingBoxKey.fullScreenGestureMode,
-        defaultValue: FullScreenGestureMode.values.last.index) as int];
+        defaultValue: FullScreenGestureMode.fromBottomtoTop.index)];
     enablePlayerControlAnimation = setting
         .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
     actionTypeSort = await setting.get(SettingBoxKey.actionTypeSort,

@@ -295,7 +295,7 @@ class AboutController extends GetxController {
       displayTime: const Duration(milliseconds: 500),
     ).then(
       (value) => launchUrl(
-        Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+        Uri.parse('https://www.123684.com/s/9sVqVv-DEZ0A'),
         mode: LaunchMode.externalApplication,
       ),
     );
@@ -349,7 +349,7 @@ class AboutController extends GetxController {
   // 官网
   webSiteUrl() {
     launchUrl(
-      Uri.parse('https://pilipalanet.mysxl.cn'),
+      Uri.parse('https://pilipala.life'),
       mode: LaunchMode.externalApplication,
     );
   }

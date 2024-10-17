@@ -217,12 +217,13 @@ class Request {
   /*
    * get请求
    */
-  get(url, {data, options, cancelToken, extra}) async {
+  get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    final Options options = Options();
+    options ??= Options(); // 如果 options 为 null，则初始化一个新的 Options 对象
     ResponseType resType = ResponseType.json;
+
     if (extra != null) {
-      resType = extra!['resType'] ?? ResponseType.json;
+      resType = extra['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
       }
@@ -238,14 +239,11 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      Response errResponse = Response(
-        data: {
-          'message': await ApiInterceptor.dioError(e)
-        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+      return Response(
+        data: {'message': await ApiInterceptor.dioError(e)},
         statusCode: 200,
         requestOptions: RequestOptions(),
       );
-      return errResponse;
     }
   }
 
