@@ -286,6 +286,19 @@ class PiliSchame {
               null, int.parse(lastPathSegment.split('?').first));
         }
         break;
+      case 'following':
+          if (path.startsWith('/detail')) {
+            var opusId = path.split('/').last;
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': 'https://m.bilibili.com/opus/$opusId',
+                'type': 'url',
+                'pageTitle': ''
+              },
+            );
+          }
+          break;
       default:
         SmartDialog.showToast('未匹配地址，请联系开发者');
         Clipboard.setData(ClipboardData(text: value.toJson().toString()));
