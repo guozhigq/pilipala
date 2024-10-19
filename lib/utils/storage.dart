@@ -113,6 +113,7 @@ class SettingBoxKey {
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi',
+      enableAutoExpand = 'enableAutoExpand',
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo';
 

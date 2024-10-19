@@ -169,7 +169,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(initialExpanded: false);
+    _expandableCtr = ExpandableController(
+        initialExpanded: GlobalDataCache().enableAutoExpand);
   }
 
   // 收藏

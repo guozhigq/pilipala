@@ -183,6 +183,14 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableAi,
             defaultVal: true,
           ),
+          SetSwitchItem(
+            title: '视频简介默认展开',
+            setKey: SettingBoxKey.enableAutoExpand,
+            defaultVal: false,
+            callFn: (val) {
+              GlobalDataCache().enableAutoExpand = val;
+            },
+          ),
           const SetSwitchItem(
             title: '相关视频推荐',
             subTitle: '视频详情页推荐相关视频',

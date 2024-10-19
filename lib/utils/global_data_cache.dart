@@ -49,6 +49,8 @@ class GlobalDataCache {
   late List historyCacheList;
   //
   late bool enableSearchSuggest = true;
+  // 简介默认展开
+  late bool enableAutoExpand = false;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -112,5 +114,7 @@ class GlobalDataCache {
     historyCacheList = localCache.get('cacheList', defaultValue: []);
     enableSearchSuggest =
         setting.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
+    enableAutoExpand =
+        setting.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
   }
 }
