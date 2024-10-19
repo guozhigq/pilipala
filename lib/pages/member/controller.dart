@@ -32,7 +32,7 @@ class MemberController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = int.tryParse(Get.parameters['mid']!) ?? -2;
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo.mid : -1;
     isOwner.value = mid == ownerMid;
@@ -43,6 +43,11 @@ class MemberController extends GetxController {
 
   // 获取用户信息
   Future<Map<String, dynamic>> getInfo() async {
+    if (mid == -2) {
+      SmartDialog.showToast('用户ID获取异常');
+      return {'status': false, 'msg': '用户ID获取异常'};
+    }
+
     await getMemberStat();
     await getMemberView();
     var res = await MemberHttp.memberInfo(mid: mid);
