@@ -131,6 +131,7 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       enableGradientBg = 'enableGradientBg',
+      enableDynamicSwitch = 'enableDynamicSwitch',
       navBarSort = 'navBarSort',
       actionTypeSort = 'actionTypeSort';
 }

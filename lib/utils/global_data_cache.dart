@@ -51,6 +51,8 @@ class GlobalDataCache {
   late bool enableSearchSuggest = true;
   // 简介默认展开
   late bool enableAutoExpand = false;
+  //
+  late bool enableDynamicSwitch = true;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -116,5 +118,7 @@ class GlobalDataCache {
         setting.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
     enableAutoExpand =
         setting.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
+    enableDynamicSwitch =
+        setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
   }
 }

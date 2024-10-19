@@ -5,6 +5,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class UpPanel extends StatefulWidget {
@@ -23,7 +24,7 @@ class UpPanel extends StatefulWidget {
 
 class _UpPanelState extends State<UpPanel> {
   final ScrollController scrollController = ScrollController();
-  int currentMid = -1;
+  RxInt currentMid = (-1).obs;
   late double contentWidth = 56;
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
@@ -37,26 +38,36 @@ class _UpPanelState extends State<UpPanel> {
   }
 
   void onClickUp(data, i) {
-    currentMid = data.mid;
+    currentMid.value = data.mid;
     widget.onClickUpCb?.call(data);
-    // int liveLen = liveList.length;
-    // int upLen = upList.length;
-    // double itemWidth = contentWidth + itemPadding.horizontal;
-    // double screenWidth = MediaQuery.sizeOf(context).width;
-    // double moveDistance = 0.0;
-    // if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
-    // } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
-    //   moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
-    // } else {
-    //   moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
-    // }
-    // data.hasUpdate = false;
-    // scrollController.animateTo(
-    //   moveDistance,
-    //   duration: const Duration(milliseconds: 200),
-    //   curve: Curves.linear,
-    // );
-    // setState(() {});
+  }
+
+  void onClickUpAni(data, i) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final itemWidth = contentWidth + itemPadding.horizontal;
+    final liveLen = liveList.length;
+    final upLen = upList.length;
+
+    currentMid.value = data.mid;
+    widget.onClickUpCb?.call(data);
+
+    double moveDistance = 0.0;
+    final totalItemsWidth = itemWidth * (upLen + liveLen);
+
+    if (totalItemsWidth > screenWidth) {
+      if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+        moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
+      } else {
+        moveDistance = totalItemsWidth + 46 - screenWidth;
+      }
+    }
+
+    data.hasUpdate = false;
+    scrollController.animateTo(
+      moveDistance,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -144,14 +155,17 @@ class _UpPanelState extends State<UpPanel> {
   }
 
   Widget upItemBuild(data, i) {
-    bool isCurrent = currentMid == data.mid || currentMid == -1;
     return InkWell(
       onTap: () {
         feedBack();
         if (data.type == 'up') {
           EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
               () {
-            onClickUp(data, i);
+            if (GlobalDataCache().enableDynamicSwitch) {
+              onClickUp(data, i);
+            } else {
+              onClickUpAni(data, i);
+            }
           });
         } else if (data.type == 'live') {
           LiveItemModel liveItem = LiveItemModel.fromJson({
@@ -177,60 +191,66 @@ class _UpPanelState extends State<UpPanel> {
       },
       child: Padding(
         padding: itemPadding,
-        child: AnimatedOpacity(
-          opacity: isCurrent ? 1 : 0.3,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Badge(
-                smallSize: 8,
-                label: data.type == 'live' ? const Text('Live') : null,
-                textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                alignment: data.type == 'live'
-                    ? AlignmentDirectional.topCenter
-                    : AlignmentDirectional.topEnd,
-                padding: const EdgeInsets.only(left: 6, right: 6),
-                isLabelVisible: data.type == 'live' ||
-                    (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor: data.type == 'live'
-                    ? Theme.of(context).colorScheme.secondaryContainer
-                    : Theme.of(context).colorScheme.primary,
-                child: data.face != ''
-                    ? NetworkImgLayer(
-                        width: 50,
-                        height: 50,
-                        src: data.face,
-                        type: 'avatar',
-                      )
-                    : const CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage(
-                          'assets/images/noface.jpeg',
+        child: Obx(
+          () => AnimatedOpacity(
+            opacity: currentMid.value == data.mid || currentMid.value == -1
+                ? 1
+                : 0.3,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Badge(
+                  smallSize: 8,
+                  label: data.type == 'live' ? const Text('Live') : null,
+                  textColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                  alignment: data.type == 'live'
+                      ? AlignmentDirectional.topCenter
+                      : AlignmentDirectional.topEnd,
+                  padding: const EdgeInsets.only(left: 6, right: 6),
+                  isLabelVisible: data.type == 'live' ||
+                      (data.type == 'up' && (data.hasUpdate ?? false)),
+                  backgroundColor: data.type == 'live'
+                      ? Theme.of(context).colorScheme.secondaryContainer
+                      : Theme.of(context).colorScheme.primary,
+                  child: data.face != ''
+                      ? NetworkImgLayer(
+                          width: 50,
+                          height: 50,
+                          src: data.face,
+                          type: 'avatar',
+                        )
+                      : const CircleAvatar(
+                          radius: 25,
+                          backgroundImage: AssetImage(
+                            'assets/images/noface.jpeg',
+                          ),
                         ),
-                      ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SizedBox(
-                  width: contentWidth,
-                  child: Text(
-                    data.uname,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: currentMid == data.mid
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium!.fontSize),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: SizedBox(
+                    width: contentWidth,
+                    child: Text(
+                      data.uname,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: currentMid.value == data.mid
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outline,
+                          fontSize: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .fontSize),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
