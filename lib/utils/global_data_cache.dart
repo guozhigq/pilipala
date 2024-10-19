@@ -45,6 +45,8 @@ class GlobalDataCache {
   late List<double> speedsList;
   // 用户信息
   UserInfoData? userInfo;
+  // 搜索历史
+  late List historyCacheList;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -105,5 +107,6 @@ class GlobalDataCache {
 
     userInfo = userInfoCache.get('userInfoCache');
     sheetHeight = localCache.get('sheetHeight');
+    historyCacheList = localCache.get('cacheList', defaultValue: []);
   }
 }

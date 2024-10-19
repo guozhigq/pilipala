@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/search/hot.dart';
 import 'package:pilipala/models/search/suggest.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class SSearchController extends GetxController {
@@ -12,7 +15,7 @@ class SSearchController extends GetxController {
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
   RxList<HotSearchItem> hotSearchList = <HotSearchItem>[].obs;
-  Box histiryWord = GStrorage.historyword;
+  Box localCache = GStrorage.localCache;
   List historyCacheList = [];
   RxList historyList = [].obs;
   RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
@@ -22,21 +25,26 @@ class SSearchController extends GetxController {
   RxString defaultSearch = ''.obs;
   Box setting = GStrorage.setting;
   bool enableHotKey = true;
+  late StreamController<bool> clearStream = StreamController<bool>.broadcast();
 
   @override
   void onInit() {
     super.onInit();
     // 其他页面跳转过来
-    if (Get.parameters.keys.isNotEmpty) {
-      if (Get.parameters['keyword'] != null) {
-        onClickKeyword(Get.parameters['keyword']!);
+    final parameters = Get.parameters;
+    if (parameters.keys.isNotEmpty) {
+      final keyword = parameters['keyword'];
+      if (keyword != null) {
+        onClickKeyword(keyword);
       }
-      if (Get.parameters['hintText'] != null) {
-        hintText = Get.parameters['hintText']!;
+
+      final hint = parameters['hintText'];
+      if (hint != null) {
+        hintText = hint;
         searchKeyWord.value = hintText;
       }
     }
-    historyCacheList = histiryWord.get('cacheList') ?? [];
+    historyCacheList = GlobalDataCache().historyCacheList;
     historyList.value = historyCacheList;
     enableHotKey = setting.get(SettingBoxKey.enableHotKey, defaultValue: true);
   }
@@ -45,8 +53,10 @@ class SSearchController extends GetxController {
     searchKeyWord.value = value;
     if (value == '') {
       searchSuggestList.value = [];
+      clearStream.add(false);
       return;
     }
+    clearStream.add(true);
     _debouncer.call(() => querySearchSuggest(value));
   }
 
@@ -55,6 +65,7 @@ class SSearchController extends GetxController {
       controller.value.clear();
       searchKeyWord.value = '';
       searchSuggestList.value = [];
+      clearStream.add(false);
     } else {
       Get.back();
     }
@@ -62,8 +73,7 @@ class SSearchController extends GetxController {
 
   // 搜索
   void submit() {
-    // ignore: unrelated_type_equality_checks
-    if (searchKeyWord == '') {
+    if (searchKeyWord.value == '') {
       return;
     }
     List arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
@@ -73,7 +83,7 @@ class SSearchController extends GetxController {
     historyList.value = historyCacheList;
     // 手动刷新
     historyList.refresh();
-    histiryWord.put('cacheList', historyCacheList);
+    localCache.put('cacheList', historyCacheList);
     searchFocusNode.unfocus();
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
@@ -117,13 +127,14 @@ class SSearchController extends GetxController {
     int index = historyList.indexOf(word);
     historyList.removeAt(index);
     historyList.refresh();
-    histiryWord.put('cacheList', historyList);
+    localCache.put('cacheList', historyList);
   }
 
   onClearHis() {
     historyList.value = [];
     historyCacheList = [];
     historyList.refresh();
-    histiryWord.put('cacheList', []);
+    localCache.put('cacheList', []);
+    SmartDialog.showToast('搜索历史已清空');
   }
 }
