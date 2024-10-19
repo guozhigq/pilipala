@@ -15,26 +15,26 @@ class PiliSchame {
     ///
     final SchemeEntity? value = await appScheme.getInitScheme();
     if (value != null) {
-      _routePush(value);
+      routePush(value);
     }
 
     /// 完整链接进入 b23.无效
     appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _routePush(value);
+        routePush(value);
       }
     });
 
     /// 注册从外部打开的Scheme监听信息 #
     appScheme.registerSchemeListener().listen((SchemeEntity? event) {
       if (event != null) {
-        _routePush(event);
+        routePush(event);
       }
     });
   }
 
   /// 路由跳转
-  static void _routePush(value) async {
+  static void routePush(value) async {
     final String scheme = value.scheme;
     final String host = value.host;
     final String path = value.path;
