@@ -86,4 +86,56 @@ class MessageUtils {
       ),
     );
   }
+
+  // 匹配链接
+  Map<String, String> extractLinks(String text) {
+    Map<String, String> result = {};
+    String message = '';
+    // 是否匹配到bv
+    RegExp bvRegex = RegExp(r'bv1[\d\w]{9}', caseSensitive: false);
+    final Iterable<RegExpMatch> bvMatches = bvRegex.allMatches(text);
+    for (var match in bvMatches) {
+      result[match.group(0)!] =
+          'https://www.bilibili.com/video/${match.group(0)!}';
+    }
+
+    // 定义正则表达式
+    RegExp regex = RegExp(
+        r'(?:(?:(?:http:\/\/|https:\/\/)(?:[a-zA-Z0-9_.-]+\.)*(?:bilibili|biligame)\.com(?:\/[/.$*?~=#!%@&\-\w]*)?)|(?:(?:http:\/\/|https:\/\/)(?:[a-zA-Z0-9_.-]+\.)*(?:acg|b23)\.tv(?:\/[/.$*?~=#!%@&\-\w]*)?)|(?:(?:http:\/\/|https:\/\/)dl\.(?:hdslb)\.com(?:\/[/.$*?~=#!%@&\-\w]*)?))');
+    // 链接文字
+    RegExp linkTextRegex = RegExp(r"#\{(.*?)\}");
+    final Iterable<RegExpMatch> matches = regex.allMatches(text);
+    int lastMatchEnd = 0;
+    if (matches.isNotEmpty) {
+      for (var match in matches) {
+        final int start = match.start;
+        final int end = match.end;
+        String str = text.substring(lastMatchEnd, start);
+        final Iterable<RegExpMatch> linkTextMatches =
+            linkTextRegex.allMatches(str);
+
+        if (linkTextMatches.isNotEmpty) {
+          for (var linkTextMatch in linkTextMatches) {
+            if (linkTextMatch.group(1) != null) {
+              String linkText = linkTextMatch.group(1)!;
+              str = str
+                  .replaceAll(linkTextMatch.group(0)!, linkText)
+                  .replaceAll('{', '')
+                  .replaceAll('}', '');
+              result[linkText] = match.group(0)!;
+            }
+            message += str;
+          }
+        } else {
+          message += '$str查看详情';
+          result['查看详情'] = match.group(0)!;
+        }
+        lastMatchEnd = end;
+      }
+      result['message'] = message;
+    } else {
+      result['message'] = text;
+    }
+    return result;
+  }
 }

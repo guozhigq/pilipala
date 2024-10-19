@@ -764,14 +764,14 @@ InlineSpan buildContent(
                         });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
-                        SchemeEntity scheme = SchemeEntity(
+                        Uri scheme = Uri(
                           scheme: uri.scheme,
                           host: uri.host,
                           port: uri.port,
                           path: uri.path,
-                          query: uri.queryParameters,
-                          source: '',
-                          dataString: matchStr,
+                          // query: uri.queryParameters,
+                          // source: '',
+                          // dataString: matchStr,
                         );
                         PiliSchame.fullPathPush(scheme);
                       }

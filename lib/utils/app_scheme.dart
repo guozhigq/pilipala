@@ -116,7 +116,7 @@ class PiliSchame {
           break;
       }
     }
-    if (scheme == 'https') {
+    if (['http', 'https'].contains(scheme)) {
       fullPathPush(value);
     }
   }
@@ -148,16 +148,16 @@ class PiliSchame {
     }
   }
 
-  static Future<void> fullPathPush(SchemeEntity value) async {
+  static Future<void> fullPathPush(Uri value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
-    final String host = value.host!;
-    final String? path = value.path;
-    Map<String, String>? query = value.query;
+    final String host = value.host;
+    final String path = value.path;
+    Map<String, String>? query = value.queryParameters;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      final String lastPathSegment = path!.split('/').last;
+      final String lastPathSegment = path.split('/').last;
       if (path.startsWith('/video')) {
         Map matchRes = IdUtils.matchAvorBv(input: path);
         if (matchRes.containsKey('AV')) {
@@ -182,13 +182,13 @@ class PiliSchame {
         _videoPush(Utils.matchNum(path.split('?').first).first, null);
       }
     } else if (host.contains('live')) {
-      int roomId = int.parse(path!.split('/').last);
+      int roomId = int.parse(path.split('/').last);
       Get.toNamed(
         '/liveRoom?roomid=$roomId',
         arguments: {'liveItem': null, 'heroTag': roomId.toString()},
       );
     } else if (host.contains('space')) {
-      var mid = path!.split('/').last;
+      var mid = path.split('/').last;
       Get.toNamed('/member?mid=$mid', arguments: {'face': ''});
       return;
     } else if (host == 'b23.tv') {
@@ -223,7 +223,7 @@ class PiliSchame {
           parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
         );
       }
-    } else if (path != null) {
+    } else {
       final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':
@@ -247,12 +247,12 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = Utils.matchNum(query!['id']!).first.toString();
+          String id = Utils.matchNum(query['id']!).first.toString();
           Get.toNamed('/read', parameters: {
-            'url': value.dataString!,
+            'url': value.toString(),
             'title': '',
             'id': id,
-            'articleType': 'read'
+            'articleType': 'read',
           });
           break;
         case 'space':
@@ -270,9 +270,9 @@ class PiliSchame {
             Get.toNamed(
               '/webview',
               parameters: {
-                'url': value.dataString ?? "",
+                'url': value.toString(),
                 'type': 'url',
-                'pageTitle': ''
+                'pageTitle': '',
               },
             );
           }
