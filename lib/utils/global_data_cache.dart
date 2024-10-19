@@ -106,7 +106,7 @@ class GlobalDataCache {
     speedsList.addAll(playSpeedSystem);
 
     userInfo = userInfoCache.get('userInfoCache');
-    sheetHeight = localCache.get('sheetHeight');
+    sheetHeight = localCache.get('sheetHeight', defaultValue: 0.0);
     historyCacheList = localCache.get('cacheList', defaultValue: []);
   }
 }
