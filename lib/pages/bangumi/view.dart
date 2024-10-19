@@ -183,8 +183,10 @@ class _BangumiPageState extends State<BangumiPage>
                     return HttpError(
                       errMsg: data['msg'],
                       fn: () {
-                        _futureBuilderFuture =
-                            _bangumidController.queryBangumiListFeed();
+                        setState(() {
+                          _futureBuilderFuture =
+                              _bangumidController.queryBangumiListFeed();
+                        });
                       },
                     );
                   }

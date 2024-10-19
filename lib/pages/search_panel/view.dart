@@ -109,33 +109,25 @@ class _SearchPanelState extends State<SearchPanel>
                   }
                 });
               } else {
-                return CustomScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  slivers: [
-                    HttpError(
-                      errMsg: data['msg'],
-                      fn: () {
-                        setState(() {
-                          _searchPanelController.onSearch();
-                        });
-                      },
-                    ),
-                  ],
+                return HttpError(
+                  errMsg: data['msg'],
+                  fn: () {
+                    setState(() {
+                      _searchPanelController.onSearch();
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {
-              return CustomScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                slivers: [
-                  HttpError(
-                    errMsg: '没有相关数据',
-                    fn: () {
-                      setState(() {
-                        _searchPanelController.onSearch();
-                      });
-                    },
-                  ),
-                ],
+              return HttpError(
+                errMsg: '没有相关数据',
+                fn: () {
+                  setState(() {
+                    _searchPanelController.onSearch();
+                  });
+                },
+                isInSliver: false,
               );
             }
           } else {

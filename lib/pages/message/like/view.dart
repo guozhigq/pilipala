@@ -85,18 +85,14 @@ class _MessageLikePageState extends State<MessageLikePage> {
                 );
               } else {
                 // 请求错误
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
-                      errMsg: snapshot.data['msg'],
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _messageLikeCtr.queryMessageLike();
-                        });
-                      },
-                    )
-                  ],
+                return HttpError(
+                  errMsg: snapshot.data['msg'],
+                  fn: () {
+                    setState(() {
+                      _futureBuilderFuture = _messageLikeCtr.queryMessageLike();
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {

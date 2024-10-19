@@ -138,16 +138,10 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
   }
 
   Widget _buildError(String errMsg) {
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: HttpError(
-            errMsg: errMsg,
-            fn: () {},
-          ),
-        ),
-      ],
+    return HttpError(
+      errMsg: errMsg,
+      fn: () {},
+      isInSliver: false,
     );
   }
 

@@ -11,6 +11,7 @@ import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
@@ -126,6 +127,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     double sheetHeight = MediaQuery.sizeOf(context).height -
         MediaQuery.of(context).padding.top -
         MediaQuery.sizeOf(context).width * 9 / 16;
+    GlobalDataCache().sheetHeight = sheetHeight;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
 

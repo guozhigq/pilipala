@@ -68,30 +68,27 @@ class _SubPageState extends State<SubPage> {
                   ),
                 );
               } else {
-                return const CustomScrollView(
-                  physics: NeverScrollableScrollPhysics(),
-                  slivers: [HttpError(errMsg: '', btnText: '没有数据', fn: null)],
+                return const HttpError(
+                  errMsg: '',
+                  btnText: '没有数据',
+                  fn: null,
+                  isInSliver: false,
                 );
               }
             } else {
-              return CustomScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                slivers: [
-                  HttpError(
-                    errMsg: data?['msg'] ?? '请求异常',
-                    btnText: data?['code'] == -101 ? '去登录' : null,
-                    fn: () {
-                      if (data?['code'] == -101) {
-                        RoutePush.loginRedirectPush();
-                      } else {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _subController.querySubFolder();
-                        });
-                      }
-                    },
-                  ),
-                ],
+              return HttpError(
+                errMsg: data?['msg'] ?? '请求异常',
+                btnText: data?['code'] == -101 ? '去登录' : null,
+                fn: () {
+                  if (data?['code'] == -101) {
+                    RoutePush.loginRedirectPush();
+                  } else {
+                    setState(() {
+                      _futureBuilderFuture = _subController.querySubFolder();
+                    });
+                  }
+                },
+                isInSliver: false,
               );
             }
           } else {

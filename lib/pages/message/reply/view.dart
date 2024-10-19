@@ -82,18 +82,15 @@ class _MessageReplyPageState extends State<MessageReplyPage> {
                 );
               } else {
                 // 请求错误
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
-                      errMsg: snapshot.data['msg'],
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _messageReplyCtr.queryMessageReply();
-                        });
-                      },
-                    )
-                  ],
+                return HttpError(
+                  errMsg: snapshot.data['msg'],
+                  fn: () {
+                    setState(() {
+                      _futureBuilderFuture =
+                          _messageReplyCtr.queryMessageReply();
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {

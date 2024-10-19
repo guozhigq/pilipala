@@ -66,67 +66,74 @@ class _LaterPageState extends State<LaterPage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: CustomScrollView(
-        controller: _laterController.scrollController,
-        slivers: [
-          FutureBuilder(
-            future: _futureBuilderFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                Map? data = snapshot.data;
-                if (data != null && data['status']) {
-                  return Obx(
-                    () => _laterController.laterList.isNotEmpty &&
-                            !_laterController.isLoading.value
-                        ? SliverList(
-                            delegate:
-                                SliverChildBuilderDelegate((context, index) {
-                              var videoItem = _laterController.laterList[index];
-                              return VideoCardH(
-                                  videoItem: videoItem,
-                                  source: 'later',
-                                  onPressedFn: () => _laterController.toViewDel(
-                                      aid: videoItem.aid));
-                            }, childCount: _laterController.laterList.length),
-                          )
-                        : _laterController.isLoading.value
-                            ? const SliverToBoxAdapter(
-                                child: Center(child: Text('加载中')),
-                              )
-                            : const NoData(),
-                  );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _laterController.queryLaterList(type: 'onRefresh');
+        },
+        child: CustomScrollView(
+          controller: _laterController.scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            FutureBuilder(
+              future: _futureBuilderFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map? data = snapshot.data;
+                  if (data != null && data['status']) {
+                    return Obx(
+                      () => _laterController.laterList.isNotEmpty &&
+                              !_laterController.isLoading.value
+                          ? SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                var videoItem =
+                                    _laterController.laterList[index];
+                                return VideoCardH(
+                                    videoItem: videoItem,
+                                    source: 'later',
+                                    onPressedFn: () => _laterController
+                                        .toViewDel(aid: videoItem.aid));
+                              }, childCount: _laterController.laterList.length),
+                            )
+                          : _laterController.isLoading.value
+                              ? const SliverToBoxAdapter(
+                                  child: Center(child: Text('加载中')),
+                                )
+                              : const NoData(),
+                    );
+                  } else {
+                    return HttpError(
+                      errMsg: data?['msg'] ?? '请求异常',
+                      btnText: data?['code'] == -101 ? '去登录' : null,
+                      fn: () {
+                        if (data?['code'] == -101) {
+                          RoutePush.loginRedirectPush();
+                        } else {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _laterController.queryLaterList();
+                          });
+                        }
+                      },
+                    );
+                  }
                 } else {
-                  return HttpError(
-                    errMsg: data?['msg'] ?? '请求异常',
-                    btnText: data?['code'] == -101 ? '去登录' : null,
-                    fn: () {
-                      if (data?['code'] == -101) {
-                        RoutePush.loginRedirectPush();
-                      } else {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _laterController.queryLaterList();
-                        });
-                      }
-                    },
+                  // 骨架屏
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return const VideoCardHSkeleton();
+                    }, childCount: 10),
                   );
                 }
-              } else {
-                // 骨架屏
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return const VideoCardHSkeleton();
-                  }, childCount: 10),
-                );
-              }
-            },
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom + 10,
+              },
             ),
-          )
-        ],
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: MediaQuery.of(context).padding.bottom + 10,
+              ),
+            )
+          ],
+        ),
       ),
       floatingActionButton: Obx(
         () => _laterController.laterList.isNotEmpty

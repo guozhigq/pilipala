@@ -1,6 +1,7 @@
 class ReplyContent {
   ReplyContent({
     this.message,
+    this.message2,
     this.atNameToMid, // @的用户的mid null
     this.members, // 被@的用户List 如果有的话 []
     this.emote, // 表情包 如果有的话 null
@@ -13,6 +14,7 @@ class ReplyContent {
   });
 
   String? message;
+  String? message2;
   Map? atNameToMid;
   List<MemberItemModel>? members;
   Map? emote;
@@ -24,10 +26,17 @@ class ReplyContent {
   Map? topicsMeta;
 
   ReplyContent.fromJson(Map<String, dynamic> json) {
-    message = json['message']
+    message = message2 = json['message']
         .replaceAll('&gt;', '>')
         .replaceAll('&#34;', '"')
-        .replaceAll('&#39;', "'");
+        .replaceAll('&#39;', "'")
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&apos;', "'")
+        .replaceAll('&nbsp;', ' ');
+
     atNameToMid = json['at_name_to_mid'] ?? {};
     members = json['members'] != null
         ? json['members']
@@ -39,8 +48,8 @@ class ReplyContent {
     pictures = json['pictures'] ?? [];
     vote = json['vote'] ?? {};
     richText = json['rich_text'] ?? {};
-    // 不包含@ 笔记 图片的时候，文字可折叠
-    isText = atNameToMid!.isEmpty && vote!.isEmpty && pictures!.isEmpty;
+    // 不包含@ 笔记的时候，文字可折叠
+    isText = atNameToMid!.isEmpty && vote!.isEmpty;
     topicsMeta = json['topics_meta'] ?? {};
   }
 }
