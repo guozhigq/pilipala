@@ -25,6 +25,7 @@ class SSearchController extends GetxController {
   RxString defaultSearch = ''.obs;
   Box setting = GStrorage.setting;
   bool enableHotKey = true;
+  bool enableSearchSuggest = true;
   late StreamController<bool> clearStream = StreamController<bool>.broadcast();
 
   @override
@@ -47,6 +48,7 @@ class SSearchController extends GetxController {
     historyCacheList = GlobalDataCache().historyCacheList;
     historyList.value = historyCacheList;
     enableHotKey = setting.get(SettingBoxKey.enableHotKey, defaultValue: true);
+    enableSearchSuggest = GlobalDataCache().enableSearchSuggest;
   }
 
   void onChange(value) {
@@ -57,18 +59,16 @@ class SSearchController extends GetxController {
       return;
     }
     clearStream.add(true);
-    _debouncer.call(() => querySearchSuggest(value));
+    if (enableSearchSuggest) {
+      _debouncer.call(() => querySearchSuggest(value));
+    }
   }
 
   void onClear() {
-    if (searchKeyWord.value.isNotEmpty && controller.value.text != '') {
-      controller.value.clear();
-      searchKeyWord.value = '';
-      searchSuggestList.value = [];
-      clearStream.add(false);
-    } else {
-      Get.back();
-    }
+    controller.value.clear();
+    searchKeyWord.value = '';
+    searchSuggestList.value = [];
+    clearStream.add(false);
   }
 
   // 搜索

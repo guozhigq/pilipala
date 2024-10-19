@@ -47,6 +47,8 @@ class GlobalDataCache {
   UserInfoData? userInfo;
   // 搜索历史
   late List historyCacheList;
+  //
+  late bool enableSearchSuggest = true;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -108,5 +110,7 @@ class GlobalDataCache {
     userInfo = userInfoCache.get('userInfoCache');
     sheetHeight = localCache.get('sheetHeight', defaultValue: 0.0);
     historyCacheList = localCache.get('cacheList', defaultValue: []);
+    enableSearchSuggest =
+        setting.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
   }
 }
