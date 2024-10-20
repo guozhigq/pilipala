@@ -126,7 +126,7 @@ class FavDetailController extends GetxController {
         'title': item!.title,
         'intro': item!.intro,
         'cover': item!.cover,
-        'privacy': [23, 1].contains(item!.attr) ? 1 : 0,
+        'privacy': [22, 0].contains(item!.attr) ? 0 : 1,
       },
     );
     title.value = res['title'];

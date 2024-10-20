@@ -66,16 +66,16 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: Icon([23, 1].contains(item.attr)
+                            leading: Icon([22, 0].contains(item.attr)
                                 ? Icons.lock_outline
                                 : Icons.folder_outlined),
                             minLeadingWidth: 0,
                             title: Text(item.title!),
                             subtitle: Text(
                               '${item.mediaCount}个内容 - ${[
-                                23,
-                                1
-                              ].contains(item.attr) ? '私密' : '公开'}',
+                                22,
+                                0
+                              ].contains(item.attr) ? '公开' : '私密'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
