@@ -1,4 +1,4 @@
-import 'package:bottom_sheet/bottom_sheet.dart';
+// import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -199,25 +199,35 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     }
   }
 
-  void _showFavPanel() {
-    showFlexibleBottomSheet(
-      bottomSheetBorderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+  void _showFavPanel() async {
+    final mediaQueryData = MediaQuery.of(context);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
+      context: Get.context!,
+      useSafeArea: true,
+      isScrollControlled: true,
+      transitionAnimationController: AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this,
       ),
-      minHeight: 0.6,
-      initHeight: 0.6,
-      maxHeight: 1,
-      context: context,
-      builder: (BuildContext context, ScrollController scrollController,
-          double offset) {
-        return FavPanel(
-          ctr: videoIntroController,
-          scrollController: scrollController,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return FavPanel(
+              ctr: videoIntroController,
+              scrollController: scrollController,
+            );
+          },
         );
       },
-      anchors: [0.6, 1],
-      isSafeArea: true,
     );
   }
 

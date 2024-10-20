@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bottom_sheet/bottom_sheet.dart';
+// import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -531,25 +531,31 @@ class VideoIntroController extends GetxController {
   }
 
   // 设置关注分组
-  void setFollowGroup() {
-    showFlexibleBottomSheet(
-      bottomSheetBorderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
-      ),
-      minHeight: 0.6,
-      initHeight: 0.6,
-      maxHeight: 1,
+  void setFollowGroup() async {
+    final mediaQueryData = MediaQuery.of(Get.context!);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
       context: Get.context!,
-      builder: (BuildContext context, ScrollController scrollController,
-          double offset) {
-        return GroupPanel(
-          mid: videoDetail.value.owner!.mid!,
-          scrollController: scrollController,
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return GroupPanel(
+              mid: videoDetail.value.owner!.mid!,
+              scrollController: scrollController,
+            );
+          },
         );
       },
-      anchors: [0.6, 1],
-      isSafeArea: true,
     );
   }
 
