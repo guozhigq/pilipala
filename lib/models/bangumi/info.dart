@@ -144,6 +144,7 @@ class EpisodeItem {
     this.link,
     this.longTitle,
     this.pubTime,
+    this.pubdate,
     this.pv,
     this.releaseDate,
     this.rights,
@@ -155,6 +156,7 @@ class EpisodeItem {
     this.subtitle,
     this.title,
     this.vid,
+    this.stat,
   });
 
   int? aid;
@@ -173,6 +175,7 @@ class EpisodeItem {
   String? link;
   String? longTitle;
   int? pubTime;
+  int? pubdate;
   int? pv;
   String? releaseDate;
   Map? rights;
@@ -184,6 +187,7 @@ class EpisodeItem {
   String? subtitle;
   String? title;
   String? vid;
+  String? stat;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     aid = json['aid'];
@@ -202,6 +206,7 @@ class EpisodeItem {
     link = json['link'];
     longTitle = json['long_title'];
     pubTime = json['pub_time'];
+    pubdate = json['pub_time'];
     pv = json['pv'];
     releaseDate = json['release_date'];
     rights = json['rights'];
@@ -211,7 +216,7 @@ class EpisodeItem {
     skip = json['skip'];
     status = json['status'];
     subtitle = json['subtitle'];
-    title = json['title'];
+    title = json['long_title'];
     vid = json['vid'];
   }
 }

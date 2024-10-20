@@ -302,14 +302,13 @@ class BangumiIntroController extends GetxController {
         episodes: episodes,
         currentCid: videoDetailCtr.cid.value,
         dataType: dataType,
-        context: Get.context!,
         sheetHeight: Get.size.height,
         isFullScreen: true,
         changeFucCall: (item, index) {
           changeSeasonOrbangu(item.bvid, item.cid, item.aid, item.cover);
           SmartDialog.dismiss();
         },
-      ).buildShowContent(Get.context!),
+      ).buildShowContent(),
     );
   }
 

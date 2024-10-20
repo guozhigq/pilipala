@@ -62,6 +62,7 @@ class VideoIntroController extends GetxController {
   late ModelResult modelResult;
   PersistentBottomSheetController? bottomSheetController;
   late bool enableRelatedVideo;
+  UgcSeason? ugcSeason;
 
   @override
   void onInit() {
@@ -87,6 +88,7 @@ class VideoIntroController extends GetxController {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
+      ugcSeason = result['data']!.ugcSeason;
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
@@ -608,9 +610,9 @@ class VideoIntroController extends GetxController {
         episodes: episodes,
         currentCid: lastPlayCid.value,
         dataType: dataType,
-        context: Get.context!,
         sheetHeight: Get.size.height,
         isFullScreen: true,
+        ugcSeason: ugcSeason,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
             changeSeasonOrbangu(
@@ -621,7 +623,7 @@ class VideoIntroController extends GetxController {
           }
           SmartDialog.dismiss();
         },
-      ).buildShowContent(Get.context!),
+      ).buildShowContent(),
     );
   }
 
