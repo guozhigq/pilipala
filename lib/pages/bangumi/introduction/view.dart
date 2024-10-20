@@ -13,6 +13,7 @@ import 'package:pilipala/pages/bangumi/widgets/bangumi_panel.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/action_item.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/fav_panel.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../../../common/widgets/http_error.dart';
@@ -205,10 +206,24 @@ class _BangumiInfoState extends State<BangumiInfo> {
             children: [
               Stack(
                 children: [
-                  NetworkImgLayer(
-                    width: 115,
-                    height: 115 / 0.75,
-                    src: widget.bangumiDetail!.cover!,
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        HeroDialogRoute<void>(
+                          builder: (BuildContext context) =>
+                              InteractiveviewerGallery(
+                            sources: [widget.bangumiDetail!.cover!],
+                            initIndex: 0,
+                            onPageChanged: (int pageIndex) {},
+                          ),
+                        ),
+                      );
+                    },
+                    child: NetworkImgLayer(
+                      width: 115,
+                      height: 115 / 0.75,
+                      src: widget.bangumiDetail!.cover!,
+                    ),
                   ),
                   PBadge(
                     text:
