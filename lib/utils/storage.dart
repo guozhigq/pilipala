@@ -113,6 +113,7 @@ class SettingBoxKey {
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi',
+      enableAutoExpand = 'enableAutoExpand',
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo';
 
@@ -130,6 +131,7 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       enableGradientBg = 'enableGradientBg',
+      enableDynamicSwitch = 'enableDynamicSwitch',
       navBarSort = 'navBarSort',
       actionTypeSort = 'actionTypeSort';
 }

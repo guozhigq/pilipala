@@ -146,17 +146,34 @@ class _BangumiInfoState extends State<BangumiInfo> {
   }
 
   // 收藏
-  showFavBottomSheet() {
+  showFavBottomSheet() async {
     if (bangumiIntroController.userInfo.mid == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
+    final mediaQueryData = MediaQuery.of(context);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
+      context: Get.context!,
+      useSafeArea: true,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return FavPanel(ctr: bangumiIntroController);
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return FavPanel(
+              ctr: bangumiIntroController,
+              scrollController: scrollController,
+            );
+          },
+        );
       },
     );
   }

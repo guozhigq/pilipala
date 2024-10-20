@@ -1,13 +1,11 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/utils/utils.dart';
-
+import '../utils/index.dart';
 import 'controller.dart';
 
 class MessageLikePage extends StatefulWidget {
@@ -122,39 +120,13 @@ class LikeItem extends StatelessWidget {
     final nickNameList = item.users!.map((e) => e.nickname).take(2).toList();
     int usersLen = item.users!.length > 3 ? 3 : item.users!.length;
     final Uri uri = Uri.parse(item.item!.uri!);
-    final String path = uri.path;
-    final String bvid = path.split('/').last;
 
     /// bilibili://
     final Uri nativeUri = Uri.parse(item.item!.nativeUri!);
-    final Map<String, String> queryParameters = nativeUri.queryParameters;
     final String type = item.item!.type!;
-    // cid
-    final String? argCid = queryParameters['cid'];
-    // 页码
-    final String? page = queryParameters['page'];
-    // 根评论id
-    final String? commentRootId = queryParameters['comment_root_id'];
-    // 二级评论id
-    final String? commentSecondaryId = queryParameters['comment_secondary_id'];
-
     return InkWell(
       onTap: () async {
-        try {
-          final int cid = argCid != null
-              ? int.parse(argCid)
-              : await SearchHttp.ab2c(bvid: bvid);
-          final String heroTag = Utils.makeHeroTag(bvid);
-          Get.toNamed<dynamic>(
-            '/video?bvid=$bvid&cid=$cid',
-            arguments: <String, String?>{
-              'pic': '',
-              'heroTag': heroTag,
-            },
-          );
-        } catch (e) {
-          SmartDialog.showToast('视频可能失效了$e');
-        }
+        MessageUtils.onClickMessage(context, uri, nativeUri, type);
       },
       child: Stack(
         children: [
@@ -243,6 +215,7 @@ class LikeItem extends StatelessWidget {
                     width: 60,
                     height: 60,
                     src: item.item!.image,
+                    radius: 6,
                   ),
               ],
             ),

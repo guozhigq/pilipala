@@ -101,6 +101,7 @@ class ReplyReplyData {
     this.page,
     this.config,
     this.replies,
+    this.root,
     this.topReplies,
     this.upper,
   });
@@ -108,6 +109,7 @@ class ReplyReplyData {
   ReplyPage? page;
   ReplyConfig? config;
   late List<ReplyItemModel>? replies;
+  ReplyItemModel? root;
   late List<ReplyItemModel>? topReplies;
   ReplyUpper? upper;
 
@@ -120,6 +122,9 @@ class ReplyReplyData {
                 (item) => ReplyItemModel.fromJson(item, json['upper']['mid']))
             .toList()
         : [];
+    root = json['root'] != null
+        ? ReplyItemModel.fromJson(json['root'], false)
+        : null;
     topReplies = json['top_replies'] != null
         ? json['top_replies']
             .map<ReplyItemModel>((item) => ReplyItemModel.fromJson(

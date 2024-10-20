@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/pages/message/utils/index.dart';
 import 'package:pilipala/utils/utils.dart';
-
 import 'controller.dart';
 
 class MessageReplyPage extends StatefulWidget {
@@ -112,28 +111,14 @@ class ReplyItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Color outline = Theme.of(context).colorScheme.outline;
     final String heroTag = Utils.makeHeroTag(item.user!.mid);
-    final String bvid = item.item!.uri!.split('/').last;
-    // 页码
-    final String page =
-        item.item!.nativeUri!.split('page=').last.split('&').first;
-    // 根评论id
-    final String commentRootId =
-        item.item!.nativeUri!.split('comment_root_id=').last.split('&').first;
-    // 二级评论id
-    final String commentSecondaryId =
-        item.item!.nativeUri!.split('comment_secondary_id=').last;
+    final Uri uri = Uri.parse(item.item!.uri!);
 
+    /// bilibili://
+    final Uri nativeUri = Uri.parse(item.item!.nativeUri!);
+    final String type = item.item!.type!;
     return InkWell(
       onTap: () async {
-        final int cid = await SearchHttp.ab2c(bvid: bvid);
-        final String heroTag = Utils.makeHeroTag(bvid);
-        Get.toNamed<dynamic>(
-          '/video?bvid=$bvid&cid=$cid',
-          arguments: <String, String?>{
-            'pic': '',
-            'heroTag': heroTag,
-          },
-        );
+        MessageUtils.onClickMessage(context, uri, nativeUri, type);
       },
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -217,6 +202,7 @@ class ReplyItem extends StatelessWidget {
                 width: 60,
                 height: 60,
                 src: item.item!.image,
+                radius: 6,
               ),
           ],
         ),

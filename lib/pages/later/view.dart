@@ -129,7 +129,7 @@ class _LaterPageState extends State<LaterPage> {
             ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: MediaQuery.of(context).padding.bottom + 10,
+                height: MediaQuery.of(context).padding.bottom + 80,
               ),
             )
           ],

@@ -377,6 +377,7 @@ class Part {
   int? page;
   String? from;
   String? pagePart;
+  String? title;
   int? duration;
   String? vid;
   String? weblink;
@@ -389,6 +390,7 @@ class Part {
     this.page,
     this.from,
     this.pagePart,
+    this.title,
     this.duration,
     this.vid,
     this.weblink,
@@ -406,6 +408,7 @@ class Part {
     page = json["page"];
     from = json["from"];
     pagePart = json["part"];
+    title = json["part"];
     duration = json["duration"];
     vid = json["vid"];
     weblink = json["weblink"];
@@ -649,6 +652,9 @@ class EpisodeItem {
   Part? page;
   String? bvid;
   String? cover;
+  int? pubdate;
+  int? duration;
+  Stat? stat;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     seasonId = json['season_id'];
@@ -661,6 +667,9 @@ class EpisodeItem {
     page = Part.fromJson(json['page']);
     bvid = json['bvid'];
     cover = json['arc']['pic'];
+    pubdate = json['arc']['pubdate'];
+    duration = json['arc']['duration'];
+    stat = Stat.fromJson(json['arc']['stat']);
   }
 }
 

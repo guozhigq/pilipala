@@ -5,13 +5,15 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 
 class VideoReplyReplyController extends GetxController {
-  VideoReplyReplyController(this.aid, this.rpid, this.replyType);
+  VideoReplyReplyController(this.aid, this.rpid, this.replyType, this.showRoot);
   final ScrollController scrollController = ScrollController();
   // 视频aid 请求时使用的oid
   int? aid;
   // rpid 请求楼中楼回复
   String? rpid;
   ReplyType replyType = ReplyType.video;
+  bool showRoot = false;
+  ReplyItemModel? rootReply;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   // 当前页
   int currentPage = 0;
@@ -42,6 +44,7 @@ class VideoReplyReplyController extends GetxController {
     );
     if (res['status']) {
       final List<ReplyItemModel> replies = res['data'].replies;
+      ReplyItemModel? root = res['data'].root;
       if (replies.isNotEmpty) {
         noMore.value = '加载中...';
         if (replies.length == res['data'].page.count) {
@@ -60,7 +63,9 @@ class VideoReplyReplyController extends GetxController {
           return;
         }
         replyList.addAll(replies);
-        // res['data'].replies.addAll(replyList);
+      }
+      if (showRoot && root != null) {
+        rootReply = root;
       }
     }
     if (replyList.isNotEmpty && currentReply != null) {
