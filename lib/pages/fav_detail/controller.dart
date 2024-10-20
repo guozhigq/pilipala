@@ -21,6 +21,7 @@ class FavDetailController extends GetxController {
   RxString loadingText = '加载中...'.obs;
   RxInt mediaCount = 0.obs;
   late String isOwner;
+  late bool hasMore = true;
 
   @override
   void onInit() {
@@ -35,7 +36,7 @@ class FavDetailController extends GetxController {
   }
 
   Future<dynamic> queryUserFavFolderDetail({type = 'init'}) async {
-    if (type == 'onLoad' && favList.length >= mediaCount.value) {
+    if (type == 'onLoad' && !hasMore) {
       loadingText.value = '没有更多了';
       return;
     }
@@ -47,17 +48,18 @@ class FavDetailController extends GetxController {
     );
     if (res['status']) {
       favInfo.value = res['data'].info;
+      hasMore = res['data'].hasMore;
       if (currentPage == 1 && type == 'init') {
         favList.value = res['data'].medias;
         mediaCount.value = res['data'].info['media_count'];
       } else if (type == 'onLoad') {
         favList.addAll(res['data'].medias);
       }
-      if (favList.length >= mediaCount.value) {
+      if (!hasMore) {
         loadingText.value = '没有更多了';
       }
+      currentPage += 1;
     }
-    currentPage += 1;
     isLoadingMore = false;
     return res;
   }

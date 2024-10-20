@@ -193,7 +193,9 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.mediaCount}条视频',
+                  _favDetailController.mediaCount > 0
+                      ? '共${_favDetailController.mediaCount}条视频'
+                      : '',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -215,7 +217,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     List favList = _favDetailController.favList;
                     return Obx(
                       () => favList.isEmpty
-                          ? const SliverToBoxAdapter(child: SizedBox())
+                          ? const NoData()
                           : SliverList(
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
@@ -247,18 +249,20 @@ class _FavDetailPageState extends State<FavDetailPage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              height: MediaQuery.of(context).padding.bottom + 60,
+              height: MediaQuery.of(context).padding.bottom + 90,
               padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).padding.bottom),
               child: Center(
-                child: Obx(
-                  () => Text(
-                    _favDetailController.loadingText.value,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize: 13),
-                  ),
-                ),
+                child: Obx(() {
+                  final mediaCount = _favDetailController.mediaCount;
+                  final loadingText = _favDetailController.loadingText.value;
+                  final textColor = Theme.of(context).colorScheme.outline;
+
+                  return Text(
+                    mediaCount > 0 ? loadingText : '',
+                    style: TextStyle(color: textColor, fontSize: 13),
+                  );
+                }),
               ),
             ),
           )
