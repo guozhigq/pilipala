@@ -601,4 +601,7 @@ class Api {
 
   /// 删除评论
   static const String replyDel = '/x/v2/reply/del';
+
+  /// 图片上传
+  static const String uploadImage = '/x/dynamic/feed/draw/upload_bfs';
 }
