@@ -5,6 +5,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/common.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -25,6 +26,7 @@ class MainController extends GetxController {
   late PageController pageController;
   int selectedIndex = 0;
   Box userInfoCache = GStrorage.userInfo;
+  dynamic userInfo;
   RxBool userLogin = false.obs;
   late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
   late bool enableGradientBg;
@@ -38,7 +40,7 @@ class MainController extends GetxController {
     }
     hideTabBar = setting.get(SettingBoxKey.hideTabBar, defaultValue: false);
 
-    var userInfo = userInfoCache.get('userInfoCache');
+    userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     dynamicBadgeType.value = DynamicBadgeMode.values[setting.get(
         SettingBoxKey.dynamicBadgeMode,
@@ -73,11 +75,19 @@ class MainController extends GetxController {
     }
     int dynamicItemIndex =
         navigationBars.indexWhere((item) => item['label'] == "动态");
+    int mineItemIndex =
+        navigationBars.indexWhere((item) => item['label'] == "我的");
     var res = await CommonHttp.unReadDynamic();
     var data = res['data'];
     if (dynamicItemIndex != -1) {
       navigationBars[dynamicItemIndex]['count'] =
           data == null ? 0 : data.length; // 修改 count 属性为新的值
+    }
+    if (mineItemIndex != -1 && userInfo != null) {
+      Widget avatar = NetworkImgLayer(
+          width: 28, height: 28, src: userInfo.face, type: 'avatar');
+      navigationBars[mineItemIndex]['icon'] = avatar;
+      navigationBars[mineItemIndex]['selectIcon'] = avatar;
     }
     navigationBars.refresh();
   }

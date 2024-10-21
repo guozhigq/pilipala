@@ -8,7 +8,7 @@ import 'package:pilipala/utils/storage.dart';
 import '../../http/index.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
-  bool flag = false;
+  bool flag = true;
   late RxList tabs = [].obs;
   RxInt initialIndex = 1.obs;
   late TabController tabController;

@@ -10,6 +10,8 @@ import 'package:pilipala/pages/message/at/index.dart';
 import 'package:pilipala/pages/message/like/index.dart';
 import 'package:pilipala/pages/message/reply/index.dart';
 import 'package:pilipala/pages/message/system/index.dart';
+import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/pages/mine_edit/index.dart';
 import 'package:pilipala/pages/opus/index.dart';
 import 'package:pilipala/pages/read/index.dart';
 import 'package:pilipala/pages/setting/pages/logs.dart';
@@ -31,7 +33,6 @@ import '../pages/html/index.dart';
 import '../pages/later/index.dart';
 import '../pages/live_room/view.dart';
 import '../pages/login/index.dart';
-import '../pages/media/index.dart';
 import '../pages/member/index.dart';
 import '../pages/member_archive/index.dart';
 import '../pages/member_coin/index.dart';
@@ -78,8 +79,6 @@ class Routes {
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
     CustomGetPage(name: '/setting', page: () => const SettingPage()),
-    //
-    CustomGetPage(name: '/media', page: () => const MediaPage()),
     //
     CustomGetPage(name: '/fav', page: () => const FavPage()),
     //
@@ -187,6 +186,8 @@ class Routes {
     // 系统通知
     CustomGetPage(
         name: '/messageSystem', page: () => const MessageSystemPage()),
+    // 我的
+    CustomGetPage(name: '/mine', page: () => const MinePage()),
     // 收藏夹编辑
     CustomGetPage(name: '/favEdit', page: () => const FavEditPage()),
 
@@ -196,6 +197,8 @@ class Routes {
     // 用户专栏
     CustomGetPage(
         name: '/memberArticle', page: () => const MemberArticlePage()),
+    // 用户信息编辑
+    CustomGetPage(name: '/mineEdit', page: () => const MineEditPage()),
   ];
 }
 

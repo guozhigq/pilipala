@@ -593,6 +593,15 @@ class Api {
   static const String liveRoomEntry =
       '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
 
+  /// 用户信息
+  static const String accountInfo = '/x/member/web/account';
+
+  /// 更新用户信息
+  static const String updateAccountInfo = '/x/member/web/update';
+
   /// 删除评论
   static const String replyDel = '/x/v2/reply/del';
+
+  /// 图片上传
+  static const String uploadImage = '/x/dynamic/feed/draw/upload_bfs';
 }
