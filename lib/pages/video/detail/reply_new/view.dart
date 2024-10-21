@@ -140,16 +140,13 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       try {
         final XFile? pickedFile =
             await _picker.pickImage(source: ImageSource.gallery);
-        print('选择图片成功: ${pickedFile}');
         var res = await ReplyHttp.uploadImage(xFile: pickedFile!);
         if (res['status']) {
           imageList.add(res['data']['img_src']);
           pictures.add(res['data']);
-          print('imageList: $imageList');
-          print('pictures: $pictures');
         }
       } catch (e) {
-        print('选择图片失败: $e');
+        debugPrint('选择图片失败: $e');
       }
     }
   }
@@ -301,6 +298,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                               onTap: () =>
                                   onPreviewImg(imageList, index, context),
                               onLongPress: () {
+                                feedBack();
                                 imageList.removeAt(index);
                               },
                               child: CachedNetworkImage(
@@ -379,13 +377,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'emote',
                 ),
-                const SizedBox(width: 10),
-                ToolbarIconButton(
-                  onPressed: onChooseImage,
-                  icon: const Icon(Icons.photo, size: 22),
-                  toolbarType: toolbarType,
-                  selected: toolbarType == 'picture',
-                ),
+                if (widget.root != null && widget.root == 0) ...[
+                  const SizedBox(width: 10),
+                  ToolbarIconButton(
+                    onPressed: onChooseImage,
+                    icon: const Icon(Icons.photo, size: 22),
+                    toolbarType: toolbarType,
+                    selected: toolbarType == 'picture',
+                  ),
+                ],
                 const SizedBox(width: 6),
                 Obx(
                   () => showForward.value
