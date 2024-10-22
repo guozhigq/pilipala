@@ -39,7 +39,7 @@ Xcode 13.4 不支持 ```auto_orientation```，请注释相关代码
 
 ## 技术交流
 
-Telegram: https://t.me/+lm_oOVmF0RJiODk1
+Telegram: [https://t.me/+1DFtqS6usUM5MDNl](https://t.me/+1DFtqS6usUM5MDNl)
 
 Telegram Beta 版本：@PiliPala_Beta
 
