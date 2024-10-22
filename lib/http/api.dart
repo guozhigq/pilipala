@@ -175,7 +175,7 @@ class Api {
   static const String delHistory = '/x/v2/history/delete';
 
   // 搜索历史记录
-  static const String searchHistory = '/x/web-goblin/history/search';
+  static const String searchHistory = '/x/web-interface/history/search';
 
   // 热搜
   static const String hotSearchList =
