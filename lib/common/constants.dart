@@ -15,4 +15,5 @@ class Constants {
   // 59b43e04ad6965f34319062b478f83dd TV端
   static const String appSec = '59b43e04ad6965f34319062b478f83dd';
   static const String thirdSign = '04224646d1fea004e79606d3b038c84a';
+  static const List<int> publicFavFolder = <int>[0, 2, 22];
 }

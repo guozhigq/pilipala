@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -66,16 +67,14 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: Icon([22, 0].contains(item.attr)
-                                ? Icons.lock_outline
-                                : Icons.folder_outlined),
+                            leading: Icon(
+                                Constants.publicFavFolder.contains(item.attr)
+                                    ? Icons.folder_outlined
+                                    : Icons.lock_outline),
                             minLeadingWidth: 0,
                             title: Text(item.title!),
                             subtitle: Text(
-                              '${item.mediaCount}个内容 - ${[
-                                22,
-                                0
-                              ].contains(item.attr) ? '公开' : '私密'}',
+                              '${item.mediaCount}个内容 - ${Constants.publicFavFolder.contains(item.attr) ? '公开' : '私密'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
