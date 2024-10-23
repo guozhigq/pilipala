@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pilipala/http/dynamics.dart';
+import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/emote.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/emote/index.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
 import 'toolbar_icon_button.dart';
@@ -44,6 +49,9 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   RxBool isForward = false.obs;
   RxBool showForward = false.obs;
   RxString message = ''.obs;
+  final ImagePicker _picker = ImagePicker();
+  RxList<String> imageList = [''].obs;
+  List<Map<dynamic, dynamic>> pictures = [];
 
   @override
   void initState() {
@@ -60,6 +68,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     if (routePath.startsWith('/video')) {
       showForward.value = true;
     }
+    imageList.clear();
   }
 
   _autoFocus() async {
@@ -90,6 +99,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       message: widget.replyItem != null && widget.replyItem!.root != 0
           ? ' 回复 @${widget.replyItem!.member!.uname!} : ${message.value}'
           : message.value,
+      pictures: pictures,
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
@@ -122,6 +132,59 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       text: newText,
       selection:
           TextSelection.collapsed(offset: cursorPosition + emote.text!.length),
+    );
+  }
+
+  void onChooseImage() async {
+    if (mounted) {
+      try {
+        final XFile? pickedFile =
+            await _picker.pickImage(source: ImageSource.gallery);
+        var res = await ReplyHttp.uploadImage(xFile: pickedFile!);
+        if (res['status']) {
+          imageList.add(res['data']['img_src']);
+          pictures.add(res['data']);
+        }
+      } catch (e) {
+        debugPrint('选择图片失败: $e');
+      }
+    }
+  }
+
+  void onPreviewImg(picList, initIndex, context) {
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          itemBuilder: (
+            BuildContext context,
+            int index,
+            bool isFocus,
+            bool enablePageView,
+          ) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (enablePageView) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Center(
+                child: Hero(
+                  tag: picList[index],
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 0),
+                    imageUrl: picList[index],
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            );
+          },
+          onPageChanged: (int pageIndex) {},
+        ),
+      ),
     );
   }
 
@@ -175,10 +238,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ConstrainedBox(
             constraints: const BoxConstraints(
-              maxHeight: 200,
+              maxHeight: 250,
               minHeight: 120,
             ),
             child: Container(
@@ -204,6 +268,65 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                     onChanged: (text) {
                       message.value = text;
                     },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Obx(
+            () => Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: SizedBox(
+                height: 65, // 固定高度以避免无限扩展
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: imageList.length,
+                  itemBuilder: (context, index) {
+                    final url = imageList[index];
+                    return url != ''
+                        ? Container(
+                            width: 65,
+                            height: 65,
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(6))),
+                            child: InkWell(
+                              onTap: () =>
+                                  onPreviewImg(imageList, index, context),
+                              onLongPress: () {
+                                feedBack();
+                                imageList.removeAt(index);
+                              },
+                              child: CachedNetworkImage(
+                                imageUrl: url,
+                                width: 65,
+                                height: 65,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : const SizedBox();
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8.0),
+                ),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: imageList.isNotEmpty,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                child: Text(
+                  '点击预览，长按删除',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -240,7 +363,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'input',
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 10),
                 ToolbarIconButton(
                   onPressed: () {
                     if (toolbarType == 'input') {
@@ -254,6 +377,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'emote',
                 ),
+                if (widget.root != null && widget.root == 0) ...[
+                  const SizedBox(width: 10),
+                  ToolbarIconButton(
+                    onPressed: onChooseImage,
+                    icon: const Icon(Icons.photo, size: 22),
+                    toolbarType: toolbarType,
+                    selected: toolbarType == 'picture',
+                  ),
+                ],
                 const SizedBox(width: 6),
                 Obx(
                   () => showForward.value

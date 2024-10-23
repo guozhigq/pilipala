@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -32,8 +31,14 @@ class _FavPanelState extends State<FavPanel> {
         AppBar(
           centerTitle: false,
           elevation: 0,
-          automaticallyImplyLeading: false,
-          leadingWidth: 0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: const Icon(Icons.close_outlined)),
           title: Text(
             '选择收藏夹',
             style: Theme.of(context)
@@ -61,16 +66,16 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: Icon([23, 1].contains(item.attr)
+                            leading: Icon([22, 0].contains(item.attr)
                                 ? Icons.lock_outline
                                 : Icons.folder_outlined),
                             minLeadingWidth: 0,
                             title: Text(item.title!),
                             subtitle: Text(
                               '${item.mediaCount}个内容 - ${[
-                                23,
-                                1
-                              ].contains(item.attr) ? '私密' : '公开'}',
+                                22,
+                                0
+                              ].contains(item.attr) ? '公开' : '私密'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
@@ -92,7 +97,7 @@ class _FavPanelState extends State<FavPanel> {
                   }
                 } else {
                   // 骨架屏
-                  return const Text('请求中');
+                  return const Center(child: Text('请求中'));
                 }
               },
             ),

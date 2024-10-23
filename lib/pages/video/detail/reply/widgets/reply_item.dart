@@ -238,28 +238,53 @@ class ReplyItem extends StatelessWidget {
         // title
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
-          child: Text.rich(
-            style: const TextStyle(height: 1.75),
-            maxLines:
-                replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
-            overflow: TextOverflow.ellipsis,
-            TextSpan(
-              children: [
-                if (replyItem!.isTop!)
-                  const WidgetSpan(
-                    alignment: PlaceholderAlignment.top,
-                    child: PBadge(
-                      text: 'TOP',
-                      size: 'small',
-                      stack: 'normal',
-                      type: 'line',
-                      fs: 9,
+          child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints boxConstraints) {
+            String text = replyItem?.content?.message ?? '';
+            bool didExceedMaxLines = false;
+            final double maxWidth = boxConstraints.maxWidth;
+            TextPainter? textPainter;
+            final int maxLines =
+                replyItem!.content!.isText! && replyLevel == '1' ? 6 : 999;
+            try {
+              textPainter = TextPainter(
+                text: TextSpan(text: text),
+                maxLines: maxLines,
+                textDirection: Directionality.of(context),
+              );
+              textPainter.layout(maxWidth: maxWidth);
+              didExceedMaxLines = textPainter.didExceedMaxLines;
+            } catch (e) {
+              debugPrint('Error while measuring text: $e');
+              didExceedMaxLines = false;
+            }
+            return Text.rich(
+              style: const TextStyle(height: 1.75),
+              TextSpan(
+                children: [
+                  if (replyItem!.isTop!)
+                    const WidgetSpan(
+                      alignment: PlaceholderAlignment.top,
+                      child: PBadge(
+                        text: 'TOP',
+                        size: 'small',
+                        stack: 'normal',
+                        type: 'line',
+                        fs: 9,
+                      ),
                     ),
+                  buildContent(
+                    context,
+                    replyItem!,
+                    replyReply,
+                    null,
+                    didExceedMaxLines,
+                    textPainter,
                   ),
-                buildContent(context, replyItem!, replyReply, null),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          }),
         ),
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
@@ -465,8 +490,8 @@ class ReplyItemRow extends StatelessWidget {
                                 fs: 9,
                               ),
                             ),
-                          buildContent(
-                              context, replies![i], replyReply, replyItem),
+                          buildContent(context, replies![i], replyReply,
+                              replyItem, false, null),
                         ],
                       ),
                     ),
@@ -508,7 +533,13 @@ class ReplyItemRow extends StatelessWidget {
 }
 
 InlineSpan buildContent(
-    BuildContext context, replyItem, replyReply, fReplyItem) {
+  BuildContext context,
+  replyItem,
+  replyReply,
+  fReplyItem,
+  bool didExceedMaxLines,
+  TextPainter? textPainter,
+) {
   final String routePath = Get.currentRoute;
   bool isVideoPage = routePath.startsWith('/video');
   ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -518,6 +549,25 @@ InlineSpan buildContent(
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
   final List<InlineSpan> spanChilds = <InlineSpan>[];
+
+  if (didExceedMaxLines && content.message != '') {
+    final textSize = textPainter!.size;
+    var position = textPainter.getPositionForOffset(
+      Offset(
+        textSize.width,
+        textSize.height,
+      ),
+    );
+    final endOffset = textPainter.getOffsetBefore(position.offset);
+
+    if (endOffset != null && endOffset > 0) {
+      content.message = content.message.substring(0, endOffset);
+    } else {
+      content.message = content.message.substring(0, position.offset);
+    }
+  } else {
+    content.message = content.message2;
+  }
 
   // 投票
   if (content.vote.isNotEmpty) {
@@ -547,13 +597,6 @@ InlineSpan buildContent(
     });
   }
   content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  content.message = content.message
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&apos;', "'")
-      .replaceAll('&nbsp;', ' ');
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
@@ -721,14 +764,14 @@ InlineSpan buildContent(
                         });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
-                        SchemeEntity scheme = SchemeEntity(
+                        Uri scheme = Uri(
                           scheme: uri.scheme,
                           host: uri.host,
                           port: uri.port,
                           path: uri.path,
-                          query: uri.queryParameters,
-                          source: '',
-                          dataString: matchStr,
+                          // query: uri.queryParameters,
+                          // source: '',
+                          // dataString: matchStr,
                         );
                         PiliSchame.httpsScheme(scheme);
                       }
@@ -874,6 +917,18 @@ InlineSpan buildContent(
       }
     }
   }
+
+  if (didExceedMaxLines) {
+    spanChilds.add(
+      TextSpan(
+        text: '\n查看更多',
+        style: TextStyle(
+          color: colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
   // 图片渲染
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];

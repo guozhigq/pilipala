@@ -104,7 +104,7 @@ class Api {
 
   // 评论列表
   // https://api.bilibili.com/x/v2/reply/main?csrf=6e22efc1a47225ea25f901f922b5cfdd&mode=3&oid=254175381&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=0&type=11
-  static const String replyList = '/x/v2/reply';
+  static const String replyList = '/x/v2/reply/main';
 
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
@@ -175,7 +175,7 @@ class Api {
   static const String delHistory = '/x/v2/history/delete';
 
   // 搜索历史记录
-  static const String searchHistory = '/x/web-goblin/history/search';
+  static const String searchHistory = '/x/web-interface/history/search';
 
   // 热搜
   static const String hotSearchList =
@@ -593,6 +593,15 @@ class Api {
   static const String liveRoomEntry =
       '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
 
+  /// 用户信息
+  static const String accountInfo = '/x/member/web/account';
+
+  /// 更新用户信息
+  static const String updateAccountInfo = '/x/member/web/update';
+
   /// 删除评论
   static const String replyDel = '/x/v2/reply/del';
+
+  /// 图片上传
+  static const String uploadImage = '/x/dynamic/feed/draw/upload_bfs';
 }

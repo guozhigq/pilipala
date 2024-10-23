@@ -151,7 +151,6 @@ class _BangumiPanelState extends State<BangumiPanel> {
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.bangumiEpisode,
-                      context: context,
                     ).show(context);
                   },
                   child: Text(

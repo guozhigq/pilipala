@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/models/member/info.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class ProfilePanel extends StatelessWidget {
@@ -71,11 +71,27 @@ class ProfilePanel extends StatelessWidget {
             tag: ctr.heroTag!,
             child: Stack(
               children: [
-                NetworkImgLayer(
-                  width: 90,
-                  height: 90,
-                  type: 'avatar',
-                  src: !loadingStatus ? memberInfo.face : ctr.face.value,
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      HeroDialogRoute<void>(
+                        builder: (BuildContext context) =>
+                            InteractiveviewerGallery(
+                          sources: [
+                            !loadingStatus ? memberInfo.face : ctr.face.value
+                          ],
+                          initIndex: 0,
+                          onPageChanged: (int pageIndex) {},
+                        ),
+                      ),
+                    );
+                  },
+                  child: NetworkImgLayer(
+                    width: 90,
+                    height: 90,
+                    type: 'avatar',
+                    src: !loadingStatus ? memberInfo.face : ctr.face.value,
+                  ),
                 ),
                 if (!loadingStatus &&
                     memberInfo.liveRoom != null &&
@@ -237,7 +253,7 @@ class ProfilePanel extends StatelessWidget {
   Widget buildEditProfileButton(BuildContext context) {
     return TextButton(
       onPressed: () {
-        SmartDialog.showToast('功能开发中 💪');
+        Get.toNamed('/mineEdit');
       },
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 80),

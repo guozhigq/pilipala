@@ -147,11 +147,12 @@ dependencies:
   lottie: ^3.1.2
   # 二维码
   qr_flutter: ^4.1.0
-  bottom_sheet: ^4.0.4
   web_socket_channel: ^2.4.5
   brotli: ^0.6.0
   # 文本语法高亮
   re_highlight: ^0.0.3
+  # 图片选择器
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

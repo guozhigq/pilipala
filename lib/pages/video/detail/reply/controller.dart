@@ -21,11 +21,9 @@ class VideoReplyController extends GetxController {
   // rpid 请求楼中楼回复
   String? rpid;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
-  // 当前页
-  int currentPage = 0;
+  String nextOffset = "";
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
-  int ps = 20;
   RxInt count = 0.obs;
   // 当前回复的回复
   ReplyItemModel? currentReplyItem;
@@ -57,7 +55,7 @@ class VideoReplyController extends GetxController {
     }
     isLoadingMore = true;
     if (type == 'init') {
-      currentPage = 0;
+      nextOffset = '';
       noMore.value = '';
     }
     if (noMore.value == '没有更多了') {
@@ -66,28 +64,20 @@ class VideoReplyController extends GetxController {
     }
     final res = await ReplyHttp.replyList(
       oid: aid!,
-      pageNum: currentPage + 1,
-      ps: ps,
+      nextOffset: nextOffset,
       type: ReplyType.video.index,
       sort: _sortType.index,
     );
     if (res['status']) {
       final List<ReplyItemModel> replies = res['data'].replies;
+      nextOffset = res['data'].cursor.paginationReply.nextOffset ?? "";
       if (replies.isNotEmpty) {
         noMore.value = '加载中...';
-
-        /// 第一页回复数小于20
-        if (currentPage == 0 && replies.length < 18) {
-          noMore.value = '没有更多了';
-        }
-        currentPage++;
-
-        if (replyList.length == res['data'].page.acount) {
+        if (res['data'].cursor.isEnd == true) {
           noMore.value = '没有更多了';
         }
       } else {
-        // 未登录状态replies可能返回null
-        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
+        noMore.value = nextOffset == "" ? '还没有评论' : '没有更多了';
       }
       if (type == 'init') {
         // 添加置顶回复
@@ -99,7 +89,7 @@ class VideoReplyController extends GetxController {
           }
         }
         replies.insertAll(0, res['data'].topReplies);
-        count.value = res['data'].page.count;
+        count.value = res['data'].cursor.allCount;
         replyList.value = replies;
       } else {
         replyList.addAll(replies);
@@ -130,7 +120,7 @@ class VideoReplyController extends GetxController {
       }
       sortTypeTitle.value = _sortType.titles;
       sortTypeLabel.value = _sortType.labels;
-      currentPage = 0;
+      nextOffset = "";
       noMore.value = '';
       replyList.clear();
       queryReplyList(type: 'init');

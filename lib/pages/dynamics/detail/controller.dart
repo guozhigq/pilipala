@@ -14,7 +14,7 @@ class DynamicDetailController extends GetxController {
   int? type;
   dynamic item;
   int? floor;
-  int currentPage = 0;
+  String nextOffset = "";
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
@@ -49,25 +49,25 @@ class DynamicDetailController extends GetxController {
 
   Future queryReplyList({reqType = 'init'}) async {
     if (reqType == 'init') {
-      currentPage = 0;
+      nextOffset = "";
     }
     var res = await ReplyHttp.replyList(
       oid: oid!,
-      pageNum: currentPage + 1,
+      nextOffset: nextOffset,
       type: type!,
       sort: _sortType.index,
     );
     if (res['status']) {
       List<ReplyItemModel> replies = res['data'].replies;
-      acount.value = res['data'].page.acount;
+      acount.value = res['data'].cursor.allCount;
+      nextOffset = res['data'].cursor.paginationReply.nextOffset ?? "";
       if (replies.isNotEmpty) {
-        currentPage++;
         noMore.value = '加载中...';
-        if (replies.length < 20) {
+        if (res['data'].cursor.isEnd == true) {
           noMore.value = '没有更多了';
         }
       } else {
-        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
+        noMore.value = nextOffset == "" ? '还没有评论' : '没有更多了';
       }
       if (reqType == 'init') {
         // 添加置顶回复
