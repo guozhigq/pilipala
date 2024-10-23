@@ -75,60 +75,58 @@ class _MinePageState extends State<MinePage>
               parent: BouncingScrollPhysics()),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 110),
-            child: Expanded(
-              child: Column(
-                children: [
-                  Obx(() => _buildProfileSection(context, ctr.userInfo.value)),
-                  const SizedBox(height: 10),
-                  FutureBuilder(
-                    future: _futureBuilderFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == null) {
-                          return const SizedBox();
-                        }
-                        if (snapshot.data['status']) {
-                          return Obx(
-                            () => _buildStatsSection(
-                              context,
-                              ctr.userStat.value,
-                            ),
-                          );
-                        } else {
-                          return _buildStatsSection(
+            child: Column(
+              children: [
+                Obx(() => _buildProfileSection(context, ctr.userInfo.value)),
+                const SizedBox(height: 10),
+                FutureBuilder(
+                  future: _futureBuilderFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.data == null) {
+                        return const SizedBox();
+                      }
+                      if (snapshot.data['status']) {
+                        return Obx(
+                          () => _buildStatsSection(
                             context,
                             ctr.userStat.value,
-                          );
-                        }
+                          ),
+                        );
                       } else {
                         return _buildStatsSection(
                           context,
                           ctr.userStat.value,
                         );
                       }
-                    },
-                  ),
-                  _buildMenuSection(context),
-                  Obx(
-                    () => Visibility(
-                      visible: ctr.userLogin.value,
-                      child: Divider(
-                        height: 25,
-                        color: Theme.of(context).dividerColor.withOpacity(0.1),
-                      ),
+                    } else {
+                      return _buildStatsSection(
+                        context,
+                        ctr.userStat.value,
+                      );
+                    }
+                  },
+                ),
+                _buildMenuSection(context),
+                Obx(
+                  () => Visibility(
+                    visible: ctr.userLogin.value,
+                    child: Divider(
+                      height: 25,
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
                     ),
                   ),
-                  Obx(
-                    () => ctr.userLogin.value
-                        ? _buildFavoritesSection(context)
-                        : const SizedBox(),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).padding.bottom +
-                        kBottomNavigationBarHeight,
-                  )
-                ],
-              ),
+                ),
+                Obx(
+                  () => ctr.userLogin.value
+                      ? _buildFavoritesSection(context)
+                      : const SizedBox(),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).padding.bottom +
+                      kBottomNavigationBarHeight,
+                )
+              ],
             ),
           ),
         ),
