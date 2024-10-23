@@ -100,13 +100,6 @@ class SystemItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (item.content is Map) {
-    //   var res = MessageUtils().extractLinks(item.content['web']);
-    //   print('res: $res');
-    // } else {
-    //   var res = MessageUtils().extractLinks(item.content);
-    //   print('res: $res');
-    // }
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
       child: Column(
@@ -156,7 +149,7 @@ class SystemItem extends StatelessWidget {
     contentMap['message'].splitMapJoin(
       regExp,
       onMatch: (Match match) {
-        if (!match.group(0)!.startsWith('BV')) {
+        if (match.group(0) != '' && !match.group(0)!.startsWith('BV')) {
           spanChilds.add(
             WidgetSpan(
               child: Icon(Icons.link, color: colorScheme.primary, size: 16),
