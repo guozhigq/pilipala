@@ -124,7 +124,7 @@ class _AboutPageState extends State<AboutPage> {
               onTap: () => _aboutController.webSiteUrl(),
               title: const Text('访问官网'),
               trailing: Text(
-                'https://pilipalanet.mysxl.cn',
+                'https://pilipala.life',
                 style: subTitleStyle,
               ),
             ),
