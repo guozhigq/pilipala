@@ -84,6 +84,7 @@ class SSearchController extends GetxController {
     // 手动刷新
     historyList.refresh();
     localCache.put('cacheList', historyCacheList);
+    GlobalDataCache().historyCacheList = historyCacheList;
     searchFocusNode.unfocus();
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
@@ -135,6 +136,7 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     localCache.put('cacheList', []);
+    GlobalDataCache().historyCacheList = [];
     SmartDialog.showToast('搜索历史已清空');
   }
 }
