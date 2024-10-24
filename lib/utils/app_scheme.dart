@@ -212,9 +212,9 @@ class PiliSchame {
     }
   }
 
-  static Future<void> biliScheme(SchemeEntity value) async {
-    final String host = value.host!;
-    final String path = value.path!;
+  static Future<void> biliScheme(Uri value) async {
+    final String host = value.host;
+    final String path = value.path;
     switch (host) {
       case 'root':
         Navigator.popUntil(
@@ -301,7 +301,7 @@ class PiliSchame {
         break;
       default:
         SmartDialog.showToast('未匹配地址，请联系开发者');
-        Clipboard.setData(ClipboardData(text: value.toJson().toString()));
+        Clipboard.setData(ClipboardData(text: value.toString()));
         break;
     }
   }
