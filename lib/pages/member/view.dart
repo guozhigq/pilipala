@@ -156,6 +156,25 @@ class _MemberPageState extends State<MemberPage>
           bottom: MediaQuery.of(context).padding.bottom + 20,
         ),
         children: [
+          Obx(() {
+            Rx<MemberInfoModel> memberInfo = _memberController.memberInfo;
+            return memberInfo.value.silence != null &&
+                    memberInfo.value.silence! == 1
+                ? Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: Text(
+                      '该账号封禁中',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : const SizedBox();
+          }),
           profileWidget(),
 
           /// 动态链接
