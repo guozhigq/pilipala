@@ -117,7 +117,7 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
         width: 50,
         height: 50,
         type: 'emote',
-        src: item.cover['url'],
+        src: item?.cover?['url'] ?? '',
       ),
       title: Text(
         item.content,
