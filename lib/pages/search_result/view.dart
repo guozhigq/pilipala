@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/pages/search_panel/index.dart';
 import 'controller.dart';
+import 'widget/tab_bar.dart';
 
 class SearchResultPage extends StatefulWidget {
   const SearchResultPage({super.key});
@@ -27,6 +28,17 @@ class _SearchResultPageState extends State<SearchResultPage>
       length: SearchType.values.length,
       initialIndex: _searchResultController.tabIndex,
     );
+  }
+
+  // tab点击事件
+  void _onTap(int index) {
+    if (index == _searchResultController.tabIndex) {
+      Get.find<SearchPanelController>(
+              tag: SearchType.values[index].type +
+                  _searchResultController.keyword!)
+          .animateToTop();
+    }
+    _searchResultController.tabIndex = index;
   }
 
   @override
@@ -55,50 +67,10 @@ class _SearchResultPageState extends State<SearchResultPage>
       body: Column(
         children: [
           const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(left: 8),
-            color: Theme.of(context).colorScheme.surface,
-            child: Theme(
-              data: ThemeData(
-                splashColor: Colors.transparent, // 点击时的水波纹颜色设置为透明
-                highlightColor: Colors.transparent, // 点击时的背景高亮颜色设置为透明
-              ),
-              child: Obx(
-                () => (TabBar(
-                  controller: _tabController,
-                  tabs: [
-                    for (var i in _searchResultController.searchTabs)
-                      Tab(text: "${i['label']} ${i['count'] ?? ''}")
-                  ],
-                  isScrollable: true,
-                  indicatorWeight: 0,
-                  indicatorPadding:
-                      const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-                  indicator: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor:
-                      Theme.of(context).colorScheme.onSecondaryContainer,
-                  labelStyle: const TextStyle(fontSize: 13),
-                  dividerColor: Colors.transparent,
-                  unselectedLabelColor: Theme.of(context).colorScheme.outline,
-                  tabAlignment: TabAlignment.start,
-                  onTap: (index) {
-                    if (index == _searchResultController.tabIndex) {
-                      Get.find<SearchPanelController>(
-                              tag: SearchType.values[index].type +
-                                  _searchResultController.keyword!)
-                          .animateToTop();
-                    }
-
-                    _searchResultController.tabIndex = index;
-                  },
-                )),
-              ),
-            ),
+          TabBarWidget(
+            onTap: _onTap,
+            tabController: _tabController!,
+            searchResultCtr: _searchResultController,
           ),
           Expanded(
             child: TabBarView(

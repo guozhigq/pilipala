@@ -87,7 +87,9 @@ class _BlackListPageState extends State<BlackListPage> {
                           itemCount: list.length,
                           itemBuilder: (BuildContext context, int index) {
                             return ListTile(
-                              onTap: () {},
+                              onTap: () => Get.toNamed(
+                                  '/member?mid=${list[index].mid}',
+                                  arguments: {'face': list[index].face}),
                               leading: NetworkImgLayer(
                                 width: 45,
                                 height: 45,

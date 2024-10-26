@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/pages/member/index.dart';
+import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'widgets/commen_widget.dart';
 import 'widgets/conis.dart';
@@ -154,6 +156,25 @@ class _MemberPageState extends State<MemberPage>
           bottom: MediaQuery.of(context).padding.bottom + 20,
         ),
         children: [
+          Obx(() {
+            Rx<MemberInfoModel> memberInfo = _memberController.memberInfo;
+            return memberInfo.value.silence != null &&
+                    memberInfo.value.silence! == 1
+                ? Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: Text(
+                      '该账号封禁中',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : const SizedBox();
+          }),
           profileWidget(),
 
           /// 动态链接
@@ -318,6 +339,7 @@ class _MemberPageState extends State<MemberPage>
               Rx<MemberInfoModel> memberInfo = _memberController.memberInfo;
               return Obx(
                 () => Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ProfilePanel(ctr: _memberController),
@@ -376,7 +398,7 @@ class _MemberPageState extends State<MemberPage>
                                 .value.vip!.label!['img_label_uri_hans_static'],
                             height: 20,
                           ),
-                        ]
+                        ],
                       ],
                     ),
                     if (memberInfo.value.official!['title'] != '') ...[
@@ -392,6 +414,39 @@ class _MemberPageState extends State<MemberPage>
                         ),
                       ),
                     ],
+                    const SizedBox(height: 6),
+                    InkWell(
+                      onTap: () {
+                        feedBack();
+                        Clipboard.setData(ClipboardData(
+                            text: memberInfo.value.mid.toString()));
+                        SmartDialog.showToast('uid复制成功');
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          child: SizedBox(
+                            height: 16,
+                            child: Text(
+                              'uid: ${memberInfo.value.mid}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     SelectableText(memberInfo.value.sign ?? ''),
                   ],

@@ -122,18 +122,13 @@ class MemberController extends GetxController {
 
 // 合并关注/取关和拉黑逻辑
   Future modifyRelation(String actionType) async {
-    if (userInfo == null) {
-      SmartDialog.showToast('账号未登录');
-      return;
-    }
-
     String contentText;
     int act;
     if (actionType == 'follow') {
       contentText = memberInfo.value.isFollowed! ? '确定取消关注UP主?' : '确定关注UP主?';
       act = memberInfo.value.isFollowed! ? 2 : 1;
     } else if (actionType == 'block') {
-      contentText = attribute.value != 128 ? '确定拉黑UP主?' : '确定从黑名单移除UP主？';
+      contentText = attribute.value != 128 ? '确定拉黑UP主?' : '确定从黑名单移除UP主?';
       act = attribute.value != 128 ? 5 : 6;
     } else {
       return;

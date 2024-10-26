@@ -26,7 +26,6 @@ class SSearchController extends GetxController {
   Box setting = GStrorage.setting;
   bool enableHotKey = true;
   bool enableSearchSuggest = true;
-  late StreamController<bool> clearStream = StreamController<bool>.broadcast();
 
   @override
   void onInit() {
@@ -42,7 +41,6 @@ class SSearchController extends GetxController {
       final hint = parameters['hintText'];
       if (hint != null) {
         hintText = hint;
-        searchKeyWord.value = hintText;
       }
     }
     historyCacheList = GlobalDataCache().historyCacheList;
@@ -55,10 +53,8 @@ class SSearchController extends GetxController {
     searchKeyWord.value = value;
     if (value == '') {
       searchSuggestList.value = [];
-      clearStream.add(false);
       return;
     }
-    clearStream.add(true);
     if (enableSearchSuggest) {
       _debouncer.call(() => querySearchSuggest(value));
     }
@@ -68,23 +64,20 @@ class SSearchController extends GetxController {
     controller.value.clear();
     searchKeyWord.value = '';
     searchSuggestList.value = [];
-    clearStream.add(false);
   }
 
   // 搜索
   void submit() {
-    if (searchKeyWord.value == '') {
+    if (searchKeyWord.value == '' && hintText.isNotEmpty && hintText == '搜索') {
       return;
+    } else {
+      if (searchKeyWord.value == '' && hintText != '搜索') {
+        searchKeyWord.value = hintText;
+        controller.value.text = hintText;
+      }
     }
-    List arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
-    arr.insert(0, searchKeyWord.value);
-    historyCacheList = arr;
-
-    historyList.value = historyCacheList;
-    // 手动刷新
-    historyList.refresh();
-    localCache.put('cacheList', historyCacheList);
-    searchFocusNode.unfocus();
+    hintText = '搜索';
+    cacheHistory();
     Get.toNamed('/searchResult', parameters: {'keyword': searchKeyWord.value});
   }
 
@@ -135,6 +128,18 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     localCache.put('cacheList', []);
+    GlobalDataCache().historyCacheList = [];
     SmartDialog.showToast('搜索历史已清空');
+  }
+
+  cacheHistory() {
+    List arr = historyCacheList.where((e) => e != searchKeyWord.value).toList();
+    arr.insert(0, searchKeyWord.value);
+    historyCacheList = arr;
+    historyList.value = historyCacheList;
+    historyList.refresh();
+    localCache.put('cacheList', historyCacheList);
+    GlobalDataCache().historyCacheList = historyCacheList;
+    searchFocusNode.unfocus();
   }
 }
