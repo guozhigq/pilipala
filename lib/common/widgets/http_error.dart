@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class HttpError extends StatelessWidget {
   const HttpError({
     required this.errMsg,
-    required this.fn,
+    this.fn,
     this.btnText,
     this.isShowBtn = true,
     this.isInSliver = true,
@@ -23,7 +23,6 @@ class HttpError extends StatelessWidget {
     final errorContent = SizedBox(
       height: 400,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SvgPicture.asset("assets/images/error.svg", height: 200),
@@ -50,7 +49,7 @@ class HttpError extends StatelessWidget {
     if (isInSliver) {
       return SliverToBoxAdapter(child: errorContent);
     } else {
-      return Center(child: errorContent);
+      return Align(alignment: Alignment.topCenter, child: errorContent);
     }
   }
 }

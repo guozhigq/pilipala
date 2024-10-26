@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/pages/fav_edit/index.dart';
 import 'package:pilipala/pages/follow_search/view.dart';
+import 'package:pilipala/pages/live_follow/index.dart';
 import 'package:pilipala/pages/member_article/index.dart';
 import 'package:pilipala/pages/message/at/index.dart';
 import 'package:pilipala/pages/message/like/index.dart';
@@ -199,6 +200,8 @@ class Routes {
         name: '/memberArticle', page: () => const MemberArticlePage()),
     // 用户信息编辑
     CustomGetPage(name: '/mineEdit', page: () => const MineEditPage()),
+    // 关注的直播up
+    CustomGetPage(name: '/liveFollowing', page: () => const LiveFollowPage()),
   ];
 }
 
