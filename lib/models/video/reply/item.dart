@@ -11,6 +11,7 @@ class ReplyItemModel {
     this.parent,
     this.dialog,
     this.count,
+    this.rcount,
     this.floor,
     this.state,
     this.fansgrade,
@@ -41,6 +42,7 @@ class ReplyItemModel {
   int? parent;
   int? dialog;
   int? count;
+  int? rcount;
   int? floor;
   int? state;
   int? fansgrade;
@@ -72,6 +74,7 @@ class ReplyItemModel {
     parent = json['parent'];
     dialog = json['dialog'];
     count = json['count'];
+    rcount = json['rcount'] ?? 0;
     floor = json['floor'];
     state = json['state'];
     fansgrade = json['fansgrade'];
