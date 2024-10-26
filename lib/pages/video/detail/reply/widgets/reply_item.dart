@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:appscheme/appscheme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,9 +59,7 @@ class ReplyItem extends StatelessWidget {
             return;
           }
           feedBack();
-          if (replyReply != null) {
-            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
-          }
+          replyReply?.call(replyItem, null, replyItem!.rcount! > 0);
         },
         onLongPress: () {
           if (replySave!) {
@@ -289,9 +286,7 @@ class ReplyItem extends StatelessWidget {
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
-        if ((replyItem!.replyControl!.isShow! ||
-                replyItem!.replies!.isNotEmpty) &&
-            showReplyRow!) ...[
+        if ((replyItem!.rcount! > 0) && showReplyRow!) ...[
           Padding(
             padding: const EdgeInsets.only(top: 5, bottom: 12),
             child: ReplyItemRow(
@@ -408,8 +403,7 @@ class ReplyItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isShow = replyControl!.isShow!;
-    final int extraRow = replyControl != null && isShow ? 1 : 0;
+    final int extraRow = replyItem!.rcount! > 0 ? 1 : 0;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
