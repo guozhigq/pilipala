@@ -31,7 +31,7 @@ class SearchPanelController extends GetxController {
       tids: searchType!.type != 'video' ? null : tids.value,
     );
     if (result['status']) {
-      if (type == 'onRefresh') {
+      if (type == 'init') {
         resultList.value = result['data'].list ?? [];
       } else {
         resultList.addAll(result['data'].list ?? []);
@@ -44,7 +44,7 @@ class SearchPanelController extends GetxController {
 
   Future onRefresh() async {
     page.value = 1;
-    await onSearch(type: 'onRefresh');
+    await onSearch();
   }
 
   // 返回顶部并刷新

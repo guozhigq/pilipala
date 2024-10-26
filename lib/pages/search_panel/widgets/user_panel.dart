@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -20,7 +21,8 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
         onTap: () => Get.toNamed('/member?mid=${i.mid}',
             arguments: {'heroTag': heroTag, 'face': i.upic}),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+              horizontal: StyleString.safeSpace, vertical: 7),
           child: Row(
             children: [
               Hero(
