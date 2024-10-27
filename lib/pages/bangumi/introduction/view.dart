@@ -239,88 +239,65 @@ class _BangumiInfoState extends State<BangumiInfo> {
               Expanded(
                 child: InkWell(
                   onTap: () => showIntroDetail(),
+                  borderRadius: BorderRadius.circular(8),
                   child: SizedBox(
                     height: 115 / 0.75,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.bangumiDetail!.title!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.bangumiDetail!.title!,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            const SizedBox(width: 20),
-                            Obx(
-                              () => BangumiStatusWidget(
-                                ctr: bangumiIntroController,
-                                isFollowed:
-                                    bangumiIntroController.isFollowed.value,
+                              const SizedBox(width: 20),
+                              Obx(
+                                () => BangumiStatusWidget(
+                                  ctr: bangumiIntroController,
+                                  isFollowed:
+                                      bangumiIntroController.isFollowed.value,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            StatView(
-                              view: widget.bangumiDetail!.stat!['views'],
-                              size: 'medium',
-                            ),
-                            const SizedBox(width: 6),
-                            StatDanMu(
-                              danmu: widget.bangumiDetail!.stat!['danmakus'],
-                              size: 'medium',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Text(
-                              (widget.bangumiDetail!.areas!.isNotEmpty
-                                  ? widget.bangumiDetail!.areas!.first['name']
-                                  : ''),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              widget.bangumiDetail!.publish!['pub_time_show'],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          widget.bangumiDetail!.newEp!['desc'],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: t.colorScheme.outline,
+                            ],
                           ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '简介：${widget.bangumiDetail!.evaluate!}',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: t.colorScheme.outline,
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              StatView(
+                                view: widget.bangumiDetail!.stat!['views'],
+                                size: 'medium',
+                              ),
+                              const SizedBox(width: 6),
+                              StatDanMu(
+                                danmu: widget.bangumiDetail!.stat!['danmakus'],
+                                size: 'medium',
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 10),
+                          Text(
+                            '简介：${widget.bangumiDetail!.evaluate!}',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: t.colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
