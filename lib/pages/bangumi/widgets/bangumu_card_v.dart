@@ -25,6 +25,7 @@ class BangumiCardV extends StatelessWidget {
         RoutePush.bangumiPush(
           bangumiItem.seasonId,
           null,
+          progressIndex: bangumiItem.progressIndex,
           heroTag: heroTag,
         );
       },

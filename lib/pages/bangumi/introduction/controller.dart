@@ -79,12 +79,8 @@ class BangumiIntroController extends GetxController {
   // 获取番剧简介&选集
   Future queryBangumiIntro() async {
     if (userLogin) {
-      // 获取点赞状态
-      queryHasLikeVideo();
-      // 获取投币状态
-      queryHasCoinVideo();
-      // 获取收藏状态
-      queryHasFavVideo();
+      // 获取点赞投币收藏状态
+      bangumiActionStatus();
     }
     var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
     if (result['status']) {
@@ -94,26 +90,15 @@ class BangumiIntroController extends GetxController {
     return result;
   }
 
-  // 获取点赞状态
-  Future queryHasLikeVideo() async {
-    var result = await VideoHttp.hasLikeVideo(bvid: bvid);
-    // data	num	被点赞标志	0：未点赞  1：已点赞
-    hasLike.value = result["data"] == 1 ? true : false;
-  }
-
-  // 获取投币状态
-  Future queryHasCoinVideo() async {
-    var result = await VideoHttp.hasCoinVideo(bvid: bvid);
-    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
-  }
-
-  // 获取收藏状态
-  Future queryHasFavVideo() async {
-    var result = await VideoHttp.hasFavVideo(aid: IdUtils.bv2av(bvid));
+  // 获取番剧点赞投币收藏状态
+  Future bangumiActionStatus() async {
+    var result = await BangumiHttp.bangumiActionStatus(epId: epId!);
     if (result['status']) {
-      hasFav.value = result["data"]['favoured'];
+      hasLike.value = result['data']['like'] == 1;
+      hasCoin.value = result['data']['coin_number'] != 0;
+      hasFav.value = result['data']['favorite'] == 1;
     } else {
-      hasFav.value = false;
+      SmartDialog.showToast(result['msg']);
     }
   }
 
@@ -121,7 +106,7 @@ class BangumiIntroController extends GetxController {
   Future actionLikeVideo() async {
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
-      SmartDialog.showToast(!hasLike.value ? '点赞成功 👍' : '取消赞');
+      SmartDialog.showToast(!hasLike.value ? '点赞成功' : '取消赞');
       hasLike.value = !hasLike.value;
       bangumiDetail.value.stat!['likes'] =
           bangumiDetail.value.stat!['likes'] + (!hasLike.value ? 1 : -1);
@@ -158,7 +143,7 @@ class BangumiIntroController extends GetxController {
                           var res = await VideoHttp.coinVideo(
                               bvid: bvid, multiply: _tempThemeValue);
                           if (res['status']) {
-                            SmartDialog.showToast('投币成功 👏');
+                            SmartDialog.showToast('投币成功');
                             hasCoin.value = true;
                             bangumiDetail.value.stat!['coins'] =
                                 bangumiDetail.value.stat!['coins'] +
@@ -196,9 +181,11 @@ class BangumiIntroController extends GetxController {
       addMediaIdsNew = [];
       delMediaIdsNew = [];
       // 重新获取收藏状态
-      queryHasFavVideo();
-      SmartDialog.showToast('✅ 操作成功');
+      bangumiActionStatus();
+      SmartDialog.showToast('操作成功');
       Get.back();
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
   }
 

@@ -21,8 +21,19 @@ class BangumiHttp {
     }
   }
 
-  static Future bangumiFollow({int? mid}) async {
-    var res = await Request().get(Api.bangumiFollow, data: {'vmid': mid});
+  static Future getRecentBangumi({
+    int? mid,
+    int type = 1,
+    int pn = 1,
+    int ps = 20,
+  }) async {
+    var res = await Request().get(Api.getRecentBangumiApi, data: {
+      'vmid': mid,
+      'type': type,
+      'follow_status': 0,
+      'pn': pn,
+      'ps': ps,
+    });
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -79,6 +90,19 @@ class BangumiHttp {
         'data': [],
         'msg': res.data['message'],
       };
+    }
+  }
+
+  // 获取番剧点赞投币收藏状态
+  static Future bangumiActionStatus({required int epId}) async {
+    var res = await Request().get(
+      Api.bangumiActionStatus,
+      data: {'ep_id': epId},
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }
