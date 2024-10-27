@@ -113,12 +113,14 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
           'articleType': 'opus',
         });
       },
-      leading: NetworkImgLayer(
-        width: 50,
-        height: 50,
-        type: 'emote',
-        src: item?.cover?['url'] ?? '',
-      ),
+      leading: item?.cover != null
+          ? NetworkImgLayer(
+              width: 50,
+              height: 50,
+              type: 'emote',
+              src: item?.cover?['url'] ?? '',
+            )
+          : const SizedBox(),
       title: Text(
         item.content,
         maxLines: 2,
