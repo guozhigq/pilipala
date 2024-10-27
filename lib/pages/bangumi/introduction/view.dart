@@ -259,27 +259,11 @@ class _BangumiInfoState extends State<BangumiInfo> {
                               ),
                             ),
                             const SizedBox(width: 20),
-                            SizedBox(
-                              width: 34,
-                              height: 34,
-                              child: IconButton(
-                                style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.zero),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (Set<MaterialState> states) {
-                                    return t.colorScheme.primaryContainer
-                                        .withOpacity(0.7);
-                                  }),
-                                ),
-                                onPressed: () =>
-                                    bangumiIntroController.bangumiAdd(),
-                                icon: Icon(
-                                  Icons.favorite_border_rounded,
-                                  color: t.colorScheme.primary,
-                                  size: 22,
-                                ),
+                            Obx(
+                              () => BangumiStatusWidget(
+                                ctr: bangumiIntroController,
+                                isFollowed:
+                                    bangumiIntroController.isFollowed.value,
                               ),
                             ),
                           ],
@@ -424,5 +408,99 @@ class _BangumiInfoState extends State<BangumiInfo> {
         ),
       );
     });
+  }
+}
+
+// 追番状态
+class BangumiStatusWidget extends StatelessWidget {
+  final BangumiIntroController ctr;
+  final bool isFollowed;
+
+  const BangumiStatusWidget({
+    Key? key,
+    required this.ctr,
+    required this.isFollowed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    void updateFollowStatus() {
+      showModalBottomSheet(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        builder: (context) {
+          return morePanel(context, ctr);
+        },
+      );
+    }
+
+    return Obx(
+      () => SizedBox(
+        width: 34,
+        height: 34,
+        child: IconButton(
+          style: ButtonStyle(
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            backgroundColor:
+                MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+              return ctr.isFollowed.value
+                  ? colorScheme.primaryContainer.withOpacity(0.7)
+                  : colorScheme.outlineVariant.withOpacity(0.7);
+            }),
+          ),
+          onPressed:
+              isFollowed ? () => updateFollowStatus() : () => ctr.bangumiAdd(),
+          icon: Icon(
+            ctr.isFollowed.value
+                ? Icons.favorite
+                : Icons.favorite_border_rounded,
+            color: ctr.isFollowed.value
+                ? colorScheme.primary
+                : colorScheme.outline,
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget morePanel(BuildContext context, BangumiIntroController ctr) {
+    return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => Get.back(),
+            child: Container(
+              height: 35,
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outline,
+                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+                ),
+              ),
+            ),
+          ),
+          ...ctr.followStatusList
+              .map(
+                (e) => ListTile(
+                  onTap: () => ctr.updateBangumiStatus(e['status']),
+                  selected: ctr.followStatus == e['status'],
+                  title: Text(e['title']),
+                ),
+              )
+              .toList(),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
   }
 }

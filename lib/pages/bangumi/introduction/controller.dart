@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/bangumi.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/video.dart';
@@ -52,17 +53,27 @@ class BangumiIntroController extends GetxController {
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
   List delMediaIdsNew = [];
-  // 关注状态 默认未关注
-  RxMap followStatus = {}.obs;
+  // 追番状态  1想看 2在看 3已看
+  RxBool isFollowed = false.obs;
+  RxInt followStatus = 1.obs;
   int _tempThemeValue = -1;
   var userInfo;
   PersistentBottomSheetController? bottomSheetController;
+  List<Map<String, dynamic>> followStatusList = [
+    {'title': '标记为 「想看」', 'status': 1},
+    {'title': '标记为 「在看」', 'status': 2},
+    {'title': '标记为 「已看」', 'status': 3},
+    {'title': '取消追番', 'status': -1},
+  ];
 
   @override
   void onInit() {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin = userInfo != null;
+    if (userLogin && seasonId != null) {
+      bangumiStatus();
+    }
   }
 
   // 获取番剧简介&选集
@@ -239,15 +250,22 @@ class BangumiIntroController extends GetxController {
 
   // 追番
   Future bangumiAdd() async {
-    var result =
-        await VideoHttp.bangumiAdd(seasonId: bangumiDetail.value.seasonId);
+    var result = await VideoHttp.bangumiAdd(
+        seasonId: seasonId ?? bangumiDetail.value.seasonId);
+    if (result['status']) {
+      followStatus.value = 2;
+      isFollowed.value = true;
+    }
     SmartDialog.showToast(result['msg']);
   }
 
   // 取消追番
   Future bangumiDel() async {
-    var result =
-        await VideoHttp.bangumiDel(seasonId: bangumiDetail.value.seasonId);
+    var result = await VideoHttp.bangumiDel(
+        seasonId: seasonId ?? bangumiDetail.value.seasonId);
+    if (result['status']) {
+      isFollowed.value = false;
+    }
     SmartDialog.showToast(result['msg']);
   }
 
@@ -314,5 +332,36 @@ class BangumiIntroController extends GetxController {
 
   hiddenEpisodeBottomSheet() {
     bottomSheetController?.close();
+  }
+
+  // 获取追番状态
+  Future bangumiStatus() async {
+    var result = await BangumiHttp.bangumiStatus(seasonId: seasonId!);
+    if (result['status']) {
+      followStatus.value = result['data']['followStatus'];
+      isFollowed.value = result['data']['isFollowed'];
+    }
+    return result;
+  }
+
+  // 更新追番状态
+  Future updateBangumiStatus(int status) async {
+    Get.back();
+    if (status == -1) {
+      bangumiDel();
+    } else {
+      var result = await BangumiHttp.bangumiStatus(seasonId: seasonId!);
+      if (result['status']) {
+        followStatus.value = status;
+        final title = followStatusList.firstWhere(
+          (e) => e['status'] == status,
+          orElse: () => {'title': '未知状态'},
+        )['title'];
+        SmartDialog.showToast('追番状态$title');
+      } else {
+        SmartDialog.showToast(result['msg']);
+      }
+      return result;
+    }
   }
 }

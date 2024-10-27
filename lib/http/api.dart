@@ -604,4 +604,7 @@ class Api {
 
   /// 图片上传
   static const String uploadImage = '/x/dynamic/feed/draw/upload_bfs';
+
+  /// 更新追番状态
+  static const String updateBangumiStatus = '/pgc/web/follow/status/update';
 }

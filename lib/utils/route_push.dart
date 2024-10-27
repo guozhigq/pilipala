@@ -31,7 +31,7 @@ class RoutePush {
         };
         arguments['heroTag'] = heroTag ?? Utils.makeHeroTag(cid);
         Get.toNamed(
-          '/video?bvid=$bvid&cid=$cid&epId=$epId',
+          '/video?bvid=$bvid&cid=$cid&epId=$epId&seasonId=$seasonId',
           arguments: arguments,
         );
       } else {
