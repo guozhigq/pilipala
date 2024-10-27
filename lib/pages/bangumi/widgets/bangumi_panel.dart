@@ -175,59 +175,60 @@ class _BangumiPanelState extends State<BangumiPanel> {
               return Container(
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
-                child: Material(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: BorderRadius.circular(6),
-                  clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                    onTap: () => changeFucCall(page, i),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            children: [
-                              if (isSelected) ...<Widget>[
-                                Image.asset('assets/images/live.png',
-                                    color: primary, height: 12),
-                                const SizedBox(width: 6)
-                              ],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => changeFucCall(page, i),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            if (isSelected) ...<Widget>[
+                              Image.asset('assets/images/live.png',
+                                  color: primary, height: 12),
+                              const SizedBox(width: 6)
+                            ],
+                            Text(
+                              '第${i + 1}话',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isSelected ? primary : onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            if (page.badge != null) ...[
+                              const Spacer(),
                               Text(
-                                '第${i + 1}话',
+                                page.badge!,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  color: isSelected ? primary : onSurface,
+                                  fontSize: 12,
+                                  color: primary,
                                 ),
                               ),
-                              const SizedBox(width: 2),
-                              if (page.badge != null) ...[
-                                const Spacer(),
-                                Text(
-                                  page.badge!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: primary,
-                                  ),
-                                ),
-                              ]
-                            ],
+                            ]
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          page.longTitle!,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isSelected ? primary : onSurface,
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            page.longTitle!,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSelected ? primary : onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
                     ),
                   ),
                 ),

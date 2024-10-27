@@ -239,104 +239,65 @@ class _BangumiInfoState extends State<BangumiInfo> {
               Expanded(
                 child: InkWell(
                   onTap: () => showIntroDetail(),
+                  borderRadius: BorderRadius.circular(8),
                   child: SizedBox(
                     height: 115 / 0.75,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.bangumiDetail!.title!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            SizedBox(
-                              width: 34,
-                              height: 34,
-                              child: IconButton(
-                                style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.zero),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (Set<MaterialState> states) {
-                                    return t.colorScheme.primaryContainer
-                                        .withOpacity(0.7);
-                                  }),
-                                ),
-                                onPressed: () =>
-                                    bangumiIntroController.bangumiAdd(),
-                                icon: Icon(
-                                  Icons.favorite_border_rounded,
-                                  color: t.colorScheme.primary,
-                                  size: 22,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.bangumiDetail!.title!,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            StatView(
-                              view: widget.bangumiDetail!.stat!['views'],
-                              size: 'medium',
-                            ),
-                            const SizedBox(width: 6),
-                            StatDanMu(
-                              danmu: widget.bangumiDetail!.stat!['danmakus'],
-                              size: 'medium',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Text(
-                              (widget.bangumiDetail!.areas!.isNotEmpty
-                                  ? widget.bangumiDetail!.areas!.first['name']
-                                  : ''),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
+                              const SizedBox(width: 20),
+                              Obx(
+                                () => BangumiStatusWidget(
+                                  ctr: bangumiIntroController,
+                                  isFollowed:
+                                      bangumiIntroController.isFollowed.value,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              widget.bangumiDetail!.publish!['pub_time_show'],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.colorScheme.outline,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          widget.bangumiDetail!.newEp!['desc'],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: t.colorScheme.outline,
+                            ],
                           ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '简介：${widget.bangumiDetail!.evaluate!}',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: t.colorScheme.outline,
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              StatView(
+                                view: widget.bangumiDetail!.stat!['views'],
+                                size: 'medium',
+                              ),
+                              const SizedBox(width: 6),
+                              StatDanMu(
+                                danmu: widget.bangumiDetail!.stat!['danmakus'],
+                                size: 'medium',
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 10),
+                          Text(
+                            '简介：${widget.bangumiDetail!.evaluate!}',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: t.colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -424,5 +385,99 @@ class _BangumiInfoState extends State<BangumiInfo> {
         ),
       );
     });
+  }
+}
+
+// 追番状态
+class BangumiStatusWidget extends StatelessWidget {
+  final BangumiIntroController ctr;
+  final bool isFollowed;
+
+  const BangumiStatusWidget({
+    Key? key,
+    required this.ctr,
+    required this.isFollowed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    void updateFollowStatus() {
+      showModalBottomSheet(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        builder: (context) {
+          return morePanel(context, ctr);
+        },
+      );
+    }
+
+    return Obx(
+      () => SizedBox(
+        width: 34,
+        height: 34,
+        child: IconButton(
+          style: ButtonStyle(
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            backgroundColor:
+                MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+              return ctr.isFollowed.value
+                  ? colorScheme.primaryContainer.withOpacity(0.7)
+                  : colorScheme.outlineVariant.withOpacity(0.7);
+            }),
+          ),
+          onPressed:
+              isFollowed ? () => updateFollowStatus() : () => ctr.bangumiAdd(),
+          icon: Icon(
+            ctr.isFollowed.value
+                ? Icons.favorite
+                : Icons.favorite_border_rounded,
+            color: ctr.isFollowed.value
+                ? colorScheme.primary
+                : colorScheme.outline,
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget morePanel(BuildContext context, BangumiIntroController ctr) {
+    return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => Get.back(),
+            child: Container(
+              height: 35,
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 3,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outline,
+                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+                ),
+              ),
+            ),
+          ),
+          ...ctr.followStatusList
+              .map(
+                (e) => ListTile(
+                  onTap: () => ctr.updateBangumiStatus(e['status']),
+                  selected: ctr.followStatus == e['status'],
+                  title: Text(e['title']),
+                ),
+              )
+              .toList(),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
   }
 }
