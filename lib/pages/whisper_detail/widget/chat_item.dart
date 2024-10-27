@@ -153,6 +153,7 @@ class ChatItem extends StatelessWidget {
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
+            textAlign: TextAlign.center,
             style: TextStyle(
               letterSpacing: 0.6,
               height: 5,
@@ -359,39 +360,40 @@ class ChatItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Expanded(
-                            child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              i['field1'],
-                              maxLines: 2,
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context),
-                                fontWeight: FontWeight.bold,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                i['field1'],
+                                maxLines: 2,
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              i['field2'],
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context).withOpacity(0.6),
-                                fontSize: 12,
+                              Text(
+                                i['field2'],
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context).withOpacity(0.6),
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            Text(
-                              i['field3'],
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context).withOpacity(0.6),
-                                fontSize: 12,
+                              Text(
+                                i['field3'],
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context).withOpacity(0.6),
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
-                        )),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

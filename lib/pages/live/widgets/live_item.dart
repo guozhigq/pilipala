@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/models/live/follow.dart';
 import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/image_save.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -9,7 +11,7 @@ import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
-  final LiveItemModel liveItem;
+  final dynamic liveItem;
   final int crossAxisCount;
 
   const LiveCardV({
@@ -64,6 +66,9 @@ class LiveCardV extends StatelessWidget {
                           ),
                         ),
                       ),
+                    if (liveItem is LiveFollowingItemModel &&
+                        liveItem.liveStatus == 1)
+                      const PBadge(top: 8, right: 8, text: '直播中'),
                   ],
                 );
               }),
@@ -148,7 +153,7 @@ class LiveContent extends StatelessWidget {
 }
 
 class VideoStat extends StatelessWidget {
-  final LiveItemModel? liveItem;
+  final dynamic liveItem;
 
   const VideoStat({
     Key? key,
@@ -178,25 +183,20 @@ class VideoStat extends StatelessWidget {
             liveItem!.areaName!,
             style: const TextStyle(fontSize: 11, color: Colors.white),
           ),
-          Text(
-            liveItem!.watchedShow!['text_small'],
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          ),
+          if (liveItem is LiveItemModel) ...[
+            Text(
+              liveItem!.watchedShow?['text_small'],
+              style: const TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ],
+          if (liveItem is LiveFollowingItemModel) ...[
+            Text(
+              '${liveItem.textSmall}',
+              style: const TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ]
         ],
       ),
-
-      // child: RichText(
-      //   maxLines: 1,
-      //   textAlign: TextAlign.justify,
-      //   softWrap: false,
-      //   text: TextSpan(
-      //     style: const TextStyle(fontSize: 11, color: Colors.white),
-      //     children: [
-      //       TextSpan(text: liveItem!.areaName!),
-      //       TextSpan(text: liveItem!.watchedShow!['text_small']),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

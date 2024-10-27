@@ -96,7 +96,9 @@ class VideoContent extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              [22, 0].contains(favFolderItem.attr) ? '公开' : '私密',
+              Constants.publicFavFolder.contains(favFolderItem.attr)
+                  ? '公开'
+                  : '私密',
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

@@ -8,6 +8,7 @@ class MemberInfoModel {
     this.level,
     this.isFollowed,
     this.topPhoto,
+    this.silence,
     this.official,
     this.vip,
     this.liveRoom,
@@ -21,6 +22,7 @@ class MemberInfoModel {
   int? level;
   bool? isFollowed;
   String? topPhoto;
+  int? silence;
   Map? official;
   Vip? vip;
   LiveRoom? liveRoom;
@@ -34,6 +36,7 @@ class MemberInfoModel {
     level = json['level'];
     isFollowed = json['is_followed'];
     topPhoto = json['top_photo'];
+    silence = json['silence'] ?? 0;
     official = json['official'];
     vip = Vip.fromJson(json['vip']);
     liveRoom =

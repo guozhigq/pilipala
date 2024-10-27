@@ -470,8 +470,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     const Spacer(),
                     Obx(
                       () {
-                        final bool isFollowed =
-                            videoIntroController.followStatus['attribute'] != 0;
+                        final int attr =
+                            videoIntroController.followStatus['attribute'] ?? 0;
                         return videoIntroController.followStatus.isEmpty
                             ? const SizedBox()
                             : SizedBox(
@@ -484,15 +484,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                       left: 8,
                                       right: 8,
                                     ),
-                                    foregroundColor: isFollowed
+                                    foregroundColor: attr != 0
                                         ? outline
                                         : t.colorScheme.onPrimary,
-                                    backgroundColor: isFollowed
+                                    backgroundColor: attr != 0
                                         ? t.colorScheme.onInverseSurface
                                         : t.colorScheme.primary, // 设置按钮背景色
                                   ),
                                   child: Text(
-                                    isFollowed ? '已关注' : '关注',
+                                    attr == 128
+                                        ? '已拉黑'
+                                        : attr != 0
+                                            ? '已关注'
+                                            : '关注',
                                     style: TextStyle(
                                       fontSize:
                                           t.textTheme.labelMedium!.fontSize,

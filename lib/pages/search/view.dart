@@ -63,24 +63,35 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             focusNode: _searchController.searchFocusNode,
             controller: _searchController.controller.value,
             textInputAction: TextInputAction.search,
-            onChanged: (value) => _searchController.onChange(value),
+            onChanged: _searchController.onChange,
             decoration: InputDecoration(
               hintText: _searchController.hintText,
               border: InputBorder.none,
-              suffixIcon: StreamBuilder(
-                initialData: false,
-                stream: _searchController.clearStream.stream,
-                builder: (_, snapshot) {
-                  if (snapshot.data == true) {
-                    return IconButton(
+              suffix: Obx(() {
+                RxString searchKeyWord = _searchController.searchKeyWord;
+                if (searchKeyWord.value.isEmpty) {
+                  return const SizedBox();
+                }
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (RegExp(r'^\d+$').hasMatch(searchKeyWord.value))
+                      IconButton(
+                        tooltip: '直达up主页',
+                        icon: const Icon(Icons.person_outline, size: 22),
+                        onPressed: () {
+                          _searchController.cacheHistory();
+                          Get.toNamed('/member?mid=${searchKeyWord.value}',
+                              arguments: {'face': null});
+                        },
+                      ),
+                    IconButton(
                       icon: const Icon(Icons.clear, size: 22),
                       onPressed: () => _searchController.onClear(),
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
-                },
-              ),
+                    ),
+                  ],
+                );
+              }),
             ),
             onSubmitted: (String value) => _searchController.submit(),
           ),

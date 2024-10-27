@@ -45,7 +45,7 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
-  final bool? replySave;
+  final bool replySave;
 
   @override
   Widget build(BuildContext context) {
@@ -55,14 +55,14 @@ class ReplyItem extends StatelessWidget {
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
           replyReply?.call(replyItem, null, replyItem!.rcount! > 0);
         },
         onLongPress: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
@@ -235,53 +235,32 @@ class ReplyItem extends StatelessWidget {
         // title
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
-          child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints boxConstraints) {
-            String text = replyItem?.content?.message ?? '';
-            bool didExceedMaxLines = false;
-            final double maxWidth = boxConstraints.maxWidth;
-            TextPainter? textPainter;
-            final int maxLines =
-                replyItem!.content!.isText! && replyLevel == '1' ? 6 : 999;
-            try {
-              textPainter = TextPainter(
-                text: TextSpan(text: text),
-                maxLines: maxLines,
-                textDirection: Directionality.of(context),
-              );
-              textPainter.layout(maxWidth: maxWidth);
-              didExceedMaxLines = textPainter.didExceedMaxLines;
-            } catch (e) {
-              debugPrint('Error while measuring text: $e');
-              didExceedMaxLines = false;
-            }
-            return Text.rich(
-              style: const TextStyle(height: 1.75),
-              TextSpan(
-                children: [
-                  if (replyItem!.isTop!)
-                    const WidgetSpan(
-                      alignment: PlaceholderAlignment.top,
-                      child: PBadge(
-                        text: 'TOP',
-                        size: 'small',
-                        stack: 'normal',
-                        type: 'line',
-                        fs: 9,
-                      ),
-                    ),
-                  buildContent(
-                    context,
-                    replyItem!,
-                    replyReply,
-                    null,
-                    didExceedMaxLines,
-                    textPainter,
-                  ),
-                ],
-              ),
-            );
-          }),
+          child: !replySave
+              ? LayoutBuilder(builder:
+                  (BuildContext context, BoxConstraints boxConstraints) {
+                  String text = replyItem?.content?.message ?? '';
+                  bool didExceedMaxLines = false;
+                  final double maxWidth = boxConstraints.maxWidth;
+                  TextPainter? textPainter;
+                  final int maxLines =
+                      replyItem!.content!.isText! && replyLevel == '1'
+                          ? 6
+                          : 999;
+                  try {
+                    textPainter = TextPainter(
+                      text: TextSpan(text: text),
+                      maxLines: maxLines,
+                      textDirection: Directionality.of(context),
+                    );
+                    textPainter.layout(maxWidth: maxWidth);
+                    didExceedMaxLines = textPainter.didExceedMaxLines;
+                  } catch (e) {
+                    debugPrint('Error while measuring text: $e');
+                    didExceedMaxLines = false;
+                  }
+                  return replyContent(context, didExceedMaxLines, textPainter);
+                })
+              : replyContent(context, false, null),
         ),
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
@@ -299,6 +278,36 @@ class ReplyItem extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget replyContent(
+      BuildContext context, bool? didExceedMaxLines, TextPainter? textPainter) {
+    return Text.rich(
+      style: const TextStyle(height: 1.75),
+      TextSpan(
+        children: [
+          if (replyItem!.isTop!)
+            const WidgetSpan(
+              alignment: PlaceholderAlignment.top,
+              child: PBadge(
+                text: 'TOP',
+                size: 'small',
+                stack: 'normal',
+                type: 'line',
+                fs: 9,
+              ),
+            ),
+          buildContent(
+            context,
+            replyItem!,
+            replyReply,
+            null,
+            didExceedMaxLines ?? false,
+            textPainter,
+          ),
+        ],
+      ),
     );
   }
 
