@@ -30,6 +30,13 @@ typedef IndexedFocusedWidgetBuilder = Widget Function(
 
 typedef IndexedTagStringBuilder = String Function(int index);
 
+// 图片操作类型
+enum ImgActionType {
+  share,
+  copy,
+  save,
+}
+
 class InteractiveviewerGallery<T> extends StatefulWidget {
   const InteractiveviewerGallery({
     required this.sources,
@@ -39,6 +46,11 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
     this.minScale = 1.0,
     this.onPageChanged,
     this.onDismissed,
+    this.actionType = const [
+      ImgActionType.share,
+      ImgActionType.copy,
+      ImgActionType.save
+    ],
     Key? key,
   }) : super(key: key);
 
@@ -58,6 +70,8 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
   final ValueChanged<int>? onPageChanged;
 
   final ValueChanged<int>? onDismissed;
+
+  final List<ImgActionType> actionType;
 
   @override
   State<InteractiveviewerGallery> createState() =>
@@ -247,8 +261,8 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                 onDoubleTapDown: (TapDownDetails details) {
                   _doubleTapLocalPosition = details.localPosition;
                 },
-                onDoubleTap: onDoubleTap,
-                onLongPress: onLongPress,
+                onDoubleTap: _onDoubleTap,
+                onLongPress: _onLongPress,
                 child: widget.itemBuilder != null
                     ? widget.itemBuilder!(
                         context,
@@ -298,28 +312,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                     : const SizedBox(),
                 PopupMenuButton(
                   itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        value: 0,
-                        onTap: () => onShareImg(widget.sources[currentIndex!]),
-                        child: const Text("分享图片"),
-                      ),
-                      PopupMenuItem(
-                        value: 1,
-                        onTap: () {
-                          onCopyImg(widget.sources[currentIndex!].toString());
-                        },
-                        child: const Text("复制图片"),
-                      ),
-                      PopupMenuItem(
-                        value: 2,
-                        onTap: () {
-                          DownloadUtils.downloadImg(
-                              widget.sources[currentIndex!]);
-                        },
-                        child: const Text("保存图片"),
-                      ),
-                    ];
+                    return _buildPopupMenuList();
                   },
                   child: const Icon(Icons.more_horiz, color: Colors.white),
                 ),
@@ -332,7 +325,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
   }
 
   // 图片分享
-  void onShareImg(String imgUrl) async {
+  void _onShareImg(String imgUrl) async {
     SmartDialog.showLoading();
     var response = await Dio()
         .get(imgUrl, options: Options(responseType: ResponseType.bytes));
@@ -346,7 +339,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
   }
 
   // 复制图片
-  void onCopyImg(String imgUrl) {
+  void _onCopyImg(String imgUrl) {
     Clipboard.setData(
             ClipboardData(text: widget.sources[currentIndex!].toString()))
         .then((value) {
@@ -380,7 +373,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
     );
   }
 
-  onDoubleTap() {
+  _onDoubleTap() {
     Matrix4 matrix = _transformationController!.value.clone();
     double currentScale = matrix.row0.x;
 
@@ -427,7 +420,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
         .whenComplete(() => _onScaleChanged(targetScale));
   }
 
-  onLongPress() {
+  _onLongPress() {
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -456,31 +449,81 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                   ),
                 ),
               ),
-              ListTile(
-                onTap: () {
-                  onShareImg(widget.sources[currentIndex!]);
-                  Navigator.of(context).pop();
-                },
-                title: const Text('分享图片'),
-              ),
-              ListTile(
-                onTap: () {
-                  onCopyImg(widget.sources[currentIndex!].toString());
-                  Navigator.of(context).pop();
-                },
-                title: const Text('复制图片'),
-              ),
-              ListTile(
-                onTap: () {
-                  DownloadUtils.downloadImg(widget.sources[currentIndex!]);
-                  Navigator.of(context).pop();
-                },
-                title: const Text('保存图片'),
-              ),
+              ..._buildListTitles(),
             ],
           ),
         );
       },
     );
+  }
+
+  List<PopupMenuEntry> _buildPopupMenuList() {
+    List<PopupMenuItem> items = [];
+    for (var i in widget.actionType) {
+      switch (i) {
+        case ImgActionType.share:
+          items.add(PopupMenuItem(
+            value: 0,
+            onTap: () => _onShareImg(widget.sources[currentIndex!]),
+            child: const Text("分享图片"),
+          ));
+          break;
+        case ImgActionType.copy:
+          items.add(PopupMenuItem(
+            value: 1,
+            onTap: () {
+              _onCopyImg(widget.sources[currentIndex!].toString());
+            },
+            child: const Text("复制图片"),
+          ));
+          break;
+        case ImgActionType.save:
+          items.add(PopupMenuItem(
+            value: 2,
+            onTap: () {
+              DownloadUtils.downloadImg(widget.sources[currentIndex!]);
+            },
+            child: const Text("保存图片"),
+          ));
+          break;
+      }
+    }
+    return items;
+  }
+
+  List<Widget> _buildListTitles() {
+    List<Widget> items = [];
+    for (var i in widget.actionType) {
+      switch (i) {
+        case ImgActionType.share:
+          items.add(ListTile(
+            onTap: () {
+              _onShareImg(widget.sources[currentIndex!]);
+              Navigator.of(context).pop();
+            },
+            title: const Text('分享图片'),
+          ));
+          break;
+        case ImgActionType.copy:
+          items.add(ListTile(
+            onTap: () {
+              _onCopyImg(widget.sources[currentIndex!].toString());
+              Navigator.of(context).pop();
+            },
+            title: const Text('复制图片'),
+          ));
+          break;
+        case ImgActionType.save:
+          items.add(ListTile(
+            onTap: () {
+              DownloadUtils.downloadImg(widget.sources[currentIndex!]);
+              Navigator.of(context).pop();
+            },
+            title: const Text('保存图片'),
+          ));
+          break;
+      }
+    }
+    return items;
   }
 }
