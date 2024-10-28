@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/skeleton.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'controller.dart';
@@ -126,7 +127,7 @@ class _WhisperPageState extends State<WhisperPage> {
                       RxList sessionList = _whisperController.sessionList;
                       return Obx(
                         () => sessionList.isEmpty
-                            ? const SizedBox()
+                            ? const CustomScrollView(slivers: [NoData()])
                             : ListView.separated(
                                 itemCount: sessionList.length,
                                 shrinkWrap: true,
