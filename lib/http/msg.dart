@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
 import 'package:pilipala/models/msg/system.dart';
@@ -63,7 +64,7 @@ class MsgHttp {
               .toList(),
         };
       } catch (err) {
-        print('err🔟: $err');
+        debugPrint('err: $err');
       }
     } else {
       return {
