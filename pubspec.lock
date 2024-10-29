@@ -1434,14 +1434,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.1.3"
-  scrollable_positioned_list:
+  scrollview_observer:
     dependency: "direct main"
     description:
-      name: scrollable_positioned_list
-      sha256: "1b54d5f1329a1e263269abc9e2543d90806131aa14fe7c6062a8054d57249287"
+      name: scrollview_observer
+      sha256: fa408bcfd41e19da841eb53fc471f8f952d5ef818b854d2505c4bb3f0c876381
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.8"
+    version: "1.22.0"
   sentry:
     dependency: transitive
     description:

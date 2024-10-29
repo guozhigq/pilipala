@@ -5,7 +5,7 @@ import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/utils/utils.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:scrollview_observer/scrollview_observer.dart';
 import '../models/common/video_episode_type.dart';
 import 'widgets/badge.dart';
 import 'widgets/stat/danmu.dart';
@@ -83,7 +83,8 @@ class PagesBottomSheet extends StatefulWidget {
 }
 
 class _PagesBottomSheetState extends State<PagesBottomSheet> {
-  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ScrollController _listScrollController = ScrollController();
+  late ListObserverController _listObserverController;
   final ScrollController _scrollController = ScrollController();
   late int currentIndex;
 
@@ -92,10 +93,17 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
     super.initState();
     currentIndex =
         widget.episodes.indexWhere((dynamic e) => e.cid == widget.currentCid);
+    _listObserverController =
+        ListObserverController(controller: _listScrollController);
+    if (widget.dataType == VideoEpidoesType.videoEpisode) {
+      _listObserverController.initialIndexModel = ObserverIndexPositionModel(
+        index: currentIndex,
+        isFixedHeight: true,
+      );
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.dataType == VideoEpidoesType.videoEpisode) {
-        _itemScrollController.jumpTo(index: currentIndex);
-      } else {
+      if (widget.dataType != VideoEpidoesType.videoEpisode) {
         double itemHeight = (widget.isFullScreen
                 ? 400
                 : Get.size.width - 3 * StyleString.safeSpace) /
@@ -119,6 +127,12 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
   }
 
   @override
+  void dispose() {
+    _listObserverController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -136,27 +150,30 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
             Expanded(
               child: Material(
                 child: widget.dataType == VideoEpidoesType.videoEpisode
-                    ? ScrollablePositionedList.builder(
-                        itemScrollController: _itemScrollController,
-                        itemCount: widget.episodes.length + 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          bool isLastItem = index == widget.episodes.length;
-                          bool isCurrentIndex = currentIndex == index;
-                          return isLastItem
-                              ? SizedBox(
-                                  height:
-                                      MediaQuery.of(context).padding.bottom +
-                                          20,
-                                )
-                              : EpisodeListItem(
-                                  episode: widget.episodes[index],
-                                  index: index,
-                                  isCurrentIndex: isCurrentIndex,
-                                  dataType: widget.dataType,
-                                  changeFucCall: widget.changeFucCall,
-                                  isFullScreen: widget.isFullScreen,
-                                );
-                        },
+                    ? ListViewObserver(
+                        controller: _listObserverController,
+                        child: ListView.builder(
+                          controller: _listScrollController,
+                          itemCount: widget.episodes.length + 1,
+                          itemBuilder: (BuildContext context, int index) {
+                            bool isLastItem = index == widget.episodes.length;
+                            bool isCurrentIndex = currentIndex == index;
+                            return isLastItem
+                                ? SizedBox(
+                                    height:
+                                        MediaQuery.of(context).padding.bottom +
+                                            20,
+                                  )
+                                : EpisodeListItem(
+                                    episode: widget.episodes[index],
+                                    index: index,
+                                    isCurrentIndex: isCurrentIndex,
+                                    dataType: widget.dataType,
+                                    changeFucCall: widget.changeFucCall,
+                                    isFullScreen: widget.isFullScreen,
+                                  );
+                          },
+                        ),
                       )
                     : Padding(
                         padding: const EdgeInsets.symmetric(

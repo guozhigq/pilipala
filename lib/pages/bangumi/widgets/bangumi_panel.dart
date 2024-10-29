@@ -7,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../common/pages_bottom_sheet.dart';
 import '../../../models/common/video_episode_type.dart';
 import '../introduction/controller.dart';
@@ -44,7 +43,6 @@ class _BangumiPanelState extends State<BangumiPanel> {
   late int cid;
   String heroTag = Get.arguments['heroTag'];
   late final VideoDetailController videoDetailCtr;
-  final ItemScrollController itemScrollController = ItemScrollController();
   late PersistentBottomSheetController? _bottomSheetController;
 
   @override
