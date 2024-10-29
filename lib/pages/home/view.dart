@@ -395,14 +395,17 @@ class SearchBar extends StatelessWidget {
                     color: colorScheme.onSecondaryContainer,
                   ),
                   const SizedBox(width: 10),
-                  Obx(
-                    () => Text(
-                      ctr!.defaultSearch.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: colorScheme.outline),
+                  Expanded(
+                    child: Obx(
+                      () => Text(
+                        ctr!.defaultSearch.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: colorScheme.outline),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 10),
                 ],
               ),
             ),
