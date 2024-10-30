@@ -73,7 +73,7 @@ class ReplyCursor {
     isEnd = json['is_end'];
     mode = json['mode'];
     modeText = json['mode_text'];
-    allCount = json['all_count'];
+    allCount = json['all_count'] ?? 0;
     supportMode = json['support_mode'].cast<int>();
     name = json['name'];
     paginationReply = json['pagination_reply'] != null

@@ -80,16 +80,21 @@ class _SubDetailPageState extends State<SubDetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _subDetailController.item.title!,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          SizedBox(
+                            width: Get.size.width - 100,
+                            child: Text(
+                              _subDetailController.item.title!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                           Text(
                             '共${_subDetailController.item.mediaCount!}条视频',
                             style: Theme.of(context).textTheme.labelMedium,
                           )
                         ],
-                      )
+                      ),
                     ],
                   ),
                 );

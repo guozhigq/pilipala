@@ -39,7 +39,7 @@ class Total {
   List<MessageLikeItem>? items;
 
   factory Total.fromJson(Map<String, dynamic> json) => Total(
-        cursor: Cursor.fromJson(json['cursor']),
+        cursor: json['cursor'] != null ? Cursor.fromJson(json['cursor']) : null,
         items: json["items"] == null
             ? []
             : json["items"].map<MessageLikeItem>((e) {

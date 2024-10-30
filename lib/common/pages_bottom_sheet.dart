@@ -430,7 +430,7 @@ class EpisodeGridItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: isCurrentIndex
                 ? colorScheme.primaryContainer.withOpacity(0.6)
-                : colorScheme.secondaryContainer.withOpacity(0.4),
+                : colorScheme.onInverseSurface.withOpacity(0.6),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isCurrentIndex
