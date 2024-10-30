@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 class MemberDynamicsController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -10,11 +11,17 @@ class MemberDynamicsController extends GetxController {
   int count = 0;
   bool hasMore = true;
   RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
+    ownerMid = GlobalDataCache().userInfo != null
+        ? GlobalDataCache().userInfo!.mid!
+        : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
   Future getMemberDynamic(type) async {
