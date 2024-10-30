@@ -11,7 +11,7 @@ class VideoReplyReplyController extends GetxController {
   int? aid;
   // rpid 请求楼中楼回复
   String? rpid;
-  ReplyType replyType = ReplyType.video;
+  ReplyType? replyType;
   bool showRoot = false;
   ReplyItemModel? rootReply;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
@@ -40,7 +40,7 @@ class VideoReplyReplyController extends GetxController {
       oid: aid!,
       root: rpid!,
       pageNum: currentPage + 1,
-      type: replyType.index,
+      type: (replyType ?? ReplyType.video).index,
     );
     if (res['status']) {
       final List<ReplyItemModel> replies = res['data'].replies;
