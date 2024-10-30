@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../utils/index.dart';
@@ -57,34 +58,34 @@ class _MessageLikePageState extends State<MessageLikePage> {
           future: _futureBuilderFuture,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.data == null) {
-                return const SizedBox();
-              }
-              if (snapshot.data['status']) {
+              Map? data = snapshot.data;
+              if (data != null && data['status']) {
                 final likeItems = _messageLikeCtr.likeItems;
                 return Obx(
-                  () => ListView.separated(
-                    controller: scrollController,
-                    itemBuilder: (context, index) => LikeItem(
-                      item: likeItems[index],
-                      index: index,
-                      messageLikeCtr: _messageLikeCtr,
-                    ),
-                    itemCount: likeItems.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
-                        indent: 66,
-                        endIndent: 14,
-                        height: 1,
-                        color: Colors.grey.withOpacity(0.1),
-                      );
-                    },
-                  ),
+                  () => likeItems.isEmpty
+                      ? const CustomScrollView(slivers: [NoData()])
+                      : ListView.separated(
+                          controller: scrollController,
+                          itemBuilder: (context, index) => LikeItem(
+                            item: likeItems[index],
+                            index: index,
+                            messageLikeCtr: _messageLikeCtr,
+                          ),
+                          itemCount: likeItems.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return Divider(
+                              indent: 66,
+                              endIndent: 14,
+                              height: 1,
+                              color: Colors.grey.withOpacity(0.1),
+                            );
+                          },
+                        ),
                 );
               } else {
                 // 请求错误
                 return HttpError(
-                  errMsg: snapshot.data['msg'],
+                  errMsg: data?['msg'] ?? '请求异常',
                   fn: () {
                     setState(() {
                       _futureBuilderFuture = _messageLikeCtr.queryMessageLike();

@@ -20,7 +20,7 @@ class MemberArticleController extends GetxController {
   }
 
   Future getMemberArticle(type) async {
-    if (isLoading.value) {
+    if (isLoading.value || !hasMore) {
       return;
     }
     isLoading.value = true;
