@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/archive.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 class MemberArchiveController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -17,12 +18,18 @@ class MemberArchiveController extends GetxController {
   ].obs;
   RxList<VListItemModel> archivesList = <VListItemModel>[].obs;
   RxBool isLoading = false.obs;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
     currentOrder.value = orderList.first;
+    ownerMid = GlobalDataCache().userInfo != null
+        ? GlobalDataCache().userInfo!.mid!
+        : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
   // 获取用户投稿

@@ -18,7 +18,11 @@ class MessageLikeController extends GetxController {
         id: params['id'], likeTime: params['likeTime']);
     if (res['status']) {
       cursor = res['data'].total.cursor;
-      likeItems.addAll(res['data'].total.items);
+      if (type == 'init') {
+        likeItems.value = res['data'].total.items;
+      } else {
+        likeItems.addAll(res['data'].total.items);
+      }
     }
     return res;
   }

@@ -13,13 +13,20 @@ class MessageUtils {
       BuildContext context, Uri uri, Uri nativeUri, String type) async {
     final String path = uri.path;
     final String bvid = path.split('/').last;
+    String? sourceType;
     final String nativePath = nativeUri.path;
-    final String oid = nativePath.split('/').last;
+    String oid = nativePath.split('/').last;
     final Map<String, String> queryParameters = nativeUri.queryParameters;
     final String? argCid = queryParameters['cid'];
     // final String? page = queryParameters['page'];
-    final String? commentRootId = queryParameters['comment_root_id'];
+    String? commentRootId = queryParameters['comment_root_id'];
     // final String? commentSecondaryId = queryParameters['comment_secondary_id'];
+    if (nativePath.contains('detail')) {
+      // 动态详情
+      sourceType = 'opus';
+      oid = nativePath.split('/')[3];
+      commentRootId = nativePath.split('/')[4];
+    }
     switch (type) {
       case 'video':
       case 'danmu':
@@ -42,7 +49,12 @@ class MessageUtils {
       case 'reply':
         debugPrint('commentRootId: $oid, $commentRootId');
         navigateToComment(
-            context, oid, commentRootId!, ReplyType.video, nativeUri);
+          context,
+          oid,
+          commentRootId!,
+          sourceType == 'opus' ? ReplyType.dynamics : ReplyType.video,
+          nativeUri,
+        );
         break;
       default:
         break;

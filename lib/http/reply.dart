@@ -136,13 +136,13 @@ class ReplyHttp {
   }
 
   // 图片上传
-  static Future uploadImage({required XFile xFile, String type = 'im'}) async {
+  static Future uploadImage(
+      {required XFile xFile, String type = 'new_dyn'}) async {
     var formData = FormData.fromMap({
       'file_up': await xFileToMultipartFile(xFile),
       'biz': type,
       'csrf': await Request.getCsrf(),
-      'build': 0,
-      'mobi_app': 'web',
+      'category': 'daily',
     });
     var res = await Request().post(
       Api.uploadImage,
