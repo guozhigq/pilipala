@@ -183,8 +183,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                setState(() {});
-                _videoReplyReplyController.currentPage = 0;
+                _videoReplyReplyController.currentPage = 1;
                 return await _videoReplyReplyController.queryReplyList(
                   currentReply: widget.currentReply,
                 );
