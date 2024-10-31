@@ -212,9 +212,9 @@ class PiliSchame {
     }
   }
 
-  static Future<void> biliScheme(Uri value) async {
-    final String host = value.host;
-    final String path = value.path;
+  static Future<void> biliScheme(SchemeEntity value) async {
+    final String host = value.host!;
+    final String path = value.path!;
     switch (host) {
       case 'root':
         Navigator.popUntil(
