@@ -50,7 +50,12 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: const Text('Ta的图文', style: TextStyle(fontSize: 16)),
+        title: Obx(
+          () => Text(
+            '${_memberArticleController.isOwner.value ? '我' : 'Ta'}的图文',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,

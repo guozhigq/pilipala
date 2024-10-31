@@ -606,4 +606,7 @@ class Api {
 
   /// 番剧点赞投币收藏状态
   static const String bangumiActionStatus = '/pgc/season/episode/community';
+
+  /// @我的
+  static const String messageAtAPi = '/x/msgfeed/at?';
 }

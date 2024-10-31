@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/article.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 class MemberArticleController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -12,11 +13,17 @@ class MemberArticleController extends GetxController {
   bool hasMore = true;
   RxBool isLoading = false.obs;
   RxList<MemberArticleItemModel> articleList = <MemberArticleItemModel>[].obs;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
+    ownerMid = GlobalDataCache().userInfo != null
+        ? GlobalDataCache().userInfo!.mid!
+        : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
   Future getMemberArticle(type) async {

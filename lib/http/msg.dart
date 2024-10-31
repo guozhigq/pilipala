@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pilipala/models/msg/at.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
 import 'package:pilipala/models/msg/system.dart';
@@ -348,6 +349,26 @@ class MsgHttp {
       }
     } else {
       return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // @我的
+  static Future messageAt() async {
+    var res = await Request().get(Api.messageAtAPi, data: {
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageAtModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {'status': false, 'data': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }
