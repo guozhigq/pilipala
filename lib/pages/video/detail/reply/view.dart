@@ -312,13 +312,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                               );
                             },
                           ).then(
-                            (value) => {
+                            (value) {
                               // 完成评论，数据添加
-                              if (value != null && value['data'] != null)
-                                {
-                                  _videoReplyController.replyList
-                                      .add(value['data'])
-                                }
+                              if (value != null && value['data'] != null) {
+                                _videoReplyController.replyList
+                                    .add(value['data']);
+                                _videoReplyController.replyList.refresh();
+                              }
                             },
                           );
                         },
