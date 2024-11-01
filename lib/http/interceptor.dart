@@ -3,6 +3,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:pilipala/utils/login.dart';
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -18,6 +19,9 @@ class ApiInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     try {
       // 在响应之后处理数据
+      if (response.data['code'] == -101) {
+        LoginUtils.loginOut();
+      }
     } catch (err) {
       print('ApiInterceptor: $err');
     }
