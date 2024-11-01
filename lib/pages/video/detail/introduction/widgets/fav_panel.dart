@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/logic_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
@@ -67,14 +67,13 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: Icon(
-                                Constants.publicFavFolder.contains(item.attr)
-                                    ? Icons.folder_outlined
-                                    : Icons.lock_outline),
+                            leading: Icon(LogicUtils.isPublic(item.attr)
+                                ? Icons.folder_outlined
+                                : Icons.lock_outline),
                             minLeadingWidth: 0,
                             title: Text(item.title!),
                             subtitle: Text(
-                              '${item.mediaCount}个内容 - ${Constants.publicFavFolder.contains(item.attr) ? '公开' : '私密'}',
+                              '${item.mediaCount}个内容 - ${LogicUtils.isPublic(item.attr) ? '公开' : '私密'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
