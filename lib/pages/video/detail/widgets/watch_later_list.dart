@@ -19,8 +19,9 @@ class MediaListPanel extends StatefulWidget {
     this.changeMediaList,
     this.panelTitle,
     this.bvid,
-    this.mediaId,
+    required this.mediaId,
     this.hasMore = false,
+    required this.type,
     super.key,
   });
 
@@ -29,8 +30,9 @@ class MediaListPanel extends StatefulWidget {
   final Function? changeMediaList;
   final String? panelTitle;
   final String? bvid;
-  final int? mediaId;
+  final int mediaId;
   final bool hasMore;
+  final int type;
 
   @override
   State<MediaListPanel> createState() => _MediaListPanelState();
@@ -59,8 +61,8 @@ class _MediaListPanelState extends State<MediaListPanel> {
 
   void loadMore() async {
     var res = await UserHttp.getMediaList(
-      type: 3,
-      bizId: widget.mediaId!,
+      type: widget.type,
+      bizId: widget.mediaId,
       ps: 20,
       oid: mediaList.last.id,
     );

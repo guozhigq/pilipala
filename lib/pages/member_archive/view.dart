@@ -135,6 +135,15 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
           ),
         ],
       ),
+      floatingActionButton: Obx(
+        () => _memberArchivesController.count > 0
+            ? FloatingActionButton.extended(
+                onPressed: _memberArchivesController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
+      ),
     );
   }
 }
