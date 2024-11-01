@@ -137,7 +137,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        return await _videoReplyController.queryReplyList(type: 'init');
+        return await _videoReplyController.onRefresh();
       },
       child: Stack(
         children: [

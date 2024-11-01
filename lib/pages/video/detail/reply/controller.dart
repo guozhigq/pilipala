@@ -34,6 +34,7 @@ class VideoReplyController extends GetxController {
 
   Box setting = GStrorage.setting;
   RxInt replyReqCode = 200.obs;
+  bool isEnd = false;
 
   @override
   void onInit() {
@@ -49,18 +50,14 @@ class VideoReplyController extends GetxController {
     sortTypeLabel.value = _sortType.labels;
   }
 
-  Future queryReplyList({type = 'init'}) async {
-    if (isLoadingMore) {
+  Future<dynamic> queryReplyList({type = 'init'}) async {
+    if (isLoadingMore || noMore.value == '没有更多了' || isEnd) {
       return;
     }
     isLoadingMore = true;
     if (type == 'init') {
       nextOffset = '';
       noMore.value = '';
-    }
-    if (noMore.value == '没有更多了') {
-      isLoadingMore = false;
-      return;
     }
     final res = await ReplyHttp.replyList(
       oid: aid!,
@@ -70,14 +67,13 @@ class VideoReplyController extends GetxController {
     );
     if (res['status']) {
       final List<ReplyItemModel> replies = res['data'].replies;
+      isEnd = res['data'].cursor.isEnd ?? false;
       nextOffset = res['data'].cursor.paginationReply.nextOffset ?? "";
       if (replies.isNotEmpty) {
-        noMore.value = '加载中...';
-        if (res['data'].cursor.isEnd == true) {
-          noMore.value = '没有更多了';
-        }
+        noMore.value = isEnd ? '没有更多了' : '加载中...';
       } else {
-        noMore.value = nextOffset == "" ? '还没有评论' : '没有更多了';
+        noMore.value =
+            replyList.isEmpty && nextOffset == "" ? '还没有评论' : '没有更多了';
       }
       if (type == 'init') {
         // 添加置顶回复
@@ -105,6 +101,14 @@ class VideoReplyController extends GetxController {
     queryReplyList(type: 'onLoad');
   }
 
+  // 下拉刷新
+  Future onRefresh() async {
+    nextOffset = "";
+    noMore.value = '';
+    isEnd = false;
+    queryReplyList(type: 'init');
+  }
+
   // 排序搜索评论
   queryBySort() {
     EasyThrottle.throttle('queryBySort', const Duration(seconds: 1), () {
@@ -118,6 +122,8 @@ class VideoReplyController extends GetxController {
           break;
         default:
       }
+      isLoadingMore = false;
+      isEnd = false;
       sortTypeTitle.value = _sortType.titles;
       sortTypeLabel.value = _sortType.labels;
       nextOffset = "";
