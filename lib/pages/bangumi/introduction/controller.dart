@@ -24,7 +24,7 @@ class BangumiIntroController extends GetxController {
   // 视频bvid
   String bvid = Get.parameters['bvid']!;
   var seasonId = Get.parameters['seasonId'] != null
-      ? int.parse(Get.parameters['seasonId']!)
+      ? int.tryParse(Get.parameters['seasonId']!)
       : null;
   var epId = Get.parameters['epId'] != null
       ? int.tryParse(Get.parameters['epId']!)
@@ -69,6 +69,7 @@ class BangumiIntroController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('bangumi: ${Get.parameters.toString()}');
     userInfo = userInfoCache.get('userInfoCache');
     userLogin = userInfo != null;
     if (userLogin && seasonId != null) {
