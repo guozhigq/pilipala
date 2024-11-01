@@ -357,8 +357,8 @@ class VideoHttp {
       'plat': 1,
       'oid': oid,
       'type': type.index,
-      // 'root': root == null || root == 0 ? '' : root,
-      // 'parent': parent == null || parent == 0 ? '' : parent,
+      'root': root == null || root == 0 ? '' : root,
+      'parent': parent == null || parent == 0 ? '' : parent,
       'message': message,
       'at_name_to_mid': {},
       if (pictures != null) 'pictures': jsonEncode(pictures),
@@ -377,8 +377,8 @@ class VideoHttp {
       },
       data: formData,
     );
-    log(res.toString());
     if (res.data['code'] == 0) {
+      log(res.toString());
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
