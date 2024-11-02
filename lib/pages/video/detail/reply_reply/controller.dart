@@ -16,7 +16,7 @@ class VideoReplyReplyController extends GetxController {
   ReplyItemModel? rootReply;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
   // 当前页
-  int currentPage = 0;
+  int currentPage = 1;
   bool isLoadingMore = false;
   RxString noMore = ''.obs;
   // 当前回复的回复
@@ -25,12 +25,12 @@ class VideoReplyReplyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    currentPage = 0;
+    currentPage = 1;
   }
 
   Future queryReplyList({type = 'init', currentReply}) async {
     if (type == 'init') {
-      currentPage = 0;
+      currentPage = 1;
     }
     if (isLoadingMore) {
       return;
@@ -39,7 +39,7 @@ class VideoReplyReplyController extends GetxController {
     final res = await ReplyHttp.replyReplyList(
       oid: aid!,
       root: rpid!,
-      pageNum: currentPage + 1,
+      pageNum: currentPage,
       type: (replyType ?? ReplyType.video).index,
     );
     if (res['status']) {
@@ -50,12 +50,12 @@ class VideoReplyReplyController extends GetxController {
         if (replies.length == res['data'].page.count) {
           noMore.value = '没有更多了';
         }
-        currentPage++;
+        // currentPage++;
       } else {
         // 未登录状态replies可能返回null
-        noMore.value = currentPage == 0 ? '还没有评论' : '没有更多了';
+        noMore.value = currentPage == 1 ? '还没有评论' : '没有更多了';
       }
-      if (type == 'init') {
+      if (type == 'init' && currentPage == 1) {
         replyList.value = replies;
       } else {
         // 每次回复之后，翻页请求有且只有相同的一条回复数据
@@ -79,6 +79,7 @@ class VideoReplyReplyController extends GetxController {
         replyList.insert(0, currentReply);
       }
     }
+    currentPage += 1;
     isLoadingMore = false;
     return res;
   }
