@@ -137,7 +137,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     autoEnterPip(status: status);
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
-      if (autoExitFullcreen) {
+      if (autoExitFullcreen && plPlayerController!.isFullScreen.value) {
         plPlayerController!.triggerFullScreen(status: false);
       }
       shutdownTimerService.handleWaitingFinished();
