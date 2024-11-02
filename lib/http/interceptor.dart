@@ -19,7 +19,7 @@ class ApiInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     try {
       // 在响应之后处理数据
-      if (response.data['code'] == -101) {
+      if (response.data is Map && response.data['code'] == -101) {
         LoginUtils.loginOut();
       }
     } catch (err) {
