@@ -97,6 +97,8 @@ class VideoHttp {
       for (var i in res.data['data']['items']) {
         // 屏蔽推广和拉黑用户
         if (i['card_goto'] != 'ad_av' &&
+            i['card_goto'] != 'ad_web_s' &&
+            i['card_goto'] != 'ad_web' &&
             (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
             (i['args'] != null &&
                 !blackMidsList.contains(i['args']['up_mid']))) {

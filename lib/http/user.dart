@@ -516,4 +516,34 @@ class UserHttp {
       };
     }
   }
+
+  // 解析up投稿
+  static Future parseUpArchiveVideo({
+    required int mid,
+    required int oid,
+    required String bvid,
+    String sortField = 'pubtime',
+  }) async {
+    var res = await Request().get(
+      'https://www.bilibili.com/list/$mid',
+      data: {
+        'oid': oid,
+        'bvid': bvid,
+        'sort_field': sortField,
+      },
+    );
+    String scriptContent =
+        extractScriptContents(parse(res.data).body!.outerHtml)[0];
+    int startIndex = scriptContent.indexOf('{');
+    int endIndex = scriptContent.lastIndexOf('};');
+    String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
+    // 解析JSON字符串为Map
+    Map<String, dynamic> jsonData = json.decode(jsonContent);
+    return {
+      'status': true,
+      'data': jsonData['resourceList']
+          .map<MediaVideoItemModel>((e) => MediaVideoItemModel.fromJson(e))
+          .toList()
+    };
+  }
 }
