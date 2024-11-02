@@ -101,7 +101,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    fullScreenStatusListener();
+    if (autoPlayEnable) {
+      fullScreenStatusListener();
+    }
     if (Platform.isAndroid) {
       floating = vdCtr.floating!;
     }
@@ -184,6 +186,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     await vdCtr.playerInit(autoplay: true);
     plPlayerController = vdCtr.plPlayerController;
     plPlayerController!.addStatusLister(playerListener);
+    fullScreenStatusListener();
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
     isShowing.value = true;
