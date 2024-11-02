@@ -10,6 +10,7 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/video/ai.dart';
+import 'package:pilipala/models/video/tags.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
@@ -52,6 +53,7 @@ class VideoIntroController extends GetxController {
 
   RxInt lastPlayCid = 0.obs;
   var userInfo;
+  RxList<VideoTagItem> videoTags = <VideoTagItem>[].obs;
 
   // 同时观看
   bool isShowOnlineTotal = false;
@@ -81,6 +83,7 @@ class VideoIntroController extends GetxController {
     }
     enableRelatedVideo =
         setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
+    queryVideoTag();
   }
 
   // 获取视频简介&分p
@@ -677,5 +680,13 @@ class VideoIntroController extends GetxController {
         );
       },
     );
+  }
+
+  // 获取视频标签
+  void queryVideoTag() async {
+    var result = await VideoHttp.getVideoTag(bvid: bvid);
+    if (result['status']) {
+      videoTags.value = result['data'];
+    }
   }
 }

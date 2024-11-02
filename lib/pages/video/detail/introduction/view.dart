@@ -387,7 +387,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ExpandablePanel(
             controller: _expandableCtr,
             collapsed: const SizedBox(height: 0),
-            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            expanded: IntroDetail(
+              videoDetail: widget.videoDetail!,
+              videoTags: videoIntroController.videoTags,
+            ),
             theme: const ExpandableThemeData(
               animationDuration: Duration(milliseconds: 300),
               scrollAnimationDuration: Duration(milliseconds: 300),

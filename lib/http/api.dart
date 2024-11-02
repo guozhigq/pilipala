@@ -609,4 +609,7 @@ class Api {
 
   /// @我的
   static const String messageAtAPi = '/x/msgfeed/at?';
+
+  /// 视频标签
+  static const String videoTag = '/x/tag/archive/tags';
 }

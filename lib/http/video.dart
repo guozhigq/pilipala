@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/video/tags.dart';
 import '../common/constants.dart';
 import '../models/common/reply_type.dart';
 import '../models/home/rcmd/result.dart';
@@ -558,5 +559,20 @@ class VideoHttp {
         await SubTitleUtils.convertToWebVTT(res.data['body']);
     final List body = res.data['body'];
     return {'content': content, 'body': body};
+  }
+
+  // 获取视频标签
+  static Future getVideoTag({required String bvid}) async {
+    var res = await Request().get(Api.videoTag, data: {'bvid': bvid});
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'].map<VideoTagItem>((e) {
+          return VideoTagItem.fromJson(e);
+        }).toList()
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
   }
 }
