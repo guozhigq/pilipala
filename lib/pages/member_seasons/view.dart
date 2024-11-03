@@ -23,9 +23,7 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
   void initState() {
     super.initState();
     category = Get.parameters['category']!;
-    _futureBuilderFuture = category == '0'
-        ? _memberSeasonsController.getSeasonDetail('onRefresh')
-        : _memberSeasonsController.getSeriesDetail('onRefresh');
+    _futureBuilderFuture = _memberSeasonsController.onRefresh();
     scrollController = _memberSeasonsController.scrollController;
     scrollController.addListener(
       () {
