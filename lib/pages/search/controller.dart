@@ -18,7 +18,7 @@ class SSearchController extends GetxController {
   RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
-  late bool customSearchHint;
+  bool customSearchHint = false;
   String hintText = '搜索';
   RxString defaultSearch = ''.obs;
   Box setting = GStrorage.setting;
