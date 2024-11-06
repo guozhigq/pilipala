@@ -1033,6 +1033,8 @@ class PlPlayerController {
         if (progress >= content['from']! && progress <= content['to']!) {
           subtitleContent.value = content['content']!;
           return;
+        } else {
+          subtitleContent.value = '';
         }
       }
     }

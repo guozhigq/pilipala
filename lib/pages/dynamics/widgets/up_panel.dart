@@ -4,18 +4,22 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/utils.dart';
 
+import '../controller.dart';
+import '../up_dynamic/route_panel.dart';
+
 class UpPanel extends StatefulWidget {
   final FollowUpModel upData;
-  final Function? onClickUpCb;
+  final DynamicsController dynamicsController;
 
   const UpPanel({
     super.key,
     required this.upData,
-    this.onClickUpCb,
+    required this.dynamicsController,
   });
 
   @override
@@ -39,7 +43,15 @@ class _UpPanelState extends State<UpPanel> {
 
   void onClickUp(data, i) {
     currentMid.value = data.mid;
-    widget.onClickUpCb?.call(data);
+    Navigator.push(
+      context,
+      PlPopupRoute(
+        child: OverlayPanel(
+          ctr: widget.dynamicsController,
+          upInfo: data,
+        ),
+      ),
+    ).then((value) => {currentMid.value = -1});
   }
 
   void onClickUpAni(data, i) {
@@ -49,7 +61,7 @@ class _UpPanelState extends State<UpPanel> {
     final upLen = upList.length;
 
     currentMid.value = data.mid;
-    widget.onClickUpCb?.call(data);
+    widget.dynamicsController.onTapUp(data);
 
     double moveDistance = 0.0;
     final totalItemsWidth = itemWidth * (upLen + liveLen);

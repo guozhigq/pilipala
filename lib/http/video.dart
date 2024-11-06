@@ -509,10 +509,11 @@ class VideoHttp {
     }
   }
 
-  static Future getSubtitle({int? cid, String? bvid}) async {
+  static Future getSubtitle({int? cid, String? bvid, String? aid}) async {
     var res = await Request().get(Api.getSubtitleConfig, data: {
       'cid': cid,
-      'bvid': bvid,
+      if (bvid != null) 'bvid': bvid,
+      if (aid != null) 'aid': aid,
     });
     try {
       if (res.data['code'] == 0) {

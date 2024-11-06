@@ -9,9 +9,7 @@ import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -19,7 +17,6 @@ import 'package:pilipala/utils/storage.dart';
 import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
-import 'up_dynamic/route_panel.dart';
 import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -209,21 +206,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                     return Obx(
                       () => UpPanel(
                         upData: _dynamicsController.upData.value,
-                        onClickUpCb: (data) {
-                          if (GlobalDataCache().enableDynamicSwitch) {
-                            Navigator.push(
-                              context,
-                              PlPopupRoute(
-                                child: OverlayPanel(
-                                  ctr: _dynamicsController,
-                                  upInfo: data,
-                                ),
-                              ),
-                            );
-                          } else {
-                            _dynamicsController.onTapUp(data);
-                          }
-                        },
+                        dynamicsController: _dynamicsController,
                       ),
                     );
                   } else {
