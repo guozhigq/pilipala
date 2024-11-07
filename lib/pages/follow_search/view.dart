@@ -82,10 +82,10 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
             if (snapshot.connectionState == ConnectionState.done) {
               var data = snapshot.data;
               if (data == null) {
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(errMsg: snapshot.data['msg'], fn: reRequest)
-                  ],
+                return HttpError(
+                  errMsg: snapshot.data['msg'],
+                  fn: reRequest,
+                  isInSliver: false,
                 );
               }
               if (data['status']) {
@@ -101,15 +101,17 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
                             );
                           }),
                         )
-                      : CustomScrollView(
-                          slivers: [HttpError(errMsg: '未搜索到结果', fn: reRequest)],
+                      : HttpError(
+                          errMsg: '未搜索到结果',
+                          fn: reRequest,
+                          isInSliver: false,
                         ),
                 );
               } else {
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(errMsg: snapshot.data['msg'], fn: reRequest)
-                  ],
+                return HttpError(
+                  errMsg: snapshot.data['msg'],
+                  fn: reRequest,
+                  isInSliver: false,
                 );
               }
             } else {

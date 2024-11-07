@@ -77,17 +77,19 @@ class _BlackListPageState extends State<BlackListPage> {
                 List<BlackListItem> list = _blackListController.blackList;
                 return Obx(
                   () => list.isEmpty
-                      ? CustomScrollView(
-                          slivers: [
-                            HttpError(errMsg: '你没有拉黑任何人哦～_～', fn: () => {})
-                          ],
+                      ? HttpError(
+                          errMsg: '你没有拉黑任何人哦～_～',
+                          fn: () => {},
+                          isInSliver: false,
                         )
                       : ListView.builder(
                           controller: scrollController,
                           itemCount: list.length,
                           itemBuilder: (BuildContext context, int index) {
                             return ListTile(
-                              onTap: () {},
+                              onTap: () => Get.toNamed(
+                                  '/member?mid=${list[index].mid}',
+                                  arguments: {'face': list[index].face}),
                               leading: NetworkImgLayer(
                                 width: 45,
                                 height: 45,
@@ -119,13 +121,10 @@ class _BlackListPageState extends State<BlackListPage> {
                         ),
                 );
               } else {
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
-                      errMsg: data['msg'],
-                      fn: () => _blackListController.queryBlacklist(),
-                    )
-                  ],
+                return HttpError(
+                  errMsg: data['msg'],
+                  fn: () => _blackListController.queryBlacklist(),
+                  isInSliver: false,
                 );
               }
             } else {

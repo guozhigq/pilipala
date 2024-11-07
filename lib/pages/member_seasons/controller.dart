@@ -24,7 +24,8 @@ class MemberSeasonsController extends GetxController {
       seasonId = int.parse(Get.parameters['seasonId']!);
     }
     if (category == '1') {
-      seriesId = int.parse(Get.parameters['seriesId']!);
+      seriesId = int.tryParse(Get.parameters['seriesId']!);
+      seasonId = int.tryParse(Get.parameters['seasonId']!);
     }
   }
 
@@ -73,7 +74,27 @@ class MemberSeasonsController extends GetxController {
       getSeasonDetail('onLoad');
     }
     if (category == '1') {
-      getSeriesDetail('onLoad');
+      if (seasonId != null) {
+        getSeasonDetail('onLoad');
+      }
+      if (seriesId != null) {
+        getSeriesDetail('onLoad');
+      }
+    }
+  }
+
+  // 下拉刷新
+  Future onRefresh() async {
+    if (category == '0') {
+      return getSeasonDetail('onRefresh');
+    }
+    if (category == '1') {
+      if (seasonId != null) {
+        return getSeasonDetail('onRefresh');
+      }
+      if (seriesId != null) {
+        return getSeriesDetail('onRefresh');
+      }
     }
   }
 }

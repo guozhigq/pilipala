@@ -32,7 +32,7 @@ class MemberController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = int.tryParse(Get.parameters['mid']!) ?? -2;
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo.mid : -1;
     isOwner.value = mid == ownerMid;
@@ -43,6 +43,11 @@ class MemberController extends GetxController {
 
   // 获取用户信息
   Future<Map<String, dynamic>> getInfo() async {
+    if (mid == -2) {
+      SmartDialog.showToast('用户ID获取异常');
+      return {'status': false, 'msg': '用户ID获取异常'};
+    }
+
     await getMemberStat();
     await getMemberView();
     var res = await MemberHttp.memberInfo(mid: mid);
@@ -117,18 +122,13 @@ class MemberController extends GetxController {
 
 // 合并关注/取关和拉黑逻辑
   Future modifyRelation(String actionType) async {
-    if (userInfo == null) {
-      SmartDialog.showToast('账号未登录');
-      return;
-    }
-
     String contentText;
     int act;
     if (actionType == 'follow') {
       contentText = memberInfo.value.isFollowed! ? '确定取消关注UP主?' : '确定关注UP主?';
       act = memberInfo.value.isFollowed! ? 2 : 1;
     } else if (actionType == 'block') {
-      contentText = attribute.value != 128 ? '确定拉黑UP主?' : '确定从黑名单移除UP主？';
+      contentText = attribute.value != 128 ? '确定拉黑UP主?' : '确定从黑名单移除UP主?';
       act = attribute.value != 128 ? 5 : 6;
     } else {
       return;

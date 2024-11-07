@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pilipala/utils/feed_back.dart';
 
 class SearchText extends StatelessWidget {
   final String? searchText;
@@ -17,30 +18,31 @@ class SearchText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: isSelect
-          ? Theme.of(context).colorScheme.primaryContainer
-          : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+          ? colorScheme.primaryContainer
+          : colorScheme.surfaceVariant.withOpacity(0.5),
       borderRadius: BorderRadius.circular(6),
       child: Padding(
         padding: EdgeInsets.zero,
         child: InkWell(
           onTap: () {
-            onSelect!(searchText);
+            onSelect?.call(searchText);
           },
           onLongPress: () {
-            onLongSelect!(searchText);
+            feedBack();
+            onLongSelect?.call(searchText);
           },
           borderRadius: BorderRadius.circular(6),
           child: Padding(
-            padding:
-                const EdgeInsets.only(top: 5, bottom: 5, left: 11, right: 11),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
             child: Text(
               searchText!,
               style: TextStyle(
                 color: isSelect
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ),

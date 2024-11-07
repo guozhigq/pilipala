@@ -101,7 +101,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    fullScreenStatusListener();
+    if (autoPlayEnable) {
+      fullScreenStatusListener();
+    }
     if (Platform.isAndroid) {
       floating = vdCtr.floating!;
     }
@@ -137,7 +139,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     autoEnterPip(status: status);
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
-      if (autoExitFullcreen) {
+      if (autoExitFullcreen && plPlayerController!.isFullScreen.value) {
         plPlayerController!.triggerFullScreen(status: false);
       }
       shutdownTimerService.handleWaitingFinished();
@@ -184,6 +186,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     await vdCtr.playerInit(autoplay: true);
     plPlayerController = vdCtr.plPlayerController;
     plPlayerController!.addStatusLister(playerListener);
+    fullScreenStatusListener();
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
     isShowing.value = true;
@@ -783,7 +786,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           Obx(
             () => Visibility(
               visible: vdCtr.sourceType.value == 'watchLater' ||
-                  vdCtr.sourceType.value == 'fav',
+                  vdCtr.sourceType.value == 'fav' ||
+                  vdCtr.sourceType.value == 'up_archive',
               child: AnimatedPositioned(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
@@ -815,17 +819,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                       child: Row(children: [
                         const Icon(Icons.playlist_play, size: 24),
                         const SizedBox(width: 10),
-                        Text(
-                          vdCtr.watchLaterTitle.value,
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.2,
+                        Expanded(
+                          child: Text(
+                            vdCtr.watchLaterTitle.value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.2,
+                            ),
                           ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 50),
                         const Icon(Icons.keyboard_arrow_up_rounded, size: 26),
                       ]),
                     ),

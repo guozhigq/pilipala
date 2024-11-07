@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/video/later.dart';
-import '../common/constants.dart';
 import '../models/model_hot_video_item.dart';
 import '../models/user/fav_detail.dart';
 import '../models/user/fav_folder.dart';
@@ -218,25 +216,6 @@ class UserHttp {
     }
   }
 
-  // 获取用户凭证 失效
-  static Future thirdLogin() async {
-    var res = await Request().get(
-      'https://passport.bilibili.com/login/app/third',
-      data: {
-        'appkey': Constants.appKey,
-        'api': Constants.thirdApi,
-        'sign': Constants.thirdSign,
-      },
-    );
-    try {
-      if (res.data['code'] == 0 && res.data['data']['has_login'] == 1) {
-        Request().get(res.data['data']['confirm_uri']);
-      }
-    } catch (err) {
-      SmartDialog.showNotify(msg: '获取用户凭证: $err', notifyType: NotifyType.error);
-    }
-  }
-
   // 清空稍后再看
   static Future toViewClear() async {
     var res = await Request().post(
@@ -283,30 +262,6 @@ class UserHttp {
       return {'status': false, 'msg': res.data['message']};
     }
   }
-  // // 相互关系查询
-  // static Future relationSearch(int mid) async {
-  //   Map params = await WbiSign().makSign({
-  //     'mid': mid,
-  //     'token': '',
-  //     'platform': 'web',
-  //     'web_location': 1550101,
-  //   });
-  //   var res = await Request().get(
-  //     Api.relationSearch,
-  //     data: {
-  //       'mid': mid,
-  //       'w_rid': params['w_rid'],
-  //       'wts': params['wts'],
-  //     },
-  //   );
-  //   if (res.data['code'] == 0) {
-  //     // relation 主动状态
-  //     // 被动状态
-  //     return {'status': true, 'data': res.data['data']};
-  //   } else {
-  //     return {'status': false, 'msg': res.data['message']};
-  //   }
-  // }
 
   // 搜索历史记录
   static Future searchHistory(
@@ -436,31 +391,6 @@ class UserHttp {
     }
   }
 
-  // 稍后再看播放全部
-  // static Future toViewPlayAll({required int oid, required String bvid}) async {
-  //   var res = await Request().get(
-  //     Api.watchLaterHtml,
-  //     data: {
-  //       'oid': oid,
-  //       'bvid': bvid,
-  //     },
-  //   );
-  //   String scriptContent =
-  //       extractScriptContents(parse(res.data).body!.outerHtml)[0];
-  //   int startIndex = scriptContent.indexOf('{');
-  //   int endIndex = scriptContent.lastIndexOf('};');
-  //   String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
-  //   // 解析JSON字符串为Map
-  //   Map<String, dynamic> jsonData = json.decode(jsonContent);
-  //   // 输出解析后的数据
-  //   return {
-  //     'status': true,
-  //     'data': jsonData['resourceList']
-  //         .map((e) => MediaVideoItemModel.fromJson(e))
-  //         .toList()
-  //   };
-  // }
-
   static List<String> extractScriptContents(String htmlContent) {
     RegExp scriptRegExp = RegExp(r'<script>([\s\S]*?)<\/script>');
     Iterable<Match> matches = scriptRegExp.allMatches(htmlContent);
@@ -521,6 +451,85 @@ class UserHttp {
       data: {
         'oid': mediaId,
         'bvid': bvid,
+      },
+    );
+    String scriptContent =
+        extractScriptContents(parse(res.data).body!.outerHtml)[0];
+    int startIndex = scriptContent.indexOf('{');
+    int endIndex = scriptContent.lastIndexOf('};');
+    String jsonContent = scriptContent.substring(startIndex, endIndex + 1);
+    // 解析JSON字符串为Map
+    Map<String, dynamic> jsonData = json.decode(jsonContent);
+    return {
+      'status': true,
+      'data': jsonData['resourceList']
+          .map<MediaVideoItemModel>((e) => MediaVideoItemModel.fromJson(e))
+          .toList()
+    };
+  }
+
+  static Future getAccountInfo() async {
+    var res = await Request().get(
+      Api.accountInfo,
+      data: {'web_location': 333.33},
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': {},
+        'mag': res.data['message'],
+      };
+    }
+  }
+
+  static Future updateAccountInfo({
+    required String uname,
+    required String sign,
+    required String sex,
+    required String birthday,
+  }) async {
+    var res = await Request().post(
+      Api.updateAccountInfo,
+      data: {
+        'uname': uname,
+        'usersign': sign,
+        'sex': sex,
+        'birthday': birthday,
+        'csrf': await Request.getCsrf(),
+      },
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'msg': '更新成功',
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  // 解析up投稿
+  static Future parseUpArchiveVideo({
+    required int mid,
+    required int oid,
+    required String bvid,
+    String sortField = 'pubtime',
+  }) async {
+    var res = await Request().get(
+      'https://www.bilibili.com/list/$mid',
+      data: {
+        'oid': oid,
+        'bvid': bvid,
+        'sort_field': sortField,
       },
     );
     String scriptContent =

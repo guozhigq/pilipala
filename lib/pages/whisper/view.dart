@@ -4,7 +4,9 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/skeleton.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'controller.dart';
@@ -71,11 +73,6 @@ class _WhisperPageState extends State<WhisperPage> {
                             ..._whisperController.noticesList.map((element) {
                               return InkWell(
                                 onTap: () {
-                                  if (['/messageAt']
-                                      .contains(element['path'])) {
-                                    SmartDialog.showToast('功能开发中');
-                                    return;
-                                  }
                                   Get.toNamed(element['path']);
 
                                   if (element['count'] > 0) {
@@ -126,7 +123,7 @@ class _WhisperPageState extends State<WhisperPage> {
                       RxList sessionList = _whisperController.sessionList;
                       return Obx(
                         () => sessionList.isEmpty
-                            ? const SizedBox()
+                            ? const CustomScrollView(slivers: [NoData()])
                             : ListView.separated(
                                 itemCount: sessionList.length,
                                 shrinkWrap: true,
@@ -150,8 +147,15 @@ class _WhisperPageState extends State<WhisperPage> {
                       );
                     } else {
                       // 请求错误
-                      return Center(
-                        child: Text(data?['msg'] ?? '请求异常'),
+                      return HttpError(
+                        errMsg: data?['msg'] ?? '请求异常',
+                        fn: () {
+                          setState(() {
+                            _futureBuilderFuture =
+                                _whisperController.querySessionList('init');
+                          });
+                        },
+                        isInSliver: false,
                       );
                     }
                   } else {
@@ -227,8 +231,8 @@ class SessionItem extends StatelessWidget {
           '/whisperDetail',
           parameters: {
             'talkerId': sessionItem.talkerId.toString(),
-            'name': sessionItem.accountInfo.name,
-            'face': sessionItem.accountInfo.face ?? '',
+            'name': sessionItem.accountInfo?.name ?? '',
+            'face': sessionItem.accountInfo?.face ?? '',
             'mid': (sessionItem.accountInfo?.mid ?? 0).toString(),
             'heroTag': heroTag,
           },
@@ -244,11 +248,11 @@ class SessionItem extends StatelessWidget {
             width: 45,
             height: 45,
             type: 'avatar',
-            src: sessionItem.accountInfo.face ?? '',
+            src: sessionItem.accountInfo?.face ?? '',
           ),
         ),
       ),
-      title: Text(sessionItem.accountInfo.name),
+      title: Text(sessionItem.accountInfo?.name ?? ''),
       subtitle: Text(
           msgStatus == 1
               ? '你撤回了一条消息'

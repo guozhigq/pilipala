@@ -76,9 +76,14 @@ class _BangumiPageState extends State<BangumiPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '最近追番',
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => 0 != _bangumidController.total.value
+                                ? Text(
+                                    '我的追番(${_bangumidController.total.value})',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  )
+                                : const SizedBox(),
                           ),
                           IconButton(
                             onPressed: () {
@@ -183,8 +188,10 @@ class _BangumiPageState extends State<BangumiPage>
                     return HttpError(
                       errMsg: data['msg'],
                       fn: () {
-                        _futureBuilderFuture =
-                            _bangumidController.queryBangumiListFeed();
+                        setState(() {
+                          _futureBuilderFuture =
+                              _bangumidController.queryBangumiListFeed();
+                        });
                       },
                     );
                   }

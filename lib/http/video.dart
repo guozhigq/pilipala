@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 import '../common/constants.dart';
 import '../models/common/reply_type.dart';
@@ -95,6 +97,8 @@ class VideoHttp {
       for (var i in res.data['data']['items']) {
         // 屏蔽推广和拉黑用户
         if (i['card_goto'] != 'ad_av' &&
+            i['card_goto'] != 'ad_web_s' &&
+            i['card_goto'] != 'ad_web' &&
             (!enableRcmdDynamic ? i['card_goto'] != 'picture' : true) &&
             (i['args'] != null &&
                 !blackMidsList.contains(i['args']['up_mid']))) {
@@ -346,23 +350,37 @@ class VideoHttp {
     required String message,
     int? root,
     int? parent,
+    List<Map<dynamic, dynamic>>? pictures,
   }) async {
     if (message == '') {
       return {'status': false, 'data': [], 'msg': '请输入评论内容'};
     }
+    var params = <String, dynamic>{
+      'plat': 1,
+      'oid': oid,
+      'type': type.index,
+      'root': root == null || root == 0 ? '' : root,
+      'parent': parent == null || parent == 0 ? '' : parent,
+      'message': message,
+      'at_name_to_mid': {},
+      if (pictures != null) 'pictures': jsonEncode(pictures),
+      'gaia_source': 'main_web',
+      'csrf': await Request.getCsrf(),
+    };
+    Map sign = await WbiSign().makSign(params);
+    params.remove('wts');
+    params.remove('w_rid');
+    FormData formData = FormData.fromMap({...params});
     var res = await Request().post(
       Api.replyAdd,
-      data: {
-        'type': type.index,
-        'oid': oid,
-        'root': root == null || root == 0 ? '' : root,
-        'parent': parent == null || parent == 0 ? '' : parent,
-        'message': message,
-        'csrf': await Request.getCsrf(),
+      queryParameters: {
+        'w_rid': sign['w_rid'],
+        'wts': sign['wts'],
       },
+      data: formData,
     );
-    log(res.toString());
     if (res.data['code'] == 0) {
+      log(res.toString());
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
@@ -491,10 +509,11 @@ class VideoHttp {
     }
   }
 
-  static Future getSubtitle({int? cid, String? bvid}) async {
+  static Future getSubtitle({int? cid, String? bvid, String? aid}) async {
     var res = await Request().get(Api.getSubtitleConfig, data: {
       'cid': cid,
-      'bvid': bvid,
+      if (bvid != null) 'bvid': bvid,
+      if (aid != null) 'aid': aid,
     });
     try {
       if (res.data['code'] == 0) {

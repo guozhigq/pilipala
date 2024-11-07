@@ -116,7 +116,6 @@ class _PagesPanelState extends State<PagesPanel> {
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.videoPart,
-                      context: context,
                     ).show(context);
                   },
                   child: Text(

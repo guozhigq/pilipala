@@ -108,6 +108,12 @@ class _StyleSettingState extends State<StyleSetting> {
             defaultVal: true,
             needReboot: true,
           ),
+          const SetSwitchItem(
+            title: '动态页滑动切换up',
+            setKey: SettingBoxKey.enableDynamicSwitch,
+            defaultVal: true,
+            needReboot: true,
+          ),
           ListTile(
             onTap: () async {
               int? result = await showDialog(

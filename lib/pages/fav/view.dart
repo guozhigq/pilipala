@@ -112,23 +112,19 @@ class _FavPageState extends State<FavPage> {
               ),
             );
           } else {
-            return CustomScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              slivers: [
-                HttpError(
-                  errMsg: data?['msg'] ?? '请求异常',
-                  btnText: data?['code'] == -101 ? '去登录' : null,
-                  fn: () {
-                    if (data?['code'] == -101) {
-                      RoutePush.loginRedirectPush();
-                    } else {
-                      setState(() {
-                        _futureBuilderFuture = _favController.queryFavFolder();
-                      });
-                    }
-                  },
-                ),
-              ],
+            return HttpError(
+              errMsg: data?['msg'] ?? '请求异常',
+              btnText: data?['code'] == -101 ? '去登录' : null,
+              fn: () {
+                if (data?['code'] == -101) {
+                  RoutePush.loginRedirectPush();
+                } else {
+                  setState(() {
+                    _futureBuilderFuture = _favController.queryFavFolder();
+                  });
+                }
+              },
+              isInSliver: false,
             );
           }
         } else {

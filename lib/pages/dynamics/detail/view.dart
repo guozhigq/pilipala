@@ -31,7 +31,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     with TickerProviderStateMixin {
   late DynamicDetailController _dynamicDetailController;
   late AnimationController fabAnimationCtr;
-  Future? _futureBuilderFuture;
+  late Future _futureBuilderFuture;
   late StreamController<bool> titleStreamC =
       StreamController<bool>.broadcast(); // appBar title
   late ScrollController scrollController;
@@ -140,7 +140,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
           EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
-            _dynamicDetailController.queryReplyList(reqType: 'onLoad');
+            _dynamicDetailController.onLoad();
           });
         }
 
@@ -278,8 +278,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
               future: _futureBuilderFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  Map data = snapshot.data as Map;
-                  if (snapshot.data['status']) {
+                  Map? data = snapshot.data;
+                  if (data != null && snapshot.data['status']) {
                     RxList<ReplyItemModel> replyList =
                         _dynamicDetailController.replyList;
                     // 请求成功
@@ -345,8 +345,11 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                   } else {
                     // 请求错误
                     return HttpError(
-                      errMsg: data['msg'],
-                      fn: () => setState(() {}),
+                      errMsg: data?['msg'] ?? '请求异常',
+                      fn: () => setState(() {
+                        _futureBuilderFuture =
+                            _dynamicDetailController.queryReplyList();
+                      }),
                     );
                   }
                 } else {

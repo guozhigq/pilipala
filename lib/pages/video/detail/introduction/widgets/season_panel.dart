@@ -124,7 +124,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                 changeFucCall: changeFucCall,
                 sheetHeight: widget.sheetHeight,
                 dataType: VideoEpidoesType.videoEpisode,
-                context: context,
+                ugcSeason: widget.ugcSeason,
               ).show(context);
             },
             child: Padding(

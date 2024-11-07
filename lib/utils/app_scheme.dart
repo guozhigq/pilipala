@@ -24,30 +24,30 @@ class PiliSchame {
 
     appScheme.getInitScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _routePush(value);
+        routePush(value);
       }
     });
 
     appScheme.getLatestScheme().then((SchemeEntity? value) {
       if (value != null) {
-        _routePush(value);
+        routePush(value);
       }
     });
 
     appScheme.registerSchemeListener().listen((SchemeEntity? event) {
       if (event != null) {
-        _routePush(event);
+        routePush(event);
       }
     });
   }
 
   /// 路由跳转
-  static void _routePush(value) async {
+  static void routePush(value) async {
     final String scheme = value.scheme;
     if (scheme == 'bilibili') {
       biliScheme(value);
     }
-    if (scheme == 'https') {
+    if (['http', 'https'].contains(scheme)) {
       httpsScheme(value);
     }
   }
@@ -79,16 +79,16 @@ class PiliSchame {
     }
   }
 
-  static Future<void> httpsScheme(SchemeEntity value) async {
+  static Future<void> httpsScheme(Uri value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
-    final String host = value.host!;
-    final String? path = value.path;
-    Map<String, String>? query = value.query;
+    final String host = value.host;
+    final String path = value.path;
+    Map<String, String>? query = value.queryParameters;
     RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      final String lastPathSegment = path!.split('/').last;
+      final String lastPathSegment = path.split('/').last;
       if (path.startsWith('/video')) {
         Map matchRes = IdUtils.matchAvorBv(input: path);
         if (matchRes.containsKey('AV')) {
@@ -113,13 +113,13 @@ class PiliSchame {
         _videoPush(Utils.matchNum(path.split('?').first).first, null);
       }
     } else if (host.contains('live')) {
-      int roomId = int.parse(path!.split('/').last);
+      int roomId = int.parse(path.split('/').last);
       Get.toNamed(
         '/liveRoom?roomid=$roomId',
         arguments: {'liveItem': null, 'heroTag': roomId.toString()},
       );
     } else if (host.contains('space')) {
-      var mid = path!.split('/').last;
+      var mid = path.split('/').last;
       Get.toNamed('/member?mid=$mid', arguments: {'face': ''});
       return;
     } else if (host == 'b23.tv') {
@@ -154,7 +154,7 @@ class PiliSchame {
           parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
         );
       }
-    } else if (path != null) {
+    } else {
       final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':
@@ -178,12 +178,12 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
-          String id = Utils.matchNum(query!['id']!).first.toString();
+          String id = Utils.matchNum(query['id']!).first.toString();
           Get.toNamed('/read', parameters: {
-            'url': value.dataString!,
+            'url': value.toString(),
             'title': '',
             'id': id,
-            'articleType': 'read'
+            'articleType': 'read',
           });
           break;
         case 'space':
@@ -201,9 +201,9 @@ class PiliSchame {
             Get.toNamed(
               '/webview',
               parameters: {
-                'url': value.dataString ?? "",
+                'url': value.toString(),
                 'type': 'url',
-                'pageTitle': ''
+                'pageTitle': '',
               },
             );
           }
@@ -286,9 +286,22 @@ class PiliSchame {
               null, int.parse(lastPathSegment.split('?').first));
         }
         break;
+      case 'following':
+        if (path.startsWith('/detail')) {
+          var opusId = path.split('/').last;
+          Get.toNamed(
+            '/webview',
+            parameters: {
+              'url': 'https://m.bilibili.com/opus/$opusId',
+              'type': 'url',
+              'pageTitle': ''
+            },
+          );
+        }
+        break;
       default:
         SmartDialog.showToast('未匹配地址，请联系开发者');
-        Clipboard.setData(ClipboardData(text: value.toJson().toString()));
+        Clipboard.setData(ClipboardData(text: value.toString()));
         break;
     }
   }

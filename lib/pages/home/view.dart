@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/mine/index.dart';
+import 'package:pilipala/pages/main/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import './controller.dart';
 
@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final HomeController _homeController = Get.put(HomeController());
+  final MainController mainController = Get.put(MainController());
+
   List videoList = [];
   late Stream<bool> stream;
 
@@ -33,15 +35,14 @@ class _HomePageState extends State<HomePage>
 
   showUserBottomSheet() {
     feedBack();
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => const SizedBox(
-        height: 450,
-        child: MinePage(),
-      ),
-      clipBehavior: Clip.hardEdge,
-      isScrollControlled: true,
-    );
+    final MainController mainController = Get.put(MainController());
+    int mineItemIndex = mainController.navigationBars
+        .indexWhere((item) => item['label'] == "我的");
+    if (mineItemIndex != -1) {
+      mainController.pageController.jumpToPage(mineItemIndex);
+    } else {
+      Get.toNamed('/mine');
+    }
   }
 
   @override
@@ -394,14 +395,17 @@ class SearchBar extends StatelessWidget {
                     color: colorScheme.onSecondaryContainer,
                   ),
                   const SizedBox(width: 10),
-                  Obx(
-                    () => Text(
-                      ctr!.defaultSearch.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: colorScheme.outline),
+                  Expanded(
+                    child: Obx(
+                      () => Text(
+                        ctr!.defaultSearch.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: colorScheme.outline),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 10),
                 ],
               ),
             ),

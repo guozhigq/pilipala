@@ -1,4 +1,4 @@
-import 'package:bottom_sheet/bottom_sheet.dart';
+// import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -169,7 +169,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(initialExpanded: false);
+    _expandableCtr = ExpandableController(
+        initialExpanded: GlobalDataCache().enableAutoExpand);
   }
 
   // 收藏
@@ -198,25 +199,35 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     }
   }
 
-  void _showFavPanel() {
-    showFlexibleBottomSheet(
-      bottomSheetBorderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+  void _showFavPanel() async {
+    final mediaQueryData = MediaQuery.of(context);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
+      context: Get.context!,
+      useSafeArea: true,
+      isScrollControlled: true,
+      transitionAnimationController: AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this,
       ),
-      minHeight: 0.6,
-      initHeight: 0.6,
-      maxHeight: 1,
-      context: context,
-      builder: (BuildContext context, ScrollController scrollController,
-          double offset) {
-        return FavPanel(
-          ctr: videoIntroController,
-          scrollController: scrollController,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return FavPanel(
+              ctr: videoIntroController,
+              scrollController: scrollController,
+            );
+          },
         );
       },
-      anchors: [0.6, 1],
-      isSafeArea: true,
     );
   }
 
@@ -242,6 +253,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     showBottomSheet(
       context: context,
       enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
       builder: (BuildContext context) {
         return AiDetail(modelResult: videoIntroController.modelResult);
       },
@@ -453,8 +470,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     const Spacer(),
                     Obx(
                       () {
-                        final bool isFollowed =
-                            videoIntroController.followStatus['attribute'] != 0;
+                        final int attr =
+                            videoIntroController.followStatus['attribute'] ?? 0;
                         return videoIntroController.followStatus.isEmpty
                             ? const SizedBox()
                             : SizedBox(
@@ -467,15 +484,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                       left: 8,
                                       right: 8,
                                     ),
-                                    foregroundColor: isFollowed
+                                    foregroundColor: attr != 0
                                         ? outline
                                         : t.colorScheme.onPrimary,
-                                    backgroundColor: isFollowed
+                                    backgroundColor: attr != 0
                                         ? t.colorScheme.onInverseSurface
                                         : t.colorScheme.primary, // 设置按钮背景色
                                   ),
                                   child: Text(
-                                    isFollowed ? '已关注' : '关注',
+                                    attr == 128
+                                        ? '已拉黑'
+                                        : attr != 0
+                                            ? '已关注'
+                                            : '关注',
                                     style: TextStyle(
                                       fontSize:
                                           t.textTheme.labelMedium!.fontSize,

@@ -9,7 +9,6 @@ import 'package:pilipala/common/skeleton/dynamic_card.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/main_stream.dart';
 import 'package:pilipala/utils/route_push.dart';
@@ -18,7 +17,6 @@ import 'package:pilipala/utils/storage.dart';
 import '../mine/controller.dart';
 import 'controller.dart';
 import 'widgets/dynamic_panel.dart';
-import 'up_dynamic/route_panel.dart';
 import 'widgets/up_panel.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -90,32 +88,34 @@ class _DynamicsPageState extends State<DynamicsPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Obx(() {
-                    if (_dynamicsController.mid.value != -1 &&
-                        _dynamicsController.upInfo.value.uname != null) {
-                      return SizedBox(
-                        height: 36,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return ScaleTransition(
-                                scale: animation, child: child);
-                          },
-                          child: Text(
-                              '${_dynamicsController.upInfo.value.uname!}的动态',
-                              key: ValueKey<String>(
-                                  _dynamicsController.upInfo.value.uname!),
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge!
-                                    .fontSize,
-                              )),
-                        ),
-                      );
-                    } else {
+                    final mid = _dynamicsController.mid.value;
+                    final uname = _dynamicsController.upInfo.value.uname;
+
+                    if (mid == -1 || uname == null) {
                       return const SizedBox();
                     }
+
+                    return SizedBox(
+                      height: 36,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                              scale: animation, child: child);
+                        },
+                        child: Text(
+                          '$uname的动态',
+                          key: ValueKey<String>(uname),
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .labelLarge!
+                                .fontSize,
+                          ),
+                        ),
+                      ),
+                    );
                   }),
                   Obx(
                     () => _dynamicsController.userLogin.value
@@ -206,16 +206,7 @@ class _DynamicsPageState extends State<DynamicsPage>
                     return Obx(
                       () => UpPanel(
                         upData: _dynamicsController.upData.value,
-                        onClickUpCb: (data) {
-                          // _dynamicsController.onTapUp(data);
-                          Navigator.push(
-                            context,
-                            PlPopupRoute(
-                              child: OverlayPanel(
-                                  ctr: _dynamicsController, upInfo: data),
-                            ),
-                          );
-                        },
+                        dynamicsController: _dynamicsController,
                       ),
                     );
                   } else {

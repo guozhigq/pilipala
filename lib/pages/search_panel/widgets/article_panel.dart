@@ -174,14 +174,11 @@ Widget searchArticlePanel(BuildContext context, ctr, list) {
               );
             },
           )
-        : CustomScrollView(
-            slivers: [
-              HttpError(
-                errMsg: '没有数据',
-                isShowBtn: false,
-                fn: () => {},
-              )
-            ],
+        : HttpError(
+            errMsg: '没有数据',
+            isShowBtn: false,
+            fn: () => {},
+            isInSliver: false,
           ),
   );
 }

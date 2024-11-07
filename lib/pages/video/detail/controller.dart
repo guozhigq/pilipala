@@ -119,6 +119,7 @@ class VideoDetailController extends GetxController
   List<MediaVideoItemModel> mediaList = <MediaVideoItemModel>[];
   RxBool isWatchLaterVisible = false.obs;
   RxString watchLaterTitle = ''.obs;
+  RxInt watchLaterCount = 0.obs;
 
   @override
   void onInit() {
@@ -170,7 +171,7 @@ class VideoDetailController extends GetxController
 
     sourceType.value = argMap['sourceType'] ?? 'normal';
     isWatchLaterVisible.value =
-        sourceType.value == 'watchLater' || sourceType.value == 'fav';
+        ['watchLater', 'fav', 'up_archive'].contains(sourceType.value);
     if (sourceType.value == 'watchLater') {
       watchLaterTitle.value = '稍后再看';
       fetchMediaList();
@@ -178,6 +179,11 @@ class VideoDetailController extends GetxController
     if (sourceType.value == 'fav') {
       watchLaterTitle.value = argMap['favTitle'];
       queryFavVideoList();
+    }
+    if (sourceType.value == 'up_archive') {
+      watchLaterTitle.value = argMap['favTitle'];
+      watchLaterCount.value = argMap['count'];
+      queryArchiveVideoList();
     }
     tabCtr.addListener(() {
       onTabChanged();
@@ -585,7 +591,9 @@ class VideoDetailController extends GetxController
   }
 
   void toggeleWatchLaterVisible(bool val) {
-    if (sourceType.value == 'watchLater' || sourceType.value == 'fav') {
+    if (sourceType.value == 'watchLater' ||
+        sourceType.value == 'fav' ||
+        sourceType.value == 'up_archive') {
       isWatchLaterVisible.value = !isWatchLaterVisible.value;
     }
   }
@@ -616,8 +624,19 @@ class VideoDetailController extends GetxController
         changeMediaList: changeMediaList,
         panelTitle: watchLaterTitle.value,
         bvid: bvid,
-        mediaId: Get.arguments['mediaId'],
+        mediaId: [
+          'watchLater',
+          'fav',
+        ].contains(sourceType.value)
+            ? Get.arguments['mediaId']
+            : Get.arguments['favInfo'].owner.mid,
         hasMore: mediaList.length != Get.arguments['count'],
+        type: [
+          'watchLater',
+          'fav',
+        ].contains(sourceType.value)
+            ? 3
+            : 1,
       );
     });
     replyReplyBottomSheetCtr?.closed.then((value) {
@@ -661,6 +680,21 @@ class VideoDetailController extends GetxController
       mediaId: mediaId,
       oid: oid,
       bvid: bvid,
+    );
+    if (res['status']) {
+      mediaList = res['data'];
+    }
+  }
+
+  Future queryArchiveVideoList() async {
+    final Map argMap = Get.arguments;
+    var favInfo = argMap['favInfo'];
+    var sortField = argMap['sortField'];
+    var res = await UserHttp.parseUpArchiveVideo(
+      mid: favInfo.owner.mid,
+      oid: oid.value,
+      bvid: bvid,
+      sortField: sortField,
     );
     if (res['status']) {
       mediaList = res['data'];

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bottom_sheet/bottom_sheet.dart';
+// import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -62,6 +62,7 @@ class VideoIntroController extends GetxController {
   late ModelResult modelResult;
   PersistentBottomSheetController? bottomSheetController;
   late bool enableRelatedVideo;
+  UgcSeason? ugcSeason;
 
   @override
   void onInit() {
@@ -87,6 +88,7 @@ class VideoIntroController extends GetxController {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
+      ugcSeason = result['data']!.ugcSeason;
       if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
         lastPlayCid.value = videoDetail.value.pages!.first.cid!;
       }
@@ -336,78 +338,100 @@ class VideoIntroController extends GetxController {
       return;
     }
     final int currentStatus = followStatus['attribute'];
-    int actionStatus = 0;
-    switch (currentStatus) {
-      case 0:
-        actionStatus = 1;
-        break;
-      case 2:
-        actionStatus = 2;
-        break;
-      default:
-        actionStatus = 0;
-        break;
+    if (currentStatus == 128) {
+      modifyRelation('block', currentStatus);
+    } else {
+      modifyRelation('follow', currentStatus);
     }
-    SmartDialog.show(
-      useSystem: true,
-      animationType: SmartAnimationType.centerFade_otherSlide,
+  }
+
+  // 操作用户关系
+  Future modifyRelation(String actionType, int currentStatus) async {
+    final int mid = videoDetail.value.owner!.mid!;
+    String contentText;
+    int act;
+    if (actionType == 'follow') {
+      contentText = currentStatus != 0 ? '确定取消关注UP主?' : '确定关注UP主?';
+      act = currentStatus != 0 ? 2 : 1;
+    } else if (actionType == 'block') {
+      contentText = '确定从黑名单移除UP主?';
+      act = 6;
+    } else {
+      return;
+    }
+
+    showDialog(
+      context: Get.context!,
       builder: (BuildContext context) {
+        final Color outline = Theme.of(Get.context!).colorScheme.outline;
         return AlertDialog(
           title: const Text('提示'),
-          content: Text(currentStatus == 0 ? '关注UP主?' : '取消关注UP主?'),
+          content: Text(contentText),
           actions: [
             TextButton(
-              onPressed: () => SmartDialog.dismiss(),
-              child: Text(
-                '点错了',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
+              onPressed: Navigator.of(context).pop,
+              child: Text('点错了', style: TextStyle(color: outline)),
             ),
             TextButton(
-              onPressed: () async {
-                var result = await VideoHttp.relationMod(
-                  mid: videoDetail.value.owner!.mid!,
-                  act: actionStatus,
-                  reSrc: 14,
-                );
-                if (result['status']) {
-                  switch (currentStatus) {
-                    case 0:
-                      actionStatus = 2;
-                      break;
-                    case 2:
-                      actionStatus = 0;
-                      break;
-                    default:
-                      actionStatus = 0;
-                      break;
-                  }
-                  followStatus['attribute'] = actionStatus;
-                  followStatus.refresh();
-                  if (actionStatus == 2) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('关注成功'),
-                          duration: const Duration(seconds: 2),
-                          action: SnackBarAction(
-                            label: '设置分组',
-                            onPressed: setFollowGroup,
-                          ),
-                          showCloseIcon: true,
-                        ),
-                      );
-                    }
-                  }
-                }
-                SmartDialog.dismiss();
-              },
-              child: const Text('确认'),
+              onPressed: () => modifyRelationFetch(
+                context,
+                mid,
+                act,
+                currentStatus,
+                actionType,
+              ),
+              child: const Text('确定'),
             )
           ],
         );
       },
     );
+  }
+
+  // 操作用户关系Future
+  Future modifyRelationFetch(
+    BuildContext context,
+    mid,
+    act,
+    currentStatus,
+    actionType,
+  ) async {
+    var res = await VideoHttp.relationMod(mid: mid, act: act, reSrc: 11);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+    if (res['status']) {
+      if (actionType == 'follow') {
+        final Map<int, int> statusMap = {
+          0: 2,
+          2: 0,
+        };
+        late int actionStatus;
+        actionStatus = statusMap[currentStatus] ?? 0;
+        followStatus['attribute'] = actionStatus;
+        if (currentStatus == 0 && Get.context!.mounted) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: const Text('关注成功'),
+              duration: const Duration(seconds: 2),
+              action: SnackBarAction(
+                label: '设置分组',
+                onPressed: setFollowGroup,
+              ),
+              showCloseIcon: true,
+            ),
+          );
+        } else {
+          SmartDialog.showToast('取消关注成功');
+        }
+      } else if (actionType == 'block') {
+        followStatus['attribute'] = 0;
+        SmartDialog.showToast('取消拉黑成功');
+      }
+      followStatus.refresh();
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
   }
 
   // 修改分P或番剧分集
@@ -531,25 +555,31 @@ class VideoIntroController extends GetxController {
   }
 
   // 设置关注分组
-  void setFollowGroup() {
-    showFlexibleBottomSheet(
-      bottomSheetBorderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
-      ),
-      minHeight: 0.6,
-      initHeight: 0.6,
-      maxHeight: 1,
+  void setFollowGroup() async {
+    final mediaQueryData = MediaQuery.of(Get.context!);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
       context: Get.context!,
-      builder: (BuildContext context, ScrollController scrollController,
-          double offset) {
-        return GroupPanel(
-          mid: videoDetail.value.owner!.mid!,
-          scrollController: scrollController,
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return GroupPanel(
+              mid: videoDetail.value.owner!.mid!,
+              scrollController: scrollController,
+            );
+          },
         );
       },
-      anchors: [0.6, 1],
-      isSafeArea: true,
     );
   }
 
@@ -602,9 +632,9 @@ class VideoIntroController extends GetxController {
         episodes: episodes,
         currentCid: lastPlayCid.value,
         dataType: dataType,
-        context: Get.context!,
         sheetHeight: Get.size.height,
         isFullScreen: true,
+        ugcSeason: ugcSeason,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
             changeSeasonOrbangu(
@@ -615,7 +645,7 @@ class VideoIntroController extends GetxController {
           }
           SmartDialog.dismiss();
         },
-      ).buildShowContent(Get.context!),
+      ).buildShowContent(),
     );
   }
 

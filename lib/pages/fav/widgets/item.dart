@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/logic_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class FavItem extends StatelessWidget {
@@ -96,7 +97,7 @@ class VideoContent extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              [23, 1].contains(favFolderItem.attr) ? '私密' : '公开',
+              LogicUtils.isPublic(favFolderItem.attr) ? '公开' : '私密',
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

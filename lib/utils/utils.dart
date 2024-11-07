@@ -351,6 +351,9 @@ class Utils {
 
   // 时间戳转时间
   static tampToSeektime(number) {
+    if (number is String && int.tryParse(number) == null) {
+      return number;
+    }
     int hours = number ~/ 60;
     int minutes = number % 60;
 

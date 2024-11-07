@@ -7,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../common/pages_bottom_sheet.dart';
 import '../../../models/common/video_episode_type.dart';
 import '../introduction/controller.dart';
@@ -44,7 +43,6 @@ class _BangumiPanelState extends State<BangumiPanel> {
   late int cid;
   String heroTag = Get.arguments['heroTag'];
   late final VideoDetailController videoDetailCtr;
-  final ItemScrollController itemScrollController = ItemScrollController();
   late PersistentBottomSheetController? _bottomSheetController;
 
   @override
@@ -151,7 +149,6 @@ class _BangumiPanelState extends State<BangumiPanel> {
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.bangumiEpisode,
-                      context: context,
                     ).show(context);
                   },
                   child: Text(
@@ -176,59 +173,60 @@ class _BangumiPanelState extends State<BangumiPanel> {
               return Container(
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
-                child: Material(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: BorderRadius.circular(6),
-                  clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                    onTap: () => changeFucCall(page, i),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            children: [
-                              if (isSelected) ...<Widget>[
-                                Image.asset('assets/images/live.png',
-                                    color: primary, height: 12),
-                                const SizedBox(width: 6)
-                              ],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => changeFucCall(page, i),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            if (isSelected) ...<Widget>[
+                              Image.asset('assets/images/live.png',
+                                  color: primary, height: 12),
+                              const SizedBox(width: 6)
+                            ],
+                            Text(
+                              '第${i + 1}话',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isSelected ? primary : onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            if (page.badge != null) ...[
+                              const Spacer(),
                               Text(
-                                '第${i + 1}话',
+                                page.badge!,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  color: isSelected ? primary : onSurface,
+                                  fontSize: 12,
+                                  color: primary,
                                 ),
                               ),
-                              const SizedBox(width: 2),
-                              if (page.badge != null) ...[
-                                const Spacer(),
-                                Text(
-                                  page.badge!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: primary,
-                                  ),
-                                ),
-                              ]
-                            ],
+                            ]
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          page.longTitle!,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isSelected ? primary : onSurface,
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            page.longTitle!,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSelected ? primary : onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
                     ),
                   ),
                 ),

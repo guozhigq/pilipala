@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -15,6 +16,10 @@ class IntroDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle textStyle = TextStyle(
+      fontSize: 14,
+      color: Theme.of(context).colorScheme.primary,
+    );
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -29,12 +34,7 @@ class IntroDetail extends StatelessWidget {
                   Clipboard.setData(ClipboardData(text: videoDetail!.bvid!));
                   SmartDialog.showToast('已复制');
                 },
-                child: Text(
-                  videoDetail!.bvid!,
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.primary),
-                ),
+                child: Text(videoDetail!.bvid!, style: textStyle),
               ),
               const SizedBox(width: 10),
               GestureDetector(
@@ -44,12 +44,18 @@ class IntroDetail extends StatelessWidget {
                       ClipboardData(text: videoDetail!.aid!.toString()));
                   SmartDialog.showToast('已复制');
                 },
-                child: Text(
-                  videoDetail!.aid!.toString(),
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.primary),
-                ),
+                child: Text(videoDetail!.aid!.toString(), style: textStyle),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  feedBack();
+                  String videoUrl =
+                      '${HttpString.baseUrl}/video/${videoDetail!.bvid!}';
+                  Clipboard.setData(ClipboardData(text: videoUrl));
+                  SmartDialog.showToast('已复制视频链接');
+                },
+                child: Text('复制链接', style: textStyle),
               )
             ],
           ),

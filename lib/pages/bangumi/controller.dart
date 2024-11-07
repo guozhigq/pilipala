@@ -9,6 +9,7 @@ class BangumiController extends GetxController {
   final ScrollController scrollController = ScrollController();
   RxList<BangumiListItemModel> bangumiList = <BangumiListItemModel>[].obs;
   RxList<BangumiListItemModel> bangumiFollowList = <BangumiListItemModel>[].obs;
+  RxInt total = 0.obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
   Box userInfoCache = GStrorage.userInfo;
@@ -54,9 +55,10 @@ class BangumiController extends GetxController {
     if (userInfo == null) {
       return;
     }
-    var result = await BangumiHttp.bangumiFollow(mid: userInfo.mid);
+    var result = await BangumiHttp.getRecentBangumi(mid: userInfo.mid);
     if (result['status']) {
       bangumiFollowList.value = result['data'].list;
+      total.value = result['data'].total;
     } else {}
     return result;
   }

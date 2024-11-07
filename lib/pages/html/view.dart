@@ -380,13 +380,10 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
                                 );
                               } else {
                                 // 请求错误
-                                return CustomScrollView(
-                                  slivers: [
-                                    HttpError(
-                                      errMsg: data['msg'],
-                                      fn: () => setState(() {}),
-                                    )
-                                  ],
+                                return HttpError(
+                                  errMsg: data['msg'],
+                                  fn: () => setState(() {}),
+                                  isInSliver: false,
                                 );
                               }
                             } else {

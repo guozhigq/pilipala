@@ -162,34 +162,61 @@ class _LivePageState extends State<LivePage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(
-              () => Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: ' 我的关注 ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Obx(
+                  () => Text.rich(
                     TextSpan(
-                      text: ' ${_liveController.liveFollowingList.length}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      children: [
+                        const TextSpan(
+                          text: ' 我的关注 ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' ${_liveController.liveFollowingCount}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '人正在直播',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: '人正在直播',
-                      style: TextStyle(
-                        fontSize: 12,
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed('/liveFollowing');
+                  },
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  child: Row(
+                    children: [
+                      Text(
+                        '查看更多',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
                         color: Theme.of(context).colorScheme.outline,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
             FutureBuilder(
               future: _futureBuilderFuture2,
@@ -201,8 +228,7 @@ class _LivePageState extends State<LivePage>
                   Map? data = snapshot.data;
                   if (data?['status']) {
                     RxList list = _liveController.liveFollowingList;
-                    // ignore: invalid_use_of_protected_member
-                    return Obx(() => LiveFollowingListView(list: list.value));
+                    return LiveFollowingListView(list: list);
                   } else {
                     return SizedBox(
                       height: 80,
@@ -230,69 +256,71 @@ class _LivePageState extends State<LivePage>
 }
 
 class LiveFollowingListView extends StatelessWidget {
-  final List list;
+  final RxList list;
 
   const LiveFollowingListView({super.key, required this.list});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          final LiveFollowingItemModel item = list[index];
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(3, 12, 3, 0),
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: () {
-                    Get.toNamed(
-                      '/liveRoom?roomid=${item.roomId}',
-                      arguments: {
-                        'liveItem': item,
-                        'heroTag': item.roomId.toString()
-                      },
-                    );
-                  },
-                  child: Container(
-                    width: 54,
-                    height: 54,
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(27),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 1.5,
+    return Obx(
+      () => SizedBox(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            final LiveFollowingItemModel item = list[index];
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(3, 12, 3, 0),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Get.toNamed(
+                        '/liveRoom?roomid=${item.roomId}',
+                        arguments: {
+                          'liveItem': item,
+                          'heroTag': item.roomId.toString()
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 54,
+                      height: 54,
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(27),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: NetworkImgLayer(
+                        width: 50,
+                        height: 50,
+                        type: 'avatar',
+                        src: list[index].face,
                       ),
                     ),
-                    child: NetworkImgLayer(
-                      width: 50,
-                      height: 50,
-                      type: 'avatar',
-                      src: list[index].face,
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: 62,
+                    child: Text(
+                      list[index].uname,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: 62,
-                  child: Text(
-                    list[index].uname,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-        itemCount: list.length,
+                ],
+              ),
+            );
+          },
+          itemCount: list.length,
+        ),
       ),
     );
   }

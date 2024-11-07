@@ -5,7 +5,6 @@ import 'package:pilipala/models/user/info.dart';
 
 class GStrorage {
   static late final Box<dynamic> userInfo;
-  static late final Box<dynamic> historyword;
   static late final Box<dynamic> localCache;
   static late final Box<dynamic> setting;
   static late final Box<dynamic> video;
@@ -26,18 +25,11 @@ class GStrorage {
     localCache = await Hive.openBox(
       'localCache',
       compactionStrategy: (int entries, int deletedEntries) {
-        return deletedEntries > 4;
+        return deletedEntries > 10;
       },
     );
     // 设置
     setting = await Hive.openBox('setting');
-    // 搜索历史
-    historyword = await Hive.openBox(
-      'historyWord',
-      compactionStrategy: (int entries, int deletedEntries) {
-        return deletedEntries > 10;
-      },
-    );
     // 视频设置
     video = await Hive.openBox('video');
   }
@@ -52,8 +44,6 @@ class GStrorage {
     // user.close();
     userInfo.compact();
     userInfo.close();
-    historyword.compact();
-    historyword.close();
     localCache.compact();
     localCache.close();
     setting.compact();
@@ -117,11 +107,13 @@ class SettingBoxKey {
       replySortType = 'replySortType',
       defaultDynamicType = 'defaultDynamicType',
       enableHotKey = 'enableHotKey',
+      enableSearchSuggest = 'enableSearchSuggest',
       enableQuickFav = 'enableQuickFav',
       enableWordRe = 'enableWordRe',
       enableSearchWord = 'enableSearchWord',
       enableSystemProxy = 'enableSystemProxy',
       enableAi = 'enableAi',
+      enableAutoExpand = 'enableAutoExpand',
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo';
 
@@ -139,6 +131,7 @@ class SettingBoxKey {
       tabbarSort = 'tabbarSort', // 首页tabbar
       dynamicBadgeMode = 'dynamicBadgeMode',
       enableGradientBg = 'enableGradientBg',
+      enableDynamicSwitch = 'enableDynamicSwitch',
       navBarSort = 'navBarSort',
       actionTypeSort = 'actionTypeSort';
 }

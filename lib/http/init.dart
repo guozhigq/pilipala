@@ -8,7 +8,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-// import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
@@ -171,15 +170,6 @@ class Request {
 
     dio = Dio(options);
 
-    /// fix 第三方登录 302重定向 跟iOS代理问题冲突
-    // ..httpClientAdapter = Http2Adapter(
-    //   ConnectionManager(
-    //     idleTimeout: const Duration(milliseconds: 10000),
-    //     onClientCreate: (_, ClientSetting config) =>
-    //         config.onBadCertificate = (_) => true,
-    //   ),
-    // );
-
     /// 设置代理
     if (enableSystemProxy) {
       dio.httpClientAdapter = IOHttpClientAdapter(
@@ -248,10 +238,25 @@ class Request {
   }
 
   /*
+   * get请求
+   */
+  getWithoutCookie(url, {data}) {
+    return get(
+      url,
+      data: data,
+      options: Options(
+        headers: {
+          'cookie': 'buvid3= ; b_nut= ; sid= ',
+          'user-agent': headerUa(type: 'pc'),
+        },
+      ),
+    );
+  }
+
+  /*
    * post请求
    */
   post(url, {data, queryParameters, options, cancelToken, extra}) async {
-    // print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
@@ -262,7 +267,6 @@ class Request {
             options ?? Options(contentType: Headers.formUrlEncodedContentType),
         cancelToken: cancelToken,
       );
-      // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
       Response errResponse = Response(
@@ -318,7 +322,7 @@ class Request {
       }
     } else {
       headerUa =
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36';
     }
     return headerUa;
   }

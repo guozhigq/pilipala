@@ -50,7 +50,12 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: const Text('Ta的图文', style: TextStyle(fontSize: 16)),
+        title: Obx(
+          () => Text(
+            '${_memberArticleController.isOwner.value ? '我' : 'Ta'}的图文',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,
@@ -113,12 +118,14 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
           'articleType': 'opus',
         });
       },
-      leading: NetworkImgLayer(
-        width: 50,
-        height: 50,
-        type: 'emote',
-        src: item.cover['url'],
-      ),
+      leading: item?.cover != null
+          ? NetworkImgLayer(
+              width: 50,
+              height: 50,
+              type: 'emote',
+              src: item?.cover?['url'] ?? '',
+            )
+          : const SizedBox(),
       title: Text(
         item.content,
         maxLines: 2,
@@ -138,16 +145,10 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
   }
 
   Widget _buildError(String errMsg) {
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: HttpError(
-            errMsg: errMsg,
-            fn: () {},
-          ),
-        ),
-      ],
+    return HttpError(
+      errMsg: errMsg,
+      fn: () {},
+      isInSliver: false,
     );
   }
 

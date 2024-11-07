@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:appscheme/appscheme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +45,7 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
-  final bool? replySave;
+  final bool replySave;
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +55,14 @@ class ReplyItem extends StatelessWidget {
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
-          if (replyReply != null) {
-            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
-          }
+          replyReply?.call(replyItem, null, replyItem!.rcount! > 0);
         },
         onLongPress: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
@@ -239,10 +236,10 @@ class ReplyItem extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
           child: Text.rich(
-            style: const TextStyle(height: 1.75),
-            maxLines:
-                replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
             overflow: TextOverflow.ellipsis,
+            maxLines:
+                replyLevel == '1' && replyItem!.content!.isText! ? 5 : 999,
+            style: const TextStyle(height: 1.75),
             TextSpan(
               children: [
                 if (replyItem!.isTop!)
@@ -256,7 +253,12 @@ class ReplyItem extends StatelessWidget {
                       fs: 9,
                     ),
                   ),
-                buildContent(context, replyItem!, replyReply, null),
+                buildContent(
+                  context,
+                  replyItem!,
+                  replyReply,
+                  null,
+                ),
               ],
             ),
           ),
@@ -264,9 +266,7 @@ class ReplyItem extends StatelessWidget {
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
-        if ((replyItem!.replyControl!.isShow! ||
-                replyItem!.replies!.isNotEmpty) &&
-            showReplyRow!) ...[
+        if ((replyItem!.rcount! > 0) && showReplyRow!) ...[
           Padding(
             padding: const EdgeInsets.only(top: 5, bottom: 12),
             child: ReplyItemRow(
@@ -383,8 +383,7 @@ class ReplyItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isShow = replyControl!.isShow!;
-    final int extraRow = replyControl != null && isShow ? 1 : 0;
+    final int extraRow = replyItem!.rcount! > 0 ? 1 : 0;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -466,7 +465,11 @@ class ReplyItemRow extends StatelessWidget {
                               ),
                             ),
                           buildContent(
-                              context, replies![i], replyReply, replyItem),
+                            context,
+                            replies![i],
+                            replyReply,
+                            replyItem,
+                          ),
                         ],
                       ),
                     ),
@@ -508,7 +511,11 @@ class ReplyItemRow extends StatelessWidget {
 }
 
 InlineSpan buildContent(
-    BuildContext context, replyItem, replyReply, fReplyItem) {
+  BuildContext context,
+  replyItem,
+  replyReply,
+  fReplyItem,
+) {
   final String routePath = Get.currentRoute;
   bool isVideoPage = routePath.startsWith('/video');
   ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -547,13 +554,6 @@ InlineSpan buildContent(
     });
   }
   content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  content.message = content.message
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&apos;', "'")
-      .replaceAll('&nbsp;', ' ');
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
@@ -721,14 +721,14 @@ InlineSpan buildContent(
                         });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
-                        SchemeEntity scheme = SchemeEntity(
+                        Uri scheme = Uri(
                           scheme: uri.scheme,
                           host: uri.host,
                           port: uri.port,
                           path: uri.path,
-                          query: uri.queryParameters,
-                          source: '',
-                          dataString: matchStr,
+                          // query: uri.queryParameters,
+                          // source: '',
+                          // dataString: matchStr,
                         );
                         PiliSchame.httpsScheme(scheme);
                       }
@@ -874,6 +874,7 @@ InlineSpan buildContent(
       }
     }
   }
+
   // 图片渲染
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
