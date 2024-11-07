@@ -609,4 +609,8 @@ class Api {
 
   /// @我的
   static const String messageAtAPi = '/x/msgfeed/at?';
+
+  /// 获取空降区间
+  static const String getSkipSegments =
+      '${HttpString.sponsorBlockBaseUrl}/api/skipSegments';
 }
