@@ -30,7 +30,7 @@ extension SegmentTypeExtension on SegmentType {
         'chapter',
       ][index];
 
-  String get name => [
+  String get label => [
         '赞助',
         '开场介绍',
         '片尾致谢',

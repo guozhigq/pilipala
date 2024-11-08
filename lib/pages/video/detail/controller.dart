@@ -13,6 +13,7 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/sponsor_block/segment.dart';
+import 'package:pilipala/models/sponsor_block/segment_type.dart';
 import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
@@ -754,7 +755,7 @@ class VideoDetailController extends GetxController
             await plPlayerController.videoPlayerController
                 ?.seek(Duration(seconds: segmentEnd));
             segment.isSkip = true;
-            SmartDialog.showToast('已跳过${segment.category!.name}片段');
+            SmartDialog.showToast('已跳过${segment.category!.label}片段');
           }
         } catch (err) {
           SmartDialog.showToast('skipSegments error: $err');

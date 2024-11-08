@@ -16,7 +16,7 @@ extension ActionTypeExtension on ActionType {
         'chapter',
       ][index];
 
-  String get name => [
+  String get label => [
         '跳过',
         '静音',
         '完整观看',

@@ -6,7 +6,7 @@ class SegmentDataModel {
   final ActionType? actionType;
   final List? segment;
   final String? uuid;
-  final double? videoDuration;
+  final num? videoDuration;
   final int? locked;
   final int? votes;
   final String? description;
