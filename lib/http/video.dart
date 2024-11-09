@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/utils/id_utils.dart';
 import '../common/constants.dart';
 import '../models/common/reply_type.dart';
 import '../models/home/rcmd/result.dart';
@@ -559,5 +560,51 @@ class VideoHttp {
         await SubTitleUtils.convertToWebVTT(res.data['body']);
     final List body = res.data['body'];
     return {'content': content, 'body': body};
+  }
+
+  static Future<Map<String, dynamic>> getSubscribeStatus(
+      {required dynamic bvid}) async {
+    var res = await Request().get(
+      Api.videoRelation,
+      data: {
+        'aid': IdUtils.bv2av(bvid),
+        'bvid': bvid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future seasonFav({
+    required bool isFav,
+    required dynamic seasonId,
+  }) async {
+    var res = await Request().post(
+      isFav ? Api.cancelSub : Api.confirmSub,
+      data: {
+        'platform': 'web',
+        'season_id': seasonId,
+        'csrf': await Request.getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
   }
 }

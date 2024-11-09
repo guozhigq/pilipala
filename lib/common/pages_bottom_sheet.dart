@@ -3,7 +3,9 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import '../models/common/video_episode_type.dart';
@@ -101,6 +103,9 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
   TabController? tabController;
   List<ListObserverController>? _listObserverControllerList;
   List<ScrollController>? _listScrollControllerList;
+  final String heroTag = Get.arguments['heroTag'];
+  VideoDetailController? _videoDetailController;
+  late RxInt isSubscribe = (-1).obs;
 
   @override
   void initState() {
@@ -109,6 +114,10 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
         widget.episodes.indexWhere((dynamic e) => e.cid == widget.currentCid);
     _scrollToInit();
     _scrollPositionInit();
+    if (widget.dataType == VideoEpidoesType.videoEpisode) {
+      _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
+      _getSubscribeStatus();
+    }
   }
 
   String prefix() {
@@ -189,6 +198,32 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
     });
   }
 
+  // 获取订阅状态
+  void _getSubscribeStatus() async {
+    var res =
+        await VideoHttp.getSubscribeStatus(bvid: _videoDetailController!.bvid);
+    if (res['status']) {
+      isSubscribe.value = res['data']['season_fav'] ? 1 : 0;
+    }
+  }
+
+  // 更改订阅状态
+  void _changeSubscribeStatus() async {
+    if (isSubscribe.value == -1) {
+      return;
+    }
+    dynamic result = await VideoHttp.seasonFav(
+      isFav: isSubscribe.value == 1,
+      seasonId: widget.ugcSeason!.id,
+    );
+    if (result['status']) {
+      SmartDialog.showToast(isSubscribe.value == 1 ? '取消订阅成功' : '订阅成功');
+      isSubscribe.value = isSubscribe.value == 1 ? 0 : 1;
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
   @override
   void dispose() {
     try {
@@ -217,7 +252,11 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
               isFullScreen: widget.isFullScreen,
             ),
             if (widget.ugcSeason != null) ...[
-              UgcSeasonBuild(ugcSeason: widget.ugcSeason!),
+              UgcSeasonBuild(
+                ugcSeason: widget.ugcSeason!,
+                isSubscribe: isSubscribe,
+                changeFucCall: _changeSubscribeStatus,
+              ),
             ],
             Expanded(
               child: Material(
@@ -638,14 +677,20 @@ class EpisodeGridItem extends StatelessWidget {
 
 class UgcSeasonBuild extends StatelessWidget {
   final UgcSeason ugcSeason;
+  final RxInt isSubscribe;
+  final Function changeFucCall;
 
   const UgcSeasonBuild({
     Key? key,
     required this.ugcSeason,
+    required this.isSubscribe,
+    required this.changeFucCall,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData t = Theme.of(context);
+    final Color outline = t.colorScheme.outline;
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       color: Theme.of(context).colorScheme.surface,
@@ -673,17 +718,30 @@ class UgcSeasonBuild extends StatelessWidget {
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.outline)),
                 ),
-                // SizedBox(
-                //   height: 32,
-                //   child: FilledButton.tonal(
-                //     onPressed: () {},
-                //     style: ButtonStyle(
-                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                //     ),
-                //     child: const Text('订阅'),
-                //   ),
-                // ),
-                // const SizedBox(width: 6),
+                Obx(
+                  () => isSubscribe.value == -1
+                      ? const SizedBox(height: 32)
+                      : SizedBox(
+                          height: 32,
+                          child: FilledButton.tonal(
+                            onPressed: () => changeFucCall.call(),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.only(
+                                left: 8,
+                                right: 8,
+                              ),
+                              foregroundColor: isSubscribe.value == 1
+                                  ? outline
+                                  : t.colorScheme.onPrimary,
+                              backgroundColor: isSubscribe.value == 1
+                                  ? t.colorScheme.onInverseSurface
+                                  : t.colorScheme.primary, // 设置按钮背景色
+                            ),
+                            child: Text(isSubscribe.value == 1 ? '已订阅' : '订阅'),
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 6),
               ],
             ),
           ],
