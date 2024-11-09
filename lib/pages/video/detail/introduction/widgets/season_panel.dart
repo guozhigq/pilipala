@@ -33,7 +33,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   late PersistentBottomSheetController? _bottomSheetController;
-  int currentEpisodeIndex = 0;
+  int currentEpisodeIndex = -1;
 
   @override
   void initState() {
@@ -55,10 +55,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
     }
 
     /// 取对应 season_id 的 episodes
-    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    getCurrentIndex();
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+      getCurrentIndex();
     });
   }
 
@@ -71,6 +71,23 @@ class _SeasonPanelState extends State<SeasonPanel> {
     );
     currentIndex.value = i;
     _bottomSheetController?.close();
+  }
+
+  // 获取currentIndex
+  void getCurrentIndex() {
+    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    final List<SectionItem> sections = widget.ugcSeason.sections!;
+    if (sections.length == 1 && sections.first.type == 1) {
+      final List<EpisodeItem> episodesList = sections.first.episodes!;
+      for (int i = 0; i < episodesList.length; i++) {
+        for (int j = 0; j < episodesList[i].pages!.length; j++) {
+          if (episodesList[i].pages![j].cid == cid) {
+            currentIndex.value = i;
+            continue;
+          }
+        }
+      }
+    }
   }
 
   Widget buildEpisodeListItem(
@@ -126,6 +143,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                 dataType: VideoEpidoesType.videoEpisode,
                 ugcSeason: widget.ugcSeason,
                 currentEpisodeIndex: currentEpisodeIndex,
+                currentIndex: currentIndex.value,
               ).show(context);
             },
             child: Padding(

@@ -21,6 +21,7 @@ class EpisodeBottomSheet {
   bool isFullScreen = false;
   final UgcSeason? ugcSeason;
   final int? currentEpisodeIndex;
+  final int? currentIndex;
 
   EpisodeBottomSheet({
     required this.episodes,
@@ -32,6 +33,7 @@ class EpisodeBottomSheet {
     this.isFullScreen = false,
     this.ugcSeason,
     this.currentEpisodeIndex,
+    this.currentIndex,
   });
 
   Widget buildShowContent() {
@@ -45,6 +47,7 @@ class EpisodeBottomSheet {
       isFullScreen: isFullScreen,
       ugcSeason: ugcSeason,
       currentEpisodeIndex: currentEpisodeIndex,
+      currentIndex: currentIndex,
     );
   }
 
@@ -71,6 +74,7 @@ class PagesBottomSheet extends StatefulWidget {
     this.isFullScreen = false,
     this.ugcSeason,
     this.currentEpisodeIndex,
+    this.currentIndex,
   });
 
   final List<dynamic> episodes;
@@ -82,6 +86,7 @@ class PagesBottomSheet extends StatefulWidget {
   final bool isFullScreen;
   final UgcSeason? ugcSeason;
   final int? currentEpisodeIndex;
+  final int? currentIndex;
 
   @override
   State<PagesBottomSheet> createState() => _PagesBottomSheetState();
@@ -100,7 +105,7 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
   @override
   void initState() {
     super.initState();
-    currentIndex =
+    currentIndex = widget.currentIndex ??
         widget.episodes.indexWhere((dynamic e) => e.cid == widget.currentCid);
     _scrollToInit();
     _scrollPositionInit();
