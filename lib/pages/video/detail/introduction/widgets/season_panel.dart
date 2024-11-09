@@ -33,6 +33,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   late PersistentBottomSheetController? _bottomSheetController;
+  int currentEpisodeIndex = 0;
 
   @override
   void initState() {
@@ -41,13 +42,12 @@ class _SeasonPanelState extends State<SeasonPanel> {
     _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
 
     /// 根据 cid 找到对应集，找到对应 episodes
-    /// 有多个episodes时，只显示其中一个
-    /// TODO 同时显示多个合集
     final List<SectionItem> sections = widget.ugcSeason.sections!;
     for (int i = 0; i < sections.length; i++) {
       final List<EpisodeItem> episodesList = sections[i].episodes!;
       for (int j = 0; j < episodesList.length; j++) {
         if (episodesList[j].cid == cid) {
+          currentEpisodeIndex = i;
           episodes = episodesList;
           continue;
         }
@@ -125,6 +125,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                 sheetHeight: widget.sheetHeight,
                 dataType: VideoEpidoesType.videoEpisode,
                 ugcSeason: widget.ugcSeason,
+                currentEpisodeIndex: currentEpisodeIndex,
               ).show(context);
             },
             child: Padding(

@@ -20,6 +20,7 @@ class EpisodeBottomSheet {
   final double? sheetHeight;
   bool isFullScreen = false;
   final UgcSeason? ugcSeason;
+  final int? currentEpisodeIndex;
 
   EpisodeBottomSheet({
     required this.episodes,
@@ -30,6 +31,7 @@ class EpisodeBottomSheet {
     this.sheetHeight,
     this.isFullScreen = false,
     this.ugcSeason,
+    this.currentEpisodeIndex,
   });
 
   Widget buildShowContent() {
@@ -42,6 +44,7 @@ class EpisodeBottomSheet {
       sheetHeight: sheetHeight,
       isFullScreen: isFullScreen,
       ugcSeason: ugcSeason,
+      currentEpisodeIndex: currentEpisodeIndex,
     );
   }
 
@@ -67,6 +70,7 @@ class PagesBottomSheet extends StatefulWidget {
     this.sheetHeight,
     this.isFullScreen = false,
     this.ugcSeason,
+    this.currentEpisodeIndex,
   });
 
   final List<dynamic> episodes;
@@ -77,41 +81,29 @@ class PagesBottomSheet extends StatefulWidget {
   final double? sheetHeight;
   final bool isFullScreen;
   final UgcSeason? ugcSeason;
+  final int? currentEpisodeIndex;
 
   @override
   State<PagesBottomSheet> createState() => _PagesBottomSheetState();
 }
 
-class _PagesBottomSheetState extends State<PagesBottomSheet> {
+class _PagesBottomSheetState extends State<PagesBottomSheet>
+    with TickerProviderStateMixin {
   final ScrollController _listScrollController = ScrollController();
   late ListObserverController _listObserverController;
   final ScrollController _scrollController = ScrollController();
   late int currentIndex;
+  TabController? tabController;
+  List<ListObserverController>? _listObserverControllerList;
+  List<ScrollController>? _listScrollControllerList;
 
   @override
   void initState() {
     super.initState();
     currentIndex =
         widget.episodes.indexWhere((dynamic e) => e.cid == widget.currentCid);
-    _listObserverController =
-        ListObserverController(controller: _listScrollController);
-    if (widget.dataType == VideoEpidoesType.videoEpisode) {
-      _listObserverController.initialIndexModel = ObserverIndexPositionModel(
-        index: currentIndex,
-        isFixedHeight: true,
-      );
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.dataType != VideoEpidoesType.videoEpisode) {
-        double itemHeight = (widget.isFullScreen
-                ? 400
-                : Get.size.width - 3 * StyleString.safeSpace) /
-            5.2;
-        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
-        _scrollController.jumpTo(offset);
-      }
-    });
+    _scrollToInit();
+    _scrollPositionInit();
   }
 
   String prefix() {
@@ -126,9 +118,84 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
     return '选集';
   }
 
+  // 滚动器初始化
+  void _scrollToInit() {
+    /// 单个
+    _listObserverController =
+        ListObserverController(controller: _listScrollController);
+
+    if (widget.dataType == VideoEpidoesType.videoEpisode &&
+        widget.ugcSeason?.sections != null &&
+        widget.ugcSeason!.sections!.length > 1) {
+      tabController = TabController(
+        length: widget.ugcSeason!.sections!.length,
+        vsync: this,
+        initialIndex: widget.currentEpisodeIndex ?? 0,
+      );
+
+      /// 多tab
+      _listScrollControllerList = List.generate(
+        widget.ugcSeason!.sections!.length,
+        (index) {
+          return ScrollController();
+        },
+      );
+      _listObserverControllerList = List.generate(
+        widget.ugcSeason!.sections!.length,
+        (index) {
+          return ListObserverController(
+            controller: _listScrollControllerList![index],
+          );
+        },
+      );
+    }
+  }
+
+  // 滚动器位置初始化
+  void _scrollPositionInit() {
+    if (widget.dataType == VideoEpidoesType.videoEpisode) {
+      // 单个 多tab
+      if (widget.ugcSeason?.sections != null) {
+        if (widget.ugcSeason!.sections!.length == 1) {
+          _listObserverController.initialIndexModel =
+              ObserverIndexPositionModel(
+            index: currentIndex,
+            isFixedHeight: true,
+          );
+        } else {
+          _listObserverControllerList![widget.currentEpisodeIndex!]
+              .initialIndexModel = ObserverIndexPositionModel(
+            index: currentIndex,
+            isFixedHeight: true,
+          );
+        }
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.dataType != VideoEpidoesType.videoEpisode) {
+        double itemHeight = (widget.isFullScreen
+                ? 400
+                : Get.size.width - 3 * StyleString.safeSpace) /
+            5.2;
+        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
+        _scrollController.jumpTo(offset);
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _listObserverController.controller?.dispose();
+    try {
+      _listObserverController.controller?.dispose();
+      _listScrollController.dispose();
+      for (var element in _listObserverControllerList!) {
+        element.controller?.dispose();
+      }
+      for (var element in _listScrollControllerList!) {
+        element.dispose();
+      }
+    } catch (_) {}
     super.dispose();
   }
 
@@ -150,31 +217,35 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
             Expanded(
               child: Material(
                 child: widget.dataType == VideoEpidoesType.videoEpisode
-                    ? ListViewObserver(
-                        controller: _listObserverController,
-                        child: ListView.builder(
-                          controller: _listScrollController,
-                          itemCount: widget.episodes.length + 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            bool isLastItem = index == widget.episodes.length;
-                            bool isCurrentIndex = currentIndex == index;
-                            return isLastItem
-                                ? SizedBox(
-                                    height:
-                                        MediaQuery.of(context).padding.bottom +
+                    ? (widget.ugcSeason!.sections!.length == 1
+                        ? ListViewObserver(
+                            controller: _listObserverController,
+                            child: ListView.builder(
+                              controller: _listScrollController,
+                              itemCount: widget.episodes.length + 1,
+                              itemBuilder: (BuildContext context, int index) {
+                                bool isLastItem =
+                                    index == widget.episodes.length;
+                                bool isCurrentIndex = currentIndex == index;
+                                return isLastItem
+                                    ? SizedBox(
+                                        height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
                                             20,
-                                  )
-                                : EpisodeListItem(
-                                    episode: widget.episodes[index],
-                                    index: index,
-                                    isCurrentIndex: isCurrentIndex,
-                                    dataType: widget.dataType,
-                                    changeFucCall: widget.changeFucCall,
-                                    isFullScreen: widget.isFullScreen,
-                                  );
-                          },
-                        ),
-                      )
+                                      )
+                                    : EpisodeListItem(
+                                        episode: widget.episodes[index],
+                                        index: index,
+                                        isCurrentIndex: isCurrentIndex,
+                                        dataType: widget.dataType,
+                                        changeFucCall: widget.changeFucCall,
+                                        isFullScreen: widget.isFullScreen,
+                                      );
+                              },
+                            ),
+                          )
+                        : buildTabBar())
                     : Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12.0), // 设置左右间距为12
@@ -205,6 +276,61 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
         ),
       );
     });
+  }
+
+  Widget buildTabBar() {
+    return Column(
+      children: [
+        TabBar(
+          controller: tabController,
+          isScrollable: true,
+          indicatorSize: TabBarIndicatorSize.label,
+          tabAlignment: TabAlignment.start,
+          splashBorderRadius: BorderRadius.circular(4),
+          tabs: [
+            ...widget.ugcSeason!.sections!.map((SectionItem section) {
+              return Tab(
+                text: section.title,
+              );
+            }).toList()
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              ...widget.ugcSeason!.sections!.map((SectionItem section) {
+                final int fIndex = widget.ugcSeason!.sections!.indexOf(section);
+                return ListViewObserver(
+                  controller: _listObserverControllerList![fIndex],
+                  child: ListView.builder(
+                    controller: _listScrollControllerList![fIndex],
+                    itemCount: section.episodes!.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      final bool isLastItem = index == section.episodes!.length;
+                      return isLastItem
+                          ? SizedBox(
+                              height:
+                                  MediaQuery.of(context).padding.bottom + 20,
+                            )
+                          : EpisodeListItem(
+                              episode: section.episodes![index], // 调整索引
+                              index: index, // 调整索引
+                              isCurrentIndex: widget.currentCid ==
+                                  section.episodes![index].cid,
+                              dataType: widget.dataType,
+                              changeFucCall: widget.changeFucCall,
+                              isFullScreen: widget.isFullScreen,
+                            );
+                    },
+                  ),
+                );
+              }).toList()
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -516,7 +642,7 @@ class UgcSeasonBuild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       color: Theme.of(context).colorScheme.surface,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
