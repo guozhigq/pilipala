@@ -609,4 +609,10 @@ class Api {
 
   /// @我的
   static const String messageAtAPi = '/x/msgfeed/at?';
+
+  /// 订阅
+  static const String confirmSub = '/x/v3/fav/season/fav';
+
+  /// 订阅状态
+  static const String videoRelation = '/x/web-interface/archive/relation';
 }
