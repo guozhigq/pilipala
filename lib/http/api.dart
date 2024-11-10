@@ -615,4 +615,8 @@ class Api {
 
   /// 订阅状态
   static const String videoRelation = '/x/web-interface/archive/relation';
+
+  /// 获取空降区间
+  static const String getSkipSegments =
+      '${HttpString.sponsorBlockBaseUrl}/api/skipSegments';
 }
