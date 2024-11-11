@@ -137,8 +137,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String heroTag;
   late final VideoIntroController videoIntroController;
   late final VideoDetailController videoDetailCtr;
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double sheetHeight;
   late final dynamic owner;
   late int mid;

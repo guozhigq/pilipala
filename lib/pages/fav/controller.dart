@@ -11,7 +11,7 @@ class FavController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
   int pageSize = 60;

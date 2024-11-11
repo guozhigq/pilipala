@@ -17,8 +17,8 @@ class MineController extends GetxController {
   Rx<UserInfoData> userInfo = UserInfoData().obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
-  Box setting = GStrorage.setting;
-  Box userInfoCache = GStrorage.userInfo;
+  Box setting = GStorage.setting;
+  Box userInfoCache = GStorage.userInfo;
   List menuList = [
     {
       'icon': Icons.history,

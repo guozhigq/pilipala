@@ -7,7 +7,7 @@ import 'package:pilipala/utils/storage.dart';
 
 class LiveFollowController extends GetxController {
   RxInt crossAxisCount = 2.obs;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   int _currentPage = 1;
   RxInt liveFollowingCount = 0.obs;
   RxList<LiveFollowingItemModel> liveFollowingList =

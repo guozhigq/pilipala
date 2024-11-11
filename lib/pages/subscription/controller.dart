@@ -11,7 +11,7 @@ import '../../models/user/sub_folder.dart';
 class SubController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<SubFolderModelData> subFolderData = SubFolderModelData().obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
   int pageSize = 20;

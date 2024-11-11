@@ -54,8 +54,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   double doubleOffset = 0;
 
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double statusBarHeight;
   final double videoHeight = Get.size.width * 9 / 16;
   late Future _futureBuilderFuture;

@@ -32,7 +32,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   late ScrollController scrollController;
 
   @override

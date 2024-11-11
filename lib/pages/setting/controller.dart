@@ -13,9 +13,9 @@ import '../main/index.dart';
 import 'widgets/select_dialog.dart';
 
 class SettingController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
-  Box setting = GStrorage.setting;
-  Box localCache = GStrorage.localCache;
+  Box userInfoCache = GStorage.userInfo;
+  Box setting = GStorage.setting;
+  Box localCache = GStorage.localCache;
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;

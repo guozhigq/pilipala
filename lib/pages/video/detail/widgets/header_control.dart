@@ -52,8 +52,8 @@ class _HeaderControlState extends State<HeaderControl> {
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> videoStorage = GStrorage.video;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> videoStorage = GStorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
   RxBool isFullScreen = false.obs;

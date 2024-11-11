@@ -16,7 +16,7 @@ class FavPanel extends StatefulWidget {
 }
 
 class _FavPanelState extends State<FavPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   late Future _futureBuilderFuture;
 
   @override

@@ -6,7 +6,7 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class MineEditController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   final formKey = GlobalKey<FormState>();
   final TextEditingController unameCtr = TextEditingController();
   final TextEditingController useridCtr = TextEditingController();

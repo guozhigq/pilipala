@@ -116,7 +116,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   String heroTag = Get.arguments['heroTag'];
   late final BangumiIntroController bangumiIntroController;
   late final VideoDetailController videoDetailCtr;
-  Box localCache = GStrorage.localCache;
+  Box localCache = GStorage.localCache;
   late double sheetHeight;
   int? cid;
   bool isProcessing = false;

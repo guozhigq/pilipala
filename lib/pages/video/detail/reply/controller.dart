@@ -32,20 +32,20 @@ class VideoReplyController extends GetxController {
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   RxInt replyReqCode = 200.obs;
   bool isEnd = false;
 
   @override
   void onInit() {
     super.onInit();
-    int deaultReplySortIndex =
+    int defaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
-    if (deaultReplySortIndex == 2) {
+    if (defaultReplySortIndex == 2) {
       setting.put(SettingBoxKey.replySortType, 0);
-      deaultReplySortIndex = 0;
+      defaultReplySortIndex = 0;
     }
-    _sortType = ReplySortType.values[deaultReplySortIndex];
+    _sortType = ReplySortType.values[defaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }

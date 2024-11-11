@@ -32,7 +32,7 @@ void main() async {
   MediaKit.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  await GStrorage.init();
+  await GStorage.init();
   clearLogs();
   Request();
   await Request.setCookie();
@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Box setting = GStrorage.setting;
+    Box setting = GStorage.setting;
     // 主题色
     Color defaultColor =
         colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]

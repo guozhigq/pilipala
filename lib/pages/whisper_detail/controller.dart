@@ -20,7 +20,7 @@ class WhisperDetailController extends GetxController {
   //表情转换图片规则
   RxList<dynamic> eInfos = [].obs;
   final TextEditingController replyContentController = TextEditingController();
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   List emoteList = [];
   List<String> picList = [];
 

@@ -32,7 +32,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late PlDanmakuController _plDanmakuController;
   DanmakuController? _controller;
   // bool danmuPlayStatus = true;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late bool enableShowDanmaku;
   late List blockTypes;
   late double showArea;

@@ -71,7 +71,7 @@ class LoginUtils {
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
         try {
-          Box userInfoCache = GStrorage.userInfo;
+          Box userInfoCache = GStorage.userInfo;
           if (!userInfoCache.isOpen) {
             userInfoCache = await Hive.openBox('userInfo');
           }
