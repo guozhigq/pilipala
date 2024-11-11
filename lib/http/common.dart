@@ -18,7 +18,7 @@ class CommonHttp {
   }
 
   static Future querySkipSegments({required String bvid}) async {
-    var res = await Request().get(Api.getSkipSegments, data: {
+    var res = await Request().getWithoutCookie(Api.getSkipSegments, data: {
       'videoID': bvid,
     });
     if (res.data is List && res.data.isNotEmpty) {
