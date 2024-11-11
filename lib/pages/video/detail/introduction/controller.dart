@@ -85,15 +85,14 @@ class VideoIntroController extends GetxController {
   }
 
   // 获取视频简介&分p
-  Future queryVideoIntro({cover}) async {
+  Future queryVideoIntro({String? cover, String? type, int? cid}) async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
       pages.value = result['data']!.pages!;
-      lastPlayCid.value = videoDetail.value.cid!;
-      if (pages.isNotEmpty) {
-        lastPlayCid.value = pages.first.cid!;
+      if (type == null) {
+        lastPlayCid.value = cid ?? videoDetail.value.cid!;
       }
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
@@ -473,7 +472,8 @@ class VideoIntroController extends GetxController {
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
     this.bvid = bvid;
-    await queryVideoIntro(cover: cover);
+    // 点击切换时，优先取当前cid
+    await queryVideoIntro(cover: cover, cid: cid);
   }
 
   void startTimer() {
