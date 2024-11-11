@@ -95,9 +95,9 @@ class Request {
     String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
     Random rand = Random();
     String rand_png_end = base64.encode(
-      List<int>.generate(32, (_) => rand.nextInt(256)) +
-      List<int>.filled(4, 0) +
-      [73, 69, 78, 68] +
+        List<int>.generate(32, (_) => rand.nextInt(256)) +
+            List<int>.filled(4, 0) +
+            [73, 69, 78, 68] +
       List<int>.generate(4, (_) => rand.nextInt(256))
     );
 
@@ -112,7 +112,7 @@ class Request {
 
     await Request().post(
       Api.activateBuvidApi,
-      data: {'payload': jsonData},
+        data: {'payload': jsonData},
       options: Options(contentType: 'application/json')
     );
   }
@@ -196,6 +196,15 @@ class Request {
       resType = extra!['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
+      }
+      if (extra['opus-goback'] != null) {
+        List<Cookie> cookies = await cookieManager.cookieJar
+            .loadForRequest(Uri.parse(HttpString.baseUrl));
+        String cookieHeader = cookies
+            .map((cookie) => '${cookie.name}=${cookie.value}')
+            .join('; ');
+        options.headers!['cookie'] =
+            '$cookieHeader; opus-goback = ${extra['opus-goback']}';
       }
     }
     options.responseType = resType;
