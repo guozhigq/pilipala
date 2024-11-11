@@ -295,7 +295,7 @@ class EpisodeListItem extends StatelessWidget {
       dense: false,
       leading: isCurrentIndex
           ? Image.asset(
-              'assets/images/live.gif',
+              'assets/images/live.png',
               color: primary,
               height: 12,
             )
