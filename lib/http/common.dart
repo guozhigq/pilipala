@@ -21,7 +21,6 @@ class CommonHttp {
     var res = await Request().get(Api.getSkipSegments, data: {
       'videoID': bvid,
     });
-    print(res.data);
     if (res.data is List && res.data.isNotEmpty) {
       try {
         return {
@@ -39,7 +38,7 @@ class CommonHttp {
       }
     } else {
       return {
-        'status': true,
+        'status': false,
         'data': [],
       };
     }

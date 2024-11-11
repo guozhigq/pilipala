@@ -722,15 +722,16 @@ class VideoDetailController extends GetxController
     var res = await CommonHttp.querySkipSegments(bvid: bvid);
     if (res['status']) {
       /// TODO 根据segmentType过滤数据
-      skipSegments = res['data'];
-    } else {
-      SmartDialog.showToast(res['msg']);
+      skipSegments = res['data'] ?? [];
     }
   }
 
   // 监听视频进度
   void onPositionChanged() async {
-    if (skipSegments.isEmpty) {
+    final List<SegmentDataModel> sponsorSkipSegments = skipSegments
+        .where((e) => e.category!.value == SegmentType.sponsor.value)
+        .toList();
+    if (sponsorSkipSegments.isEmpty) {
       return;
     }
 
@@ -744,8 +745,7 @@ class VideoDetailController extends GetxController
       }
 
       lastPosition = positionMs;
-
-      for (SegmentDataModel segment in skipSegments) {
+      for (SegmentDataModel segment in sponsorSkipSegments) {
         try {
           final segmentStart = segment.segment!.first.toInt();
           final segmentEnd = segment.segment!.last.toInt();
