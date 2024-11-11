@@ -71,9 +71,9 @@ class VideoDetailController extends GetxController
   RxBool enableHA = false.obs;
 
   /// 本地存储
-  Box userInfoCache = GStrorage.userInfo;
-  Box localCache = GStrorage.localCache;
-  Box setting = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box localCache = GStorage.localCache;
+  Box setting = GStorage.setting;
 
   RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用

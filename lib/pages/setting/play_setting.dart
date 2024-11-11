@@ -23,7 +23,7 @@ class PlaySetting extends StatefulWidget {
 }
 
 class _PlaySettingState extends State<PlaySetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late dynamic defaultVideoQa;
   late dynamic defaultLiveQa;
   late dynamic defaultAudioQa;

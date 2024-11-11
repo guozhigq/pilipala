@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pilipala/models/user/info.dart';
 
-class GStrorage {
+class GStorage {
   static late final Box<dynamic> userInfo;
   static late final Box<dynamic> localCache;
   static late final Box<dynamic> setting;

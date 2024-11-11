@@ -22,7 +22,7 @@ class _BlackListPageState extends State<BlackListPage> {
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
   bool _isLoadingMore = false;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void initState() {

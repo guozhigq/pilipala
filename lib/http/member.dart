@@ -470,8 +470,8 @@ class MemberHttp {
     SmartDialog.dismiss();
     if (res.data['code'] == 0) {
       String accessKey = res.data['data']['access_token'];
-      Box localCache = GStrorage.localCache;
-      Box userInfoCache = GStrorage.userInfo;
+      Box localCache = GStorage.localCache;
+      Box userInfoCache = GStorage.userInfo;
       var userInfo = userInfoCache.get('userInfoCache');
       localCache.put(
           LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});

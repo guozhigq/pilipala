@@ -82,7 +82,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   final RxDouble _distance = 0.0.obs;
   final RxBool _volumeInterceptEventStream = false.obs;
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;

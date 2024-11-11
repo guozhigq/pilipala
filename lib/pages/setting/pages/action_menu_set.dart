@@ -13,7 +13,7 @@ class ActionMenuSetPage extends StatefulWidget {
 }
 
 class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late List<String> actionTypeSort;
   late List<Map> allLabels;
 

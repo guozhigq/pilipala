@@ -14,8 +14,8 @@ class PlaySpeedPage extends StatefulWidget {
 }
 
 class _PlaySpeedPageState extends State<PlaySpeedPage> {
-  Box videoStorage = GStrorage.video;
-  Box settingStorage = GStrorage.setting;
+  Box videoStorage = GStorage.video;
+  Box settingStorage = GStorage.setting;
   late double playSpeedDefault;
   late List<double> playSpeedSystem;
   late double longPressSpeedDefault;

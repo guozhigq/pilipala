@@ -26,7 +26,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'reply_save.dart';
 import 'zan.dart';
 
-Box setting = GStrorage.setting;
+Box setting = GStorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({

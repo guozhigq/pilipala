@@ -18,7 +18,7 @@ class GroupPanel extends StatefulWidget {
 }
 
 class _GroupPanelState extends State<GroupPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   late Future _futureBuilderFuture;
   late List<MemberTagItemModel> tagsList;
   bool showDefault = true;

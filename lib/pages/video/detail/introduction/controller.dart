@@ -41,7 +41,7 @@ class VideoIntroController extends GetxController {
   RxBool hasFav = false.obs;
   // 是否不喜欢
   RxBool hasDisLike = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];

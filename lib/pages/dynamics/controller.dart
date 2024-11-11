@@ -50,11 +50,11 @@ class DynamicsController extends GetxController {
   ];
   bool flag = false;
   RxInt initialValue = 0.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   var userInfo;
   RxBool isLoadingDynamic = false.obs;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {

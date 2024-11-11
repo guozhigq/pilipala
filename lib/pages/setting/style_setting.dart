@@ -28,7 +28,7 @@ class _StyleSettingState extends State<StyleSetting> {
   final ColorSelectController colorSelectController =
       Get.put(ColorSelectController());
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late int picQuality;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;

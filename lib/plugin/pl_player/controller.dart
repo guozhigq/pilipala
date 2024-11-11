@@ -27,9 +27,9 @@ import '../../models/video/subTitile/content.dart';
 import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-Box videoStorage = GStrorage.video;
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
+Box videoStorage = GStorage.video;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
