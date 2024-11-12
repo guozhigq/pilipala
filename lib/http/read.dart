@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/read/opus.dart';
 import 'package:pilipala/models/read/read.dart';
@@ -64,7 +65,7 @@ class ReadHttp {
   static Future parseArticleCv({required String id}) async {
     var res = await Request().get(
       'https://www.bilibili.com/read/cv$id',
-      extra: {'ua': 'pc'},
+      extra: {'ua': 'pc', 'opus-goback': '1'},
     );
     String scriptContent =
         extractScriptContents(parse(res.data).body!.outerHtml)[0];
