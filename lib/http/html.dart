@@ -70,7 +70,7 @@ class HtmlHttp {
   static Future reqReadHtml(id, dynamicType) async {
     var response = await Request().get(
       "https://www.bilibili.com/$dynamicType/$id/",
-      extra: {'ua': 'pc'},
+      extra: {'ua': 'pc', 'opus-goback': '1'},
     );
     Document rootTree = parse(response.data);
     Element body = rootTree.body!;
