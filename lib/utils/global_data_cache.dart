@@ -5,10 +5,10 @@ import 'package:pilipala/plugin/pl_player/models/play_speed.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../models/common/index.dart';
 
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
-Box videoStorage = GStrorage.video;
-Box userInfoCache = GStrorage.userInfo;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
+Box videoStorage = GStorage.video;
+Box userInfoCache = GStorage.userInfo;
 
 class GlobalDataCache {
   late int imgQuality;

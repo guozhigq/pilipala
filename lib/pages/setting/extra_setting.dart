@@ -19,8 +19,8 @@ class ExtraSetting extends StatefulWidget {
 }
 
 class _ExtraSettingState extends State<ExtraSetting> {
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;
   late dynamic enableSystemProxy;

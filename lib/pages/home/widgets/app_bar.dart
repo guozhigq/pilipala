@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box userInfoCache = GStrorage.userInfo;
+Box userInfoCache = GStorage.userInfo;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});

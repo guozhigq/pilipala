@@ -641,6 +641,7 @@ class EpisodeItem {
     this.page,
     this.bvid,
     this.cover,
+    this.pages,
   });
   int? seasonId;
   int? sectionId;
@@ -655,6 +656,7 @@ class EpisodeItem {
   int? pubdate;
   int? duration;
   Stat? stat;
+  List<Page>? pages;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     seasonId = json['season_id'];
@@ -670,6 +672,7 @@ class EpisodeItem {
     pubdate = json['arc']['pubdate'];
     duration = json['arc']['duration'];
     stat = Stat.fromJson(json['arc']['stat']);
+    pages = json['pages'].map<Page>((e) => Page.fromJson(e)).toList();
   }
 }
 
@@ -710,5 +713,20 @@ class Vip {
   Vip.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     status = json['status'];
+  }
+}
+
+class Page {
+  Page({
+    this.cid,
+    this.page,
+  });
+
+  int? cid;
+  int? page;
+
+  Page.fromJson(Map<String, dynamic> json) {
+    cid = json['cid'];
+    page = json['page'];
   }
 }

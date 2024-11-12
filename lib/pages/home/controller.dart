@@ -14,12 +14,12 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  Box userInfoCache = GStrorage.userInfo;
-  Box settingStorage = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box settingStorage = GStorage.setting;
   RxBool userLogin = false.obs;
   RxString userFace = ''.obs;
   var userInfo;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late final StreamController<bool> searchBarStream =
       StreamController<bool>.broadcast();
   late bool hideSearchBar;

@@ -4,7 +4,7 @@ import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box localCache = GStrorage.localCache;
+Box localCache = GStorage.localCache;
 late double sheetHeight;
 
 class IntroDetail extends StatelessWidget {

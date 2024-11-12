@@ -17,7 +17,7 @@ class LiveController extends GetxController {
   RxInt liveFollowingCount = 0.obs;
   bool flag = false;
   OverlayEntry? popupDialog;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {

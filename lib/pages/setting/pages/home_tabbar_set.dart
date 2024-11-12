@@ -12,7 +12,7 @@ class TabbarSetPage extends StatefulWidget {
 }
 
 class _TabbarSetPageState extends State<TabbarSetPage> {
-  Box settingStorage = GStrorage.setting;
+  Box settingStorage = GStorage.setting;
   late List defaultTabs;
   late List<String> tabbarSort;
 

@@ -6,11 +6,14 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:pilipala/http/common.dart';
 import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/models/sponsor_block/segment.dart';
+import 'package:pilipala/models/sponsor_block/segment_type.dart';
 import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
@@ -68,9 +71,9 @@ class VideoDetailController extends GetxController
   RxBool enableHA = false.obs;
 
   /// 本地存储
-  Box userInfoCache = GStrorage.userInfo;
-  Box localCache = GStrorage.localCache;
-  Box setting = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box localCache = GStorage.localCache;
+  Box setting = GStorage.setting;
 
   RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用
@@ -120,6 +123,8 @@ class VideoDetailController extends GetxController
   RxBool isWatchLaterVisible = false.obs;
   RxString watchLaterTitle = ''.obs;
   RxInt watchLaterCount = 0.obs;
+  List<SegmentDataModel> skipSegments = <SegmentDataModel>[];
+  int? lastPosition;
 
   @override
   void onInit() {
@@ -188,6 +193,11 @@ class VideoDetailController extends GetxController
     tabCtr.addListener(() {
       onTabChanged();
     });
+
+    /// 仅投稿视频skip
+    if (videoType == SearchType.video) {
+      querySkipSegments();
+    }
   }
 
   showReplyReplyPanel(oid, fRpid, firstFloor, currentReply, loadMore) {
@@ -305,6 +315,7 @@ class VideoDetailController extends GetxController
     plPlayerController.headerControl = headerControl;
 
     plPlayerController.subtitles.value = subtitles;
+    onPositionChanged();
   }
 
   // 视频链接
@@ -704,6 +715,53 @@ class VideoDetailController extends GetxController
   // 监听tabBarView切换
   void onTabChanged() {
     isWatchLaterVisible.value = tabCtr.index == 0;
+  }
+
+  // 获取sponsorBlock数据
+  Future querySkipSegments() async {
+    var res = await CommonHttp.querySkipSegments(bvid: bvid);
+    if (res['status']) {
+      /// TODO 根据segmentType过滤数据
+      skipSegments = res['data'] ?? [];
+    }
+  }
+
+  // 监听视频进度
+  void onPositionChanged() async {
+    final List<SegmentDataModel> sponsorSkipSegments = skipSegments
+        .where((e) => e.category!.value == SegmentType.sponsor.value)
+        .toList();
+    if (sponsorSkipSegments.isEmpty) {
+      return;
+    }
+
+    plPlayerController.videoPlayerController?.stream.position
+        .listen((Duration position) async {
+      final int positionMs = position.inSeconds;
+
+      // 如果当前秒与上次处理的秒相同，则直接返回
+      if (lastPosition != null && lastPosition! == positionMs) {
+        return;
+      }
+
+      lastPosition = positionMs;
+      for (SegmentDataModel segment in sponsorSkipSegments) {
+        try {
+          final segmentStart = segment.segment!.first.toInt();
+          final segmentEnd = segment.segment!.last.toInt();
+
+          /// 只有顺序播放时才skip，跳转时间点不会skip
+          if (positionMs == segmentStart && !segment.isSkip) {
+            await plPlayerController.videoPlayerController
+                ?.seek(Duration(seconds: segmentEnd));
+            segment.isSkip = true;
+            SmartDialog.showToast('已跳过${segment.category!.label}片段');
+          }
+        } catch (err) {
+          SmartDialog.showToast('skipSegments error: $err');
+        }
+      }
+    });
   }
 
   @override

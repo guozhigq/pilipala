@@ -42,7 +42,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
 class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late VideoReplyReplyController _videoReplyReplyController;
   late AnimationController replyAnimationCtl;
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
 

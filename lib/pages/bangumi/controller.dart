@@ -12,7 +12,7 @@ class BangumiController extends GetxController {
   RxInt total = 0.obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   late int mid;
   var userInfo;

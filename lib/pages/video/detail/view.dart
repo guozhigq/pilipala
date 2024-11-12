@@ -54,8 +54,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   double doubleOffset = 0;
 
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double statusBarHeight;
   final double videoHeight = Get.size.width * 9 / 16;
   late Future _futureBuilderFuture;
@@ -101,7 +101,9 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
     videoSourceInit();
     appbarStreamListen();
-    fullScreenStatusListener();
+    if (autoPlayEnable) {
+      fullScreenStatusListener();
+    }
     if (Platform.isAndroid) {
       floating = vdCtr.floating!;
     }
@@ -137,7 +139,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     autoEnterPip(status: status);
     if (status == PlayerStatus.completed) {
       // 结束播放退出全屏
-      if (autoExitFullcreen) {
+      if (autoExitFullcreen && plPlayerController!.isFullScreen.value) {
         plPlayerController!.triggerFullScreen(status: false);
       }
       shutdownTimerService.handleWaitingFinished();
@@ -184,6 +186,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     await vdCtr.playerInit(autoplay: true);
     plPlayerController = vdCtr.plPlayerController;
     plPlayerController!.addStatusLister(playerListener);
+    fullScreenStatusListener();
     vdCtr.autoPlay.value = true;
     vdCtr.isShowCover.value = false;
     isShowing.value = true;

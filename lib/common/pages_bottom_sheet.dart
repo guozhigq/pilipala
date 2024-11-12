@@ -3,7 +3,9 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/video_detail_res.dart';
+import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import '../models/common/video_episode_type.dart';
@@ -20,6 +22,8 @@ class EpisodeBottomSheet {
   final double? sheetHeight;
   bool isFullScreen = false;
   final UgcSeason? ugcSeason;
+  final int? currentEpisodeIndex;
+  final int? currentIndex;
 
   EpisodeBottomSheet({
     required this.episodes,
@@ -30,6 +34,8 @@ class EpisodeBottomSheet {
     this.sheetHeight,
     this.isFullScreen = false,
     this.ugcSeason,
+    this.currentEpisodeIndex,
+    this.currentIndex,
   });
 
   Widget buildShowContent() {
@@ -42,6 +48,8 @@ class EpisodeBottomSheet {
       sheetHeight: sheetHeight,
       isFullScreen: isFullScreen,
       ugcSeason: ugcSeason,
+      currentEpisodeIndex: currentEpisodeIndex,
+      currentIndex: currentIndex,
     );
   }
 
@@ -67,6 +75,8 @@ class PagesBottomSheet extends StatefulWidget {
     this.sheetHeight,
     this.isFullScreen = false,
     this.ugcSeason,
+    this.currentEpisodeIndex,
+    this.currentIndex,
   });
 
   final List<dynamic> episodes;
@@ -77,41 +87,38 @@ class PagesBottomSheet extends StatefulWidget {
   final double? sheetHeight;
   final bool isFullScreen;
   final UgcSeason? ugcSeason;
+  final int? currentEpisodeIndex;
+  final int? currentIndex;
 
   @override
   State<PagesBottomSheet> createState() => _PagesBottomSheetState();
 }
 
-class _PagesBottomSheetState extends State<PagesBottomSheet> {
+class _PagesBottomSheetState extends State<PagesBottomSheet>
+    with TickerProviderStateMixin {
   final ScrollController _listScrollController = ScrollController();
   late ListObserverController _listObserverController;
   final ScrollController _scrollController = ScrollController();
   late int currentIndex;
+  TabController? tabController;
+  List<ListObserverController>? _listObserverControllerList;
+  List<ScrollController>? _listScrollControllerList;
+  final String heroTag = Get.arguments['heroTag'];
+  VideoDetailController? _videoDetailController;
+  RxInt isSubscribe = (-1).obs;
+  bool isVisible = false;
 
   @override
   void initState() {
     super.initState();
-    currentIndex =
+    currentIndex = widget.currentIndex ??
         widget.episodes.indexWhere((dynamic e) => e.cid == widget.currentCid);
-    _listObserverController =
-        ListObserverController(controller: _listScrollController);
+    _scrollToInit();
+    _scrollPositionInit();
     if (widget.dataType == VideoEpidoesType.videoEpisode) {
-      _listObserverController.initialIndexModel = ObserverIndexPositionModel(
-        index: currentIndex,
-        isFixedHeight: true,
-      );
+      _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
+      _getSubscribeStatus();
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.dataType != VideoEpidoesType.videoEpisode) {
-        double itemHeight = (widget.isFullScreen
-                ? 400
-                : Get.size.width - 3 * StyleString.safeSpace) /
-            5.2;
-        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
-        _scrollController.jumpTo(offset);
-      }
-    });
   }
 
   String prefix() {
@@ -126,9 +133,117 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
     return '选集';
   }
 
+  // 滚动器初始化
+  void _scrollToInit() {
+    /// 单个
+    _listObserverController =
+        ListObserverController(controller: _listScrollController);
+
+    if (widget.dataType == VideoEpidoesType.videoEpisode &&
+        widget.ugcSeason?.sections != null &&
+        widget.ugcSeason!.sections!.length > 1) {
+      tabController = TabController(
+        length: widget.ugcSeason!.sections!.length,
+        vsync: this,
+        initialIndex: widget.currentEpisodeIndex ?? 0,
+      );
+
+      /// 多tab
+      _listScrollControllerList = List.generate(
+        widget.ugcSeason!.sections!.length,
+        (index) {
+          return ScrollController();
+        },
+      );
+      _listObserverControllerList = List.generate(
+        widget.ugcSeason!.sections!.length,
+        (index) {
+          return ListObserverController(
+            controller: _listScrollControllerList![index],
+          );
+        },
+      );
+    }
+  }
+
+  // 滚动器位置初始化
+  void _scrollPositionInit() {
+    if (widget.dataType == VideoEpidoesType.videoEpisode) {
+      // 单个 多tab
+      if (widget.ugcSeason?.sections != null) {
+        if (widget.ugcSeason!.sections!.length == 1) {
+          _listObserverController.initialIndexModel =
+              ObserverIndexPositionModel(
+            index: currentIndex,
+            isFixedHeight: true,
+          );
+        } else {
+          _listObserverControllerList![widget.currentEpisodeIndex!]
+              .initialIndexModel = ObserverIndexPositionModel(
+            index: currentIndex,
+            isFixedHeight: true,
+          );
+        }
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.dataType != VideoEpidoesType.videoEpisode) {
+        double itemHeight = (widget.isFullScreen
+                ? 400
+                : Get.size.width - 3 * StyleString.safeSpace) /
+            5.2;
+        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
+        _scrollController.jumpTo(offset);
+      }
+    });
+  }
+
+  // 获取订阅状态
+  void _getSubscribeStatus() async {
+    var res =
+        await VideoHttp.getSubscribeStatus(bvid: _videoDetailController!.bvid);
+    if (res['status']) {
+      isSubscribe.value = res['data']['season_fav'] ? 1 : 0;
+    }
+  }
+
+  // 更改订阅状态
+  void _changeSubscribeStatus() async {
+    if (isSubscribe.value == -1) {
+      return;
+    }
+    dynamic result = await VideoHttp.seasonFav(
+      isFav: isSubscribe.value == 1,
+      seasonId: widget.ugcSeason!.id,
+    );
+    if (result['status']) {
+      SmartDialog.showToast(isSubscribe.value == 1 ? '取消订阅成功' : '订阅成功');
+      isSubscribe.value = isSubscribe.value == 1 ? 0 : 1;
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
+  // 更改展开状态
+  void _changeVisible() {
+    setState(() {
+      isVisible = !isVisible;
+    });
+  }
+
   @override
   void dispose() {
-    _listObserverController.controller?.dispose();
+    try {
+      _listObserverController.controller?.dispose();
+      _listScrollController.dispose();
+      for (var element in _listObserverControllerList!) {
+        element.controller?.dispose();
+      }
+      for (var element in _listScrollControllerList!) {
+        element.dispose();
+      }
+    } catch (_) {}
     super.dispose();
   }
 
@@ -145,36 +260,46 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
               isFullScreen: widget.isFullScreen,
             ),
             if (widget.ugcSeason != null) ...[
-              UgcSeasonBuild(ugcSeason: widget.ugcSeason!),
+              UgcSeasonBuild(
+                ugcSeason: widget.ugcSeason!,
+                isSubscribe: isSubscribe,
+                isVisible: isVisible,
+                changeFucCall: _changeSubscribeStatus,
+                changeVisible: _changeVisible,
+              ),
             ],
             Expanded(
               child: Material(
                 child: widget.dataType == VideoEpidoesType.videoEpisode
-                    ? ListViewObserver(
-                        controller: _listObserverController,
-                        child: ListView.builder(
-                          controller: _listScrollController,
-                          itemCount: widget.episodes.length + 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            bool isLastItem = index == widget.episodes.length;
-                            bool isCurrentIndex = currentIndex == index;
-                            return isLastItem
-                                ? SizedBox(
-                                    height:
-                                        MediaQuery.of(context).padding.bottom +
+                    ? (widget.ugcSeason!.sections!.length == 1
+                        ? ListViewObserver(
+                            controller: _listObserverController,
+                            child: ListView.builder(
+                              controller: _listScrollController,
+                              itemCount: widget.episodes.length + 1,
+                              itemBuilder: (BuildContext context, int index) {
+                                bool isLastItem =
+                                    index == widget.episodes.length;
+                                bool isCurrentIndex = currentIndex == index;
+                                return isLastItem
+                                    ? SizedBox(
+                                        height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
                                             20,
-                                  )
-                                : EpisodeListItem(
-                                    episode: widget.episodes[index],
-                                    index: index,
-                                    isCurrentIndex: isCurrentIndex,
-                                    dataType: widget.dataType,
-                                    changeFucCall: widget.changeFucCall,
-                                    isFullScreen: widget.isFullScreen,
-                                  );
-                          },
-                        ),
-                      )
+                                      )
+                                    : EpisodeListItem(
+                                        episode: widget.episodes[index],
+                                        index: index,
+                                        isCurrentIndex: isCurrentIndex,
+                                        dataType: widget.dataType,
+                                        changeFucCall: widget.changeFucCall,
+                                        isFullScreen: widget.isFullScreen,
+                                      );
+                              },
+                            ),
+                          )
+                        : buildTabBar())
                     : Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12.0), // 设置左右间距为12
@@ -205,6 +330,65 @@ class _PagesBottomSheetState extends State<PagesBottomSheet> {
         ),
       );
     });
+  }
+
+  Widget buildTabBar() {
+    return Column(
+      children: [
+        // 背景色
+        Container(
+          color: Theme.of(context).colorScheme.surface,
+          child: TabBar(
+            controller: tabController,
+            isScrollable: true,
+            indicatorSize: TabBarIndicatorSize.label,
+            tabAlignment: TabAlignment.start,
+            splashBorderRadius: BorderRadius.circular(4),
+            tabs: [
+              ...widget.ugcSeason!.sections!.map((SectionItem section) {
+                return Tab(
+                  text: section.title,
+                );
+              }).toList()
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              ...widget.ugcSeason!.sections!.map((SectionItem section) {
+                final int fIndex = widget.ugcSeason!.sections!.indexOf(section);
+                return ListViewObserver(
+                  controller: _listObserverControllerList![fIndex],
+                  child: ListView.builder(
+                    controller: _listScrollControllerList![fIndex],
+                    itemCount: section.episodes!.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      final bool isLastItem = index == section.episodes!.length;
+                      return isLastItem
+                          ? SizedBox(
+                              height:
+                                  MediaQuery.of(context).padding.bottom + 20,
+                            )
+                          : EpisodeListItem(
+                              episode: section.episodes![index], // 调整索引
+                              index: index, // 调整索引
+                              isCurrentIndex: widget.currentCid ==
+                                  section.episodes![index].cid,
+                              dataType: widget.dataType,
+                              changeFucCall: widget.changeFucCall,
+                              isFullScreen: widget.isFullScreen,
+                            );
+                    },
+                  ),
+                );
+              }).toList()
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -507,77 +691,134 @@ class EpisodeGridItem extends StatelessWidget {
 
 class UgcSeasonBuild extends StatelessWidget {
   final UgcSeason ugcSeason;
+  final RxInt isSubscribe;
+  final bool isVisible;
+  final Function changeFucCall;
+  final Function changeVisible;
 
   const UgcSeasonBuild({
     Key? key,
     required this.ugcSeason,
+    required this.isSubscribe,
+    required this.isVisible,
+    required this.changeFucCall,
+    required this.changeVisible,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-      color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '合集：${ugcSeason.title}',
-            style: Theme.of(context).textTheme.titleMedium,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (ugcSeason.intro != null && ugcSeason.intro != '') ...[
-            const SizedBox(height: 4),
-            Row(
+    final ThemeData theme = Theme.of(context);
+    final Color outline = theme.colorScheme.outline;
+    final Color surface = theme.colorScheme.surface;
+    final Color primary = theme.colorScheme.primary;
+    final Color onPrimary = theme.colorScheme.onPrimary;
+    final Color onInverseSurface = theme.colorScheme.onInverseSurface;
+    final TextStyle titleMedium = theme.textTheme.titleMedium!;
+    final TextStyle labelMedium = theme.textTheme.labelMedium!;
+    final Color dividerColor = theme.dividerColor.withOpacity(0.1);
+
+    return isVisible
+        ? Container(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            color: surface,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(ugcSeason.intro ?? '',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline)),
+                Divider(height: 1, thickness: 1, color: dividerColor),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '合集：${ugcSeason.title}',
+                        style: titleMedium,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Obx(
+                      () => isSubscribe.value == -1
+                          ? const SizedBox(height: 32)
+                          : SizedBox(
+                              height: 32,
+                              child: FilledButton.tonal(
+                                onPressed: () => changeFucCall.call(),
+                                style: TextButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.only(left: 8, right: 8),
+                                  foregroundColor: isSubscribe.value == 1
+                                      ? outline
+                                      : onPrimary,
+                                  backgroundColor: isSubscribe.value == 1
+                                      ? onInverseSurface
+                                      : primary,
+                                ),
+                                child:
+                                    Text(isSubscribe.value == 1 ? '已订阅' : '订阅'),
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
-                // SizedBox(
-                //   height: 32,
-                //   child: FilledButton.tonal(
-                //     onPressed: () {},
-                //     style: ButtonStyle(
-                //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-                //     ),
-                //     child: const Text('订阅'),
-                //   ),
-                // ),
-                // const SizedBox(width: 6),
+                if (ugcSeason.intro != null && ugcSeason.intro != '') ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    ugcSeason.intro!,
+                    style: TextStyle(color: outline, fontSize: 12),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                        fontSize: labelMedium.fontSize, color: outline),
+                    children: [
+                      TextSpan(
+                          text: '${Utils.numFormat(ugcSeason.stat!.view)}播放'),
+                      const TextSpan(text: '  ·  '),
+                      TextSpan(
+                          text:
+                              '${Utils.numFormat(ugcSeason.stat!.danmaku)}弹幕'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.center,
+                  child: Material(
+                    color: surface,
+                    child: InkWell(
+                      onTap: () => changeVisible.call(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 0),
+                        child: Text(
+                          '收起简介',
+                          style: TextStyle(color: primary, fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(height: 1, thickness: 1, color: dividerColor),
               ],
             ),
-          ],
-          const SizedBox(height: 4),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
+          )
+        : Align(
+            alignment: Alignment.center,
+            child: InkWell(
+              onTap: () => changeVisible.call(),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                child: Text(
+                  '展开简介',
+                  style: TextStyle(color: primary, fontSize: 12),
+                ),
               ),
-              children: [
-                TextSpan(text: '${Utils.numFormat(ugcSeason.stat!.view)}播放'),
-                const TextSpan(text: '  ·  '),
-                TextSpan(text: '${Utils.numFormat(ugcSeason.stat!.danmaku)}弹幕'),
-              ],
             ),
-          ),
-          const SizedBox(height: 14),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-        ],
-      ),
-    );
+          );
   }
 }

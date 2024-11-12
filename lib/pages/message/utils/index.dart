@@ -136,6 +136,7 @@ class MessageUtils {
                   .replaceAll('}', '');
               result[linkText] = match.group(0)!;
             }
+            print('str: $str');
             message += str;
           }
         } else {
@@ -143,6 +144,10 @@ class MessageUtils {
           result['查看详情'] = match.group(0)!;
         }
         lastMatchEnd = end;
+      }
+      // 处理剩余的未匹配部分
+      if (lastMatchEnd < text.length) {
+        message += text.substring(lastMatchEnd + 1);
       }
       result['message'] = message;
     } else {

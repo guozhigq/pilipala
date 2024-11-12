@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
 import '../../../../../common/pages_bottom_sheet.dart';
 import '../../../../../models/common/video_episode_type.dart';
@@ -32,23 +31,24 @@ class _PagesPanelState extends State<PagesPanel> {
   late int cid;
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
-  late VideoDetailController _videoDetailController;
   final ScrollController listViewScrollCtr = ScrollController();
-  late PersistentBottomSheetController? _bottomSheetController;
+  PersistentBottomSheetController? _bottomSheetController;
 
   @override
   void initState() {
     super.initState();
     cid = widget.cid;
     episodes = widget.pages;
-    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
-    currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
-    scrollToIndex();
-    _videoDetailController.cid.listen((int p0) {
+    updateCurrentIndexAndScroll();
+    widget.videoIntroCtr.lastPlayCid.listen((int p0) {
       cid = p0;
-      currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
-      scrollToIndex();
+      updateCurrentIndexAndScroll();
     });
+  }
+
+  void updateCurrentIndexAndScroll() {
+    currentIndex.value = widget.pages.indexWhere((Part e) => e.cid == cid);
+    scrollToIndex();
   }
 
   @override
@@ -60,7 +60,10 @@ class _PagesPanelState extends State<PagesPanel> {
   void changeFucCall(item, i) async {
     widget.changeFuc?.call(item.cid, item.cover);
     currentIndex.value = i;
-    _bottomSheetController?.close();
+    cid = item.cid;
+    if (_bottomSheetController != null) {
+      _bottomSheetController?.close();
+    }
     scrollToIndex();
   }
 
@@ -112,7 +115,7 @@ class _PagesPanelState extends State<PagesPanel> {
                     widget.videoIntroCtr.bottomSheetController =
                         _bottomSheetController = EpisodeBottomSheet(
                       currentCid: cid,
-                      episodes: episodes,
+                      episodes: widget.pages,
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.videoPart,

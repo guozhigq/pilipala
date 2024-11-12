@@ -11,7 +11,7 @@ import 'package:pilipala/utils/storage.dart';
 /// 查看自己的关注时，可以查看分类
 /// 查看其他人的关注时，只可以看全部
 class FollowController extends GetxController with GetTickerProviderStateMixin {
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int pn = 1;
   int ps = 20;
   int total = 0;

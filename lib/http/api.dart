@@ -495,7 +495,7 @@ class Api {
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 
   /// 获取字幕配置
-  static const getSubtitleConfig = '/x/player/v2';
+  static const getSubtitleConfig = '/x/player/wbi/v2';
 
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
@@ -609,4 +609,14 @@ class Api {
 
   /// @我的
   static const String messageAtAPi = '/x/msgfeed/at?';
+
+  /// 订阅
+  static const String confirmSub = '/x/v3/fav/season/fav';
+
+  /// 订阅状态
+  static const String videoRelation = '/x/web-interface/archive/relation';
+
+  /// 获取空降区间
+  static const String getSkipSegments =
+      '${HttpString.sponsorBlockBaseUrl}/api/skipSegments';
 }

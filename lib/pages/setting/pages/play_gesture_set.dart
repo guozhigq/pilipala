@@ -16,7 +16,7 @@ class PlayGesturePage extends StatefulWidget {
 }
 
 class _PlayGesturePageState extends State<PlayGesturePage> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late int fullScreenGestureMode;
 
   @override

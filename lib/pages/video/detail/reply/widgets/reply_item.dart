@@ -26,7 +26,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'reply_save.dart';
 import 'zan.dart';
 
-Box setting = GStrorage.setting;
+Box setting = GStorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({
@@ -235,32 +235,33 @@ class ReplyItem extends StatelessWidget {
         // title
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
-          child: !replySave
-              ? LayoutBuilder(builder:
-                  (BuildContext context, BoxConstraints boxConstraints) {
-                  String text = replyItem?.content?.message ?? '';
-                  bool didExceedMaxLines = false;
-                  final double maxWidth = boxConstraints.maxWidth;
-                  TextPainter? textPainter;
-                  final int maxLines =
-                      replyItem!.content!.isText! && replyLevel == '1'
-                          ? 6
-                          : 999;
-                  try {
-                    textPainter = TextPainter(
-                      text: TextSpan(text: text),
-                      maxLines: maxLines,
-                      textDirection: Directionality.of(context),
-                    );
-                    textPainter.layout(maxWidth: maxWidth);
-                    didExceedMaxLines = textPainter.didExceedMaxLines;
-                  } catch (e) {
-                    debugPrint('Error while measuring text: $e');
-                    didExceedMaxLines = false;
-                  }
-                  return replyContent(context, didExceedMaxLines, textPainter);
-                })
-              : replyContent(context, false, null),
+          child: Text.rich(
+            overflow: TextOverflow.ellipsis,
+            maxLines:
+                replyLevel == '1' && replyItem!.content!.isText! ? 5 : 999,
+            style: const TextStyle(height: 1.75),
+            TextSpan(
+              children: [
+                if (replyItem!.isTop!)
+                  const WidgetSpan(
+                    alignment: PlaceholderAlignment.top,
+                    child: PBadge(
+                      text: 'TOP',
+                      size: 'small',
+                      stack: 'normal',
+                      type: 'line',
+                      fs: 9,
+                    ),
+                  ),
+                buildContent(
+                  context,
+                  replyItem!,
+                  replyReply,
+                  null,
+                ),
+              ],
+            ),
+          ),
         ),
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
@@ -278,36 +279,6 @@ class ReplyItem extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-
-  Widget replyContent(
-      BuildContext context, bool? didExceedMaxLines, TextPainter? textPainter) {
-    return Text.rich(
-      style: const TextStyle(height: 1.75),
-      TextSpan(
-        children: [
-          if (replyItem!.isTop!)
-            const WidgetSpan(
-              alignment: PlaceholderAlignment.top,
-              child: PBadge(
-                text: 'TOP',
-                size: 'small',
-                stack: 'normal',
-                type: 'line',
-                fs: 9,
-              ),
-            ),
-          buildContent(
-            context,
-            replyItem!,
-            replyReply,
-            null,
-            didExceedMaxLines ?? false,
-            textPainter,
-          ),
-        ],
-      ),
     );
   }
 
@@ -493,8 +464,12 @@ class ReplyItemRow extends StatelessWidget {
                                 fs: 9,
                               ),
                             ),
-                          buildContent(context, replies![i], replyReply,
-                              replyItem, false, null),
+                          buildContent(
+                            context,
+                            replies![i],
+                            replyReply,
+                            replyItem,
+                          ),
                         ],
                       ),
                     ),
@@ -540,8 +515,6 @@ InlineSpan buildContent(
   replyItem,
   replyReply,
   fReplyItem,
-  bool didExceedMaxLines,
-  TextPainter? textPainter,
 ) {
   final String routePath = Get.currentRoute;
   bool isVideoPage = routePath.startsWith('/video');
@@ -552,25 +525,6 @@ InlineSpan buildContent(
   // fReplyItem 父级回复内容，用作二楼回复（回复详情）展示
   final content = replyItem.content;
   final List<InlineSpan> spanChilds = <InlineSpan>[];
-
-  if (didExceedMaxLines && content.message != '') {
-    final textSize = textPainter!.size;
-    var position = textPainter.getPositionForOffset(
-      Offset(
-        textSize.width,
-        textSize.height,
-      ),
-    );
-    final endOffset = textPainter.getOffsetBefore(position.offset);
-
-    if (endOffset != null && endOffset > 0) {
-      content.message = content.message.substring(0, endOffset);
-    } else {
-      content.message = content.message.substring(0, position.offset);
-    }
-  } else {
-    content.message = content.message2;
-  }
 
   // 投票
   if (content.vote.isNotEmpty) {
@@ -919,17 +873,6 @@ InlineSpan buildContent(
         );
       }
     }
-  }
-
-  if (didExceedMaxLines) {
-    spanChilds.add(
-      TextSpan(
-        text: '\n查看更多',
-        style: TextStyle(
-          color: colorScheme.primary,
-        ),
-      ),
-    );
   }
 
   // 图片渲染

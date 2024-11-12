@@ -15,7 +15,7 @@ class SSearchController extends GetxController {
   RxString searchKeyWord = ''.obs;
   Rx<TextEditingController> controller = TextEditingController().obs;
   RxList<HotSearchItem> hotSearchList = <HotSearchItem>[].obs;
-  Box localCache = GStrorage.localCache;
+  Box localCache = GStorage.localCache;
   List historyCacheList = [];
   RxList historyList = [].obs;
   RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
@@ -23,7 +23,7 @@ class SSearchController extends GetxController {
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
   String hintText = '搜索';
   RxString defaultSearch = ''.obs;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   bool enableHotKey = true;
   bool enableSearchSuggest = true;
 
