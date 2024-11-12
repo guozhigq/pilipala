@@ -217,6 +217,13 @@ class Request {
       if (extra['ua'] != null) {
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
       }
+      if (extra['opus-goback'] != null) {
+        if (extra['opus-goback'] != null) {
+          String cookieHeader = dio.options.headers['cookie'];
+          options.headers!['cookie'] =
+              '$cookieHeader; opus-goback = ${extra['opus-goback']}';
+        }
+      }
     }
     options.responseType = resType;
 
