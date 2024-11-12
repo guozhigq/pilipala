@@ -65,7 +65,12 @@ class ReadHttp {
   static Future parseArticleCv({required String id}) async {
     var res = await Request().get(
       'https://www.bilibili.com/read/cv$id',
-      extra: {'ua': 'pc', 'opus-goback': '1'},
+      extra: {'ua': 'pc'},
+      options: Options(
+        headers: {
+          'cookie': 'opus-goback=1',
+        },
+      ),
     );
     String scriptContent =
         extractScriptContents(parse(res.data).body!.outerHtml)[0];
