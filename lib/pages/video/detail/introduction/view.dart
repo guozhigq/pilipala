@@ -404,27 +404,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             Obx(
               () => SeasonPanel(
                 ugcSeason: widget.videoDetail!.ugcSeason!,
-                cid: videoIntroController.lastPlayCid.value != 0
-                    ? videoIntroController.lastPlayCid.value
-                    : widget.videoDetail!.pages!.first.cid,
+                cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (bvid, cid, aid, cover) =>
-                    videoIntroController.changeSeasonOrbangu(
-                  bvid,
-                  cid,
-                  aid,
-                  cover,
-                ),
+                changeFuc: videoIntroController.changeSeasonOrbangu,
                 videoIntroCtr: videoIntroController,
               ),
             )
           ],
           // 合集 videoEpisode
-          if (widget.videoDetail!.pages != null &&
-              widget.videoDetail!.pages!.length > 1) ...[
+          if (videoIntroController.pages.length > 1) ...[
             Obx(
               () => PagesPanel(
-                pages: widget.videoDetail!.pages!,
+                pages: videoIntroController.pages,
                 cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
                 changeFuc: (cid, cover) =>

@@ -63,6 +63,7 @@ class VideoIntroController extends GetxController {
   PersistentBottomSheetController? bottomSheetController;
   late bool enableRelatedVideo;
   UgcSeason? ugcSeason;
+  RxList<Part> pages = <Part>[].obs;
 
   @override
   void onInit() {
@@ -84,18 +85,20 @@ class VideoIntroController extends GetxController {
   }
 
   // 获取视频简介&分p
-  Future queryVideoIntro() async {
+  Future queryVideoIntro({cover}) async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
-      if (videoDetail.value.pages!.isNotEmpty && lastPlayCid.value == 0) {
-        lastPlayCid.value = videoDetail.value.pages!.first.cid!;
+      pages.value = result['data']!.pages!;
+      lastPlayCid.value = videoDetail.value.cid!;
+      if (pages.isNotEmpty) {
+        lastPlayCid.value = pages.first.cid!;
       }
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
       videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
-      videoDetailCtr.cover.value = result['data'].pic ?? '';
+      videoDetailCtr.cover.value = cover ?? result['data'].pic ?? '';
       // 获取到粉丝数再返回
       await queryUserStat();
     }
@@ -470,8 +473,7 @@ class VideoIntroController extends GetxController {
       videoReplyCtr.queryReplyList(type: 'init');
     } catch (_) {}
     this.bvid = bvid;
-    lastPlayCid.value = cid;
-    await queryVideoIntro();
+    await queryVideoIntro(cover: cover);
   }
 
   void startTimer() {
@@ -521,9 +523,8 @@ class VideoIntroController extends GetxController {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         episodes.addAll(episodesList);
       }
-    } else if (videoDetail.value.pages != null) {
+    } else if (pages.isNotEmpty) {
       isPages = true;
-      final List<Part> pages = videoDetail.value.pages!;
       episodes.addAll(pages);
     }
 
@@ -621,10 +622,9 @@ class VideoIntroController extends GetxController {
         }
       }
     }
-    if (videoDetail.value.pages != null &&
-        videoDetail.value.pages!.length > 1) {
+    if (pages.length > 1) {
       dataType = VideoEpidoesType.videoPart;
-      episodes = videoDetail.value.pages!;
+      episodes = pages;
     }
 
     DrawerUtils.showRightDialog(

@@ -61,16 +61,7 @@ class SettingController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
-                // 清空cookie
-                await Request.cookieManager.cookieJar.deleteAll();
-                Request.dio.options.headers['cookie'] = '';
-
-                // 清空本地存储的用户标识
-                userInfoCache.put('userInfoCache', null);
-                localCache
-                    .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
-
-                await LoginUtils.refreshLoginStatus(false);
+                await LoginUtils.loginOut();
                 SmartDialog.dismiss().then((value) => Get.back());
               },
               child: const Text('确认'),
