@@ -18,9 +18,6 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class LoginUtils {
-  static Box userInfoCache = GStrorage.userInfo;
-  static Box localCache = GStrorage.localCache;
-
   static Future refreshLoginStatus(bool status) async {
     try {
       // 更改我的页面登录状态
