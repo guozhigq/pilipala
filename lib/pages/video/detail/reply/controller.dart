@@ -145,7 +145,15 @@ class VideoReplyController extends GetxController {
     if (frpid != 0 && frpid != null) {
       replyList.value = replyList.map((item) {
         if (item.rpid! == frpid) {
-          return item..replies!.removeWhere((reply) => reply.rpid == rpid);
+          item.replies!.removeWhere((reply) => reply.rpid == rpid);
+          // 【共xx条回复】
+          if (item.replyControl != null &&
+              item.replyControl!.entryTextNum! >= 1) {
+            item.replyControl!.entryTextNum =
+                item.replyControl!.entryTextNum! - 1;
+            item.rcount = item.replyControl!.entryTextNum;
+          }
+          return item;
         } else {
           return item;
         }

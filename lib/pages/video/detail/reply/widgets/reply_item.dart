@@ -503,7 +503,7 @@ class ReplyItemRow extends StatelessWidget {
                         if (replyControl!.upReply!)
                           const TextSpan(text: 'up主等人 '),
                         TextSpan(
-                          text: replyControl!.entryText!,
+                          text: '查看${replyControl!.entryTextNum}条回复',
                           style: TextStyle(
                             color: colorScheme.primary,
                           ),
@@ -1089,16 +1089,12 @@ class MorePanel extends StatelessWidget {
                 TextButton(
                   onPressed: () async {
                     Get.back();
-                    print('item.rpid: ${item.rpid}');
-                    onDelete?.call(item.rpid!, item.root);
-                    return;
                     var result = await ReplyHttp.replyDel(
                       type: item.type!,
                       oid: item.oid!,
                       rpid: item.rpid!,
                     );
                     if (result['status']) {
-                      // SmartDialog.showToast('评论删除成功，需手动刷新');
                       onDelete?.call(item.rpid!, item.root);
                       Get.back();
                     } else {

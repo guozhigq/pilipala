@@ -335,6 +335,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                             .replies!
                                             .add(replyItem);
                                       },
+                                      onDelete:
+                                          _dynamicDetailController.removeReply,
                                     );
                                   }
                                 },
