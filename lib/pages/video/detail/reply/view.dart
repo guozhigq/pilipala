@@ -242,10 +242,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem, currentReply,
-                                                loadMore) =>
-                                            replyReply(replyItem, currentReply,
-                                                loadMore),
+                                        replyReply: replyReply,
+                                        onDelete:
+                                            _videoReplyController.removeReply,
                                         replyType: ReplyType.video,
                                       );
                                     }

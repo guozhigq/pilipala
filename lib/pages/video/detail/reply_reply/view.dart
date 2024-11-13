@@ -118,6 +118,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       },
       replyType: widget.replyType,
       replyReply: (replyItem) => replyReply(replyItem),
+      onDelete: _videoReplyReplyController.removeReply,
     );
   }
 
