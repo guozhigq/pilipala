@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/models/video/tags.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -11,13 +12,15 @@ class IntroDetail extends StatelessWidget {
   const IntroDetail({
     super.key,
     this.videoDetail,
+    this.videoTags,
   });
+
   final dynamic videoDetail;
+  final RxList<VideoTagItem>? videoTags;
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = TextStyle(
-      fontSize: 14,
       color: Theme.of(context).colorScheme.primary,
     );
     return SizedBox(
@@ -59,19 +62,26 @@ class IntroDetail extends StatelessWidget {
               )
             ],
           ),
-          const SizedBox(height: 4),
-          SelectableRegion(
-            focusNode: FocusNode(),
-            selectionControls: MaterialTextSelectionControls(),
-            child: Text.rich(
-              style: const TextStyle(height: 1.4),
-              TextSpan(
-                children: [
-                  buildContent(context, videoDetail!),
-                ],
+          if (videoDetail!.descV2.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            SelectableRegion(
+              focusNode: FocusNode(),
+              selectionControls: MaterialTextSelectionControls(),
+              child: Text.rich(
+                style: TextStyle(
+                    height: 1.4, color: Theme.of(context).colorScheme.outline),
+                TextSpan(
+                  children: [
+                    buildContent(context, videoDetail!),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
+          const SizedBox(height: 8),
+          Obx(() => null != videoTags && videoTags!.isNotEmpty
+              ? _buildTags(context, videoTags)
+              : const SizedBox.shrink()),
         ],
       ),
     );
@@ -151,5 +161,37 @@ class IntroDetail extends StatelessWidget {
       }
     });
     return TextSpan(children: spanChilds);
+  }
+
+  Widget _buildTags(BuildContext context, List<VideoTagItem>? videoTags) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      direction: Axis.horizontal,
+      textDirection: TextDirection.ltr,
+      children: videoTags!.map((tag) {
+        return InkWell(
+          onTap: () {
+            Get.toNamed('/searchResult', parameters: {'keyword': tag.tagName!});
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceVariant.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+            child: Text(
+              tag.tagName!,
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }
