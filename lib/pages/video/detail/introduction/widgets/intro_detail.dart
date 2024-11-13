@@ -173,21 +173,15 @@ class IntroDetail extends StatelessWidget {
       children: videoTags!.map((tag) {
         return InkWell(
           onTap: () {
-            Get.toNamed(
-              '/tag',
-              arguments: {
-                'tagId': tag.tagId,
-                'tagName': tag.tagName,
-              },
-            );
+            Get.toNamed('/searchResult', parameters: {'keyword': tag.tagName!});
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(6),
           child: Container(
             decoration: BoxDecoration(
               color: colorScheme.surfaceVariant.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(6),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
             child: Text(
               tag.tagName!,
               style: TextStyle(
