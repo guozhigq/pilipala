@@ -44,17 +44,6 @@ class Request {
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
     final userInfo = userInfoCache.get('userInfoCache');
-    if (userInfo != null && userInfo.mid != null) {
-      final List<Cookie> cookie2 = await cookieManager.cookieJar
-          .loadForRequest(Uri.parse(HttpString.tUrl));
-      if (cookie2.isEmpty) {
-        try {
-          await Request().get(HttpString.tUrl);
-        } catch (e) {
-          log("setCookie, ${e.toString()}");
-        }
-      }
-    }
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
     String baseUrlType = 'default';
     if (setting.get(SettingBoxKey.enableGATMode, defaultValue: false)) {
@@ -77,11 +66,11 @@ class Request {
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
     List<Cookie> cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
-    String token = '';
-    if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
-      token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
-    }
+        .loadForRequest(Uri.parse(HttpString.baseUrl));
+    String token = cookies
+        .firstWhere((e) => e.name == 'bili_jct',
+            orElse: () => Cookie('bili_jct', ''))
+        .value;
     return token;
   }
 

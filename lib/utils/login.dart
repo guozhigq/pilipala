@@ -12,7 +12,6 @@ import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
-import 'package:pilipala/utils/cookie.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:uuid/uuid.dart';
@@ -71,7 +70,6 @@ class LoginUtils {
       content = '${content + url}; \n';
     }
     try {
-      await SetCookie.onSet();
       final result = await UserHttp.userInfo();
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
