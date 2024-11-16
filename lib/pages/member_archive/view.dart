@@ -117,7 +117,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: snapshot.data['msg'],
+                    errMsg: snapshot.data?['msg'] ?? '请求异常',
                     fn: () {},
                   );
                 }
