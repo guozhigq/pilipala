@@ -127,7 +127,7 @@ class AtItem extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        MessageUtils.onClickMessage(context, uri, nativeUri, type);
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, null);
       },
       child: Padding(
         padding: const EdgeInsets.all(14),

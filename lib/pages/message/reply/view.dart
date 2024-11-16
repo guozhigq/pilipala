@@ -117,7 +117,7 @@ class ReplyItem extends StatelessWidget {
     final String type = item.item!.type!;
     return InkWell(
       onTap: () async {
-        MessageUtils.onClickMessage(context, uri, nativeUri, type);
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, item.item!);
       },
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -155,6 +155,9 @@ class ReplyItem extends StatelessWidget {
                         text: '回复了我的评论',
                         style: TextStyle(color: outline),
                       ),
+                    if (item.item!.type! == 'dynamic')
+                      TextSpan(
+                          text: '对我的动态发表了评论', style: TextStyle(color: outline)),
                   ])),
                   const SizedBox(height: 6),
                   Text.rich(
@@ -197,11 +200,32 @@ class ReplyItem extends StatelessWidget {
                 ),
               ),
             if (item.item!.type! == 'video')
-              NetworkImgLayer(
+              // NetworkImgLayer(
+              //   width: 60,
+              //   height: 60,
+              //   src: item.item!.image,
+              //   radius: 6,
+              // ),
+              Container(
                 width: 60,
                 height: 60,
-                src: item.item!.image,
-                radius: 6,
+                clipBehavior: Clip.hardEdge,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                ),
+                child: Image.network(item.item!.image!, fit: BoxFit.cover),
+              ),
+            if (item.item!.type! == 'dynamic')
+              Container(
+                width: 60,
+                height: 80,
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                  item.item!.title!,
+                  maxLines: 4,
+                  style: const TextStyle(fontSize: 12, letterSpacing: 0.3),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
           ],
         ),
