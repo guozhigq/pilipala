@@ -123,4 +123,15 @@ class DynamicDetailController extends GetxController {
   Future onLoad() async {
     queryReplyList(reqType: 'onLoad');
   }
+
+  Future removeReply(int? rpid, int? frpid) async {
+    // 移除一楼评论
+    if (rpid != null) {
+      replyList.removeWhere((item) {
+        return item.rpid == rpid;
+      });
+    }
+
+    /// TODO 移除二楼评论
+  }
 }

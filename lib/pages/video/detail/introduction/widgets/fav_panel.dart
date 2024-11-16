@@ -30,8 +30,6 @@ class _FavPanelState extends State<FavPanel> {
     return Column(
       children: [
         AppBar(
-          centerTitle: false,
-          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(20),

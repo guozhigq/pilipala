@@ -38,10 +38,7 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: const Text('选择应用主题'),
-      ),
+      appBar: AppBar(title: const Text('选择应用主题')),
       body: ListView(
         children: [
           Obx(

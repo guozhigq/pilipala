@@ -47,10 +47,7 @@ class _BottomControlState extends State<BottomControl> {
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Row(

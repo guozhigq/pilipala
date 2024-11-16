@@ -131,14 +131,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '其他设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('其他设置')),
       body: ListView(
         children: [
           const SetSwitchItem(

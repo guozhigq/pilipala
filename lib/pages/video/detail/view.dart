@@ -614,8 +614,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 builder: ((context, snapshot) {
                   return AppBar(
                     backgroundColor: Colors.black,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
                   );
                 }),
               ),
@@ -861,12 +859,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     return AppBar(
       backgroundColor: Colors.transparent, // 使背景透明
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
-      titleSpacing: 0,
       title: Container(
         height: kToolbarHeight,
         padding: const EdgeInsets.symmetric(horizontal: 14),

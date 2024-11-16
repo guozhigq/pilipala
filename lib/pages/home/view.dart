@@ -54,7 +54,6 @@ class _HomePageState extends State<HomePage>
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         toolbarHeight: 0,
-        elevation: 0,
         backgroundColor: Colors.transparent,
         systemOverlayStyle: Platform.isAndroid
             ? SystemUiOverlayStyle(

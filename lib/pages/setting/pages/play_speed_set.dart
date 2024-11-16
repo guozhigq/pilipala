@@ -204,16 +204,7 @@ class _PlaySpeedPageState extends State<PlaySpeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text(
-          '倍速设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('倍速设置')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

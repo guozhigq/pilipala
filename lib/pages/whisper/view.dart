@@ -1,6 +1,5 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/skeleton.dart';
@@ -45,9 +44,7 @@ class _WhisperPageState extends State<WhisperPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('消息'),
-      ),
+      appBar: AppBar(title: const Text('消息')),
       body: RefreshIndicator(
         onRefresh: () async {
           _whisperController.unread();

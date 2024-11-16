@@ -33,8 +33,6 @@ class ScrollAppBar extends StatelessWidget {
           padding: EdgeInsets.only(top: statusBarHeight),
           child: AppBar(
             primary: false,
-            elevation: 0,
-            scrolledUnderElevation: 0,
             centerTitle: true,
             title: TextButton(
               onPressed: () => callback(),

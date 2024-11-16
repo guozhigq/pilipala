@@ -85,7 +85,6 @@ class _MediaListPanelState extends State<MediaListPanel> {
           AppBar(
             toolbarHeight: 45,
             automaticallyImplyLeading: false,
-            centerTitle: false,
             title: Text(
               widget.panelTitle ?? '稍后再看',
               style: Theme.of(context).textTheme.titleSmall,
