@@ -212,7 +212,8 @@ class Request {
     if (extra != null) {
       if (extra['ua'] != null) {
         options ??= Options();
-        options.headers!['user-agent'] = headerUa(type: extra['ua']);
+        options.headers ??= <String, dynamic>{};
+        options.headers?['user-agent'] = headerUa(type: extra['ua']);
       }
     }
     try {
