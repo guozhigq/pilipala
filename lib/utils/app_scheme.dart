@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/pages/message/utils/index.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
 import 'id_utils.dart';
@@ -270,15 +271,8 @@ class PiliSchame {
         break;
       case 'following':
         if (path.startsWith('/detail')) {
-          var opusId = path.split('/').last;
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': 'https://m.bilibili.com/opus/$opusId',
-              'type': 'url',
-              'pageTitle': ''
-            },
-          );
+          final String opusId = path.split('/').last;
+          MessageUtils.navigateToDynamicDetail(opusId);
         }
         break;
       default:
