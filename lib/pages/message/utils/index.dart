@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -161,5 +164,15 @@ class MessageUtils {
       result['message'] = text;
     }
     return result;
+  }
+
+  // 跳转查看动态详情
+  static void navigateToDynamicDetail(String opusId) async {
+    DynamicsController dynamicsController = Get.put(DynamicsController());
+    var res = await DynamicsHttp.dynamicDetail(id: opusId);
+    if (res['status']) {
+      DynamicItemModel item = res['data'];
+      dynamicsController.pushDetail(item, 1);
+    }
   }
 }
