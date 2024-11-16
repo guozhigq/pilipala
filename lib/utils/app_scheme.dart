@@ -1,5 +1,4 @@
 import 'package:app_links/app_links.dart';
-import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -12,37 +11,20 @@ import 'utils.dart';
 
 class PiliSchame {
   static late AppLinks appLinks;
-  static AppScheme appScheme = AppSchemeImpl.getInstance()!;
   static Future<void> init() async {
     appLinks = AppLinks();
     appLinks.uriLinkStream.listen((Uri uri) {
       final String scheme = uri.scheme;
       if (RegExp(r'^pili', caseSensitive: false).hasMatch(scheme)) {
         piliScheme(uri);
-      }
-    });
-
-    appScheme.getInitScheme().then((SchemeEntity? value) {
-      if (value != null) {
-        routePush(value);
-      }
-    });
-
-    appScheme.getLatestScheme().then((SchemeEntity? value) {
-      if (value != null) {
-        routePush(value);
-      }
-    });
-
-    appScheme.registerSchemeListener().listen((SchemeEntity? event) {
-      if (event != null) {
-        routePush(event);
+      } else {
+        routePush(uri);
       }
     });
   }
 
   /// 路由跳转
-  static void routePush(value) async {
+  static void routePush(Uri value) async {
     final String scheme = value.scheme;
     if (scheme == 'bilibili') {
       biliScheme(value);
@@ -212,9 +194,9 @@ class PiliSchame {
     }
   }
 
-  static Future<void> biliScheme(SchemeEntity value) async {
-    final String host = value.host!;
-    final String path = value.path!;
+  static Future<void> biliScheme(Uri value) async {
+    final String host = value.host;
+    final String path = value.path;
     switch (host) {
       case 'root':
         Navigator.popUntil(
