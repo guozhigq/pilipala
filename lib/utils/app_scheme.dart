@@ -282,8 +282,14 @@ class PiliSchame {
         }
         break;
       default:
-        SmartDialog.showToast('未匹配地址，请联系开发者');
-        Clipboard.setData(ClipboardData(text: value.toString()));
+        final Map<String, String> queryParameters = value.queryParameters;
+        final String? enterUri = queryParameters['enterUri'];
+        if (enterUri != null && enterUri.startsWith('bilibili://')) {
+          biliScheme(Uri.parse(enterUri));
+        } else {
+          SmartDialog.showToast('未匹配地址，请联系开发者');
+          Clipboard.setData(ClipboardData(text: value.toString()));
+        }
         break;
     }
   }
