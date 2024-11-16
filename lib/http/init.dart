@@ -209,24 +209,12 @@ class Request {
    */
   get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    options ??= Options(); // 如果 options 为 null，则初始化一个新的 Options 对象
-    ResponseType resType = ResponseType.json;
-
     if (extra != null) {
-      resType = extra['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
-        options.headers = {'user-agent': headerUa(type: extra['ua'])};
-      }
-      if (extra['opus-goback'] != null) {
-        if (extra['opus-goback'] != null) {
-          String cookieHeader = dio.options.headers['cookie'];
-          options.headers!['cookie'] =
-              '$cookieHeader; opus-goback = ${extra['opus-goback']}';
-        }
+        options ??= Options();
+        options.headers!['user-agent'] = headerUa(type: extra['ua']);
       }
     }
-    options.responseType = resType;
-
     try {
       response = await dio.get(
         url,

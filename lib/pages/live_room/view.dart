@@ -259,8 +259,6 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             left: 0,
             right: 0,
             child: AppBar(
-              centerTitle: false,
-              titleSpacing: 0,
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
               toolbarHeight: isPortrait ? 56 : 0,

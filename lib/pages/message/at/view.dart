@@ -47,9 +47,7 @@ class _MessageAtPageState extends State<MessageAtPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('@我的'),
-      ),
+      appBar: AppBar(title: const Text('@我的')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageAtCtr.queryMessageAt(type: 'init');

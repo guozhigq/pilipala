@@ -44,8 +44,6 @@ class _MinePageState extends State<MinePage>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        scrolledUnderElevation: 0,
-        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined),
@@ -355,7 +353,8 @@ class _MinePageState extends State<MinePage>
                       itemBuilder: (context, index) {
                         if (flag && index == favFolderList.length) {
                           return Padding(
-                            padding: const EdgeInsets.only(right: 14),
+                            padding:
+                                const EdgeInsets.only(right: 14, bottom: 70),
                             child: Center(
                               child: IconButton(
                                 style: ButtonStyle(
@@ -488,7 +487,7 @@ class FavFolderItem extends StatelessWidget {
               child: NetworkImgLayer(
                 src: item!.cover,
                 width: 180,
-                height: 110,
+                height: MediaQuery.textScalerOf(context).scale(110),
               ),
             ),
           ),

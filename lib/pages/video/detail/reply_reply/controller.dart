@@ -84,6 +84,16 @@ class VideoReplyReplyController extends GetxController {
     return res;
   }
 
+  // 移除评论
+  Future removeReply(int? rpid, int? frpid) async {
+    // 移除一楼评论
+    if (rpid != null) {
+      replyList.removeWhere((item) {
+        return item.rpid == rpid;
+      });
+    }
+  }
+
   @override
   void onClose() {
     currentPage = 0;

@@ -122,7 +122,7 @@ class ProfilePanel extends StatelessWidget {
                         ),
                         child: Row(children: [
                           Image.asset(
-                            'assets/images/live.gif',
+                            'assets/images/live.png',
                             height: 10,
                           ),
                           Text(

@@ -57,8 +57,6 @@ class _GroupPanelState extends State<GroupPanel> {
     return Column(
       children: <Widget>[
         AppBar(
-          centerTitle: false,
-          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(20),

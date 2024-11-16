@@ -132,4 +132,32 @@ class VideoReplyController extends GetxController {
       queryReplyList(type: 'init');
     });
   }
+
+  // 移除评论
+  Future removeReply(int? rpid, int? frpid) async {
+    // 移除一楼评论
+    if (rpid != null) {
+      replyList.removeWhere((item) {
+        return item.rpid == rpid;
+      });
+    }
+    // 移除二楼评论
+    if (frpid != 0 && frpid != null) {
+      replyList.value = replyList.map((item) {
+        if (item.rpid! == frpid) {
+          item.replies!.removeWhere((reply) => reply.rpid == rpid);
+          // 【共xx条回复】
+          if (item.replyControl != null &&
+              item.replyControl!.entryTextNum! >= 1) {
+            item.replyControl!.entryTextNum =
+                item.replyControl!.entryTextNum! - 1;
+            item.rcount = item.replyControl!.entryTextNum;
+          }
+          return item;
+        } else {
+          return item;
+        }
+      }).toList();
+    }
+  }
 }

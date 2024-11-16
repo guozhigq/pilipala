@@ -222,13 +222,27 @@ class BuildMainApp extends StatelessWidget {
       elevation: 20,
     );
 
-    return GetMaterialApp(
-      title: 'PiliPala',
-      theme: ThemeData(
-        colorScheme: currentThemeValue == ThemeType.dark
-            ? darkColorScheme
-            : lightColorScheme,
+    AppBarTheme appBarTheme(ColorScheme colorScheme) {
+      return AppBarTheme(
+        backgroundColor: currentThemeValue == ThemeType.dark
+            ? darkColorScheme.surface
+            : lightColorScheme.surface,
+        foregroundColor: currentThemeValue == ThemeType.dark
+            ? darkColorScheme.onSurface
+            : lightColorScheme.onSurface,
+        elevation: 0,
+        titleSpacing: 0,
+        scrolledUnderElevation: 0,
+        // titleTextStyle: TextStyle(
+        //     fontSize: Theme.of(context).textTheme.titleLarge!.fontSize),
+      );
+    }
+
+    ThemeData buildThemeData(ColorScheme colorScheme) {
+      return ThemeData(
+        colorScheme: colorScheme,
         snackBarTheme: snackBarTheme,
+        appBarTheme: appBarTheme(colorScheme),
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: <TargetPlatform, PageTransitionsBuilder>{
             TargetPlatform.android: ZoomPageTransitionsBuilder(
@@ -236,12 +250,20 @@ class BuildMainApp extends StatelessWidget {
             ),
           },
         ),
+      );
+    }
+
+    return GetMaterialApp(
+      title: 'PiliPala',
+      theme: buildThemeData(
+        currentThemeValue == ThemeType.dark
+            ? darkColorScheme
+            : lightColorScheme,
       ),
-      darkTheme: ThemeData(
-        colorScheme: currentThemeValue == ThemeType.light
+      darkTheme: buildThemeData(
+        currentThemeValue == ThemeType.light
             ? lightColorScheme
             : darkColorScheme,
-        snackBarTheme: snackBarTheme,
       ),
       localizationsDelegates: const [
         GlobalCupertinoLocalizations.delegate,

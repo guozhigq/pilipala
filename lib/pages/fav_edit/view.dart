@@ -19,8 +19,6 @@ class _FavEditPageState extends State<FavEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: Obx(
           () => _favEditController.type.value == 'add'
               ? Text(
@@ -32,7 +30,6 @@ class _FavEditPageState extends State<FavEditPage> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
         ),
-        centerTitle: false,
         actions: [
           Obx(
             () => _favEditController.privacy.value == 0

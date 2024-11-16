@@ -48,9 +48,7 @@ class _MessageReplyPageState extends State<MessageReplyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('回复我的'),
-      ),
+      appBar: AppBar(title: const Text('回复我的')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageReplyCtr.queryMessageReply(type: 'init');

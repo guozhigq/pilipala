@@ -49,14 +49,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
-  appscheme:
-    dependency: "direct main"
-    description:
-      name: appscheme
-      sha256: b885b65219f3839ebafc937024a1bc5ce5a75b0e458fd249ef15e80e81235b6f
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.8"
   archive:
     dependency: transitive
     description:

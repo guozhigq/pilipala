@@ -78,8 +78,6 @@ class _DynamicsPageState extends State<DynamicsPage>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: SizedBox(
           height: 34,
           child: Stack(

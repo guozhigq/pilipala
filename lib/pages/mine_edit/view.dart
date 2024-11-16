@@ -23,9 +23,7 @@ class _MineEditPageState extends State<MineEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('编辑资料'),
-      ),
+      appBar: AppBar(title: const Text('编辑资料')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder(
