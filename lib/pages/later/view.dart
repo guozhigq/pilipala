@@ -28,18 +28,12 @@ class _LaterPageState extends State<LaterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => _laterController.laterList.isNotEmpty
               ? Text(
                   '稍后再看 (${_laterController.laterList.length})',
-                  style: Theme.of(context).textTheme.titleMedium,
                 )
-              : Text(
-                  '稍后再看',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+              : const Text('稍后再看'),
         ),
         actions: [
           Obx(

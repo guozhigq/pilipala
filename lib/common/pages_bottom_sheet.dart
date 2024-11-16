@@ -408,17 +408,29 @@ class TitleBar extends StatelessWidget {
       toolbarHeight: 45,
       automaticallyImplyLeading: false,
       centerTitle: false,
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium,
+      elevation: 1,
+      scrolledUnderElevation: 1,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       actions: !isFullScreen
           ? [
-              IconButton(
-                icon: const Icon(Icons.close, size: 20),
-                onPressed: () => Navigator.pop(context),
+              SizedBox(
+                width: 35,
+                height: 35,
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 8),
             ]
           : null,
     );

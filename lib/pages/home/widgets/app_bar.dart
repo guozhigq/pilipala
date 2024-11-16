@@ -28,7 +28,6 @@ class HomeAppBar extends StatelessWidget {
             background: Column(
               children: [
                 AppBar(
-                  centerTitle: false,
                   title: const Text(
                     'PiLiPaLa',
                     style: TextStyle(
@@ -73,8 +72,6 @@ class HomeAppBar extends StatelessWidget {
 
                     const SizedBox(width: 10)
                   ],
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
                 ),
               ],
             ),

@@ -89,7 +89,6 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     return AppBar(
       toolbarHeight: 45,
       automaticallyImplyLeading: false,
-      centerTitle: false,
       title: Text(
         '评论详情',
         style: Theme.of(context).textTheme.titleSmall,

@@ -44,8 +44,6 @@ class _MinePageState extends State<MinePage>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        scrolledUnderElevation: 0,
-        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined),

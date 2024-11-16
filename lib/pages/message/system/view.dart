@@ -29,9 +29,7 @@ class _MessageSystemPageState extends State<MessageSystemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('系统通知'),
-      ),
+      appBar: AppBar(title: const Text('系统通知')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageSystemCtr.queryAndProcessMessages();

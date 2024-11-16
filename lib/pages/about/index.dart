@@ -39,9 +39,7 @@ class _AboutPageState extends State<AboutPage> {
     TextStyle subTitleStyle =
         TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('关于', style: Theme.of(context).textTheme.titleMedium),
-      ),
+      appBar: AppBar(title: const Text('关于')),
       body: SingleChildScrollView(
         child: Column(
           children: [
