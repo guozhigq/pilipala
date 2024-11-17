@@ -14,6 +14,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/sponsor_block/segment.dart';
 import 'package:pilipala/models/sponsor_block/segment_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
@@ -94,7 +95,7 @@ class VideoDetailController extends GetxController
   double? brightness;
   // 默认记录历史记录
   bool enableHeart = true;
-  var userInfo;
+  UserInfoData? userInfo;
   late bool isFirstTime = true;
   Floating? floating;
   late PreferredSizeWidget headerControl;
@@ -617,7 +618,7 @@ class VideoDetailController extends GetxController
     var count = argMap['count'];
     var res = await UserHttp.getMediaList(
       type: 2,
-      bizId: userInfo.mid,
+      bizId: userInfo!.mid!,
       ps: count,
     );
     if (res['status']) {

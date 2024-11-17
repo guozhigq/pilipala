@@ -10,6 +10,7 @@ import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/dynamics/result.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/route_push.dart';
@@ -52,7 +53,7 @@ class DynamicsController extends GetxController {
   RxInt initialValue = 0.obs;
   Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
-  var userInfo;
+  UserInfoData? userInfo;
   RxBool isLoadingDynamic = false.obs;
   Box setting = GStorage.setting;
 
@@ -246,7 +247,7 @@ class DynamicsController extends GetxController {
       }
       upData.value.upList!.insertAll(0, [
         UpItem(face: '', uname: '全部动态', mid: -1),
-        UpItem(face: userInfo.face, uname: '我', mid: userInfo.mid),
+        UpItem(face: userInfo!.face, uname: '我', mid: userInfo!.mid),
       ]);
     }
     return res;

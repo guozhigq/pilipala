@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class PrivacySetting extends StatefulWidget {
@@ -15,7 +16,7 @@ class PrivacySetting extends StatefulWidget {
 class _PrivacySettingState extends State<PrivacySetting> {
   bool userLogin = false;
   Box userInfoCache = GStorage.userInfo;
-  var userInfo;
+  UserInfoData? userInfo;
 
   @override
   void initState() {
