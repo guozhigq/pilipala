@@ -123,14 +123,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 流
   appbarStreamListen() {
     appbarStream = StreamController<double>.broadcast();
-    _extendNestCtr.addListener(
-      () {
-        final double offset = _extendNestCtr.position.pixels;
-        vdCtr.sheetHeight.value =
-            Get.size.height - videoHeight - statusBarHeight + offset;
-        appbarStream.add(offset);
-      },
-    );
+    _extendNestCtr.addListener(_extendNestCtrListener);
   }
 
   // 播放器状态监听
@@ -225,6 +218,14 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     statusHeight = await StatusBarControl.getHeight;
   }
 
+  // _extendNestCtr监听
+  void _extendNestCtrListener() {
+    final double offset = _extendNestCtr.position.pixels;
+    vdCtr.sheetHeight.value =
+        Get.size.height - videoHeight - statusBarHeight + offset;
+    appbarStream.add(offset);
+  }
+
   @override
   void dispose() {
     shutdownTimerService.handleWaitingFinished();
@@ -243,6 +244,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStream.close();
     WidgetsBinding.instance.removeObserver(this);
     _lifecycleListener.dispose();
+    _extendNestCtr.removeListener(_extendNestCtrListener);
     super.dispose();
   }
 
@@ -594,6 +596,28 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       );
     }
 
+    Widget buildAppBar(BuildContext context, AsyncSnapshot<num> snapshot) {
+      final double distance =
+          statusBarHeight + MediaQuery.of(context).padding.top;
+      return AppBar(
+        backgroundColor: Colors.black,
+        systemOverlayStyle: Platform.isAndroid
+            ? SystemUiOverlayStyle(
+                statusBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Brightness.light
+                        : (snapshot.data! > distance
+                            ? Brightness.dark
+                            : Brightness.light),
+              )
+            : Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : (snapshot.data! > distance
+                    ? SystemUiOverlayStyle.dark
+                    : SystemUiOverlayStyle.light),
+      );
+    }
+
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
@@ -611,11 +635,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               child: StreamBuilder(
                 stream: appbarStream.stream.distinct(),
                 initialData: 0,
-                builder: ((context, snapshot) {
-                  return AppBar(
-                    backgroundColor: Colors.black,
-                  );
-                }),
+                builder: buildAppBar,
               ),
             ),
             body: ExtendedNestedScrollView(
@@ -773,7 +793,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             builder: ((context, snapshot) {
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
-                () => continuePlay(),
+                continuePlay,
                 playerStatus.value,
                 null,
               );
