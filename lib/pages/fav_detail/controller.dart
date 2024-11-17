@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/common.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_detail.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/pages/fav/index.dart';
 import 'package:pilipala/utils/utils.dart';
+
+import 'widget/invalid_video_card.dart';
 
 class FavDetailController extends GetxController {
   FavFolderItemData? item;
@@ -151,5 +154,23 @@ class FavDetailController extends GetxController {
         'count': favInfo['media_count'],
       },
     );
+  }
+
+  // 查看无效视频信息
+  Future toViewInvalidVideo(FavDetailItemData item) async {
+    SmartDialog.showLoading(msg: '加载中...');
+    var res = await CommonHttp.fixVideoPicAndTitle(aid: item.id!);
+    SmartDialog.dismiss();
+    if (res['status']) {
+      showModalBottomSheet(
+        context: Get.context!,
+        isScrollControlled: true,
+        builder: (context) {
+          return InvalidVideoCard(videoInfo: res['data']);
+        },
+      );
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
   }
 }
