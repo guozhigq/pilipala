@@ -125,6 +125,8 @@ class VideoDetailController extends GetxController
   RxInt watchLaterCount = 0.obs;
   List<SegmentDataModel> skipSegments = <SegmentDataModel>[];
   int? lastPosition;
+  // 默认屏幕方向
+  RxString videoDirection = 'horizontal'.obs;
 
   @override
   void onInit() {
@@ -283,6 +285,10 @@ class VideoDetailController extends GetxController
     } else {
       ScreenBrightness().resetScreenBrightness();
     }
+    videoDirection.value = (firstVideo.width != null &&
+            firstVideo.height != null)
+        ? (firstVideo.width! > firstVideo.height! ? 'horizontal' : 'vertical')
+        : 'horizontal';
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
@@ -299,11 +305,7 @@ class VideoDetailController extends GetxController
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction: firstVideo.width != null && firstVideo.height != null
-          ? ((firstVideo.width! - firstVideo.height!) > 0
-              ? 'horizontal'
-              : 'vertical')
-          : null,
+      direction: videoDirection.value,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,

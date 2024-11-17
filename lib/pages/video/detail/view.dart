@@ -221,9 +221,15 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // _extendNestCtr监听
   void _extendNestCtrListener() {
     final double offset = _extendNestCtr.position.pixels;
-    vdCtr.sheetHeight.value =
-        Get.size.height - videoHeight - statusBarHeight + offset;
-    appbarStream.add(offset);
+    if (vdCtr.videoDirection.value == 'horizontal') {
+      vdCtr.sheetHeight.value =
+          Get.size.height - videoHeight - statusBarHeight + offset;
+      appbarStream.add(offset);
+    } else {
+      if (offset > (Get.size.width * 22 / 16 - videoHeight)) {
+        appbarStream.add(offset - (Get.size.width * 22 / 16 - videoHeight));
+      }
+    }
   }
 
   @override
@@ -501,6 +507,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight.value;
     // ignore: no_leading_underscores_for_local_identifiers
+    vdCtr.videoDirection.listen((p0) {
+      if (p0 == 'vertical') {
+        defaultVideoHeight = sizeContext.width * 22 / 16;
+        videoHeight.value = sizeContext.width * 22 / 16;
+      }
+    });
 
     // 竖屏
     final bool isPortrait = _context.orientation == Orientation.portrait;
