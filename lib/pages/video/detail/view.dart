@@ -502,15 +502,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
     final _context = MediaQuery.of(context);
-    late double defaultVideoHeight = sizeContext.width * 9 / 16;
+    late final double verticalHeight = sizeContext.width * 22 / 16;
+    late double defaultVideoHeight = vdCtr.videoDirection.value == 'vertical'
+        ? verticalHeight
+        : sizeContext.width * 9 / 16;
     late RxDouble videoHeight = defaultVideoHeight.obs;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight.value;
-    // ignore: no_leading_underscores_for_local_identifiers
     vdCtr.videoDirection.listen((p0) {
       if (p0 == 'vertical') {
-        defaultVideoHeight = sizeContext.width * 22 / 16;
-        videoHeight.value = sizeContext.width * 22 / 16;
+        videoHeight.value = defaultVideoHeight = verticalHeight;
       }
     });
 
