@@ -555,10 +555,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               showEposideCb: () => vdCtr.videoType == SearchType.video
                   ? videoIntroController.showEposideHandler()
                   : bangumiIntroController.showEposideHandler(),
-              fullScreenCb: (bool status) {
-                videoHeight.value =
-                    status ? Get.size.height : defaultVideoHeight;
-              },
             ));
     }
 
