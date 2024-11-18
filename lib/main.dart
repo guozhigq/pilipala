@@ -224,12 +224,8 @@ class BuildMainApp extends StatelessWidget {
 
     AppBarTheme appBarTheme(ColorScheme colorScheme) {
       return AppBarTheme(
-        backgroundColor: currentThemeValue == ThemeType.dark
-            ? darkColorScheme.surface
-            : lightColorScheme.surface,
-        foregroundColor: currentThemeValue == ThemeType.dark
-            ? darkColorScheme.onSurface
-            : lightColorScheme.onSurface,
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
         titleSpacing: 0,
         scrolledUnderElevation: 0,

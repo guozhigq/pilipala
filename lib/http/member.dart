@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/member/article.dart';
 import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
@@ -472,9 +473,9 @@ class MemberHttp {
       String accessKey = res.data['data']['access_token'];
       Box localCache = GStorage.localCache;
       Box userInfoCache = GStorage.userInfo;
-      var userInfo = userInfoCache.get('userInfoCache');
+      final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
       localCache.put(
-          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
+          LocalCacheKey.accessKey, {'mid': userInfo!.mid, 'value': accessKey});
       return {'status': true, 'data': [], 'msg': '操作成功'};
     } else {
       return {

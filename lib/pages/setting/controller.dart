@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -22,7 +22,7 @@ class SettingController extends GetxController {
   RxDouble toastOpacity = (1.0).obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
-  var userInfo;
+  UserInfoData? userInfo;
   Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
   RxInt defaultHomePage = 0.obs;
 

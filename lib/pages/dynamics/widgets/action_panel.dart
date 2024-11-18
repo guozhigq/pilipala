@@ -90,7 +90,7 @@ class _ActionPanelState extends State<ActionPanel>
       SmartDialog.showToast('请先登录');
       return;
     }
-    int mid = userInfo.mid;
+    int mid = userInfo.mid!;
     showModalBottomSheet(
       context: context,
       enableDrag: true,
