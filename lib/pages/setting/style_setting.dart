@@ -249,6 +249,15 @@ class _StyleSettingState extends State<StyleSetting> {
                 '当前模式：${settingController.themeType.value.description}',
                 style: subTitleStyle)),
           ),
+          SetSwitchItem(
+            title: '纯黑模式',
+            subTitle: '深色模式时使用纯黑色背景，适用于OLED屏幕',
+            setKey: SettingBoxKey.enablePureBlack,
+            defaultVal: false,
+            callFn: (bool val) => {
+              if (val && Get.isDarkMode) {Get.appUpdate()}
+            },
+          ),
           ListTile(
             dense: false,
             onTap: () => settingController.setDynamicBadgeMode(context),

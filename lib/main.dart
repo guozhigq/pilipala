@@ -214,6 +214,27 @@ class BuildMainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Box setting = GStorage.setting;
+
+    /// 纯黑模式主题配置
+    ColorScheme? pureDarkColorScheme;
+    final bool enablePureBlack =
+        setting.get(SettingBoxKey.enablePureBlack, defaultValue: false);
+    if (enablePureBlack) {
+      pureDarkColorScheme = darkColorScheme.copyWith(
+        background: Colors.black,
+        surface: Colors.black,
+        primary: Colors.white,
+        secondary: Colors.white,
+        error: Colors.red,
+        onPrimary: Colors.black,
+        onSecondary: Colors.black,
+        onSurface: Colors.white,
+        onBackground: Colors.white,
+        onError: Colors.white,
+      );
+    }
+
     final SnackBarThemeData snackBarTheme = SnackBarThemeData(
       actionTextColor: lightColorScheme.primary,
       backgroundColor: lightColorScheme.secondaryContainer,
@@ -253,13 +274,13 @@ class BuildMainApp extends StatelessWidget {
       title: 'PiliPala',
       theme: buildThemeData(
         currentThemeValue == ThemeType.dark
-            ? darkColorScheme
+            ? pureDarkColorScheme ?? darkColorScheme
             : lightColorScheme,
       ),
       darkTheme: buildThemeData(
         currentThemeValue == ThemeType.light
             ? lightColorScheme
-            : darkColorScheme,
+            : pureDarkColorScheme ?? darkColorScheme,
       ),
       localizationsDelegates: const [
         GlobalCupertinoLocalizations.delegate,
