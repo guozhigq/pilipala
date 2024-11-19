@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.24+1024
+version: 1.0.25+1025
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -111,7 +111,7 @@ dependencies:
   # 高帧率
   flutter_displaymode: ^0.6.0
   # scheme跳转
-  appscheme: ^1.0.8
+  app_links: ^6.3.2
   # 弹幕
   ns_danmaku:
     git:
@@ -133,7 +133,7 @@ dependencies:
   # 极验
   gt3_flutter_plugin: ^0.1.0
   uuid: ^3.0.7
-  scrollable_positioned_list: ^0.3.8
+  scrollview_observer: ^1.22.0
   catcher_2: ^1.2.6
   logger: ^2.3.0
   path: ^1.9.0
@@ -146,9 +146,12 @@ dependencies:
   lottie: ^3.1.2
   # 二维码
   qr_flutter: ^4.1.0
-  bottom_sheet: ^4.0.4
   web_socket_channel: ^2.4.5
   brotli: ^0.6.0
+  # 文本语法高亮
+  re_highlight: ^0.0.3
+  # 图片选择器
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -214,6 +217,7 @@ flutter:
     - assets/images/logo/
     - assets/images/live/
     - assets/images/video/
+    - assets/images/pay/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

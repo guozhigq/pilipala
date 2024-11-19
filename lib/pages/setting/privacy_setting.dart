@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class PrivacySetting extends StatefulWidget {
@@ -14,8 +15,8 @@ class PrivacySetting extends StatefulWidget {
 
 class _PrivacySettingState extends State<PrivacySetting> {
   bool userLogin = false;
-  Box userInfoCache = GStrorage.userInfo;
-  var userInfo;
+  Box userInfoCache = GStorage.userInfo;
+  UserInfoData? userInfo;
 
   @override
   void initState() {
@@ -32,14 +33,7 @@ class _PrivacySettingState extends State<PrivacySetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '隐私设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('隐私设置')),
       body: Column(
         children: [
           ListTile(

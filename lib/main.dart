@@ -32,7 +32,7 @@ void main() async {
   MediaKit.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  await GStrorage.init();
+  await GStorage.init();
   clearLogs();
   Request();
   await Request.setCookie();
@@ -60,6 +60,7 @@ void main() async {
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
       statusBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
     ));
   }
 
@@ -72,7 +73,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Box setting = GStrorage.setting;
+    Box setting = GStorage.setting;
     // 主题色
     Color defaultColor =
         colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]
@@ -221,13 +222,23 @@ class BuildMainApp extends StatelessWidget {
       elevation: 20,
     );
 
-    return GetMaterialApp(
-      title: 'PiliPala',
-      theme: ThemeData(
-        colorScheme: currentThemeValue == ThemeType.dark
-            ? darkColorScheme
-            : lightColorScheme,
+    AppBarTheme appBarTheme(ColorScheme colorScheme) {
+      return AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
+        titleSpacing: 0,
+        scrolledUnderElevation: 0,
+        // titleTextStyle: TextStyle(
+        //     fontSize: Theme.of(context).textTheme.titleLarge!.fontSize),
+      );
+    }
+
+    ThemeData buildThemeData(ColorScheme colorScheme) {
+      return ThemeData(
+        colorScheme: colorScheme,
         snackBarTheme: snackBarTheme,
+        appBarTheme: appBarTheme(colorScheme),
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: <TargetPlatform, PageTransitionsBuilder>{
             TargetPlatform.android: ZoomPageTransitionsBuilder(
@@ -235,12 +246,20 @@ class BuildMainApp extends StatelessWidget {
             ),
           },
         ),
+      );
+    }
+
+    return GetMaterialApp(
+      title: 'PiliPala',
+      theme: buildThemeData(
+        currentThemeValue == ThemeType.dark
+            ? darkColorScheme
+            : lightColorScheme,
       ),
-      darkTheme: ThemeData(
-        colorScheme: currentThemeValue == ThemeType.light
+      darkTheme: buildThemeData(
+        currentThemeValue == ThemeType.light
             ? lightColorScheme
             : darkColorScheme,
-        snackBarTheme: snackBarTheme,
       ),
       localizationsDelegates: const [
         GlobalCupertinoLocalizations.delegate,

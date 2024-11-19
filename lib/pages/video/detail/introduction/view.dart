@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
-import 'package:bottom_sheet/bottom_sheet.dart';
-import 'package:easy_debounce/easy_throttle.dart';
+// import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -140,22 +137,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String heroTag;
   late final VideoIntroController videoIntroController;
   late final VideoDetailController videoDetailCtr;
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double sheetHeight;
   late final dynamic owner;
-  late final dynamic follower;
   late int mid;
   late String memberHeroTag;
   late bool enableAi;
   bool isProcessing = false;
   RxBool isExpand = false.obs;
   late ExpandableController _expandableCtr;
-
-  // 一键三连动画
-  late AnimationController _controller;
-  late Animation<double> _scaleTransition;
-  final RxDouble _progress = 0.0.obs;
 
   void Function()? handleState(Future<dynamic> Function() action) {
     return isProcessing
@@ -177,29 +168,9 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     sheetHeight = localCache.get('sheetHeight');
 
     owner = widget.videoDetail!.owner;
-    follower = Utils.numFormat(videoIntroController.userStat['follower']);
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(initialExpanded: false);
-
-    /// 一键三连动画
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      reverseDuration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _scaleTransition = Tween<double>(begin: 0.5, end: 1.5).animate(_controller)
-      ..addListener(() async {
-        _progress.value =
-            double.parse((_scaleTransition.value - 0.5).toStringAsFixed(3));
-        if (_progress.value == 1) {
-          if (_controller.status == AnimationStatus.completed) {
-            await videoIntroController.actionOneThree();
-          }
-          _progress.value = 0;
-          _scaleTransition.removeListener(() {});
-          _controller.stop();
-        }
-      });
+    _expandableCtr = ExpandableController(
+        initialExpanded: GlobalDataCache().enableAutoExpand);
   }
 
   // 收藏
@@ -228,22 +199,35 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     }
   }
 
-  void _showFavPanel() {
-    showFlexibleBottomSheet(
-      bottomSheetColor: Colors.transparent,
-      minHeight: 0.6,
-      initHeight: 0.6,
-      maxHeight: 1,
-      context: context,
-      builder: (BuildContext context, ScrollController scrollController,
-          double offset) {
-        return FavPanel(
-          ctr: videoIntroController,
-          scrollController: scrollController,
+  void _showFavPanel() async {
+    final mediaQueryData = MediaQuery.of(context);
+    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+    final double initialChildSize =
+        (contentHeight - Get.width * 9 / 16) / contentHeight;
+    await showModalBottomSheet(
+      context: Get.context!,
+      useSafeArea: true,
+      isScrollControlled: true,
+      transitionAnimationController: AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this,
+      ),
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize: initialChildSize,
+          minChildSize: 0,
+          maxChildSize: 1,
+          snap: true,
+          expand: false,
+          snapSizes: [initialChildSize],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return FavPanel(
+              ctr: videoIntroController,
+              scrollController: scrollController,
+            );
+          },
         );
       },
-      anchors: [0.6, 1],
-      isSafeArea: true,
     );
   }
 
@@ -269,6 +253,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     showBottomSheet(
       context: context,
       enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
       builder: (BuildContext context) {
         return AiDetail(modelResult: videoIntroController.modelResult);
       },
@@ -278,8 +268,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   @override
   void dispose() {
     _expandableCtr.dispose();
-    _controller.dispose();
-    _scaleTransition.removeListener(() {});
     super.dispose();
   }
 
@@ -321,7 +309,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               expanded: Text(
                 widget.videoDetail!.title!,
                 softWrap: true,
-                maxLines: 4,
+                maxLines: 10,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -346,13 +334,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       StatView(
-                        theme: 'gray',
                         view: widget.videoDetail!.stat!.view,
                         size: 'medium',
                       ),
                       const SizedBox(width: 10),
                       StatDanMu(
-                        theme: 'gray',
                         danmu: widget.videoDetail!.stat!.danmaku,
                         size: 'medium',
                       ),
@@ -401,7 +387,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ExpandablePanel(
             controller: _expandableCtr,
             collapsed: const SizedBox(height: 0),
-            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            expanded: IntroDetail(
+              videoDetail: widget.videoDetail!,
+              videoTags: videoIntroController.videoTags,
+            ),
             theme: const ExpandableThemeData(
               animationDuration: Duration(milliseconds: 300),
               scrollAnimationDuration: Duration(milliseconds: 300),
@@ -418,27 +407,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             Obx(
               () => SeasonPanel(
                 ugcSeason: widget.videoDetail!.ugcSeason!,
-                cid: videoIntroController.lastPlayCid.value != 0
-                    ? videoIntroController.lastPlayCid.value
-                    : widget.videoDetail!.pages!.first.cid,
+                cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
-                changeFuc: (bvid, cid, aid, cover) =>
-                    videoIntroController.changeSeasonOrbangu(
-                  bvid,
-                  cid,
-                  aid,
-                  cover,
-                ),
+                changeFuc: videoIntroController.changeSeasonOrbangu,
                 videoIntroCtr: videoIntroController,
               ),
             )
           ],
           // 合集 videoEpisode
-          if (widget.videoDetail!.pages != null &&
-              widget.videoDetail!.pages!.length > 1) ...[
+          if (videoIntroController.pages.length > 1) ...[
             Obx(
               () => PagesPanel(
-                pages: widget.videoDetail!.pages!,
+                pages: videoIntroController.pages,
                 cid: videoIntroController.lastPlayCid.value,
                 sheetHeight: videoDetailCtr.sheetHeight.value,
                 changeFuc: (cid, cover) =>
@@ -469,20 +449,23 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       fadeOutDuration: Duration.zero,
                     ),
                     const SizedBox(width: 10),
-                    Text(owner.name, style: const TextStyle(fontSize: 13)),
+                    Text(widget.videoDetail!.owner!.name!,
+                        style: const TextStyle(fontSize: 13)),
                     const SizedBox(width: 6),
-                    Text(
-                      follower,
-                      style: TextStyle(
-                        fontSize: t.textTheme.labelSmall!.fontSize,
-                        color: outline,
+                    Obx(
+                      () => Text(
+                        Utils.numFormat(videoIntroController.follower.value),
+                        style: TextStyle(
+                          fontSize: t.textTheme.labelSmall!.fontSize,
+                          color: outline,
+                        ),
                       ),
                     ),
                     const Spacer(),
                     Obx(
                       () {
-                        final bool isFollowed =
-                            videoIntroController.followStatus['attribute'] != 0;
+                        final int attr =
+                            videoIntroController.followStatus['attribute'] ?? 0;
                         return videoIntroController.followStatus.isEmpty
                             ? const SizedBox()
                             : SizedBox(
@@ -495,15 +478,19 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                                       left: 8,
                                       right: 8,
                                     ),
-                                    foregroundColor: isFollowed
+                                    foregroundColor: attr != 0
                                         ? outline
                                         : t.colorScheme.onPrimary,
-                                    backgroundColor: isFollowed
+                                    backgroundColor: attr != 0
                                         ? t.colorScheme.onInverseSurface
                                         : t.colorScheme.primary, // 设置按钮背景色
                                   ),
                                   child: Text(
-                                    isFollowed ? '已关注' : '关注',
+                                    attr == 128
+                                        ? '已拉黑'
+                                        : attr != 0
+                                            ? '已关注'
+                                            : '关注',
                                     style: TextStyle(
                                       fontSize:
                                           t.textTheme.labelMedium!.fontSize,
@@ -571,131 +558,34 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget actionGrid(BuildContext context, videoIntroController) {
     final actionTypeSort = GlobalDataCache().actionTypeSort;
 
-    Widget progressWidget(progress) {
-      return SizedBox(
-        width: const IconThemeData.fallback().size! + 5,
-        height: const IconThemeData.fallback().size! + 5,
-        child: CircularProgressIndicator(
-          value: progress.value,
-          strokeWidth: 2,
-        ),
-      );
-    }
-
     Map<String, Widget> menuListWidgets = {
       'like': Obx(
-        () {
-          bool likeStatus = videoIntroController.hasLike.value;
-          ColorScheme colorScheme = Theme.of(context).colorScheme;
-          return Stack(
-            children: [
-              Positioned(
-                  top: ((Get.size.width - 24) / 5) / 2 -
-                      (const IconThemeData.fallback().size!),
-                  left: ((Get.size.width - 24) / 5) / 2 -
-                      (const IconThemeData.fallback().size! + 5) / 2,
-                  child: progressWidget(_progress)),
-              InkWell(
-                onTapDown: (details) {
-                  feedBack();
-                  if (videoIntroController.userInfo == null) {
-                    SmartDialog.showToast('账号未登录');
-                    return;
-                  }
-                  _controller.forward();
-                },
-                onTapUp: (TapUpDetails details) {
-                  if (_progress.value == 0) {
-                    feedBack();
-                    EasyThrottle.throttle(
-                        'my-throttler', const Duration(milliseconds: 200), () {
-                      videoIntroController.actionLikeVideo();
-                    });
-                  }
-                  _controller.reverse();
-                },
-                onTapCancel: () {
-                  _controller.reverse();
-                },
-                borderRadius: StyleString.mdRadius,
-                child: SizedBox(
-                  width: (Get.size.width - 24) / 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 4),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return ScaleTransition(
-                              scale: animation, child: child);
-                        },
-                        child: Icon(
-                          key: ValueKey<bool>(likeStatus),
-                          likeStatus
-                              ? FontAwesomeIcons.solidThumbsUp
-                              : FontAwesomeIcons.thumbsUp,
-                          color: likeStatus
-                              ? colorScheme.primary
-                              : colorScheme.outline,
-                          size: 21,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.videoDetail!.stat!.like!.toString(),
-                        style: TextStyle(
-                          color: likeStatus ? colorScheme.primary : null,
-                          fontSize:
-                              Theme.of(context).textTheme.labelSmall!.fontSize,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.thumbsUp),
+          selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+          onTap: handleState(videoIntroController.actionLikeVideo),
+          onLongPress: () => videoIntroController.oneThreeDialog(),
+          selectStatus: videoIntroController.hasLike.value,
+          text: widget.videoDetail!.stat!.like!.toString(),
+        ),
       ),
       'coin': Obx(
-        () => Stack(
-          children: [
-            Positioned(
-                top: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size!),
-                left: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size! + 5) / 2,
-                child: progressWidget(_progress)),
-            ActionItem(
-              icon: const Icon(FontAwesomeIcons.b),
-              selectIcon: const Icon(FontAwesomeIcons.b),
-              onTap: handleState(videoIntroController.actionCoinVideo),
-              selectStatus: videoIntroController.hasCoin.value,
-              text: widget.videoDetail!.stat!.coin!.toString(),
-            ),
-          ],
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.b),
+          selectIcon: const Icon(FontAwesomeIcons.b),
+          onTap: handleState(videoIntroController.actionCoinVideo),
+          selectStatus: videoIntroController.hasCoin.value,
+          text: widget.videoDetail!.stat!.coin!.toString(),
         ),
       ),
       'collect': Obx(
-        () => Stack(
-          children: [
-            Positioned(
-                top: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size!),
-                left: ((Get.size.width - 24) / 5) / 2 -
-                    (const IconThemeData.fallback().size! + 5) / 2,
-                child: progressWidget(_progress)),
-            ActionItem(
-              icon: const Icon(FontAwesomeIcons.star),
-              selectIcon: const Icon(FontAwesomeIcons.solidStar),
-              onTap: () => showFavBottomSheet(),
-              onLongPress: () => showFavBottomSheet(type: 'longPress'),
-              selectStatus: videoIntroController.hasFav.value,
-              text: widget.videoDetail!.stat!.favorite!.toString(),
-            ),
-          ],
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.star),
+          selectIcon: const Icon(FontAwesomeIcons.solidStar),
+          onTap: () => showFavBottomSheet(),
+          onLongPress: () => showFavBottomSheet(type: 'longPress'),
+          selectStatus: videoIntroController.hasFav.value,
+          text: widget.videoDetail!.stat!.favorite!.toString(),
         ),
       ),
       'watchLater': ActionItem(

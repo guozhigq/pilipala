@@ -7,12 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/http/index.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/cookie.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:uuid/uuid.dart';
 
@@ -31,9 +32,6 @@ class LoginUtils {
 
       DynamicsController dynamicsCtr = Get.find<DynamicsController>();
       dynamicsCtr.userLogin.value = status;
-
-      MediaController mediaCtr = Get.find<MediaController>();
-      mediaCtr.userLogin.value = status;
     } catch (err) {
       SmartDialog.showToast('refreshLoginStatus error: ${err.toString()}');
     }
@@ -75,7 +73,7 @@ class LoginUtils {
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
         try {
-          Box userInfoCache = GStrorage.userInfo;
+          Box userInfoCache = GStorage.userInfo;
           if (!userInfoCache.isOpen) {
             userInfoCache = await Hive.openBox('userInfo');
           }
@@ -84,8 +82,6 @@ class LoginUtils {
           final HomeController homeCtr = Get.find<HomeController>();
           homeCtr.updateLoginStatus(true);
           homeCtr.userFace.value = result['data'].face;
-          final MediaController mediaCtr = Get.find<MediaController>();
-          mediaCtr.mid = result['data'].mid;
           await LoginUtils.refreshLoginStatus(true);
         } catch (err) {
           SmartDialog.show(builder: (BuildContext context) {
@@ -114,5 +110,15 @@ class LoginUtils {
       content = content + e.toString();
       Clipboard.setData(ClipboardData(text: content));
     }
+  }
+
+  // 退出登录
+  static loginOut() async {
+    await Request.cookieManager.cookieJar.deleteAll();
+    Request.dio.options.headers['cookie'] = '';
+    userInfoCache.put('userInfoCache', null);
+    localCache.put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
+    GlobalDataCache().userInfo = null;
+    await refreshLoginStatus(false);
   }
 }

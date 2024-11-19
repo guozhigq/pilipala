@@ -14,7 +14,7 @@ class RcmdController extends GetxController {
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;
   late String defaultRcmdType = 'web';

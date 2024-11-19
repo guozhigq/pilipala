@@ -5,16 +5,18 @@ import 'package:pilipala/plugin/pl_player/models/play_speed.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../models/common/index.dart';
 
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
-Box videoStorage = GStrorage.video;
-Box userInfoCache = GStrorage.userInfo;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
+Box videoStorage = GStorage.video;
+Box userInfoCache = GStorage.userInfo;
 
 class GlobalDataCache {
   late int imgQuality;
   late FullScreenGestureMode fullScreenGestureMode;
   late bool enablePlayerControlAnimation;
   late List<String> actionTypeSort;
+  late double sheetHeight;
+  String? wWebid;
 
   /// 播放器相关
   // 弹幕开关
@@ -43,6 +45,14 @@ class GlobalDataCache {
   late List<double> speedsList;
   // 用户信息
   UserInfoData? userInfo;
+  // 搜索历史
+  late List historyCacheList;
+  //
+  late bool enableSearchSuggest = true;
+  // 简介默认展开
+  late bool enableAutoExpand = false;
+  //
+  late bool enableDynamicSwitch = true;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -59,7 +69,7 @@ class GlobalDataCache {
         defaultValue: 10); // 设置全局变量
     fullScreenGestureMode = FullScreenGestureMode.values[setting.get(
         SettingBoxKey.fullScreenGestureMode,
-        defaultValue: FullScreenGestureMode.values.last.index) as int];
+        defaultValue: FullScreenGestureMode.fromBottomtoTop.index)];
     enablePlayerControlAnimation = setting
         .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
     actionTypeSort = await setting.get(SettingBoxKey.actionTypeSort,
@@ -102,5 +112,13 @@ class GlobalDataCache {
     speedsList.addAll(playSpeedSystem);
 
     userInfo = userInfoCache.get('userInfoCache');
+    sheetHeight = localCache.get('sheetHeight', defaultValue: 0.0);
+    historyCacheList = localCache.get('cacheList', defaultValue: []);
+    enableSearchSuggest =
+        setting.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
+    enableAutoExpand =
+        setting.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
+    enableDynamicSwitch =
+        setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
   }
 }

@@ -69,12 +69,7 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBarWidget(
         visible: _historyController.enableMultiple.value,
         child1: AppBar(
-          titleSpacing: 0,
-          centerTitle: false,
-          title: Text(
-            '观看记录',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          title: const Text('观看记录'),
           actions: [
             IconButton(
               onPressed: () => Get.toNamed('/historySearch'),
@@ -127,8 +122,6 @@ class _HistoryPageState extends State<HistoryPage> {
           ],
         ),
         child2: AppBar(
-          titleSpacing: 0,
-          centerTitle: false,
           leading: IconButton(
             onPressed: () {
               _historyController.enableMultiple.value = false;
@@ -143,7 +136,6 @@ class _HistoryPageState extends State<HistoryPage> {
           title: Obx(
             () => Text(
               '已选择${_historyController.checkedCount.value}项',
-              style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
           actions: [

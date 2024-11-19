@@ -1,4 +1,3 @@
-import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -48,21 +47,27 @@ class FollowItem extends StatelessWidget {
               height: 34,
               child: TextButton(
                 onPressed: () async {
-                  await showFlexibleBottomSheet(
-                    bottomSheetColor: Colors.transparent,
-                    minHeight: 1,
-                    initHeight: 1,
-                    maxHeight: 1,
-                    context: Get.context!,
-                    builder: (BuildContext context,
-                        ScrollController scrollController, double offset) {
-                      return GroupPanel(
-                        mid: item.mid!,
-                        scrollController: scrollController,
+                  await showModalBottomSheet(
+                    context: context,
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return DraggableScrollableSheet(
+                        initialChildSize: 0.6,
+                        minChildSize: 0,
+                        maxChildSize: 1,
+                        snap: true,
+                        expand: false,
+                        snapSizes: const [0.6],
+                        builder: (BuildContext context,
+                            ScrollController scrollController) {
+                          return GroupPanel(
+                            mid: item.mid!,
+                            scrollController: scrollController,
+                          );
+                        },
                       );
                     },
-                    anchors: [1],
-                    isSafeArea: true,
                   );
                 },
                 style: TextButton.styleFrom(

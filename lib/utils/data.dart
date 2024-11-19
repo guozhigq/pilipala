@@ -9,8 +9,8 @@ class Data {
   }
 
   static Future historyStatus() async {
-    Box localCache = GStrorage.localCache;
-    Box userInfoCache = GStrorage.userInfo;
+    Box localCache = GStorage.localCache;
+    Box userInfoCache = GStorage.userInfo;
     if (userInfoCache.get('userInfoCache') == null) {
       return;
     }

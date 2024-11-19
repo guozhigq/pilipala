@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/video/reply/emote.dart';
 import 'package:pilipala/pages/emote/index.dart';
 import 'package:pilipala/pages/video/detail/reply_new/toolbar_icon_button.dart';
 import 'package:pilipala/pages/whisper_detail/controller.dart';
 import 'package:pilipala/utils/feed_back.dart';
-import '../../utils/storage.dart';
 import 'widget/chat_item.dart';
 
 class WhisperDetailPage extends StatefulWidget {
@@ -30,7 +28,6 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
   late double emoteHeight = 230.0;
   double keyboardHeight = 0.0; // 键盘高度
   RxString toolbarType = ''.obs;
-  Box userInfoCache = GStrorage.userInfo;
 
   @override
   void initState() {
@@ -193,27 +190,21 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                             ? const SizedBox()
                             : Align(
                                 alignment: Alignment.topCenter,
-                                child: ListView.builder(
+                                child: ListView.separated(
                                   itemCount: messageList.length,
                                   shrinkWrap: true,
                                   reverse: true,
                                   itemBuilder: (_, int i) {
-                                    if (i == 0) {
-                                      return Column(
-                                        children: [
-                                          ChatItem(
-                                              item: messageList[i],
-                                              e_infos: _whisperDetailController
-                                                  .eInfos),
-                                          const SizedBox(height: 20),
-                                        ],
-                                      );
-                                    } else {
-                                      return ChatItem(
-                                          item: messageList[i],
-                                          e_infos:
-                                              _whisperDetailController.eInfos);
-                                    }
+                                    return ChatItem(
+                                      item: messageList[i],
+                                      e_infos: _whisperDetailController.eInfos,
+                                      ctr: _whisperDetailController,
+                                    );
+                                  },
+                                  separatorBuilder: (_, int i) {
+                                    return i == 0
+                                        ? const SizedBox(height: 20)
+                                        : const SizedBox.shrink();
                                   },
                                 ),
                               ),

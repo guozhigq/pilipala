@@ -78,10 +78,7 @@ class MemberSeasonsItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      StatView(
-                        view: seasonItem.view,
-                        theme: 'gray',
-                      ),
+                      StatView(view: seasonItem.view),
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(

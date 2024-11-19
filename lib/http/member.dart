@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
+import 'package:html/parser.dart';
+import 'package:pilipala/models/member/article.dart';
 import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/models/user/info.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
 import '../models/follow/result.dart';
@@ -16,14 +21,20 @@ import 'index.dart';
 
 class MemberHttp {
   static Future memberInfo({
-    int? mid,
+    required int mid,
     String token = '',
   }) async {
+    String? wWebid;
+    if ((await getWWebid(mid: mid))['status']) {
+      wWebid = GlobalDataCache().wWebid;
+    }
+
     Map params = await WbiSign().makSign({
       'mid': mid,
       'token': token,
       'platform': 'web',
       'web_location': 1550101,
+      ...wWebid != null ? {'w_webid': wWebid} : {},
     });
     var res = await Request().get(
       Api.memberInfo,
@@ -195,13 +206,15 @@ class MemberHttp {
 
   // 设置分组
   static Future addUsers(int? fids, String? tagids) async {
-    var res = await Request().post(Api.addUsers, queryParameters: {
-      'fids': fids,
-      'tagids': tagids ?? '0',
-      'csrf': await Request.getCsrf(),
-    }, data: {
-      'cross_domain': true
-    });
+    var res = await Request().post(
+      Api.addUsers,
+      data: {
+        'fids': fids,
+        'tagids': tagids ?? '0',
+        'csrf': await Request.getCsrf(),
+      },
+      queryParameters: {'cross_domain': true},
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': [], 'msg': '操作成功'};
     } else {
@@ -419,11 +432,14 @@ class MemberHttp {
   static Future cookieToKey() async {
     var authCodeRes = await getTVCode();
     if (authCodeRes['status']) {
-      var res = await Request().post(Api.cookieToKey, queryParameters: {
-        'auth_code': authCodeRes['data'],
-        'build': 708200,
-        'csrf': await Request.getCsrf(),
-      });
+      var res = await Request().post(
+        Api.cookieToKey,
+        data: {
+          'auth_code': authCodeRes['data'],
+          'build': 708200,
+          'csrf': await Request.getCsrf(),
+        },
+      );
       await Future.delayed(const Duration(milliseconds: 300));
       await qrcodePoll(authCodeRes['data']);
       if (res.data['code'] == 0) {
@@ -455,11 +471,11 @@ class MemberHttp {
     SmartDialog.dismiss();
     if (res.data['code'] == 0) {
       String accessKey = res.data['data']['access_token'];
-      Box localCache = GStrorage.localCache;
-      Box userInfoCache = GStrorage.userInfo;
-      var userInfo = userInfoCache.get('userInfoCache');
+      Box localCache = GStorage.localCache;
+      Box userInfoCache = GStorage.userInfo;
+      final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
       localCache.put(
-          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
+          LocalCacheKey.accessKey, {'mid': userInfo!.mid, 'value': accessKey});
       return {'status': true, 'data': [], 'msg': '操作成功'};
     } else {
       return {
@@ -553,6 +569,62 @@ class MemberHttp {
         'status': false,
         'data': [],
         'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future getWWebid({required int mid}) async {
+    String? wWebid = GlobalDataCache().wWebid;
+    if (wWebid != null) {
+      return {'status': true, 'data': wWebid};
+    }
+    var res = await Request().get('https://space.bilibili.com/$mid/article');
+    String? headContent = parse(res.data).head?.outerHtml;
+    final regex = RegExp(
+        r'<script id="__RENDER_DATA__" type="application/json">(.*?)</script>');
+    if (headContent != null) {
+      final match = regex.firstMatch(headContent);
+      if (match != null && match.groupCount >= 1) {
+        final content = match.group(1);
+        String decodedString = Uri.decodeComponent(content!);
+        Map<String, dynamic> map = jsonDecode(decodedString);
+        GlobalDataCache().wWebid = map['access_id'];
+        return {'status': true, 'data': map['access_id']};
+      } else {
+        return {'status': false, 'data': '请检查登录状态'};
+      }
+    }
+    return {'status': false, 'data': '请检查登录状态'};
+  }
+
+  // 获取用户专栏
+  static Future getMemberArticle({
+    required int mid,
+    required int pn,
+    String? offset,
+  }) async {
+    String? wWebid;
+    if ((await getWWebid(mid: mid))['status']) {
+      wWebid = GlobalDataCache().wWebid;
+    }
+    Map params = await WbiSign().makSign({
+      'host_mid': mid,
+      'page': pn,
+      'offset': offset,
+      'web_location': 333.999,
+      ...wWebid != null ? {'w_webid': wWebid} : {},
+    });
+    var res = await Request().get(Api.opusList, data: params);
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MemberArticleDataModel.fromJson(res.data['data'])
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'] ?? '请求异常',
       };
     }
   }

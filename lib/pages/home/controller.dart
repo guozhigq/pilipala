@@ -4,22 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/tab_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../../http/index.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
-  bool flag = false;
+  bool flag = true;
   late RxList tabs = [].obs;
   RxInt initialIndex = 1.obs;
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  Box userInfoCache = GStrorage.userInfo;
-  Box settingStorage = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box settingStorage = GStorage.setting;
   RxBool userLogin = false.obs;
   RxString userFace = ''.obs;
-  var userInfo;
-  Box setting = GStrorage.setting;
+  UserInfoData? userInfo;
+  Box setting = GStorage.setting;
   late final StreamController<bool> searchBarStream =
       StreamController<bool>.broadcast();
   late bool hideSearchBar;
@@ -33,7 +34,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    userFace.value = userInfo != null ? userInfo.face : '';
+    userFace.value = userInfo != null ? userInfo!.face! : '';
     hideSearchBar =
         setting.get(SettingBoxKey.hideSearchBar, defaultValue: false);
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
@@ -62,7 +63,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     userInfo = await userInfoCache.get('userInfoCache');
     userLogin.value = val ?? false;
     if (val) return;
-    userFace.value = userInfo != null ? userInfo.face : '';
+    userFace.value = userInfo != null ? userInfo!.face! : '';
   }
 
   void setTabConfig() async {

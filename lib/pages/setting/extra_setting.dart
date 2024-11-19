@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../home/index.dart';
@@ -18,8 +19,8 @@ class ExtraSetting extends StatefulWidget {
 }
 
 class _ExtraSettingState extends State<ExtraSetting> {
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late dynamic defaultReplySort;
   late dynamic defaultDynamicType;
   late dynamic enableSystemProxy;
@@ -130,14 +131,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '其他设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('其他设置')),
       body: ListView(
         children: [
           const SetSwitchItem(
@@ -145,6 +139,15 @@ class _ExtraSettingState extends State<ExtraSetting> {
             subTitle: '是否展示「大家都在搜」',
             setKey: SettingBoxKey.enableHotKey,
             defaultVal: true,
+          ),
+          SetSwitchItem(
+            title: '展示搜索建议',
+            subTitle: '输入搜索内容时展示建议词',
+            setKey: SettingBoxKey.enableSearchSuggest,
+            defaultVal: true,
+            callFn: (val) {
+              GlobalDataCache().enableSearchSuggest = val;
+            },
           ),
           SetSwitchItem(
             title: '搜索默认词',
@@ -172,6 +175,14 @@ class _ExtraSettingState extends State<ExtraSetting> {
             subTitle: '视频详情页开启ai总结',
             setKey: SettingBoxKey.enableAi,
             defaultVal: true,
+          ),
+          SetSwitchItem(
+            title: '视频简介默认展开',
+            setKey: SettingBoxKey.enableAutoExpand,
+            defaultVal: false,
+            callFn: (val) {
+              GlobalDataCache().enableAutoExpand = val;
+            },
           ),
           const SetSwitchItem(
             title: '相关视频推荐',

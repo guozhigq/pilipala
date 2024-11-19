@@ -27,9 +27,9 @@ import '../../models/video/subTitile/content.dart';
 import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-Box videoStorage = GStrorage.video;
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
+Box videoStorage = GStorage.video;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -1033,6 +1033,8 @@ class PlPlayerController {
         if (progress >= content['from']! && progress <= content['to']!) {
           subtitleContent.value = content['content']!;
           return;
+        } else {
+          subtitleContent.value = '';
         }
       }
     }
@@ -1045,6 +1047,14 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
+    final cache = GlobalDataCache();
+    cache.blockTypes = blockTypes;
+    cache.showArea = showArea;
+    cache.opacityVal = opacityVal;
+    cache.fontSizeVal = fontSizeVal;
+    cache.danmakuDurationVal = danmakuDurationVal;
+    cache.strokeWidth = strokeWidth;
+
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
     localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);

@@ -1,7 +1,10 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/skeleton/media_bangumi.dart';
+import 'package:pilipala/common/skeleton/user_list.dart';
 import 'package:pilipala/common/skeleton/video_card_h.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/models/common/search_type.dart';
@@ -45,6 +48,11 @@ class _SearchPanelState extends State<SearchPanel>
       ),
       tag: widget.searchType!.type + widget.keyword!,
     );
+
+    /// 专栏默认排序
+    if (widget.searchType == SearchType.article) {
+      _searchPanelController.order.value = 'totalrank';
+    }
     scrollController = _searchPanelController.scrollController;
     scrollController.addListener(() async {
       if (scrollController.position.pixels >=
@@ -74,17 +82,16 @@ class _SearchPanelState extends State<SearchPanel>
         future: _futureBuilderFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data != null) {
-              Map data = snapshot.data;
+            Map? data = snapshot.data;
+            if (data != null && data['status']) {
               var ctr = _searchPanelController;
               RxList list = ctr.resultList;
-              if (data['status']) {
+              if (list.isNotEmpty) {
                 return Obx(() {
                   switch (widget.searchType) {
                     case SearchType.video:
                       return SearchVideoPanel(
                         ctr: _searchPanelController,
-                        // ignore: invalid_use_of_protected_member
                         list: list.value,
                       );
                     case SearchType.media_bangumi:
@@ -94,39 +101,31 @@ class _SearchPanelState extends State<SearchPanel>
                     case SearchType.live_room:
                       return searchLivePanel(context, ctr, list);
                     case SearchType.article:
-                      return searchArticlePanel(context, ctr, list);
+                      return SearchArticlePanel(
+                        ctr: _searchPanelController,
+                        list: list.value,
+                      );
                     default:
                       return const SizedBox();
                   }
                 });
               } else {
-                return CustomScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  slivers: [
-                    HttpError(
-                      errMsg: data['msg'],
-                      fn: () {
-                        setState(() {
-                          _searchPanelController.onSearch();
-                        });
-                      },
-                    ),
-                  ],
+                return HttpError(
+                  errMsg: '没有数据',
+                  isShowBtn: false,
+                  fn: () => {},
+                  isInSliver: false,
                 );
               }
             } else {
-              return CustomScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                slivers: [
-                  HttpError(
-                    errMsg: '没有相关数据',
-                    fn: () {
-                      setState(() {
-                        _searchPanelController.onSearch();
-                      });
-                    },
-                  ),
-                ],
+              return HttpError(
+                errMsg: data?['msg'] ?? '请求异常',
+                fn: () {
+                  setState(() {
+                    _futureBuilderFuture = _searchPanelController.onRefresh();
+                  });
+                },
+                isInSliver: false,
               );
             }
           } else {
@@ -142,7 +141,7 @@ class _SearchPanelState extends State<SearchPanel>
                   case SearchType.media_bangumi:
                     return const MediaBangumiSkeleton();
                   case SearchType.bili_user:
-                    return const VideoCardHSkeleton();
+                    return const UserListSkeleton();
                   case SearchType.live_room:
                     return const VideoCardHSkeleton();
                   default:

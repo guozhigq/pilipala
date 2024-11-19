@@ -69,10 +69,7 @@ class MemberLikeItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      StatView(
-                        view: likeItem.stat!.view,
-                        theme: 'gray',
-                      ),
+                      StatView(view: likeItem.stat!.view),
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(

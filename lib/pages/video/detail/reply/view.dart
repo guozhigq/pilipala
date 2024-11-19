@@ -137,7 +137,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
-        return await _videoReplyController.queryReplyList(type: 'init');
+        return await _videoReplyController.onRefresh();
       },
       child: Stack(
         children: [
@@ -153,7 +153,17 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   child: Container(
                     height: 40,
                     padding: const EdgeInsets.fromLTRB(12, 0, 6, 0),
-                    color: Theme.of(context).colorScheme.surface,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.surface,
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                          offset: const Offset(2, 0),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -232,10 +242,9 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
-                                        replyReply: (replyItem, currentReply,
-                                                loadMore) =>
-                                            replyReply(replyItem, currentReply,
-                                                loadMore),
+                                        replyReply: replyReply,
+                                        onDelete:
+                                            _videoReplyController.removeReply,
                                         replyType: ReplyType.video,
                                       );
                                     }
@@ -302,13 +311,13 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                               );
                             },
                           ).then(
-                            (value) => {
+                            (value) {
                               // 完成评论，数据添加
-                              if (value != null && value['data'] != null)
-                                {
-                                  _videoReplyController.replyList
-                                      .add(value['data'])
-                                }
+                              if (value != null && value['data'] != null) {
+                                _videoReplyController.replyList
+                                    .add(value['data']);
+                                _videoReplyController.replyList.refresh();
+                              }
                             },
                           );
                         },

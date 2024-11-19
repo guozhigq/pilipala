@@ -90,52 +90,55 @@ class VideoContent extends StatelessWidget {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Text(
-              subFolderItem.title!,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  subFolderItem.title!,
+                  textAlign: TextAlign.start,
+                  maxLines: 3,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '合集 UP主：${subFolderItem.upper!.name!}',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${subFolderItem.mediaCount}个视频',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 2),
-            Text(
-              '合集 UP主：${subFolderItem.upper!.name!}',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${subFolderItem.mediaCount}个视频',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const Spacer(),
             isOwner
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.zero),
-                        ),
-                        onPressed: () => cancelSub?.call(subFolderItem),
-                        icon: Icon(
-                          Icons.clear_outlined,
-                          color: Theme.of(context).colorScheme.outline,
-                          size: 18,
-                        ),
-                      )
-                    ],
+                ? Positioned(
+                    right: 0,
+                    bottom: -4,
+                    child: IconButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () => cancelSub?.call(subFolderItem),
+                      icon: Icon(
+                        Icons.clear_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 18,
+                      ),
+                    ),
                   )
                 : const SizedBox()
           ],

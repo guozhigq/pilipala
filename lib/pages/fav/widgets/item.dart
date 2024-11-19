@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/utils/logic_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class FavItem extends StatelessWidget {
@@ -74,7 +75,7 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
+        padding: const EdgeInsets.fromLTRB(10, 2, 6, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -88,6 +89,15 @@ class VideoContent extends StatelessWidget {
             ),
             Text(
               '${favFolderItem.mediaCount}个内容',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              LogicUtils.isPublic(favFolderItem.attr) ? '公开' : '私密',
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,

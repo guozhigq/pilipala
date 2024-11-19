@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:pilipala/pages/mine/index.dart';
 import '../../pages/dynamics/index.dart';
 import '../../pages/home/index.dart';
-import '../../pages/media/index.dart';
 import '../../pages/rank/index.dart';
 
 List defaultNavigationBars = [
@@ -51,15 +50,15 @@ List defaultNavigationBars = [
   {
     'id': 3,
     'icon': const Icon(
-      Icons.video_collection_outlined,
+      Icons.person_outline,
       size: 20,
     ),
     'selectIcon': const Icon(
-      Icons.video_collection,
+      Icons.person,
       size: 21,
     ),
-    'label': "媒体库",
+    'label': "我的",
     'count': 0,
-    'page': const MediaPage(),
-  }
+    'page': const MinePage(),
+  },
 ];
