@@ -65,7 +65,7 @@ void main() async {
   }
 
   PiliSchame.init();
-  await GlobalDataCache().initialize();
+  await GlobalDataCache.initialize();
 }
 
 class MyApp extends StatelessWidget {

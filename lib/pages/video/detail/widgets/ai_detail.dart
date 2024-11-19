@@ -18,7 +18,7 @@ class AiDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 16),
-      height: GlobalDataCache().sheetHeight,
+      height: GlobalDataCache.sheetHeight,
       child: Column(
         children: [
           _buildHeader(context),

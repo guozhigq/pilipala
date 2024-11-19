@@ -125,7 +125,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     double sheetHeight = MediaQuery.sizeOf(context).height -
         MediaQuery.of(context).padding.top -
         MediaQuery.sizeOf(context).width * 9 / 16;
-    GlobalDataCache().sheetHeight = sheetHeight;
+    GlobalDataCache.sheetHeight = sheetHeight;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
 

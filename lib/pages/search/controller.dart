@@ -43,10 +43,10 @@ class SSearchController extends GetxController {
         hintText = hint;
       }
     }
-    historyCacheList = GlobalDataCache().historyCacheList;
+    historyCacheList = GlobalDataCache.historyCacheList;
     historyList.value = historyCacheList;
     enableHotKey = setting.get(SettingBoxKey.enableHotKey, defaultValue: true);
-    enableSearchSuggest = GlobalDataCache().enableSearchSuggest;
+    enableSearchSuggest = GlobalDataCache.enableSearchSuggest;
   }
 
   void onChange(value) {
@@ -128,7 +128,7 @@ class SSearchController extends GetxController {
     historyCacheList = [];
     historyList.refresh();
     localCache.put('cacheList', []);
-    GlobalDataCache().historyCacheList = [];
+    GlobalDataCache.historyCacheList = [];
     SmartDialog.showToast('搜索历史已清空');
   }
 
@@ -139,7 +139,7 @@ class SSearchController extends GetxController {
     historyList.value = historyCacheList;
     historyList.refresh();
     localCache.put('cacheList', historyCacheList);
-    GlobalDataCache().historyCacheList = historyCacheList;
+    GlobalDataCache.historyCacheList = historyCacheList;
     searchFocusNode.unfocus();
   }
 }

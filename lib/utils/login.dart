@@ -118,7 +118,7 @@ class LoginUtils {
     Request.dio.options.headers['cookie'] = '';
     userInfoCache.put('userInfoCache', null);
     localCache.put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
-    GlobalDataCache().userInfo = null;
+    GlobalDataCache.userInfo = null;
     await refreshLoginStatus(false);
   }
 }

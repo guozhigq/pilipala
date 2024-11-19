@@ -155,7 +155,7 @@ class _PlaySettingState extends State<PlaySetting> {
               setKey: SettingBoxKey.enablePlayerControlAnimation,
               defaultVal: true,
               callFn: (bool val) {
-                GlobalDataCache().enablePlayerControlAnimation = val;
+                GlobalDataCache.enablePlayerControlAnimation = val;
               }),
           SetSwitchItem(
             title: '港澳台模式',

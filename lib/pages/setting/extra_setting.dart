@@ -146,7 +146,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableSearchSuggest,
             defaultVal: true,
             callFn: (val) {
-              GlobalDataCache().enableSearchSuggest = val;
+              GlobalDataCache.enableSearchSuggest = val;
             },
           ),
           SetSwitchItem(
@@ -181,7 +181,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableAutoExpand,
             defaultVal: false,
             callFn: (val) {
-              GlobalDataCache().enableAutoExpand = val;
+              GlobalDataCache.enableAutoExpand = val;
             },
           ),
           const SetSwitchItem(

@@ -52,7 +52,7 @@ class ReplyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isOwner = int.parse(replyItem!.member!.mid!) ==
-        (GlobalDataCache().userInfo?.mid ?? -1);
+        (GlobalDataCache.userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
@@ -415,7 +415,7 @@ class ReplyItemRow extends StatelessWidget {
                   onLongPress: () {
                     feedBack();
                     final bool isOwner = int.parse(replyItem!.member!.mid!) ==
-                        (GlobalDataCache().userInfo?.mid ?? -1);
+                        (GlobalDataCache.userInfo?.mid ?? -1);
                     showModalBottomSheet(
                       context: context,
                       useRootNavigator: true,
