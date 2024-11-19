@@ -19,6 +19,7 @@ class InvalidVideoModel {
   final String? videoReview;
   final String? favorites;
   final String? tag;
+  final List<String>? tagList;
 
   InvalidVideoModel({
     this.id,
@@ -41,6 +42,7 @@ class InvalidVideoModel {
     this.videoReview,
     this.favorites,
     this.tag,
+    this.tagList,
   });
 
   factory InvalidVideoModel.fromJson(Map<String, dynamic> json) {
@@ -65,6 +67,7 @@ class InvalidVideoModel {
       videoReview: json['video_review'],
       favorites: json['favorites'],
       tag: json['tag'],
+      tagList: json['tag'].toString().split(',').toList(),
     );
   }
 }
