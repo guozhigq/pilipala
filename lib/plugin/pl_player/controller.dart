@@ -909,7 +909,7 @@ class PlPlayerController {
     if (videoType == 'live') {
       return;
     }
-    if (controlsLock.value) {
+    if (_controlsLock.value) {
       return;
     }
     _doubleSpeedStatus.value = val;
@@ -1081,6 +1081,7 @@ class PlPlayerController {
       videoFitChangedTimer?.cancel();
       // _position.close();
       _playerEventSubs?.cancel();
+      _controlsLock.value = false;
       // _sliderPosition.close();
       // _sliderTempPosition.close();
       // _isSliderMoving.close();
