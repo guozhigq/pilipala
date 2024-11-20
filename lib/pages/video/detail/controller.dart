@@ -14,6 +14,7 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/sponsor_block/segment.dart';
 import 'package:pilipala/models/sponsor_block/segment_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
@@ -94,7 +95,7 @@ class VideoDetailController extends GetxController
   double? brightness;
   // 默认记录历史记录
   bool enableHeart = true;
-  var userInfo;
+  UserInfoData? userInfo;
   late bool isFirstTime = true;
   Floating? floating;
   late PreferredSizeWidget headerControl;
@@ -125,6 +126,8 @@ class VideoDetailController extends GetxController
   RxInt watchLaterCount = 0.obs;
   List<SegmentDataModel> skipSegments = <SegmentDataModel>[];
   int? lastPosition;
+  // 默认屏幕方向
+  RxString videoDirection = 'horizontal'.obs;
 
   @override
   void onInit() {
@@ -283,6 +286,10 @@ class VideoDetailController extends GetxController
     } else {
       ScreenBrightness().resetScreenBrightness();
     }
+    videoDirection.value = (firstVideo.width != null &&
+            firstVideo.height != null)
+        ? (firstVideo.width! > firstVideo.height! ? 'horizontal' : 'vertical')
+        : 'horizontal';
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
@@ -299,11 +306,7 @@ class VideoDetailController extends GetxController
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction: firstVideo.width != null && firstVideo.height != null
-          ? ((firstVideo.width! - firstVideo.height!) > 0
-              ? 'horizontal'
-              : 'vertical')
-          : null,
+      direction: videoDirection.value,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
@@ -615,7 +618,7 @@ class VideoDetailController extends GetxController
     var count = argMap['count'];
     var res = await UserHttp.getMediaList(
       type: 2,
-      bizId: userInfo.mid,
+      bizId: userInfo!.mid!,
       ps: count,
     );
     if (res['status']) {

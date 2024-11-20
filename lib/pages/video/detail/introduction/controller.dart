@@ -9,6 +9,7 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/models/video/tags.dart';
 import 'package:pilipala/models/video_detail_res.dart';
@@ -49,10 +50,8 @@ class VideoIntroController extends GetxController {
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
-  int _tempThemeValue = -1;
-
   RxInt lastPlayCid = 0.obs;
-  var userInfo;
+  UserInfoData? userInfo;
   RxList<VideoTagItem> videoTags = <VideoTagItem>[].obs;
 
   // 同时观看
@@ -301,7 +300,7 @@ class VideoIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
+        mid: userInfo!.mid!, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }

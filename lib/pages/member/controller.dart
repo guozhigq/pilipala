@@ -9,6 +9,7 @@ import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -22,7 +23,7 @@ class MemberController extends GetxController {
   late int ownerMid;
   // 投稿列表
   RxList<VListItemModel>? archiveList = <VListItemModel>[].obs;
-  dynamic userInfo;
+  UserInfoData? userInfo;
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
@@ -34,7 +35,7 @@ class MemberController extends GetxController {
     super.onInit();
     mid = int.tryParse(Get.parameters['mid']!) ?? -2;
     userInfo = userInfoCache.get('userInfoCache');
-    ownerMid = userInfo != null ? userInfo.mid : -1;
+    ownerMid = userInfo != null ? userInfo!.mid! : -1;
     isOwner.value = mid == ownerMid;
     face.value = Get.arguments['face'] ?? '';
     heroTag = Get.arguments['heroTag'] ?? '';

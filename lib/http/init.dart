@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
@@ -43,7 +44,7 @@ class Request {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    final userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));

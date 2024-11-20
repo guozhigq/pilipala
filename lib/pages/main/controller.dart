@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/common.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../models/common/dynamic_badge_mode.dart';
@@ -26,7 +27,7 @@ class MainController extends GetxController {
   late PageController pageController;
   int selectedIndex = 0;
   Box userInfoCache = GStorage.userInfo;
-  dynamic userInfo;
+  UserInfoData? userInfo;
   RxBool userLogin = false.obs;
   late Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
   late bool enableGradientBg;
@@ -85,7 +86,7 @@ class MainController extends GetxController {
     }
     if (mineItemIndex != -1 && userInfo != null) {
       Widget avatar = NetworkImgLayer(
-          width: 28, height: 28, src: userInfo.face, type: 'avatar');
+          width: 28, height: 28, src: userInfo!.face, type: 'avatar');
       navigationBars[mineItemIndex]['icon'] = avatar;
       navigationBars[mineItemIndex]['selectIcon'] = avatar;
     }
