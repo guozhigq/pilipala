@@ -58,11 +58,11 @@ class _PlayGesturePageState extends State<PlayGesturePage> {
                 },
               );
               if (result != null) {
-                GlobalDataCache().fullScreenGestureMode = FullScreenGestureMode
+                GlobalDataCache.fullScreenGestureMode = FullScreenGestureMode
                     .values
                     .firstWhere((element) => element.values == result);
                 fullScreenGestureMode =
-                    GlobalDataCache().fullScreenGestureMode.index;
+                    GlobalDataCache.fullScreenGestureMode.index;
                 setting.put(
                     SettingBoxKey.fullScreenGestureMode, fullScreenGestureMode);
                 SmartDialog.showToast('设置成功');

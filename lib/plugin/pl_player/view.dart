@@ -89,7 +89,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   late bool enableBackgroundPlay;
   late double screenWidth;
   final FullScreenGestureMode fullScreenGestureMode =
-      GlobalDataCache().fullScreenGestureMode;
+      GlobalDataCache.fullScreenGestureMode;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
@@ -136,7 +136,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     screenWidth = Get.size.width;
     animationController = AnimationController(
       vsync: this,
-      duration: GlobalDataCache().enablePlayerControlAnimation
+      duration: GlobalDataCache.enablePlayerControlAnimation
           ? const Duration(milliseconds: 150)
           : const Duration(milliseconds: 10),
     );

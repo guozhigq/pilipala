@@ -173,7 +173,7 @@ class _UpPanelState extends State<UpPanel> {
         if (data.type == 'up') {
           EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
               () {
-            if (GlobalDataCache().enableDynamicSwitch) {
+            if (GlobalDataCache.enableDynamicSwitch) {
               onClickUp(data, i);
             } else {
               onClickUpAni(data, i);

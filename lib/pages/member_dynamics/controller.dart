@@ -18,9 +18,8 @@ class MemberDynamicsController extends GetxController {
   void onInit() {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
-    ownerMid = GlobalDataCache().userInfo != null
-        ? GlobalDataCache().userInfo!.mid!
-        : -1;
+    ownerMid =
+        GlobalDataCache.userInfo != null ? GlobalDataCache.userInfo!.mid! : -1;
     isOwner.value = mid == -1 || mid == ownerMid;
   }
 
