@@ -48,7 +48,7 @@ class NetworkImgLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     int defaultImgQuality = 10;
     try {
-      defaultImgQuality = GlobalDataCache().imgQuality;
+      defaultImgQuality = GlobalDataCache.imgQuality;
     } catch (_) {}
 
     if (src == '' || src == null) {

@@ -169,8 +169,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(
-        initialExpanded: GlobalDataCache().enableAutoExpand);
+    _expandableCtr =
+        ExpandableController(initialExpanded: GlobalDataCache.enableAutoExpand);
   }
 
   // 收藏
@@ -556,7 +556,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    final actionTypeSort = GlobalDataCache().actionTypeSort;
+    final actionTypeSort = GlobalDataCache.actionTypeSort;
 
     Map<String, Widget> menuListWidgets = {
       'like': Obx(
