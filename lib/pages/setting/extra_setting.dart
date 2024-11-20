@@ -190,6 +190,12 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableRelatedVideo,
             defaultVal: true,
           ),
+          const SetSwitchItem(
+            title: '视频投屏开关',
+            subTitle: '打开后将在播放器右上角显示投屏入口',
+            setKey: SettingBoxKey.enableDlna,
+            defaultVal: false,
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),
