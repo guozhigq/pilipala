@@ -12,7 +12,6 @@
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="https" />
         </intent>
-
     </queries>
     <queries>
         <intent>
@@ -20,7 +19,6 @@
                 "android.support.customtabs.action.CustomTabsService" />
         </intent>
     </queries>
-
     <queries>
         <!-- If your app checks for http support -->
         <intent>
@@ -34,7 +32,6 @@
             <data android:scheme="https" />
         </intent>
     </queries>
-
     <application
         android:label="PiliPala"
         android:name="${applicationName}"
@@ -45,15 +42,16 @@
         android:fullBackupContent="false"
         tools:replace="android:allowBackup">
         <activity
-            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:name="com.guozhigq.pilipala.MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
             android:supportsPictureInPicture="true"
             android:resizeableActivity="true"
+            android:autoVerify="true"
             >
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
@@ -63,10 +61,21 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep Link -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pili"/>
+                <data android:scheme="pilipala"/>
+            </intent-filter>
+            <!-- App Link -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.SEARCH" />
@@ -132,102 +141,55 @@
                 <data android:scheme="bilibili" android:host="assistant" />
                 <data android:scheme="bilibili" android:host="feedback" />
                 <data android:scheme="bilibili" android:host="auth" android:path="/launch" />
-
-                <data android:scheme="http" android:host="live.bilibili.com"
-                    android:pathPattern="/live/.*" />
                 <data android:scheme="https" android:host="live.bilibili.com"
                     android:pathPattern="/live/.*" />
-                    <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
-                    android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.tv"
                     android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.tv"
                     android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.cn"
-                    android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.cn"
                     android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/mobile/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/mobile/video/.*" />
-                <data android:scheme="http" android:host="m.bilibili.com"
-                    android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="m.bilibili.com"
                     android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/story/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/story/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/bangumi/i/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/bangumi/i/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/mobile/bangumi/i/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/mobile/bangumi/i/.*" />
-                <data android:scheme="http" android:host="bangumi.bilibili.com"
-                    android:pathPattern="/.*" />
                 <data android:scheme="https" android:host="bangumi.bilibili.com"
                     android:pathPattern="/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/bangumi/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
-                    android:pathPattern="/bangumi/.*" />
-                <data android:scheme="http" android:host="m.bilibili.com"
                     android:pathPattern="/bangumi/.*" />
                 <data android:scheme="https" android:host="m.bilibili.com"
                     android:pathPattern="/bangumi/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/cheese/play/ss.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/cheese/play/ss.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/cheese/play/ep.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/cheese/play/ep.*" />
-                <data android:scheme="http" android:host="m.bilibili.com"
-                    android:pathPattern="/bangumi/play/ss.*" />
                 <data android:scheme="https" android:host="m.bilibili.com"
                     android:pathPattern="/cheese/play/ss.*" />
-                <data android:scheme="http" android:host="m.bilibili.com"
-                    android:pathPattern="/cheese/play/ep.*" />
                 <data android:scheme="https" android:host="m.bilibili.com"
                     android:pathPattern="/cheese/play/ep.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/read/cv.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/read/cv.*" />
-                <data android:scheme="http" android:host="www.bilibili.com" android:path="/review/" />
                 <data android:scheme="https" android:host="www.bilibili.com" android:path="/review/" />
-                <data android:scheme="http" android:host="bilibili.cn"
-                    android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="bilibili.cn"
-                    android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="bilibili.com"
                     android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="bilibili.com"
                     android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.cn"
-                    android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.cn"
-                    android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
                     android:pathPattern="/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/video/.*" />
-                <data android:scheme="http" android:host="www.bilibili.com"
-                    android:pathPattern="/mobile/video/.*" />
                 <data android:scheme="https" android:host="www.bilibili.com"
                     android:pathPattern="/mobile/video/.*" />
                 <data android:scheme="https" android:host="b23.tv"
                     android:pathPattern="/*" />
                 <data android:scheme="https" android:host="space.bilibili.com"
                     android:pathPattern="/*" />
-
             </intent-filter>
         </activity>
         <service 
@@ -239,7 +201,6 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-
         <receiver 
             android:name="com.ryanheise.audioservice.MediaButtonReceiver"
             android:exported="true" 
@@ -247,7 +208,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
-        </receiver> 
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

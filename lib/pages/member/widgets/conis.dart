@@ -4,8 +4,8 @@ import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/pages/member_coin/widgets/item.dart';
 
 class MemberCoinsPanel extends StatelessWidget {
-  final List<MemberCoinsDataModel>? data;
-  const MemberCoinsPanel({super.key, this.data});
+  final List<MemberCoinsDataModel> data;
+  const MemberCoinsPanel({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +20,9 @@ class MemberCoinsPanel extends StatelessWidget {
           ),
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: data!.length,
+          itemCount: data.length,
           itemBuilder: (context, i) {
-            return MemberCoinsItem(coinItem: data![i]);
+            return MemberCoinsItem(coinItem: data[i]);
           },
         );
       },

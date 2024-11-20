@@ -24,8 +24,29 @@ class MemberSeasonsPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                onTap: () => Get.toNamed(
-                    '/memberSeasons?mid=${item.meta!.mid}&seasonId=${item.meta!.seasonId}'),
+                onTap: () {
+                  final int category = item.meta!.category!;
+                  Map<String, String> parameters = {};
+                  if (category == 0) {
+                    parameters = {
+                      'category': '0',
+                      'mid': item.meta!.mid.toString(),
+                      'seasonId': item.meta!.seasonId.toString(),
+                      'seasonName': item.meta!.name!,
+                    };
+                  }
+                  // 2为直播回放
+                  if (category == 1 || category == 2) {
+                    parameters = {
+                      'category': '1',
+                      'mid': item.meta!.mid.toString(),
+                      'seriesId': item.meta!.seriesId.toString(),
+                      'seasonId': item.meta!.seasonId.toString(),
+                      'seasonName': item.meta!.name!,
+                    };
+                  }
+                  Get.toNamed('/memberSeasons', parameters: parameters);
+                },
                 title: Text(
                   item.meta!.name!,
                   maxLines: 1,
@@ -44,24 +65,30 @@ class MemberSeasonsPanel extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              LayoutBuilder(
-                builder: (context, boxConstraints) {
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Use a fixed count for GridView
-                      crossAxisSpacing: StyleString.safeSpace,
-                      mainAxisSpacing: StyleString.safeSpace,
-                      childAspectRatio: 0.94,
-                    ),
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: item.archives!.length,
-                    itemBuilder: (context, i) {
-                      return MemberSeasonsItem(seasonItem: item.archives![i]);
-                    },
-                  );
-                },
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: StyleString.safeSpace,
+                  right: StyleString.safeSpace,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, boxConstraints) {
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Use a fixed count for GridView
+                        crossAxisSpacing: StyleString.safeSpace,
+                        mainAxisSpacing: StyleString.safeSpace,
+                        childAspectRatio: 0.94,
+                      ),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: item.archives!.length,
+                      itemBuilder: (context, i) {
+                        return MemberSeasonsItem(seasonItem: item.archives![i]);
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

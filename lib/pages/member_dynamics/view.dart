@@ -5,6 +5,7 @@ import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import '../../common/widgets/http_error.dart';
+import '../../models/dynamics/result.dart';
 import '../dynamics/widgets/dynamic_panel.dart';
 
 class MemberDynamicsPage extends StatefulWidget {
@@ -53,9 +54,11 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text('他的动态', style: Theme.of(context).textTheme.titleMedium),
+        title: Obx(
+          () => Text(
+            '${_memberDynamicController.isOwner.value ? '我' : 'Ta'}的动态',
+          ),
+        ),
       ),
       body: CustomScrollView(
         controller: _memberDynamicController.scrollController,
@@ -66,7 +69,8 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
                   Map data = snapshot.data as Map;
-                  List list = _memberDynamicController.dynamicsList;
+                  RxList<DynamicItemModel> list =
+                      _memberDynamicController.dynamicsList;
                   if (data['status']) {
                     return Obx(
                       () => list.isNotEmpty

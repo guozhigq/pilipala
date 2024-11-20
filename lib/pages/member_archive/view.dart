@@ -1,6 +1,8 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/common/widgets/video_card_h.dart';
 import 'package:pilipala/utils/utils.dart';
 import '../../common/widgets/http_error.dart';
@@ -45,16 +47,29 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text('他的投稿', style: Theme.of(context).textTheme.titleMedium),
+        title: Obx(
+          () => Text(
+            '${_memberArchivesController.isOwner.value ? '我' : 'Ta'}的投稿 - ${_memberArchivesController.currentOrder['label']}',
+          ),
+        ),
         actions: [
-          Obx(
-            () => TextButton.icon(
-              icon: const Icon(Icons.sort, size: 20),
-              onPressed: _memberArchivesController.toggleSort,
-              label: Text(_memberArchivesController.currentOrder['label']!),
-            ),
+          // Obx(
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              // 这里处理选择逻辑
+              _memberArchivesController.currentOrder.value = value;
+              _memberArchivesController.getMemberArchive('init');
+            },
+            itemBuilder: (BuildContext context) =>
+                _memberArchivesController.orderList.map(
+              (e) {
+                return PopupMenuItem(
+                  value: e,
+                  child: Text(e['label']!),
+                );
+              },
+            ).toList(),
           ),
           const SizedBox(width: 6),
         ],
@@ -79,12 +94,20 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                                     videoItem: list[index],
                                     showOwner: false,
                                     showPubdate: true,
+                                    showCharge: true,
                                   );
                                 },
                                 childCount: list.length,
                               ),
                             )
-                          : const SliverToBoxAdapter(),
+                          : _memberArchivesController.isLoading.value
+                              ? SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return const VideoCardHSkeleton();
+                                  }, childCount: 10),
+                                )
+                              : const NoData(),
                     );
                   } else {
                     return HttpError(
@@ -94,16 +117,29 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: snapshot.data['msg'],
+                    errMsg: snapshot.data?['msg'] ?? '请求异常',
                     fn: () {},
                   );
                 }
               } else {
-                return const SliverToBoxAdapter();
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return const VideoCardHSkeleton();
+                  }, childCount: 10),
+                );
               }
             },
           ),
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _memberArchivesController.count > 0
+            ? FloatingActionButton.extended(
+                onPressed: _memberArchivesController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }

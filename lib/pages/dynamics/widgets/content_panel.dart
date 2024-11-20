@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/result.dart';
-import 'package:pilipala/pages/preview/index.dart';
-
+import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'rich_node_panel.dart';
 
 // ignore: must_be_immutable
@@ -59,17 +58,15 @@ class _ContentState extends State<Content> {
                   (pictureItem.height != null && pictureItem.width != null
                       ? pictureItem.height! / pictureItem.width!
                       : 1);
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: 0, imgList: picList);
-                    },
-                  );
+              return Hero(
+                tag: pictureItem.url!,
+                placeholderBuilder:
+                    (BuildContext context, Size heroSize, Widget child) {
+                  return child;
                 },
-                child: Container(
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, 1, context),
+                  child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
                     width: box.maxWidth / 2,
@@ -91,7 +88,9 @@ class _ContentState extends State<Content> {
                               )
                             : const SizedBox(),
                       ],
-                    )),
+                    ),
+                  ),
+                ),
               );
             },
           ),
@@ -102,26 +101,23 @@ class _ContentState extends State<Content> {
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(pics[i].url!);
+      }
+      for (var i = 0; i < len; i++) {
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
               double maxWidth = box.maxWidth.truncateToDouble();
-              return GestureDetector(
-                onTap: () {
-                  showDialog(
-                    useSafeArea: false,
-                    context: context,
-                    builder: (context) {
-                      return ImagePreview(initialPage: i, imgList: picList);
-                    },
-                  );
-                },
-                child: NetworkImgLayer(
-                  src: pics[i].url,
-                  width: maxWidth,
-                  height: maxWidth,
-                  origAspectRatio:
-                      pics[i].width!.toInt() / pics[i].height!.toInt(),
+              return Hero(
+                tag: picList[i],
+                child: GestureDetector(
+                  onTap: () => onPreviewImg(picList, i, context),
+                  child: NetworkImgLayer(
+                    src: pics[i].url,
+                    width: maxWidth,
+                    height: maxWidth,
+                    origAspectRatio:
+                        pics[i].width!.toInt() / pics[i].height!.toInt(),
+                  ),
                 ),
               );
             },
@@ -160,6 +156,18 @@ class _ContentState extends State<Content> {
     }
     return TextSpan(
       children: spanChilds,
+    );
+  }
+
+  void onPreviewImg(picList, initIndex, context) {
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          onPageChanged: (int pageIndex) {},
+        ),
+      ),
     );
   }
 

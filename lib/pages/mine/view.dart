@@ -1,12 +1,13 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/user/info.dart';
+import 'package:pilipala/models/user/stat.dart';
+import 'package:pilipala/utils/utils.dart';
 import 'controller.dart';
 
 class MinePage extends StatefulWidget {
@@ -16,19 +17,23 @@ class MinePage extends StatefulWidget {
   State<MinePage> createState() => _MinePageState();
 }
 
-class _MinePageState extends State<MinePage> {
-  final MineController mineController = Get.put(MineController());
+class _MinePageState extends State<MinePage>
+    with AutomaticKeepAliveClientMixin {
+  final MineController ctr = Get.put(MineController());
   late Future _futureBuilderFuture;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = mineController.queryUserInfo();
-
-    mineController.userLogin.listen((status) {
+    _futureBuilderFuture = ctr.queryUserInfo();
+    ctr.queryFavFolder();
+    ctr.userLogin.listen((status) {
       if (mounted) {
         setState(() {
-          _futureBuilderFuture = mineController.queryUserInfo();
+          _futureBuilderFuture = ctr.queryUserInfo();
         });
       }
     });
@@ -36,71 +41,210 @@ class _MinePageState extends State<MinePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        toolbarHeight: kTextTabBarHeight + 20,
-        backgroundColor: Colors.transparent,
-        centerTitle: false,
-        title: const Text(
-          'PLPL',
-          style: TextStyle(
-            height: 2.8,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Jura-Bold',
-          ),
-        ),
         actions: [
           IconButton(
-            onPressed: () => mineController.onChangeTheme(),
-            icon: Icon(
-              mineController.themeType.value == ThemeType.dark
-                  ? CupertinoIcons.sun_max
-                  : CupertinoIcons.moon,
-              size: 22,
-            ),
+            icon: const Icon(Icons.search_outlined),
+            onPressed: () => Get.toNamed('/search'),
           ),
           IconButton(
-            onPressed: () => Get.toNamed('/setting', preventDuplicates: false),
-            icon: const Icon(
-              CupertinoIcons.slider_horizontal_3,
+            icon: Icon(
+              ctr.themeType.value == ThemeType.dark
+                  ? Icons.wb_sunny_outlined
+                  : Icons.dark_mode_outlined,
             ),
+            onPressed: () => ctr.onChangeTheme(),
           ),
-          const SizedBox(width: 10),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Get.toNamed('/setting', preventDuplicates: false),
+          ),
+          const SizedBox(width: 22),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: SizedBox(
-              height: constraint.maxHeight,
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  FutureBuilder(
-                    future: _futureBuilderFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == null) {
-                          return const SizedBox();
-                        }
-                        if (snapshot.data['status']) {
-                          return Obx(
-                              () => userInfoBuild(mineController, context));
-                        } else {
-                          return userInfoBuild(mineController, context);
-                        }
-                      } else {
-                        return userInfoBuild(mineController, context);
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ctr.queryUserInfo();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 110),
+            child: Column(
+              children: [
+                Obx(() => _buildProfileSection(context, ctr.userInfo.value)),
+                const SizedBox(height: 10),
+                FutureBuilder(
+                  future: _futureBuilderFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.data == null) {
+                        return const SizedBox();
                       }
-                    },
+                      if (snapshot.data['status']) {
+                        return Obx(
+                          () => _buildStatsSection(
+                            context,
+                            ctr.userStat.value,
+                          ),
+                        );
+                      } else {
+                        return _buildStatsSection(
+                          context,
+                          ctr.userStat.value,
+                        );
+                      }
+                    } else {
+                      return _buildStatsSection(
+                        context,
+                        ctr.userStat.value,
+                      );
+                    }
+                  },
+                ),
+                _buildMenuSection(context),
+                Obx(
+                  () => Visibility(
+                    visible: ctr.userLogin.value,
+                    child: Divider(
+                      height: 25,
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
                   ),
+                ),
+                Obx(
+                  () => ctr.userLogin.value
+                      ? _buildFavoritesSection(context)
+                      : const SizedBox(),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).padding.bottom +
+                      kBottomNavigationBarHeight,
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSection(BuildContext context, UserInfoData userInfo) {
+    return InkWell(
+      onTap: () => ctr.onLogin(),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 10, 30, 10),
+        child: Row(
+          children: [
+            userInfo.face != null
+                ? NetworkImgLayer(
+                    src: userInfo.face,
+                    width: 85,
+                    height: 85,
+                    type: 'avatar',
+                  )
+                : ClipOval(
+                    child: SizedBox(
+                      width: 85,
+                      height: 85,
+                      child: Image.asset('assets/images/noface.jpeg'),
+                    ),
+                  ),
+            const SizedBox(width: 12),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      userInfo.uname ?? '去登录',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: userInfo.vipStatus == 1
+                            ? const Color.fromARGB(255, 251, 100, 163)
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Image.asset(
+                      'assets/images/lv/lv${userInfo.levelInfo != null ? userInfo.levelInfo!.currentLevel : '0'}.png',
+                      height: 12,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                if (userInfo.vipType != 0 && userInfo.vipStatus == 1) ...[
+                  Image.network(
+                    userInfo.vipLabel!['img_label_uri_hans_static'],
+                    height: 22,
+                  ),
+                  const SizedBox(height: 2),
                 ],
-              ),
+                Text.rich(
+                  TextSpan(children: [
+                    TextSpan(
+                        text: '硬币: ',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline)),
+                    TextSpan(
+                        text: (userInfo.money ?? '-').toString(),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary)),
+                  ]),
+                )
+              ],
+            ),
+            const Spacer(),
+            Icon(
+              Icons.keyboard_arrow_right_rounded,
+              size: 28,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsSection(BuildContext context, UserStat userStat) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 30, right: 30),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SizedBox(
+            height: constraints.maxWidth / 3 * 0.6,
+            child: GridView.count(
+              primary: false,
+              padding: const EdgeInsets.all(0),
+              crossAxisCount: 3,
+              childAspectRatio: 1.67,
+              children: <Widget>[
+                _buildStatItem(
+                  context,
+                  (userStat.dynamicCount ?? '-').toString(),
+                  '动态',
+                  ctr.pushDynamic,
+                ),
+                _buildStatItem(
+                  context,
+                  (userStat.following ?? '-').toString(),
+                  '关注',
+                  ctr.pushFollow,
+                ),
+                _buildStatItem(
+                  context,
+                  (userStat.follower ?? '-').toString(),
+                  '粉丝',
+                  ctr.pushFans,
+                ),
+              ],
             ),
           );
         },
@@ -108,257 +252,258 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  Widget userInfoBuild(_mineController, context) {
-    return Column(
-      children: [
-        const SizedBox(height: 5),
-        GestureDetector(
-          onTap: () => _mineController.onLogin(),
-          child: ClipOval(
-            child: Container(
-              width: 85,
-              height: 85,
-              color: Theme.of(context).colorScheme.onInverseSurface,
-              child: Center(
-                child: _mineController.userInfo.value.face != null
-                    ? NetworkImgLayer(
-                        src: _mineController.userInfo.value.face,
-                        width: 85,
-                        height: 85)
-                    : Image.asset('assets/images/noface.jpeg'),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              _mineController.userInfo.value.uname ?? '点击头像登录',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(width: 4),
-            Image.asset(
-              'assets/images/lv/lv${_mineController.userInfo.value.levelInfo != null ? _mineController.userInfo.value.levelInfo!.currentLevel : '0'}.png',
-              height: 10,
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text.rich(TextSpan(children: [
-              TextSpan(
-                  text: '硬币: ',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.outline)),
-              TextSpan(
-                  text: (_mineController.userInfo.value.money ?? 'pilipala')
-                      .toString(),
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary)),
-            ]))
-          ],
-        ),
-        const SizedBox(height: 25),
-        if (_mineController.userInfo.value.levelInfo != null) ...[
-          LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              LevelInfo levelInfo = _mineController.userInfo.value.levelInfo;
-              return SizedBox(
-                width: box.maxWidth,
-                height: 24,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        color: Theme.of(context).colorScheme.primary,
-                        height: 24,
-                        constraints:
-                            const BoxConstraints(minWidth: 100), // 设置最小宽度为100
-                        width: box.maxWidth *
-                            (1 - (levelInfo.currentExp! / levelInfo.nextExp!)),
-                        child: Center(
-                          child: Text(
-                            '${levelInfo.currentExp!}/${levelInfo.nextExp!}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 23,
-                      left: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: box.maxWidth *
-                            (_mineController
-                                    .userInfo.value.levelInfo!.currentExp! /
-                                _mineController
-                                    .userInfo.value.levelInfo!.nextExp!),
-                        height: 1,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ],
+  Widget _buildStatItem(
+    BuildContext context,
+    String count,
+    String label,
+    Function onTap,
+  ) {
+    TextStyle style = TextStyle(
+        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+        fontWeight: FontWeight.bold);
+    return InkWell(
+      onTap: () => onTap(),
+      // onTap: () {},
+      borderRadius: StyleString.mdRadius,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(count, style: style),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
                 ),
-              );
-            },
           ),
         ],
-        const SizedBox(height: 30),
-        Padding(
-          padding: const EdgeInsets.only(left: 12, right: 12),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              TextStyle style = TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold);
-              return SizedBox(
-                height: constraints.maxWidth / 3 * 0.6,
-                child: GridView.count(
-                  primary: false,
-                  padding: const EdgeInsets.all(0),
-                  crossAxisCount: 3,
-                  childAspectRatio: 1.67,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () => _mineController.pushDynamic(),
-                      borderRadius: StyleString.mdRadius,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                                (_mineController.userStat.value.dynamicCount ??
-                                        '-')
-                                    .toString(),
-                                key: ValueKey<String>(_mineController
-                                    .userStat.value.dynamicCount
-                                    .toString()),
-                                style: style),
+      ),
+    );
+  }
+
+  Widget _buildMenuSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SizedBox(
+            height: constraints.maxWidth / 4 * 0.85,
+            child: GridView.count(
+              primary: false,
+              crossAxisCount: 4,
+              padding: const EdgeInsets.all(0),
+              childAspectRatio: 1.2,
+              children: [
+                ...ctr.menuList.map((element) {
+                  return InkWell(
+                    onTap: () {
+                      if (!ctr.userLogin.value) {
+                        SmartDialog.showToast('账号未登录');
+                      } else {
+                        element['onTap']();
+                      }
+                    },
+                    borderRadius: StyleString.mdRadius,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Icon(
+                            element['icon'],
+                            size: 21,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '动态',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(element['title'])
+                      ],
                     ),
-                    InkWell(
-                      onTap: () => _mineController.pushFollow(),
-                      borderRadius: StyleString.mdRadius,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                                (_mineController.userStat.value.following ??
-                                        '-')
-                                    .toString(),
-                                key: ValueKey<String>(_mineController
-                                    .userStat.value.following
-                                    .toString()),
-                                style: style),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '关注',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
+                  );
+                }).toList(),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFavoritesSection(context) {
+    return Column(
+      children: [
+        _buildFavoritesTitle(context, 'fav', '收藏夹'),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: double.infinity,
+          height: MediaQuery.textScalerOf(context).scale(180),
+          child: FutureBuilder(
+            future: ctr.queryFavFolder(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
+                  List favFolderList = ctr.favFolderData.value.list!;
+                  int favFolderCount = ctr.favFolderData.value.count!;
+                  bool flag = favFolderCount > favFolderList.length;
+                  return Obx(
+                    () => ListView.builder(
+                      itemCount:
+                          ctr.favFolderData.value.list!.length + (flag ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (flag && index == favFolderList.length) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(right: 14, bottom: 70),
+                            child: Center(
+                              child: IconButton(
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.zero),
+                                  backgroundColor:
+                                      MaterialStateProperty.resolveWith(
+                                          (states) {
+                                    return Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withOpacity(0.5);
+                                  }),
+                                ),
+                                onPressed: () => Get.toNamed('/fav'),
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 18,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return FavFolderItem(
+                            item: ctr.favFolderData.value.list![index],
+                            index: index,
+                          );
+                        }
+                      },
+                      scrollDirection: Axis.horizontal,
                     ),
-                    InkWell(
-                      onTap: () => _mineController.pushFans(),
-                      borderRadius: StyleString.mdRadius,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 400),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                                (_mineController.userStat.value.follower ?? '-')
-                                    .toString(),
-                                key: ValueKey<String>(_mineController
-                                    .userStat.value.follower
-                                    .toString()),
-                                style: style),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '粉丝',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
+                  );
+                } else {
+                  return SizedBox(
+                    height: 110,
+                    child: Center(child: Text(data?['msg'] ?? '')),
+                  );
+                }
+              } else {
+                // 骨架屏
+                return Obx(
+                  () => ctr.favFolderData.value.list != null
+                      ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: ctr.favFolderData.value.list!.length,
+                          itemBuilder: (context, index) {
+                            return FavFolderItem(
+                              item: ctr.favFolderData.value.list![index],
+                              index: index,
+                            );
+                          },
+                        )
+                      : const SizedBox(),
+                );
+              }
             },
           ),
         ),
       ],
     );
   }
+
+  Widget _buildFavoritesTitle(
+    BuildContext context,
+    String type,
+    String title,
+  ) {
+    return ListTile(
+      onTap: () => Get.toNamed('/fav'),
+      leading: null,
+      dense: true,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: title,
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                    fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' '),
+              TextSpan(
+                text: '20',
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      // trailing: IconButton(
+      //   onPressed: () {},
+      //   icon: const Icon(
+      //     Icons.refresh,
+      //     size: 20,
+      //   ),
+      // ),
+    );
+  }
 }
 
-class ActionItem extends StatelessWidget {
-  final Icon? icon;
-  final Function? onTap;
-  final String? text;
-
-  const ActionItem({
-    Key? key,
-    this.icon,
-    this.onTap,
-    this.text,
-  }) : super(key: key);
-
+class FavFolderItem extends StatelessWidget {
+  const FavFolderItem({super.key, this.item, this.index});
+  final FavFolderItemData? item;
+  final int? index;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: StyleString.mdRadius,
+    String heroTag = Utils.makeHeroTag(item!.fid);
+    return Container(
+      margin: EdgeInsets.only(left: index == 0 ? 20 : 0, right: 14),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon!.icon!),
+          InkWell(
+            onTap: () =>
+                Get.toNamed('/favDetail', arguments: item, parameters: {
+              'mediaId': item!.id.toString(),
+              'heroTag': heroTag,
+              'isOwner': '1',
+            }),
+            borderRadius: StyleString.mdRadius,
+            child: Hero(
+              tag: heroTag,
+              child: NetworkImgLayer(
+                src: item!.cover,
+                width: 180,
+                height: MediaQuery.textScalerOf(context).scale(110),
+              ),
+            ),
+          ),
           const SizedBox(height: 8),
           Text(
-            text!,
-            style: Theme.of(context).textTheme.labelMedium,
+            ' ${item!.title}',
+            overflow: TextOverflow.fade,
+            maxLines: 1,
           ),
+          Text(
+            ' 共${item!.mediaCount}条视频',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: Theme.of(context).colorScheme.outline),
+          )
         ],
       ),
     );

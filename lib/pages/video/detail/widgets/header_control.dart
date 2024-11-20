@@ -30,6 +30,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.floating,
     this.bvid,
     this.videoType,
+    this.showSubtitleBtn,
     super.key,
   });
   final PlPlayerController? controller;
@@ -37,6 +38,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final Floating? floating;
   final String? bvid;
   final SearchType? videoType;
+  final bool? showSubtitleBtn;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -50,8 +52,8 @@ class _HeaderControlState extends State<HeaderControl> {
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> videoStorage = GStrorage.video;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> videoStorage = GStorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
   RxBool isFullScreen = false.obs;
@@ -83,7 +85,6 @@ class _HeaderControlState extends State<HeaderControl> {
 
   /// 设置面板
   void showSettingSheet() {
-    // Scaffold.of(context).openDrawer();
     showModalBottomSheet(
       elevation: 0,
       context: context,
@@ -94,7 +95,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 460,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -181,15 +182,16 @@ class _HeaderControlState extends State<HeaderControl> {
                             '当前音质 ${widget.videoDetailCtr!.currentAudioQa!.description}',
                             style: subTitleStyle),
                       ),
-                    ListTile(
-                      onTap: () => {Get.back(), showSetDecodeFormats()},
-                      dense: true,
-                      leading: const Icon(Icons.av_timer_outlined, size: 20),
-                      title: const Text('解码格式', style: titleStyle),
-                      subtitle: Text(
-                          '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats.description}',
-                          style: subTitleStyle),
-                    ),
+                    if (widget.videoDetailCtr!.currentDecodeFormats != null)
+                      ListTile(
+                        onTap: () => {Get.back(), showSetDecodeFormats()},
+                        dense: true,
+                        leading: const Icon(Icons.av_timer_outlined, size: 20),
+                        title: const Text('解码格式', style: titleStyle),
+                        subtitle: Text(
+                            '当前解码格式 ${widget.videoDetailCtr!.currentDecodeFormats!.description}',
+                            style: subTitleStyle),
+                      ),
                     ListTile(
                       onTap: () => {Get.back(), showSetRepeat()},
                       dense: true,
@@ -317,7 +319,7 @@ class _HeaderControlState extends State<HeaderControl> {
             height: 500,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             margin: const EdgeInsets.all(12),
@@ -377,7 +379,7 @@ class _HeaderControlState extends State<HeaderControl> {
                           inactiveThumbColor:
                               Theme.of(context).colorScheme.primaryContainer,
                           inactiveTrackColor:
-                              Theme.of(context).colorScheme.background,
+                              Theme.of(context).colorScheme.surface,
                           splashRadius: 10.0,
                           // boolean variable value
                           value: shutdownTimerService.waitForPlayingCompleted,
@@ -426,49 +428,59 @@ class _HeaderControlState extends State<HeaderControl> {
   /// 选择字幕
   void showSubtitleDialog() async {
     int tempThemeValue = widget.controller!.subTitleCode.value;
-    int len = widget.videoDetailCtr!.subtitles.length;
+    final List subtitles = widget.videoDetailCtr!.subtitles;
+    int len = subtitles.length;
+    if (subtitles.firstWhereOrNull((element) => element.id == tempThemeValue) ==
+        null) {
+      tempThemeValue = -1;
+    }
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('选择字幕'),
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 18),
-            content: StatefulBuilder(builder: (context, StateSetter setState) {
-              return len == 0
-                  ? const SizedBox(
-                      height: 60,
-                      child: Center(
-                        child: Text('没有字幕'),
-                      ),
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RadioListTile(
-                          value: -1,
-                          title: const Text('关闭弹幕'),
-                          groupValue: tempThemeValue,
-                          onChanged: (value) {
-                            tempThemeValue = value!;
-                            widget.controller?.toggleSubtitle(value);
-                            Get.back();
-                          },
+            content: StatefulBuilder(
+              builder: (context, StateSetter setState) {
+                return len == 0
+                    ? const SizedBox(
+                        height: 60,
+                        child: Center(
+                          child: Text('没有字幕'),
                         ),
-                        ...widget.videoDetailCtr!.subtitles
-                            .map((e) => RadioListTile(
-                                  value: e.code,
-                                  title: Text(e.title),
-                                  groupValue: tempThemeValue,
-                                  onChanged: (value) {
-                                    tempThemeValue = value!;
-                                    widget.controller?.toggleSubtitle(value);
-                                    Get.back();
-                                  },
-                                ))
-                            .toList(),
-                      ],
-                    );
-            }),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile(
+                              value: -1,
+                              title: const Text('关闭字幕'),
+                              groupValue: tempThemeValue,
+                              onChanged: (value) {
+                                tempThemeValue = value!;
+                                widget.controller?.toggleSubtitle(value);
+                                Get.back();
+                              },
+                            ),
+                            ...widget.videoDetailCtr!.subtitles
+                                .map((e) => RadioListTile(
+                                      value: e.id,
+                                      title: Text(e.title),
+                                      groupValue: tempThemeValue,
+                                      onChanged: (value) {
+                                        tempThemeValue = value!;
+                                        widget.controller
+                                            ?.toggleSubtitle(value);
+                                        Get.back();
+                                      },
+                                    ))
+                                .toList(),
+                          ],
+                        ),
+                      );
+              },
+            ),
           );
         });
   }
@@ -542,14 +554,22 @@ class _HeaderControlState extends State<HeaderControl> {
 
     /// 可用的质量分类
     int userfulQaSam = 0;
-    final List<VideoItem> video = videoInfo.dash!.video!;
-    final Set<int> idSet = {};
-    for (final VideoItem item in video) {
-      final int id = item.id!;
-      if (!idSet.contains(id)) {
-        idSet.add(id);
-        userfulQaSam++;
+    if (videoInfo.dash != null) {
+      // dash格式视频一次请求会返回所有可播放的清晰度video
+      final List<VideoItem> video = videoInfo.dash!.video!;
+      final Set<int> idSet = {};
+      for (final VideoItem item in video) {
+        final int id = item.id!;
+        if (!idSet.contains(id)) {
+          idSet.add(id);
+          userfulQaSam++;
+        }
       }
+    }
+
+    if (videoInfo.durl != null) {
+      // durl格式视频一次请求返回对应清晰度video
+      userfulQaSam = videoFormat.length - 1;
     }
 
     showModalBottomSheet(
@@ -562,7 +582,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 310,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -652,7 +672,7 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
@@ -708,7 +728,7 @@ class _HeaderControlState extends State<HeaderControl> {
   void showSetDecodeFormats() {
     // 当前选中的解码格式
     final VideoDecodeFormats currentDecodeFormats =
-        widget.videoDetailCtr!.currentDecodeFormats;
+        widget.videoDetailCtr!.currentDecodeFormats!;
     final VideoItem firstVideo = widget.videoDetailCtr!.firstVideo;
     // 当前视频可用的解码格式
     final List<FormatItem> videoFormat = videoInfo.supportFormats!;
@@ -726,15 +746,18 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择解码格式', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择解码格式', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -817,7 +840,7 @@ class _HeaderControlState extends State<HeaderControl> {
             height: 580,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             margin: const EdgeInsets.all(12),
@@ -1058,7 +1081,9 @@ class _HeaderControlState extends State<HeaderControl> {
           );
         });
       },
-    );
+    ).then((value) {
+      widget.controller!.cacheDanmakuOption();
+    });
   }
 
   /// 播放顺序
@@ -1073,15 +1098,18 @@ class _HeaderControlState extends State<HeaderControl> {
           height: 250,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                  height: 45,
-                  child: Center(child: Text('选择播放顺序', style: titleStyle))),
+              const SizedBox(
+                height: 45,
+                child: Center(
+                  child: Text('选择播放顺序', style: titleStyle),
+                ),
+              ),
               Expanded(
                 child: Material(
                   child: ListView(
@@ -1127,10 +1155,7 @@ class _HeaderControlState extends State<HeaderControl> {
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Row(
@@ -1166,11 +1191,13 @@ class _HeaderControlState extends State<HeaderControl> {
               children: [
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
-                  child: Text(
-                    videoIntroController.videoDetail.value.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                  child: Obx(
+                    () => Text(
+                      videoIntroController.videoDetail.value.title ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -1299,28 +1326,15 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          // SizedBox(
-          //   width: 34,
-          //   height: 34,
-          //   child: IconButton(
-          //     style: ButtonStyle(
-          //       padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     ),
-          //     onPressed: () => showSubtitleDialog(),
-          //     icon: const Icon(
-          //       Icons.closed_caption_off,
-          //       size: 22,
-          //     ),
-          //   ),
-          // ),
-          ComBtn(
-            icon: const Icon(
-              Icons.closed_caption_off,
-              size: 22,
-              color: Colors.white,
+          if (widget.showSubtitleBtn ?? true)
+            ComBtn(
+              icon: const Icon(
+                Icons.closed_caption_off,
+                size: 22,
+                color: Colors.white,
+              ),
+              fuc: () => showSubtitleDialog(),
             ),
-            fuc: () => showSubtitleDialog(),
-          ),
           SizedBox(width: buttonSpace),
           Obx(
             () => SizedBox(

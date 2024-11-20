@@ -1,89 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/models/live/follow.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/utils/image_save.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
-  final LiveItemModel liveItem;
+  final dynamic liveItem;
   final int crossAxisCount;
-  final Function()? longPress;
-  final Function()? longPressEnd;
 
   const LiveCardV({
     Key? key,
     required this.liveItem,
     required this.crossAxisCount,
-    this.longPress,
-    this.longPressEnd,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(liveItem.roomId);
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.zero,
-      child: GestureDetector(
-        onLongPress: () {
-          if (longPress != null) {
-            longPress!();
-          }
-        },
-        // onLongPressEnd: (details) {
-        //   if (longPressEnd != null) {
-        //     longPressEnd!();
-        //   }
-        // },
-        child: InkWell(
-          onTap: () async {
-            Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
-                arguments: {'liveItem': liveItem, 'heroTag': heroTag});
-          },
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.all(StyleString.imgRadius),
-                child: AspectRatio(
-                  aspectRatio: StyleString.aspectRatio,
-                  child: LayoutBuilder(builder: (context, boxConstraints) {
-                    double maxWidth = boxConstraints.maxWidth;
-                    double maxHeight = boxConstraints.maxHeight;
-                    return Stack(
-                      children: [
-                        Hero(
-                          tag: heroTag,
-                          child: NetworkImgLayer(
-                            src: liveItem.cover!,
-                            width: maxWidth,
-                            height: maxHeight,
+    return InkWell(
+      onLongPress: () => imageSaveDialog(
+        context,
+        liveItem,
+        SmartDialog.dismiss,
+      ),
+      borderRadius: BorderRadius.circular(16),
+      onTap: () async {
+        Get.toNamed('/liveRoom?roomid=${liveItem.roomId}',
+            arguments: {'liveItem': liveItem, 'heroTag': heroTag});
+      },
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.all(StyleString.imgRadius),
+            child: AspectRatio(
+              aspectRatio: StyleString.aspectRatio,
+              child: LayoutBuilder(builder: (context, boxConstraints) {
+                double maxWidth = boxConstraints.maxWidth;
+                double maxHeight = boxConstraints.maxHeight;
+                return Stack(
+                  children: [
+                    Hero(
+                      tag: heroTag,
+                      child: NetworkImgLayer(
+                        src: liveItem.cover!,
+                        width: maxWidth,
+                        height: maxHeight,
+                      ),
+                    ),
+                    if (crossAxisCount != 1)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: AnimatedOpacity(
+                          opacity: 1,
+                          duration: const Duration(milliseconds: 200),
+                          child: VideoStat(
+                            liveItem: liveItem,
                           ),
                         ),
-                        if (crossAxisCount != 1)
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: AnimatedOpacity(
-                              opacity: 1,
-                              duration: const Duration(milliseconds: 200),
-                              child: VideoStat(
-                                liveItem: liveItem,
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-              LiveContent(liveItem: liveItem, crossAxisCount: crossAxisCount)
-            ],
+                      ),
+                    if (liveItem is LiveFollowingItemModel &&
+                        liveItem.liveStatus == 1)
+                      const PBadge(top: 8, right: 8, text: '直播中'),
+                  ],
+                );
+              }),
+            ),
           ),
-        ),
+          LiveContent(liveItem: liveItem, crossAxisCount: crossAxisCount)
+        ],
       ),
     );
   }
@@ -161,7 +153,7 @@ class LiveContent extends StatelessWidget {
 }
 
 class VideoStat extends StatelessWidget {
-  final LiveItemModel? liveItem;
+  final dynamic liveItem;
 
   const VideoStat({
     Key? key,
@@ -191,25 +183,20 @@ class VideoStat extends StatelessWidget {
             liveItem!.areaName!,
             style: const TextStyle(fontSize: 11, color: Colors.white),
           ),
-          Text(
-            liveItem!.watchedShow!['text_small'],
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          ),
+          if (liveItem is LiveItemModel) ...[
+            Text(
+              liveItem!.watchedShow?['text_small'],
+              style: const TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ],
+          if (liveItem is LiveFollowingItemModel) ...[
+            Text(
+              '${liveItem.textSmall}',
+              style: const TextStyle(fontSize: 11, color: Colors.white),
+            ),
+          ]
         ],
       ),
-
-      // child: RichText(
-      //   maxLines: 1,
-      //   textAlign: TextAlign.justify,
-      //   softWrap: false,
-      //   text: TextSpan(
-      //     style: const TextStyle(fontSize: 11, color: Colors.white),
-      //     children: [
-      //       TextSpan(text: liveItem!.areaName!),
-      //       TextSpan(text: liveItem!.watchedShow!['text_small']),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/video.dart';
@@ -13,7 +14,7 @@ class RcmdController extends GetxController {
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
   bool isLoadingMore = true;
   OverlayEntry? popupDialog;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   RxInt crossAxisCount = 2.obs;
   late bool enableSaveLastData;
   late String defaultRcmdType = 'web';
@@ -105,5 +106,11 @@ class RcmdController extends GetxController {
       await scrollController.animateTo(0,
           duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
+  }
+
+  void blockUserCb(mid) {
+    videoList.removeWhere((e) => e.owner.mid == mid);
+    videoList.refresh();
+    SmartDialog.showToast('已移除相关视频');
   }
 }

@@ -8,10 +8,12 @@ import '../../../models/user/sub_folder.dart';
 
 class SubItem extends StatelessWidget {
   final SubFolderItemData subFolderItem;
+  final bool isOwner;
   final Function(SubFolderItemData) cancelSub;
   const SubItem({
     super.key,
     required this.subFolderItem,
+    required this.isOwner,
     required this.cancelSub,
   });
 
@@ -25,6 +27,7 @@ class SubItem extends StatelessWidget {
         parameters: {
           'heroTag': heroTag,
           'seasonId': subFolderItem.id.toString(),
+          'type': subFolderItem.type.toString(),
         },
       ),
       child: Padding(
@@ -58,6 +61,7 @@ class SubItem extends StatelessWidget {
                   ),
                   VideoContent(
                     subFolderItem: subFolderItem,
+                    isOwner: isOwner,
                     cancelSub: cancelSub,
                   )
                 ],
@@ -72,61 +76,71 @@ class SubItem extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final SubFolderItemData subFolderItem;
+  final bool isOwner;
   final Function(SubFolderItemData)? cancelSub;
-  const VideoContent({super.key, required this.subFolderItem, this.cancelSub});
+  const VideoContent({
+    super.key,
+    required this.subFolderItem,
+    required this.isOwner,
+    this.cancelSub,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 2, 6, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Text(
-              subFolderItem.title!,
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '合集 UP主：${subFolderItem.upper!.name!}',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${subFolderItem.mediaCount}个视频',
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 35,
-                  width: 35,
-                  child: IconButton(
-                    onPressed: () => cancelSub?.call(subFolderItem),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.outline,
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    ),
-                    icon: const Icon(Icons.delete_outline, size: 18),
+                Text(
+                  subFolderItem.title!,
+                  textAlign: TextAlign.start,
+                  maxLines: 3,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.3,
                   ),
-                )
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '合集 UP主：${subFolderItem.upper!.name!}',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${subFolderItem.mediaCount}个视频',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
               ],
-            )
+            ),
+            isOwner
+                ? Positioned(
+                    right: 0,
+                    bottom: -4,
+                    child: IconButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () => cancelSub?.call(subFolderItem),
+                      icon: Icon(
+                        Icons.clear_outlined,
+                        color: Theme.of(context).colorScheme.outline,
+                        size: 18,
+                      ),
+                    ),
+                  )
+                : const SizedBox()
           ],
         ),
       ),

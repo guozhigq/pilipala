@@ -20,7 +20,6 @@ class MemberCoinsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String heroTag = Utils.makeHeroTag(coinItem.aid);
     return Card(
-      elevation: 0,
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.zero,
       child: InkWell(
@@ -59,6 +58,7 @@ class MemberCoinsItem extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(5, 6, 0, 0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     coinItem.title!,
@@ -68,10 +68,7 @@ class MemberCoinsItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      StatView(
-                        view: coinItem.view,
-                        theme: 'gray',
-                      ),
+                      StatView(view: coinItem.view),
                       const Spacer(),
                       Text(
                         Utils.CustomStamp_str(

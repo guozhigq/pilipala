@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/utils/login.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -18,12 +19,7 @@ class _WebviewPageState extends State<WebviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          centerTitle: false,
-          titleSpacing: 0,
-          title: Text(
-            _webviewController.pageTitle,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          title: Text(_webviewController.pageTitle),
           actions: [
             const SizedBox(width: 4),
             IconButton(
@@ -43,7 +39,8 @@ class _WebviewPageState extends State<WebviewPage> {
             Obx(
               () => _webviewController.type.value == 'login'
                   ? TextButton(
-                      onPressed: () => _webviewController.confirmLogin(null),
+                      onPressed: () =>
+                          LoginUtils.confirmLogin(null, _webviewController),
                       child: const Text('刷新登录状态'),
                     )
                   : const SizedBox(),

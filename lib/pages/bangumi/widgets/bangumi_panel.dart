@@ -5,11 +5,12 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../common/pages_bottom_sheet.dart';
 import '../../../models/common/video_episode_type.dart';
+import '../introduction/controller.dart';
 
 class BangumiPanel extends StatefulWidget {
   const BangumiPanel({
@@ -19,6 +20,7 @@ class BangumiPanel extends StatefulWidget {
     this.sheetHeight,
     this.changeFuc,
     this.bangumiDetail,
+    this.bangumiIntroController,
   });
 
   final List<EpisodeItem> pages;
@@ -26,6 +28,7 @@ class BangumiPanel extends StatefulWidget {
   final double? sheetHeight;
   final Function? changeFuc;
   final BangumiInfoModel? bangumiDetail;
+  final BangumiIntroController? bangumiIntroController;
 
   @override
   State<BangumiPanel> createState() => _BangumiPanelState();
@@ -34,14 +37,13 @@ class BangumiPanel extends StatefulWidget {
 class _BangumiPanelState extends State<BangumiPanel> {
   late RxInt currentIndex = (-1).obs;
   final ScrollController listViewScrollCtr = ScrollController();
-  Box userInfoCache = GStrorage.userInfo;
-  dynamic userInfo;
+  Box userInfoCache = GStorage.userInfo;
+  UserInfoData? userInfo;
   // 默认未开通
   int vipStatus = 0;
   late int cid;
   String heroTag = Get.arguments['heroTag'];
   late final VideoDetailController videoDetailCtr;
-  final ItemScrollController itemScrollController = ItemScrollController();
   late PersistentBottomSheetController? _bottomSheetController;
 
   @override
@@ -62,7 +64,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
     /// 获取大会员状态
     userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null) {
-      vipStatus = userInfo.vipStatus;
+      vipStatus = userInfo!.vipStatus!;
     }
   }
 
@@ -81,9 +83,14 @@ class _BangumiPanelState extends State<BangumiPanel> {
       item.bvid,
       item.cid,
       item.aid,
+      item.cover,
     );
-    _bottomSheetController?.close();
-    currentIndex = i;
+    try {
+      if (_bottomSheetController != null) {
+        _bottomSheetController?.close();
+      }
+    } catch (_) {}
+    currentIndex.value = i;
     scrollToIndex();
   }
 
@@ -92,11 +99,15 @@ class _BangumiPanelState extends State<BangumiPanel> {
       // 在回调函数中获取更新后的状态
       final double offset = min((currentIndex * 150) - 75,
           listViewScrollCtr.position.maxScrollExtent);
-      listViewScrollCtr.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (currentIndex.value == 0) {
+        listViewScrollCtr.jumpTo(0);
+      } else {
+        listViewScrollCtr.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -132,13 +143,13 @@ class _BangumiPanelState extends State<BangumiPanel> {
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
-                    _bottomSheetController = EpisodeBottomSheet(
+                    widget.bangumiIntroController?.bottomSheetController =
+                        _bottomSheetController = EpisodeBottomSheet(
                       currentCid: cid,
                       episodes: widget.pages,
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.bangumiEpisode,
-                      context: context,
                     ).show(context);
                   },
                   child: Text(
@@ -163,59 +174,60 @@ class _BangumiPanelState extends State<BangumiPanel> {
               return Container(
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
-                child: Material(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: BorderRadius.circular(6),
-                  clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                    onTap: () => changeFucCall(page, i),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            children: [
-                              if (isSelected) ...<Widget>[
-                                Image.asset('assets/images/live.png',
-                                    color: primary, height: 12),
-                                const SizedBox(width: 6)
-                              ],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => changeFucCall(page, i),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            if (isSelected) ...<Widget>[
+                              Image.asset('assets/images/live.png',
+                                  color: primary, height: 12),
+                              const SizedBox(width: 6)
+                            ],
+                            Text(
+                              '第${i + 1}话',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isSelected ? primary : onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            if (page.badge != null) ...[
+                              const Spacer(),
                               Text(
-                                '第${i + 1}话',
+                                page.badge!,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  color: isSelected ? primary : onSurface,
+                                  fontSize: 12,
+                                  color: primary,
                                 ),
                               ),
-                              const SizedBox(width: 2),
-                              if (page.badge != null) ...[
-                                const Spacer(),
-                                Text(
-                                  page.badge!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: primary,
-                                  ),
-                                ),
-                              ]
-                            ],
+                            ]
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          page.longTitle!,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isSelected ? primary : onSurface,
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            page.longTitle!,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSelected ? primary : onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
                     ),
                   ),
                 ),

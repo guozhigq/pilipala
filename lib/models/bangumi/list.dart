@@ -30,6 +30,7 @@ class BangumiListItemModel {
   BangumiListItemModel({
     this.badge,
     this.badgeType,
+    this.pic,
     this.cover,
     // this.firstEp,
     this.indexShow,
@@ -46,10 +47,12 @@ class BangumiListItemModel {
     this.title,
     this.titleIcon,
     this.progress,
+    this.progressIndex,
   });
 
   String? badge;
   int? badgeType;
+  String? pic;
   String? cover;
   String? indexShow;
   int? isFinish;
@@ -64,12 +67,13 @@ class BangumiListItemModel {
   String? subTitle;
   String? title;
   String? titleIcon;
-
   String? progress;
+  int? progressIndex;
 
   BangumiListItemModel.fromJson(Map<String, dynamic> json) {
     badge = json['badge'] == '' ? null : json['badge'];
     badgeType = json['badge_type'];
+    pic = json['cover'];
     cover = json['cover'];
     indexShow = json['index_show'];
     isFinish = json['is_finish'];
@@ -84,7 +88,9 @@ class BangumiListItemModel {
     subTitle = json['sub_title'];
     title = json['title'];
     titleIcon = json['title_icon'];
-
     progress = json['progress'];
+    progressIndex = int.parse(
+        RegExp(r'第(\d+)话').firstMatch(json['progress'] ?? '第1话')?.group(1) ??
+            '0');
   }
 }

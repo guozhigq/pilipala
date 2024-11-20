@@ -11,21 +11,32 @@ import '../../models/user/sub_folder.dart';
 class SubController extends GetxController {
   final ScrollController scrollController = ScrollController();
   Rx<SubFolderModelData> subFolderData = SubFolderModelData().obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
   int currentPage = 1;
   int pageSize = 20;
   RxBool hasMore = true.obs;
+  late int mid;
+  late int ownerMid;
+  RxBool isOwner = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    mid = int.parse(Get.parameters['mid'] ?? '-1');
+    userInfo = userInfoCache.get('userInfoCache');
+    ownerMid = userInfo != null ? userInfo!.mid! : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
+  }
 
   Future<dynamic> querySubFolder({type = 'init'}) async {
-    userInfo = userInfoCache.get('userInfoCache');
     if (userInfo == null) {
-      return {'status': false, 'msg': '账号未登录'};
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
     var res = await UserHttp.userSubFolder(
       pn: currentPage,
       ps: pageSize,
-      mid: userInfo!.mid!,
+      mid: isOwner.value ? ownerMid : mid,
     );
     if (res['status']) {
       if (type == 'init') {

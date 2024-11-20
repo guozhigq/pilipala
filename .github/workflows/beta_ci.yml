@@ -12,7 +12,6 @@ on:
       - ".idea/**"
       - "!.github/workflows/**"
 
-
 jobs:
   update_version:
     name: Read and update version
@@ -96,7 +95,7 @@ jobs:
         if: steps.cache-flutter.outputs.cache-hit != 'true'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.16.5
+          flutter-version: 3.19.6
           channel: any
 
       - name: 下载项目依赖
@@ -206,4 +205,4 @@ jobs:
           method: sendFile
           path: Pilipala-Beta/*
           parse_mode: Markdown
-          context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}](${{ github.event.head_commit.url }})"
+          context: "*Beta版本: v${{ needs.update_version.outputs.new_version }}*\n更新内容: [${{ needs.update_version.outputs.last_commit }}]"

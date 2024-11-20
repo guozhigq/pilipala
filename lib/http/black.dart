@@ -28,7 +28,7 @@ class BlackHttp {
   static Future removeBlack({required int fid}) async {
     var res = await Request().post(
       Api.removeBlack,
-      queryParameters: {
+      data: {
         'act': 6,
         'csrf': await Request.getCsrf(),
         'fid': fid,

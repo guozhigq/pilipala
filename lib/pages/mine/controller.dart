@@ -4,22 +4,45 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/models/user/fav_folder.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/user/stat.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class MineController extends GetxController {
-  // 用户信息 头像、昵称、lv
-  Rx<UserInfoData> userInfo = UserInfoData().obs;
+  RxBool userLogin = false.obs;
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
-  RxBool userLogin = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
-  Box setting = GStrorage.setting;
+  // 用户信息 头像、昵称、lv
+  Rx<UserInfoData> userInfo = UserInfoData().obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
-
+  Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  Box setting = GStorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  List menuList = [
+    {
+      'icon': Icons.history,
+      'title': '观看记录',
+      'onTap': () => Get.toNamed('/history'),
+    },
+    {
+      'icon': Icons.star_border,
+      'title': '我的收藏',
+      'onTap': () => Get.toNamed('/fav'),
+    },
+    {
+      'icon': Icons.subscriptions_outlined,
+      'title': '我的订阅',
+      'onTap': () => Get.toNamed('/subscription'),
+    },
+    {
+      'icon': Icons.watch_later_outlined,
+      'title': '稍后再看',
+      'onTap': () => Get.toNamed('/later'),
+    },
+  ];
   @override
-  onInit() {
+  void onInit() {
     super.onInit();
 
     if (userInfoCache.get('userInfoCache') != null) {
@@ -33,15 +56,7 @@ class MineController extends GetxController {
 
   onLogin() async {
     if (!userLogin.value) {
-      Get.toNamed(
-        '/webview',
-        parameters: {
-          'url': 'https://passport.bilibili.com/h5-app/passport/login',
-          'type': 'login',
-          'pageTitle': '登录bilibili',
-        },
-      );
-      // Get.toNamed('/loginPage');
+      Get.toNamed('/loginPage', preventDuplicates: false);
     } else {
       int mid = userInfo.value.mid!;
       String face = userInfo.value.face!;
@@ -65,8 +80,6 @@ class MineController extends GetxController {
       } else {
         resetUserInfo();
       }
-    } else {
-      resetUserInfo();
     }
     await queryUserStatOwner();
     return res;
@@ -119,7 +132,10 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/follow?mid=${userInfo.value.mid}', preventDuplicates: false);
+    Get.toNamed(
+      '/follow?mid=${userInfo.value.mid}',
+      preventDuplicates: false,
+    );
   }
 
   pushFans() {
@@ -127,7 +143,10 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/fan?mid=${userInfo.value.mid}', preventDuplicates: false);
+    Get.toNamed(
+      '/fan?mid=${userInfo.value.mid}',
+      preventDuplicates: false,
+    );
   }
 
   pushDynamic() {
@@ -135,7 +154,22 @@ class MineController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    Get.toNamed('/memberDynamics?mid=${userInfo.value.mid}',
-        preventDuplicates: false);
+    Get.toNamed(
+      '/memberDynamics?mid=${userInfo.value.mid}',
+      preventDuplicates: false,
+    );
+  }
+
+  Future<dynamic> queryFavFolder() async {
+    if (!userLogin.value) {
+      return {'status': false, 'data': [], 'msg': '未登录'};
+    }
+    var res = await await UserHttp.userfavFolder(
+      pn: 1,
+      ps: 5,
+      mid: userInfo.value.mid!,
+    );
+    favFolderData.value = res['data'];
+    return res;
   }
 }

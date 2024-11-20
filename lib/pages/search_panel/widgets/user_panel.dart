@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -12,15 +13,16 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
     controller: ctr!.scrollController,
     addAutomaticKeepAlives: false,
     addRepaintBoundaries: false,
-    itemCount: list!.length,
+    itemCount: list.length,
     itemBuilder: (context, index) {
-      var i = list![index];
-      String heroTag = Utils.makeHeroTag(i!.mid);
+      var i = list[index];
+      String heroTag = Utils.makeHeroTag(i.mid);
       return InkWell(
         onTap: () => Get.toNamed('/member?mid=${i.mid}',
             arguments: {'heroTag': heroTag, 'face': i.upic}),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+              horizontal: StyleString.safeSpace, vertical: 7),
           child: Row(
             children: [
               Hero(
@@ -41,7 +43,7 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                   Row(
                     children: [
                       Text(
-                        i!.uname,
+                        i.uname!,
                         style: const TextStyle(
                           fontSize: 14,
                         ),
@@ -53,15 +55,16 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Text('粉丝：${i.fans} ', style: style),
-                      Text(' 视频：${i.videos}', style: style)
-                    ],
-                  ),
-                  if (i.officialVerify['desc'] != '')
+                  if (i.fans != null && i.videos != null)
+                    Row(
+                      children: [
+                        Text('粉丝：${i.fans} ', style: style),
+                        Text(' 视频：${i.videos}', style: style)
+                      ],
+                    ),
+                  if (i.officialVerify!['desc'] != '')
                     Text(
-                      i.officialVerify['desc'],
+                      i.officialVerify!['desc'],
                       style: style,
                     ),
                 ],

@@ -49,6 +49,8 @@
 		<true/>
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>请允许APP保存图片到相册</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>请允许APP保存图片到相册</string>
 		<key>NSCameraUsageDescription</key>
 		<string>App需要您的同意,才能访问相册</string>
 		<key>NSAppleMusicUsageDescription</key>
@@ -63,44 +65,29 @@
 		<array>
 			<dict>
 				<key>CFBundleURLName</key>
-				<string></string>
+				<string>bilibili</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
 					<string>http</string>
 					<string>https</string>
-				</array>
-				<key>CFBundleURLTypes</key>
-				<array>
-					<dict>
-						<key>CFBundleURLName</key>
-						<string></string>
-						<key>CFBundleURLSchemes</key>
-						<array>
-							<string>m.bilibili.com</string>
-							<string>bilibili.com</string>
-							<string>www.bilibili.com</string>
-							<string>bangumi.bilibili.com</string>
-							<string>bilibili.cn</string>
-							<string>www.bilibili.cn</string>
-							<string>bangumi.bilibili.cn</string>
-							<string>bilibili.tv</string>
-							<string>www.bilibili.tv</string>
-							<string>bangumi.bilibili.tv</string>
-							<string>miniapp.bilibili.com</string>
-							<string>live.bilibili.com</string>
-						</array>
-					</dict>
-				</array>
-			</dict>
-
-			<!-- 当其他应用程序或系统通过 bilibili -->
-			<dict>
-				<key>CFBundleURLName</key>
-				<string>bilibili</string>
-				<key>CFBundleURLSchemes</key>
-				<array>
 					<string>bilibili</string>
+					<string>m.bilibili.com</string>
+					<string>bilibili.com</string>
+					<string>www.bilibili.com</string>
+					<string>bangumi.bilibili.com</string>
+					<string>bilibili.cn</string>
+					<string>www.bilibili.cn</string>
+					<string>bangumi.bilibili.cn</string>
+					<string>bilibili.tv</string>
+					<string>www.bilibili.tv</string>
+					<string>bangumi.bilibili.tv</string>
+					<string>miniapp.bilibili.com</string>
+					<string>live.bilibili.com</string>
+					<string>pili</string>
+					<string>pilipala</string>
 				</array>
+				<key>FlutterDeepLinkingEnabled</key>
+				<false/>
 			</dict>
 		</array>
 		<key>UIBackgroundModes</key>

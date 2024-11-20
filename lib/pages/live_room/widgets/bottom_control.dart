@@ -14,10 +14,12 @@ class BottomControl extends StatefulWidget implements PreferredSizeWidget {
   final PlPlayerController? controller;
   final LiveRoomController? liveRoomCtr;
   final Floating? floating;
+  final Function? onRefresh;
   const BottomControl({
     this.controller,
     this.liveRoomCtr,
     this.floating,
+    this.onRefresh,
     Key? key,
   }) : super(key: key);
 
@@ -33,7 +35,7 @@ class _BottomControlState extends State<BottomControl> {
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
-  Box localCache = GStrorage.localCache;
+  Box localCache = GStorage.localCache;
 
   @override
   void initState() {
@@ -45,10 +47,7 @@ class _BottomControlState extends State<BottomControl> {
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Row(
@@ -61,6 +60,14 @@ class _BottomControlState extends State<BottomControl> {
           //   ),
           //   fuc: () => Get.back(),
           // ),
+          ComBtn(
+            icon: const Icon(
+              Icons.refresh_outlined,
+              size: 18,
+              color: Colors.white,
+            ),
+            fuc: widget.onRefresh,
+          ),
           const Spacer(),
           // ComBtn(
           //   icon: const Icon(
@@ -143,28 +150,11 @@ class _BottomControlState extends State<BottomControl> {
               size: 20,
               color: Colors.white,
             ),
-            fuc: () => widget.controller!.triggerFullScreen(),
+            fuc: () => widget.controller!.triggerFullScreen(
+                status: !(widget.controller!.isFullScreen.value)),
           ),
         ],
       ),
     );
-  }
-}
-
-class MSliderTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    SliderThemeData? sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    const double trackHeight = 3;
-    final double trackLeft = offset.dx;
-    final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2 + 4;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

@@ -67,6 +67,7 @@ class VideoDetailData {
   String? likeIcon;
   bool? needJumpBv;
   String? epId;
+  List<Staff>? staff;
 
   VideoDetailData({
     this.bvid,
@@ -103,6 +104,7 @@ class VideoDetailData {
     this.likeIcon,
     this.needJumpBv,
     this.epId,
+    this.staff,
   });
 
   VideoDetailData.fromJson(Map<String, dynamic> json) {
@@ -155,6 +157,9 @@ class VideoDetailData {
     if (json['redirect_url'] != null) {
       epId = resolveEpId(json['redirect_url']);
     }
+    staff = json["staff"] != null
+        ? List<Staff>.from(json["staff"]!.map((e) => Staff.fromJson(e)))
+        : null;
   }
 
   String resolveEpId(url) {
@@ -372,22 +377,26 @@ class Part {
   int? page;
   String? from;
   String? pagePart;
+  String? title;
   int? duration;
   String? vid;
   String? weblink;
   Dimension? dimension;
   String? firstFrame;
+  String? cover;
 
   Part({
     this.cid,
     this.page,
     this.from,
     this.pagePart,
+    this.title,
     this.duration,
     this.vid,
     this.weblink,
     this.dimension,
     this.firstFrame,
+    this.cover,
   });
 
   fromRawJson(String str) => Part.fromJson(json.decode(str));
@@ -399,13 +408,15 @@ class Part {
     page = json["page"];
     from = json["from"];
     pagePart = json["part"];
+    title = json["part"];
     duration = json["duration"];
     vid = json["vid"];
     weblink = json["weblink"];
     dimension = json["dimension"] == null
         ? null
         : Dimension.fromJson(json["dimension"]);
-    firstFrame = json["first_frame"];
+    firstFrame = json["first_frame"] ?? '';
+    cover = json["first_frame"] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -629,6 +640,8 @@ class EpisodeItem {
     this.attribute,
     this.page,
     this.bvid,
+    this.cover,
+    this.pages,
   });
   int? seasonId;
   int? sectionId;
@@ -639,6 +652,11 @@ class EpisodeItem {
   int? attribute;
   Part? page;
   String? bvid;
+  String? cover;
+  int? pubdate;
+  int? duration;
+  Stat? stat;
+  List<Page>? pages;
 
   EpisodeItem.fromJson(Map<String, dynamic> json) {
     seasonId = json['season_id'];
@@ -650,5 +668,65 @@ class EpisodeItem {
     attribute = json['attribute'];
     page = Part.fromJson(json['page']);
     bvid = json['bvid'];
+    cover = json['arc']['pic'];
+    pubdate = json['arc']['pubdate'];
+    duration = json['arc']['duration'];
+    stat = Stat.fromJson(json['arc']['stat']);
+    pages = json['pages'].map<Page>((e) => Page.fromJson(e)).toList();
+  }
+}
+
+class Staff {
+  Staff({
+    this.mid,
+    this.title,
+    this.name,
+    this.face,
+    this.vip,
+  });
+
+  int? mid;
+  String? title;
+  String? name;
+  String? face;
+  int? status;
+  Vip? vip;
+
+  Staff.fromJson(Map<String, dynamic> json) {
+    mid = json['mid'];
+    title = json['title'];
+    name = json['name'];
+    face = json['face'];
+    vip = Vip.fromJson(json['vip']);
+  }
+}
+
+class Vip {
+  Vip({
+    this.type,
+    this.status,
+  });
+
+  int? type;
+  int? status;
+
+  Vip.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    status = json['status'];
+  }
+}
+
+class Page {
+  Page({
+    this.cid,
+    this.page,
+  });
+
+  int? cid;
+  int? page;
+
+  Page.fromJson(Map<String, dynamic> json) {
+    cid = json['cid'];
+    page = json['page'];
   }
 }

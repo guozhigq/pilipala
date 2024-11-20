@@ -109,7 +109,6 @@ class Utils {
           toInt: false,
           formatType: formatType);
     }
-    print('distance: $distance');
     if (distance <= 60) {
       return '刚刚';
     } else if (distance <= 3600) {
@@ -210,15 +209,18 @@ class Utils {
     int minDiff = 127;
     int closestNumber = 0; // 初始化为0，表示没有找到比目标值小的整数
 
+    if (numbers.contains(target)) {
+      return target;
+    }
     // 向下查找
     try {
       for (int number in numbers) {
         if (number < target) {
           int diff = target - number; // 计算目标值与当前整数的差值
-
           if (diff < minDiff) {
             minDiff = diff;
             closestNumber = number;
+            return closestNumber;
           }
         }
       }
@@ -304,7 +306,7 @@ class Utils {
                 onPressed: () async {
                   await SmartDialog.dismiss();
                   launchUrl(
-                    Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+                    Uri.parse('https://www.123684.com/s/9sVqVv-DEZ0A'),
                     mode: LaunchMode.externalApplication,
                   );
                 },
@@ -349,6 +351,9 @@ class Utils {
 
   // 时间戳转时间
   static tampToSeektime(number) {
+    if (number is String && int.tryParse(number) == null) {
+      return number;
+    }
     int hours = number ~/ 60;
     int minutes = number % 60;
 
@@ -380,5 +385,12 @@ class Utils {
   static String base64EncodeRandomString(int minLength, int maxLength) {
     List<int> randomBytes = generateRandomBytes(minLength, maxLength);
     return base64.encode(randomBytes);
+  }
+
+  static List<int> matchNum(String str) {
+    final RegExp regExp = RegExp(r'\d+');
+    final Iterable<Match> matches = regExp.allMatches(str);
+
+    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
   }
 }

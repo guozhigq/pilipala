@@ -2,6 +2,8 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/skeleton/video_card_h.dart';
+import 'package:pilipala/common/widgets/http_error.dart';
 import 'controller.dart';
 import 'widgets/item.dart';
 
@@ -17,12 +19,13 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
       Get.put(MemberSeasonsController());
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
+  late String category;
 
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture =
-        _memberSeasonsController.getSeasonDetail('onRefresh');
+    category = Get.parameters['category']!;
+    _futureBuilderFuture = _memberSeasonsController.onRefresh();
     scrollController = _memberSeasonsController.scrollController;
     scrollController.addListener(
       () {
@@ -40,11 +43,7 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
-        title: Text('他的专栏', style: Theme.of(context).textTheme.titleMedium),
-      ),
+      appBar: AppBar(title: Text(Get.parameters['seasonName']!)),
       body: Padding(
         padding: const EdgeInsets.only(
           left: StyleString.safeSpace,
@@ -57,9 +56,9 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
-                  Map data = snapshot.data as Map;
+                  Map? data = snapshot.data;
                   List list = _memberSeasonsController.seasonsList;
-                  if (data['status']) {
+                  if (data?['status']) {
                     return Obx(
                       () => list.isNotEmpty
                           ? LayoutBuilder(
@@ -85,16 +84,44 @@ class _MemberSeasonsPageState extends State<MemberSeasonsPage> {
                                 );
                               },
                             )
-                          : const SizedBox(),
+                          : const HttpError(
+                              errMsg: '没有数据',
+                              isInSliver: false,
+                              isShowBtn: false,
+                            ),
                     );
                   } else {
-                    return const SizedBox();
+                    return HttpError(
+                      errMsg: snapshot.data['msg'],
+                      isInSliver: false,
+                      fn: () {
+                        setState(() {
+                          _futureBuilderFuture =
+                              _memberSeasonsController.onRefresh();
+                        });
+                      },
+                    );
                   }
                 } else {
-                  return const SizedBox();
+                  return HttpError(
+                    errMsg: snapshot.data['msg'] ?? '请求异常',
+                    isInSliver: false,
+                    fn: () {
+                      setState(() {
+                        _futureBuilderFuture =
+                            _memberSeasonsController.onRefresh();
+                      });
+                    },
+                  );
                 }
               } else {
-                return const SizedBox();
+                return ListView.builder(
+                  itemCount: 10,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return const VideoCardHSkeleton();
+                  },
+                );
               }
             },
           ),

@@ -24,14 +24,14 @@ class _SubDetailPageState extends State<SubDetailPage> {
   late final ScrollController _controller = ScrollController();
   final SubDetailController _subDetailController =
       Get.put(SubDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   late Future _futureBuilderFuture;
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _subDetailController.queryUserSeasonList();
-    titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
@@ -53,6 +53,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
   @override
   void dispose() {
     _controller.dispose();
+    titleStreamC.close();
     super.dispose();
   }
 
@@ -67,7 +68,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
             pinned: true,
             titleSpacing: 0,
             title: StreamBuilder(
-              stream: titleStreamC.stream,
+              stream: titleStreamC.stream.distinct(),
               initialData: false,
               builder: (context, AsyncSnapshot snapshot) {
                 return AnimatedOpacity(
@@ -79,16 +80,21 @@ class _SubDetailPageState extends State<SubDetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _subDetailController.item.title!,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          SizedBox(
+                            width: Get.size.width - 100,
+                            child: Text(
+                              _subDetailController.item.title!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                           Text(
                             '共${_subDetailController.item.mediaCount!}条视频',
                             style: Theme.of(context).textTheme.labelMedium,
                           )
                         ],
-                      )
+                      ),
                     ],
                   ),
                 );
@@ -197,8 +203,8 @@ class _SubDetailPageState extends State<SubDetailPage> {
             future: _futureBuilderFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                Map data = snapshot.data;
-                if (data['status']) {
+                Map? data = snapshot.data;
+                if (data != null && data['status']) {
                   if (_subDetailController.item.mediaCount == 0) {
                     return const NoData();
                   } else {
@@ -218,7 +224,7 @@ class _SubDetailPageState extends State<SubDetailPage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: data['msg'],
+                    errMsg: data?['msg'] ?? '请求异常',
                     fn: () => setState(() {}),
                   );
                 }

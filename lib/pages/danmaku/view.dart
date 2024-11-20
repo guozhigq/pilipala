@@ -12,11 +12,15 @@ import 'package:pilipala/utils/storage.dart';
 class PlDanmaku extends StatefulWidget {
   final int cid;
   final PlPlayerController playerController;
+  final String type;
+  final Function(DanmakuController)? createdController;
 
   const PlDanmaku({
     super.key,
     required this.cid,
     required this.playerController,
+    this.type = 'video',
+    this.createdController,
   });
 
   @override
@@ -28,7 +32,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
   late PlDanmakuController _plDanmakuController;
   DanmakuController? _controller;
   // bool danmuPlayStatus = true;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late bool enableShowDanmaku;
   late List blockTypes;
   late double showArea;
@@ -43,9 +47,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
     super.initState();
     enableShowDanmaku =
         setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
-    _plDanmakuController = PlDanmakuController(widget.cid);
-    if (mounted) {
-      playerController = widget.playerController;
+    _plDanmakuController = PlDanmakuController(widget.cid, widget.type);
+    playerController = widget.playerController;
+    if (mounted && widget.type == 'video') {
       if (enableShowDanmaku || playerController.isOpenDanmu.value) {
         _plDanmakuController.initiate(
             playerController.duration.value.inMilliseconds,
@@ -55,13 +59,15 @@ class _PlDanmakuState extends State<PlDanmaku> {
         ..addStatusLister(playerListener)
         ..addPositionListener(videoPositionListen);
     }
-    playerController.isOpenDanmu.listen((p0) {
-      if (p0 && !_plDanmakuController.initiated) {
-        _plDanmakuController.initiate(
-            playerController.duration.value.inMilliseconds,
-            playerController.position.value.inMilliseconds);
-      }
-    });
+    if (widget.type == 'video') {
+      playerController.isOpenDanmu.listen((p0) {
+        if (p0 && !_plDanmakuController.initiated) {
+          _plDanmakuController.initiate(
+              playerController.duration.value.inMilliseconds,
+              playerController.position.value.inMilliseconds);
+        }
+      });
+    }
     blockTypes = playerController.blockTypes;
     showArea = playerController.showArea;
     opacityVal = playerController.opacityVal;
@@ -128,6 +134,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
           child: DanmakuView(
             createdController: (DanmakuController e) async {
               playerController.danmakuController = _controller = e;
+              widget.createdController?.call(e);
             },
             option: DanmakuOption(
               fontSize: 15 * fontSizeVal,
@@ -136,8 +143,7 @@ class _PlDanmakuState extends State<PlDanmaku> {
               hideTop: blockTypes.contains(5),
               hideScroll: blockTypes.contains(2),
               hideBottom: blockTypes.contains(4),
-              duration:
-                  danmakuDurationVal / playerController.playbackSpeed,
+              duration: danmakuDurationVal / playerController.playbackSpeed,
               strokeWidth: strokeWidth,
               // initDuration /
               //     (danmakuSpeedVal * widget.playerController.playbackSpeed),

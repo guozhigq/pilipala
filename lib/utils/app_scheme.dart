@@ -1,94 +1,37 @@
-import 'package:appscheme/appscheme.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/pages/message/utils/index.dart';
+import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
-import '../models/common/search_type.dart';
 import 'id_utils.dart';
 import 'url_utils.dart';
 import 'utils.dart';
 
 class PiliSchame {
-  static AppScheme appScheme = AppSchemeImpl.getInstance()!;
+  static late AppLinks appLinks;
   static Future<void> init() async {
-    ///
-    final SchemeEntity? value = await appScheme.getInitScheme();
-    if (value != null) {
-      _routePush(value);
-    }
-
-    /// 完整链接进入 b23.无效
-    appScheme.getLatestScheme().then((SchemeEntity? value) {
-      if (value != null) {
-        _fullPathPush(value);
-      }
-    });
-
-    /// 注册从外部打开的Scheme监听信息 #
-    appScheme.registerSchemeListener().listen((SchemeEntity? event) {
-      if (event != null) {
-        _routePush(event);
+    appLinks = AppLinks();
+    appLinks.uriLinkStream.listen((Uri uri) {
+      final String scheme = uri.scheme;
+      if (RegExp(r'^pili', caseSensitive: false).hasMatch(scheme)) {
+        piliScheme(uri);
+      } else {
+        routePush(uri);
       }
     });
   }
 
   /// 路由跳转
-  static void _routePush(value) async {
+  static void routePush(Uri value) async {
     final String scheme = value.scheme;
-    final String host = value.host;
-    final String path = value.path;
-
     if (scheme == 'bilibili') {
-      if (host == 'root') {
-        Navigator.popUntil(
-            Get.context!, (Route<dynamic> route) => route.isFirst);
-      } else if (host == 'space') {
-        final String mid = path.split('/').last;
-        Get.toNamed<dynamic>(
-          '/member?mid=$mid',
-          arguments: <String, dynamic>{'face': null},
-        );
-      } else if (host == 'video') {
-        String pathQuery = path.split('/').last;
-        final numericRegex = RegExp(r'^[0-9]+$');
-        if (numericRegex.hasMatch(pathQuery)) {
-          pathQuery = 'AV$pathQuery';
-        }
-        Map map = IdUtils.matchAvorBv(input: pathQuery);
-        if (map.containsKey('AV')) {
-          _videoPush(map['AV'], null);
-        } else if (map.containsKey('BV')) {
-          _videoPush(null, map['BV']);
-        } else {
-          SmartDialog.showToast('投稿匹配失败');
-        }
-      } else if (host == 'live') {
-        final String roomId = path.split('/').last;
-        Get.toNamed<dynamic>('/liveRoom?roomid=$roomId',
-            arguments: <String, String?>{'liveItem': null, 'heroTag': roomId});
-      } else if (host == 'bangumi') {
-        if (path.startsWith('/season')) {
-          final String seasonId = path.split('/').last;
-          _bangumiPush(int.parse(seasonId), null);
-        }
-      } else if (host == 'opus') {
-        if (path.startsWith('/detail')) {
-          var opusId = path.split('/').last;
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': 'https://www.bilibili.com/opus/$opusId',
-              'type': 'url',
-              'pageTitle': '',
-            },
-          );
-        }
-      } else if (host == 'search') {
-        Get.toNamed('/searchResult', parameters: {'keyword': ''});
-      }
+      biliScheme(value);
     }
-    if (scheme == 'https') {
-      _fullPathPush(value);
+    if (['http', 'https'].contains(scheme)) {
+      httpsScheme(value);
     }
   }
 
@@ -110,7 +53,7 @@ class PiliSchame {
         // ignore: always_specify_types
         (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',
             arguments: <String, String?>{
-              'pic': null,
+              'pic': '',
               'heroTag': heroTag,
             }),
       );
@@ -119,53 +62,47 @@ class PiliSchame {
     }
   }
 
-  // 番剧跳转
-  static Future<void> _bangumiPush(int? seasonId, int? epId) async {
-    SmartDialog.showLoading<dynamic>(msg: '获取中...');
-    try {
-      var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
-      if (result['status']) {
-        var bangumiDetail = result['data'];
-        final int cid = bangumiDetail.episodes!.first.cid;
-        final String bvid = IdUtils.av2bv(bangumiDetail.episodes!.first.aid);
-        final String heroTag = Utils.makeHeroTag(cid);
-        var epId = bangumiDetail.episodes!.first.id;
-        SmartDialog.dismiss().then(
-          (e) => Get.toNamed(
-            '/video?bvid=$bvid&cid=$cid&epId=$epId',
-            arguments: <String, dynamic>{
-              'pic': bangumiDetail.cover,
-              'heroTag': heroTag,
-              'videoType': SearchType.media_bangumi,
-            },
-          ),
-        );
-      } else {
-        SmartDialog.showToast(result['msg']);
-      }
-    } catch (e) {
-      SmartDialog.showToast('番剧获取失败：$e');
-    }
-  }
-
-  static Future<void> _fullPathPush(SchemeEntity value) async {
+  static Future<void> httpsScheme(Uri value) async {
     // https://m.bilibili.com/bangumi/play/ss39708
     // https | m.bilibili.com | /bangumi/play/ss39708
     // final String scheme = value.scheme!;
-    final String host = value.host!;
-    final String? path = value.path;
-    Map<String, String>? query = value.query;
-    RegExp regExp = RegExp(r'^(www\.)?m?\.(bilibili\.com)$');
+    final String host = value.host;
+    final String path = value.path;
+    Map<String, String>? query = value.queryParameters;
+    RegExp regExp = RegExp(r'^((www\.)|(m\.))?bilibili\.com$');
     if (regExp.hasMatch(host)) {
-      print('bilibili.com');
+      final String lastPathSegment = path.split('/').last;
+      if (path.startsWith('/video')) {
+        Map matchRes = IdUtils.matchAvorBv(input: path);
+        if (matchRes.containsKey('AV')) {
+          _videoPush(matchRes['AV']! as int, null);
+        } else if (matchRes.containsKey('BV')) {
+          _videoPush(null, matchRes['BV'] as String);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
+        }
+      }
+      if (path.startsWith('/bangumi')) {
+        if (lastPathSegment.contains('ss')) {
+          RoutePush.bangumiPush(Utils.matchNum(lastPathSegment).first, null);
+        }
+        if (lastPathSegment.contains('ep')) {
+          RoutePush.bangumiPush(null, Utils.matchNum(lastPathSegment).first);
+        }
+      } else if (path.startsWith('/BV')) {
+        final String bvid = path.split('?').first.split('/').last;
+        _videoPush(null, bvid);
+      } else if (path.startsWith('/av')) {
+        _videoPush(Utils.matchNum(path.split('?').first).first, null);
+      }
     } else if (host.contains('live')) {
-      int roomId = int.parse(path!.split('/').last);
+      int roomId = int.parse(path.split('/').last);
       Get.toNamed(
         '/liveRoom?roomid=$roomId',
         arguments: {'liveItem': null, 'heroTag': roomId.toString()},
       );
     } else if (host.contains('space')) {
-      var mid = path!.split('/').last;
+      var mid = path.split('/').last;
       Get.toNamed('/member?mid=$mid', arguments: {'face': ''});
       return;
     } else if (host == 'b23.tv') {
@@ -200,17 +137,15 @@ class PiliSchame {
           parameters: {'url': redirectUrl, 'type': 'url', 'pageTitle': ''},
         );
       }
-    }
-
-    if (path != null) {
+    } else {
       final String area = path.split('/').last;
       switch (area) {
         case 'bangumi':
           print('番剧');
           if (area.startsWith('ep')) {
-            _bangumiPush(null, matchNum(area).first);
+            RoutePush.bangumiPush(null, Utils.matchNum(area).first);
           } else if (area.startsWith('ss')) {
-            _bangumiPush(matchNum(area).first, null);
+            RoutePush.bangumiPush(Utils.matchNum(area).first, null);
           }
           break;
         case 'video':
@@ -226,30 +161,194 @@ class PiliSchame {
           break;
         case 'read':
           print('专栏');
+          String id = Utils.matchNum(query['id']!).first.toString();
+          Get.toNamed('/read', parameters: {
+            'url': value.toString(),
+            'title': '',
+            'id': id,
+            'articleType': 'read',
+          });
           break;
         case 'space':
           print('个人空间');
           Get.toNamed('/member?mid=$area', arguments: {'face': ''});
           break;
+        default:
+          final Map<String, dynamic> map =
+              IdUtils.matchAvorBv(input: area.split('?').first);
+          if (map.containsKey('AV')) {
+            _videoPush(map['AV']! as int, null);
+          } else if (map.containsKey('BV')) {
+            _videoPush(null, map['BV'] as String);
+          } else {
+            Get.toNamed(
+              '/webview',
+              parameters: {
+                'url': value.toString(),
+                'type': 'url',
+                'pageTitle': '',
+              },
+            );
+          }
+          break;
       }
     }
   }
 
-  static List<int> matchNum(String str) {
-    final RegExp regExp = RegExp(r'\d+');
-    final Iterable<Match> matches = regExp.allMatches(str);
+  static Future<void> biliScheme(Uri value) async {
+    final String host = value.host;
+    final String path = value.path;
+    switch (host) {
+      case 'root':
+        Navigator.popUntil(
+            Get.context!, (Route<dynamic> route) => route.isFirst);
+        break;
+      case 'space':
+        final String mid = path.split('/').last;
+        Get.toNamed<dynamic>(
+          '/member?mid=$mid',
+          arguments: <String, dynamic>{'face': null},
+        );
+        break;
+      case 'video':
+        String pathQuery = path.split('/').last;
+        final numericRegex = RegExp(r'^[0-9]+$');
+        if (numericRegex.hasMatch(pathQuery)) {
+          pathQuery = 'AV$pathQuery';
+        }
+        Map map = IdUtils.matchAvorBv(input: pathQuery);
+        if (map.containsKey('AV')) {
+          _videoPush(map['AV'], null);
+        } else if (map.containsKey('BV')) {
+          _videoPush(null, map['BV']);
+        } else {
+          SmartDialog.showToast('投稿匹配失败');
+        }
+        break;
+      case 'live':
+        final String roomId = path.split('/').last;
+        Get.toNamed<dynamic>(
+          '/liveRoom?roomid=$roomId',
+          arguments: <String, String?>{'liveItem': null, 'heroTag': roomId},
+        );
+        break;
+      case 'bangumi':
+        if (path.startsWith('/season')) {
+          final String seasonId = path.split('/').last;
+          RoutePush.bangumiPush(int.parse(seasonId), null);
+        }
+        break;
+      case 'opus':
+        if (path.startsWith('/detail')) {
+          var opusId = path.split('/').last;
+          Get.toNamed('/opus', parameters: {
+            'title': '',
+            'id': opusId,
+            'articleType': 'opus',
+          });
+        }
+        break;
+      case 'search':
+        Get.toNamed('/searchResult', parameters: {'keyword': ''});
+        break;
+      case 'article':
+        final String id = path.split('/').last.split('?').first;
+        Get.toNamed(
+          '/read',
+          parameters: {
+            'title': 'cv$id',
+            'id': id,
+            'dynamicType': 'read',
+          },
+        );
+        break;
+      case 'pgc':
+        if (path.contains('ep')) {
+          final String lastPathSegment = path.split('/').last;
+          RoutePush.bangumiPush(
+              null, int.parse(lastPathSegment.split('?').first));
+        }
+        break;
+      case 'following':
+        if (path.startsWith('/detail')) {
+          final String opusId = path.split('/').last;
+          MessageUtils.navigateToDynamicDetail(opusId);
+        }
+        break;
+      default:
+        final Map<String, String> queryParameters = value.queryParameters;
+        final String? enterUri = queryParameters['enterUri'];
+        if (enterUri != null && enterUri.startsWith('bilibili://')) {
+          biliScheme(Uri.parse(enterUri));
+        } else {
+          SmartDialog.showToast('未匹配地址，请联系开发者');
+          Clipboard.setData(ClipboardData(text: value.toString()));
+        }
+        break;
+    }
+  }
 
-    return matches.map((Match match) => int.parse(match.group(0)!)).toList();
+  static Future<void> piliScheme(Uri value) async {
+    final String host = value.host;
+    final String path = value.path;
+    final String arg = path.split('/').last;
+    switch (host) {
+      case 'home':
+      case 'root':
+        Get.toNamed('/');
+        break;
+      case 'member':
+        if (arg != '') {
+          final int? mid = int.tryParse(arg);
+          if (mid == null) {
+            SmartDialog.showToast('用户id有误');
+            return;
+          }
+          Get.toNamed<dynamic>(
+            '/member?mid=$mid',
+            arguments: <String, dynamic>{'face': null},
+          );
+        } else {
+          Get.toNamed('/mine');
+        }
+        break;
+      case 'search':
+        if (arg != '') {
+          final String encodedArg = Uri.decodeComponent(arg);
+          Get.toNamed('/searchResult', parameters: {'keyword': encodedArg});
+        } else {
+          Get.toNamed('/search');
+        }
+        break;
+      case 'setting':
+        Get.toNamed('/setting');
+        break;
+      case 'fav':
+        Get.toNamed('/fav');
+        break;
+      case 'history':
+        Get.toNamed('/history');
+        break;
+      case 'later':
+        Get.toNamed('/later');
+        break;
+      case 'msg':
+        Get.toNamed('/whisper');
+        break;
+      default:
+        Get.toNamed('/');
+        break;
+    }
   }
 
   static void _handleEpisodePath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(null, matchNum(seasonId).first);
+    RoutePush.bangumiPush(null, Utils.matchNum(seasonId).first);
   }
 
   static void _handleSeasonPath(String lastPathSegment, String redirectUrl) {
     final String seasonId = _extractIdFromPath(lastPathSegment);
-    _bangumiPush(matchNum(seasonId).first, null);
+    RoutePush.bangumiPush(Utils.matchNum(seasonId).first, null);
   }
 
   static String _extractIdFromPath(String lastPathSegment) {

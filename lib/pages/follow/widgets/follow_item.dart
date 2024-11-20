@@ -47,9 +47,27 @@ class FollowItem extends StatelessWidget {
               height: 34,
               child: TextButton(
                 onPressed: () async {
-                  await Get.bottomSheet(
-                    GroupPanel(mid: item.mid!),
+                  await showModalBottomSheet(
+                    context: context,
+                    useSafeArea: true,
                     isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return DraggableScrollableSheet(
+                        initialChildSize: 0.6,
+                        minChildSize: 0,
+                        maxChildSize: 1,
+                        snap: true,
+                        expand: false,
+                        snapSizes: const [0.6],
+                        builder: (BuildContext context,
+                            ScrollController scrollController) {
+                          return GroupPanel(
+                            mid: item.mid!,
+                            scrollController: scrollController,
+                          );
+                        },
+                      );
+                    },
                   );
                 },
                 style: TextButton.styleFrom(

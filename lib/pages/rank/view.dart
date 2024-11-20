@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,94 +32,62 @@ class _RankPageState extends State<RankPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    // 设置状态栏图标的亮度
-    if (_rankController.enableGradientBg) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarIconBrightness: currentBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light,
-      ));
-    }
     return Scaffold(
       extendBody: true,
-      extendBodyBehindAppBar: false,
-      appBar: _rankController.enableGradientBg
-          ? null
-          : AppBar(toolbarHeight: 0, elevation: 0),
-      body: Stack(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Platform.isAndroid
+            ? SystemUiOverlayStyle(
+                statusBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Brightness.light
+                        : Brightness.dark,
+              )
+            : Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+      ),
+      body: Column(
         children: [
-          // gradient background
-          if (_rankController.enableGradientBg) ...[
-            Align(
-              alignment: Alignment.topLeft,
-              child: Opacity(
-                opacity: 0.6,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.9),
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.5),
-                          Theme.of(context).colorScheme.surface
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: const [0, 0.0034, 0.34]),
-                  ),
+          const CustomAppBar(),
+          if (_rankController.tabs.length > 1) ...[
+            const SizedBox(height: 4),
+            SizedBox(
+              width: double.infinity,
+              height: 42,
+              child: Align(
+                alignment: Alignment.center,
+                child: TabBar(
+                  controller: _rankController.tabController,
+                  tabs: [
+                    for (var i in _rankController.tabs) Tab(text: i['label'])
+                  ],
+                  isScrollable: true,
+                  dividerColor: Colors.transparent,
+                  enableFeedback: true,
+                  splashBorderRadius: BorderRadius.circular(10),
+                  tabAlignment: TabAlignment.center,
+                  onTap: (value) {
+                    feedBack();
+                    if (_rankController.initialIndex.value == value) {
+                      _rankController.tabsCtrList[value].animateToTop();
+                    }
+                    _rankController.initialIndex.value = value;
+                  },
                 ),
               ),
             ),
+          ] else ...[
+            const SizedBox(height: 6),
           ],
-          Column(
-            children: [
-              const CustomAppBar(),
-              if (_rankController.tabs.length > 1) ...[
-                const SizedBox(height: 4),
-                SizedBox(
-                  width: double.infinity,
-                  height: 42,
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: TabBar(
-                      controller: _rankController.tabController,
-                      tabs: [
-                        for (var i in _rankController.tabs)
-                          Tab(text: i['label'])
-                      ],
-                      isScrollable: true,
-                      dividerColor: Colors.transparent,
-                      enableFeedback: true,
-                      splashBorderRadius: BorderRadius.circular(10),
-                      tabAlignment: TabAlignment.center,
-                      onTap: (value) {
-                        feedBack();
-                        if (_rankController.initialIndex.value == value) {
-                          _rankController.tabsCtrList[value]().animateToTop();
-                        }
-                        _rankController.initialIndex.value = value;
-                      },
-                    ),
-                  ),
-                ),
-              ] else ...[
-                const SizedBox(height: 6),
-              ],
-              Expanded(
-                child: TabBarView(
-                  controller: _rankController.tabController,
-                  children: _rankController.tabsPageList,
-                ),
-              ),
-            ],
+          Expanded(
+            child: TabBarView(
+              controller: _rankController.tabController,
+              children: _rankController.tabsPageList,
+            ),
           ),
         ],
       ),

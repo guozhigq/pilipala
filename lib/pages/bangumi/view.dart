@@ -2,13 +2,10 @@ import 'dart:async';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:nil/nil.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
-import 'package:pilipala/pages/home/index.dart';
-import 'package:pilipala/pages/main/index.dart';
+import 'package:pilipala/utils/main_stream.dart';
 
 import 'controller.dart';
 import 'widgets/bangumu_card_v.dart';
@@ -34,10 +31,6 @@ class _BangumiPageState extends State<BangumiPage>
   void initState() {
     super.initState();
     scrollController = _bangumidController.scrollController;
-    StreamController<bool> mainStream =
-        Get.find<MainController>().bottomBarStream;
-    StreamController<bool> searchBarStream =
-        Get.find<HomeController>().searchBarStream;
     _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
     _futureBuilderFutureFollow = _bangumidController.queryBangumiFollow();
     scrollController.addListener(
@@ -49,16 +42,7 @@ class _BangumiPageState extends State<BangumiPage>
             _bangumidController.onLoad();
           });
         }
-
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          mainStream.add(true);
-          searchBarStream.add(true);
-        } else if (direction == ScrollDirection.reverse) {
-          mainStream.add(false);
-          searchBarStream.add(false);
-        }
+        handleScrollEvent(scrollController);
       },
     );
   }
@@ -92,9 +76,14 @@ class _BangumiPageState extends State<BangumiPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '最近追番',
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => 0 != _bangumidController.total.value
+                                ? Text(
+                                    '我的追番(${_bangumidController.total.value})',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  )
+                                : const SizedBox(),
                           ),
                           IconButton(
                             onPressed: () {
@@ -112,7 +101,8 @@ class _BangumiPageState extends State<BangumiPage>
                       ),
                     ),
                     SizedBox(
-                      height: 268,
+                      height: Get.size.width / 3 / 0.75 +
+                          MediaQuery.textScalerOf(context).scale(50.0),
                       child: FutureBuilder(
                         future: _futureBuilderFutureFollow,
                         builder:
@@ -133,7 +123,6 @@ class _BangumiPageState extends State<BangumiPage>
                                         itemBuilder: (context, index) {
                                           return Container(
                                             width: Get.size.width / 3,
-                                            height: 254,
                                             margin: EdgeInsets.only(
                                                 left: StyleString.safeSpace,
                                                 right: index ==
@@ -157,10 +146,10 @@ class _BangumiPageState extends State<BangumiPage>
                                       ),
                               );
                             } else {
-                              return nil;
+                              return const SizedBox();
                             }
                           } else {
-                            return nil;
+                            return const SizedBox();
                           }
                         },
                       ),
@@ -199,8 +188,10 @@ class _BangumiPageState extends State<BangumiPage>
                     return HttpError(
                       errMsg: data['msg'],
                       fn: () {
-                        _futureBuilderFuture =
-                            _bangumidController.queryBangumiListFeed();
+                        setState(() {
+                          _futureBuilderFuture =
+                              _bangumidController.queryBangumiListFeed();
+                        });
                       },
                     );
                   }
@@ -224,14 +215,14 @@ class _BangumiPageState extends State<BangumiPage>
         crossAxisSpacing: StyleString.cardSpace,
         // 列数
         crossAxisCount: 3,
-        mainAxisExtent: Get.size.width / 3 / 0.65 +
-            MediaQuery.textScalerOf(context).scale(32.0),
+        mainAxisExtent: Get.size.width / 3 / 0.75 +
+            MediaQuery.textScalerOf(context).scale(42.0),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           return bangumiList!.isNotEmpty
               ? BangumiCardV(bangumiItem: bangumiList[index])
-              : nil;
+              : const SizedBox();
         },
         childCount: bangumiList!.isNotEmpty ? bangumiList!.length : 10,
       ),

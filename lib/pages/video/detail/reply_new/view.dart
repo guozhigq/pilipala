@@ -1,12 +1,18 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pilipala/http/dynamics.dart';
+import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/emote.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/emote/index.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/feed_back.dart';
 
 import 'toolbar_icon_button.dart';
@@ -40,6 +46,12 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
   double keyboardHeight = 0.0; // 键盘高度
   final _debouncer = Debouncer(milliseconds: 200); // 设置延迟时间
   String toolbarType = 'input';
+  RxBool isForward = false.obs;
+  RxBool showForward = false.obs;
+  RxString message = ''.obs;
+  final ImagePicker _picker = ImagePicker();
+  RxList<String> imageList = [''].obs;
+  List<Map<dynamic, dynamic>> pictures = [];
 
   @override
   void initState() {
@@ -52,6 +64,11 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     _autoFocus();
     // 监听聚焦状态
     _focuslistener();
+    final String routePath = Get.currentRoute;
+    if (routePath.startsWith('/video')) {
+      showForward.value = true;
+    }
+    imageList.clear();
   }
 
   _autoFocus() async {
@@ -73,21 +90,32 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
 
   Future submitReplyAdd() async {
     feedBack();
-    String message = _replyContentController.text;
+    // String message = _replyContentController.text;
     var result = await VideoHttp.replyAdd(
       type: widget.replyType ?? ReplyType.video,
       oid: widget.oid!,
       root: widget.root!,
       parent: widget.parent!,
       message: widget.replyItem != null && widget.replyItem!.root != 0
-          ? ' 回复 @${widget.replyItem!.member!.uname!} : $message'
-          : message,
+          ? ' 回复 @${widget.replyItem!.member!.uname!} : ${message.value}'
+          : message.value,
+      pictures: pictures,
     );
     if (result['status']) {
       SmartDialog.showToast(result['data']['success_toast']);
       Get.back(result: {
         'data': ReplyItemModel.fromJson(result['data']['reply'], ''),
       });
+
+      /// 投稿、番剧页面
+      if (isForward.value) {
+        await DynamicsHttp.dynamicCreate(
+          mid: 0,
+          rawText: message.value,
+          oid: widget.oid!,
+          scene: 5,
+        );
+      }
     } else {
       SmartDialog.showToast(result['msg']);
     }
@@ -99,10 +127,64 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     final String newText = currentText.substring(0, cursorPosition) +
         emote.text! +
         currentText.substring(cursorPosition);
+    message.value = newText;
     _replyContentController.value = TextEditingValue(
       text: newText,
       selection:
           TextSelection.collapsed(offset: cursorPosition + emote.text!.length),
+    );
+  }
+
+  void onChooseImage() async {
+    if (mounted) {
+      try {
+        final XFile? pickedFile =
+            await _picker.pickImage(source: ImageSource.gallery);
+        var res = await ReplyHttp.uploadImage(xFile: pickedFile!);
+        if (res['status']) {
+          imageList.add(res['data']['img_src']);
+          pictures.add(res['data']);
+        }
+      } catch (e) {
+        debugPrint('选择图片失败: $e');
+      }
+    }
+  }
+
+  void onPreviewImg(picList, initIndex, context) {
+    Navigator.of(context).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: picList,
+          initIndex: initIndex,
+          itemBuilder: (
+            BuildContext context,
+            int index,
+            bool isFocus,
+            bool enablePageView,
+          ) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (enablePageView) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Center(
+                child: Hero(
+                  tag: picList[index],
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 0),
+                    imageUrl: picList[index],
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            );
+          },
+          onPageChanged: (int pageIndex) {},
+        ),
+      ),
     );
   }
 
@@ -145,7 +227,6 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
     double _keyboardHeight = EdgeInsets.fromViewPadding(
             View.of(context).viewInsets, View.of(context).devicePixelRatio)
         .bottom;
-    print('_keyboardHeight: $_keyboardHeight');
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
@@ -153,14 +234,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ConstrainedBox(
             constraints: const BoxConstraints(
-              maxHeight: 200,
+              maxHeight: 250,
               minHeight: 120,
             ),
             child: Container(
@@ -172,7 +254,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: TextField(
                     controller: _replyContentController,
-                    minLines: 1,
+                    minLines: 3,
                     maxLines: null,
                     autofocus: false,
                     focusNode: replyContentFocusNode,
@@ -183,6 +265,68 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                           fontSize: 14,
                         )),
                     style: Theme.of(context).textTheme.bodyLarge,
+                    onChanged: (text) {
+                      message.value = text;
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Obx(
+            () => Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: SizedBox(
+                height: 65, // 固定高度以避免无限扩展
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: imageList.length,
+                  itemBuilder: (context, index) {
+                    final url = imageList[index];
+                    return url != ''
+                        ? Container(
+                            width: 65,
+                            height: 65,
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(6))),
+                            child: InkWell(
+                              onTap: () =>
+                                  onPreviewImg(imageList, index, context),
+                              onLongPress: () {
+                                feedBack();
+                                imageList.removeAt(index);
+                              },
+                              child: CachedNetworkImage(
+                                imageUrl: url,
+                                width: 65,
+                                height: 65,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : const SizedBox();
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8.0),
+                ),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: imageList.isNotEmpty,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                child: Text(
+                  '点击预览，长按删除',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -194,7 +338,15 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
           ),
           Container(
             height: 52,
-            padding: const EdgeInsets.only(left: 12, right: 12),
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+            ),
+            margin: EdgeInsets.only(
+              bottom: toolbarType == 'input' && keyboardHeight == 0.0
+                  ? MediaQuery.of(context).padding.bottom
+                  : 0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -211,7 +363,7 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'input',
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 10),
                 ToolbarIconButton(
                   onPressed: () {
                     if (toolbarType == 'input') {
@@ -225,9 +377,48 @@ class _VideoReplyNewDialogState extends State<VideoReplyNewDialog>
                   toolbarType: toolbarType,
                   selected: toolbarType == 'emote',
                 ),
+                if (widget.root != null && widget.root == 0) ...[
+                  const SizedBox(width: 10),
+                  ToolbarIconButton(
+                    onPressed: onChooseImage,
+                    icon: const Icon(Icons.photo, size: 22),
+                    toolbarType: toolbarType,
+                    selected: toolbarType == 'picture',
+                  ),
+                ],
+                const SizedBox(width: 6),
+                Obx(
+                  () => showForward.value
+                      ? TextButton.icon(
+                          onPressed: () {
+                            isForward.value = !isForward.value;
+                          },
+                          icon: Icon(
+                              isForward.value
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              size: 22),
+                          label: const Text('转发到动态'),
+                          style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(
+                              isForward.value
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
                 const Spacer(),
-                TextButton(
-                    onPressed: () => submitReplyAdd(), child: const Text('发送'))
+                SizedBox(
+                  height: 36,
+                  child: Obx(
+                    () => FilledButton(
+                      onPressed: message.isNotEmpty ? submitReplyAdd : null,
+                      child: const Text('发送'),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

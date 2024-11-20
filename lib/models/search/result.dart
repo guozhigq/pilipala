@@ -5,10 +5,12 @@ class SearchVideoModel {
   SearchVideoModel({this.list});
   List<SearchVideoItemModel>? list;
   SearchVideoModel.fromJson(Map<String, dynamic> json) {
-    list = json['result']
-        .where((e) => e['available'] == true)
-        .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
-        .toList();
+    list = json['result'] == null
+        ? []
+        : json['result']
+            .where((e) => e['available'] == true)
+            .map<SearchVideoItemModel>((e) => SearchVideoItemModel.fromJson(e))
+            .toList();
   }
 }
 
@@ -25,6 +27,7 @@ class SearchVideoItemModel {
     this.aid,
     this.bvid,
     this.title,
+    this.titleList,
     this.description,
     this.pic,
     // this.play,
@@ -54,8 +57,8 @@ class SearchVideoItemModel {
   String? arcurl;
   int? aid;
   String? bvid;
-  List? title;
-  // List? titleList;
+  String? title;
+  List? titleList;
   String? description;
   String? pic;
   // String? play;
@@ -82,8 +85,9 @@ class SearchVideoItemModel {
     aid = json['aid'];
     bvid = json['bvid'];
     mid = json['mid'];
-    // title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
-    title = Em.regTitle(json['title']);
+    title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
+    // title = Em.regTitle(json['title']);
+    titleList = Em.regTitle(json['title']);
     description = json['description'];
     pic = json['pic'] != null && json['pic'].startsWith('//')
         ? 'https:${json['pic']}'
@@ -232,6 +236,7 @@ class SearchLiveItemModel {
     this.userCover,
     this.type,
     this.title,
+    this.titleList,
     this.cover,
     this.pic,
     this.online,
@@ -251,7 +256,8 @@ class SearchLiveItemModel {
   String? face;
   String? userCover;
   String? type;
-  List? title;
+  String? title;
+  List? titleList;
   String? cover;
   String? pic;
   int? online;
@@ -272,7 +278,8 @@ class SearchLiveItemModel {
     face = json['uface'];
     userCover = json['user_cover'];
     type = json['type'];
-    title = Em.regTitle(json['title']);
+    title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
+    titleList = Em.regTitle(json['title']);
     cover = json['cover'];
     pic = json['cover'];
     online = json['online'];
@@ -302,6 +309,7 @@ class SearchMBangumiItemModel {
     this.type,
     this.mediaId,
     this.title,
+    this.titleList,
     this.orgTitle,
     this.mediaType,
     this.cv,
@@ -328,7 +336,8 @@ class SearchMBangumiItemModel {
 
   String? type;
   int? mediaId;
-  List? title;
+  String? title;
+  List? titleList;
   String? orgTitle;
   int? mediaType;
   String? cv;
@@ -355,7 +364,8 @@ class SearchMBangumiItemModel {
   SearchMBangumiItemModel.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     mediaId = json['media_id'];
-    title = Em.regTitle(json['title']);
+    title = json['title'].replaceAll(RegExp(r'<.*?>'), '');
+    titleList = Em.regTitle(json['title']);
     orgTitle = json['org_title'];
     mediaType = json['media_type'];
     cv = json['cv'];

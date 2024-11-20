@@ -3,9 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/models/video_detail_res.dart';
-import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/index.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../../../common/pages_bottom_sheet.dart';
 import '../../../../../models/common/video_episode_type.dart';
 
@@ -33,24 +31,24 @@ class _PagesPanelState extends State<PagesPanel> {
   late int cid;
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
-  late VideoDetailController _videoDetailController;
   final ScrollController listViewScrollCtr = ScrollController();
-  final ItemScrollController itemScrollController = ItemScrollController();
-  late PersistentBottomSheetController? _bottomSheetController;
+  PersistentBottomSheetController? _bottomSheetController;
 
   @override
   void initState() {
     super.initState();
     cid = widget.cid;
     episodes = widget.pages;
-    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
-    currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
-    scrollToIndex();
-    _videoDetailController.cid.listen((int p0) {
+    updateCurrentIndexAndScroll();
+    widget.videoIntroCtr.lastPlayCid.listen((int p0) {
       cid = p0;
-      currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
-      scrollToIndex();
+      updateCurrentIndexAndScroll();
     });
+  }
+
+  void updateCurrentIndexAndScroll() {
+    currentIndex.value = widget.pages.indexWhere((Part e) => e.cid == cid);
+    scrollToIndex();
   }
 
   @override
@@ -60,10 +58,12 @@ class _PagesPanelState extends State<PagesPanel> {
   }
 
   void changeFucCall(item, i) async {
-    print('pages changeFucCall');
-    widget.changeFuc?.call(item.cid);
+    widget.changeFuc?.call(item.cid, item.cover);
     currentIndex.value = i;
-    _bottomSheetController?.close();
+    cid = item.cid;
+    if (_bottomSheetController != null) {
+      _bottomSheetController?.close();
+    }
     scrollToIndex();
   }
 
@@ -72,11 +72,15 @@ class _PagesPanelState extends State<PagesPanel> {
       // 在回调函数中获取更新后的状态
       final double offset = min((currentIndex * 150) - 75,
           listViewScrollCtr.position.maxScrollExtent);
-      listViewScrollCtr.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (currentIndex.value == 0) {
+        listViewScrollCtr.jumpTo(0);
+      } else {
+        listViewScrollCtr.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -111,11 +115,10 @@ class _PagesPanelState extends State<PagesPanel> {
                     widget.videoIntroCtr.bottomSheetController =
                         _bottomSheetController = EpisodeBottomSheet(
                       currentCid: cid,
-                      episodes: episodes,
+                      episodes: widget.pages,
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.videoPart,
-                      context: context,
                     ).show(context);
                   },
                   child: Text(
@@ -128,7 +131,7 @@ class _PagesPanelState extends State<PagesPanel> {
           ),
         ),
         Container(
-          height: 35,
+          height: 55,
           margin: const EdgeInsets.only(bottom: 8),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -153,7 +156,7 @@ class _PagesPanelState extends State<PagesPanel> {
                         children: <Widget>[
                           if (isCurrentIndex) ...<Widget>[
                             Image.asset(
-                              'assets/images/live.gif',
+                              'assets/images/live.png',
                               color: Theme.of(context).colorScheme.primary,
                               height: 12,
                             ),
@@ -162,7 +165,7 @@ class _PagesPanelState extends State<PagesPanel> {
                           Expanded(
                               child: Text(
                             widget.pages[i].pagePart!,
-                            maxLines: 1,
+                            maxLines: 2,
                             style: TextStyle(
                                 fontSize: 13,
                                 color: isCurrentIndex

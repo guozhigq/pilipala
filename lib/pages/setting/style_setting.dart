@@ -8,7 +8,7 @@ import 'package:pilipala/models/common/theme_type.dart';
 import 'package:pilipala/pages/setting/pages/color_select.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/pages/setting/widgets/slide_dialog.dart';
-import 'package:pilipala/utils/global_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../../models/common/dynamic_badge_mode.dart';
@@ -28,7 +28,7 @@ class _StyleSettingState extends State<StyleSetting> {
   final ColorSelectController colorSelectController =
       Get.put(ColorSelectController());
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late int picQuality;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;
@@ -49,14 +49,7 @@ class _StyleSettingState extends State<StyleSetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '外观设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('外观设置')),
       body: ListView(
         children: [
           Obx(
@@ -103,8 +96,14 @@ class _StyleSettingState extends State<StyleSetting> {
             needReboot: true,
           ),
           const SetSwitchItem(
-            title: '首页底栏背景渐变',
+            title: '首页顶部背景渐变',
             setKey: SettingBoxKey.enableGradientBg,
+            defaultVal: true,
+            needReboot: true,
+          ),
+          const SetSwitchItem(
+            title: '动态页滑动切换up',
+            setKey: SettingBoxKey.enableDynamicSwitch,
             defaultVal: true,
             needReboot: true,
           ),
@@ -176,7 +175,7 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
-                              GlobalData().imgQuality = picQuality;
+                              GlobalDataCache.imgQuality = picQuality;
                               SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),
@@ -287,8 +286,13 @@ class _StyleSettingState extends State<StyleSetting> {
           ListTile(
             dense: false,
             onTap: () => Get.toNamed('/navbarSetting'),
-            title: Text('navbar设置', style: titleStyle),
+            title: Text('底部导航栏设置', style: titleStyle),
           ),
+          // ListTile(
+          //   dense: false,
+          //   onTap: () => Get.toNamed('/actionMenuSet'),
+          //   title: Text('操作菜单设置', style: titleStyle),
+          // ),
           if (Platform.isAndroid)
             ListTile(
               dense: false,

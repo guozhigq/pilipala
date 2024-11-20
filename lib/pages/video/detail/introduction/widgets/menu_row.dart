@@ -12,7 +12,7 @@ class MenuRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.only(top: 9, bottom: 9, left: 12),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -84,7 +84,7 @@ class MenuRow extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 13,
                       color: selectStatus
-                          ? Theme.of(context).colorScheme.onBackground
+                          ? Theme.of(context).colorScheme.onSurface
                           : Theme.of(context).colorScheme.outline),
                 ),
               ),
