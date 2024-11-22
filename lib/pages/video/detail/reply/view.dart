@@ -188,7 +188,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data;
                     if (_videoReplyController.replyList.isNotEmpty ||
-                        (data && data['status'])) {
+                        (data != null && data['status'] == true)) {
                       // 请求成功
                       return Obx(
                         () => _videoReplyController.isLoadingMore &&
@@ -247,7 +247,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                     } else {
                       // 请求错误
                       return HttpError(
-                        errMsg: data['msg'],
+                        errMsg: data?['msg'] ?? "网络不太好 请稍后再试",
                         fn: () {
                           setState(() {
                             _futureBuilderFuture =
