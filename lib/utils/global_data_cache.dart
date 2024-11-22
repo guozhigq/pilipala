@@ -53,6 +53,8 @@ class GlobalDataCache {
   static late bool enableAutoExpand;
   // 动态切换
   static late bool enableDynamicSwitch;
+  // 投屏开关
+  static bool enableDlna = false;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -120,5 +122,6 @@ class GlobalDataCache {
         setting.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
     enableDynamicSwitch =
         setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = setting.get(SettingBoxKey.enableDlna, defaultValue: false);
   }
 }
