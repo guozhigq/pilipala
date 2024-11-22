@@ -190,11 +190,14 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableRelatedVideo,
             defaultVal: true,
           ),
-          const SetSwitchItem(
+          SetSwitchItem(
             title: '视频投屏开关',
             subTitle: '打开后将在播放器右上角显示投屏入口',
             setKey: SettingBoxKey.enableDlna,
             defaultVal: false,
+            callFn: (bool val) {
+              GlobalDataCache.enableDlna = val;
+            },
           ),
           ListTile(
             dense: false,
