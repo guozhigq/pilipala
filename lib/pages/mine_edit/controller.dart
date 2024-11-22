@@ -3,17 +3,18 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/user.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class MineEditController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   final formKey = GlobalKey<FormState>();
   final TextEditingController unameCtr = TextEditingController();
   final TextEditingController useridCtr = TextEditingController();
   final TextEditingController signCtr = TextEditingController();
   final TextEditingController birthdayCtr = TextEditingController();
   String? sex;
-  dynamic userInfo;
+  UserInfoData? userInfo;
 
   @override
   void onInit() {

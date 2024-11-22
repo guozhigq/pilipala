@@ -35,7 +35,7 @@ class _BottomControlState extends State<BottomControl> {
   TextStyle subTitleStyle = const TextStyle(fontSize: 12);
   TextStyle titleStyle = const TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
-  Box localCache = GStrorage.localCache;
+  Box localCache = GStorage.localCache;
 
   @override
   void initState() {
@@ -47,10 +47,7 @@ class _BottomControlState extends State<BottomControl> {
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Row(

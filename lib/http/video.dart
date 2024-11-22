@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/utils/id_utils.dart';
+import 'package:pilipala/models/video/tags.dart';
 import '../common/constants.dart';
 import '../models/common/reply_type.dart';
 import '../models/home/rcmd/result.dart';
@@ -25,11 +26,11 @@ import 'init.dart';
 /// 返回{'status': bool, 'data': List}
 /// view层根据 status 判断渲染逻辑
 class VideoHttp {
-  static Box localCache = GStrorage.localCache;
-  static Box setting = GStrorage.setting;
+  static Box localCache = GStorage.localCache;
+  static Box setting = GStorage.setting;
   static bool enableRcmdDynamic =
       setting.get(SettingBoxKey.enableRcmdDynamic, defaultValue: true);
-  static Box userInfoCache = GStrorage.userInfo;
+  static Box userInfoCache = GStorage.userInfo;
 
   // 首页推荐视频
   static Future rcmdVideoList({required int ps, required int freshIdx}) async {
@@ -605,6 +606,21 @@ class VideoHttp {
         'status': false,
         'msg': res.data['message'],
       };
+    }
+  }
+
+  // 获取视频标签
+  static Future getVideoTag({required String bvid}) async {
+    var res = await Request().get(Api.videoTag, data: {'bvid': bvid});
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'].map<VideoTagItem>((e) {
+          return VideoTagItem.fromJson(e);
+        }).toList()
+      };
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

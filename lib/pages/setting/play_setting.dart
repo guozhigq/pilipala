@@ -23,7 +23,7 @@ class PlaySetting extends StatefulWidget {
 }
 
 class _PlaySettingState extends State<PlaySetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late dynamic defaultVideoQa;
   late dynamic defaultLiveQa;
   late dynamic defaultAudioQa;
@@ -67,14 +67,7 @@ class _PlaySettingState extends State<PlaySetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '播放设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('播放设置')),
       body: ListView(
         children: [
           ListTile(
@@ -162,7 +155,7 @@ class _PlaySettingState extends State<PlaySetting> {
               setKey: SettingBoxKey.enablePlayerControlAnimation,
               defaultVal: true,
               callFn: (bool val) {
-                GlobalDataCache().enablePlayerControlAnimation = val;
+                GlobalDataCache.enablePlayerControlAnimation = val;
               }),
           SetSwitchItem(
             title: '港澳台模式',

@@ -137,8 +137,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String heroTag;
   late final VideoIntroController videoIntroController;
   late final VideoDetailController videoDetailCtr;
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double sheetHeight;
   late final dynamic owner;
   late int mid;
@@ -169,8 +169,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(
-        initialExpanded: GlobalDataCache().enableAutoExpand);
+    _expandableCtr =
+        ExpandableController(initialExpanded: GlobalDataCache.enableAutoExpand);
   }
 
   // 收藏
@@ -387,7 +387,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ExpandablePanel(
             controller: _expandableCtr,
             collapsed: const SizedBox(height: 0),
-            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            expanded: IntroDetail(
+              videoDetail: widget.videoDetail!,
+              videoTags: videoIntroController.videoTags,
+            ),
             theme: const ExpandableThemeData(
               animationDuration: Duration(milliseconds: 300),
               scrollAnimationDuration: Duration(milliseconds: 300),
@@ -553,7 +556,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    final actionTypeSort = GlobalDataCache().actionTypeSort;
+    final actionTypeSort = GlobalDataCache.actionTypeSort;
 
     Map<String, Widget> menuListWidgets = {
       'like': Obx(

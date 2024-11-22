@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
@@ -21,8 +22,8 @@ class Request {
   static late CookieManager cookieManager;
   static late final Dio dio;
   factory Request() => _instance;
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
@@ -32,8 +33,8 @@ class Request {
 
   /// 设置cookie
   static setCookie() async {
-    Box userInfoCache = GStrorage.userInfo;
-    Box setting = GStrorage.setting;
+    Box userInfoCache = GStorage.userInfo;
+    Box setting = GStorage.setting;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -43,7 +44,7 @@ class Request {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    final userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
@@ -209,17 +210,13 @@ class Request {
    */
   get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    options ??= Options(); // 如果 options 为 null，则初始化一个新的 Options 对象
-    ResponseType resType = ResponseType.json;
-
     if (extra != null) {
-      resType = extra['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
-        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+        options ??= Options();
+        options.headers ??= <String, dynamic>{};
+        options.headers?['user-agent'] = headerUa(type: extra['ua']);
       }
     }
-    options.responseType = resType;
-
     try {
       response = await dio.get(
         url,

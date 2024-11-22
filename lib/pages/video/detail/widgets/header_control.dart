@@ -16,6 +16,7 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
 import '../../../../http/danmaku.dart';
@@ -52,8 +53,8 @@ class _HeaderControlState extends State<HeaderControl> {
   static const TextStyle subTitleStyle = TextStyle(fontSize: 12);
   static const TextStyle titleStyle = TextStyle(fontSize: 14);
   Size get preferredSize => const Size(double.infinity, kToolbarHeight);
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> videoStorage = GStrorage.video;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> videoStorage = GStorage.video;
   late List<double> speedsList;
   double buttonSpace = 8;
   RxBool isFullScreen = false.obs;
@@ -1155,10 +1156,7 @@ class _HeaderControlState extends State<HeaderControl> {
     return AppBar(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
       primary: false,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
       title: Row(
@@ -1240,22 +1238,24 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
-          ComBtn(
-            icon: const Icon(
-              Icons.cast,
-              size: 19,
-              color: Colors.white,
+          if (GlobalDataCache.enableDlna) ...[
+            ComBtn(
+              icon: const Icon(
+                Icons.cast,
+                size: 19,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return LiveDlnaPage(
+                        datasource: widget.videoDetailCtr!.videoUrl);
+                  },
+                );
+              },
             ),
-            fuc: () async {
-              showDialog<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return LiveDlnaPage(
-                      datasource: widget.videoDetailCtr!.videoUrl);
-                },
-              );
-            },
-          ),
+          ],
           if (isFullScreen.value) ...[
             SizedBox(
               width: 56,

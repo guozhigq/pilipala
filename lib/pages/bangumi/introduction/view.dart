@@ -116,7 +116,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   String heroTag = Get.arguments['heroTag'];
   late final BangumiIntroController bangumiIntroController;
   late final VideoDetailController videoDetailCtr;
-  Box localCache = GStrorage.localCache;
+  Box localCache = GStorage.localCache;
   late double sheetHeight;
   int? cid;
   bool isProcessing = false;
@@ -148,7 +148,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
 
   // 收藏
   showFavBottomSheet() async {
-    if (bangumiIntroController.userInfo.mid == null) {
+    if (bangumiIntroController.userInfo?.mid == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }

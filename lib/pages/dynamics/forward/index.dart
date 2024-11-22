@@ -47,7 +47,7 @@ class _DynamicForwardPageState extends State<DynamicForwardPage> {
       widget.cb?.call();
       _onClose();
     } else {
-      SmartDialog.showToast(res['message']);
+      SmartDialog.showToast(res['msg']);
     }
   }
 

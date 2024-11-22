@@ -33,7 +33,7 @@ class LiveRoomController extends GetxController {
   int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int userId = 0;
   PlSocket? plSocket;
   List<String> danmuHostList = [];

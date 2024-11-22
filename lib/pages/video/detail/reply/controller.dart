@@ -32,20 +32,20 @@ class VideoReplyController extends GetxController {
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   RxInt replyReqCode = 200.obs;
   bool isEnd = false;
 
   @override
   void onInit() {
     super.onInit();
-    int deaultReplySortIndex =
+    int defaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0) as int;
-    if (deaultReplySortIndex == 2) {
+    if (defaultReplySortIndex == 2) {
       setting.put(SettingBoxKey.replySortType, 0);
-      deaultReplySortIndex = 0;
+      defaultReplySortIndex = 0;
     }
-    _sortType = ReplySortType.values[deaultReplySortIndex];
+    _sortType = ReplySortType.values[defaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }
@@ -131,5 +131,33 @@ class VideoReplyController extends GetxController {
       replyList.clear();
       queryReplyList(type: 'init');
     });
+  }
+
+  // 移除评论
+  Future removeReply(int? rpid, int? frpid) async {
+    // 移除一楼评论
+    if (rpid != null) {
+      replyList.removeWhere((item) {
+        return item.rpid == rpid;
+      });
+    }
+    // 移除二楼评论
+    if (frpid != 0 && frpid != null) {
+      replyList.value = replyList.map((item) {
+        if (item.rpid! == frpid) {
+          item.replies!.removeWhere((reply) => reply.rpid == rpid);
+          // 【共xx条回复】
+          if (item.replyControl != null &&
+              item.replyControl!.entryTextNum! >= 1) {
+            item.replyControl!.entryTextNum =
+                item.replyControl!.entryTextNum! - 1;
+            item.rcount = item.replyControl!.entryTextNum;
+          }
+          return item;
+        } else {
+          return item;
+        }
+      }).toList();
+    }
   }
 }

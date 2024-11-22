@@ -66,7 +66,7 @@ import '../pages/whisper/index.dart';
 import '../pages/whisper_detail/index.dart';
 import '../utils/storage.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 
 class Routes {
   static final List<GetPage<dynamic>> getPages = [

@@ -92,7 +92,7 @@ class DynamicsHttp {
 
   //
   static Future dynamicDetail({
-    String? id,
+    required String id,
   }) async {
     var res = await Request().get(Api.dynamicDetail, data: {
       'timezone_offset': -480,

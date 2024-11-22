@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'storage.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 void feedBack() {
   // 设置中是否开启
   final bool enable =

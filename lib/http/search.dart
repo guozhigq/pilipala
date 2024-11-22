@@ -11,7 +11,7 @@ import '../utils/storage.dart';
 import 'index.dart';
 
 class SearchHttp {
-  static Box setting = GStrorage.setting;
+  static Box setting = GStorage.setting;
   static Future hotSearchList() async {
     var res = await Request().get(Api.hotSearchList);
     if (res.data is String) {

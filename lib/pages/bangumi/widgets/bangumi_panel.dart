@@ -5,6 +5,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/bangumi/info.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../../../common/pages_bottom_sheet.dart';
@@ -36,8 +37,8 @@ class BangumiPanel extends StatefulWidget {
 class _BangumiPanelState extends State<BangumiPanel> {
   late RxInt currentIndex = (-1).obs;
   final ScrollController listViewScrollCtr = ScrollController();
-  Box userInfoCache = GStrorage.userInfo;
-  dynamic userInfo;
+  Box userInfoCache = GStorage.userInfo;
+  UserInfoData? userInfo;
   // 默认未开通
   int vipStatus = 0;
   late int cid;
@@ -63,7 +64,7 @@ class _BangumiPanelState extends State<BangumiPanel> {
     /// 获取大会员状态
     userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null) {
-      vipStatus = userInfo.vipStatus;
+      vipStatus = userInfo!.vipStatus!;
     }
   }
 

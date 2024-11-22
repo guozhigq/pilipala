@@ -28,7 +28,7 @@ class _StyleSettingState extends State<StyleSetting> {
   final ColorSelectController colorSelectController =
       Get.put(ColorSelectController());
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late int picQuality;
   late ThemeType _tempThemeValue;
   late dynamic defaultCustomRows;
@@ -49,14 +49,7 @@ class _StyleSettingState extends State<StyleSetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '外观设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('外观设置')),
       body: ListView(
         children: [
           Obx(
@@ -182,7 +175,7 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
-                              GlobalDataCache().imgQuality = picQuality;
+                              GlobalDataCache.imgQuality = picQuality;
                               SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),

@@ -48,12 +48,9 @@ class _MemberArticlePageState extends State<MemberArticlePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => Text(
             '${_memberArticleController.isOwner.value ? '我' : 'Ta'}的图文',
-            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       ),

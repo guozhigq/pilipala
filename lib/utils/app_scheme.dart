@@ -1,9 +1,9 @@
 import 'package:app_links/app_links.dart';
-import 'package:appscheme/appscheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/pages/message/utils/index.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../http/search.dart';
 import 'id_utils.dart';
@@ -12,37 +12,20 @@ import 'utils.dart';
 
 class PiliSchame {
   static late AppLinks appLinks;
-  static AppScheme appScheme = AppSchemeImpl.getInstance()!;
   static Future<void> init() async {
     appLinks = AppLinks();
     appLinks.uriLinkStream.listen((Uri uri) {
       final String scheme = uri.scheme;
       if (RegExp(r'^pili', caseSensitive: false).hasMatch(scheme)) {
         piliScheme(uri);
-      }
-    });
-
-    appScheme.getInitScheme().then((SchemeEntity? value) {
-      if (value != null) {
-        routePush(value);
-      }
-    });
-
-    appScheme.getLatestScheme().then((SchemeEntity? value) {
-      if (value != null) {
-        routePush(value);
-      }
-    });
-
-    appScheme.registerSchemeListener().listen((SchemeEntity? event) {
-      if (event != null) {
-        routePush(event);
+      } else {
+        routePush(uri);
       }
     });
   }
 
   /// 路由跳转
-  static void routePush(value) async {
+  static void routePush(Uri value) async {
     final String scheme = value.scheme;
     if (scheme == 'bilibili') {
       biliScheme(value);
@@ -212,9 +195,9 @@ class PiliSchame {
     }
   }
 
-  static Future<void> biliScheme(SchemeEntity value) async {
-    final String host = value.host!;
-    final String path = value.path!;
+  static Future<void> biliScheme(Uri value) async {
+    final String host = value.host;
+    final String path = value.path;
     switch (host) {
       case 'root':
         Navigator.popUntil(
@@ -288,20 +271,19 @@ class PiliSchame {
         break;
       case 'following':
         if (path.startsWith('/detail')) {
-          var opusId = path.split('/').last;
-          Get.toNamed(
-            '/webview',
-            parameters: {
-              'url': 'https://m.bilibili.com/opus/$opusId',
-              'type': 'url',
-              'pageTitle': ''
-            },
-          );
+          final String opusId = path.split('/').last;
+          MessageUtils.navigateToDynamicDetail(opusId);
         }
         break;
       default:
-        SmartDialog.showToast('未匹配地址，请联系开发者');
-        Clipboard.setData(ClipboardData(text: value.toString()));
+        final Map<String, String> queryParameters = value.queryParameters;
+        final String? enterUri = queryParameters['enterUri'];
+        if (enterUri != null && enterUri.startsWith('bilibili://')) {
+          biliScheme(Uri.parse(enterUri));
+        } else {
+          SmartDialog.showToast('未匹配地址，请联系开发者');
+          Clipboard.setData(ClipboardData(text: value.toString()));
+        }
         break;
     }
   }

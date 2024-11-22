@@ -30,7 +30,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   late MineController _mineController;
 
   int? _lastSelectTime; //上次点击时间
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late bool enableMYBar;
 
   @override
@@ -113,19 +113,19 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() async {
-    await GStrorage.close();
+    await GStorage.close();
     EventBus().off(EventName.loginEvent);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Box localCache = GStrorage.localCache;
+    Box localCache = GStorage.localCache;
     double statusBarHeight = MediaQuery.of(context).padding.top;
     double sheetHeight = MediaQuery.sizeOf(context).height -
         MediaQuery.of(context).padding.top -
         MediaQuery.sizeOf(context).width * 9 / 16;
-    GlobalDataCache().sheetHeight = sheetHeight;
+    GlobalDataCache.sheetHeight = sheetHeight;
     localCache.put('sheetHeight', sheetHeight);
     localCache.put('statusBarHeight', statusBarHeight);
 

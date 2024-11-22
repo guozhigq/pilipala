@@ -42,7 +42,7 @@ class VideoReplyReplyPanel extends StatefulWidget {
 class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
   late VideoReplyReplyController _videoReplyReplyController;
   late AnimationController replyAnimationCtl;
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   Future? _futureBuilderFuture;
   late ScrollController scrollController;
 
@@ -89,7 +89,6 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     return AppBar(
       toolbarHeight: 45,
       automaticallyImplyLeading: false,
-      centerTitle: false,
       title: Text(
         '评论详情',
         style: Theme.of(context).textTheme.titleSmall,
@@ -118,6 +117,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
       },
       replyType: widget.replyType,
       replyReply: (replyItem) => replyReply(replyItem),
+      onDelete: _videoReplyReplyController.removeReply,
     );
   }
 

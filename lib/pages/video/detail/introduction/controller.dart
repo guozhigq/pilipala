@@ -9,7 +9,9 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/ai.dart';
+import 'package:pilipala/models/video/tags.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
@@ -41,17 +43,16 @@ class VideoIntroController extends GetxController {
   RxBool hasFav = false.obs;
   // 是否不喜欢
   RxBool hasDisLike = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
-  int _tempThemeValue = -1;
-
   RxInt lastPlayCid = 0.obs;
-  var userInfo;
+  UserInfoData? userInfo;
+  RxList<VideoTagItem> videoTags = <VideoTagItem>[].obs;
 
   // 同时观看
   bool isShowOnlineTotal = false;
@@ -82,6 +83,7 @@ class VideoIntroController extends GetxController {
     }
     enableRelatedVideo =
         setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
+    queryVideoTag();
   }
 
   // 获取视频简介&分p
@@ -298,7 +300,7 @@ class VideoIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
+        mid: userInfo!.mid!, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }
@@ -677,5 +679,13 @@ class VideoIntroController extends GetxController {
         );
       },
     );
+  }
+
+  // 获取视频标签
+  void queryVideoTag() async {
+    var result = await VideoHttp.getVideoTag(bvid: bvid);
+    if (result['status']) {
+      videoTags.value = result['data'];
+    }
   }
 }

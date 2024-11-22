@@ -33,24 +33,17 @@ class ScrollAppBar extends StatelessWidget {
           padding: EdgeInsets.only(top: statusBarHeight),
           child: AppBar(
             primary: false,
-            elevation: 0,
-            scrolledUnderElevation: 0,
             centerTitle: true,
-            title: TextButton(
+            title: TextButton.icon(
               onPressed: () => callback(),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.play_arrow_rounded),
-                  Text(
-                    playerStatus == PlayerStatus.paused
-                        ? '继续播放'
-                        : playerStatus == PlayerStatus.completed
-                            ? '重新播放'
-                            : '播放中',
-                  )
-                ],
+              label: Text(
+                playerStatus == PlayerStatus.paused
+                    ? '继续播放'
+                    : playerStatus == PlayerStatus.completed
+                        ? '重新播放'
+                        : '播放中',
               ),
+              icon: const Icon(Icons.play_arrow_rounded),
             ),
             // actions: [
             //   IconButton(

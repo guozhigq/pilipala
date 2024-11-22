@@ -9,14 +9,7 @@ class SettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final SettingController settingController = Get.put(SettingController());
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('设置')),
       body: Column(
         children: [
           ListTile(

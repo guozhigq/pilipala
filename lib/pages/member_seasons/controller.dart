@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/seasons.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 class MemberSeasonsController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -58,7 +59,7 @@ class MemberSeasonsController extends GetxController {
       mid: mid,
       seriesId: seriesId!,
       pn: pn,
-      currentMid: 17340771,
+      currentMid: GlobalDataCache.userInfo?.mid ?? -1,
     );
     if (res['status']) {
       seasonsList.addAll(res['data'].seriesList);
