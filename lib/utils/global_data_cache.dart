@@ -55,6 +55,8 @@ class GlobalDataCache {
   static late bool enableDynamicSwitch;
   // 投屏开关
   static bool enableDlna = false;
+  // sponsorBlock开关
+  static bool enableSponsorBlock = false;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -123,5 +125,7 @@ class GlobalDataCache {
     enableDynamicSwitch =
         setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
     enableDlna = setting.get(SettingBoxKey.enableDlna, defaultValue: false);
+    enableSponsorBlock =
+        setting.get(SettingBoxKey.enableSponsorBlock, defaultValue: false);
   }
 }
