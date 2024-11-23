@@ -909,6 +909,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
               fuc: () => Get.back(),
             ),
+            const SizedBox(width: 8),
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                await vdCtr.plPlayerController.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
+            ),
             const Spacer(),
             ComBtn(
               icon: const Icon(Icons.history_outlined, size: 22),
