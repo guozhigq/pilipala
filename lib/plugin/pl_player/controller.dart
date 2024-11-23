@@ -929,6 +929,11 @@ class PlPlayerController {
     showControls.value = !val;
   }
 
+  /// 设置/更新顶部控制栏
+  void setHeaderControl(PreferredSizeWidget? widget) {
+    headerControl = widget;
+  }
+
   void toggleFullScreen(bool val) {
     _isFullScreen.value = val;
   }

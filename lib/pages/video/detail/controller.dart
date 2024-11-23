@@ -480,6 +480,15 @@ class VideoDetailController extends GetxController
         getDanmaku(subtitles);
       }
     }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+      bvid: bvid,
+      videoType: videoType,
+      showSubtitleBtn: result['status'] && result['data'].subtitles.isNotEmpty,
+    );
+    plPlayerController.setHeaderControl(headerControl);
   }
 
   // 获取弹幕

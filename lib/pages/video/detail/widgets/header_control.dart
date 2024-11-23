@@ -30,7 +30,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.floating,
     this.bvid,
     this.videoType,
-    this.showSubtitleBtn,
+    this.showSubtitleBtn = true,
     super.key,
   });
   final PlPlayerController? controller;
@@ -38,7 +38,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final Floating? floating;
   final String? bvid;
   final SearchType? videoType;
-  final bool? showSubtitleBtn;
+  final bool showSubtitleBtn;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -1326,7 +1326,7 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          if (widget.showSubtitleBtn ?? true)
+          if (widget.showSubtitleBtn)
             ComBtn(
               icon: const Icon(
                 Icons.closed_caption_off,
