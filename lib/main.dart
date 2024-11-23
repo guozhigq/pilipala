@@ -66,7 +66,7 @@ void main() async {
   }
 
   PiliSchame.init();
-  await GlobalDataCache().initialize();
+  await GlobalDataCache.initialize();
   CommonHttp.buvidActivate();
 }
 

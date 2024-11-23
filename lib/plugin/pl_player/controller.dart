@@ -278,19 +278,18 @@ class PlPlayerController {
 
   // 添加一个私有构造函数
   PlPlayerController._internal(this.videoType) {
-    final cache = GlobalDataCache();
-    isOpenDanmu.value = cache.isOpenDanmu;
-    blockTypes = cache.blockTypes;
-    showArea = cache.showArea;
-    opacityVal = cache.opacityVal;
-    fontSizeVal = cache.fontSizeVal;
-    danmakuDurationVal = cache.danmakuDurationVal;
-    strokeWidth = cache.strokeWidth;
-    playRepeat = cache.playRepeat;
-    _playbackSpeed.value = cache.playbackSpeed;
-    enableAutoLongPressSpeed = cache.enableAutoLongPressSpeed;
-    _longPressSpeed.value = cache.longPressSpeed;
-    speedsList = cache.speedsList;
+    isOpenDanmu.value = GlobalDataCache.isOpenDanmu;
+    blockTypes = GlobalDataCache.blockTypes;
+    showArea = GlobalDataCache.showArea;
+    opacityVal = GlobalDataCache.opacityVal;
+    fontSizeVal = GlobalDataCache.fontSizeVal;
+    danmakuDurationVal = GlobalDataCache.danmakuDurationVal;
+    strokeWidth = GlobalDataCache.strokeWidth;
+    playRepeat = GlobalDataCache.playRepeat;
+    _playbackSpeed.value = GlobalDataCache.playbackSpeed;
+    enableAutoLongPressSpeed = GlobalDataCache.enableAutoLongPressSpeed;
+    _longPressSpeed.value = GlobalDataCache.longPressSpeed;
+    speedsList = GlobalDataCache.speedsList;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -1052,13 +1051,12 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
-    final cache = GlobalDataCache();
-    cache.blockTypes = blockTypes;
-    cache.showArea = showArea;
-    cache.opacityVal = opacityVal;
-    cache.fontSizeVal = fontSizeVal;
-    cache.danmakuDurationVal = danmakuDurationVal;
-    cache.strokeWidth = strokeWidth;
+    GlobalDataCache.blockTypes = blockTypes;
+    GlobalDataCache.showArea = showArea;
+    GlobalDataCache.opacityVal = opacityVal;
+    GlobalDataCache.fontSizeVal = fontSizeVal;
+    GlobalDataCache.danmakuDurationVal = danmakuDurationVal;
+    GlobalDataCache.strokeWidth = strokeWidth;
 
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);

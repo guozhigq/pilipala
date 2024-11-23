@@ -26,7 +26,7 @@ class MemberHttp {
   }) async {
     String? wWebid;
     if ((await getWWebid(mid: mid))['status']) {
-      wWebid = GlobalDataCache().wWebid;
+      wWebid = GlobalDataCache.wWebid;
     }
 
     Map params = await WbiSign().makSign({
@@ -574,7 +574,7 @@ class MemberHttp {
   }
 
   static Future getWWebid({required int mid}) async {
-    String? wWebid = GlobalDataCache().wWebid;
+    String? wWebid = GlobalDataCache.wWebid;
     if (wWebid != null) {
       return {'status': true, 'data': wWebid};
     }
@@ -588,7 +588,7 @@ class MemberHttp {
         final content = match.group(1);
         String decodedString = Uri.decodeComponent(content!);
         Map<String, dynamic> map = jsonDecode(decodedString);
-        GlobalDataCache().wWebid = map['access_id'];
+        GlobalDataCache.wWebid = map['access_id'];
         return {'status': true, 'data': map['access_id']};
       } else {
         return {'status': false, 'data': '请检查登录状态'};
@@ -605,7 +605,7 @@ class MemberHttp {
   }) async {
     String? wWebid;
     if ((await getWWebid(mid: mid))['status']) {
-      wWebid = GlobalDataCache().wWebid;
+      wWebid = GlobalDataCache.wWebid;
     }
     Map params = await WbiSign().makSign({
       'host_mid': mid,

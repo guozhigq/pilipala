@@ -308,7 +308,7 @@ class UpItemWidget extends StatelessWidget {
         if (data.type == 'up') {
           EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
               () {
-            if (GlobalDataCache().enableDynamicSwitch) {
+            if (GlobalDataCache.enableDynamicSwitch) {
               onClickUp(data, index);
             } else {
               onClickUpAni(data, index);
