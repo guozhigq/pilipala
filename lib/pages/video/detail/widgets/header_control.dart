@@ -56,7 +56,7 @@ class _HeaderControlState extends State<HeaderControl> {
   final Box<dynamic> localCache = GStorage.localCache;
   final Box<dynamic> videoStorage = GStorage.video;
   late List<double> speedsList;
-  double buttonSpace = 8;
+  double buttonSpace = 4;
   RxBool isFullScreen = false.obs;
   late String heroTag;
   late VideoIntroController videoIntroController;
@@ -484,65 +484,6 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
           );
         });
-  }
-
-  /// 选择倍速
-  void showSetSpeedSheet() {
-    final double currentSpeed = widget.controller!.playbackSpeed;
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('播放速度'),
-          content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return Wrap(
-              spacing: 8,
-              runSpacing: 2,
-              children: [
-                for (final double i in speedsList) ...<Widget>[
-                  if (i == currentSpeed) ...<Widget>[
-                    FilledButton(
-                      onPressed: () async {
-                        // setState(() => currentSpeed = i),
-                        await widget.controller!.setPlaybackSpeed(i);
-                        Get.back();
-                      },
-                      child: Text(i.toString()),
-                    ),
-                  ] else ...[
-                    FilledButton.tonal(
-                      onPressed: () async {
-                        // setState(() => currentSpeed = i),
-                        await widget.controller!.setPlaybackSpeed(i);
-                        Get.back();
-                      },
-                      child: Text(i.toString()),
-                    ),
-                  ]
-                ]
-              ],
-            );
-          }),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                '取消',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                await widget.controller!.setDefaultSpeed();
-                Get.back();
-              },
-              child: const Text('默认速度'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   /// 选择画质
@@ -1222,7 +1163,7 @@ class _HeaderControlState extends State<HeaderControl> {
               fuc: () async {
                 // 销毁播放器实例
                 await widget.controller!.dispose(type: 'all');
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.popUntil(
                       context, (Route<dynamic> route) => route.isFirst);
                 }
@@ -1230,21 +1171,9 @@ class _HeaderControlState extends State<HeaderControl> {
             ),
           ],
           const Spacer(),
-          // ComBtn(
-          //   icon: const Icon(
-          //     FontAwesomeIcons.cropSimple,
-          //     size: 15,
-          //     color: Colors.white,
-          //   ),
-          //   fuc: () => _.screenshot(),
-          // ),
           if (GlobalDataCache.enableDlna) ...[
             ComBtn(
-              icon: const Icon(
-                Icons.cast,
-                size: 19,
-                color: Colors.white,
-              ),
+              icon: Image.asset('assets/images/video/dlna.png', width: 19),
               fuc: () async {
                 showDialog<void>(
                   context: context,
@@ -1255,7 +1184,10 @@ class _HeaderControlState extends State<HeaderControl> {
                 );
               },
             ),
+            SizedBox(width: buttonSpace),
           ],
+
+          /// 弹幕开关（全屏时）
           if (isFullScreen.value) ...[
             SizedBox(
               width: 56,
@@ -1271,6 +1203,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 ),
               ),
             ),
+            SizedBox(width: buttonSpace),
             SizedBox(
               width: 34,
               height: 34,
@@ -1292,8 +1225,10 @@ class _HeaderControlState extends State<HeaderControl> {
                 ),
               ),
             ),
+            SizedBox(width: buttonSpace),
           ],
-          SizedBox(width: buttonSpace),
+
+          /// pip
           if (Platform.isAndroid) ...<Widget>[
             SizedBox(
               width: 34,
@@ -1318,9 +1253,9 @@ class _HeaderControlState extends State<HeaderControl> {
                     await widget.floating!.enable(aspectRatio: aspectRatio);
                   } else {}
                 },
-                icon: const Icon(
-                  Icons.picture_in_picture_outlined,
-                  size: 19,
+                icon: Image.asset(
+                  'assets/images/video/pip.png',
+                  width: 19,
                   color: Colors.white,
                 ),
               ),
@@ -1329,37 +1264,21 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          if (widget.showSubtitleBtn)
+          if (widget.showSubtitleBtn) ...[
             ComBtn(
-              icon: const Icon(
-                Icons.closed_caption_off,
-                size: 22,
-                color: Colors.white,
+              icon: Icon(
+                FontAwesomeIcons.closedCaptioning,
+                size: 16,
+                color: Colors.white.withOpacity(0.9),
               ),
               fuc: () => showSubtitleDialog(),
             ),
-          SizedBox(width: buttonSpace),
-          Obx(
-            () => SizedBox(
-              width: 45,
-              height: 34,
-              child: TextButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                ),
-                onPressed: () => showSetSpeedSheet(),
-                child: Text(
-                  '${_.playbackSpeed}X',
-                  style: textStyle,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: buttonSpace),
+            SizedBox(width: buttonSpace),
+          ],
           ComBtn(
             icon: const Icon(
               Icons.more_vert_outlined,
-              size: 18,
+              size: 19,
               color: Colors.white,
             ),
             fuc: () => showSettingSheet(),
