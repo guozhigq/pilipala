@@ -24,6 +24,7 @@ import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 
@@ -123,14 +124,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   // 流
   appbarStreamListen() {
     appbarStream = StreamController<double>.broadcast();
-    _extendNestCtr.addListener(
-      () {
-        final double offset = _extendNestCtr.position.pixels;
-        vdCtr.sheetHeight.value =
-            Get.size.height - videoHeight - statusBarHeight + offset;
-        appbarStream.add(offset);
-      },
-    );
+    _extendNestCtr.addListener(_extendNestCtrListener);
   }
 
   // 播放器状态监听
@@ -225,6 +219,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     statusHeight = await StatusBarControl.getHeight;
   }
 
+  // _extendNestCtr监听
+  void _extendNestCtrListener() {
+    final double offset = _extendNestCtr.position.pixels;
+    if (vdCtr.videoDirection.value == 'horizontal') {
+      vdCtr.sheetHeight.value =
+          Get.size.height - videoHeight - statusBarHeight + offset;
+      appbarStream.add(offset);
+    } else {
+      if (offset > (Get.size.width * 22 / 16 - videoHeight)) {
+        appbarStream.add(offset - (Get.size.width * 22 / 16 - videoHeight));
+      }
+    }
+  }
+
   @override
   void dispose() {
     shutdownTimerService.handleWaitingFinished();
@@ -243,6 +251,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     appbarStream.close();
     WidgetsBinding.instance.removeObserver(this);
     _lifecycleListener.dispose();
+    _extendNestCtr.removeListener(_extendNestCtrListener);
     super.dispose();
   }
 
@@ -494,11 +503,18 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
     final _context = MediaQuery.of(context);
-    late double defaultVideoHeight = sizeContext.width * 9 / 16;
+    late final double verticalHeight = sizeContext.width * 22 / 16;
+    late double defaultVideoHeight = vdCtr.videoDirection.value == 'vertical'
+        ? verticalHeight
+        : sizeContext.width * 9 / 16;
     late RxDouble videoHeight = defaultVideoHeight.obs;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight.value;
-    // ignore: no_leading_underscores_for_local_identifiers
+    vdCtr.videoDirection.listen((p0) {
+      if (p0 == 'vertical') {
+        videoHeight.value = defaultVideoHeight = verticalHeight;
+      }
+    });
 
     // 竖屏
     final bool isPortrait = _context.orientation == Orientation.portrait;
@@ -541,10 +557,6 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               showEposideCb: () => vdCtr.videoType == SearchType.video
                   ? videoIntroController.showEposideHandler()
                   : bangumiIntroController.showEposideHandler(),
-              fullScreenCb: (bool status) {
-                videoHeight.value =
-                    status ? Get.size.height : defaultVideoHeight;
-              },
             ));
     }
 
@@ -594,6 +606,28 @@ class _VideoDetailPageState extends State<VideoDetailPage>
       );
     }
 
+    Widget buildAppBar(BuildContext context, AsyncSnapshot<num> snapshot) {
+      final double distance =
+          statusBarHeight + MediaQuery.of(context).padding.top;
+      return AppBar(
+        backgroundColor: Colors.black,
+        systemOverlayStyle: Platform.isAndroid
+            ? SystemUiOverlayStyle(
+                statusBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Brightness.light
+                        : (snapshot.data! > distance
+                            ? Brightness.dark
+                            : Brightness.light),
+              )
+            : Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : (snapshot.data! > distance
+                    ? SystemUiOverlayStyle.dark
+                    : SystemUiOverlayStyle.light),
+      );
+    }
+
     Widget childWhenDisabled = SafeArea(
       top: MediaQuery.of(context).orientation == Orientation.portrait &&
           plPlayerController?.isFullScreen.value == true,
@@ -611,11 +645,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
               child: StreamBuilder(
                 stream: appbarStream.stream.distinct(),
                 initialData: 0,
-                builder: ((context, snapshot) {
-                  return AppBar(
-                    backgroundColor: Colors.black,
-                  );
-                }),
+                builder: buildAppBar,
               ),
             ),
             body: ExtendedNestedScrollView(
@@ -750,13 +780,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             );
                           },
                         ),
-                        Obx(
-                          () => VideoReplyPanel(
-                            bvid: vdCtr.bvid,
-                            oid: vdCtr.oid.value,
-                            onControllerCreated: vdCtr.onControllerCreated,
-                          ),
-                        )
+                        if ((vdCtr.videoType == SearchType.media_bangumi &&
+                                GlobalDataCache.enableComment
+                                    .contains('bangumi')) ||
+                            (vdCtr.videoType == SearchType.video &&
+                                GlobalDataCache.enableComment
+                                    .contains('video'))) ...[
+                          Obx(
+                            () => VideoReplyPanel(
+                              bvid: vdCtr.bvid,
+                              oid: vdCtr.oid.value,
+                              onControllerCreated: vdCtr.onControllerCreated,
+                            ),
+                          )
+                        ],
                       ],
                     ),
                   ),
@@ -773,7 +810,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             builder: ((context, snapshot) {
               return ScrollAppBar(
                 snapshot.data!.toDouble(),
-                () => continuePlay(),
+                continuePlay,
                 playerStatus.value,
                 null,
               );
@@ -879,6 +916,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ComBtn(
               icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
               fuc: () => Get.back(),
+            ),
+            const SizedBox(width: 8),
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                await vdCtr.plPlayerController.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
             ),
             const Spacer(),
             ComBtn(

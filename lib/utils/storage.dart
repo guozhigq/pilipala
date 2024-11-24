@@ -115,7 +115,10 @@ class SettingBoxKey {
       enableAi = 'enableAi',
       enableAutoExpand = 'enableAutoExpand',
       defaultHomePage = 'defaultHomePage',
-      enableRelatedVideo = 'enableRelatedVideo';
+      enableRelatedVideo = 'enableRelatedVideo',
+      enableDlna = 'enableDlna',
+      enableSponsorBlock = 'enableSponsorBlock',
+      enableComment = 'enableComment';
 
   /// 外观
   static const String themeMode = 'themeMode',

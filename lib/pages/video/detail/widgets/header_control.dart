@@ -16,6 +16,7 @@ import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/introduction/widgets/menu_row.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/services/shutdown_timer_service.dart';
 import '../../../../http/danmaku.dart';
@@ -30,7 +31,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
     this.floating,
     this.bvid,
     this.videoType,
-    this.showSubtitleBtn,
+    this.showSubtitleBtn = true,
     super.key,
   });
   final PlPlayerController? controller;
@@ -38,7 +39,7 @@ class HeaderControl extends StatefulWidget implements PreferredSizeWidget {
   final Floating? floating;
   final String? bvid;
   final SearchType? videoType;
-  final bool? showSubtitleBtn;
+  final bool showSubtitleBtn;
 
   @override
   State<HeaderControl> createState() => _HeaderControlState();
@@ -1237,22 +1238,24 @@ class _HeaderControlState extends State<HeaderControl> {
           //   ),
           //   fuc: () => _.screenshot(),
           // ),
-          ComBtn(
-            icon: const Icon(
-              Icons.cast,
-              size: 19,
-              color: Colors.white,
+          if (GlobalDataCache.enableDlna) ...[
+            ComBtn(
+              icon: const Icon(
+                Icons.cast,
+                size: 19,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return LiveDlnaPage(
+                        datasource: widget.videoDetailCtr!.videoUrl);
+                  },
+                );
+              },
             ),
-            fuc: () async {
-              showDialog<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return LiveDlnaPage(
-                      datasource: widget.videoDetailCtr!.videoUrl);
-                },
-              );
-            },
-          ),
+          ],
           if (isFullScreen.value) ...[
             SizedBox(
               width: 56,
@@ -1326,7 +1329,7 @@ class _HeaderControlState extends State<HeaderControl> {
           ],
 
           /// 字幕
-          if (widget.showSubtitleBtn ?? true)
+          if (widget.showSubtitleBtn)
             ComBtn(
               icon: const Icon(
                 Icons.closed_caption_off,

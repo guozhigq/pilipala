@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:html/parser.dart';
 import 'package:pilipala/models/member/article.dart';
 import 'package:pilipala/models/member/like.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import '../common/constants.dart';
 import '../models/dynamics/result.dart';
@@ -25,7 +26,7 @@ class MemberHttp {
   }) async {
     String? wWebid;
     if ((await getWWebid(mid: mid))['status']) {
-      wWebid = GlobalDataCache().wWebid;
+      wWebid = GlobalDataCache.wWebid;
     }
 
     Map params = await WbiSign().makSign({
@@ -472,9 +473,9 @@ class MemberHttp {
       String accessKey = res.data['data']['access_token'];
       Box localCache = GStorage.localCache;
       Box userInfoCache = GStorage.userInfo;
-      var userInfo = userInfoCache.get('userInfoCache');
+      final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
       localCache.put(
-          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
+          LocalCacheKey.accessKey, {'mid': userInfo!.mid, 'value': accessKey});
       return {'status': true, 'data': [], 'msg': '操作成功'};
     } else {
       return {
@@ -573,7 +574,7 @@ class MemberHttp {
   }
 
   static Future getWWebid({required int mid}) async {
-    String? wWebid = GlobalDataCache().wWebid;
+    String? wWebid = GlobalDataCache.wWebid;
     if (wWebid != null) {
       return {'status': true, 'data': wWebid};
     }
@@ -587,7 +588,7 @@ class MemberHttp {
         final content = match.group(1);
         String decodedString = Uri.decodeComponent(content!);
         Map<String, dynamic> map = jsonDecode(decodedString);
-        GlobalDataCache().wWebid = map['access_id'];
+        GlobalDataCache.wWebid = map['access_id'];
         return {'status': true, 'data': map['access_id']};
       } else {
         return {'status': false, 'data': '请检查登录状态'};
@@ -604,7 +605,7 @@ class MemberHttp {
   }) async {
     String? wWebid;
     if ((await getWWebid(mid: mid))['status']) {
-      wWebid = GlobalDataCache().wWebid;
+      wWebid = GlobalDataCache.wWebid;
     }
     Map params = await WbiSign().makSign({
       'host_mid': mid,

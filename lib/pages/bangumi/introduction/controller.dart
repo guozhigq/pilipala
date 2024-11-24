@@ -8,6 +8,7 @@ import 'package:pilipala/http/search.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/bangumi/info.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
@@ -57,7 +58,7 @@ class BangumiIntroController extends GetxController {
   RxBool isFollowed = false.obs;
   RxInt followStatus = 1.obs;
   int _tempThemeValue = -1;
-  var userInfo;
+  UserInfoData? userInfo;
   PersistentBottomSheetController? bottomSheetController;
   List<Map<String, dynamic>> followStatusList = [
     {'title': '标记为 「想看」', 'status': 1},
@@ -259,7 +260,7 @@ class BangumiIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
+        mid: userInfo!.mid!, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }

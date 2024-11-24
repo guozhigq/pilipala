@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/common/rcmd_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -21,7 +22,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
   static Box localCache = GStorage.localCache;
   late dynamic defaultRcmdType;
   Box userInfoCache = GStorage.userInfo;
-  late dynamic userInfo;
+  UserInfoData? userInfo;
   bool userLogin = false;
   late dynamic accessKeyInfo;
   // late int filterUnfollowedRatio;
