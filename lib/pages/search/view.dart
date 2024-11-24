@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
@@ -50,11 +49,10 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             width: 1,
           ),
         ),
-        titleSpacing: 0,
         actions: [
           IconButton(
             onPressed: () => _searchController.submit(),
-            icon: const Icon(CupertinoIcons.search, size: 22),
+            icon: const Icon(Icons.search),
           ),
           const SizedBox(width: 10)
         ],
@@ -64,18 +62,35 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             focusNode: _searchController.searchFocusNode,
             controller: _searchController.controller.value,
             textInputAction: TextInputAction.search,
-            onChanged: (value) => _searchController.onChange(value),
+            onChanged: _searchController.onChange,
             decoration: InputDecoration(
               hintText: _searchController.hintText,
               border: InputBorder.none,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  size: 22,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-                onPressed: () => _searchController.onClear(),
-              ),
+              suffix: Obx(() {
+                RxString searchKeyWord = _searchController.searchKeyWord;
+                if (searchKeyWord.value.isEmpty) {
+                  return const SizedBox();
+                }
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (RegExp(r'^\d+$').hasMatch(searchKeyWord.value))
+                      IconButton(
+                        tooltip: '直达up主页',
+                        icon: const Icon(Icons.person_outline, size: 22),
+                        onPressed: () {
+                          _searchController.cacheHistory();
+                          Get.toNamed('/member?mid=${searchKeyWord.value}',
+                              arguments: {'face': null});
+                        },
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.clear, size: 22),
+                      onPressed: () => _searchController.onClear(),
+                    ),
+                  ],
+                );
+              }),
             ),
             onSubmitted: (String value) => _searchController.submit(),
           ),
@@ -84,7 +99,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             // 搜索建议
             _searchSuggest(),
             // 热搜
@@ -135,7 +150,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+            padding: const EdgeInsets.fromLTRB(6, 0, 6, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -153,7 +168,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                       padding: MaterialStateProperty.all(const EdgeInsets.only(
                           left: 10, top: 6, bottom: 6, right: 10)),
                     ),
-                    onPressed: () => ctr.queryHotSearchList(),
+                    onPressed: ctr.queryHotSearchList,
                     icon: const Icon(Icons.refresh_outlined, size: 18),
                     label: const Text('刷新'),
                   ),
@@ -187,13 +202,10 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                         ),
                       );
                     } else {
-                      return CustomScrollView(
-                        slivers: [
-                          HttpError(
-                            errMsg: data['msg'],
-                            fn: () => setState(() {}),
-                          )
-                        ],
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () => setState(() {}),
+                        isInSliver: false,
                       );
                     }
                   } else {
@@ -202,6 +214,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                       return HotKeyword(
                         width: width,
                         hotSearchList: _searchController.hotSearchList,
+                        onClick: () {},
                       );
                     } else {
                       return const SizedBox();
@@ -220,13 +233,13 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Obx(
       () => Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(10, 25, 6, 0),
+        padding: const EdgeInsets.fromLTRB(10, 20, 4, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_searchController.historyList.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(6, 0, 0, 2),
+                padding: const EdgeInsets.fromLTRB(6, 0, 6, 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -237,10 +250,19 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                           .titleMedium!
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
-                    TextButton(
-                      onPressed: () => _searchController.onClearHis(),
-                      child: const Text('清空'),
-                    )
+                    SizedBox(
+                      height: 34,
+                      child: TextButton.icon(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.only(
+                                  left: 10, top: 6, bottom: 6, right: 10)),
+                        ),
+                        onPressed: _searchController.onClearHis,
+                        icon: const Icon(Icons.clear_all_outlined, size: 18),
+                        label: const Text('清空'),
+                      ),
+                    ),
                   ],
                 ),
               ),

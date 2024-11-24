@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:appscheme/appscheme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/main/index.dart';
@@ -19,6 +18,7 @@ import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/url_utils.dart';
@@ -26,7 +26,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'reply_save.dart';
 import 'zan.dart';
 
-Box setting = GStrorage.setting;
+Box setting = GStorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({
@@ -37,6 +37,7 @@ class ReplyItem extends StatelessWidget {
     this.replyReply,
     this.replyType,
     this.replySave = false,
+    this.onDelete,
     super.key,
   });
   final ReplyItemModel? replyItem;
@@ -45,24 +46,25 @@ class ReplyItem extends StatelessWidget {
   final bool? showReplyRow;
   final Function? replyReply;
   final ReplyType? replyType;
-  final bool? replySave;
+  final bool replySave;
+  final Function(int? rpid, int? frpid)? onDelete;
 
   @override
   Widget build(BuildContext context) {
+    final bool isOwner = int.parse(replyItem!.member!.mid!) ==
+        (GlobalDataCache.userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
         onTap: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
-          if (replyReply != null) {
-            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
-          }
+          replyReply?.call(replyItem, null, replyItem!.rcount! > 0);
         },
         onLongPress: () {
-          if (replySave!) {
+          if (replySave) {
             return;
           }
           feedBack();
@@ -74,6 +76,8 @@ class ReplyItem extends StatelessWidget {
               return MorePanel(
                 item: replyItem,
                 mainFloor: true,
+                isOwner: isOwner,
+                onDelete: onDelete,
               );
             },
           );
@@ -196,25 +200,36 @@ class ReplyItem extends StatelessWidget {
                         ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        Utils.dateFormat(replyItem!.ctime),
-                        style: TextStyle(
-                          fontSize: textTheme.labelSmall!.fontSize,
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      if (replyItem!.replyControl != null &&
-                          replyItem!.replyControl!.location != '')
-                        Text(
-                          ' • ${replyItem!.replyControl!.location!}',
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: Utils.dateFormat(replyItem!.ctime),
                           style: TextStyle(
-                              fontSize: textTheme.labelSmall!.fontSize,
-                              color: colorScheme.outline),
+                            fontSize: textTheme.labelSmall!.fontSize,
+                            color: colorScheme.outline,
+                          ),
                         ),
-                    ],
-                  )
+                        if (replyItem!.replyControl != null &&
+                            replyItem!.replyControl!.location != '')
+                          TextSpan(
+                            text: ' • ${replyItem!.replyControl!.location!}',
+                            style: TextStyle(
+                              fontSize: textTheme.labelSmall!.fontSize,
+                              color: colorScheme.outline,
+                            ),
+                          ),
+                        if (replyItem!.invisible!)
+                          TextSpan(
+                            text: ' • 隐藏的评论',
+                            style: TextStyle(
+                              color: colorScheme.outline,
+                              fontSize: textTheme.labelSmall!.fontSize,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -224,10 +239,10 @@ class ReplyItem extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(top: 10, left: 45, right: 6, bottom: 4),
           child: Text.rich(
-            style: const TextStyle(height: 1.75),
-            maxLines:
-                replyItem!.content!.isText! && replyLevel == '1' ? 3 : 999,
             overflow: TextOverflow.ellipsis,
+            maxLines:
+                replyLevel == '1' && replyItem!.content!.isText! ? 5 : 999,
+            style: const TextStyle(height: 1.75),
             TextSpan(
               children: [
                 if (replyItem!.isTop!)
@@ -241,7 +256,12 @@ class ReplyItem extends StatelessWidget {
                       fs: 9,
                     ),
                   ),
-                buildContent(context, replyItem!, replyReply, null),
+                buildContent(
+                  context,
+                  replyItem!,
+                  replyReply,
+                  null,
+                ),
               ],
             ),
           ),
@@ -249,9 +269,7 @@ class ReplyItem extends StatelessWidget {
         // 操作区域
         bottonAction(context, replyItem!.replyControl, replySave),
         // 一楼的评论
-        if ((replyItem!.replyControl!.isShow! ||
-                replyItem!.replies!.isNotEmpty) &&
-            showReplyRow!) ...[
+        if ((replyItem!.rcount! > 0) && showReplyRow!) ...[
           Padding(
             padding: const EdgeInsets.only(top: 5, bottom: 12),
             child: ReplyItemRow(
@@ -260,6 +278,7 @@ class ReplyItem extends StatelessWidget {
               // f_rpid: replyItem!.rpid,
               replyItem: replyItem,
               replyReply: replyReply,
+              onDelete: onDelete,
             ),
           ),
         ],
@@ -356,20 +375,19 @@ class ReplyItemRow extends StatelessWidget {
     super.key,
     this.replies,
     this.replyControl,
-    // this.f_rpid,
     this.replyItem,
     this.replyReply,
+    this.onDelete,
   });
   final List? replies;
   ReplyControl? replyControl;
-  // int? f_rpid;
   ReplyItemModel? replyItem;
   Function? replyReply;
+  final Function(int? rpid, int? frpid)? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    final bool isShow = replyControl!.isShow!;
-    final int extraRow = replyControl != null && isShow ? 1 : 0;
+    final int extraRow = replyItem!.rcount! > 0 ? 1 : 0;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -396,12 +414,18 @@ class ReplyItemRow extends StatelessWidget {
                   },
                   onLongPress: () {
                     feedBack();
+                    final bool isOwner = int.parse(replyItem!.member!.mid!) ==
+                        (GlobalDataCache.userInfo?.mid ?? -1);
                     showModalBottomSheet(
                       context: context,
                       useRootNavigator: true,
                       isScrollControlled: true,
                       builder: (context) {
-                        return MorePanel(item: replies![i]);
+                        return MorePanel(
+                          item: replies![i],
+                          isOwner: isOwner,
+                          onDelete: onDelete,
+                        );
                       },
                     );
                   },
@@ -451,7 +475,11 @@ class ReplyItemRow extends StatelessWidget {
                               ),
                             ),
                           buildContent(
-                              context, replies![i], replyReply, replyItem),
+                            context,
+                            replies![i],
+                            replyReply,
+                            replyItem,
+                          ),
                         ],
                       ),
                     ),
@@ -475,7 +503,7 @@ class ReplyItemRow extends StatelessWidget {
                         if (replyControl!.upReply!)
                           const TextSpan(text: 'up主等人 '),
                         TextSpan(
-                          text: replyControl!.entryText!,
+                          text: '查看${replyControl!.entryTextNum}条回复',
                           style: TextStyle(
                             color: colorScheme.primary,
                           ),
@@ -493,7 +521,11 @@ class ReplyItemRow extends StatelessWidget {
 }
 
 InlineSpan buildContent(
-    BuildContext context, replyItem, replyReply, fReplyItem) {
+  BuildContext context,
+  replyItem,
+  replyReply,
+  fReplyItem,
+) {
   final String routePath = Get.currentRoute;
   bool isVideoPage = routePath.startsWith('/video');
   ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -532,13 +564,6 @@ InlineSpan buildContent(
     });
   }
   content.message = content.message.replaceAll(RegExp(r"\{vote:.*?\}"), ' ');
-  content.message = content.message
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&apos;', "'")
-      .replaceAll('&nbsp;', ' ');
   // 构建正则表达式
   final List<String> specialTokens = [
     ...content.emote.keys,
@@ -583,34 +608,6 @@ InlineSpan buildContent(
         builder: (BuildContext context) => InteractiveviewerGallery(
           sources: picList,
           initIndex: initIndex,
-          itemBuilder: (
-            BuildContext context,
-            int index,
-            bool isFocus,
-            bool enablePageView,
-          ) {
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (enablePageView) {
-                  Navigator.of(context).pop();
-                  final MainController mainController =
-                      Get.find<MainController>();
-                  mainController.imgPreviewStatus = false;
-                }
-              },
-              child: Center(
-                child: Hero(
-                  tag: picList[index] + randomInt,
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 0),
-                    imageUrl: picList[index],
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            );
-          },
           onPageChanged: (int pageIndex) {},
           onDismissed: (int value) {
             print('onDismissed');
@@ -727,26 +724,23 @@ InlineSpan buildContent(
                           '',
                         );
                       } else if (RegExp(r'^cv\d+$').hasMatch(matchStr)) {
-                        Get.toNamed(
-                          '/webview',
-                          parameters: {
-                            'url': 'https://www.bilibili.com/read/$matchStr',
-                            'type': 'url',
-                            'pageTitle': title
-                          },
-                        );
+                        Get.toNamed('/read', parameters: {
+                          'title': title,
+                          'id': Utils.matchNum(matchStr).first.toString(),
+                          'articleType': 'read',
+                        });
                       } else {
                         Uri uri = Uri.parse(matchStr.replaceAll('/?', '?'));
-                        SchemeEntity scheme = SchemeEntity(
+                        Uri scheme = Uri(
                           scheme: uri.scheme,
                           host: uri.host,
                           port: uri.port,
                           path: uri.path,
-                          query: uri.queryParameters,
-                          source: '',
-                          dataString: matchStr,
+                          // query: uri.queryParameters,
+                          // source: '',
+                          // dataString: matchStr,
                         );
-                        PiliSchame.fullPathPush(scheme);
+                        PiliSchame.httpsScheme(scheme);
                       }
                     } else {
                       if (appUrlSchema.startsWith('bilibili://search')) {
@@ -890,6 +884,7 @@ InlineSpan buildContent(
       }
     }
   }
+
   // 图片渲染
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
@@ -1033,10 +1028,14 @@ InlineSpan buildContent(
 class MorePanel extends StatelessWidget {
   final dynamic item;
   final bool mainFloor;
+  final bool isOwner;
+  final Function(int? rpid, int? frpid)? onDelete;
   const MorePanel({
     super.key,
     required this.item,
     this.mainFloor = false,
+    this.isOwner = false,
+    this.onDelete,
   });
 
   Future<dynamic> menuActionHandler(String type) async {
@@ -1072,9 +1071,43 @@ class MorePanel extends StatelessWidget {
       // case 'report':
       //   SmartDialog.showToast('举报');
       //   break;
-      // case 'delete':
-      //   SmartDialog.showToast('删除');
-      //   break;
+      case 'delete':
+        // 删除评论提示
+        await showDialog(
+          context: Get.context!,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('删除评论'),
+              content: const Text('删除评论后，评论下所有回复将被删除，确定删除吗？'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('取消',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Get.back();
+                    var result = await ReplyHttp.replyDel(
+                      type: item.type!,
+                      oid: item.oid!,
+                      rpid: item.rpid!,
+                    );
+                    if (result['status']) {
+                      onDelete?.call(item.rpid!, item.root);
+                      Get.back();
+                    } else {
+                      SmartDialog.showToast(result['msg']);
+                    }
+                  },
+                  child: const Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+        break;
       default:
     }
   }
@@ -1083,6 +1116,7 @@ class MorePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
+    Color errorColor = colorScheme.error;
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
@@ -1135,12 +1169,14 @@ class MorePanel extends StatelessWidget {
           //   leading: Icon(Icons.report_outlined, color: errorColor),
           //   title: Text('举报', style: TextStyle(color: errorColor)),
           // ),
-          // ListTile(
-          //   onTap: () async => await menuActionHandler('del'),
-          //   minLeadingWidth: 0,
-          //   leading: Icon(Icons.delete_outline, color: errorColor),
-          //   title: Text('删除', style: TextStyle(color: errorColor)),
-          // ),
+          if (isOwner)
+            ListTile(
+              onTap: () async => await menuActionHandler('delete'),
+              minLeadingWidth: 0,
+              leading: Icon(Icons.delete_outline, color: errorColor),
+              title: Text('删除评论',
+                  style: textTheme.titleSmall!.copyWith(color: errorColor)),
+            ),
         ],
       ),
     );

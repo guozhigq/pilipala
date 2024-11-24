@@ -63,7 +63,7 @@ class LiveFollowingItemModel {
   String? roomNews;
   String? watchIcon;
   String? textSmall;
-  String? roomCover;
+  String? cover;
   String? pic;
   int? parentAreaId;
   int? areaId;
@@ -90,7 +90,7 @@ class LiveFollowingItemModel {
     this.roomNews,
     this.watchIcon,
     this.textSmall,
-    this.roomCover,
+    this.cover,
     this.pic,
     this.parentAreaId,
     this.areaId,
@@ -108,7 +108,8 @@ class LiveFollowingItemModel {
     isAttention = json['is_attention'];
     clipNum = json['clipnum'];
     fansNum = json['fans_num'];
-    areaName = json['area_name'];
+    areaName =
+        json['area_name'] == '' ? json['area_name_v2'] : json['area_name'];
     areaValue = json['area_value'];
     tags = json['tags'];
     recentRecordIdV2 = json['recent_record_id_v2'];
@@ -118,7 +119,7 @@ class LiveFollowingItemModel {
     roomNews = json['room_news'];
     watchIcon = json['watch_icon'];
     textSmall = json['text_small'];
-    roomCover = json['room_cover'];
+    cover = json['room_cover'];
     pic = json['room_cover'];
     parentAreaId = json['parent_area_id'];
     areaId = json['area_id'];

@@ -22,7 +22,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
   late final ScrollController _controller = ScrollController();
   final FavDetailController _favDetailController =
       Get.put(FavDetailController());
-  late StreamController<bool> titleStreamC; // a
+  late StreamController<bool> titleStreamC =
+      StreamController<bool>.broadcast(); // a
   Future? _futureBuilderFuture;
   late String mediaId;
 
@@ -31,7 +32,6 @@ class _FavDetailPageState extends State<FavDetailPage> {
     super.initState();
     mediaId = Get.parameters['mediaId']!;
     _futureBuilderFuture = _favDetailController.queryUserFavFolderDetail();
-    titleStreamC = StreamController<bool>();
     _controller.addListener(
       () {
         if (_controller.offset > 160) {
@@ -80,9 +80,11 @@ class _FavDetailPageState extends State<FavDetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _favDetailController.item!.title!,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => Text(
+                              _favDetailController.title.value,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                           Text(
                             '共${_favDetailController.mediaCount}条视频',
@@ -156,14 +158,16 @@ class _FavDetailPageState extends State<FavDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text(
-                              _favDetailController.item!.title!,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .fontSize,
-                                  fontWeight: FontWeight.bold),
+                            Obx(
+                              () => Text(
+                                _favDetailController.title.value,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .fontSize,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -189,7 +193,9 @@ class _FavDetailPageState extends State<FavDetailPage> {
               padding: const EdgeInsets.only(top: 15, bottom: 8, left: 14),
               child: Obx(
                 () => Text(
-                  '共${_favDetailController.mediaCount}条视频',
+                  _favDetailController.mediaCount > 0
+                      ? '共${_favDetailController.mediaCount}条视频'
+                      : '',
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.labelMedium!.fontSize,
@@ -211,7 +217,7 @@ class _FavDetailPageState extends State<FavDetailPage> {
                     List favList = _favDetailController.favList;
                     return Obx(
                       () => favList.isEmpty
-                          ? const SliverToBoxAdapter(child: SizedBox())
+                          ? const NoData()
                           : SliverList(
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
@@ -220,6 +226,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                   isOwner: _favDetailController.isOwner,
                                   callFn: () => _favDetailController
                                       .onCancelFav(favList[index].id),
+                                  viewInvalidVideoCb: () => _favDetailController
+                                      .toViewInvalidVideo(favList[index]),
                                 );
                               }, childCount: favList.length),
                             ),
@@ -243,22 +251,33 @@ class _FavDetailPageState extends State<FavDetailPage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              height: MediaQuery.of(context).padding.bottom + 60,
+              height: MediaQuery.of(context).padding.bottom + 90,
               padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).padding.bottom),
               child: Center(
-                child: Obx(
-                  () => Text(
-                    _favDetailController.loadingText.value,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize: 13),
-                  ),
-                ),
+                child: Obx(() {
+                  final mediaCount = _favDetailController.mediaCount;
+                  final loadingText = _favDetailController.loadingText.value;
+                  final textColor = Theme.of(context).colorScheme.outline;
+
+                  return Text(
+                    mediaCount > 0 ? loadingText : '',
+                    style: TextStyle(color: textColor, fontSize: 13),
+                  );
+                }),
               ),
             ),
           )
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _favDetailController.mediaCount > 0
+            ? FloatingActionButton.extended(
+                onPressed: _favDetailController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }

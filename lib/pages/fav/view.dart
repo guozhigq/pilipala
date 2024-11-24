@@ -40,11 +40,8 @@ class _FavPageState extends State<FavPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
         title: Obx(() => Text(
               '${_favController.isOwner.value ? '我' : 'Ta'}的收藏',
-              style: Theme.of(context).textTheme.titleMedium,
             )),
         actions: [
           Obx(() => !_favController.isOwner.value
@@ -79,56 +76,64 @@ class _FavPageState extends State<FavPage> {
           const SizedBox(width: 14),
         ],
       ),
-      body: FutureBuilder(
-        future: _futureBuilderFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            Map? data = snapshot.data;
-            if (data != null && data['status']) {
-              return Obx(
-                () => ListView.builder(
-                  controller: scrollController,
-                  itemCount: _favController.favFolderList.length,
-                  itemBuilder: (context, index) {
-                    return FavItem(
-                      favFolderItem: _favController.favFolderList[index],
-                      isOwner: _favController.isOwner.value,
-                    );
-                  },
-                ),
-              );
-            } else {
-              return CustomScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                slivers: [
-                  HttpError(
-                    errMsg: data?['msg'] ?? '请求异常',
-                    btnText: data?['code'] == -101 ? '去登录' : null,
-                    fn: () {
-                      if (data?['code'] == -101) {
-                        RoutePush.loginRedirectPush();
-                      } else {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _favController.queryFavFolder();
-                        });
-                      }
-                    },
-                  ),
-                ],
-              );
-            }
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _favController.hasMore.value = true;
+          _favController.currentPage = 1;
+          setState(() {
+            _futureBuilderFuture = _favController.queryFavFolder(type: 'init');
+          });
+        },
+        child: _buildBody(),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return FutureBuilder(
+      future: _futureBuilderFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map? data = snapshot.data;
+          if (data != null && data['status']) {
+            return Obx(
+              () => ListView.builder(
+                controller: scrollController,
+                itemCount: _favController.favFolderList.length,
+                itemBuilder: (context, index) {
+                  return FavItem(
+                    favFolderItem: _favController.favFolderList[index],
+                    isOwner: _favController.isOwner.value,
+                  );
+                },
+              ),
+            );
           } else {
-            // 骨架屏
-            return ListView.builder(
-              itemBuilder: (context, index) {
-                return const VideoCardHSkeleton();
+            return HttpError(
+              errMsg: data?['msg'] ?? '请求异常',
+              btnText: data?['code'] == -101 ? '去登录' : null,
+              fn: () {
+                if (data?['code'] == -101) {
+                  RoutePush.loginRedirectPush();
+                } else {
+                  setState(() {
+                    _futureBuilderFuture = _favController.queryFavFolder();
+                  });
+                }
               },
-              itemCount: 10,
+              isInSliver: false,
             );
           }
-        },
-      ),
+        } else {
+          // 骨架屏
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              return const VideoCardHSkeleton();
+            },
+            itemCount: 10,
+          );
+        }
+      },
     );
   }
 }

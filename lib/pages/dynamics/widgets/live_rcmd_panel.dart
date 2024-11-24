@@ -66,76 +66,85 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
         },
         child: LayoutBuilder(builder: (context, box) {
           double width = box.maxWidth;
-          return Stack(
-            children: [
-              Hero(
-                tag: liveRcmd.roomId.toString(),
-                child: NetworkImgLayer(
-                  type: floor == 1 ? 'emote' : null,
-                  width: width,
-                  height: width / StyleString.aspectRatio,
-                  src: item.modules.moduleDynamic.major.liveRcmd.cover,
-                ),
-              ),
-              PBadge(
-                text: watchedShow['text_large'],
-                top: 6,
-                right: 56,
-                bottom: null,
-                left: null,
-                type: 'gray',
-              ),
-              PBadge(
-                text: liveStatus == 1 ? '直播中' : '直播结束',
-                top: 6,
-                right: 6,
-                bottom: null,
-                left: null,
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  height: 80,
-                  padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: <Color>[
-                          Colors.transparent,
-                          Colors.black45,
-                        ],
-                      ),
-                      borderRadius: floor == 1
-                          ? null
-                          : const BorderRadius.all(Radius.circular(6))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      DefaultTextStyle.merge(
-                        style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .fontSize,
-                            color: Colors.white),
-                        child: Row(
-                          children: [
-                            Text(item.modules.moduleDynamic.major.liveRcmd
-                                    .areaName ??
-                                ''),
-                          ],
-                        ),
-                      ),
-                    ],
+          return Container(
+            margin: floor == 1
+                ? const EdgeInsets.only(
+                    left: StyleString.safeSpace, right: StyleString.safeSpace)
+                : EdgeInsets.zero,
+            clipBehavior: Clip.hardEdge,
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(StyleString.imgRadius)),
+            child: Stack(
+              children: [
+                Hero(
+                  tag: liveRcmd.roomId.toString(),
+                  child: NetworkImgLayer(
+                    type: floor == 1 ? 'emote' : null,
+                    width: width,
+                    height: width / StyleString.aspectRatio,
+                    src: item.modules.moduleDynamic.major.liveRcmd.cover,
                   ),
                 ),
-              ),
-            ],
+                PBadge(
+                  text: watchedShow['text_large'],
+                  top: 8.0,
+                  right: 62.0,
+                  bottom: null,
+                  left: null,
+                  type: 'gray',
+                ),
+                PBadge(
+                  text: liveStatus == 1 ? '直播中' : '直播结束',
+                  top: 8.0,
+                  right: 10.0,
+                  bottom: null,
+                  left: null,
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 80,
+                    padding: const EdgeInsets.fromLTRB(12, 0, 10, 10),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: <Color>[
+                            Colors.transparent,
+                            Colors.black45,
+                          ],
+                        ),
+                        borderRadius: floor == 1
+                            ? null
+                            : const BorderRadius.all(Radius.circular(6))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        DefaultTextStyle.merge(
+                          style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .fontSize,
+                              color: Colors.white),
+                          child: Row(
+                            children: [
+                              Text(item.modules.moduleDynamic.major.liveRcmd
+                                      .areaName ??
+                                  ''),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         }),
       ),

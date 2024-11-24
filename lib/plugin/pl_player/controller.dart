@@ -27,9 +27,9 @@ import '../../models/video/subTitile/content.dart';
 import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-Box videoStorage = GStrorage.video;
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
+Box videoStorage = GStorage.video;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -278,19 +278,18 @@ class PlPlayerController {
 
   // 添加一个私有构造函数
   PlPlayerController._internal(this.videoType) {
-    final cache = GlobalDataCache();
-    isOpenDanmu.value = cache.isOpenDanmu;
-    blockTypes = cache.blockTypes;
-    showArea = cache.showArea;
-    opacityVal = cache.opacityVal;
-    fontSizeVal = cache.fontSizeVal;
-    danmakuDurationVal = cache.danmakuDurationVal;
-    strokeWidth = cache.strokeWidth;
-    playRepeat = cache.playRepeat;
-    _playbackSpeed.value = cache.playbackSpeed;
-    enableAutoLongPressSpeed = cache.enableAutoLongPressSpeed;
-    _longPressSpeed.value = cache.longPressSpeed;
-    speedsList = cache.speedsList;
+    isOpenDanmu.value = GlobalDataCache.isOpenDanmu;
+    blockTypes = GlobalDataCache.blockTypes;
+    showArea = GlobalDataCache.showArea;
+    opacityVal = GlobalDataCache.opacityVal;
+    fontSizeVal = GlobalDataCache.fontSizeVal;
+    danmakuDurationVal = GlobalDataCache.danmakuDurationVal;
+    strokeWidth = GlobalDataCache.strokeWidth;
+    playRepeat = GlobalDataCache.playRepeat;
+    _playbackSpeed.value = GlobalDataCache.playbackSpeed;
+    enableAutoLongPressSpeed = GlobalDataCache.enableAutoLongPressSpeed;
+    _longPressSpeed.value = GlobalDataCache.longPressSpeed;
+    speedsList = GlobalDataCache.speedsList;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -929,6 +928,11 @@ class PlPlayerController {
     showControls.value = !val;
   }
 
+  /// 设置/更新顶部控制栏
+  void setHeaderControl(PreferredSizeWidget? widget) {
+    headerControl = widget;
+  }
+
   void toggleFullScreen(bool val) {
     _isFullScreen.value = val;
   }
@@ -1033,6 +1037,8 @@ class PlPlayerController {
         if (progress >= content['from']! && progress <= content['to']!) {
           subtitleContent.value = content['content']!;
           return;
+        } else {
+          subtitleContent.value = '';
         }
       }
     }
@@ -1045,6 +1051,13 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
+    GlobalDataCache.blockTypes = blockTypes;
+    GlobalDataCache.showArea = showArea;
+    GlobalDataCache.opacityVal = opacityVal;
+    GlobalDataCache.fontSizeVal = fontSizeVal;
+    GlobalDataCache.danmakuDurationVal = danmakuDurationVal;
+    GlobalDataCache.strokeWidth = strokeWidth;
+
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
     localCache.put(LocalCacheKey.danmakuOpacity, opacityVal);

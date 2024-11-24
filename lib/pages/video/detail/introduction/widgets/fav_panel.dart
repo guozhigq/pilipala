@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/logic_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FavPanel extends StatefulWidget {
@@ -16,7 +16,7 @@ class FavPanel extends StatefulWidget {
 }
 
 class _FavPanelState extends State<FavPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   late Future _futureBuilderFuture;
 
   @override
@@ -30,10 +30,14 @@ class _FavPanelState extends State<FavPanel> {
     return Column(
       children: [
         AppBar(
-          centerTitle: false,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          leadingWidth: 0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: const Icon(Icons.close_outlined)),
           title: Text(
             '选择收藏夹',
             style: Theme.of(context)
@@ -61,16 +65,13 @@ class _FavPanelState extends State<FavPanel> {
                             onTap: () =>
                                 widget.ctr!.onChoose(item.favState != 1, index),
                             dense: true,
-                            leading: Icon([23, 1].contains(item.attr)
-                                ? Icons.lock_outline
-                                : Icons.folder_outlined),
+                            leading: Icon(LogicUtils.isPublic(item.attr)
+                                ? Icons.folder_outlined
+                                : Icons.lock_outline),
                             minLeadingWidth: 0,
                             title: Text(item.title!),
                             subtitle: Text(
-                              '${item.mediaCount}个内容 - ${[
-                                23,
-                                1
-                              ].contains(item.attr) ? '私密' : '公开'}',
+                              '${item.mediaCount}个内容 - ${LogicUtils.isPublic(item.attr) ? '公开' : '私密'}',
                             ),
                             trailing: Transform.scale(
                               scale: 0.9,
@@ -92,7 +93,7 @@ class _FavPanelState extends State<FavPanel> {
                   }
                 } else {
                   // 骨架屏
-                  return const Text('请求中');
+                  return const Center(child: Text('请求中'));
                 }
               },
             ),

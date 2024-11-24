@@ -269,25 +269,46 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Container(
                             margin: const EdgeInsets.only(top: 38, bottom: 15),
-                            child: TextFormField(
-                              controller: _loginPageCtr.passwordTextController,
-                              focusNode: _loginPageCtr.passwordTextFieldNode,
-                              keyboardType: TextInputType.visiblePassword,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                labelText: '输入密码',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                              ),
-                              // 校验用户名
-                              validator: (v) {
-                                return v!.trim().isNotEmpty ? null : "密码不能为空";
-                              },
-                              onSaved: (val) {
-                                print(val);
-                              },
-                            ),
+                            child: Obx(() => TextFormField(
+                                  controller:
+                                      _loginPageCtr.passwordTextController,
+                                  focusNode:
+                                      _loginPageCtr.passwordTextFieldNode,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  obscureText:
+                                      _loginPageCtr.passwordVisible.value,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    labelText: '输入密码',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6.0),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _loginPageCtr.passwordVisible.value
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                      onPressed: () {
+                                        _loginPageCtr.passwordVisible.value =
+                                            !_loginPageCtr
+                                                .passwordVisible.value;
+                                      },
+                                    ),
+                                  ),
+                                  // 校验用户名
+                                  validator: (v) {
+                                    return v!.trim().isNotEmpty
+                                        ? null
+                                        : "密码不能为空";
+                                  },
+                                  onSaved: (val) {
+                                    print(val);
+                                  },
+                                )),
                           ),
                           const Spacer(),
                           Row(

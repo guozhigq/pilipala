@@ -1,19 +1,16 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-// import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
-import 'api.dart';
 import 'constants.dart';
 import 'interceptor.dart';
 
@@ -22,19 +19,17 @@ class Request {
   static late CookieManager cookieManager;
   static late final Dio dio;
   factory Request() => _instance;
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
-  static final RegExp spmPrefixExp =
-      RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
   static String? buvid;
 
   /// 设置cookie
   static setCookie() async {
-    Box userInfoCache = GStrorage.userInfo;
-    Box setting = GStrorage.setting;
+    Box userInfoCache = GStorage.userInfo;
+    Box setting = GStorage.setting;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -44,7 +39,7 @@ class Request {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    final userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
@@ -62,11 +57,6 @@ class Request {
       baseUrlType = 'bangumi';
     }
     setBaseUrl(type: baseUrlType);
-    try {
-      await buvidActivate();
-    } catch (e) {
-      log("setCookie, ${e.toString()}");
-    }
 
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
@@ -122,30 +112,6 @@ class Request {
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
   }
 
-  static Future buvidActivate() async {
-    var html = await Request().get(Api.dynamicSpmPrefix);
-    String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
-    Random rand = Random();
-    String rand_png_end = base64.encode(
-        List<int>.generate(32, (_) => rand.nextInt(256)) +
-            List<int>.filled(4, 0) +
-            [73, 69, 78, 68] +
-            List<int>.generate(4, (_) => rand.nextInt(256)));
-
-    String jsonData = json.encode({
-      '3064': 1,
-      '39c8': '${spmPrefix}.fp.risk',
-      '3c43': {
-        'adca': 'Linux',
-        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
-      },
-    });
-
-    await Request().post(Api.activateBuvidApi,
-        data: {'payload': jsonData},
-        options: Options(contentType: 'application/json'));
-  }
-
   /*
    * config it and create
    */
@@ -170,15 +136,6 @@ class Request {
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
 
     dio = Dio(options);
-
-    /// fix 第三方登录 302重定向 跟iOS代理问题冲突
-    // ..httpClientAdapter = Http2Adapter(
-    //   ConnectionManager(
-    //     idleTimeout: const Duration(milliseconds: 10000),
-    //     onClientCreate: (_, ClientSetting config) =>
-    //         config.onBadCertificate = (_) => true,
-    //   ),
-    // );
 
     /// 设置代理
     if (enableSystemProxy) {
@@ -217,18 +174,15 @@ class Request {
   /*
    * get请求
    */
-  get(url, {data, options, cancelToken, extra}) async {
+  get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    final Options options = Options();
-    ResponseType resType = ResponseType.json;
     if (extra != null) {
-      resType = extra!['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
-        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+        options ??= Options();
+        options.headers ??= <String, dynamic>{};
+        options.headers?['user-agent'] = headerUa(type: extra['ua']);
       }
     }
-    options.responseType = resType;
-
     try {
       response = await dio.get(
         url,
@@ -238,32 +192,44 @@ class Request {
       );
       return response;
     } on DioException catch (e) {
-      Response errResponse = Response(
-        data: {
-          'message': await ApiInterceptor.dioError(e)
-        }, // 将自定义 Map 数据赋值给 Response 的 data 属性
+      return Response(
+        data: {'message': await ApiInterceptor.dioError(e)},
         statusCode: 200,
         requestOptions: RequestOptions(),
       );
-      return errResponse;
     }
+  }
+
+  /*
+   * get请求
+   */
+  getWithoutCookie(url, {data}) {
+    return get(
+      url,
+      data: data,
+      options: Options(
+        headers: {
+          'cookie': 'buvid3= ; b_nut= ; sid= ',
+          'user-agent': headerUa(type: 'pc'),
+        },
+      ),
+    );
   }
 
   /*
    * post请求
    */
   post(url, {data, queryParameters, options, cancelToken, extra}) async {
-    // print('post-data: $data');
     Response response;
     try {
       response = await dio.post(
         url,
         data: data,
         queryParameters: queryParameters,
-        options: options,
+        options:
+            options ?? Options(contentType: Headers.formUrlEncodedContentType),
         cancelToken: cancelToken,
       );
-      // print('post success: ${response.data}');
       return response;
     } on DioException catch (e) {
       Response errResponse = Response(
@@ -319,7 +285,7 @@ class Request {
       }
     } else {
       headerUa =
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36';
     }
     return headerUa;
   }

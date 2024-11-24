@@ -94,13 +94,14 @@ class _FollowListState extends State<FollowList> {
                     : const CustomScrollView(slivers: [NoData()]),
               );
             } else {
-              return CustomScrollView(
-                slivers: [
-                  HttpError(
-                    errMsg: data['msg'],
-                    fn: () => widget.ctr.queryFollowings('init'),
-                  )
-                ],
+              return HttpError(
+                errMsg: data['msg'],
+                fn: () {
+                  setState(() {
+                    _futureBuilderFuture = widget.ctr.queryFollowings('init');
+                  });
+                },
+                isInSliver: false,
               );
             }
           } else {

@@ -49,7 +49,6 @@ class _MemberSearchPageState extends State<MemberSearchPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
         actions: [
           IconButton(
               onPressed: () => _memberSearchCtr.submit(),
@@ -164,13 +163,10 @@ class _MemberSearchPageState extends State<MemberSearchPage>
                                         ),
                             );
                           } else {
-                            return CustomScrollView(
-                              slivers: <Widget>[
-                                HttpError(
-                                  errMsg: data['msg'],
-                                  fn: () => setState(() {}),
-                                )
-                              ],
+                            return HttpError(
+                              errMsg: data['msg'],
+                              fn: () => setState(() {}),
+                              isInSliver: false,
                             );
                           }
                         } else {

@@ -1,13 +1,12 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/utils/utils.dart';
-
+import '../utils/index.dart';
 import 'controller.dart';
 
 class MessageLikePage extends StatefulWidget {
@@ -48,9 +47,7 @@ class _MessageLikePageState extends State<MessageLikePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('收到的赞'),
-      ),
+      appBar: AppBar(title: const Text('收到的赞')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageLikeCtr.queryMessageLike(type: 'init');
@@ -59,44 +56,40 @@ class _MessageLikePageState extends State<MessageLikePage> {
           future: _futureBuilderFuture,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.data == null) {
-                return const SizedBox();
-              }
-              if (snapshot.data['status']) {
+              Map? data = snapshot.data;
+              if (data != null && data['status']) {
                 final likeItems = _messageLikeCtr.likeItems;
                 return Obx(
-                  () => ListView.separated(
-                    controller: scrollController,
-                    itemBuilder: (context, index) => LikeItem(
-                      item: likeItems[index],
-                      index: index,
-                      messageLikeCtr: _messageLikeCtr,
-                    ),
-                    itemCount: likeItems.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
-                        indent: 66,
-                        endIndent: 14,
-                        height: 1,
-                        color: Colors.grey.withOpacity(0.1),
-                      );
-                    },
-                  ),
+                  () => likeItems.isEmpty
+                      ? const CustomScrollView(slivers: [NoData()])
+                      : ListView.separated(
+                          controller: scrollController,
+                          itemBuilder: (context, index) => LikeItem(
+                            item: likeItems[index],
+                            index: index,
+                            messageLikeCtr: _messageLikeCtr,
+                          ),
+                          itemCount: likeItems.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return Divider(
+                              indent: 66,
+                              endIndent: 14,
+                              height: 1,
+                              color: Colors.grey.withOpacity(0.1),
+                            );
+                          },
+                        ),
                 );
               } else {
                 // 请求错误
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
-                      errMsg: snapshot.data['msg'],
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _messageLikeCtr.queryMessageLike();
-                        });
-                      },
-                    )
-                  ],
+                return HttpError(
+                  errMsg: data?['msg'] ?? '请求异常',
+                  fn: () {
+                    setState(() {
+                      _futureBuilderFuture = _messageLikeCtr.queryMessageLike();
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {
@@ -125,32 +118,14 @@ class LikeItem extends StatelessWidget {
     Color outline = Theme.of(context).colorScheme.outline;
     final nickNameList = item.users!.map((e) => e.nickname).take(2).toList();
     int usersLen = item.users!.length > 3 ? 3 : item.users!.length;
-    final String bvid = item.item!.uri!.split('/').last;
-    // 页码
-    final String page =
-        item.item!.nativeUri!.split('page=').last.split('&').first;
-    // 根评论id
-    final String commentRootId =
-        item.item!.nativeUri!.split('comment_root_id=').last.split('&').first;
-    // 二级评论id
-    final String commentSecondaryId =
-        item.item!.nativeUri!.split('comment_secondary_id=').last;
+    final Uri uri = Uri.parse(item.item!.uri!);
 
+    /// bilibili://
+    final Uri nativeUri = Uri.parse(item.item!.nativeUri!);
+    final String type = item.item!.type!;
     return InkWell(
       onTap: () async {
-        try {
-          final int cid = await SearchHttp.ab2c(bvid: bvid);
-          final String heroTag = Utils.makeHeroTag(bvid);
-          Get.toNamed<dynamic>(
-            '/video?bvid=$bvid&cid=$cid',
-            arguments: <String, String?>{
-              'pic': '',
-              'heroTag': heroTag,
-            },
-          );
-        } catch (_) {
-          SmartDialog.showToast('视频可能失效了');
-        }
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, null);
       },
       child: Stack(
         children: [
@@ -222,7 +197,7 @@ class LikeItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 25),
-                if (item.item!.type! == 'reply')
+                if (type == 'reply' || type == 'danmu')
                   Container(
                     width: 60,
                     height: 60,
@@ -234,11 +209,12 @@ class LikeItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                if (item.item!.type! == 'video')
+                if (type == 'video')
                   NetworkImgLayer(
                     width: 60,
                     height: 60,
                     src: item.item!.image,
+                    radius: 6,
                   ),
               ],
             ),

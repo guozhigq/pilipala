@@ -7,6 +7,9 @@ class HttpString {
   static const String passBaseUrl = 'https://passport.bilibili.com';
   static const String messageBaseUrl = 'https://message.bilibili.com';
   static const String bangumiBaseUrl = 'https://bili.meark.me';
+  static const String sponsorBlockBaseUrl = 'https://www.bsbsb.top';
+  static const String biliplusBaseUrl = 'https://www.biliplus.com';
+
   static const List<int> validateStatusCodes = [
     302,
     304,

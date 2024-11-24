@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/pages/message/utils/index.dart';
 import 'package:pilipala/utils/utils.dart';
-
 import 'controller.dart';
 
 class MessageReplyPage extends StatefulWidget {
@@ -48,9 +48,7 @@ class _MessageReplyPageState extends State<MessageReplyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('回复我的'),
-      ),
+      appBar: AppBar(title: const Text('回复我的')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageReplyCtr.queryMessageReply(type: 'init');
@@ -59,41 +57,38 @@ class _MessageReplyPageState extends State<MessageReplyPage> {
           future: _futureBuilderFuture,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.data == null) {
-                return const SizedBox();
-              }
-              if (snapshot.data['status']) {
+              Map? data = snapshot.data;
+              if (data != null && data['status']) {
                 final replyItems = _messageReplyCtr.replyItems;
                 return Obx(
-                  () => ListView.separated(
-                    controller: scrollController,
-                    itemBuilder: (context, index) =>
-                        ReplyItem(item: replyItems[index]),
-                    itemCount: replyItems.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
-                        indent: 66,
-                        endIndent: 14,
-                        height: 1,
-                        color: Colors.grey.withOpacity(0.1),
-                      );
-                    },
-                  ),
+                  () => replyItems.isEmpty
+                      ? const CustomScrollView(slivers: [NoData()])
+                      : ListView.separated(
+                          controller: scrollController,
+                          itemBuilder: (context, index) =>
+                              ReplyItem(item: replyItems[index]),
+                          itemCount: replyItems.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return Divider(
+                              indent: 66,
+                              endIndent: 14,
+                              height: 1,
+                              color: Colors.grey.withOpacity(0.1),
+                            );
+                          },
+                        ),
                 );
               } else {
                 // 请求错误
-                return CustomScrollView(
-                  slivers: [
-                    HttpError(
-                      errMsg: snapshot.data['msg'],
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _messageReplyCtr.queryMessageReply();
-                        });
-                      },
-                    )
-                  ],
+                return HttpError(
+                  errMsg: data?['msg'] ?? '请求异常',
+                  fn: () {
+                    setState(() {
+                      _futureBuilderFuture =
+                          _messageReplyCtr.queryMessageReply();
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {
@@ -115,28 +110,14 @@ class ReplyItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Color outline = Theme.of(context).colorScheme.outline;
     final String heroTag = Utils.makeHeroTag(item.user!.mid);
-    final String bvid = item.item!.uri!.split('/').last;
-    // 页码
-    final String page =
-        item.item!.nativeUri!.split('page=').last.split('&').first;
-    // 根评论id
-    final String commentRootId =
-        item.item!.nativeUri!.split('comment_root_id=').last.split('&').first;
-    // 二级评论id
-    final String commentSecondaryId =
-        item.item!.nativeUri!.split('comment_secondary_id=').last;
+    final Uri uri = Uri.parse(item.item!.uri!);
 
+    /// bilibili://
+    final Uri nativeUri = Uri.parse(item.item!.nativeUri!);
+    final String type = item.item!.type!;
     return InkWell(
       onTap: () async {
-        final int cid = await SearchHttp.ab2c(bvid: bvid);
-        final String heroTag = Utils.makeHeroTag(bvid);
-        Get.toNamed<dynamic>(
-          '/video?bvid=$bvid&cid=$cid',
-          arguments: <String, String?>{
-            'pic': '',
-            'heroTag': heroTag,
-          },
-        );
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, item.item!);
       },
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -174,6 +155,9 @@ class ReplyItem extends StatelessWidget {
                         text: '回复了我的评论',
                         style: TextStyle(color: outline),
                       ),
+                    if (item.item!.type! == 'dynamic')
+                      TextSpan(
+                          text: '对我的动态发表了评论', style: TextStyle(color: outline)),
                   ])),
                   const SizedBox(height: 6),
                   Text.rich(
@@ -216,10 +200,32 @@ class ReplyItem extends StatelessWidget {
                 ),
               ),
             if (item.item!.type! == 'video')
-              NetworkImgLayer(
+              // NetworkImgLayer(
+              //   width: 60,
+              //   height: 60,
+              //   src: item.item!.image,
+              //   radius: 6,
+              // ),
+              Container(
                 width: 60,
                 height: 60,
-                src: item.item!.image,
+                clipBehavior: Clip.hardEdge,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                ),
+                child: Image.network(item.item!.image!, fit: BoxFit.cover),
+              ),
+            if (item.item!.type! == 'dynamic')
+              Container(
+                width: 60,
+                height: 80,
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                  item.item!.title!,
+                  maxLines: 4,
+                  style: const TextStyle(fontSize: 12, letterSpacing: 0.3),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
           ],
         ),

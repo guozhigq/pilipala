@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/member/seasons.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 
 class MemberSeasonsController extends GetxController {
   final ScrollController scrollController = ScrollController();
@@ -24,7 +25,8 @@ class MemberSeasonsController extends GetxController {
       seasonId = int.parse(Get.parameters['seasonId']!);
     }
     if (category == '1') {
-      seriesId = int.parse(Get.parameters['seriesId']!);
+      seriesId = int.tryParse(Get.parameters['seriesId']!);
+      seasonId = int.tryParse(Get.parameters['seasonId']!);
     }
   }
 
@@ -57,7 +59,7 @@ class MemberSeasonsController extends GetxController {
       mid: mid,
       seriesId: seriesId!,
       pn: pn,
-      currentMid: 17340771,
+      currentMid: GlobalDataCache.userInfo?.mid ?? -1,
     );
     if (res['status']) {
       seasonsList.addAll(res['data'].seriesList);
@@ -73,7 +75,27 @@ class MemberSeasonsController extends GetxController {
       getSeasonDetail('onLoad');
     }
     if (category == '1') {
-      getSeriesDetail('onLoad');
+      if (seasonId != null) {
+        getSeasonDetail('onLoad');
+      }
+      if (seriesId != null) {
+        getSeriesDetail('onLoad');
+      }
+    }
+  }
+
+  // 下拉刷新
+  Future onRefresh() async {
+    if (category == '0') {
+      return getSeasonDetail('onRefresh');
+    }
+    if (category == '1') {
+      if (seasonId != null) {
+        return getSeasonDetail('onRefresh');
+      }
+      if (seriesId != null) {
+        return getSeriesDetail('onRefresh');
+      }
     }
   }
 }
