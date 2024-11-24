@@ -55,6 +55,8 @@ class GlobalDataCache {
   static late bool enableDynamicSwitch;
   // 投屏开关
   static bool enableDlna = false;
+  // sponsorBlock开关
+  static bool enableSponsorBlock = false;
   // 视频评论开关
   static List<String> enableComment = ['video', 'bangumi'];
 
@@ -124,6 +126,10 @@ class GlobalDataCache {
         settingBox.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
     enableDynamicSwitch =
         settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
+    enableSponsorBlock =
+        settingBox.get(SettingBoxKey.enableSponsorBlock, defaultValue: false);
+    settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
     enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
     enableComment = settingBox
         .get(SettingBoxKey.enableComment, defaultValue: ['video', 'bangumi']);

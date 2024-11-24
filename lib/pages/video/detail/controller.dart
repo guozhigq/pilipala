@@ -207,7 +207,7 @@ class VideoDetailController extends GetxController
     });
 
     /// 仅投稿视频skip
-    if (videoType == SearchType.video) {
+    if (videoType == SearchType.video && GlobalDataCache.enableSponsorBlock) {
       querySkipSegments();
     }
   }

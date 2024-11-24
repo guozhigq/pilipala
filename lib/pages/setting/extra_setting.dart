@@ -204,6 +204,15 @@ class _ExtraSettingState extends State<ExtraSetting> {
               GlobalDataCache.enableDlna = val;
             },
           ),
+          SetSwitchItem(
+            title: 'Sponsor Block',
+            subTitle: '自动跳过视频中赞助片段',
+            setKey: SettingBoxKey.enableSponsorBlock,
+            defaultVal: false,
+            callFn: (bool val) {
+              GlobalDataCache.enableSponsorBlock = val;
+            },
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),

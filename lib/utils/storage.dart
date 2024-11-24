@@ -117,6 +117,7 @@ class SettingBoxKey {
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo',
       enableDlna = 'enableDlna',
+      enableSponsorBlock = 'enableSponsorBlock',
       enableComment = 'enableComment';
 
   /// 外观
