@@ -17,6 +17,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
@@ -99,7 +100,11 @@ class VideoIntroController extends GetxController {
       }
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
-      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
+      videoDetailCtr.tabs.value = [
+        '简介',
+        if (GlobalDataCache.enableComment.contains('video'))
+          '评论 ${result['data']?.stat?.reply}'
+      ];
       videoDetailCtr.cover.value = cover ?? result['data'].pic ?? '';
       // 获取到粉丝数再返回
       await queryUserStat();
@@ -469,10 +474,12 @@ class VideoIntroController extends GetxController {
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
-      final VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: heroTag);
-      videoReplyCtr.aid = aid;
-      videoReplyCtr.queryReplyList(type: 'init');
+      if (GlobalDataCache.enableComment.contains('video')) {
+        final VideoReplyController videoReplyCtr =
+            Get.find<VideoReplyController>(tag: heroTag);
+        videoReplyCtr.aid = aid;
+        videoReplyCtr.queryReplyList(type: 'init');
+      }
     } catch (_) {}
     this.bvid = bvid;
     await queryVideoIntro(cover: cover);

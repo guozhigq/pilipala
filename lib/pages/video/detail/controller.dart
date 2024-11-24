@@ -141,8 +141,16 @@ class VideoDetailController extends GetxController
     } else if (argMap.containsKey('pic')) {
       updateCover(argMap['pic']);
     }
-
-    tabCtr = TabController(length: 2, vsync: this);
+    tabs.value = <String>[
+      '简介',
+      if (videoType == SearchType.video &&
+          GlobalDataCache.enableComment.contains('video'))
+        '评论',
+      if (videoType == SearchType.media_bangumi &&
+          GlobalDataCache.enableComment.contains('bangumi'))
+        '评论'
+    ];
+    tabCtr = TabController(length: tabs.length, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: false);
@@ -481,6 +489,15 @@ class VideoDetailController extends GetxController
         getDanmaku(subtitles);
       }
     }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+      bvid: bvid,
+      videoType: videoType,
+      showSubtitleBtn: result['status'] && result['data'].subtitles.isNotEmpty,
+    );
+    plPlayerController.setHeaderControl(headerControl);
   }
 
   // 获取弹幕

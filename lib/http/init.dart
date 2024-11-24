@@ -1,9 +1,7 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -13,7 +11,6 @@ import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
-import 'api.dart';
 import 'constants.dart';
 import 'interceptor.dart';
 
@@ -27,8 +24,6 @@ class Request {
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
-  static final RegExp spmPrefixExp =
-      RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
   static String? buvid;
 
   /// 设置cookie
@@ -62,11 +57,6 @@ class Request {
       baseUrlType = 'bangumi';
     }
     setBaseUrl(type: baseUrlType);
-    try {
-      await buvidActivate();
-    } catch (e) {
-      log("setCookie, ${e.toString()}");
-    }
 
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
@@ -120,30 +110,6 @@ class Request {
     dio.options.headers['app-key'] = 'android64';
     dio.options.headers['x-bili-aurora-zone'] = 'sh001';
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
-  }
-
-  static Future buvidActivate() async {
-    var html = await Request().get(Api.dynamicSpmPrefix);
-    String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
-    Random rand = Random();
-    String rand_png_end = base64.encode(
-        List<int>.generate(32, (_) => rand.nextInt(256)) +
-            List<int>.filled(4, 0) +
-            [73, 69, 78, 68] +
-            List<int>.generate(4, (_) => rand.nextInt(256)));
-
-    String jsonData = json.encode({
-      '3064': 1,
-      '39c8': '${spmPrefix}.fp.risk',
-      '3c43': {
-        'adca': 'Linux',
-        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
-      },
-    });
-
-    await Request().post(Api.activateBuvidApi,
-        data: {'payload': jsonData},
-        options: Options(contentType: 'application/json'));
   }
 
   /*

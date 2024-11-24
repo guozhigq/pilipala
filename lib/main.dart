@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/custom_toast.dart';
+import 'package:pilipala/http/common.dart';
 import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/color_type.dart';
 import 'package:pilipala/models/common/theme_type.dart';
@@ -66,6 +67,7 @@ void main() async {
 
   PiliSchame.init();
   await GlobalDataCache.initialize();
+  CommonHttp.buvidActivate();
 }
 
 class MyApp extends StatelessWidget {

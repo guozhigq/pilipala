@@ -117,7 +117,8 @@ class SettingBoxKey {
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo',
       enableDlna = 'enableDlna',
-      enableSponsorBlock = 'enableSponsorBlock';
+      enableSponsorBlock = 'enableSponsorBlock',
+      enableComment = 'enableComment';
 
   /// 外观
   static const String themeMode = 'themeMode',
