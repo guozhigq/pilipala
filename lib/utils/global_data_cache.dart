@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
@@ -55,6 +56,8 @@ class GlobalDataCache {
   static late bool enableDynamicSwitch;
   // 投屏开关
   static bool enableDlna = false;
+  // 硬件解码格式
+  static late String hardwareDecodeFormat;
 
   // 私有构造函数
   GlobalDataCache._();
@@ -123,5 +126,7 @@ class GlobalDataCache {
     enableDynamicSwitch =
         setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
     enableDlna = setting.get(SettingBoxKey.enableDlna, defaultValue: false);
+    hardwareDecodeFormat = setting.get(SettingBoxKey.hardwareDecodeFormat,
+        defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
   }
 }

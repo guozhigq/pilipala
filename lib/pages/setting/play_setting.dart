@@ -31,6 +31,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
   late String defaultAoOutput;
+  late String hardwareDecodeFormat;
 
   @override
   void initState() {
@@ -49,6 +50,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: BtmProgresBehavior.values.first.code);
     defaultAoOutput =
         setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
+    hardwareDecodeFormat = setting.get(SettingBoxKey.hardwareDecodeFormat,
+        defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
   }
 
   @override
@@ -290,6 +293,34 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultAoOutput = result;
                 setting.put(SettingBoxKey.defaultAoOutput, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('硬解方式', style: titleStyle),
+            subtitle: Text(
+              '当前硬解方式(--hwdec)：$hardwareDecodeFormat',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(
+                      title: '硬解方式',
+                      value: hardwareDecodeFormat,
+                      values: ['no', 'auto-safe', 'auto', 'yes', 'auto-copy']
+                          .map((e) {
+                        return {'title': e, 'value': e};
+                      }).toList());
+                },
+              );
+              if (result != null) {
+                setting.put(SettingBoxKey.hardwareDecodeFormat, result);
+                hardwareDecodeFormat = result;
+                GlobalDataCache.hardwareDecodeFormat = result;
                 setState(() {});
               }
             },
