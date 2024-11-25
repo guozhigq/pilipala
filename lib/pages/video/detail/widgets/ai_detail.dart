@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/models/video/ai.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
@@ -17,39 +18,28 @@ class AiDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 16),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       height: GlobalDataCache.sheetHeight,
       child: Column(
         children: [
-          _buildHeader(context),
+          const DragHandle(),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (modelResult!.summary != '') ...[
-                    _buildSummaryText(modelResult!.summary!),
-                    const SizedBox(height: 20),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: Column(
+                  children: [
+                    if (modelResult!.summary != '') ...[
+                      _buildSummaryText(modelResult!.summary!),
+                      const SizedBox(height: 20),
+                    ],
+                    _buildOutlineList(context),
                   ],
-                  _buildOutlineList(context),
-                ],
+                ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).hintColor,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
-        ),
-        height: 4,
-        width: 40,
-        margin: const EdgeInsets.symmetric(vertical: 16),
       ),
     );
   }

@@ -7,8 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/utils/download.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:status_bar_control/status_bar_control.dart';
@@ -423,29 +423,13 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
       useRootNavigator: true,
       isScrollControlled: true,
       builder: (context) {
-        return Container(
+        return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              InkWell(
-                onTap: () => Get.back(),
-                child: Container(
-                  height: 35,
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Center(
-                    child: Container(
-                      width: 32,
-                      height: 3,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.outline,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(3))),
-                    ),
-                  ),
-                ),
-              ),
+              const DragHandle(),
               ..._buildListTitles(),
             ],
           ),
