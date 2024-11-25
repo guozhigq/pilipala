@@ -21,6 +21,7 @@ import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
@@ -140,8 +141,16 @@ class VideoDetailController extends GetxController
     } else if (argMap.containsKey('pic')) {
       updateCover(argMap['pic']);
     }
-
-    tabCtr = TabController(length: 2, vsync: this);
+    tabs.value = <String>[
+      '简介',
+      if (videoType == SearchType.video &&
+          GlobalDataCache.enableComment.contains('video'))
+        '评论',
+      if (videoType == SearchType.media_bangumi &&
+          GlobalDataCache.enableComment.contains('bangumi'))
+        '评论'
+    ];
+    tabCtr = TabController(length: tabs.length, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: false);
@@ -198,7 +207,7 @@ class VideoDetailController extends GetxController
     });
 
     /// 仅投稿视频skip
-    if (videoType == SearchType.video) {
+    if (videoType == SearchType.video && GlobalDataCache.enableSponsorBlock) {
       querySkipSegments();
     }
   }

@@ -27,7 +27,7 @@ class SeasonPanel extends StatefulWidget {
 }
 
 class _SeasonPanelState extends State<SeasonPanel> {
-  late List<EpisodeItem> episodes;
+  List<EpisodeItem>? episodes;
   late int cid;
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
@@ -75,7 +75,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
 
   // 获取currentIndex
   void getCurrentIndex() {
-    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    if (episodes != null) {
+      currentIndex.value =
+          episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
+    }
     final List<SectionItem> sections = widget.ugcSeason.sections!;
     if (sections.length == 1 && sections.first.type == 1) {
       final List<EpisodeItem> episodesList = sections.first.episodes!;
@@ -83,6 +86,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
         for (int j = 0; j < episodesList[i].pages!.length; j++) {
           if (episodesList[i].pages![j].cid == cid) {
             currentIndex.value = i;
+            episodes = episodesList;
             continue;
           }
         }
@@ -137,7 +141,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
               widget.videoIntroCtr.bottomSheetController =
                   _bottomSheetController = EpisodeBottomSheet(
                 currentCid: cid,
-                episodes: episodes,
+                episodes: episodes!,
                 changeFucCall: changeFucCall,
                 sheetHeight: widget.sheetHeight,
                 dataType: VideoEpidoesType.videoEpisode,
@@ -165,7 +169,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   ),
                   const SizedBox(width: 10),
                   Obx(() => Text(
-                        '${currentIndex.value + 1}/${episodes.length}',
+                        '${currentIndex.value + 1}/${episodes!.length}',
                         style: Theme.of(context).textTheme.labelMedium,
                       )),
                   const SizedBox(width: 6),

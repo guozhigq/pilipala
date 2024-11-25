@@ -57,7 +57,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
     heroTag = Get.arguments['heroTag'];
     videoIntroController =
         Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
-    _futureBuilderFuture = videoIntroController.queryVideoIntro();
+    _futureBuilderFuture = videoIntroController.queryVideoIntro(type: 'init');
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
     });

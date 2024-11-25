@@ -6,7 +6,7 @@ import 'package:pilipala/plugin/pl_player/models/play_speed.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../models/common/index.dart';
 
-Box setting = GStorage.setting;
+Box settingBox = GStorage.setting;
 Box localCache = GStorage.localCache;
 Box videoStorage = GStorage.video;
 Box userInfoCache = GStorage.userInfo;
@@ -58,6 +58,10 @@ class GlobalDataCache {
   static bool enableDlna = false;
   // 硬件解码格式
   static late String hardwareDecodeFormat;
+  // sponsorBlock开关
+  static bool enableSponsorBlock = false;
+  // 视频评论开关
+  static List<String> enableComment = ['video', 'bangumi'];
 
   // 私有构造函数
   GlobalDataCache._();
@@ -70,18 +74,18 @@ class GlobalDataCache {
 
   // 异步初始化方法
   static Future<void> initialize() async {
-    imgQuality = await setting.get(SettingBoxKey.defaultPicQa,
+    imgQuality = await settingBox.get(SettingBoxKey.defaultPicQa,
         defaultValue: 10); // 设置全局变量
-    fullScreenGestureMode = FullScreenGestureMode.values[setting.get(
+    fullScreenGestureMode = FullScreenGestureMode.values[settingBox.get(
         SettingBoxKey.fullScreenGestureMode,
         defaultValue: FullScreenGestureMode.fromBottomtoTop.index)];
-    enablePlayerControlAnimation = setting
+    enablePlayerControlAnimation = settingBox
         .get(SettingBoxKey.enablePlayerControlAnimation, defaultValue: true);
-    actionTypeSort = await setting.get(SettingBoxKey.actionTypeSort,
+    actionTypeSort = await settingBox.get(SettingBoxKey.actionTypeSort,
         defaultValue: ['like', 'coin', 'collect', 'watchLater', 'share']);
 
-    isOpenDanmu =
-        await setting.get(SettingBoxKey.enableShowDanmaku, defaultValue: false);
+    isOpenDanmu = await settingBox.get(SettingBoxKey.enableShowDanmaku,
+        defaultValue: false);
     blockTypes =
         await localCache.get(LocalCacheKey.danmakuBlockType, defaultValue: []);
     showArea =
@@ -102,7 +106,7 @@ class GlobalDataCache {
         .firstWhere((e) => e.value == defaultPlayRepeat);
     playbackSpeed =
         await videoStorage.get(VideoBoxKey.playSpeedDefault, defaultValue: 1.0);
-    enableAutoLongPressSpeed = await setting
+    enableAutoLongPressSpeed = await settingBox
         .get(SettingBoxKey.enableAutoLongPressSpeed, defaultValue: false);
     if (!enableAutoLongPressSpeed) {
       longPressSpeed = await videoStorage.get(VideoBoxKey.longPressSpeedDefault,
@@ -120,13 +124,21 @@ class GlobalDataCache {
     sheetHeight = localCache.get('sheetHeight', defaultValue: 0.0);
     historyCacheList = localCache.get('cacheList', defaultValue: []);
     enableSearchSuggest =
-        setting.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
+        settingBox.get(SettingBoxKey.enableSearchSuggest, defaultValue: true);
     enableAutoExpand =
-        setting.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
+        settingBox.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
     enableDynamicSwitch =
-        setting.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
-    enableDlna = setting.get(SettingBoxKey.enableDlna, defaultValue: false);
-    hardwareDecodeFormat = setting.get(SettingBoxKey.hardwareDecodeFormat,
+        settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
+    hardwareDecodeFormat = settingBox.get(SettingBoxKey.hardwareDecodeFormat,
         defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
+    settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
+    enableSponsorBlock =
+        settingBox.get(SettingBoxKey.enableSponsorBlock, defaultValue: false);
+    settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
+    enableComment = settingBox
+        .get(SettingBoxKey.enableComment, defaultValue: ['video', 'bangumi']);
   }
 }
