@@ -234,17 +234,17 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
 
   @override
   Widget build(BuildContext context) {
-    return InteractiveViewerBoundary(
-      controller: _transformationController,
-      boundaryWidth: MediaQuery.of(context).size.width,
-      onScaleChanged: _onScaleChanged,
-      onLeftBoundaryHit: _onLeftBoundaryHit,
-      onRightBoundaryHit: _onRightBoundaryHit,
-      onNoBoundaryHit: _onNoBoundaryHit,
-      maxScale: widget.maxScale,
-      minScale: widget.minScale,
-      child: Stack(children: [
-        CustomDismissible(
+    return Stack(children: [
+      InteractiveViewerBoundary(
+        controller: _transformationController,
+        boundaryWidth: MediaQuery.of(context).size.width,
+        onScaleChanged: _onScaleChanged,
+        onLeftBoundaryHit: _onLeftBoundaryHit,
+        onRightBoundaryHit: _onRightBoundaryHit,
+        onNoBoundaryHit: _onNoBoundaryHit,
+        maxScale: widget.maxScale,
+        minScale: widget.minScale,
+        child: CustomDismissible(
           onDismissed: () {
             Navigator.of(context).pop();
             widget.onDismissed?.call(_pageController!.page!.floor());
@@ -275,53 +275,50 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
             },
           ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(
-                12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
-            decoration: _enablePageView
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3)
-                      ],
-                    ),
-                  )
-                : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onDismissed?.call(_pageController!.page!.floor());
-                  },
-                ),
-                widget.sources.length > 1
-                    ? Text(
-                        "${currentIndex! + 1}/${widget.sources.length}",
-                        style: const TextStyle(color: Colors.white),
-                      )
-                    : const SizedBox(),
-                PopupMenuButton(
-                  itemBuilder: (context) {
-                    return _buildPopupMenuList();
-                  },
-                  child: const Icon(Icons.more_horiz, color: Colors.white),
-                ),
-              ],
-            ),
+      ),
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+              12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
+          decoration: _enablePageView
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
+                  ),
+                )
+              : null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  widget.onDismissed?.call(_pageController!.page!.floor());
+                },
+              ),
+              widget.sources.length > 1
+                  ? Text(
+                      "${currentIndex! + 1}/${widget.sources.length}",
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : const SizedBox(),
+              PopupMenuButton(
+                itemBuilder: (context) {
+                  return _buildPopupMenuList();
+                },
+                child: const Icon(Icons.more_horiz, color: Colors.white),
+              ),
+            ],
           ),
         ),
-      ]),
-    );
+      ),
+    ]);
   }
 
   // 图片分享
