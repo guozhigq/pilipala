@@ -739,28 +739,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         // 头部、底部控制条
         Obx(
           () => Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (widget.headerControl != null || _.headerControl != null)
-                ClipRect(
+              if (widget.headerControl != null || _.headerControl != null) ...[
+                Flexible(
+                  child: ClipRect(
+                    child: AppBarAni(
+                      controller: animationController,
+                      visible: !_.controlsLock.value && _.showControls.value,
+                      position: 'top',
+                      child: widget.headerControl ?? _.headerControl!,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                const SizedBox.shrink()
+              ],
+              Flexible(
+                flex: _.videoType == 'live' ? 0 : 1,
+                child: ClipRect(
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'top',
-                    child: widget.headerControl ?? _.headerControl!,
+                    position: 'bottom',
+                    child: widget.bottomControl ??
+                        BottomControl(
+                          controller: widget.controller,
+                          triggerFullScreen: _.triggerFullScreen,
+                          buildBottomControl: buildBottomControl(),
+                        ),
                   ),
-                ),
-              const Spacer(),
-              ClipRect(
-                child: AppBarAni(
-                  controller: animationController,
-                  visible: !_.controlsLock.value && _.showControls.value,
-                  position: 'bottom',
-                  child: widget.bottomControl ??
-                      BottomControl(
-                        controller: widget.controller,
-                        triggerFullScreen: _.triggerFullScreen,
-                        buildBottomControl: buildBottomControl(),
-                      ),
                 ),
               ),
             ],

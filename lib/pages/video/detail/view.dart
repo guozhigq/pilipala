@@ -680,8 +680,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         forceElevated: innerBoxIsScrolled,
                         expandedHeight: expandedHeight,
                         backgroundColor: Colors.black,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: PopScope(
+                        flexibleSpace: SizedBox.expand(
+                          child: PopScope(
                             canPop:
                                 plPlayerController?.isFullScreen.value != true,
                             onPopInvoked: (bool didPop) {
