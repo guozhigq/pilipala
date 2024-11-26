@@ -134,8 +134,9 @@ class FavDetailController extends GetxController {
         'privacy': [22, 0].contains(item!.attr) ? 0 : 1,
       },
     );
-    title.value = res['title'];
-    print(title);
+    if (res != null) {
+      title.value = res['title'];
+    }
   }
 
   Future toViewPlayAll() async {
