@@ -116,6 +116,7 @@ class VideoDetailController extends GetxController
     BottomControlType.time,
     BottomControlType.space,
     BottomControlType.fit,
+    BottomControlType.speed,
     BottomControlType.fullscreen,
   ].obs;
   RxDouble sheetHeight = 0.0.obs;
