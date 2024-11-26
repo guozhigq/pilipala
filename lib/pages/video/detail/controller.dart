@@ -169,7 +169,7 @@ class VideoDetailController extends GetxController
     }
 
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     // 预设的画质
     cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa);
     // 预设的解码格式

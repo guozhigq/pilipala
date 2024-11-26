@@ -69,7 +69,7 @@ class LiveRoomController extends GetxController {
       Request.getBuvid().then((value) => buvid = value);
     }
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       userId = userInfo.mid;
