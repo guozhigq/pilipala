@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
@@ -183,7 +182,7 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
             isFixedHeight: true,
           );
         } else {
-          _listObserverControllerList![widget.currentEpisodeIndex!]
+          _listObserverControllerList![widget.currentEpisodeIndex ?? 0]
               .initialIndexModel = ObserverIndexPositionModel(
             index: currentIndex,
             isFixedHeight: true,
