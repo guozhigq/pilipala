@@ -5,6 +5,7 @@ import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/image_save.dart';
 import 'package:pilipala/utils/route_push.dart';
 import '../../models/model_rec_video_item.dart';
+import 'drag_handle.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
 import '../../http/dynamics.dart';
@@ -368,27 +369,12 @@ class MorePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.outline,
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
-                ),
-              ),
-            ),
-          ),
+          const DragHandle(),
           ListTile(
             onTap: () async => await menuActionHandler('block'),
             minLeadingWidth: 0,

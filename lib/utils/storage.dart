@@ -117,6 +117,7 @@ class SettingBoxKey {
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo',
       enableDlna = 'enableDlna',
+      hardwareDecodeFormat = 'hardwareDecodeFormat',
       enableSponsorBlock = 'enableSponsorBlock',
       enableComment = 'enableComment';
 
