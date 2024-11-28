@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
@@ -102,22 +103,7 @@ class _HeaderControlState extends State<HeaderControl> {
           margin: const EdgeInsets.all(12),
           child: Column(
             children: <Widget>[
-              SizedBox(
-                height: 35,
-                child: Center(
-                  child: Container(
-                    width: 32,
-                    height: 3,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondaryContainer
-                            .withOpacity(0.5),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(3))),
-                  ),
-                ),
-              ),
+              const DragHandle(),
               Expanded(
                   child: Material(
                 child: ListView(

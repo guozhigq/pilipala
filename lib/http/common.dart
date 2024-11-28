@@ -1,3 +1,4 @@
+import 'package:pilipala/models/common/invalid_video.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:dio/dio.dart';
@@ -46,6 +47,32 @@ class CommonHttp {
       return {
         'status': false,
         'data': [],
+      };
+    }
+  }
+
+  static Future fixVideoPicAndTitle({required int aid}) async {
+    var res = await Request().getWithoutCookie(Api.fixTitleAndPic, data: {
+      'id': aid,
+    });
+    if (res != null) {
+      if (res.data['code'] == -404) {
+        return {
+          'status': false,
+          'data': null,
+          'msg': '没有相关信息',
+        };
+      } else {
+        return {
+          'status': true,
+          'data': InvalidVideoModel.fromJson(res.data),
+        };
+      }
+    } else {
+      return {
+        'status': false,
+        'data': null,
+        'msg': '没有相关信息',
       };
     }
   }

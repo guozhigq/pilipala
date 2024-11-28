@@ -68,7 +68,7 @@ class Request {
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
     List<Cookie> cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+        .loadForRequest(Uri.parse(HttpString.baseUrl));
     String token = '';
     if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
@@ -82,9 +82,12 @@ class Request {
     }
 
     final List<Cookie> cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.baseUrl));
-    buvid = cookies.firstWhere((cookie) => cookie.name == 'buvid3').value;
-    if (buvid == null) {
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+    buvid = cookies
+        .firstWhere((cookie) => cookie.name == 'buvid3',
+            orElse: () => Cookie('buvid3', ''))
+        .value;
+    if (buvid == null || buvid!.isEmpty) {
       try {
         var result = await Request().get(
           "${HttpString.apiBaseUrl}/x/frontend/finger/spi",

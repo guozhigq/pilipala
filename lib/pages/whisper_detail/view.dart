@@ -101,25 +101,11 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: SizedBox(
-          width: double.infinity,
+          width: double.maxFinite,
           height: 50,
           child: Row(
             children: [
-              SizedBox(
-                width: 34,
-                height: 34,
-                child: IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    size: 18,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   feedBack();

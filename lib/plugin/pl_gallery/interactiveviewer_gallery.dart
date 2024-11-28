@@ -7,8 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/utils/download.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:status_bar_control/status_bar_control.dart';
@@ -234,17 +234,17 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
 
   @override
   Widget build(BuildContext context) {
-    return InteractiveViewerBoundary(
-      controller: _transformationController,
-      boundaryWidth: MediaQuery.of(context).size.width,
-      onScaleChanged: _onScaleChanged,
-      onLeftBoundaryHit: _onLeftBoundaryHit,
-      onRightBoundaryHit: _onRightBoundaryHit,
-      onNoBoundaryHit: _onNoBoundaryHit,
-      maxScale: widget.maxScale,
-      minScale: widget.minScale,
-      child: Stack(children: [
-        CustomDismissible(
+    return Stack(children: [
+      InteractiveViewerBoundary(
+        controller: _transformationController,
+        boundaryWidth: MediaQuery.of(context).size.width,
+        onScaleChanged: _onScaleChanged,
+        onLeftBoundaryHit: _onLeftBoundaryHit,
+        onRightBoundaryHit: _onRightBoundaryHit,
+        onNoBoundaryHit: _onNoBoundaryHit,
+        maxScale: widget.maxScale,
+        minScale: widget.minScale,
+        child: CustomDismissible(
           onDismissed: () {
             Navigator.of(context).pop();
             widget.onDismissed?.call(_pageController!.page!.floor());
@@ -275,53 +275,50 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
             },
           ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(
-                12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
-            decoration: _enablePageView
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3)
-                      ],
-                    ),
-                  )
-                : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onDismissed?.call(_pageController!.page!.floor());
-                  },
-                ),
-                widget.sources.length > 1
-                    ? Text(
-                        "${currentIndex! + 1}/${widget.sources.length}",
-                        style: const TextStyle(color: Colors.white),
-                      )
-                    : const SizedBox(),
-                PopupMenuButton(
-                  itemBuilder: (context) {
-                    return _buildPopupMenuList();
-                  },
-                  child: const Icon(Icons.more_horiz, color: Colors.white),
-                ),
-              ],
-            ),
+      ),
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+              12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
+          decoration: _enablePageView
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
+                  ),
+                )
+              : null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  widget.onDismissed?.call(_pageController!.page!.floor());
+                },
+              ),
+              widget.sources.length > 1
+                  ? Text(
+                      "${currentIndex! + 1}/${widget.sources.length}",
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : const SizedBox(),
+              PopupMenuButton(
+                itemBuilder: (context) {
+                  return _buildPopupMenuList();
+                },
+                child: const Icon(Icons.more_horiz, color: Colors.white),
+              ),
+            ],
           ),
         ),
-      ]),
-    );
+      ),
+    ]);
   }
 
   // 图片分享
@@ -426,29 +423,13 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
       useRootNavigator: true,
       isScrollControlled: true,
       builder: (context) {
-        return Container(
+        return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              InkWell(
-                onTap: () => Get.back(),
-                child: Container(
-                  height: 35,
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Center(
-                    child: Container(
-                      width: 32,
-                      height: 3,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.outline,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(3))),
-                    ),
-                  ),
-                ),
-              ),
+              const DragHandle(),
               ..._buildListTitles(),
             ],
           ),
