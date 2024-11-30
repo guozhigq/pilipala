@@ -6,6 +6,7 @@ import 'package:pilipala/models/read/opus.dart';
 import 'package:pilipala/models/read/read.dart';
 import 'package:pilipala/pages/opus/text_helper.dart';
 import 'package:pilipala/utils/utils.dart';
+
 import 'controller.dart';
 
 class ReadPage extends StatefulWidget {
@@ -38,16 +39,18 @@ class _ReadPageState extends State<ReadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
+      body: CustomScrollView(
         controller: controller.scrollController,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(),
-            _buildFutureContent(),
-          ],
-        ),
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                _buildTitle(),
+                _buildFutureContent(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
