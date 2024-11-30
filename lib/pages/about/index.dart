@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pilipala/http/index.dart';
 import 'package:pilipala/models/github/latest.dart';
+import 'package:pilipala/plugin/pl_gallery/index.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/cache_manage.dart';
@@ -38,9 +39,7 @@ class _AboutPageState extends State<AboutPage> {
     TextStyle subTitleStyle =
         TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('关于', style: Theme.of(context).textTheme.titleMedium),
-      ),
+      appBar: AppBar(title: const Text('关于')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -124,7 +123,7 @@ class _AboutPageState extends State<AboutPage> {
               onTap: () => _aboutController.webSiteUrl(),
               title: const Text('访问官网'),
               trailing: Text(
-                'https://pilipalanet.mysxl.cn',
+                'https://pilipala.life',
                 style: subTitleStyle,
               ),
             ),
@@ -168,7 +167,7 @@ class _AboutPageState extends State<AboutPage> {
                           onTap: () => _aboutController.tgChanel(),
                           title: const Text('TG频道'),
                           trailing: Text(
-                            'https://t.me/+lm_oOVmF0RJiODk1',
+                            'https://t.me/+1DFtqS6usUM5MDNl',
                             style: subTitleStyle,
                           ),
                         ),
@@ -295,7 +294,7 @@ class AboutController extends GetxController {
       displayTime: const Duration(milliseconds: 500),
     ).then(
       (value) => launchUrl(
-        Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+        Uri.parse('https://www.123684.com/s/9sVqVv-DEZ0A'),
         mode: LaunchMode.externalApplication,
       ),
     );
@@ -321,35 +320,41 @@ class AboutController extends GetxController {
   // tg频道
   tgChanel() {
     Clipboard.setData(
-      const ClipboardData(text: 'https://t.me/+lm_oOVmF0RJiODk1'),
+      const ClipboardData(text: 'https://t.me/+1DFtqS6usUM5MDNl'),
     );
     SmartDialog.showToast(
       '已复制，即将在浏览器打开',
       displayTime: const Duration(milliseconds: 500),
     ).then(
       (value) => launchUrl(
-        Uri.parse('https://t.me/+lm_oOVmF0RJiODk1'),
+        Uri.parse('https://t.me/+1DFtqS6usUM5MDNl'),
         mode: LaunchMode.externalApplication,
       ),
     );
   }
 
   aPay() {
-    try {
-      launchUrl(
-        Uri.parse(
-            'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx14623ddwl1ping3ddd73'),
-        mode: LaunchMode.externalApplication,
-      );
-    } catch (e) {
-      print(e);
-    }
+    const List<String> sources = [
+      'assets/images/pay/wechat.png',
+      'assets/images/pay/alipay.jpg'
+    ];
+    Navigator.of(Get.context!).push(
+      HeroDialogRoute<void>(
+        builder: (BuildContext context) => InteractiveviewerGallery(
+          sources: sources,
+          initIndex: 0,
+          itemBuilder: (context, index, isFocus, enablePageView) =>
+              Image.asset(sources[index]),
+          actionType: const [ImgActionType.save],
+        ),
+      ),
+    );
   }
 
   // 官网
   webSiteUrl() {
     launchUrl(
-      Uri.parse('https://pilipalanet.mysxl.cn'),
+      Uri.parse('https://pilipala.life'),
       mode: LaunchMode.externalApplication,
     );
   }

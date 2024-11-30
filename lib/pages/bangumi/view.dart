@@ -76,9 +76,14 @@ class _BangumiPageState extends State<BangumiPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '最近追番',
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Obx(
+                            () => 0 != _bangumidController.total.value
+                                ? Text(
+                                    '我的追番(${_bangumidController.total.value})',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  )
+                                : const SizedBox(),
                           ),
                           IconButton(
                             onPressed: () {
@@ -96,7 +101,8 @@ class _BangumiPageState extends State<BangumiPage>
                       ),
                     ),
                     SizedBox(
-                      height: 268,
+                      height: Get.size.width / 3 / 0.75 +
+                          MediaQuery.textScalerOf(context).scale(50.0),
                       child: FutureBuilder(
                         future: _futureBuilderFutureFollow,
                         builder:
@@ -117,7 +123,6 @@ class _BangumiPageState extends State<BangumiPage>
                                         itemBuilder: (context, index) {
                                           return Container(
                                             width: Get.size.width / 3,
-                                            height: 254,
                                             margin: EdgeInsets.only(
                                                 left: StyleString.safeSpace,
                                                 right: index ==
@@ -183,8 +188,10 @@ class _BangumiPageState extends State<BangumiPage>
                     return HttpError(
                       errMsg: data['msg'],
                       fn: () {
-                        _futureBuilderFuture =
-                            _bangumidController.queryBangumiListFeed();
+                        setState(() {
+                          _futureBuilderFuture =
+                              _bangumidController.queryBangumiListFeed();
+                        });
                       },
                     );
                   }
@@ -208,8 +215,8 @@ class _BangumiPageState extends State<BangumiPage>
         crossAxisSpacing: StyleString.cardSpace,
         // 列数
         crossAxisCount: 3,
-        mainAxisExtent: Get.size.width / 3 / 0.65 +
-            MediaQuery.textScalerOf(context).scale(32.0),
+        mainAxisExtent: Get.size.width / 3 / 0.75 +
+            MediaQuery.textScalerOf(context).scale(42.0),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

@@ -47,12 +47,10 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => Text(
-              '他的投稿 - ${_memberArchivesController.currentOrder['label']}',
-              style: Theme.of(context).textTheme.titleMedium),
+            '${_memberArchivesController.isOwner.value ? '我' : 'Ta'}的投稿 - ${_memberArchivesController.currentOrder['label']}',
+          ),
         ),
         actions: [
           // Obx(
@@ -119,7 +117,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: snapshot.data['msg'],
+                    errMsg: snapshot.data?['msg'] ?? '请求异常',
                     fn: () {},
                   );
                 }
@@ -133,6 +131,15 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
             },
           ),
         ],
+      ),
+      floatingActionButton: Obx(
+        () => _memberArchivesController.count > 0
+            ? FloatingActionButton.extended(
+                onPressed: _memberArchivesController.toViewPlayAll,
+                label: const Text('播放全部'),
+                icon: const Icon(Icons.playlist_play),
+              )
+            : const SizedBox(),
       ),
     );
   }

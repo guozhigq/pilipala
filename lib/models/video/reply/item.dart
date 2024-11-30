@@ -11,6 +11,7 @@ class ReplyItemModel {
     this.parent,
     this.dialog,
     this.count,
+    this.rcount,
     this.floor,
     this.state,
     this.fansgrade,
@@ -41,6 +42,7 @@ class ReplyItemModel {
   int? parent;
   int? dialog;
   int? count;
+  int? rcount;
   int? floor;
   int? state;
   int? fansgrade;
@@ -72,6 +74,7 @@ class ReplyItemModel {
     parent = json['parent'];
     dialog = json['dialog'];
     count = json['count'];
+    rcount = json['rcount'] ?? 0;
     floor = json['floor'];
     state = json['state'];
     fansgrade = json['fansgrade'];
@@ -122,6 +125,7 @@ class ReplyControl {
     this.upLike,
     this.isShow,
     this.entryText,
+    this.entryTextNum,
     this.titleText,
     this.time,
     this.location,
@@ -132,6 +136,7 @@ class ReplyControl {
   bool? upLike;
   bool? isShow;
   String? entryText;
+  int? entryTextNum;
   String? titleText;
   String? time;
   String? location;
@@ -152,6 +157,10 @@ class ReplyControl {
     }
 
     entryText = json['sub_reply_entry_text'];
+    // 正则匹配
+    entryTextNum = json['sub_reply_entry_text'] != null
+        ? int.parse(RegExp(r"\d+").stringMatch(json['sub_reply_entry_text']!)!)
+        : 0;
     titleText = json['sub_reply_title_text'];
     time = json['time_desc'];
     location = json['location'] != null ? json['location'].split('：')[1] : '';

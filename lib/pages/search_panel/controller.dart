@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/member.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/search_type.dart';
+import 'package:pilipala/models/search/result.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -24,12 +26,14 @@ class SearchPanelController extends GetxController {
       searchType: searchType!,
       keyword: keyword!,
       page: page.value,
-      order: searchType!.type != 'video' ? null : order.value,
+      order: !['video', 'article'].contains(searchType!.type)
+          ? null
+          : (order.value == '' ? null : order.value),
       duration: searchType!.type != 'video' ? null : duration.value,
       tids: searchType!.type != 'video' ? null : tids.value,
     );
     if (result['status']) {
-      if (type == 'onRefresh') {
+      if (type == 'init') {
         resultList.value = result['data'].list ?? [];
       } else {
         resultList.addAll(result['data'].list ?? []);
@@ -37,12 +41,36 @@ class SearchPanelController extends GetxController {
       page.value++;
       onPushDetail(keyword, resultList);
     }
+    if (RegExp(r'^\d+$').hasMatch(keyword!) &&
+        searchType == SearchType.bili_user) {
+      var res = await MemberHttp.memberInfo(mid: int.parse(keyword!));
+      if (res['status']) {
+        try {
+          final user = SearchUserItemModel(
+            mid: res['data'].mid,
+            uname: res['data'].name,
+            upic: res['data'].face,
+            level: res['data'].level,
+            fans: null,
+            videos: null,
+            officialVerify: res['data'].official,
+          );
+          if (resultList.isEmpty) {
+            resultList = [user].obs;
+          } else {
+            resultList.insert(0, user);
+          }
+        } catch (err) {
+          debugPrint('搜索用户信息失败: $err');
+        }
+      }
+    }
     return result;
   }
 
   Future onRefresh() async {
     page.value = 1;
-    await onSearch(type: 'onRefresh');
+    await onSearch();
   }
 
   // 返回顶部并刷新

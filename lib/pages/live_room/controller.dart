@@ -33,7 +33,7 @@ class LiveRoomController extends GetxController {
   int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int userId = 0;
   PlSocket? plSocket;
   List<String> danmuHostList = [];
@@ -64,12 +64,12 @@ class LiveRoomController extends GetxController {
             ? liveItem.pic
             : (liveItem.cover != null && liveItem.cover != '')
                 ? liveItem.cover
-                : null;
+                : '';
       }
       Request.getBuvid().then((value) => buvid = value);
     }
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       userId = userInfo.mid;
@@ -97,6 +97,7 @@ class LiveRoomController extends GetxController {
       autoplay: true,
     );
     plPlayerController.isOpenDanmu.value = danmakuSwitch.value;
+    heartBeat();
   }
 
   Future queryLiveInfo() async {
@@ -281,8 +282,20 @@ class LiveRoomController extends GetxController {
     }
   }
 
+  // 历史记录
+  void heartBeat() {
+    LiveHttp.liveRoomEntry(roomId: roomId);
+  }
+
+  String encodeToBase64(String input) {
+    List<int> bytes = utf8.encode(input);
+    String base64Str = base64.encode(bytes);
+    return base64Str;
+  }
+
   @override
   void onClose() {
+    heartBeat();
     plSocket?.onClose();
     super.onClose();
   }

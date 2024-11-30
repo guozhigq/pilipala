@@ -14,9 +14,10 @@ class LiveController extends GetxController {
   RxList<LiveItemModel> liveList = <LiveItemModel>[].obs;
   RxList<LiveFollowingItemModel> liveFollowingList =
       <LiveFollowingItemModel>[].obs;
+  RxInt liveFollowingCount = 0.obs;
   bool flag = false;
   OverlayEntry? popupDialog;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void onInit() {
@@ -27,9 +28,6 @@ class LiveController extends GetxController {
 
   // 获取推荐
   Future queryLiveList(type) async {
-    // if (type == 'init') {
-    //   _currentPage = 1;
-    // }
     var res = await LiveHttp.liveList(
       pn: _currentPage,
     );
@@ -68,13 +66,14 @@ class LiveController extends GetxController {
 
   //
   Future fetchLiveFollowing() async {
-    var res = await LiveHttp.liveFollowing(pn: 1, ps: 20);
+    var res = await LiveHttp.liveFollowing(pn: 1, ps: 10);
     if (res['status']) {
       liveFollowingList.value =
           (res['data'].list as List<LiveFollowingItemModel>)
               .where((LiveFollowingItemModel item) =>
                   item.liveStatus == 1 && item.recordLiveTime == 0) // 根据条件过滤
               .toList();
+      liveFollowingCount.value = res['data'].liveCount;
     }
     return res;
   }

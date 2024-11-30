@@ -19,8 +19,9 @@ class MediaListPanel extends StatefulWidget {
     this.changeMediaList,
     this.panelTitle,
     this.bvid,
-    this.mediaId,
+    required this.mediaId,
     this.hasMore = false,
+    required this.type,
     super.key,
   });
 
@@ -29,8 +30,9 @@ class MediaListPanel extends StatefulWidget {
   final Function? changeMediaList;
   final String? panelTitle;
   final String? bvid;
-  final int? mediaId;
+  final int mediaId;
   final bool hasMore;
+  final int type;
 
   @override
   State<MediaListPanel> createState() => _MediaListPanelState();
@@ -59,8 +61,8 @@ class _MediaListPanelState extends State<MediaListPanel> {
 
   void loadMore() async {
     var res = await UserHttp.getMediaList(
-      type: 3,
-      bizId: widget.mediaId!,
+      type: widget.type,
+      bizId: widget.mediaId,
       ps: 20,
       oid: mediaList.last.id,
     );
@@ -83,7 +85,6 @@ class _MediaListPanelState extends State<MediaListPanel> {
           AppBar(
             toolbarHeight: 45,
             automaticallyImplyLeading: false,
-            centerTitle: false,
             title: Text(
               widget.panelTitle ?? '稍后再看',
               style: Theme.of(context).textTheme.titleSmall,
@@ -109,7 +110,7 @@ class _MediaListPanelState extends State<MediaListPanel> {
                     var item = mediaList[index];
                     return InkWell(
                       onTap: () async {
-                        String bvid = item.bvId!;
+                        String bvid = item.bvid!;
                         int? aid = item.id;
                         String cover = item.cover ?? '';
                         final int cid =
@@ -173,7 +174,7 @@ class _MediaListPanelState extends State<MediaListPanel> {
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w500,
-                                              color: item.bvId == widget.bvid
+                                              color: item.bvid == widget.bvid
                                                   ? Theme.of(context)
                                                       .colorScheme
                                                       .primary

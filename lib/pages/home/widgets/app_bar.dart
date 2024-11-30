@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/pages/mine/view.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box userInfoCache = GStrorage.userInfo;
+Box userInfoCache = GStorage.userInfo;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     return SliverAppBar(
       // forceElevated: true,
       scrolledUnderElevation: 0,
@@ -29,7 +29,6 @@ class HomeAppBar extends StatelessWidget {
             background: Column(
               children: [
                 AppBar(
-                  centerTitle: false,
                   title: const Text(
                     'PiLiPaLa',
                     style: TextStyle(
@@ -54,19 +53,9 @@ class HomeAppBar extends StatelessWidget {
                     //   icon: const Icon(CupertinoIcons.bell, size: 22),
                     // ),
                     const SizedBox(width: 6),
-
-                    /// TODO
                     if (userInfo != null) ...[
                       GestureDetector(
-                        onTap: () => showModalBottomSheet(
-                          context: context,
-                          builder: (_) => const SizedBox(
-                            height: 450,
-                            child: MinePage(),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          isScrollControlled: true,
-                        ),
+                        onTap: () => Get.toNamed('/mine'),
                         child: NetworkImgLayer(
                           type: 'avatar',
                           width: 32,
@@ -77,23 +66,13 @@ class HomeAppBar extends StatelessWidget {
                       const SizedBox(width: 10),
                     ] else ...[
                       IconButton(
-                        onPressed: () => showModalBottomSheet(
-                          context: context,
-                          builder: (_) => const SizedBox(
-                            height: 450,
-                            child: MinePage(),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          isScrollControlled: true,
-                        ),
+                        onPressed: () => Get.toNamed('/mine'),
                         icon: const Icon(CupertinoIcons.person, size: 22),
                       ),
                     ],
 
                     const SizedBox(width: 10)
                   ],
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
                 ),
               ],
             ),

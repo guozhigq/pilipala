@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/init.dart';
 import 'package:pilipala/models/common/theme_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/feed_back.dart';
 import 'package:pilipala/utils/login.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -13,16 +13,16 @@ import '../main/index.dart';
 import 'widgets/select_dialog.dart';
 
 class SettingController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
-  Box setting = GStrorage.setting;
-  Box localCache = GStrorage.localCache;
+  Box userInfoCache = GStorage.userInfo;
+  Box setting = GStorage.setting;
+  Box localCache = GStorage.localCache;
 
   RxBool userLogin = false.obs;
   RxBool feedBackEnable = false.obs;
   RxDouble toastOpacity = (1.0).obs;
   RxInt picQuality = 10.obs;
   Rx<ThemeType> themeType = ThemeType.system.obs;
-  var userInfo;
+  UserInfoData? userInfo;
   Rx<DynamicBadgeMode> dynamicBadgeType = DynamicBadgeMode.number.obs;
   RxInt defaultHomePage = 0.obs;
 
@@ -61,16 +61,7 @@ class SettingController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
-                // 清空cookie
-                await Request.cookieManager.cookieJar.deleteAll();
-                Request.dio.options.headers['cookie'] = '';
-
-                // 清空本地存储的用户标识
-                userInfoCache.put('userInfoCache', null);
-                localCache
-                    .put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
-
-                await LoginUtils.refreshLoginStatus(false);
+                await LoginUtils.loginOut();
                 SmartDialog.dismiss().then((value) => Get.back());
               },
               child: const Text('确认'),

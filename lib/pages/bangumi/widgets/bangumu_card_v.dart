@@ -25,6 +25,7 @@ class BangumiCardV extends StatelessWidget {
         RoutePush.bangumiPush(
           bangumiItem.seasonId,
           null,
+          progressIndex: bangumiItem.progressIndex,
           heroTag: heroTag,
         );
       },
@@ -37,7 +38,7 @@ class BangumiCardV extends StatelessWidget {
               StyleString.imgRadius,
             ),
             child: AspectRatio(
-              aspectRatio: 0.65,
+              aspectRatio: 0.75,
               child: LayoutBuilder(builder: (context, boxConstraints) {
                 final double maxWidth = boxConstraints.maxWidth;
                 final double maxHeight = boxConstraints.maxHeight;

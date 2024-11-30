@@ -8,7 +8,7 @@ import 'package:pilipala/utils/utils.dart';
 class RoutePush {
   // 番剧跳转
   static Future<void> bangumiPush(int? seasonId, int? epId,
-      {String? heroTag}) async {
+      {String? heroTag, int? progressIndex}) async {
     SmartDialog.showLoading<dynamic>(msg: '获取中...');
     try {
       var result = await SearchHttp.bangumiInfo(seasonId: seasonId, epId: epId);
@@ -19,7 +19,10 @@ class RoutePush {
           return;
         }
         final BangumiInfoModel bangumiDetail = result['data'];
-        final EpisodeItem episode = bangumiDetail.episodes!.first;
+        EpisodeItem episode = bangumiDetail.episodes!.first;
+        if (progressIndex != null && progressIndex >= 1) {
+          episode = bangumiDetail.episodes![progressIndex - 1];
+        }
         final int epId = episode.id!;
         final int cid = episode.cid!;
         final String bvid = episode.bvid!;
@@ -31,7 +34,7 @@ class RoutePush {
         };
         arguments['heroTag'] = heroTag ?? Utils.makeHeroTag(cid);
         Get.toNamed(
-          '/video?bvid=$bvid&cid=$cid&epId=$epId',
+          '/video?bvid=$bvid&cid=$cid&epId=$epId&seasonId=$seasonId',
           arguments: arguments,
         );
       } else {

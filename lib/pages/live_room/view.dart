@@ -108,6 +108,12 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final isPortrait = mediaQuery.orientation == Orientation.portrait;
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+
+    final padding = mediaQuery.padding;
+
     Widget videoPlayerPanel = FutureBuilder(
       future: _futureBuilderFuture,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -187,10 +193,8 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             children: [
               Obx(
                 () => SizedBox(
-                  height: MediaQuery.of(context).padding.top +
-                      (_liveRoomController.isPortrait.value ||
-                              MediaQuery.of(context).orientation ==
-                                  Orientation.landscape
+                  height: padding.top +
+                      (_liveRoomController.isPortrait.value || isLandscape
                           ? 0
                           : kToolbarHeight),
                 ),
@@ -201,21 +205,18 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                   if (plPlayerController.isFullScreen.value == true) {
                     plPlayerController.triggerFullScreen(status: false);
                   }
-                  if (MediaQuery.of(context).orientation ==
-                      Orientation.landscape) {
+                  if (isLandscape) {
                     verticalScreen();
                   }
                 },
                 child: Obx(
                   () => Container(
                     width: Get.size.width,
-                    height: MediaQuery.of(context).orientation ==
-                            Orientation.landscape
+                    height: isLandscape
                         ? Get.size.height
                         : !_liveRoomController.isPortrait.value
                             ? Get.size.width * 9 / 16
-                            : Get.size.height -
-                                MediaQuery.of(context).padding.top,
+                            : Get.size.height - padding.top,
                     clipBehavior: Clip.hardEdge,
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -229,7 +230,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           // 定位 快速滑动到底部
           Positioned(
             right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 80,
+            bottom: padding.bottom + 80,
             child: SlideTransition(
               position: Tween<Offset>(
                 begin: const Offset(0, 4),
@@ -258,14 +259,9 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             left: 0,
             right: 0,
             child: AppBar(
-              centerTitle: false,
-              titleSpacing: 0,
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
-              toolbarHeight:
-                  MediaQuery.of(context).orientation == Orientation.portrait
-                      ? 56
-                      : 0,
+              toolbarHeight: isPortrait ? 56 : 0,
               title: FutureBuilder(
                 future: _futureBuilder,
                 builder: (context, snapshot) {
@@ -316,36 +312,42 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             ),
           ),
           // 消息列表
-          Obx(
-            () => Positioned(
-              top: MediaQuery.of(context).padding.top +
-                  kToolbarHeight +
-                  (_liveRoomController.isPortrait.value
-                      ? Get.size.width
-                      : Get.size.width * 9 / 16),
-              bottom: 90 + MediaQuery.of(context).padding.bottom,
-              left: 0,
-              right: 0,
-              child: buildMessageListUI(
-                context,
-                _liveRoomController,
-                _scrollController,
+          Visibility(
+            visible: !isLandscape,
+            child: Obx(
+              () => Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 90 + padding.bottom,
+                  ),
+                  height: Get.size.height -
+                      (padding.top +
+                          kToolbarHeight +
+                          (_liveRoomController.isPortrait.value
+                              ? Get.size.width
+                              : Get.size.width * 9 / 16) +
+                          100 +
+                          padding.bottom),
+                  child: buildMessageListUI(
+                    context,
+                    _liveRoomController,
+                    _scrollController,
+                  ),
+                ),
               ),
             ),
           ),
           // 消息输入框
           Visibility(
-            visible: MediaQuery.of(context).orientation == Orientation.portrait,
+            visible: isPortrait,
             child: Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
                 padding: EdgeInsets.only(
-                    left: 14,
-                    right: 14,
-                    top: 4,
-                    bottom: MediaQuery.of(context).padding.bottom + 20),
+                    left: 14, right: 14, top: 4, bottom: padding.bottom + 20),
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.1),
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -421,6 +423,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
         ],
       ),
     );
+
     if (Platform.isAndroid) {
       return PiPSwitcher(
         childWhenDisabled: childWhenDisabled,
@@ -438,84 +441,82 @@ Widget buildMessageListUI(
   LiveRoomController liveRoomController,
   ScrollController scrollController,
 ) {
-  return Expanded(
-    child: Obx(
-      () => MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        removeBottom: true,
-        child: ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.5),
-                Colors.black,
-              ],
-              stops: const [0.01, 0.05, 0.2],
-            ).createShader(bounds);
+  return Obx(
+    () => MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
+      child: ShaderMask(
+        shaderCallback: (Rect bounds) {
+          return LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withOpacity(0.5),
+              Colors.black,
+            ],
+            stops: const [0.01, 0.05, 0.2],
+          ).createShader(bounds);
+        },
+        blendMode: BlendMode.dstIn,
+        child: GestureDetector(
+          onTap: () {
+            // 键盘失去焦点
+            FocusScope.of(context).requestFocus(FocusNode());
           },
-          blendMode: BlendMode.dstIn,
-          child: GestureDetector(
-            onTap: () {
-              // 键盘失去焦点
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            child: ListView.builder(
-              controller: scrollController,
-              itemCount: liveRoomController.messageList.length,
-              itemBuilder: (context, index) {
-                final LiveMessageModel liveMsgItem =
-                    liveRoomController.messageList[index];
-                return Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: liveRoomController.isPortrait.value
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.grey.withOpacity(0.1),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    ),
-                    margin: EdgeInsets.only(
-                      top: index == 0 ? 20.0 : 0.0,
-                      bottom: 6.0,
-                      left: 14.0,
-                      right: 14.0,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 3.0,
-                      horizontal: 10.0,
-                    ),
-                    child: Text.rich(
-                      TextSpan(
-                        style: const TextStyle(color: Colors.white),
-                        children: [
-                          TextSpan(
-                            text: '${liveMsgItem.userName}: ',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // 处理点击事件
-                                print('Text clicked');
-                              },
+          child: ListView.builder(
+            controller: scrollController,
+            itemCount: liveRoomController.messageList.length,
+            itemBuilder: (context, index) {
+              final LiveMessageModel liveMsgItem =
+                  liveRoomController.messageList[index];
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: liveRoomController.isPortrait.value
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.grey.withOpacity(0.1),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  margin: EdgeInsets.only(
+                    top: index == 0 ? 20.0 : 0.0,
+                    bottom: 6.0,
+                    left: 14.0,
+                    right: 14.0,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 3.0,
+                    horizontal: 10.0,
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      style: const TextStyle(color: Colors.white),
+                      children: [
+                        TextSpan(
+                          text: '${liveMsgItem.userName}: ',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
                           ),
-                          TextSpan(
-                            children: [
-                              ...buildMessageTextSpan(context, liveMsgItem)
-                            ],
-                            // text: liveMsgItem.message,
-                          ),
-                        ],
-                      ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // 处理点击事件
+                              print('Text clicked');
+                            },
+                        ),
+                        TextSpan(
+                          children: [
+                            ...buildMessageTextSpan(context, liveMsgItem)
+                          ],
+                          // text: liveMsgItem.message,
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

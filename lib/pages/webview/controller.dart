@@ -84,6 +84,6 @@ class WebviewController extends GetxController {
           },
         ),
       )
-      ..loadRequest(Uri.parse(url));
+      ..loadRequest(Uri.parse(url.startsWith('http') ? url : 'https://$url'));
   }
 }

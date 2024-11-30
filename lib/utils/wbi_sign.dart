@@ -9,7 +9,7 @@ import '../http/index.dart';
 import 'storage.dart';
 
 class WbiSign {
-  static Box<dynamic> localCache = GStrorage.localCache;
+  static Box<dynamic> localCache = GStorage.localCache;
   final List<int> mixinKeyEncTab = <int>[
     46,
     47,

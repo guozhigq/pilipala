@@ -27,15 +27,10 @@ class _FollowPageState extends State<FollowPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        centerTitle: false,
         title: Text(
           _followController.isOwner.value
               ? '我的关注'
               : '${_followController.name}的关注',
-          style: Theme.of(context).textTheme.titleMedium,
         ),
         actions: [
           IconButton(

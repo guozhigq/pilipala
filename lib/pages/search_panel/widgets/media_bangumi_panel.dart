@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
-import 'package:pilipala/http/search.dart';
-import 'package:pilipala/models/bangumi/info.dart';
-import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -30,8 +25,8 @@ Widget searchMbangumiPanel(BuildContext context, ctr, list) {
           // });
         },
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              StyleString.safeSpace, 7, StyleString.safeSpace, 7),
+          padding: const EdgeInsets.symmetric(
+              horizontal: StyleString.safeSpace, vertical: 7),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -27,12 +27,13 @@ class SeasonPanel extends StatefulWidget {
 }
 
 class _SeasonPanelState extends State<SeasonPanel> {
-  late List<EpisodeItem> episodes;
+  List<EpisodeItem>? episodes;
   late int cid;
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
   late VideoDetailController _videoDetailController;
   late PersistentBottomSheetController? _bottomSheetController;
+  int currentEpisodeIndex = -1;
 
   @override
   void initState() {
@@ -41,13 +42,12 @@ class _SeasonPanelState extends State<SeasonPanel> {
     _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
 
     /// 根据 cid 找到对应集，找到对应 episodes
-    /// 有多个episodes时，只显示其中一个
-    /// TODO 同时显示多个合集
     final List<SectionItem> sections = widget.ugcSeason.sections!;
     for (int i = 0; i < sections.length; i++) {
       final List<EpisodeItem> episodesList = sections[i].episodes!;
       for (int j = 0; j < episodesList.length; j++) {
         if (episodesList[j].cid == cid) {
+          currentEpisodeIndex = i;
           episodes = episodesList;
           continue;
         }
@@ -55,10 +55,10 @@ class _SeasonPanelState extends State<SeasonPanel> {
     }
 
     /// 取对应 season_id 的 episodes
-    currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    getCurrentIndex();
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
-      currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+      getCurrentIndex();
     });
   }
 
@@ -73,6 +73,27 @@ class _SeasonPanelState extends State<SeasonPanel> {
     _bottomSheetController?.close();
   }
 
+  // 获取currentIndex
+  void getCurrentIndex() {
+    if (episodes != null) {
+      currentIndex.value =
+          episodes!.indexWhere((EpisodeItem e) => e.cid == cid);
+    }
+    final List<SectionItem> sections = widget.ugcSeason.sections!;
+    if (sections.length == 1 && sections.first.type == 1) {
+      final List<EpisodeItem> episodesList = sections.first.episodes!;
+      for (int i = 0; i < episodesList.length; i++) {
+        for (int j = 0; j < episodesList[i].pages!.length; j++) {
+          if (episodesList[i].pages![j].cid == cid) {
+            currentIndex.value = i;
+            episodes = episodesList;
+            continue;
+          }
+        }
+      }
+    }
+  }
+
   Widget buildEpisodeListItem(
     EpisodeItem episode,
     int index,
@@ -84,7 +105,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
       dense: false,
       leading: isCurrentIndex
           ? Image.asset(
-              'assets/images/live.gif',
+              'assets/images/live.png',
               color: primary,
               height: 12,
             )
@@ -120,11 +141,13 @@ class _SeasonPanelState extends State<SeasonPanel> {
               widget.videoIntroCtr.bottomSheetController =
                   _bottomSheetController = EpisodeBottomSheet(
                 currentCid: cid,
-                episodes: episodes,
+                episodes: episodes!,
                 changeFucCall: changeFucCall,
                 sheetHeight: widget.sheetHeight,
                 dataType: VideoEpidoesType.videoEpisode,
-                context: context,
+                ugcSeason: widget.ugcSeason,
+                currentEpisodeIndex: currentEpisodeIndex,
+                currentIndex: currentIndex.value,
               ).show(context);
             },
             child: Padding(
@@ -140,13 +163,13 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   ),
                   const SizedBox(width: 15),
                   Image.asset(
-                    'assets/images/live.gif',
+                    'assets/images/live.png',
                     color: Theme.of(context).colorScheme.primary,
                     height: 12,
                   ),
                   const SizedBox(width: 10),
                   Obx(() => Text(
-                        '${currentIndex.value + 1}/${episodes.length}',
+                        '${currentIndex.value + 1}/${episodes!.length}',
                         style: Theme.of(context).textTheme.labelMedium,
                       )),
                   const SizedBox(width: 6),

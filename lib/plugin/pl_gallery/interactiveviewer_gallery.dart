@@ -2,11 +2,13 @@ library interactiveviewer_gallery;
 
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/utils/download.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:status_bar_control/status_bar_control.dart';
@@ -28,15 +30,27 @@ typedef IndexedFocusedWidgetBuilder = Widget Function(
 
 typedef IndexedTagStringBuilder = String Function(int index);
 
+// 图片操作类型
+enum ImgActionType {
+  share,
+  copy,
+  save,
+}
+
 class InteractiveviewerGallery<T> extends StatefulWidget {
   const InteractiveviewerGallery({
     required this.sources,
     required this.initIndex,
-    required this.itemBuilder,
+    this.itemBuilder,
     this.maxScale = 4.5,
     this.minScale = 1.0,
     this.onPageChanged,
     this.onDismissed,
+    this.actionType = const [
+      ImgActionType.share,
+      ImgActionType.copy,
+      ImgActionType.save
+    ],
     Key? key,
   }) : super(key: key);
 
@@ -47,7 +61,7 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
   final int initIndex;
 
   /// The item content
-  final IndexedFocusedWidgetBuilder itemBuilder;
+  final IndexedFocusedWidgetBuilder? itemBuilder;
 
   final double maxScale;
 
@@ -56,6 +70,8 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
   final ValueChanged<int>? onPageChanged;
 
   final ValueChanged<int>? onDismissed;
+
+  final List<ImgActionType> actionType;
 
   @override
   State<InteractiveviewerGallery> createState() =>
@@ -218,17 +234,17 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
 
   @override
   Widget build(BuildContext context) {
-    return InteractiveViewerBoundary(
-      controller: _transformationController,
-      boundaryWidth: MediaQuery.of(context).size.width,
-      onScaleChanged: _onScaleChanged,
-      onLeftBoundaryHit: _onLeftBoundaryHit,
-      onRightBoundaryHit: _onRightBoundaryHit,
-      onNoBoundaryHit: _onNoBoundaryHit,
-      maxScale: widget.maxScale,
-      minScale: widget.minScale,
-      child: Stack(children: [
-        CustomDismissible(
+    return Stack(children: [
+      InteractiveViewerBoundary(
+        controller: _transformationController,
+        boundaryWidth: MediaQuery.of(context).size.width,
+        onScaleChanged: _onScaleChanged,
+        onLeftBoundaryHit: _onLeftBoundaryHit,
+        onRightBoundaryHit: _onRightBoundaryHit,
+        onNoBoundaryHit: _onNoBoundaryHit,
+        maxScale: widget.maxScale,
+        minScale: widget.minScale,
+        child: CustomDismissible(
           onDismissed: () {
             Navigator.of(context).pop();
             widget.onDismissed?.call(_pageController!.page!.floor());
@@ -245,99 +261,68 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                 onDoubleTapDown: (TapDownDetails details) {
                   _doubleTapLocalPosition = details.localPosition;
                 },
-                onDoubleTap: onDoubleTap,
-                child: widget.itemBuilder(
-                  context,
-                  index,
-                  index == currentIndex,
-                  _enablePageView,
-                ),
+                onDoubleTap: _onDoubleTap,
+                onLongPress: _onLongPress,
+                child: widget.itemBuilder != null
+                    ? widget.itemBuilder!(
+                        context,
+                        index,
+                        index == currentIndex,
+                        _enablePageView,
+                      )
+                    : _itemBuilder(widget.sources, index),
               );
             },
           ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(
-                12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
-            decoration: _enablePageView
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3)
-                      ],
-                    ),
-                  )
-                : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onDismissed?.call(_pageController!.page!.floor());
-                  },
-                ),
-                widget.sources.length > 1
-                    ? Text(
-                        "${currentIndex! + 1}/${widget.sources.length}",
-                        style: const TextStyle(color: Colors.white),
-                      )
-                    : const SizedBox(),
-                PopupMenuButton(
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        value: 0,
-                        onTap: () => onShareImg(widget.sources[currentIndex!]),
-                        child: const Text("分享图片"),
-                      ),
-                      PopupMenuItem(
-                        value: 1,
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(
-                                  text:
-                                      widget.sources[currentIndex!].toString()))
-                              .then((value) {
-                            SmartDialog.showToast('已复制到粘贴板');
-                          }).catchError((err) {
-                            SmartDialog.showNotify(
-                              msg: err.toString(),
-                              notifyType: NotifyType.error,
-                            );
-                          });
-                        },
-                        child: const Text("复制图片"),
-                      ),
-                      PopupMenuItem(
-                        value: 2,
-                        onTap: () {
-                          DownloadUtils.downloadImg(
-                              widget.sources[currentIndex!]);
-                        },
-                        child: const Text("保存图片"),
-                      ),
-                    ];
-                  },
-                  child: const Icon(Icons.more_horiz, color: Colors.white),
-                ),
-              ],
-            ),
+      ),
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+              12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
+          decoration: _enablePageView
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
+                  ),
+                )
+              : null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  widget.onDismissed?.call(_pageController!.page!.floor());
+                },
+              ),
+              widget.sources.length > 1
+                  ? Text(
+                      "${currentIndex! + 1}/${widget.sources.length}",
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : const SizedBox(),
+              PopupMenuButton(
+                itemBuilder: (context) {
+                  return _buildPopupMenuList();
+                },
+                child: const Icon(Icons.more_horiz, color: Colors.white),
+              ),
+            ],
           ),
         ),
-      ]),
-    );
+      ),
+    ]);
   }
 
   // 图片分享
-  void onShareImg(String imgUrl) async {
+  void _onShareImg(String imgUrl) async {
     SmartDialog.showLoading();
     var response = await Dio()
         .get(imgUrl, options: Options(responseType: ResponseType.bytes));
@@ -350,7 +335,42 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
     Share.shareXFiles([XFile(path)], subject: imgUrl);
   }
 
-  onDoubleTap() {
+  // 复制图片
+  void _onCopyImg(String imgUrl) {
+    Clipboard.setData(
+            ClipboardData(text: widget.sources[currentIndex!].toString()))
+        .then((value) {
+      SmartDialog.showToast('已复制到粘贴板');
+    }).catchError((err) {
+      SmartDialog.showNotify(
+        msg: err.toString(),
+        notifyType: NotifyType.error,
+      );
+    });
+  }
+
+  Widget _itemBuilder(sources, index) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (_enablePageView) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Center(
+        child: Hero(
+          tag: sources[index],
+          child: CachedNetworkImage(
+            fadeInDuration: const Duration(milliseconds: 0),
+            imageUrl: sources[index],
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
+  _onDoubleTap() {
     Matrix4 matrix = _transformationController!.value.clone();
     double currentScale = matrix.row0.x;
 
@@ -395,5 +415,96 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
     _animationController
         .forward(from: 0)
         .whenComplete(() => _onScaleChanged(targetScale));
+  }
+
+  _onLongPress() {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const DragHandle(),
+              ..._buildListTitles(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<PopupMenuEntry> _buildPopupMenuList() {
+    List<PopupMenuItem> items = [];
+    for (var i in widget.actionType) {
+      switch (i) {
+        case ImgActionType.share:
+          items.add(PopupMenuItem(
+            value: 0,
+            onTap: () => _onShareImg(widget.sources[currentIndex!]),
+            child: const Text("分享图片"),
+          ));
+          break;
+        case ImgActionType.copy:
+          items.add(PopupMenuItem(
+            value: 1,
+            onTap: () {
+              _onCopyImg(widget.sources[currentIndex!].toString());
+            },
+            child: const Text("复制图片"),
+          ));
+          break;
+        case ImgActionType.save:
+          items.add(PopupMenuItem(
+            value: 2,
+            onTap: () {
+              DownloadUtils.downloadImg(widget.sources[currentIndex!]);
+            },
+            child: const Text("保存图片"),
+          ));
+          break;
+      }
+    }
+    return items;
+  }
+
+  List<Widget> _buildListTitles() {
+    List<Widget> items = [];
+    for (var i in widget.actionType) {
+      switch (i) {
+        case ImgActionType.share:
+          items.add(ListTile(
+            onTap: () {
+              _onShareImg(widget.sources[currentIndex!]);
+              Navigator.of(context).pop();
+            },
+            title: const Text('分享图片'),
+          ));
+          break;
+        case ImgActionType.copy:
+          items.add(ListTile(
+            onTap: () {
+              _onCopyImg(widget.sources[currentIndex!].toString());
+              Navigator.of(context).pop();
+            },
+            title: const Text('复制图片'),
+          ));
+          break;
+        case ImgActionType.save:
+          items.add(ListTile(
+            onTap: () {
+              DownloadUtils.downloadImg(widget.sources[currentIndex!]);
+              Navigator.of(context).pop();
+            },
+            title: const Text('保存图片'),
+          ));
+          break;
+      }
+    }
+    return items;
   }
 }

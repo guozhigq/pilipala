@@ -41,6 +41,7 @@ class MemberSeasonsPanel extends StatelessWidget {
                       'category': '1',
                       'mid': item.meta!.mid.toString(),
                       'seriesId': item.meta!.seriesId.toString(),
+                      'seasonId': item.meta!.seasonId.toString(),
                       'seasonName': item.meta!.name!,
                     };
                   }

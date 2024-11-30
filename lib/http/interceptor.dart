@@ -3,8 +3,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:hive/hive.dart';
-import '../utils/storage.dart';
+import 'package:pilipala/utils/login.dart';
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -19,20 +18,9 @@ class ApiInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     try {
-      if (response.statusCode == 302) {
-        final List<String> locations = response.headers['location']!;
-        if (locations.isNotEmpty) {
-          if (locations.first.startsWith('https://www.mcbbs.net')) {
-            final Uri uri = Uri.parse(locations.first);
-            final String? accessKey = uri.queryParameters['access_key'];
-            final String? mid = uri.queryParameters['mid'];
-            try {
-              Box localCache = GStrorage.localCache;
-              localCache.put(LocalCacheKey.accessKey,
-                  <String, String?>{'mid': mid, 'value': accessKey});
-            } catch (_) {}
-          }
-        }
+      // 在响应之后处理数据
+      if (response.data is Map && response.data['code'] == -101) {
+        LoginUtils.loginOut();
       }
     } catch (err) {
       print('ApiInterceptor: $err');

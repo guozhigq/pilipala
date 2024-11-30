@@ -19,6 +19,7 @@ class FavVideoCardH extends StatelessWidget {
   final Function? callFn;
   final int? searchType;
   final String isOwner;
+  final Function? viewInvalidVideoCb;
 
   const FavVideoCardH({
     Key? key,
@@ -26,6 +27,7 @@ class FavVideoCardH extends StatelessWidget {
     this.callFn,
     this.searchType,
     required this.isOwner,
+    this.viewInvalidVideoCb,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,10 @@ class FavVideoCardH extends StatelessWidget {
     return InkWell(
       onTap: () async {
         // int? seasonId;
+        if (videoItem.title == '已失效视频') {
+          viewInvalidVideoCb?.call();
+          return;
+        }
         String? epId;
         if (videoItem.ogv != null &&
             (videoItem.ogv['type_name'] == '番剧' ||
@@ -65,11 +71,17 @@ class FavVideoCardH extends StatelessWidget {
               epId != null ? SearchType.media_bangumi : SearchType.video,
         });
       },
-      onLongPress: () => imageSaveDialog(
-        context,
-        videoItem,
-        SmartDialog.dismiss,
-      ),
+      onLongPress: () {
+        if (videoItem.title == '已失效视频') {
+          SmartDialog.showToast('视频已失效');
+          return;
+        }
+        imageSaveDialog(
+          context,
+          videoItem,
+          SmartDialog.dismiss,
+        );
+      },
       child: Column(
         children: [
           Padding(
