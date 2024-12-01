@@ -523,7 +523,7 @@ class VideoIntroController extends GetxController {
         Get.find<VideoDetailController>(tag: heroTag);
 
     /// 优先稍后再看、收藏夹
-    if (videoDetailCtr.isWatchLaterVisible.value) {
+    if (videoDetailCtr.sourceType.value != 'normal') {
       episodes.addAll(videoDetailCtr.mediaList);
     } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
