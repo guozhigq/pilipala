@@ -7,6 +7,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:marquee/marquee.dart';
 import 'package:ns_danmaku/ns_danmaku.dart';
 import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/http/user.dart';
@@ -62,6 +63,7 @@ class _HeaderControlState extends State<HeaderControl> {
   late String heroTag;
   late VideoIntroController videoIntroController;
   late VideoDetailData videoDetail;
+  DateTime initialTime = DateTime.now();
 
   @override
   void initState() {
@@ -108,30 +110,6 @@ class _HeaderControlState extends State<HeaderControl> {
                   child: Material(
                 child: ListView(
                   children: [
-                    // ListTile(
-                    //   onTap: () {},
-                    //   dense: true,
-                    //   enabled: false,
-                    //   leading:
-                    //       const Icon(Icons.network_cell_outlined, size: 20),
-                    //   title: Text('省流模式', style: titleStyle),
-                    //   subtitle: Text('低画质 ｜ 减少视频缓存', style: subTitleStyle),
-                    //   trailing: Transform.scale(
-                    //     scale: 0.75,
-                    //     child: Switch(
-                    //       thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                    //           (Set<MaterialState> states) {
-                    //         if (states.isNotEmpty &&
-                    //             states.first == MaterialState.selected) {
-                    //           return const Icon(Icons.done);
-                    //         }
-                    //         return null; // All other states will use the default thumbIcon.
-                    //       }),
-                    //       value: false,
-                    //       onChanged: (value) => {},
-                    //     ),
-                    //   ),
-                    // ),
                     ListTile(
                       onTap: () async {
                         final res = await UserHttp.toViewLater(
@@ -1071,6 +1049,16 @@ class _HeaderControlState extends State<HeaderControl> {
     );
   }
 
+  Stream<DateTime> _getTimeStream() {
+    return Stream.periodic(const Duration(seconds: 60), (count) {
+      return DateTime.now();
+    });
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return '${dateTime.hour}:${dateTime.minute < 10 ? '0${dateTime.minute}' : dateTime.minute}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final _ = widget.controller!;
@@ -1086,49 +1074,12 @@ class _HeaderControlState extends State<HeaderControl> {
       primary: false,
       automaticallyImplyLeading: false,
       titleSpacing: 14,
-      title: Row(
+      title: Column(
         children: [
-          ComBtn(
-            icon: const Icon(
-              FontAwesomeIcons.arrowLeft,
-              size: 15,
-              color: Colors.white,
-            ),
-            fuc: () => <Set<void>>{
-              if (widget.controller!.isFullScreen.value)
-                <void>{widget.controller!.triggerFullScreen(status: false)}
-              else
-                <void>{
-                  if (MediaQuery.of(context).orientation ==
-                      Orientation.landscape)
-                    {
-                      SystemChrome.setPreferredOrientations([
-                        DeviceOrientation.portraitUp,
-                      ])
-                    },
-                  Get.back()
-                }
-            },
-          ),
-          SizedBox(width: buttonSpace),
-          if (isFullScreen.value &&
-              isLandscape &&
-              widget.videoType == SearchType.video) ...[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (isFullScreen.value && isLandscape) ...[
+            Row(
               children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  child: Obx(
-                    () => Text(
-                      videoIntroController.videoDetail.value.title ?? '',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
+                const SizedBox(width: 40),
                 if (videoIntroController.isShowOnlineTotal)
                   Text(
                     '${videoIntroController.total.value}人正在看',
@@ -1136,138 +1087,226 @@ class _HeaderControlState extends State<HeaderControl> {
                       color: Colors.white,
                       fontSize: 12,
                     ),
-                  )
+                  ),
+                const Spacer(),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: StreamBuilder<DateTime>(
+                      stream: _getTimeStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String currentTime = _formatTime(snapshot.data!);
+                          return Text(
+                            currentTime,
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // 如果Stream还未发出数据，先显示初始获取的时间
+                          String currentTime = _formatTime(initialTime);
+                          return Text(
+                            currentTime,
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                const Spacer(),
+
+                /// TODO 网络&电量
               ],
-            )
-          ] else ...[
-            ComBtn(
-              icon: const Icon(
-                FontAwesomeIcons.house,
-                size: 15,
-                color: Colors.white,
-              ),
-              fuc: () async {
-                // 销毁播放器实例
-                await widget.controller!.dispose(type: 'all');
-                if (context.mounted) {
-                  Navigator.popUntil(
-                      context, (Route<dynamic> route) => route.isFirst);
-                }
-              },
             ),
           ],
-          const Spacer(),
-          if (GlobalDataCache.enableDlna) ...[
-            ComBtn(
-              icon: Image.asset('assets/images/video/dlna.png', width: 19),
-              fuc: () async {
-                showDialog<void>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return LiveDlnaPage(
-                        datasource: widget.videoDetailCtr!.videoUrl);
-                  },
-                );
-              },
-            ),
-            SizedBox(width: buttonSpace),
-          ],
-
-          /// 弹幕开关（全屏时）
-          if (isFullScreen.value) ...[
-            SizedBox(
-              width: 56,
-              height: 34,
-              child: TextButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                ),
-                onPressed: () => showShootDanmakuSheet(),
-                child: const Text(
-                  '发弹幕',
-                  style: textStyle,
-                ),
-              ),
-            ),
-            SizedBox(width: buttonSpace),
-            SizedBox(
-              width: 34,
-              height: 34,
-              child: Obx(
-                () => IconButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  ),
-                  onPressed: () {
-                    _.isOpenDanmu.value = !_.isOpenDanmu.value;
-                  },
-                  icon: Icon(
-                    _.isOpenDanmu.value
-                        ? Icons.subtitles_outlined
-                        : Icons.subtitles_off_outlined,
-                    size: 19,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: buttonSpace),
-          ],
-
-          /// pip
-          if (Platform.isAndroid) ...<Widget>[
-            SizedBox(
-              width: 34,
-              height: 34,
-              child: IconButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                ),
-                onPressed: () async {
-                  bool canUsePiP = false;
-                  widget.controller!.hiddenControls(false);
-                  try {
-                    canUsePiP = await widget.floating!.isPipAvailable;
-                  } on PlatformException catch (_) {
-                    canUsePiP = false;
-                  }
-                  if (canUsePiP) {
-                    final Rational aspectRatio = Rational(
-                      widget.videoDetailCtr!.data.dash!.video!.first.width!,
-                      widget.videoDetailCtr!.data.dash!.video!.first.height!,
-                    );
-                    await widget.floating!.enable(aspectRatio: aspectRatio);
-                  } else {}
-                },
-                icon: Image.asset(
-                  'assets/images/video/pip.png',
-                  width: 19,
+          Row(
+            children: [
+              ComBtn(
+                icon: const Icon(
+                  FontAwesomeIcons.arrowLeft,
+                  size: 15,
                   color: Colors.white,
                 ),
+                fuc: () => <Set<void>>{
+                  if (widget.controller!.isFullScreen.value)
+                    <void>{widget.controller!.triggerFullScreen(status: false)}
+                  else
+                    <void>{
+                      if (MediaQuery.of(context).orientation ==
+                          Orientation.landscape)
+                        {
+                          SystemChrome.setPreferredOrientations([
+                            DeviceOrientation.portraitUp,
+                          ])
+                        },
+                      Get.back()
+                    }
+                },
               ),
-            ),
-            SizedBox(width: buttonSpace),
-          ],
+              SizedBox(width: buttonSpace),
+              if (isFullScreen.value &&
+                  isLandscape &&
+                  widget.videoType == SearchType.video) ...[
+                Expanded(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return SizedBox(
+                      width: constraints.maxWidth,
+                      height: 25,
+                      child: Obx(
+                        () => Marquee(
+                          text: videoIntroController.videoDetail.value.title ??
+                              '',
+                          style: const TextStyle(fontSize: 16),
+                          scrollAxis: Axis.horizontal,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          blankSpace: constraints.maxWidth,
+                          velocity: 100,
+                          pauseAfterRound: const Duration(seconds: 1),
+                          startPadding: 0,
+                          accelerationDuration: const Duration(seconds: 1),
+                          accelerationCurve: Curves.linear,
+                          decelerationDuration: const Duration(seconds: 1),
+                          decelerationCurve: Curves.easeOut,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ] else ...[
+                ComBtn(
+                  icon: const Icon(
+                    FontAwesomeIcons.house,
+                    size: 15,
+                    color: Colors.white,
+                  ),
+                  fuc: () async {
+                    // 销毁播放器实例
+                    await widget.controller!.dispose(type: 'all');
+                    if (context.mounted) {
+                      Navigator.popUntil(
+                          context, (Route<dynamic> route) => route.isFirst);
+                    }
+                  },
+                ),
+              ],
+              const Spacer(),
+              if (GlobalDataCache.enableDlna) ...[
+                ComBtn(
+                  icon: Image.asset('assets/images/video/dlna.png', width: 19),
+                  fuc: () async {
+                    showDialog<void>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return LiveDlnaPage(
+                            datasource: widget.videoDetailCtr!.videoUrl);
+                      },
+                    );
+                  },
+                ),
+                SizedBox(width: buttonSpace),
+              ],
 
-          /// 字幕
-          if (widget.showSubtitleBtn) ...[
-            ComBtn(
-              icon: Icon(
-                FontAwesomeIcons.closedCaptioning,
-                size: 16,
-                color: Colors.white.withOpacity(0.9),
+              /// 弹幕开关（全屏时）
+              if (isFullScreen.value) ...[
+                SizedBox(
+                  width: 56,
+                  height: 34,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () => showShootDanmakuSheet(),
+                    child: const Text(
+                      '发弹幕',
+                      style: textStyle,
+                    ),
+                  ),
+                ),
+                SizedBox(width: buttonSpace),
+                SizedBox(
+                  width: 34,
+                  height: 34,
+                  child: Obx(
+                    () => IconButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      onPressed: () {
+                        _.isOpenDanmu.value = !_.isOpenDanmu.value;
+                      },
+                      icon: Icon(
+                        _.isOpenDanmu.value
+                            ? Icons.subtitles_outlined
+                            : Icons.subtitles_off_outlined,
+                        size: 19,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: buttonSpace),
+              ],
+
+              /// pip
+              if (Platform.isAndroid) ...<Widget>[
+                SizedBox(
+                  width: 34,
+                  height: 34,
+                  child: IconButton(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () async {
+                      bool canUsePiP = false;
+                      widget.controller!.hiddenControls(false);
+                      try {
+                        canUsePiP = await widget.floating!.isPipAvailable;
+                      } on PlatformException catch (_) {
+                        canUsePiP = false;
+                      }
+                      if (canUsePiP) {
+                        final Rational aspectRatio = Rational(
+                          widget.videoDetailCtr!.data.dash!.video!.first.width!,
+                          widget
+                              .videoDetailCtr!.data.dash!.video!.first.height!,
+                        );
+                        await widget.floating!.enable(aspectRatio: aspectRatio);
+                      } else {}
+                    },
+                    icon: Image.asset(
+                      'assets/images/video/pip.png',
+                      width: 19,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(width: buttonSpace),
+              ],
+
+              /// 字幕
+              if (widget.showSubtitleBtn) ...[
+                ComBtn(
+                  icon: Icon(
+                    FontAwesomeIcons.closedCaptioning,
+                    size: 16,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                  fuc: () => showSubtitleDialog(),
+                ),
+                SizedBox(width: buttonSpace),
+              ],
+              ComBtn(
+                icon: const Icon(
+                  Icons.more_vert_outlined,
+                  size: 19,
+                  color: Colors.white,
+                ),
+                fuc: () => showSettingSheet(),
               ),
-              fuc: () => showSubtitleDialog(),
-            ),
-            SizedBox(width: buttonSpace),
-          ],
-          ComBtn(
-            icon: const Icon(
-              Icons.more_vert_outlined,
-              size: 19,
-              color: Colors.white,
-            ),
-            fuc: () => showSettingSheet(),
+            ],
           ),
         ],
       ),

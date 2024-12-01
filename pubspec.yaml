@@ -152,6 +152,8 @@ dependencies:
   re_highlight: ^0.0.3
   # 图片选择器
   image_picker: ^1.1.2
+  # 跑马灯
+  marquee: ^2.2.3
 
 dev_dependencies:
   flutter_test:
