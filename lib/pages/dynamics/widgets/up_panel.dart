@@ -4,17 +4,22 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/dynamics/up.dart';
 import 'package:pilipala/models/live/item.dart';
+import 'package:pilipala/plugin/pl_popup/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/utils.dart';
+
+import '../controller.dart';
+import '../up_dynamic/route_panel.dart';
 
 class UpPanel extends StatefulWidget {
   final FollowUpModel upData;
-  final Function? onClickUpCb;
+  final DynamicsController dynamicsController;
 
   const UpPanel({
     super.key,
     required this.upData,
-    this.onClickUpCb,
+    required this.dynamicsController,
   });
 
   @override
@@ -23,12 +28,13 @@ class UpPanel extends StatefulWidget {
 
 class _UpPanelState extends State<UpPanel> {
   final ScrollController scrollController = ScrollController();
-  int currentMid = -1;
+  RxInt currentMid = (-1).obs;
   late double contentWidth = 56;
   List<UpItem> upList = [];
   List<LiveUserItem> liveList = [];
   static const itemPadding = EdgeInsets.symmetric(horizontal: 5, vertical: 0);
   late MyInfo userInfo;
+  RxBool showLiveUser = false.obs;
 
   void listFormat() {
     userInfo = widget.upData.myInfo!;
@@ -37,26 +43,44 @@ class _UpPanelState extends State<UpPanel> {
   }
 
   void onClickUp(data, i) {
-    currentMid = data.mid;
-    widget.onClickUpCb?.call(data);
-    // int liveLen = liveList.length;
-    // int upLen = upList.length;
-    // double itemWidth = contentWidth + itemPadding.horizontal;
-    // double screenWidth = MediaQuery.sizeOf(context).width;
-    // double moveDistance = 0.0;
-    // if (itemWidth * (upList.length + liveList.length) <= screenWidth) {
-    // } else if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
-    //   moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
-    // } else {
-    //   moveDistance = (upLen + liveLen) * itemWidth + 46 - screenWidth;
-    // }
-    // data.hasUpdate = false;
-    // scrollController.animateTo(
-    //   moveDistance,
-    //   duration: const Duration(milliseconds: 200),
-    //   curve: Curves.linear,
-    // );
-    // setState(() {});
+    currentMid.value = data.mid;
+    Navigator.push(
+      context,
+      PlPopupRoute(
+        child: OverlayPanel(
+          ctr: widget.dynamicsController,
+          upInfo: data,
+        ),
+      ),
+    ).then((value) => {currentMid.value = -1});
+  }
+
+  void onClickUpAni(data, i) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final itemWidth = contentWidth + itemPadding.horizontal;
+    final liveLen = liveList.length;
+    final upLen = upList.length;
+
+    currentMid.value = data.mid;
+    widget.dynamicsController.onTapUp(data);
+
+    double moveDistance = 0.0;
+    final totalItemsWidth = itemWidth * (upLen + liveLen);
+
+    if (totalItemsWidth > screenWidth) {
+      if ((upLen - i - 0.5) * itemWidth > screenWidth / 2) {
+        moveDistance = (i + liveLen + 0.5) * itemWidth + 46 - screenWidth / 2;
+      } else {
+        moveDistance = totalItemsWidth + 46 - screenWidth;
+      }
+    }
+
+    data.hasUpdate = false;
+    scrollController.animateTo(
+      moveDistance,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -108,21 +132,70 @@ class _UpPanelState extends State<UpPanel> {
                         children: [
                           const SizedBox(width: 10),
                           if (liveList.isNotEmpty) ...[
-                            for (int i = 0; i < liveList.length; i++) ...[
-                              upItemBuild(liveList[i], i)
-                            ],
-                            VerticalDivider(
-                              indent: 20,
-                              endIndent: 40,
-                              width: 26,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withOpacity(0.5),
+                            Obx(
+                              () => AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                transitionBuilder: (Widget child,
+                                    Animation<double> animation) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                                child: showLiveUser.value
+                                    ? Row(
+                                        key: ValueKey<bool>(showLiveUser.value),
+                                        children: [
+                                          for (int i = 0;
+                                              i < liveList.length;
+                                              i++)
+                                            UpItemWidget(
+                                              data: liveList[i],
+                                              index: i,
+                                              currentMid: currentMid,
+                                              onClickUp: onClickUp,
+                                              onClickUpAni: onClickUpAni,
+                                              itemPadding: itemPadding,
+                                              contentWidth: contentWidth,
+                                            )
+                                        ],
+                                      )
+                                    : SizedBox.shrink(
+                                        key: ValueKey<bool>(showLiveUser.value),
+                                      ),
+                              ),
+                            ),
+                            Obx(
+                              () => IconButton(
+                                onPressed: () {
+                                  showLiveUser.value = !showLiveUser.value;
+                                },
+                                icon: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  transitionBuilder: (Widget child,
+                                      Animation<double> animation) {
+                                    return ScaleTransition(
+                                        scale: animation, child: child);
+                                  },
+                                  child: Icon(
+                                    !showLiveUser.value
+                                        ? Icons.arrow_forward_ios_rounded
+                                        : Icons.arrow_back_ios_rounded,
+                                    key: ValueKey<bool>(showLiveUser.value),
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                           for (int i = 0; i < upList.length; i++) ...[
-                            upItemBuild(upList[i], i)
+                            UpItemWidget(
+                              data: upList[i],
+                              index: i,
+                              currentMid: currentMid,
+                              onClickUp: onClickUp,
+                              onClickUpAni: onClickUpAni,
+                              itemPadding: itemPadding,
+                              contentWidth: contentWidth,
+                            )
                           ],
                           const SizedBox(width: 10),
                         ],
@@ -140,100 +213,6 @@ class _UpPanelState extends State<UpPanel> {
               ),
             ],
           )),
-    );
-  }
-
-  Widget upItemBuild(data, i) {
-    bool isCurrent = currentMid == data.mid || currentMid == -1;
-    return InkWell(
-      onTap: () {
-        feedBack();
-        if (data.type == 'up') {
-          EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
-              () {
-            onClickUp(data, i);
-          });
-        } else if (data.type == 'live') {
-          LiveItemModel liveItem = LiveItemModel.fromJson({
-            'title': data.title,
-            'uname': data.uname,
-            'face': data.face,
-            'roomid': data.roomId,
-          });
-          Get.toNamed(
-            '/liveRoom?roomid=${data.roomId}',
-            arguments: {'liveItem': liveItem},
-          );
-        }
-      },
-      onLongPress: () {
-        feedBack();
-        if (data.mid == -1) {
-          return;
-        }
-        String heroTag = Utils.makeHeroTag(data.mid);
-        Get.toNamed('/member?mid=${data.mid}',
-            arguments: {'face': data.face, 'heroTag': heroTag});
-      },
-      child: Padding(
-        padding: itemPadding,
-        child: AnimatedOpacity(
-          opacity: isCurrent ? 1 : 0.3,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Badge(
-                smallSize: 8,
-                label: data.type == 'live' ? const Text('Live') : null,
-                textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                alignment: data.type == 'live'
-                    ? AlignmentDirectional.topCenter
-                    : AlignmentDirectional.topEnd,
-                padding: const EdgeInsets.only(left: 6, right: 6),
-                isLabelVisible: data.type == 'live' ||
-                    (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor: data.type == 'live'
-                    ? Theme.of(context).colorScheme.secondaryContainer
-                    : Theme.of(context).colorScheme.primary,
-                child: data.face != ''
-                    ? NetworkImgLayer(
-                        width: 50,
-                        height: 50,
-                        src: data.face,
-                        type: 'avatar',
-                      )
-                    : const CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage(
-                          'assets/images/noface.jpeg',
-                        ),
-                      ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SizedBox(
-                  width: contentWidth,
-                  child: Text(
-                    data.uname,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: currentMid == data.mid
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium!.fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -295,6 +274,132 @@ class UpPanelSkeleton extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+class UpItemWidget extends StatelessWidget {
+  final dynamic data;
+  final int index;
+  final RxInt currentMid;
+  final Function(dynamic, int) onClickUp;
+  final Function(dynamic, int) onClickUpAni;
+  // final Function() feedBack;
+  final EdgeInsets itemPadding;
+  final double contentWidth;
+
+  const UpItemWidget({
+    Key? key,
+    required this.data,
+    required this.index,
+    required this.currentMid,
+    required this.onClickUp,
+    required this.onClickUpAni,
+    // required this.feedBack,
+    required this.itemPadding,
+    required this.contentWidth,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        feedBack();
+        if (data.type == 'up') {
+          EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
+              () {
+            if (GlobalDataCache.enableDynamicSwitch) {
+              onClickUp(data, index);
+            } else {
+              onClickUpAni(data, index);
+            }
+          });
+        } else if (data.type == 'live') {
+          LiveItemModel liveItem = LiveItemModel.fromJson({
+            'title': data.title,
+            'uname': data.uname,
+            'face': data.face,
+            'roomid': data.roomId,
+          });
+          Get.toNamed(
+            '/liveRoom?roomid=${data.roomId}',
+            arguments: {'liveItem': liveItem},
+          );
+        }
+      },
+      onLongPress: () {
+        feedBack();
+        if (data.mid == -1) {
+          return;
+        }
+        String heroTag = Utils.makeHeroTag(data.mid);
+        Get.toNamed('/member?mid=${data.mid}',
+            arguments: {'face': data.face, 'heroTag': heroTag});
+      },
+      child: Padding(
+        padding: itemPadding,
+        child: Obx(
+          () => AnimatedOpacity(
+            opacity: currentMid.value == data.mid || currentMid.value == -1
+                ? 1
+                : 0.3,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Badge(
+                  smallSize: 8,
+                  label: data.type == 'live' ? const Text('Live') : null,
+                  textColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                  alignment: data.type == 'live'
+                      ? AlignmentDirectional.topCenter
+                      : AlignmentDirectional.topEnd,
+                  padding: const EdgeInsets.only(left: 6, right: 6),
+                  isLabelVisible: data.type == 'live' ||
+                      (data.type == 'up' && (data.hasUpdate ?? false)),
+                  backgroundColor: data.type == 'live'
+                      ? Theme.of(context).colorScheme.secondaryContainer
+                      : Theme.of(context).colorScheme.primary,
+                  child: data.face != ''
+                      ? NetworkImgLayer(
+                          width: 50,
+                          height: 50,
+                          src: data.face,
+                          type: 'avatar',
+                        )
+                      : const CircleAvatar(
+                          radius: 25,
+                          backgroundImage: AssetImage(
+                            'assets/images/noface.jpeg',
+                          ),
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: SizedBox(
+                    width: contentWidth,
+                    child: Text(
+                      data.uname,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: currentMid.value == data.mid
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outline,
+                        fontSize:
+                            Theme.of(context).textTheme.labelMedium!.fontSize,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -13,7 +13,7 @@ class LaterController extends GetxController {
   RxList<HotVideoItemModel> laterList = <HotVideoItemModel>[].obs;
   int count = 0;
   RxBool isLoading = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
 
   @override
@@ -22,11 +22,11 @@ class LaterController extends GetxController {
     userInfo = userInfoCache.get('userInfoCache');
   }
 
-  Future queryLaterList() async {
+  Future queryLaterList({type = 'init'}) async {
     if (userInfo == null) {
       return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
-    isLoading.value = true;
+    isLoading.value = type == 'init';
     var res = await UserHttp.seeYouLater();
     if (res['status']) {
       count = res['data']['count'];

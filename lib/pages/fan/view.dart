@@ -49,13 +49,8 @@ class _FansPageState extends State<FansPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        titleSpacing: 0,
         title: Text(
           _fansController.isOwner.value ? '我的粉丝' : '${_fansController.name}的粉丝',
-          style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
       body: RefreshIndicator(
@@ -105,7 +100,12 @@ class _FansPageState extends State<FansPage> {
               } else {
                 return HttpError(
                   errMsg: data['msg'],
-                  fn: () => _fansController.queryFans('init'),
+                  fn: () {
+                    setState(() {
+                      _futureBuilderFuture = _fansController.queryFans('init');
+                    });
+                  },
+                  isInSliver: false,
                 );
               }
             } else {

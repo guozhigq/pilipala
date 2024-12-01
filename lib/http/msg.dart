@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:pilipala/models/msg/at.dart';
 import 'package:pilipala/models/msg/like.dart';
 import 'package:pilipala/models/msg/reply.dart';
 import 'package:pilipala/models/msg/system.dart';
@@ -64,7 +65,7 @@ class MsgHttp {
               .toList(),
         };
       } catch (err) {
-        print('err🔟: $err');
+        debugPrint('err: $err');
       }
     } else {
       return {
@@ -158,9 +159,6 @@ class MsgHttp {
         'csrf_token': csrf,
         'csrf': csrf,
       },
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (res.data['code'] == 0) {
       return {
@@ -282,10 +280,10 @@ class MsgHttp {
           'data': MessageLikeModel.fromJson(res.data['data']),
         };
       } catch (err) {
-        return {'status': false, 'date': [], 'msg': err.toString()};
+        return {'status': false, 'data': [], 'msg': err.toString()};
       }
     } else {
-      return {'status': false, 'date': [], 'msg': res.data['message']};
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 
@@ -328,6 +326,49 @@ class MsgHttp {
         'status': false,
         'msg': res.data['message'],
       };
+    }
+  }
+
+  static Future messageSystemAccount() async {
+    var res = await Request().get(Api.userMessageSystemAPi, data: {
+      'csrf': await Request.getCsrf(),
+      'page_size': 20,
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // @我的
+  static Future messageAt() async {
+    var res = await Request().get(Api.messageAtAPi, data: {
+      'build': 0,
+      'mobi_app': 'web',
+    });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': MessageAtModel.fromJson(res.data['data']),
+        };
+      } catch (err) {
+        return {'status': false, 'data': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

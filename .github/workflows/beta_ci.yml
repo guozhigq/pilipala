@@ -12,7 +12,6 @@ on:
       - ".idea/**"
       - "!.github/workflows/**"
 
-
 jobs:
   update_version:
     name: Read and update version
@@ -96,7 +95,7 @@ jobs:
         if: steps.cache-flutter.outputs.cache-hit != 'true'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.16.5
+          flutter-version: 3.19.6
           channel: any
 
       - name: 下载项目依赖

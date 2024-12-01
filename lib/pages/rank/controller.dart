@@ -14,7 +14,7 @@ class RankController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late final StreamController<bool> searchBarStream =
       StreamController<bool>.broadcast();
 

@@ -12,6 +12,7 @@ import '../../http/video.dart';
 import '../../utils/utils.dart';
 import '../constants.dart';
 import 'badge.dart';
+import 'drag_handle.dart';
 import 'network_img_layer.dart';
 import 'stat/danmu.dart';
 import 'stat/view.dart';
@@ -373,27 +374,12 @@ class MorePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.outline,
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
-                ),
-              ),
-            ),
-          ),
+          const DragHandle(),
           ListTile(
             onTap: () async => await menuActionHandler('block'),
             minLeadingWidth: 0,

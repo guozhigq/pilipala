@@ -6,7 +6,7 @@ import 'package:pilipala/utils/global_data_cache.dart';
 import '../../utils/storage.dart';
 import '../constants.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 
 class NetworkImgLayer extends StatelessWidget {
   const NetworkImgLayer({
@@ -20,6 +20,7 @@ class NetworkImgLayer extends StatelessWidget {
     // 图片质量 默认1%
     this.quality,
     this.origAspectRatio,
+    this.radius,
   });
 
   final String? src;
@@ -30,10 +31,26 @@ class NetworkImgLayer extends StatelessWidget {
   final Duration? fadeInDuration;
   final int? quality;
   final double? origAspectRatio;
+  final double? radius;
+
+  BorderRadius getBorderRadius(String? type, double? radius) {
+    return BorderRadius.circular(
+      radius ??
+          (type == 'avatar'
+              ? 50
+              : type == 'emote'
+                  ? 0
+                  : StyleString.imgRadius.x),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final int defaultImgQuality = GlobalDataCache().imgQuality;
+    int defaultImgQuality = 10;
+    try {
+      defaultImgQuality = GlobalDataCache.imgQuality;
+    } catch (_) {}
+
     if (src == '' || src == null) {
       return placeholder(context);
     }
@@ -68,13 +85,7 @@ class NetworkImgLayer extends StatelessWidget {
     return src != '' && src != null
         ? ClipRRect(
             clipBehavior: Clip.antiAlias,
-            borderRadius: BorderRadius.circular(
-              type == 'avatar'
-                  ? 50
-                  : type == 'emote'
-                      ? 0
-                      : StyleString.imgRadius.x,
-            ),
+            borderRadius: getBorderRadius(type, radius),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: width,
@@ -103,11 +114,7 @@ class NetworkImgLayer extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(type == 'avatar'
-            ? 50
-            : type == 'emote'
-                ? 0
-                : StyleString.imgRadius.x),
+        borderRadius: getBorderRadius(type, radius),
       ),
       child: type == 'bg'
           ? const SizedBox()

@@ -4,9 +4,12 @@ enum FullScreenGestureMode {
 
   /// 从下滑到上
   fromBottomtoTop,
+
+  /// 关闭手势
+  none,
 }
 
 extension FullScreenGestureModeExtension on FullScreenGestureMode {
-  String get values => ['fromToptoBottom', 'fromBottomtoTop'][index];
-  String get labels => ['从上往下滑进入全屏', '从下往上滑进入全屏'][index];
+  String get values => ['fromToptoBottom', 'fromBottomtoTop', 'none'][index];
+  String get labels => ['从上往下滑进入全屏', '从下往上滑进入全屏', '关闭手势'][index];
 }

@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/route_push.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import '../../../http/search.dart';
+import '../controller.dart';
 
 enum MsgType {
   invalid(value: 0, label: "空空的~"),
@@ -42,17 +45,18 @@ enum MsgType {
 class ChatItem extends StatelessWidget {
   dynamic item;
   List? e_infos;
+  WhisperDetailController ctr;
 
   ChatItem({
     super.key,
-    this.item,
+    required this.item,
+    required this.ctr,
     this.e_infos,
   });
 
   @override
   Widget build(BuildContext context) {
-    bool isOwner =
-        item.senderUid == GStrorage.userInfo.get('userInfoCache').mid;
+    bool isOwner = item.senderUid == GStorage.userInfo.get('userInfoCache').mid;
 
     bool isPic = item.msgType == MsgType.pic.value; // 图片
     bool isText = item.msgType == MsgType.text.value; // 文本
@@ -148,6 +152,7 @@ class ChatItem extends StatelessWidget {
             jsonDecode(content['content'])
                 .map((m) => m['text'] as String)
                 .join("\n"),
+            textAlign: TextAlign.center,
             style: TextStyle(
               letterSpacing: 0.6,
               height: 5,
@@ -157,10 +162,23 @@ class ChatItem extends StatelessWidget {
         case MsgType.text:
           return richTextMessage(context);
         case MsgType.pic:
-          return NetworkImgLayer(
-            width: 220,
-            height: 220 * content['height'] / content['width'],
-            src: content['url'],
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                HeroDialogRoute<void>(
+                  builder: (BuildContext context) => InteractiveviewerGallery(
+                    sources: ctr.picList,
+                    initIndex: ctr.picList.indexOf(content['url']),
+                    onPageChanged: (int pageIndex) {},
+                  ),
+                ),
+              );
+            },
+            child: NetworkImgLayer(
+              width: 220,
+              height: 220 * content['height'] / content['width'],
+              src: content['url'],
+            ),
           );
         case MsgType.share_v2:
           return Column(
@@ -341,39 +359,40 @@ class ChatItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Expanded(
-                            child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              i['field1'],
-                              maxLines: 2,
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context),
-                                fontWeight: FontWeight.bold,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                i['field1'],
+                                maxLines: 2,
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              i['field2'],
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context).withOpacity(0.6),
-                                fontSize: 12,
+                              Text(
+                                i['field2'],
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context).withOpacity(0.6),
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            Text(
-                              i['field3'],
-                              style: TextStyle(
-                                letterSpacing: 0.6,
-                                height: 1.5,
-                                color: textColor(context).withOpacity(0.6),
-                                fontSize: 12,
+                              Text(
+                                i['field3'],
+                                style: TextStyle(
+                                  letterSpacing: 0.6,
+                                  height: 1.5,
+                                  color: textColor(context).withOpacity(0.6),
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
-                        )),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

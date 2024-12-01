@@ -104,7 +104,7 @@ class Api {
 
   // 评论列表
   // https://api.bilibili.com/x/v2/reply/main?csrf=6e22efc1a47225ea25f901f922b5cfdd&mode=3&oid=254175381&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=0&type=11
-  static const String replyList = '/x/v2/reply';
+  static const String replyList = '/x/v2/reply/main';
 
   // 楼中楼
   static const String replyReplyList = '/x/v2/reply/reply';
@@ -175,7 +175,7 @@ class Api {
   static const String delHistory = '/x/v2/history/delete';
 
   // 搜索历史记录
-  static const String searchHistory = '/x/web-goblin/history/search';
+  static const String searchHistory = '/x/web-interface/history/search';
 
   // 热搜
   static const String hotSearchList =
@@ -300,10 +300,6 @@ class Api {
   // type=1
   static const String bangumiList =
       '/pgc/season/index/result?st=1&order=3&season_version=-1&spoken_language_type=-1&area=-1&is_finish=-1&copyright=-1&season_status=-1&season_month=-1&year=-1&style_id=-1&sort=0&season_type=1&pagesize=20&type=1';
-
-  // 我的订阅
-  static const String bangumiFollow =
-      '/x/space/bangumi/follow/list?type=1&follow_status=0&pn=1&ps=15&ts=1691544359969';
 
   // 黑名单
   static const String blackLst = '/x/relation/blacks';
@@ -499,7 +495,7 @@ class Api {
   static const activateBuvidApi = '/x/internal/gaia-gateway/ExClimbWuzhi';
 
   /// 获取字幕配置
-  static const getSubtitleConfig = '/x/player/v2';
+  static const getSubtitleConfig = '/x/player/wbi/v2';
 
   /// 我的订阅
   static const userSubFolder = '/x/v3/fav/folder/collected/list';
@@ -555,9 +551,19 @@ class Api {
   static const String messageSystemAPi =
       '${HttpString.messageBaseUrl}/x/sys-msg/query_unified_notify';
 
+  /// 系统通知 个人
+  static const String userMessageSystemAPi =
+      '${HttpString.messageBaseUrl}/x/sys-msg/query_user_notify';
+
   /// 系统通知标记已读
   static const String systemMarkRead =
       '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
 
   /// 直播间弹幕信息
   static const String getDanmuInfo =
@@ -566,6 +572,58 @@ class Api {
   /// 直播间发送弹幕
   static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
 
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
   /// 稍后再看&收藏夹视频列表
   static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
+
+  /// 用户信息
+  static const String accountInfo = '/x/member/web/account';
+
+  /// 更新用户信息
+  static const String updateAccountInfo = '/x/member/web/update';
+
+  /// 删除评论
+  static const String replyDel = '/x/v2/reply/del';
+
+  /// 图片上传
+  static const String uploadImage = '/x/dynamic/feed/draw/upload_bfs';
+
+  /// 更新追番状态
+  static const String updateBangumiStatus = '/pgc/web/follow/status/update';
+
+  /// 番剧点赞投币收藏状态
+  static const String bangumiActionStatus = '/pgc/season/episode/community';
+
+  /// @我的
+  static const String messageAtAPi = '/x/msgfeed/at?';
+
+  /// 订阅
+  static const String confirmSub = '/x/v3/fav/season/fav';
+
+  /// 订阅状态
+  static const String videoRelation = '/x/web-interface/archive/relation';
+
+  /// 获取空降区间
+  static const String getSkipSegments =
+      '${HttpString.sponsorBlockBaseUrl}/api/skipSegments';
+
+  /// 视频标签
+  static const String videoTag = '/x/tag/archive/tags';
+
+  /// 修复标题和海报
+  // /api/view?id=${aid}  /all/video/av${aid}  /video/av${aid}/
+  static const String fixTitleAndPic = '${HttpString.biliplusBaseUrl}/api/view';
 }

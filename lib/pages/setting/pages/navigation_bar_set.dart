@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/models/common/tab_type.dart';
 import 'package:pilipala/utils/storage.dart';
 
 import '../../../models/common/nav_bar_config.dart';
@@ -14,7 +13,7 @@ class NavigationBarSetPage extends StatefulWidget {
 }
 
 class _NavigationbarSetPageState extends State<NavigationBarSetPage> {
-  Box settingStorage = GStrorage.setting;
+  Box settingStorage = GStorage.setting;
   late List defaultNavTabs;
   late List<int> navBarSort;
 
@@ -23,7 +22,7 @@ class _NavigationbarSetPageState extends State<NavigationBarSetPage> {
     super.initState();
     defaultNavTabs = defaultNavigationBars;
     navBarSort = settingStorage
-        .get(SettingBoxKey.navBarSort, defaultValue: [0, 1, 2, 3]);
+        .get(SettingBoxKey.navBarSort, defaultValue: [0, 1, 2, 3, 4]);
     // 对 tabData 进行排序
     defaultNavTabs.sort((a, b) {
       int indexA = navBarSort.indexOf(a['id']);
@@ -74,7 +73,6 @@ class _NavigationbarSetPageState extends State<NavigationBarSetPage> {
           },
           title: Text(defaultNavTabs[i]['label']),
           secondary: const Icon(Icons.drag_indicator_rounded),
-          enabled: defaultNavTabs[i]['id'] != 0,
         )
       ]
     ];

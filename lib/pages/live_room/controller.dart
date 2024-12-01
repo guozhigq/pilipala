@@ -33,7 +33,7 @@ class LiveRoomController extends GetxController {
   int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int userId = 0;
   PlSocket? plSocket;
   List<String> danmuHostList = [];
@@ -48,6 +48,7 @@ class LiveRoomController extends GetxController {
   // 直播间弹幕开关 默认打开
   RxBool danmakuSwitch = true.obs;
   late String buvid;
+  RxBool isPortrait = false.obs;
 
   @override
   void onInit() {
@@ -58,16 +59,17 @@ class LiveRoomController extends GetxController {
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
       heroTag = Get.arguments['heroTag'] ?? '';
-      if (liveItem != null && liveItem.pic != null && liveItem.pic != '') {
-        cover = liveItem.pic;
-      }
-      if (liveItem != null && liveItem.cover != null && liveItem.cover != '') {
-        cover = liveItem.cover;
+      if (liveItem != null) {
+        cover = (liveItem.pic != null && liveItem.pic != '')
+            ? liveItem.pic
+            : (liveItem.cover != null && liveItem.cover != '')
+                ? liveItem.cover
+                : '';
       }
       Request.getBuvid().then((value) => buvid = value);
     }
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       userId = userInfo.mid;
@@ -95,11 +97,13 @@ class LiveRoomController extends GetxController {
       autoplay: true,
     );
     plPlayerController.isOpenDanmu.value = danmakuSwitch.value;
+    heartBeat();
   }
 
   Future queryLiveInfo() async {
     var res = await LiveHttp.liveRoomInfo(roomId: roomId, qn: currentQn);
     if (res['status']) {
+      isPortrait.value = res['data'].isPortrait;
       List<CodecItem> codec =
           res['data'].playurlInfo.playurl.stream.first.format.first.codec;
       CodecItem item = codec.first;
@@ -278,8 +282,20 @@ class LiveRoomController extends GetxController {
     }
   }
 
+  // 历史记录
+  void heartBeat() {
+    LiveHttp.liveRoomEntry(roomId: roomId);
+  }
+
+  String encodeToBase64(String input) {
+    List<int> bytes = utf8.encode(input);
+    String base64Str = base64.encode(bytes);
+    return base64Str;
+  }
+
   @override
   void onClose() {
+    heartBeat();
     plSocket?.onClose();
     super.onClose();
   }

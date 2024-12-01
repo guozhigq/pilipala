@@ -19,7 +19,7 @@ class SetSelectItem extends StatefulWidget {
 }
 
 class _SetSelectItemState extends State<SetSelectItem> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late dynamic currentVal;
   late int currentIndex;
   late List menus;

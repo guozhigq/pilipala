@@ -1,7 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:get/get.dart';
-import 'network_img_layer.dart';
+import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
+import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
+import 'package:pilipala/utils/highlight.dart';
+
+import '../../utils/global_data_cache.dart';
 
 // ignore: must_be_immutable
 class HtmlRender extends StatelessWidget {
@@ -23,8 +27,24 @@ class HtmlRender extends StatelessWidget {
       onLinkTap: (String? url, Map<String, String> buildContext, attributes) {},
       extensions: [
         TagExtension(
+          tagsToExtend: <String>{'pre'},
+          builder: (ExtensionContext extensionContext) {
+            final Map<String, dynamic> attributes = extensionContext.attributes;
+            final String lang = attributes['data-lang'] as String;
+            final String code = attributes['codecontent'] as String;
+            List<String> selectedLanguages = [lang.split('@').first];
+            TextSpan? result = highlightExistingText(code, selectedLanguages);
+            if (result == null) {
+              return const Center(child: Text('代码块渲染失败'));
+            }
+            return SelectableText.rich(result);
+          },
+        ),
+        TagExtension(
           tagsToExtend: <String>{'img'},
           builder: (ExtensionContext extensionContext) {
+            int defaultImgQuality = 10;
+            defaultImgQuality = GlobalDataCache.imgQuality;
             try {
               final Map<String, dynamic> attributes =
                   extensionContext.attributes;
@@ -44,19 +64,51 @@ class HtmlRender extends StatelessWidget {
               if (isMall) {
                 return const SizedBox();
               }
-              // bool inTable =
-              //     extensionContext.element!.previousElementSibling == null ||
-              //         extensionContext.element!.nextElementSibling == null;
-              // imgUrl = Utils().imageUrl(imgUrl!);
-              // return Image.network(
-              //   imgUrl,
-              //   width: isEmote ? 22 : null,
-              //   height: isEmote ? 22 : null,
-              // );
-              return NetworkImgLayer(
-                width: isEmote ? 22 : Get.size.width - 24,
-                height: isEmote ? 22 : 200,
-                src: imgUrl,
+              return InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    HeroDialogRoute<void>(
+                      builder: (BuildContext context) =>
+                          InteractiveviewerGallery(
+                        sources: imgList ?? [imgUrl],
+                        initIndex: imgList?.indexOf(imgUrl) ?? 0,
+                        itemBuilder: (
+                          BuildContext context,
+                          int index,
+                          bool isFocus,
+                          bool enablePageView,
+                        ) {
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              if (enablePageView) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                            child: Center(
+                              child: Hero(
+                                tag: imgList?[index] ?? imgUrl,
+                                child: CachedNetworkImage(
+                                  fadeInDuration:
+                                      const Duration(milliseconds: 0),
+                                  imageUrl: imgList?[index] ?? imgUrl,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        onPageChanged: (int pageIndex) {},
+                      ),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: '$imgUrl@${defaultImgQuality}q.webp',
+                  ),
+                ),
               );
             } catch (err) {
               return const SizedBox();
@@ -66,7 +118,7 @@ class HtmlRender extends StatelessWidget {
       ],
       style: {
         'html': Style(
-          fontSize: FontSize.medium,
+          fontSize: FontSize.large,
           lineHeight: LineHeight.percent(140),
         ),
         'body': Style(margin: Margins.zero, padding: HtmlPaddings.zero),
@@ -78,7 +130,7 @@ class HtmlRender extends StatelessWidget {
           margin: Margins.only(bottom: 10),
         ),
         'span': Style(
-          fontSize: FontSize.medium,
+          fontSize: FontSize.large,
           height: Height(1.65),
         ),
         'div': Style(height: Height.auto()),
@@ -90,6 +142,14 @@ class HtmlRender extends StatelessWidget {
           textAlign: TextAlign.justify,
         ),
         'img': Style(margin: Margins.only(top: 4, bottom: 4)),
+        'figcaption': Style(
+          textAlign: TextAlign.center,
+          margin: Margins.only(top: 8, bottom: 20),
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+        'figure': Style(
+          margin: Margins.zero,
+        ),
       },
     );
   }

@@ -13,7 +13,7 @@ class ActionMenuSetPage extends StatefulWidget {
 }
 
 class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late List<String> actionTypeSort;
   late List<Map> allLabels;
 
@@ -38,7 +38,7 @@ class _ActionMenuSetPageState extends State<ActionMenuSetPage> {
         .map<String>((i) => (i['value'] as ActionType).value)
         .toList();
     setting.put(SettingBoxKey.actionTypeSort, sortedTabbar);
-    GlobalDataCache().actionTypeSort = sortedTabbar;
+    GlobalDataCache.actionTypeSort = sortedTabbar;
     SmartDialog.showToast('操作成功');
   }
 

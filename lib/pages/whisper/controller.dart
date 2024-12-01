@@ -45,7 +45,9 @@ class WhisperController extends GetxController {
     if (isLoading) return;
     var res = await MsgHttp.sessionList(
         endTs: type == 'onLoad' ? sessionList.last.sessionTs : null);
-    if (res['data'].sessionList != null && res['data'].sessionList.isNotEmpty) {
+    if (res['status'] &&
+        res['data'].sessionList != null &&
+        res['data'].sessionList.isNotEmpty) {
       await queryAccountList(res['data'].sessionList);
       // 将 accountList 转换为 Map 结构
       Map<int, dynamic> accountMap = {};
@@ -67,8 +69,6 @@ class WhisperController extends GetxController {
           );
         }
       }
-    }
-    if (res['status'] && res['data'].sessionList != null) {
       if (type == 'onLoad') {
         sessionList.addAll(res['data'].sessionList);
       } else {
@@ -81,10 +81,33 @@ class WhisperController extends GetxController {
 
   Future queryAccountList(sessionList) async {
     List midsList = sessionList.map((e) => e.talkerId!).toList();
+    var index = midsList.indexOf(0);
+    AccountListModel? accountInfo;
+    if (index != -1) {
+      accountInfo = AccountListModel(
+        mid: 0,
+        name: '客服消息',
+        face:
+            'https://i0.hdslb.com/bfs/activity-plat/static/20230809/f87fc7ea98282a4dd48ec7743044b0bf/OWdoP9ZXAX.png',
+      );
+    }
+    if (midsList.length == 1 && index != -1) {
+      accountList.add(accountInfo!);
+      return;
+    }
+
     var res = await MsgHttp.accountList(midsList.join(','));
     if (res['status']) {
       accountList.value = res['data'];
+      if (accountInfo != null) {
+        if (accountList.isNotEmpty) {
+          accountList.insert(index, accountInfo);
+        } else {
+          accountList.add(accountInfo);
+        }
+      }
     }
+
     return res;
   }
 

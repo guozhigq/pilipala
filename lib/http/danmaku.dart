@@ -17,7 +17,9 @@ class DanmakaHttp {
     var response = await Request().get(
       Api.webDanmaku,
       data: params,
-      extra: {'resType': ResponseType.bytes},
+      options: Options(
+        responseType: ResponseType.bytes,
+      ),
     );
     return DmSegMobileReply.fromBuffer(response.data);
   }
@@ -67,9 +69,6 @@ class DanmakaHttp {
     var response = await Request().post(
       Api.shootDanmaku,
       data: params,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
     );
     if (response.statusCode != 200) {
       return {

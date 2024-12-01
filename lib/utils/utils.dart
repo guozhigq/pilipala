@@ -306,7 +306,7 @@ class Utils {
                 onPressed: () async {
                   await SmartDialog.dismiss();
                   launchUrl(
-                    Uri.parse('https://www.123pan.com/s/9sVqVv-flu0A.html'),
+                    Uri.parse('https://www.123684.com/s/9sVqVv-DEZ0A'),
                     mode: LaunchMode.externalApplication,
                   );
                 },
@@ -351,6 +351,9 @@ class Utils {
 
   // 时间戳转时间
   static tampToSeektime(number) {
+    if (number is String && int.tryParse(number) == null) {
+      return number;
+    }
     int hours = number ~/ 60;
     int minutes = number % 60;
 

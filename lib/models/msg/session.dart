@@ -13,8 +13,9 @@ class SessionDataModel {
 
   SessionDataModel.fromJson(Map<String, dynamic> json) {
     sessionList = json['session_list']
-        ?.map<SessionList>((e) => SessionList.fromJson(e))
-        .toList();
+            ?.map<SessionList>((e) => SessionList.fromJson(e))
+            .toList() ??
+        [];
     hasMore = json['has_more'];
   }
 }
