@@ -554,6 +554,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 playerController: plPlayerController!,
               ),
               bottomList: vdCtr.bottomList,
+              fullScreenCb: (bool status) {
+                if (vdCtr.videoDirection.value == 'vertical') {
+                  videoHeight.value = status ? Get.size.height : verticalHeight;
+                }
+              },
               showEposideCb: () => vdCtr.videoType == SearchType.video
                   ? videoIntroController.showEposideHandler()
                   : bangumiIntroController.showEposideHandler(),
