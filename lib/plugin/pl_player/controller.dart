@@ -81,7 +81,7 @@ class PlPlayerController {
   final Rx<bool> _subTitleOpen = false.obs;
   final Rx<int> _subTitleCode = (-1).obs;
   // 默认投稿视频格式
-  static Rx<String> _videoType = 'archive'.obs;
+  static String _videoType = 'archive';
 
   final Rx<String> _direction = 'horizontal'.obs;
 
@@ -127,7 +127,6 @@ class PlPlayerController {
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
   RxList subtitles = [].obs;
-  String videoType = 'archive';
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -225,7 +224,7 @@ class PlPlayerController {
   Rx<int> get playerCount => _playerCount;
 
   ///
-  // Rx<String> get videoType => _videoType;
+  String get videoType => _videoType;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
@@ -279,7 +278,7 @@ class PlPlayerController {
   }
 
   // 添加一个私有构造函数
-  PlPlayerController._internal(this.videoType) {
+  PlPlayerController._internal() {
     isOpenDanmu.value = GlobalDataCache.isOpenDanmu;
     blockTypes = GlobalDataCache.blockTypes;
     showArea = GlobalDataCache.showArea;
@@ -306,11 +305,11 @@ class PlPlayerController {
     String videoType = 'archive',
   }) {
     // 如果实例尚未创建，则创建一个新实例
-    _instance ??= PlPlayerController._internal(videoType);
+    _instance ??= PlPlayerController._internal();
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
-      _videoType.value = videoType;
     }
+    _videoType = videoType;
     return _instance!;
   }
 
