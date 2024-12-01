@@ -85,9 +85,12 @@ class _MediaListPanelState extends State<MediaListPanel> {
           AppBar(
             toolbarHeight: 45,
             automaticallyImplyLeading: false,
-            title: Text(
-              widget.panelTitle ?? '稍后再看',
-              style: Theme.of(context).textTheme.titleSmall,
+            title: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(
+                widget.panelTitle ?? '稍后再看',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             ),
             actions: [
               IconButton(
