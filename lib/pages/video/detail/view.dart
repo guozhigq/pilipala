@@ -685,6 +685,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             canPop:
                                 plPlayerController?.isFullScreen.value != true,
                             onPopInvoked: (bool didPop) {
+                              if (plPlayerController?.controlsLock.value ==
+                                  true) {
+                                plPlayerController?.onLockControl(false);
+                                return;
+                              }
                               if (plPlayerController?.isFullScreen.value ==
                                   true) {
                                 plPlayerController!

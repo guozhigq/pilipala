@@ -42,23 +42,14 @@ class _SeasonPanelState extends State<SeasonPanel> {
     _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
 
     /// 根据 cid 找到对应集，找到对应 episodes
-    final List<SectionItem> sections = widget.ugcSeason.sections!;
-    for (int i = 0; i < sections.length; i++) {
-      final List<EpisodeItem> episodesList = sections[i].episodes!;
-      for (int j = 0; j < episodesList.length; j++) {
-        if (episodesList[j].cid == cid) {
-          currentEpisodeIndex = i;
-          episodes = episodesList;
-          continue;
-        }
-      }
-    }
+    getCurrentEpisodeIndex();
 
     /// 取对应 season_id 的 episodes
     getCurrentIndex();
     _videoDetailController.cid.listen((int p0) {
       cid = p0;
       getCurrentIndex();
+      getCurrentEpisodeIndex();
     });
   }
 
@@ -89,6 +80,21 @@ class _SeasonPanelState extends State<SeasonPanel> {
             episodes = episodesList;
             continue;
           }
+        }
+      }
+    }
+  }
+
+  // 获取currentEpisodeIndex
+  void getCurrentEpisodeIndex() {
+    final List<SectionItem> sections = widget.ugcSeason.sections!;
+    for (int i = 0; i < sections.length; i++) {
+      final List<EpisodeItem> episodesList = sections[i].episodes!;
+      for (int j = 0; j < episodesList.length; j++) {
+        if (episodesList[j].cid == cid) {
+          currentEpisodeIndex = i;
+          episodes = episodesList;
+          continue;
         }
       }
     }

@@ -617,6 +617,7 @@ class VideoIntroController extends GetxController {
   // 播放器底栏 选集 回调
   void showEposideHandler() {
     late List episodes;
+    int currentEpisodeIndex = 0;
     VideoEpidoesType dataType = VideoEpidoesType.videoEpisode;
     if (videoDetail.value.ugcSeason != null) {
       dataType = VideoEpidoesType.videoEpisode;
@@ -625,6 +626,7 @@ class VideoIntroController extends GetxController {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         for (int j = 0; j < episodesList.length; j++) {
           if (episodesList[j].cid == lastPlayCid.value) {
+            currentEpisodeIndex = i;
             episodes = episodesList;
             continue;
           }
@@ -644,6 +646,7 @@ class VideoIntroController extends GetxController {
         sheetHeight: Get.size.height,
         isFullScreen: true,
         ugcSeason: ugcSeason,
+        currentEpisodeIndex: currentEpisodeIndex,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
             changeSeasonOrbangu(

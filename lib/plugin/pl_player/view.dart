@@ -842,8 +842,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 total: Duration(seconds: max),
                 progressBarColor: colorTheme,
                 baseBarColor: Colors.white.withOpacity(0.2),
-                bufferedBarColor:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                bufferedBarColor: Colors.white.withOpacity(0.6),
                 timeLabelLocation: TimeLabelLocation.none,
                 thumbColor: colorTheme,
                 barHeight: 3,
