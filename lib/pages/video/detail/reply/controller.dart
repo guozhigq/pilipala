@@ -70,6 +70,13 @@ class VideoReplyController extends GetxController {
       isEnd = res['data'].cursor.isEnd ?? false;
       nextOffset = res['data'].cursor.paginationReply.nextOffset ?? "";
       if (replies.isNotEmpty) {
+        /// 临时修复
+        final bool flag = replyList
+            .any((ReplyItemModel reply) => reply.rpid == replies.first.rpid);
+        if (replies.length == 1 && flag) {
+          replies.clear();
+          isEnd = true;
+        }
         noMore.value = isEnd ? '没有更多了' : '加载中...';
       } else {
         noMore.value =

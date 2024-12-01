@@ -487,7 +487,7 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       if (result['data'].subtitles.isNotEmpty) {
         subtitles = result['data'].subtitles;
-        getDanmaku(subtitles);
+        getSubtitleContent(subtitles);
       }
     }
     headerControl = HeaderControl(
@@ -501,8 +501,8 @@ class VideoDetailController extends GetxController
     plPlayerController.setHeaderControl(headerControl);
   }
 
-  // 获取弹幕
-  Future getDanmaku(List subtitles) async {
+  // 获取字幕
+  Future getSubtitleContent(List subtitles) async {
     if (subtitles.isNotEmpty) {
       for (var i in subtitles) {
         final Map<String, dynamic> res = await VideoHttp.getSubtitleContent(
