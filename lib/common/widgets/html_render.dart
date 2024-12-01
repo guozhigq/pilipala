@@ -5,6 +5,8 @@ import 'package:pilipala/plugin/pl_gallery/hero_dialog_route.dart';
 import 'package:pilipala/plugin/pl_gallery/interactiveviewer_gallery.dart';
 import 'package:pilipala/utils/highlight.dart';
 
+import '../../utils/global_data_cache.dart';
+
 // ignore: must_be_immutable
 class HtmlRender extends StatelessWidget {
   const HtmlRender({
@@ -41,6 +43,8 @@ class HtmlRender extends StatelessWidget {
         TagExtension(
           tagsToExtend: <String>{'img'},
           builder: (ExtensionContext extensionContext) {
+            int defaultImgQuality = 10;
+            defaultImgQuality = GlobalDataCache.imgQuality;
             try {
               final Map<String, dynamic> attributes =
                   extensionContext.attributes;
@@ -99,13 +103,13 @@ class HtmlRender extends StatelessWidget {
                     ),
                   );
                 },
-                child: CachedNetworkImage(imageUrl: imgUrl),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: '$imgUrl@${defaultImgQuality}q.webp',
+                  ),
+                ),
               );
-              // return NetworkImgLayer(
-              //   width: isEmote ? 22 : Get.size.width - 24,
-              //   height: isEmote ? 22 : 200,
-              //   src: imgUrl,
-              // );
             } catch (err) {
               return const SizedBox();
             }
@@ -138,6 +142,14 @@ class HtmlRender extends StatelessWidget {
           textAlign: TextAlign.justify,
         ),
         'img': Style(margin: Margins.only(top: 4, bottom: 4)),
+        'figcaption': Style(
+          textAlign: TextAlign.center,
+          margin: Margins.only(top: 8, bottom: 20),
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+        'figure': Style(
+          margin: Margins.zero,
+        ),
       },
     );
   }
