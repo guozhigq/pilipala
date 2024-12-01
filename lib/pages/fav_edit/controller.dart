@@ -53,6 +53,7 @@ class FavEditController extends GetxController {
       intro: intro,
       mediaId: mediaId!,
       cover: cover,
+      privacy: privacy.value,
     );
     if (res['status']) {
       SmartDialog.showToast('编辑成功');
@@ -72,6 +73,16 @@ class FavEditController extends GetxController {
       Get.back();
     } else {
       SmartDialog.showToast(res['msg']);
+    }
+  }
+
+  void togglePrivacy() {
+    if (privacy.value == 0) {
+      privacy.value = 1;
+      SmartDialog.showToast('设置为私密后，只有自己可见');
+    } else {
+      privacy.value = 0;
+      SmartDialog.showToast('设置为公开后，所有人可见');
     }
   }
 }

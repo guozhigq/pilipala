@@ -24,6 +24,7 @@ import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 
@@ -679,8 +680,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         forceElevated: innerBoxIsScrolled,
                         expandedHeight: expandedHeight,
                         backgroundColor: Colors.black,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: PopScope(
+                        flexibleSpace: SizedBox.expand(
+                          child: PopScope(
                             canPop:
                                 plPlayerController?.isFullScreen.value != true,
                             onPopInvoked: (bool didPop) {
@@ -784,13 +785,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             );
                           },
                         ),
-                        Obx(
-                          () => VideoReplyPanel(
-                            bvid: vdCtr.bvid,
-                            oid: vdCtr.oid.value,
-                            onControllerCreated: vdCtr.onControllerCreated,
-                          ),
-                        )
+                        if ((vdCtr.videoType == SearchType.media_bangumi &&
+                                GlobalDataCache.enableComment
+                                    .contains('bangumi')) ||
+                            (vdCtr.videoType == SearchType.video &&
+                                GlobalDataCache.enableComment
+                                    .contains('video'))) ...[
+                          Obx(
+                            () => VideoReplyPanel(
+                              bvid: vdCtr.bvid,
+                              oid: vdCtr.oid.value,
+                              onControllerCreated: vdCtr.onControllerCreated,
+                            ),
+                          )
+                        ],
                       ],
                     ),
                   ),
@@ -913,6 +921,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ComBtn(
               icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
               fuc: () => Get.back(),
+            ),
+            const SizedBox(width: 8),
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                await vdCtr.plPlayerController.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
             ),
             const Spacer(),
             ComBtn(

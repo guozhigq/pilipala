@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/common/comment_range_type.dart';
 import 'package:pilipala/models/common/dynamics_type.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
@@ -27,6 +28,8 @@ class _ExtraSettingState extends State<ExtraSetting> {
   late String defaultSystemProxyHost;
   late String defaultSystemProxyPort;
   bool userLogin = false;
+  // 记录每个选项是否被选中的状态
+  late List<String> enableComment;
 
   @override
   void initState() {
@@ -47,6 +50,8 @@ class _ExtraSettingState extends State<ExtraSetting> {
         localCache.get(LocalCacheKey.systemProxyHost, defaultValue: '');
     defaultSystemProxyPort =
         localCache.get(LocalCacheKey.systemProxyPort, defaultValue: '');
+    enableComment = setting
+        .get(SettingBoxKey.enableComment, defaultValue: ['video', 'bangumi']);
   }
 
   // 设置代理
@@ -146,7 +151,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableSearchSuggest,
             defaultVal: true,
             callFn: (val) {
-              GlobalDataCache().enableSearchSuggest = val;
+              GlobalDataCache.enableSearchSuggest = val;
             },
           ),
           SetSwitchItem(
@@ -181,7 +186,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableAutoExpand,
             defaultVal: false,
             callFn: (val) {
-              GlobalDataCache().enableAutoExpand = val;
+              GlobalDataCache.enableAutoExpand = val;
             },
           ),
           const SetSwitchItem(
@@ -190,9 +195,103 @@ class _ExtraSettingState extends State<ExtraSetting> {
             setKey: SettingBoxKey.enableRelatedVideo,
             defaultVal: true,
           ),
+          SetSwitchItem(
+            title: '视频投屏开关',
+            subTitle: '打开后将在播放器右上角显示投屏入口',
+            setKey: SettingBoxKey.enableDlna,
+            defaultVal: false,
+            callFn: (bool val) {
+              GlobalDataCache.enableDlna = val;
+            },
+          ),
+          SetSwitchItem(
+            title: 'Sponsor Block',
+            subTitle: '自动跳过视频中赞助片段',
+            setKey: SettingBoxKey.enableSponsorBlock,
+            defaultVal: false,
+            callFn: (bool val) {
+              GlobalDataCache.enableSponsorBlock = val;
+            },
+          ),
           ListTile(
             dense: false,
             title: Text('评论展示', style: titleStyle),
+            onTap: () async {
+              List<String> tempEnableComment = List.from(enableComment);
+              int? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  // 带多选框的list
+                  return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return AlertDialog(
+                        title: const Text('评论展示'),
+                        contentPadding: const EdgeInsets.fromLTRB(0, 24, 0, 24),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: ListView.builder(
+                            itemCount: CommentRangeType.values.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return CheckboxListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 0),
+                                title: Text(
+                                    '${CommentRangeType.values[index].label}评论'),
+                                value: tempEnableComment.contains(
+                                    CommentRangeType.values[index].value),
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      tempEnableComment.add(
+                                          CommentRangeType.values[index].value);
+                                    } else {
+                                      tempEnableComment.remove(
+                                          CommentRangeType.values[index].value);
+                                    }
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: Navigator.of(context).pop,
+                            child: Text(
+                              '取消',
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.outline),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              enableComment = tempEnableComment;
+                              setting.put(
+                                  SettingBoxKey.enableComment, enableComment);
+                              GlobalDataCache.enableComment = enableComment;
+                              SmartDialog.showToast('操作成功');
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('确认'),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+              if (result != null) {
+                defaultReplySort = result;
+                setting.put(SettingBoxKey.replySortType, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('评论排序', style: titleStyle),
             subtitle: Text(
               '当前优先展示「${ReplySortType.values[defaultReplySort].titles}」',
               style: subTitleStyle,
@@ -202,7 +301,7 @@ class _ExtraSettingState extends State<ExtraSetting> {
                 context: context,
                 builder: (context) {
                   return SelectDialog<int>(
-                      title: '评论展示',
+                      title: '评论排序',
                       value: defaultReplySort,
                       values: ReplySortType.values.map((e) {
                         return {'title': e.titles, 'value': e.index};

@@ -7,6 +7,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
@@ -52,7 +53,7 @@ class ReplyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isOwner = int.parse(replyItem!.member!.mid!) ==
-        (GlobalDataCache().userInfo?.mid ?? -1);
+        (GlobalDataCache.userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
@@ -415,7 +416,7 @@ class ReplyItemRow extends StatelessWidget {
                   onLongPress: () {
                     feedBack();
                     final bool isOwner = int.parse(replyItem!.member!.mid!) ==
-                        (GlobalDataCache().userInfo?.mid ?? -1);
+                        (GlobalDataCache.userInfo?.mid ?? -1);
                     showModalBottomSheet(
                       context: context,
                       useRootNavigator: true,
@@ -1117,27 +1118,12 @@ class MorePanel extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
     Color errorColor = colorScheme.error;
-    return Container(
+    return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: colorScheme.outline,
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
-                ),
-              ),
-            ),
-          ),
+          const DragHandle(),
           ListTile(
             onTap: () async => await menuActionHandler('copyAll'),
             minLeadingWidth: 0,
