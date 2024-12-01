@@ -47,9 +47,7 @@ class _MessageAtPageState extends State<MessageAtPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('@我的'),
-      ),
+      appBar: AppBar(title: const Text('@我的')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageAtCtr.queryMessageAt(type: 'init');
@@ -129,7 +127,7 @@ class AtItem extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        MessageUtils.onClickMessage(context, uri, nativeUri, type);
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, null);
       },
       child: Padding(
         padding: const EdgeInsets.all(14),

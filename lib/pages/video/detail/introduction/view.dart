@@ -6,8 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:lottie/lottie.dart';
 import 'package:pilipala/common/constants.dart';
+import 'package:pilipala/common/skeleton/video_intro.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -57,7 +57,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
     heroTag = Get.arguments['heroTag'];
     videoIntroController =
         Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
-    _futureBuilderFuture = videoIntroController.queryVideoIntro();
+    _futureBuilderFuture = videoIntroController.queryVideoIntro(type: 'init');
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
     });
@@ -76,10 +76,8 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
       future: _futureBuilderFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.data == null) {
-            return const SliverToBoxAdapter(child: SizedBox());
-          }
-          if (snapshot.data['status']) {
+          Map? data = snapshot.data;
+          if (data != null && data['status']) {
             // 请求成功
             return Obx(
               () => VideoInfo(
@@ -91,25 +89,16 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
           } else {
             // 请求错误
             return HttpError(
-              errMsg: snapshot.data['msg'],
-              btnText: snapshot.data['code'] == -404 ||
-                      snapshot.data['code'] == 62002
+              errMsg: data?['msg'] ?? '请求异常',
+              btnText: (data?['code'] == -404 || data?['code'] == 62002)
                   ? '返回上一页'
                   : null,
               fn: () => Get.back(),
             );
           }
         } else {
-          return SliverToBoxAdapter(
-            child: SizedBox(
-              height: 100,
-              child: Center(
-                child: Lottie.asset(
-                  'assets/loading.json',
-                  width: 200,
-                ),
-              ),
-            ),
+          return const SliverToBoxAdapter(
+            child: VideoIntroSkeleton(),
           );
         }
       },
@@ -137,8 +126,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   late String heroTag;
   late final VideoIntroController videoIntroController;
   late final VideoDetailController videoDetailCtr;
-  final Box<dynamic> localCache = GStrorage.localCache;
-  final Box<dynamic> setting = GStrorage.setting;
+  final Box<dynamic> localCache = GStorage.localCache;
+  final Box<dynamic> setting = GStorage.setting;
   late double sheetHeight;
   late final dynamic owner;
   late int mid;
@@ -169,8 +158,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
 
     owner = widget.videoDetail!.owner;
     enableAi = setting.get(SettingBoxKey.enableAi, defaultValue: true);
-    _expandableCtr = ExpandableController(
-        initialExpanded: GlobalDataCache().enableAutoExpand);
+    _expandableCtr =
+        ExpandableController(initialExpanded: GlobalDataCache.enableAutoExpand);
   }
 
   // 收藏
@@ -387,7 +376,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ExpandablePanel(
             controller: _expandableCtr,
             collapsed: const SizedBox(height: 0),
-            expanded: IntroDetail(videoDetail: widget.videoDetail!),
+            expanded: IntroDetail(
+              videoDetail: widget.videoDetail!,
+              videoTags: videoIntroController.videoTags,
+            ),
             theme: const ExpandableThemeData(
               animationDuration: Duration(milliseconds: 300),
               scrollAnimationDuration: Duration(milliseconds: 300),
@@ -553,7 +545,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
-    final actionTypeSort = GlobalDataCache().actionTypeSort;
+    final actionTypeSort = GlobalDataCache.actionTypeSort;
 
     Map<String, Widget> menuListWidgets = {
       'like': Obx(

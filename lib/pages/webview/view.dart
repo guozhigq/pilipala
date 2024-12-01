@@ -19,12 +19,7 @@ class _WebviewPageState extends State<WebviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          centerTitle: false,
-          titleSpacing: 0,
-          title: Text(
-            _webviewController.pageTitle,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          title: Text(_webviewController.pageTitle),
           actions: [
             const SizedBox(width: 4),
             IconButton(

@@ -47,7 +47,6 @@ class _FollowSearchPageState extends State<FollowSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
         actions: [
           IconButton(
             onPressed: reRequest,

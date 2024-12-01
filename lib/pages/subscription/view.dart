@@ -40,12 +40,8 @@ class _SubPageState extends State<SubPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Obx(() => Text(
-              '${_subController.isOwner.value ? '我' : 'Ta'}的订阅',
-              style: Theme.of(context).textTheme.titleMedium,
-            )),
+        title:
+            Obx(() => Text('${_subController.isOwner.value ? '我' : 'Ta'}的订阅')),
       ),
       body: FutureBuilder(
         future: _futureBuilderFuture,

@@ -49,7 +49,6 @@ class _MemberSearchPageState extends State<MemberSearchPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
         actions: [
           IconButton(
               onPressed: () => _memberSearchCtr.submit(),

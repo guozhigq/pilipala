@@ -125,6 +125,7 @@ class ReplyControl {
     this.upLike,
     this.isShow,
     this.entryText,
+    this.entryTextNum,
     this.titleText,
     this.time,
     this.location,
@@ -135,6 +136,7 @@ class ReplyControl {
   bool? upLike;
   bool? isShow;
   String? entryText;
+  int? entryTextNum;
   String? titleText;
   String? time;
   String? location;
@@ -155,6 +157,10 @@ class ReplyControl {
     }
 
     entryText = json['sub_reply_entry_text'];
+    // 正则匹配
+    entryTextNum = json['sub_reply_entry_text'] != null
+        ? int.parse(RegExp(r"\d+").stringMatch(json['sub_reply_entry_text']!)!)
+        : 0;
     titleText = json['sub_reply_title_text'];
     time = json['time_desc'];
     location = json['location'] != null ? json['location'].split('：')[1] : '';

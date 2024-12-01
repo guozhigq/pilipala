@@ -13,7 +13,7 @@ class RecommendFilter {
   }
 
   static void update() {
-    var setting = GStrorage.setting;
+    var setting = GStorage.setting;
     // filterUnfollowedRatio =
     //     setting.get(SettingBoxKey.filterUnfollowedRatio, defaultValue: 0);
     minDurationForRcmd =

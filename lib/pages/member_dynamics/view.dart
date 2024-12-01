@@ -54,12 +54,9 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => Text(
             '${_memberDynamicController.isOwner.value ? '我' : 'Ta'}的动态',
-            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       ),

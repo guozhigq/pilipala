@@ -3,6 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/models/common/rcmd_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/setting/widgets/select_dialog.dart';
 import 'package:pilipala/utils/recommend_filter.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -17,11 +18,11 @@ class RecommendSetting extends StatefulWidget {
 }
 
 class _RecommendSettingState extends State<RecommendSetting> {
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late dynamic defaultRcmdType;
-  Box userInfoCache = GStrorage.userInfo;
-  late dynamic userInfo;
+  Box userInfoCache = GStorage.userInfo;
+  UserInfoData? userInfo;
   bool userLogin = false;
   late dynamic accessKeyInfo;
   // late int filterUnfollowedRatio;
@@ -53,14 +54,7 @@ class _RecommendSettingState extends State<RecommendSetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '推荐设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('推荐设置')),
       body: ListView(
         children: [
           ListTile(
@@ -247,10 +241,9 @@ class _RecommendSettingState extends State<RecommendSetting> {
               '* 其它（如热门视频、手动搜索、链接跳转等）均不受过滤器影响。\n'
               '* 设定较严苛的条件可导致推荐项数锐减或多次请求，请酌情选择。\n'
               '* 后续可能会增加更多过滤条件，敬请期待。',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall!
-                  .copyWith(color: Theme.of(context).colorScheme.outline.withOpacity(0.7)),
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.outline.withOpacity(0.7)),
             ),
           )
         ],

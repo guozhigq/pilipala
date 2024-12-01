@@ -16,7 +16,7 @@ class FavPanel extends StatefulWidget {
 }
 
 class _FavPanelState extends State<FavPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   late Future _futureBuilderFuture;
 
   @override
@@ -30,8 +30,6 @@ class _FavPanelState extends State<FavPanel> {
     return Column(
       children: [
         AppBar(
-          centerTitle: false,
-          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(20),

@@ -619,4 +619,11 @@ class Api {
   /// 获取空降区间
   static const String getSkipSegments =
       '${HttpString.sponsorBlockBaseUrl}/api/skipSegments';
+
+  /// 视频标签
+  static const String videoTag = '/x/tag/archive/tags';
+
+  /// 修复标题和海报
+  // /api/view?id=${aid}  /all/video/av${aid}  /video/av${aid}/
+  static const String fixTitleAndPic = '${HttpString.biliplusBaseUrl}/api/view';
 }

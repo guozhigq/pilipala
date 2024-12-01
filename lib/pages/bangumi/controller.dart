@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/bangumi.dart';
 import 'package:pilipala/models/bangumi/list.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class BangumiController extends GetxController {
@@ -12,17 +13,17 @@ class BangumiController extends GetxController {
   RxInt total = 0.obs;
   int _currentPage = 1;
   bool isLoadingMore = true;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   RxBool userLogin = false.obs;
   late int mid;
-  var userInfo;
+  UserInfoData? userInfo;
 
   @override
   void onInit() {
     super.onInit();
     userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null) {
-      mid = userInfo.mid;
+      mid = userInfo!.mid!;
     }
     userLogin.value = userInfo != null;
   }
@@ -55,7 +56,7 @@ class BangumiController extends GetxController {
     if (userInfo == null) {
       return;
     }
-    var result = await BangumiHttp.getRecentBangumi(mid: userInfo.mid);
+    var result = await BangumiHttp.getRecentBangumi(mid: userInfo!.mid!);
     if (result['status']) {
       bangumiFollowList.value = result['data'].list;
       total.value = result['data'].total;

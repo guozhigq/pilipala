@@ -82,14 +82,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   final RxDouble _distance = 0.0.obs;
   final RxBool _volumeInterceptEventStream = false.obs;
 
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late FullScreenMode mode;
   late int defaultBtmProgressBehavior;
   late bool enableQuickDouble;
   late bool enableBackgroundPlay;
   late double screenWidth;
   final FullScreenGestureMode fullScreenGestureMode =
-      GlobalDataCache().fullScreenGestureMode;
+      GlobalDataCache.fullScreenGestureMode;
 
   // 用于记录上一次全屏切换手势触发时间，避免误触
   DateTime? lastFullScreenToggleTime;
@@ -136,7 +136,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     screenWidth = Get.size.width;
     animationController = AnimationController(
       vsync: this,
-      duration: GlobalDataCache().enablePlayerControlAnimation
+      duration: GlobalDataCache.enablePlayerControlAnimation
           ? const Duration(milliseconds: 150)
           : const Duration(milliseconds: 10),
     );
@@ -301,16 +301,22 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
       /// 画面比例
       BottomControlType.fit: SizedBox(
+        width: 45,
         height: 30,
         child: TextButton(
-          onPressed: () => _.toggleVideoFit(),
+          onPressed: () => _.toggleVideoFit('press'),
+          onLongPress: () => _.toggleVideoFit('longPress'),
           style: ButtonStyle(
             padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
           child: Obx(
             () => Text(
               _.videoFitDEsc.value,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -320,29 +326,49 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       BottomControlType.speed: SizedBox(
         width: 45,
         height: 34,
-        child: TextButton(
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
-          ),
-          onPressed: () {},
-          child: Obx(
-            () => Text(
-              '${_.playbackSpeed.toString()}X',
-              style: textStyle,
+        child: PopupMenuButton<double>(
+          tooltip: '更改播放速度',
+          onSelected: (double value) {
+            _.setPlaybackSpeed(value);
+          },
+          initialValue: _.playbackSpeed,
+          color: Colors.black.withOpacity(0.8),
+          itemBuilder: (BuildContext context) {
+            return _.speedsList.map((double speed) {
+              return PopupMenuItem<double>(
+                height: 40,
+                padding: const EdgeInsets.only(left: 20),
+                value: speed,
+                child: Text(
+                  '${speed}x',
+                  style: textStyle.copyWith(fontWeight: FontWeight.bold),
+                ),
+              );
+            }).toList();
+          },
+          child: Container(
+            width: 45,
+            height: 34,
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(right: 4),
+            child: Obx(
+              () => Text(
+                '${_.playbackSpeed.toString()}x',
+                style: textStyle.copyWith(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ),
       ),
 
-      /// 字幕
       /// 全屏
       BottomControlType.fullscreen: ComBtn(
         icon: Obx(
-          () => Icon(
+          () => Image.asset(
             _.isFullScreen.value
-                ? FontAwesomeIcons.compress
-                : FontAwesomeIcons.expand,
-            size: 15,
+                ? 'assets/images/video/fullscreen_exit.png'
+                : 'assets/images/video/fullscreen.png',
+            width: 19,
             color: Colors.white,
           ),
         ),
@@ -359,6 +385,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           BottomControlType.time,
           BottomControlType.space,
           BottomControlType.fit,
+          BottomControlType.speed,
           BottomControlType.fullscreen,
         ];
     for (var i = 0; i < userSpecifyItem.length; i++) {
@@ -739,28 +766,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         // 头部、底部控制条
         Obx(
           () => Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (widget.headerControl != null || _.headerControl != null)
-                ClipRect(
+              if (widget.headerControl != null || _.headerControl != null) ...[
+                Flexible(
+                  child: ClipRect(
+                    child: AppBarAni(
+                      controller: animationController,
+                      visible: !_.controlsLock.value && _.showControls.value,
+                      position: 'top',
+                      child: widget.headerControl ?? _.headerControl!,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                const SizedBox.shrink()
+              ],
+              Flexible(
+                flex: _.videoType == 'live' ? 0 : 1,
+                child: ClipRect(
                   child: AppBarAni(
                     controller: animationController,
                     visible: !_.controlsLock.value && _.showControls.value,
-                    position: 'top',
-                    child: widget.headerControl ?? _.headerControl!,
+                    position: 'bottom',
+                    child: widget.bottomControl ??
+                        BottomControl(
+                          controller: widget.controller,
+                          triggerFullScreen: _.triggerFullScreen,
+                          buildBottomControl: buildBottomControl(),
+                        ),
                   ),
-                ),
-              const Spacer(),
-              ClipRect(
-                child: AppBarAni(
-                  controller: animationController,
-                  visible: !_.controlsLock.value && _.showControls.value,
-                  position: 'bottom',
-                  child: widget.bottomControl ??
-                      BottomControl(
-                        controller: widget.controller,
-                        triggerFullScreen: _.triggerFullScreen,
-                        buildBottomControl: buildBottomControl(),
-                      ),
                 ),
               ),
             ],
@@ -807,8 +842,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 total: Duration(seconds: max),
                 progressBarColor: colorTheme,
                 baseBarColor: Colors.white.withOpacity(0.2),
-                bufferedBarColor:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                bufferedBarColor: Colors.white.withOpacity(0.6),
                 timeLabelLocation: TimeLabelLocation.none,
                 thumbColor: colorTheme,
                 barHeight: 3,

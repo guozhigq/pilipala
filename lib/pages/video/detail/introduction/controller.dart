@@ -9,12 +9,15 @@ import 'package:pilipala/http/constants.dart';
 import 'package:pilipala/http/user.dart';
 import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/user/fav_folder.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/ai.dart';
+import 'package:pilipala/models/video/tags.dart';
 import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
@@ -41,17 +44,16 @@ class VideoIntroController extends GetxController {
   RxBool hasFav = false.obs;
   // 是否不喜欢
   RxBool hasDisLike = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   bool userLogin = false;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   List addMediaIdsNew = [];
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
   RxMap followStatus = {}.obs;
-  int _tempThemeValue = -1;
-
   RxInt lastPlayCid = 0.obs;
-  var userInfo;
+  UserInfoData? userInfo;
+  RxList<VideoTagItem> videoTags = <VideoTagItem>[].obs;
 
   // 同时观看
   bool isShowOnlineTotal = false;
@@ -82,22 +84,26 @@ class VideoIntroController extends GetxController {
     }
     enableRelatedVideo =
         setting.get(SettingBoxKey.enableRelatedVideo, defaultValue: true);
+    queryVideoTag();
   }
 
   // 获取视频简介&分p
-  Future queryVideoIntro({cover}) async {
+  Future queryVideoIntro({String? cover, String? type, int? cid}) async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
       pages.value = result['data']!.pages!;
-      lastPlayCid.value = videoDetail.value.cid!;
-      if (pages.isNotEmpty) {
-        lastPlayCid.value = pages.first.cid!;
+      if (type == null) {
+        lastPlayCid.value = cid ?? videoDetail.value.cid!;
       }
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
-      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
+      videoDetailCtr.tabs.value = [
+        '简介',
+        if (GlobalDataCache.enableComment.contains('video'))
+          '评论 ${result['data']?.stat?.reply}'
+      ];
       videoDetailCtr.cover.value = cover ?? result['data'].pic ?? '';
       // 获取到粉丝数再返回
       await queryUserStat();
@@ -298,7 +304,7 @@ class VideoIntroController extends GetxController {
 
   Future queryVideoInFolder() async {
     var result = await VideoHttp.videoInFolder(
-        mid: userInfo.mid, rid: IdUtils.bv2av(bvid));
+        mid: userInfo!.mid!, rid: IdUtils.bv2av(bvid));
     if (result['status']) {
       favFolderData.value = result['data'];
     }
@@ -467,13 +473,16 @@ class VideoIntroController extends GetxController {
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
-      final VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: heroTag);
-      videoReplyCtr.aid = aid;
-      videoReplyCtr.queryReplyList(type: 'init');
+      if (GlobalDataCache.enableComment.contains('video')) {
+        final VideoReplyController videoReplyCtr =
+            Get.find<VideoReplyController>(tag: heroTag);
+        videoReplyCtr.aid = aid;
+        videoReplyCtr.queryReplyList(type: 'init');
+      }
     } catch (_) {}
     this.bvid = bvid;
-    await queryVideoIntro(cover: cover);
+    // 点击切换时，优先取当前cid
+    await queryVideoIntro(cover: cover, cid: cid);
   }
 
   void startTimer() {
@@ -608,6 +617,7 @@ class VideoIntroController extends GetxController {
   // 播放器底栏 选集 回调
   void showEposideHandler() {
     late List episodes;
+    int currentEpisodeIndex = 0;
     VideoEpidoesType dataType = VideoEpidoesType.videoEpisode;
     if (videoDetail.value.ugcSeason != null) {
       dataType = VideoEpidoesType.videoEpisode;
@@ -616,6 +626,7 @@ class VideoIntroController extends GetxController {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         for (int j = 0; j < episodesList.length; j++) {
           if (episodesList[j].cid == lastPlayCid.value) {
+            currentEpisodeIndex = i;
             episodes = episodesList;
             continue;
           }
@@ -635,6 +646,7 @@ class VideoIntroController extends GetxController {
         sheetHeight: Get.size.height,
         isFullScreen: true,
         ugcSeason: ugcSeason,
+        currentEpisodeIndex: currentEpisodeIndex,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
             changeSeasonOrbangu(
@@ -677,5 +689,13 @@ class VideoIntroController extends GetxController {
         );
       },
     );
+  }
+
+  // 获取视频标签
+  void queryVideoTag() async {
+    var result = await VideoHttp.getVideoTag(bvid: bvid);
+    if (result['status']) {
+      videoTags.value = result['data'];
+    }
   }
 }

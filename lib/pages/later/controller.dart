@@ -13,7 +13,7 @@ class LaterController extends GetxController {
   RxList<HotVideoItemModel> laterList = <HotVideoItemModel>[].obs;
   int count = 0;
   RxBool isLoading = false.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   UserInfoData? userInfo;
 
   @override

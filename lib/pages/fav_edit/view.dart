@@ -19,36 +19,24 @@ class _FavEditPageState extends State<FavEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: Obx(
           () => _favEditController.type.value == 'add'
-              ? Text(
-                  '新建收藏夹',
-                  style: Theme.of(context).textTheme.titleMedium,
-                )
-              : Text(
-                  '编辑收藏夹',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+              ? const Text('新建收藏夹')
+              : const Text('编辑收藏夹'),
         ),
-        centerTitle: false,
         actions: [
           Obx(
-            () => _favEditController.privacy.value == 0
-                ? IconButton(
-                    onPressed: () {
-                      _favEditController.privacy.value = 1;
-                    },
-                    icon: const Icon(Icons.lock_open_outlined))
-                : IconButton(
-                    onPressed: () {
-                      _favEditController.privacy.value = 0;
-                    },
-                    icon: Icon(
-                      Icons.lock_outlined,
-                      color: Theme.of(context).colorScheme.error,
-                    )),
+            () => IconButton(
+              onPressed: _favEditController.togglePrivacy,
+              icon: Icon(
+                _favEditController.privacy.value == 0
+                    ? Icons.lock_open_outlined
+                    : Icons.lock_outlined,
+                color: _favEditController.privacy.value == 0
+                    ? null
+                    : Theme.of(context).colorScheme.error,
+              ),
+            ),
           ),
           TextButton(
               onPressed: _favEditController.onSubmit, child: const Text('保存')),

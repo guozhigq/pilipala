@@ -14,12 +14,14 @@ import 'package:pilipala/models/common/reply_type.dart';
 import 'package:pilipala/models/common/search_type.dart';
 import 'package:pilipala/models/sponsor_block/segment.dart';
 import 'package:pilipala/models/sponsor_block/segment_type.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/models/video/later.dart';
 import 'package:pilipala/models/video/play/quality.dart';
 import 'package:pilipala/models/video/play/url.dart';
 import 'package:pilipala/models/video/reply/item.dart';
 import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
 import 'package:pilipala/utils/video_utils.dart';
@@ -71,9 +73,9 @@ class VideoDetailController extends GetxController
   RxBool enableHA = false.obs;
 
   /// 本地存储
-  Box userInfoCache = GStrorage.userInfo;
-  Box localCache = GStrorage.localCache;
-  Box setting = GStrorage.setting;
+  Box userInfoCache = GStorage.userInfo;
+  Box localCache = GStorage.localCache;
+  Box setting = GStorage.setting;
 
   RxInt oid = 0.obs;
   // 评论id 请求楼中楼评论使用
@@ -94,7 +96,7 @@ class VideoDetailController extends GetxController
   double? brightness;
   // 默认记录历史记录
   bool enableHeart = true;
-  var userInfo;
+  UserInfoData? userInfo;
   late bool isFirstTime = true;
   Floating? floating;
   late PreferredSizeWidget headerControl;
@@ -114,6 +116,7 @@ class VideoDetailController extends GetxController
     BottomControlType.time,
     BottomControlType.space,
     BottomControlType.fit,
+    BottomControlType.speed,
     BottomControlType.fullscreen,
   ].obs;
   RxDouble sheetHeight = 0.0.obs;
@@ -125,6 +128,8 @@ class VideoDetailController extends GetxController
   RxInt watchLaterCount = 0.obs;
   List<SegmentDataModel> skipSegments = <SegmentDataModel>[];
   int? lastPosition;
+  // 默认屏幕方向
+  RxString videoDirection = 'horizontal'.obs;
 
   @override
   void onInit() {
@@ -137,8 +142,16 @@ class VideoDetailController extends GetxController
     } else if (argMap.containsKey('pic')) {
       updateCover(argMap['pic']);
     }
-
-    tabCtr = TabController(length: 2, vsync: this);
+    tabs.value = <String>[
+      '简介',
+      if (videoType == SearchType.video &&
+          GlobalDataCache.enableComment.contains('video'))
+        '评论',
+      if (videoType == SearchType.media_bangumi &&
+          GlobalDataCache.enableComment.contains('bangumi'))
+        '评论'
+    ];
+    tabCtr = TabController(length: tabs.length, vsync: this);
     autoPlay.value =
         setting.get(SettingBoxKey.autoPlayEnable, defaultValue: true);
     enableHA.value = setting.get(SettingBoxKey.enableHA, defaultValue: false);
@@ -156,7 +169,7 @@ class VideoDetailController extends GetxController
     }
 
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     // 预设的画质
     cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa);
     // 预设的解码格式
@@ -195,7 +208,7 @@ class VideoDetailController extends GetxController
     });
 
     /// 仅投稿视频skip
-    if (videoType == SearchType.video) {
+    if (videoType == SearchType.video && GlobalDataCache.enableSponsorBlock) {
       querySkipSegments();
     }
   }
@@ -283,6 +296,10 @@ class VideoDetailController extends GetxController
     } else {
       ScreenBrightness().resetScreenBrightness();
     }
+    videoDirection.value = (firstVideo.width != null &&
+            firstVideo.height != null)
+        ? (firstVideo.width! > firstVideo.height! ? 'horizontal' : 'vertical')
+        : 'horizontal';
     await plPlayerController.setDataSource(
       DataSource(
         videoSource: video ?? videoUrl,
@@ -299,11 +316,7 @@ class VideoDetailController extends GetxController
       seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       // 宽>高 水平 否则 垂直
-      direction: firstVideo.width != null && firstVideo.height != null
-          ? ((firstVideo.width! - firstVideo.height!) > 0
-              ? 'horizontal'
-              : 'vertical')
-          : null,
+      direction: videoDirection.value,
       bvid: bvid,
       cid: cid.value,
       enableHeart: enableHeart,
@@ -477,6 +490,15 @@ class VideoDetailController extends GetxController
         getDanmaku(subtitles);
       }
     }
+    headerControl = HeaderControl(
+      controller: plPlayerController,
+      videoDetailCtr: this,
+      floating: floating,
+      bvid: bvid,
+      videoType: videoType,
+      showSubtitleBtn: result['status'] && result['data'].subtitles.isNotEmpty,
+    );
+    plPlayerController.setHeaderControl(headerControl);
   }
 
   // 获取弹幕
@@ -615,7 +637,7 @@ class VideoDetailController extends GetxController
     var count = argMap['count'];
     var res = await UserHttp.getMediaList(
       type: 2,
-      bizId: userInfo.mid,
+      bizId: userInfo!.mid!,
       ps: count,
     );
     if (res['status']) {
@@ -722,15 +744,16 @@ class VideoDetailController extends GetxController
     var res = await CommonHttp.querySkipSegments(bvid: bvid);
     if (res['status']) {
       /// TODO 根据segmentType过滤数据
-      skipSegments = res['data'];
-    } else {
-      SmartDialog.showToast(res['msg']);
+      skipSegments = res['data'] ?? [];
     }
   }
 
   // 监听视频进度
   void onPositionChanged() async {
-    if (skipSegments.isEmpty) {
+    final List<SegmentDataModel> sponsorSkipSegments = skipSegments
+        .where((e) => e.category!.value == SegmentType.sponsor.value)
+        .toList();
+    if (sponsorSkipSegments.isEmpty) {
       return;
     }
 
@@ -744,8 +767,7 @@ class VideoDetailController extends GetxController
       }
 
       lastPosition = positionMs;
-
-      for (SegmentDataModel segment in skipSegments) {
+      for (SegmentDataModel segment in sponsorSkipSegments) {
         try {
           final segmentStart = segment.segment!.first.toInt();
           final segmentEnd = segment.segment!.last.toInt();

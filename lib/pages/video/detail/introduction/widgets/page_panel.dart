@@ -156,7 +156,7 @@ class _PagesPanelState extends State<PagesPanel> {
                         children: <Widget>[
                           if (isCurrentIndex) ...<Widget>[
                             Image.asset(
-                              'assets/images/live.gif',
+                              'assets/images/live.png',
                               color: Theme.of(context).colorScheme.primary,
                               height: 12,
                             ),

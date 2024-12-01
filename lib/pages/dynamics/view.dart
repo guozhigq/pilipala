@@ -32,7 +32,7 @@ class _DynamicsPageState extends State<DynamicsPage>
   final MineController mineController = Get.put(MineController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   late ScrollController scrollController;
 
   @override
@@ -78,8 +78,6 @@ class _DynamicsPageState extends State<DynamicsPage>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: SizedBox(
           height: 34,
           child: Stack(

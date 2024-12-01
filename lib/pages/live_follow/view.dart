@@ -42,13 +42,8 @@ class _LiveFollowPageState extends State<LiveFollowPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          titleSpacing: 0,
-          centerTitle: false,
           title: Obx(() => Text(
                 '${_liveFollowController.liveFollowingCount}人正在直播中',
-                style: Theme.of(context).textTheme.titleMedium,
               )),
         ),
         body: Container(

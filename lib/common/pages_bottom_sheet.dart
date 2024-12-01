@@ -98,14 +98,16 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
     with TickerProviderStateMixin {
   final ScrollController _listScrollController = ScrollController();
   late ListObserverController _listObserverController;
-  final ScrollController _scrollController = ScrollController();
+  late GridObserverController _gridObserverController;
+  final ScrollController _gridScrollController = ScrollController();
   late int currentIndex;
   TabController? tabController;
   List<ListObserverController>? _listObserverControllerList;
   List<ScrollController>? _listScrollControllerList;
   final String heroTag = Get.arguments['heroTag'];
   VideoDetailController? _videoDetailController;
-  late RxInt isSubscribe = (-1).obs;
+  RxInt isSubscribe = (-1).obs;
+  bool isVisible = false;
 
   @override
   void initState() {
@@ -162,6 +164,9 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
           );
         },
       );
+    } else {
+      _gridObserverController =
+          GridObserverController(controller: _gridScrollController);
     }
   }
 
@@ -177,25 +182,19 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
             isFixedHeight: true,
           );
         } else {
-          _listObserverControllerList![widget.currentEpisodeIndex!]
+          _listObserverControllerList![widget.currentEpisodeIndex ?? 0]
               .initialIndexModel = ObserverIndexPositionModel(
             index: currentIndex,
             isFixedHeight: true,
           );
         }
       }
+    } else {
+      _gridObserverController.initialIndexModel = ObserverIndexPositionModel(
+        index: currentIndex,
+        isFixedHeight: false,
+      );
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.dataType != VideoEpidoesType.videoEpisode) {
-        double itemHeight = (widget.isFullScreen
-                ? 400
-                : Get.size.width - 3 * StyleString.safeSpace) /
-            5.2;
-        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
-        _scrollController.jumpTo(offset);
-      }
-    });
   }
 
   // 获取订阅状态
@@ -224,11 +223,20 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
     }
   }
 
+  // 更改展开状态
+  void _changeVisible() {
+    setState(() {
+      isVisible = !isVisible;
+    });
+  }
+
   @override
   void dispose() {
     try {
       _listObserverController.controller?.dispose();
+      _gridObserverController.controller?.dispose();
       _listScrollController.dispose();
+      _gridScrollController.dispose();
       for (var element in _listObserverControllerList!) {
         element.controller?.dispose();
       }
@@ -255,7 +263,9 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
               UgcSeasonBuild(
                 ugcSeason: widget.ugcSeason!,
                 isSubscribe: isSubscribe,
+                isVisible: isVisible,
                 changeFucCall: _changeSubscribeStatus,
+                changeVisible: _changeVisible,
               ),
             ],
             Expanded(
@@ -293,24 +303,27 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
                     : Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12.0), // 设置左右间距为12
-                        child: GridView.count(
-                          controller: _scrollController,
-                          crossAxisCount: 2,
-                          crossAxisSpacing: StyleString.safeSpace,
-                          childAspectRatio: 2.6,
-                          children: List.generate(
-                            widget.episodes.length,
-                            (index) {
-                              bool isCurrentIndex = currentIndex == index;
-                              return EpisodeGridItem(
-                                episode: widget.episodes[index],
-                                index: index,
-                                isCurrentIndex: isCurrentIndex,
-                                dataType: widget.dataType,
-                                changeFucCall: widget.changeFucCall,
-                                isFullScreen: widget.isFullScreen,
-                              );
-                            },
+                        child: GridViewObserver(
+                          controller: _gridObserverController,
+                          child: GridView.count(
+                            controller: _gridScrollController,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: StyleString.safeSpace,
+                            childAspectRatio: 2.6,
+                            children: List.generate(
+                              widget.episodes.length,
+                              (index) {
+                                bool isCurrentIndex = currentIndex == index;
+                                return EpisodeGridItem(
+                                  episode: widget.episodes[index],
+                                  index: index,
+                                  isCurrentIndex: isCurrentIndex,
+                                  dataType: widget.dataType,
+                                  changeFucCall: widget.changeFucCall,
+                                  isFullScreen: widget.isFullScreen,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -325,19 +338,23 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
   Widget buildTabBar() {
     return Column(
       children: [
-        TabBar(
-          controller: tabController,
-          isScrollable: true,
-          indicatorSize: TabBarIndicatorSize.label,
-          tabAlignment: TabAlignment.start,
-          splashBorderRadius: BorderRadius.circular(4),
-          tabs: [
-            ...widget.ugcSeason!.sections!.map((SectionItem section) {
-              return Tab(
-                text: section.title,
-              );
-            }).toList()
-          ],
+        // 背景色
+        Container(
+          color: Theme.of(context).colorScheme.surface,
+          child: TabBar(
+            controller: tabController,
+            isScrollable: true,
+            indicatorSize: TabBarIndicatorSize.label,
+            tabAlignment: TabAlignment.start,
+            splashBorderRadius: BorderRadius.circular(4),
+            tabs: [
+              ...widget.ugcSeason!.sections!.map((SectionItem section) {
+                return Tab(
+                  text: section.title,
+                );
+              }).toList()
+            ],
+          ),
         ),
         Expanded(
           child: TabBarView(
@@ -394,17 +411,29 @@ class TitleBar extends StatelessWidget {
       toolbarHeight: 45,
       automaticallyImplyLeading: false,
       centerTitle: false,
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium,
+      elevation: 1,
+      scrolledUnderElevation: 1,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       actions: !isFullScreen
           ? [
-              IconButton(
-                icon: const Icon(Icons.close, size: 20),
-                onPressed: () => Navigator.pop(context),
+              SizedBox(
+                width: 35,
+                height: 35,
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 8),
             ]
           : null,
     );
@@ -465,7 +494,7 @@ class EpisodeListItem extends StatelessWidget {
       dense: false,
       leading: isCurrentIndex
           ? Image.asset(
-              'assets/images/live.gif',
+              'assets/images/live.png',
               color: primary,
               height: 12,
             )
@@ -678,95 +707,133 @@ class EpisodeGridItem extends StatelessWidget {
 class UgcSeasonBuild extends StatelessWidget {
   final UgcSeason ugcSeason;
   final RxInt isSubscribe;
+  final bool isVisible;
   final Function changeFucCall;
+  final Function changeVisible;
 
   const UgcSeasonBuild({
     Key? key,
     required this.ugcSeason,
     required this.isSubscribe,
+    required this.isVisible,
     required this.changeFucCall,
+    required this.changeVisible,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData t = Theme.of(context);
-    final Color outline = t.colorScheme.outline;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-      color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '合集：${ugcSeason.title}',
-            style: Theme.of(context).textTheme.titleMedium,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (ugcSeason.intro != null && ugcSeason.intro != '') ...[
-            const SizedBox(height: 4),
-            Row(
+    final ThemeData theme = Theme.of(context);
+    final Color outline = theme.colorScheme.outline;
+    final Color surface = theme.colorScheme.surface;
+    final Color primary = theme.colorScheme.primary;
+    final Color onPrimary = theme.colorScheme.onPrimary;
+    final Color onInverseSurface = theme.colorScheme.onInverseSurface;
+    final TextStyle titleMedium = theme.textTheme.titleMedium!;
+    final TextStyle labelMedium = theme.textTheme.labelMedium!;
+    final Color dividerColor = theme.dividerColor.withOpacity(0.1);
+
+    return isVisible
+        ? Container(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            color: surface,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(ugcSeason.intro ?? '',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline)),
-                ),
-                Obx(
-                  () => isSubscribe.value == -1
-                      ? const SizedBox(height: 32)
-                      : SizedBox(
-                          height: 32,
-                          child: FilledButton.tonal(
-                            onPressed: () => changeFucCall.call(),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.only(
-                                left: 8,
-                                right: 8,
+                Divider(height: 1, thickness: 1, color: dividerColor),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '合集：${ugcSeason.title}',
+                        style: titleMedium,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Obx(
+                      () => isSubscribe.value == -1
+                          ? const SizedBox(height: 32)
+                          : SizedBox(
+                              height: 32,
+                              child: FilledButton.tonal(
+                                onPressed: () => changeFucCall.call(),
+                                style: TextButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.only(left: 8, right: 8),
+                                  foregroundColor: isSubscribe.value == 1
+                                      ? outline
+                                      : onPrimary,
+                                  backgroundColor: isSubscribe.value == 1
+                                      ? onInverseSurface
+                                      : primary,
+                                ),
+                                child:
+                                    Text(isSubscribe.value == 1 ? '已订阅' : '订阅'),
                               ),
-                              foregroundColor: isSubscribe.value == 1
-                                  ? outline
-                                  : t.colorScheme.onPrimary,
-                              backgroundColor: isSubscribe.value == 1
-                                  ? t.colorScheme.onInverseSurface
-                                  : t.colorScheme.primary, // 设置按钮背景色
                             ),
-                            child: Text(isSubscribe.value == 1 ? '已订阅' : '订阅'),
-                          ),
-                        ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 6),
+                if (ugcSeason.intro != null && ugcSeason.intro != '') ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    ugcSeason.intro!,
+                    style: TextStyle(color: outline, fontSize: 12),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                        fontSize: labelMedium.fontSize, color: outline),
+                    children: [
+                      TextSpan(
+                          text: '${Utils.numFormat(ugcSeason.stat!.view)}播放'),
+                      const TextSpan(text: '  ·  '),
+                      TextSpan(
+                          text:
+                              '${Utils.numFormat(ugcSeason.stat!.danmaku)}弹幕'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.center,
+                  child: Material(
+                    color: surface,
+                    child: InkWell(
+                      onTap: () => changeVisible.call(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 0),
+                        child: Text(
+                          '收起简介',
+                          style: TextStyle(color: primary, fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(height: 1, thickness: 1, color: dividerColor),
               ],
             ),
-          ],
-          const SizedBox(height: 4),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                color: Theme.of(context).colorScheme.outline,
+          )
+        : Align(
+            alignment: Alignment.center,
+            child: InkWell(
+              onTap: () => changeVisible.call(),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                child: Text(
+                  '展开简介',
+                  style: TextStyle(color: primary, fontSize: 12),
+                ),
               ),
-              children: [
-                TextSpan(text: '${Utils.numFormat(ugcSeason.stat!.view)}播放'),
-                const TextSpan(text: '  ·  '),
-                TextSpan(text: '${Utils.numFormat(ugcSeason.stat!.danmaku)}弹幕'),
-              ],
             ),
-          ),
-          const SizedBox(height: 14),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-        ],
-      ),
-    );
+          );
   }
 }
