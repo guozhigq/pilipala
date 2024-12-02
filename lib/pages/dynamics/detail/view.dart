@@ -20,7 +20,6 @@ import '../../../models/video/reply/item.dart';
 import '../widgets/dynamic_panel.dart';
 
 class DynamicDetailPage extends StatefulWidget {
-  // const DynamicDetailPage({super.key});
   const DynamicDetailPage({Key? key}) : super(key: key);
 
   @override
@@ -90,19 +89,22 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             _dynamicDetailController = Get.put(
                 DynamicDetailController(oid, replyType),
                 tag: opusId.toString());
+            _futureBuilderFuture = _dynamicDetailController.queryReplyList();
             await _dynamicDetailController.reqHtmlByOpusId(opusId!);
             setState(() {});
           }
         } else {
           oid = moduleDynamic.major!.draw!.id!;
         }
-      } catch (_) {}
+      } catch (err) {
+        print('err:${err.toString()}');
+      }
     }
     if (!isOpusId) {
       _dynamicDetailController =
           Get.put(DynamicDetailController(oid, replyType), tag: oid.toString());
+      _futureBuilderFuture = _dynamicDetailController.queryReplyList();
     }
-    _futureBuilderFuture = _dynamicDetailController.queryReplyList();
   }
 
   // 查看二级评论
@@ -132,7 +134,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         // 分页加载
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replyList', const Duration(seconds: 2), () {
             _dynamicDetailController.onLoad();
           });
         }

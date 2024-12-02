@@ -226,6 +226,8 @@ class _FavDetailPageState extends State<FavDetailPage> {
                                   isOwner: _favDetailController.isOwner,
                                   callFn: () => _favDetailController
                                       .onCancelFav(favList[index].id),
+                                  viewInvalidVideoCb: () => _favDetailController
+                                      .toViewInvalidVideo(favList[index]),
                                 );
                               }, childCount: favList.length),
                             ),

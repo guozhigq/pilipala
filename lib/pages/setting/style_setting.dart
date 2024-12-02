@@ -175,7 +175,7 @@ class _StyleSettingState extends State<StyleSetting> {
                                   SettingBoxKey.defaultPicQa, picQuality);
                               Get.back();
                               settingController.picQuality.value = picQuality;
-                              GlobalDataCache().imgQuality = picQuality;
+                              GlobalDataCache.imgQuality = picQuality;
                               SmartDialog.showToast('设置成功');
                             },
                             child: const Text('确定'),

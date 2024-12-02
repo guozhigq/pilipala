@@ -24,6 +24,7 @@ import 'package:pilipala/pages/video/detail/related/index.dart';
 import 'package:pilipala/plugin/pl_player/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/services/service_locator.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:status_bar_control/status_bar_control.dart';
 
@@ -205,12 +206,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             vdCtr.bottomList.insert(3, BottomControlType.episode);
           }
         }
+        vdCtr.toggeleWatchLaterVisible(false);
       } else {
         if (vdCtr.bottomList.contains(BottomControlType.episode)) {
           vdCtr.bottomList.removeAt(3);
         }
       }
-      vdCtr.toggeleWatchLaterVisible(!isFullScreen);
     });
   }
 
@@ -553,6 +554,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 playerController: plPlayerController!,
               ),
               bottomList: vdCtr.bottomList,
+              fullScreenCb: (bool status) {
+                if (vdCtr.videoDirection.value == 'vertical') {
+                  videoHeight.value = status ? Get.size.height : verticalHeight;
+                }
+              },
               showEposideCb: () => vdCtr.videoType == SearchType.video
                   ? videoIntroController.showEposideHandler()
                   : bangumiIntroController.showEposideHandler(),
@@ -679,11 +685,16 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         forceElevated: innerBoxIsScrolled,
                         expandedHeight: expandedHeight,
                         backgroundColor: Colors.black,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: PopScope(
+                        flexibleSpace: SizedBox.expand(
+                          child: PopScope(
                             canPop:
                                 plPlayerController?.isFullScreen.value != true,
                             onPopInvoked: (bool didPop) {
+                              if (plPlayerController?.controlsLock.value ==
+                                  true) {
+                                plPlayerController?.onLockControl(false);
+                                return;
+                              }
                               if (plPlayerController?.isFullScreen.value ==
                                   true) {
                                 plPlayerController!
@@ -779,13 +790,20 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                             );
                           },
                         ),
-                        Obx(
-                          () => VideoReplyPanel(
-                            bvid: vdCtr.bvid,
-                            oid: vdCtr.oid.value,
-                            onControllerCreated: vdCtr.onControllerCreated,
-                          ),
-                        )
+                        if ((vdCtr.videoType == SearchType.media_bangumi &&
+                                GlobalDataCache.enableComment
+                                    .contains('bangumi')) ||
+                            (vdCtr.videoType == SearchType.video &&
+                                GlobalDataCache.enableComment
+                                    .contains('video'))) ...[
+                          Obx(
+                            () => VideoReplyPanel(
+                              bvid: vdCtr.bvid,
+                              oid: vdCtr.oid.value,
+                              onControllerCreated: vdCtr.onControllerCreated,
+                            ),
+                          )
+                        ],
                       ],
                     ),
                   ),
@@ -812,9 +830,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           /// 稍后再看列表
           Obx(
             () => Visibility(
-              visible: vdCtr.sourceType.value == 'watchLater' ||
-                  vdCtr.sourceType.value == 'fav' ||
-                  vdCtr.sourceType.value == 'up_archive',
+              visible: ['watchLater', 'fav', 'up_archive']
+                  .contains(vdCtr.sourceType.value),
               child: AnimatedPositioned(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
@@ -908,6 +925,21 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             ComBtn(
               icon: const Icon(FontAwesomeIcons.arrowLeft, size: 15),
               fuc: () => Get.back(),
+            ),
+            const SizedBox(width: 8),
+            ComBtn(
+              icon: const Icon(
+                FontAwesomeIcons.house,
+                size: 15,
+                color: Colors.white,
+              ),
+              fuc: () async {
+                await vdCtr.plPlayerController.dispose(type: 'all');
+                if (mounted) {
+                  Navigator.popUntil(
+                      context, (Route<dynamic> route) => route.isFirst);
+                }
+              },
             ),
             const Spacer(),
             ComBtn(

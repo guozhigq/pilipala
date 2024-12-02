@@ -89,9 +89,12 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
     return AppBar(
       toolbarHeight: 45,
       automaticallyImplyLeading: false,
-      title: Text(
-        '评论详情',
-        style: Theme.of(context).textTheme.titleSmall,
+      title: Padding(
+        padding: const EdgeInsets.only(left: 14),
+        child: Text(
+          '评论详情',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
       ),
       actions: [
         IconButton(
@@ -102,7 +105,7 @@ class _VideoReplyReplyPanelState extends State<VideoReplyReplyPanel> {
             Navigator.pop(context);
           },
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
       ],
     );
   }

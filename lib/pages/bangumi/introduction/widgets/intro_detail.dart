@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/common/widgets/stat/danmu.dart';
 import 'package:pilipala/common/widgets/stat/view.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -23,94 +24,81 @@ class IntroDetail extends StatelessWidget {
       color: Theme.of(context).colorScheme.onSurface,
     );
     return Container(
-      color: Theme.of(context).colorScheme.surface,
-      padding: const EdgeInsets.only(left: 14, right: 14),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       height: sheetHeight,
       child: Column(
         children: [
-          Container(
-            height: 35,
-            padding: const EdgeInsets.only(bottom: 2),
-            child: Center(
-              child: Container(
-                width: 32,
-                height: 3,
-                decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSecondaryContainer
-                        .withOpacity(0.5),
-                    borderRadius: const BorderRadius.all(Radius.circular(3))),
-              ),
-            ),
-          ),
+          const DragHandle(),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    bangumiDetail!.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      bangumiDetail!.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      StatView(
-                        view: bangumiDetail!.stat!['views'],
-                        size: 'medium',
-                      ),
-                      const SizedBox(width: 6),
-                      StatDanMu(
-                        danmu: bangumiDetail!.stat!['danmakus'],
-                        size: 'medium',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        bangumiDetail!.areas!.first['name'],
-                        style: smallTitle,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        bangumiDetail!.publish!['pub_time_show'],
-                        style: smallTitle,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        bangumiDetail!.newEp!['desc'],
-                        style: smallTitle,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '简介：',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${bangumiDetail!.evaluate!}',
-                    style: smallTitle.copyWith(fontSize: 13),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    '声优：',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    bangumiDetail.actors,
-                    style: smallTitle.copyWith(fontSize: 13),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).padding.bottom + 20)
-                ],
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        StatView(
+                          view: bangumiDetail!.stat!['views'],
+                          size: 'medium',
+                        ),
+                        const SizedBox(width: 6),
+                        StatDanMu(
+                          danmu: bangumiDetail!.stat!['danmakus'],
+                          size: 'medium',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          bangumiDetail!.areas!.first['name'],
+                          style: smallTitle,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          bangumiDetail!.publish!['pub_time_show'],
+                          style: smallTitle,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          bangumiDetail!.newEp!['desc'],
+                          style: smallTitle,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '简介：',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${bangumiDetail!.evaluate!}',
+                      style: smallTitle.copyWith(fontSize: 13),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '声优：',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      bangumiDetail.actors,
+                      style: smallTitle.copyWith(fontSize: 13),
+                    ),
+                    SizedBox(height: MediaQuery.of(context).padding.bottom + 20)
+                  ],
+                ),
               ),
             ),
           )

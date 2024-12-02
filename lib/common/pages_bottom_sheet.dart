@@ -98,7 +98,8 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
     with TickerProviderStateMixin {
   final ScrollController _listScrollController = ScrollController();
   late ListObserverController _listObserverController;
-  final ScrollController _scrollController = ScrollController();
+  late GridObserverController _gridObserverController;
+  final ScrollController _gridScrollController = ScrollController();
   late int currentIndex;
   TabController? tabController;
   List<ListObserverController>? _listObserverControllerList;
@@ -163,6 +164,9 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
           );
         },
       );
+    } else {
+      _gridObserverController =
+          GridObserverController(controller: _gridScrollController);
     }
   }
 
@@ -178,25 +182,19 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
             isFixedHeight: true,
           );
         } else {
-          _listObserverControllerList![widget.currentEpisodeIndex!]
+          _listObserverControllerList![widget.currentEpisodeIndex ?? 0]
               .initialIndexModel = ObserverIndexPositionModel(
             index: currentIndex,
             isFixedHeight: true,
           );
         }
       }
+    } else {
+      _gridObserverController.initialIndexModel = ObserverIndexPositionModel(
+        index: currentIndex,
+        isFixedHeight: false,
+      );
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.dataType != VideoEpidoesType.videoEpisode) {
-        double itemHeight = (widget.isFullScreen
-                ? 400
-                : Get.size.width - 3 * StyleString.safeSpace) /
-            5.2;
-        double offset = ((currentIndex - 1) / 2).ceil() * itemHeight;
-        _scrollController.jumpTo(offset);
-      }
-    });
   }
 
   // 获取订阅状态
@@ -236,7 +234,9 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
   void dispose() {
     try {
       _listObserverController.controller?.dispose();
+      _gridObserverController.controller?.dispose();
       _listScrollController.dispose();
+      _gridScrollController.dispose();
       for (var element in _listObserverControllerList!) {
         element.controller?.dispose();
       }
@@ -303,24 +303,27 @@ class _PagesBottomSheetState extends State<PagesBottomSheet>
                     : Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12.0), // 设置左右间距为12
-                        child: GridView.count(
-                          controller: _scrollController,
-                          crossAxisCount: 2,
-                          crossAxisSpacing: StyleString.safeSpace,
-                          childAspectRatio: 2.6,
-                          children: List.generate(
-                            widget.episodes.length,
-                            (index) {
-                              bool isCurrentIndex = currentIndex == index;
-                              return EpisodeGridItem(
-                                episode: widget.episodes[index],
-                                index: index,
-                                isCurrentIndex: isCurrentIndex,
-                                dataType: widget.dataType,
-                                changeFucCall: widget.changeFucCall,
-                                isFullScreen: widget.isFullScreen,
-                              );
-                            },
+                        child: GridViewObserver(
+                          controller: _gridObserverController,
+                          child: GridView.count(
+                            controller: _gridScrollController,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: StyleString.safeSpace,
+                            childAspectRatio: 2.6,
+                            children: List.generate(
+                              widget.episodes.length,
+                              (index) {
+                                bool isCurrentIndex = currentIndex == index;
+                                return EpisodeGridItem(
+                                  episode: widget.episodes[index],
+                                  index: index,
+                                  isCurrentIndex: isCurrentIndex,
+                                  dataType: widget.dataType,
+                                  changeFucCall: widget.changeFucCall,
+                                  isFullScreen: widget.isFullScreen,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),

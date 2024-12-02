@@ -17,6 +17,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
@@ -87,19 +88,22 @@ class VideoIntroController extends GetxController {
   }
 
   // 获取视频简介&分p
-  Future queryVideoIntro({cover}) async {
+  Future queryVideoIntro({String? cover, String? type, int? cid}) async {
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
       pages.value = result['data']!.pages!;
-      lastPlayCid.value = videoDetail.value.cid!;
-      if (pages.isNotEmpty) {
-        lastPlayCid.value = pages.first.cid!;
+      if (type == null) {
+        lastPlayCid.value = cid ?? videoDetail.value.cid!;
       }
       final VideoDetailController videoDetailCtr =
           Get.find<VideoDetailController>(tag: heroTag);
-      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
+      videoDetailCtr.tabs.value = [
+        '简介',
+        if (GlobalDataCache.enableComment.contains('video'))
+          '评论 ${result['data']?.stat?.reply}'
+      ];
       videoDetailCtr.cover.value = cover ?? result['data'].pic ?? '';
       // 获取到粉丝数再返回
       await queryUserStat();
@@ -469,13 +473,16 @@ class VideoIntroController extends GetxController {
     // 重新请求评论
     try {
       /// 未渲染回复组件时可能异常
-      final VideoReplyController videoReplyCtr =
-          Get.find<VideoReplyController>(tag: heroTag);
-      videoReplyCtr.aid = aid;
-      videoReplyCtr.queryReplyList(type: 'init');
+      if (GlobalDataCache.enableComment.contains('video')) {
+        final VideoReplyController videoReplyCtr =
+            Get.find<VideoReplyController>(tag: heroTag);
+        videoReplyCtr.aid = aid;
+        videoReplyCtr.queryReplyList(type: 'init');
+      }
     } catch (_) {}
     this.bvid = bvid;
-    await queryVideoIntro(cover: cover);
+    // 点击切换时，优先取当前cid
+    await queryVideoIntro(cover: cover, cid: cid);
   }
 
   void startTimer() {
@@ -516,7 +523,7 @@ class VideoIntroController extends GetxController {
         Get.find<VideoDetailController>(tag: heroTag);
 
     /// 优先稍后再看、收藏夹
-    if (videoDetailCtr.isWatchLaterVisible.value) {
+    if (videoDetailCtr.sourceType.value != 'normal') {
       episodes.addAll(videoDetailCtr.mediaList);
     } else if (videoDetail.value.ugcSeason != null) {
       final UgcSeason ugcSeason = videoDetail.value.ugcSeason!;
@@ -610,6 +617,7 @@ class VideoIntroController extends GetxController {
   // 播放器底栏 选集 回调
   void showEposideHandler() {
     late List episodes;
+    int currentEpisodeIndex = 0;
     VideoEpidoesType dataType = VideoEpidoesType.videoEpisode;
     if (videoDetail.value.ugcSeason != null) {
       dataType = VideoEpidoesType.videoEpisode;
@@ -618,6 +626,7 @@ class VideoIntroController extends GetxController {
         final List<EpisodeItem> episodesList = sections[i].episodes!;
         for (int j = 0; j < episodesList.length; j++) {
           if (episodesList[j].cid == lastPlayCid.value) {
+            currentEpisodeIndex = i;
             episodes = episodesList;
             continue;
           }
@@ -637,6 +646,7 @@ class VideoIntroController extends GetxController {
         sheetHeight: Get.size.height,
         isFullScreen: true,
         ugcSeason: ugcSeason,
+        currentEpisodeIndex: currentEpisodeIndex,
         changeFucCall: (item, index) {
           if (dataType == VideoEpidoesType.videoEpisode) {
             changeSeasonOrbangu(

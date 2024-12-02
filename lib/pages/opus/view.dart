@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/read/opus.dart';
+
 import 'controller.dart';
 import 'text_helper.dart';
 
@@ -26,16 +27,18 @@ class _OpusPageState extends State<OpusPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
+      body: CustomScrollView(
         controller: controller.scrollController,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(),
-            _buildFutureContent(),
-          ],
-        ),
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                _buildTitle(),
+                _buildFutureContent(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

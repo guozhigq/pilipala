@@ -85,10 +85,10 @@ packages:
     dependency: "direct main"
     description:
       name: audio_service
-      sha256: "4547c312a94f9cb2c48b60823fb190767cbd63454a83c73049384d5d3cba4650"
+      sha256: "9dd5ba7e77567b290c35908b1950d61485b4dfdd3a0ac398e98cfeec04651b75"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.18.13"
+    version: "0.18.15"
   audio_service_platform_interface:
     dependency: transitive
     description:
@@ -101,18 +101,18 @@ packages:
     dependency: transitive
     description:
       name: audio_service_web
-      sha256: "9d7d5ae5f98a5727f2580fad73062f2484f400eef6cef42919413268e62a363e"
+      sha256: "4cdc2127cd4562b957fb49227dc58e3303fafb09bde2573bc8241b938cf759d9"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.3"
   audio_session:
     dependency: "direct main"
     description:
       name: audio_session
-      sha256: "6fdf255ed3af86535c96452c33ecff1245990bb25a605bfb1958661ccc3d467f"
+      sha256: "343e83bc7809fbda2591a49e525d6b63213ade10c76f15813be9aed6657b3261"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.18"
+    version: "0.1.21"
   audio_video_progress_bar:
     dependency: "direct main"
     description:
@@ -497,6 +497,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.2.1"
+  fading_edge_scrollview:
+    dependency: transitive
+    description:
+      name: fading_edge_scrollview
+      sha256: c25c2231652ce774cc31824d0112f11f653881f43d7f5302c05af11942052031
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -990,6 +998,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.1.0"
+  marquee:
+    dependency: "direct main"
+    description:
+      name: marquee
+      sha256: "4b5243d2804373bdc25fc93d42c3b402d6ec1f4ee8d0bb72276edd04ae7addb8"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.2.3"
   matcher:
     dependency: transitive
     description:

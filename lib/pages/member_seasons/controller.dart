@@ -59,7 +59,7 @@ class MemberSeasonsController extends GetxController {
       mid: mid,
       seriesId: seriesId!,
       pn: pn,
-      currentMid: GlobalDataCache().userInfo?.mid ?? -1,
+      currentMid: GlobalDataCache.userInfo?.mid ?? -1,
     );
     if (res['status']) {
       seasonsList.addAll(res['data'].seriesList);

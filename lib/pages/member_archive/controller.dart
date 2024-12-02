@@ -28,9 +28,8 @@ class MemberArchiveController extends GetxController {
     super.onInit();
     mid = int.parse(Get.parameters['mid']!);
     currentOrder.value = orderList.first;
-    ownerMid = GlobalDataCache().userInfo != null
-        ? GlobalDataCache().userInfo!.mid!
-        : -1;
+    ownerMid =
+        GlobalDataCache.userInfo != null ? GlobalDataCache.userInfo!.mid! : -1;
     isOwner.value = mid == -1 || mid == ownerMid;
   }
 
