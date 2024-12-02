@@ -206,12 +206,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
             vdCtr.bottomList.insert(3, BottomControlType.episode);
           }
         }
+        vdCtr.toggeleWatchLaterVisible(false);
       } else {
         if (vdCtr.bottomList.contains(BottomControlType.episode)) {
           vdCtr.bottomList.removeAt(3);
         }
       }
-      vdCtr.toggeleWatchLaterVisible(!isFullScreen);
     });
   }
 
@@ -825,9 +825,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
           /// 稍后再看列表
           Obx(
             () => Visibility(
-              visible: vdCtr.sourceType.value == 'watchLater' ||
-                  vdCtr.sourceType.value == 'fav' ||
-                  vdCtr.sourceType.value == 'up_archive',
+              visible: ['watchLater', 'fav', 'up_archive']
+                  .contains(vdCtr.sourceType.value),
               child: AnimatedPositioned(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
