@@ -103,7 +103,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     if (!isOpusId) {
       _dynamicDetailController =
           Get.put(DynamicDetailController(oid, replyType), tag: oid.toString());
-      _futureBuilderFuture ??= _dynamicDetailController.queryReplyList();
+      _futureBuilderFuture = _dynamicDetailController.queryReplyList();
     }
   }
 
