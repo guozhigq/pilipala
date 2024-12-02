@@ -624,10 +624,8 @@ class VideoDetailController extends GetxController
   }
 
   void toggeleWatchLaterVisible(bool val) {
-    if (sourceType.value == 'watchLater' ||
-        sourceType.value == 'fav' ||
-        sourceType.value == 'up_archive') {
-      isWatchLaterVisible.value = !isWatchLaterVisible.value;
+    if (['watchLater', 'fav', 'up_archive'].contains(sourceType.value)) {
+      isWatchLaterVisible.value = val;
     }
   }
 
