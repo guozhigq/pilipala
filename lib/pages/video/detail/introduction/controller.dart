@@ -66,6 +66,8 @@ class VideoIntroController extends GetxController {
   late bool enableRelatedVideo;
   UgcSeason? ugcSeason;
   RxList<Part> pages = <Part>[].obs;
+  // 默认原创视频
+  int copyright = 1;
 
   @override
   void onInit() {
@@ -94,6 +96,7 @@ class VideoIntroController extends GetxController {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
       pages.value = result['data']!.pages!;
+      copyright = result['data']!.copyright!;
       if (type == null) {
         lastPlayCid.value = cid ?? videoDetail.value.cid!;
       }
@@ -215,7 +218,7 @@ class VideoIntroController extends GetxController {
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [1, 2]
+              children: (copyright == 2 ? [1] : [1, 2])
                   .map(
                     (e) => ListTile(
                       title: Padding(
