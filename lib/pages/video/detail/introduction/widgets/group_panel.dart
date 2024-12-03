@@ -18,7 +18,7 @@ class GroupPanel extends StatefulWidget {
 }
 
 class _GroupPanelState extends State<GroupPanel> {
-  final Box<dynamic> localCache = GStrorage.localCache;
+  final Box<dynamic> localCache = GStorage.localCache;
   late Future _futureBuilderFuture;
   late List<MemberTagItemModel> tagsList;
   bool showDefault = true;
@@ -57,8 +57,6 @@ class _GroupPanelState extends State<GroupPanel> {
     return Column(
       children: <Widget>[
         AppBar(
-          centerTitle: false,
-          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(20),

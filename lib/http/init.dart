@@ -1,18 +1,16 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:hive/hive.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
-import 'api.dart';
 import 'constants.dart';
 import 'interceptor.dart';
 
@@ -21,19 +19,17 @@ class Request {
   static late CookieManager cookieManager;
   static late final Dio dio;
   factory Request() => _instance;
-  Box setting = GStrorage.setting;
-  static Box localCache = GStrorage.localCache;
+  Box setting = GStorage.setting;
+  static Box localCache = GStorage.localCache;
   late bool enableSystemProxy;
   late String systemProxyHost;
   late String systemProxyPort;
-  static final RegExp spmPrefixExp =
-      RegExp(r'<meta name="spm_prefix" content="([^"]+?)">');
   static String? buvid;
 
   /// 设置cookie
   static setCookie() async {
-    Box userInfoCache = GStrorage.userInfo;
-    Box setting = GStrorage.setting;
+    Box userInfoCache = GStorage.userInfo;
+    Box setting = GStorage.setting;
     final String cookiePath = await Utils.getCookiePath();
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -43,7 +39,7 @@ class Request {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    final userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       final List<Cookie> cookie2 = await cookieManager.cookieJar
           .loadForRequest(Uri.parse(HttpString.tUrl));
@@ -61,11 +57,6 @@ class Request {
       baseUrlType = 'bangumi';
     }
     setBaseUrl(type: baseUrlType);
-    try {
-      await buvidActivate();
-    } catch (e) {
-      log("setCookie, ${e.toString()}");
-    }
 
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
@@ -77,7 +68,7 @@ class Request {
   // 从cookie中获取 csrf token
   static Future<String> getCsrf() async {
     List<Cookie> cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+        .loadForRequest(Uri.parse(HttpString.baseUrl));
     String token = '';
     if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
@@ -91,9 +82,12 @@ class Request {
     }
 
     final List<Cookie> cookies = await cookieManager.cookieJar
-        .loadForRequest(Uri.parse(HttpString.baseUrl));
-    buvid = cookies.firstWhere((cookie) => cookie.name == 'buvid3').value;
-    if (buvid == null) {
+        .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+    buvid = cookies
+        .firstWhere((cookie) => cookie.name == 'buvid3',
+            orElse: () => Cookie('buvid3', ''))
+        .value;
+    if (buvid == null || buvid!.isEmpty) {
       try {
         var result = await Request().get(
           "${HttpString.apiBaseUrl}/x/frontend/finger/spi",
@@ -119,30 +113,6 @@ class Request {
     dio.options.headers['app-key'] = 'android64';
     dio.options.headers['x-bili-aurora-zone'] = 'sh001';
     dio.options.headers['referer'] = 'https://www.bilibili.com/';
-  }
-
-  static Future buvidActivate() async {
-    var html = await Request().get(Api.dynamicSpmPrefix);
-    String spmPrefix = spmPrefixExp.firstMatch(html.data)!.group(1)!;
-    Random rand = Random();
-    String rand_png_end = base64.encode(
-        List<int>.generate(32, (_) => rand.nextInt(256)) +
-            List<int>.filled(4, 0) +
-            [73, 69, 78, 68] +
-            List<int>.generate(4, (_) => rand.nextInt(256)));
-
-    String jsonData = json.encode({
-      '3064': 1,
-      '39c8': '${spmPrefix}.fp.risk',
-      '3c43': {
-        'adca': 'Linux',
-        'bfe9': rand_png_end.substring(rand_png_end.length - 50),
-      },
-    });
-
-    await Request().post(Api.activateBuvidApi,
-        data: {'payload': jsonData},
-        options: Options(contentType: 'application/json'));
   }
 
   /*
@@ -209,17 +179,13 @@ class Request {
    */
   get(url, {data, Options? options, cancelToken, extra}) async {
     Response response;
-    options ??= Options(); // 如果 options 为 null，则初始化一个新的 Options 对象
-    ResponseType resType = ResponseType.json;
-
     if (extra != null) {
-      resType = extra['resType'] ?? ResponseType.json;
       if (extra['ua'] != null) {
-        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+        options ??= Options();
+        options.headers ??= <String, dynamic>{};
+        options.headers?['user-agent'] = headerUa(type: extra['ua']);
       }
     }
-    options.responseType = resType;
-
     try {
       response = await dio.get(
         url,

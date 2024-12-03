@@ -6,7 +6,7 @@ import 'package:pilipala/utils/global_data_cache.dart';
 import '../../utils/storage.dart';
 import '../constants.dart';
 
-Box<dynamic> setting = GStrorage.setting;
+Box<dynamic> setting = GStorage.setting;
 
 class NetworkImgLayer extends StatelessWidget {
   const NetworkImgLayer({
@@ -48,7 +48,7 @@ class NetworkImgLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     int defaultImgQuality = 10;
     try {
-      defaultImgQuality = GlobalDataCache().imgQuality;
+      defaultImgQuality = GlobalDataCache.imgQuality;
     } catch (_) {}
 
     if (src == '' || src == null) {

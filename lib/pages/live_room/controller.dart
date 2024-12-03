@@ -33,7 +33,7 @@ class LiveRoomController extends GetxController {
   int? tempCurrentQn;
   late List<Map<String, dynamic>> acceptQnList;
   RxString currentQnDesc = ''.obs;
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int userId = 0;
   PlSocket? plSocket;
   List<String> danmuHostList = [];
@@ -69,7 +69,7 @@ class LiveRoomController extends GetxController {
       Request.getBuvid().then((value) => buvid = value);
     }
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       userId = userInfo.mid;

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/search.dart';
 import 'package:pilipala/models/common/reply_type.dart';
+import 'package:pilipala/models/dynamics/result.dart';
+import 'package:pilipala/models/msg/reply.dart';
+import 'package:pilipala/pages/dynamics/index.dart';
 import 'package:pilipala/pages/video/detail/reply_reply/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -10,7 +14,12 @@ import 'package:pilipala/utils/utils.dart';
 class MessageUtils {
   // 回复我的、收到的赞点击
   static void onClickMessage(
-      BuildContext context, Uri uri, Uri nativeUri, String type) async {
+    BuildContext context,
+    Uri uri,
+    Uri nativeUri,
+    String type,
+    ReplyContentItem? item,
+  ) async {
     final String path = uri.path;
     final String bvid = path.split('/').last;
     String? sourceType;
@@ -24,8 +33,8 @@ class MessageUtils {
     if (nativePath.contains('detail')) {
       // 动态详情
       sourceType = 'opus';
-      oid = nativePath.split('/')[3];
-      commentRootId = nativePath.split('/')[4];
+      oid = item?.subjectId!.toString() ?? nativePath.split('/')[3];
+      commentRootId = item?.sourceId!.toString() ?? nativePath.split('/')[4];
     }
     switch (type) {
       case 'video':
@@ -47,6 +56,7 @@ class MessageUtils {
         }
         break;
       case 'reply':
+      case 'dynamic':
         debugPrint('commentRootId: $oid, $commentRootId');
         navigateToComment(
           context,
@@ -154,5 +164,15 @@ class MessageUtils {
       result['message'] = text;
     }
     return result;
+  }
+
+  // 跳转查看动态详情
+  static void navigateToDynamicDetail(String opusId) async {
+    DynamicsController dynamicsController = Get.put(DynamicsController());
+    var res = await DynamicsHttp.dynamicDetail(id: opusId);
+    if (res['status']) {
+      DynamicItemModel item = res['data'];
+      dynamicsController.pushDetail(item, 1);
+    }
   }
 }

@@ -47,7 +47,6 @@ class _FavSearchPageState extends State<FavSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
         actions: [
           IconButton(
               onPressed: () => _favSearchCtr.submit(),

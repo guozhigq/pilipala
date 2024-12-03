@@ -3,17 +3,18 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/fan.dart';
 import 'package:pilipala/models/fans/result.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class FansController extends GetxController {
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   int pn = 1;
   int ps = 20;
   int total = 0;
   RxList<FansItemModel> fansList = <FansItemModel>[].obs;
   late int mid;
   late String name;
-  var userInfo;
+  UserInfoData? userInfo;
   RxString loadingText = '加载中...'.obs;
   RxBool isOwner = false.obs;
 
@@ -23,9 +24,9 @@ class FansController extends GetxController {
     userInfo = userInfoCache.get('userInfoCache');
     mid = Get.parameters['mid'] != null
         ? int.parse(Get.parameters['mid']!)
-        : userInfo.mid;
-    isOwner.value = mid == userInfo.mid;
-    name = Get.parameters['name'] ?? userInfo.uname;
+        : userInfo!.mid!;
+    isOwner.value = mid == userInfo?.mid;
+    name = Get.parameters['name'] ?? userInfo?.uname ?? '';
   }
 
   Future queryFans(type) async {

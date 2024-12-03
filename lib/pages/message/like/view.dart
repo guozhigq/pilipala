@@ -47,9 +47,7 @@ class _MessageLikePageState extends State<MessageLikePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('收到的赞'),
-      ),
+      appBar: AppBar(title: const Text('收到的赞')),
       body: RefreshIndicator(
         onRefresh: () async {
           await _messageLikeCtr.queryMessageLike(type: 'init');
@@ -127,7 +125,7 @@ class LikeItem extends StatelessWidget {
     final String type = item.item!.type!;
     return InkWell(
       onTap: () async {
-        MessageUtils.onClickMessage(context, uri, nativeUri, type);
+        MessageUtils.onClickMessage(context, uri, nativeUri, type, null);
       },
       child: Stack(
         children: [

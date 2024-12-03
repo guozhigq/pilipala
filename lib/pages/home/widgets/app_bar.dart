@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/storage.dart';
 
-Box userInfoCache = GStrorage.userInfo;
+Box userInfoCache = GStorage.userInfo;
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     return SliverAppBar(
       // forceElevated: true,
       scrolledUnderElevation: 0,
@@ -28,7 +29,6 @@ class HomeAppBar extends StatelessWidget {
             background: Column(
               children: [
                 AppBar(
-                  centerTitle: false,
                   title: const Text(
                     'PiLiPaLa',
                     style: TextStyle(
@@ -73,8 +73,6 @@ class HomeAppBar extends StatelessWidget {
 
                     const SizedBox(width: 10)
                   ],
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
                 ),
               ],
             ),

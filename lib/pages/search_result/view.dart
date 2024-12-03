@@ -51,8 +51,6 @@ class _SearchResultPageState extends State<SearchResultPage>
             width: 1,
           ),
         ),
-        titleSpacing: 0,
-        centerTitle: false,
         title: GestureDetector(
           onTap: () => Get.back(),
           child: SizedBox(

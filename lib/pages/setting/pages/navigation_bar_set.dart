@@ -13,7 +13,7 @@ class NavigationBarSetPage extends StatefulWidget {
 }
 
 class _NavigationbarSetPageState extends State<NavigationBarSetPage> {
-  Box settingStorage = GStrorage.setting;
+  Box settingStorage = GStorage.setting;
   late List defaultNavTabs;
   late List<int> navBarSort;
 

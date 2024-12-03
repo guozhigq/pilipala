@@ -18,9 +18,6 @@ import 'package:pilipala/utils/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class LoginUtils {
-  static Box userInfoCache = GStrorage.userInfo;
-  static Box localCache = GStrorage.localCache;
-
   static Future refreshLoginStatus(bool status) async {
     try {
       // 更改我的页面登录状态
@@ -76,7 +73,7 @@ class LoginUtils {
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
         try {
-          Box userInfoCache = GStrorage.userInfo;
+          Box userInfoCache = GStorage.userInfo;
           if (!userInfoCache.isOpen) {
             userInfoCache = await Hive.openBox('userInfo');
           }
@@ -121,7 +118,7 @@ class LoginUtils {
     Request.dio.options.headers['cookie'] = '';
     userInfoCache.put('userInfoCache', null);
     localCache.put(LocalCacheKey.accessKey, {'mid': -1, 'value': ''});
-    GlobalDataCache().userInfo = null;
+    GlobalDataCache.userInfo = null;
     await refreshLoginStatus(false);
   }
 }

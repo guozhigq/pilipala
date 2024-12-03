@@ -24,7 +24,7 @@ class DynamicDetailController extends GetxController {
   ReplySortType _sortType = ReplySortType.time;
   RxString sortTypeTitle = ReplySortType.time.titles.obs;
   RxString sortTypeLabel = ReplySortType.time.labels.obs;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   RxInt replyReqCode = 200.obs;
   bool isEnd = false;
 
@@ -37,13 +37,13 @@ class DynamicDetailController extends GetxController {
       acount.value =
           int.parse(item!.modules!.moduleStat!.comment!.count ?? '0');
     }
-    int deaultReplySortIndex =
+    int defaultReplySortIndex =
         setting.get(SettingBoxKey.replySortType, defaultValue: 0);
-    if (deaultReplySortIndex == 2) {
+    if (defaultReplySortIndex == 2) {
       setting.put(SettingBoxKey.replySortType, 0);
-      deaultReplySortIndex = 0;
+      defaultReplySortIndex = 0;
     }
-    _sortType = ReplySortType.values[deaultReplySortIndex];
+    _sortType = ReplySortType.values[defaultReplySortIndex];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }
@@ -122,5 +122,16 @@ class DynamicDetailController extends GetxController {
   // 上拉加载
   Future onLoad() async {
     queryReplyList(reqType: 'onLoad');
+  }
+
+  Future removeReply(int? rpid, int? frpid) async {
+    // 移除一楼评论
+    if (rpid != null) {
+      replyList.removeWhere((item) {
+        return item.rpid == rpid;
+      });
+    }
+
+    /// TODO 移除二楼评论
   }
 }

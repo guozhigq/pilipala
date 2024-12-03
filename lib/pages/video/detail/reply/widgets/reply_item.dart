@@ -7,6 +7,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/widgets/badge.dart';
+import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_type.dart';
@@ -26,7 +27,7 @@ import 'package:pilipala/utils/utils.dart';
 import 'reply_save.dart';
 import 'zan.dart';
 
-Box setting = GStrorage.setting;
+Box setting = GStorage.setting;
 
 class ReplyItem extends StatelessWidget {
   const ReplyItem({
@@ -37,6 +38,7 @@ class ReplyItem extends StatelessWidget {
     this.replyReply,
     this.replyType,
     this.replySave = false,
+    this.onDelete,
     super.key,
   });
   final ReplyItemModel? replyItem;
@@ -46,11 +48,12 @@ class ReplyItem extends StatelessWidget {
   final Function? replyReply;
   final ReplyType? replyType;
   final bool replySave;
+  final Function(int? rpid, int? frpid)? onDelete;
 
   @override
   Widget build(BuildContext context) {
     final bool isOwner = int.parse(replyItem!.member!.mid!) ==
-        (GlobalDataCache().userInfo?.mid ?? -1);
+        (GlobalDataCache.userInfo?.mid ?? -1);
     return Material(
       child: InkWell(
         // 点击整个评论区 评论详情/回复
@@ -75,6 +78,7 @@ class ReplyItem extends StatelessWidget {
                 item: replyItem,
                 mainFloor: true,
                 isOwner: isOwner,
+                onDelete: onDelete,
               );
             },
           );
@@ -275,6 +279,7 @@ class ReplyItem extends StatelessWidget {
               // f_rpid: replyItem!.rpid,
               replyItem: replyItem,
               replyReply: replyReply,
+              onDelete: onDelete,
             ),
           ),
         ],
@@ -371,15 +376,15 @@ class ReplyItemRow extends StatelessWidget {
     super.key,
     this.replies,
     this.replyControl,
-    // this.f_rpid,
     this.replyItem,
     this.replyReply,
+    this.onDelete,
   });
   final List? replies;
   ReplyControl? replyControl;
-  // int? f_rpid;
   ReplyItemModel? replyItem;
   Function? replyReply;
+  final Function(int? rpid, int? frpid)? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -410,12 +415,18 @@ class ReplyItemRow extends StatelessWidget {
                   },
                   onLongPress: () {
                     feedBack();
+                    final bool isOwner = int.parse(replyItem!.member!.mid!) ==
+                        (GlobalDataCache.userInfo?.mid ?? -1);
                     showModalBottomSheet(
                       context: context,
                       useRootNavigator: true,
                       isScrollControlled: true,
                       builder: (context) {
-                        return MorePanel(item: replies![i]);
+                        return MorePanel(
+                          item: replies![i],
+                          isOwner: isOwner,
+                          onDelete: onDelete,
+                        );
                       },
                     );
                   },
@@ -493,7 +504,7 @@ class ReplyItemRow extends StatelessWidget {
                         if (replyControl!.upReply!)
                           const TextSpan(text: 'up主等人 '),
                         TextSpan(
-                          text: replyControl!.entryText!,
+                          text: '查看${replyControl!.entryTextNum}条回复',
                           style: TextStyle(
                             color: colorScheme.primary,
                           ),
@@ -1019,11 +1030,13 @@ class MorePanel extends StatelessWidget {
   final dynamic item;
   final bool mainFloor;
   final bool isOwner;
+  final Function(int? rpid, int? frpid)? onDelete;
   const MorePanel({
     super.key,
     required this.item,
     this.mainFloor = false,
     this.isOwner = false,
+    this.onDelete,
   });
 
   Future<dynamic> menuActionHandler(String type) async {
@@ -1083,7 +1096,7 @@ class MorePanel extends StatelessWidget {
                       rpid: item.rpid!,
                     );
                     if (result['status']) {
-                      SmartDialog.showToast('评论删除成功，需手动刷新');
+                      onDelete?.call(item.rpid!, item.root);
                       Get.back();
                     } else {
                       SmartDialog.showToast(result['msg']);
@@ -1105,27 +1118,12 @@ class MorePanel extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
     Color errorColor = colorScheme.error;
-    return Container(
+    return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: colorScheme.outline,
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
-                ),
-              ),
-            ),
-          ),
+          const DragHandle(),
           ListTile(
             onTap: () async => await menuActionHandler('copyAll'),
             minLeadingWidth: 0,

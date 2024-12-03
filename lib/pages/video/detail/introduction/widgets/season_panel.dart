@@ -111,7 +111,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
       dense: false,
       leading: isCurrentIndex
           ? Image.asset(
-              'assets/images/live.gif',
+              'assets/images/live.png',
               color: primary,
               height: 12,
             )
@@ -169,7 +169,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
                   ),
                   const SizedBox(width: 15),
                   Image.asset(
-                    'assets/images/live.gif',
+                    'assets/images/live.png',
                     color: Theme.of(context).colorScheme.primary,
                     height: 12,
                   ),

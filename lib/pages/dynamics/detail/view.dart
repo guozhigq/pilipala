@@ -20,7 +20,6 @@ import '../../../models/video/reply/item.dart';
 import '../widgets/dynamic_panel.dart';
 
 class DynamicDetailPage extends StatefulWidget {
-  // const DynamicDetailPage({super.key});
   const DynamicDetailPage({Key? key}) : super(key: key);
 
   @override
@@ -90,19 +89,22 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             _dynamicDetailController = Get.put(
                 DynamicDetailController(oid, replyType),
                 tag: opusId.toString());
+            _futureBuilderFuture = _dynamicDetailController.queryReplyList();
             await _dynamicDetailController.reqHtmlByOpusId(opusId!);
             setState(() {});
           }
         } else {
           oid = moduleDynamic.major!.draw!.id!;
         }
-      } catch (_) {}
+      } catch (err) {
+        print('err:${err.toString()}');
+      }
     }
     if (!isOpusId) {
       _dynamicDetailController =
           Get.put(DynamicDetailController(oid, replyType), tag: oid.toString());
+      _futureBuilderFuture = _dynamicDetailController.queryReplyList();
     }
-    _futureBuilderFuture = _dynamicDetailController.queryReplyList();
   }
 
   // 查看二级评论
@@ -111,14 +113,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
     int rpid = replyItem.rpid!;
     Get.to(
       () => Scaffold(
-        appBar: AppBar(
-          titleSpacing: 0,
-          centerTitle: false,
-          title: Text(
-            '评论详情',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+        appBar: AppBar(title: const Text('评论详情')),
         body: VideoReplyReplyPanel(
           oid: oid,
           rpid: rpid,
@@ -139,7 +134,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
         // 分页加载
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(seconds: 2), () {
+          EasyThrottle.throttle('replyList', const Duration(seconds: 2), () {
             _dynamicDetailController.onLoad();
           });
         }
@@ -192,10 +187,7 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         scrolledUnderElevation: 1,
-        centerTitle: false,
-        titleSpacing: 0,
         title: StreamBuilder(
           stream: titleStreamC.stream,
           initialData: false,
@@ -335,6 +327,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
                                             .replies!
                                             .add(replyItem);
                                       },
+                                      onDelete:
+                                          _dynamicDetailController.removeReply,
                                     );
                                   }
                                 },

@@ -104,14 +104,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
     int rpid = replyItem.rpid!;
     Get.to(
       () => Scaffold(
-        appBar: AppBar(
-          titleSpacing: 0,
-          centerTitle: false,
-          title: Text(
-            '评论详情',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+        appBar: AppBar(title: const Text('评论详情')),
         body: VideoReplyReplyPanel(
           oid: oid,
           rpid: rpid,
@@ -127,12 +120,7 @@ class _HtmlRenderPageState extends State<HtmlRenderPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Text(title),
         actions: [
           const SizedBox(width: 4),
           IconButton(

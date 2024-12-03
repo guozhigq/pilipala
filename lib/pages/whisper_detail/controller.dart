@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/msg.dart';
 import 'package:pilipala/models/msg/session.dart';
+import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/pages/whisper/index.dart';
 import '../../utils/feed_back.dart';
 import '../../utils/storage.dart';
@@ -20,7 +21,7 @@ class WhisperDetailController extends GetxController {
   //表情转换图片规则
   RxList<dynamic> eInfos = [].obs;
   final TextEditingController replyContentController = TextEditingController();
-  Box userInfoCache = GStrorage.userInfo;
+  Box userInfoCache = GStorage.userInfo;
   List emoteList = [];
   List<String> picList = [];
 
@@ -80,7 +81,7 @@ class WhisperDetailController extends GetxController {
   Future sendMsg() async {
     feedBack();
     String message = replyContentController.text;
-    final userInfo = userInfoCache.get('userInfoCache');
+    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
     if (userInfo == null) {
       SmartDialog.showToast('请先登录');
       return;
@@ -90,7 +91,7 @@ class WhisperDetailController extends GetxController {
       return;
     }
     var result = await MsgHttp.sendMsg(
-      senderUid: userInfo.mid,
+      senderUid: userInfo.mid!,
       receiverId: int.parse(mid),
       content: {'content': message},
       msgType: 1,

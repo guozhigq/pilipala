@@ -28,7 +28,7 @@ class SetSwitchItem extends StatefulWidget {
 
 class _SetSwitchItemState extends State<SetSwitchItem> {
   // ignore: non_constant_identifier_names
-  Box Setting = GStrorage.setting;
+  Box Setting = GStorage.setting;
   late bool val;
 
   @override

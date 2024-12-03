@@ -17,7 +17,9 @@ class DanmakaHttp {
     var response = await Request().get(
       Api.webDanmaku,
       data: params,
-      extra: {'resType': ResponseType.bytes},
+      options: Options(
+        responseType: ResponseType.bytes,
+      ),
     );
     return DmSegMobileReply.fromBuffer(response.data);
   }

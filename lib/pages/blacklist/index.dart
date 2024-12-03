@@ -22,7 +22,7 @@ class _BlackListPageState extends State<BlackListPage> {
   final ScrollController scrollController = ScrollController();
   Future? _futureBuilderFuture;
   bool _isLoadingMore = false;
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
 
   @override
   void initState() {
@@ -55,14 +55,9 @@ class _BlackListPageState extends State<BlackListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => Text(
             '黑名单管理 ${_blackListController.total.value == 0 ? '' : '- ${_blackListController.total.value}'}',
-            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       ),

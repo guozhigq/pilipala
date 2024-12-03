@@ -259,8 +259,6 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             left: 0,
             right: 0,
             child: AppBar(
-              centerTitle: false,
-              titleSpacing: 0,
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
               toolbarHeight: isPortrait ? 56 : 0,
@@ -314,25 +312,28 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             ),
           ),
           // 消息列表
-          Obx(
-            () => Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                margin: EdgeInsets.only(
-                  bottom: 90 + padding.bottom,
-                ),
-                height: Get.size.height -
-                    (padding.top +
-                        kToolbarHeight +
-                        (_liveRoomController.isPortrait.value
-                            ? Get.size.width
-                            : Get.size.width * 9 / 16) +
-                        100 +
-                        padding.bottom),
-                child: buildMessageListUI(
-                  context,
-                  _liveRoomController,
-                  _scrollController,
+          Visibility(
+            visible: !isLandscape,
+            child: Obx(
+              () => Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 90 + padding.bottom,
+                  ),
+                  height: Get.size.height -
+                      (padding.top +
+                          kToolbarHeight +
+                          (_liveRoomController.isPortrait.value
+                              ? Get.size.width
+                              : Get.size.width * 9 / 16) +
+                          100 +
+                          padding.bottom),
+                  child: buildMessageListUI(
+                    context,
+                    _liveRoomController,
+                    _scrollController,
+                  ),
                 ),
               ),
             ),

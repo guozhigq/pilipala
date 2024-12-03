@@ -47,12 +47,9 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        centerTitle: false,
         title: Obx(
           () => Text(
             '${_memberArchivesController.isOwner.value ? '我' : 'Ta'}的投稿 - ${_memberArchivesController.currentOrder['label']}',
-            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
         actions: [
@@ -120,7 +117,7 @@ class _MemberArchivePageState extends State<MemberArchivePage> {
                   }
                 } else {
                   return HttpError(
-                    errMsg: snapshot.data['msg'],
+                    errMsg: snapshot.data?['msg'] ?? '请求异常',
                     fn: () {},
                   );
                 }

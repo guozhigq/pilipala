@@ -16,7 +16,7 @@ class PlayGesturePage extends StatefulWidget {
 }
 
 class _PlayGesturePageState extends State<PlayGesturePage> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late int fullScreenGestureMode;
 
   @override
@@ -34,14 +34,7 @@ class _PlayGesturePageState extends State<PlayGesturePage> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '手势设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('手势设置')),
       body: ListView(
         children: [
           ListTile(
@@ -65,11 +58,11 @@ class _PlayGesturePageState extends State<PlayGesturePage> {
                 },
               );
               if (result != null) {
-                GlobalDataCache().fullScreenGestureMode = FullScreenGestureMode
+                GlobalDataCache.fullScreenGestureMode = FullScreenGestureMode
                     .values
                     .firstWhere((element) => element.values == result);
                 fullScreenGestureMode =
-                    GlobalDataCache().fullScreenGestureMode.index;
+                    GlobalDataCache.fullScreenGestureMode.index;
                 setting.put(
                     SettingBoxKey.fullScreenGestureMode, fullScreenGestureMode);
                 SmartDialog.showToast('设置成功');

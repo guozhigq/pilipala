@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -27,9 +28,9 @@ import '../../models/video/subTitile/content.dart';
 import '../../models/video/subTitile/result.dart';
 // import 'package:wakelock_plus/wakelock_plus.dart';
 
-Box videoStorage = GStrorage.video;
-Box setting = GStrorage.setting;
-Box localCache = GStrorage.localCache;
+Box videoStorage = GStorage.video;
+Box setting = GStorage.setting;
+Box localCache = GStorage.localCache;
 
 class PlPlayerController {
   Player? _videoPlayerController;
@@ -80,7 +81,7 @@ class PlPlayerController {
   final Rx<bool> _subTitleOpen = false.obs;
   final Rx<int> _subTitleCode = (-1).obs;
   // 默认投稿视频格式
-  static Rx<String> _videoType = 'archive'.obs;
+  static String _videoType = 'archive';
 
   final Rx<String> _direction = 'horizontal'.obs;
 
@@ -113,19 +114,19 @@ class PlPlayerController {
   // final Durations durations;
 
   List<Map<String, dynamic>> videoFitType = [
-    {'attr': BoxFit.contain, 'desc': '包含'},
-    {'attr': BoxFit.cover, 'desc': '覆盖'},
-    {'attr': BoxFit.fill, 'desc': '填充'},
-    {'attr': BoxFit.fitHeight, 'desc': '高度适应'},
-    {'attr': BoxFit.fitWidth, 'desc': '宽度适应'},
-    {'attr': BoxFit.scaleDown, 'desc': '缩小适应'},
+    {'attr': BoxFit.contain, 'desc': '自动'},
+    {'attr': BoxFit.cover, 'desc': '铺满'},
+    {'attr': BoxFit.fill, 'desc': '填满'},
+    {'attr': BoxFit.fitHeight, 'desc': '等高'},
+    {'attr': BoxFit.fitWidth, 'desc': '等宽'},
+    {'attr': BoxFit.scaleDown, 'desc': '缩放'},
+    {'attr': BoxFit.none, 'desc': '原始'},
   ];
 
   PreferredSizeWidget? headerControl;
   PreferredSizeWidget? bottomControl;
   Widget? danmuWidget;
   RxList subtitles = [].obs;
-  String videoType = 'archive';
 
   /// 数据加载监听
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -223,7 +224,7 @@ class PlPlayerController {
   Rx<int> get playerCount => _playerCount;
 
   ///
-  // Rx<String> get videoType => _videoType;
+  String get videoType => _videoType;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = false.obs;
@@ -277,20 +278,19 @@ class PlPlayerController {
   }
 
   // 添加一个私有构造函数
-  PlPlayerController._internal(this.videoType) {
-    final cache = GlobalDataCache();
-    isOpenDanmu.value = cache.isOpenDanmu;
-    blockTypes = cache.blockTypes;
-    showArea = cache.showArea;
-    opacityVal = cache.opacityVal;
-    fontSizeVal = cache.fontSizeVal;
-    danmakuDurationVal = cache.danmakuDurationVal;
-    strokeWidth = cache.strokeWidth;
-    playRepeat = cache.playRepeat;
-    _playbackSpeed.value = cache.playbackSpeed;
-    enableAutoLongPressSpeed = cache.enableAutoLongPressSpeed;
-    _longPressSpeed.value = cache.longPressSpeed;
-    speedsList = cache.speedsList;
+  PlPlayerController._internal() {
+    isOpenDanmu.value = GlobalDataCache.isOpenDanmu;
+    blockTypes = GlobalDataCache.blockTypes;
+    showArea = GlobalDataCache.showArea;
+    opacityVal = GlobalDataCache.opacityVal;
+    fontSizeVal = GlobalDataCache.fontSizeVal;
+    danmakuDurationVal = GlobalDataCache.danmakuDurationVal;
+    strokeWidth = GlobalDataCache.strokeWidth;
+    playRepeat = GlobalDataCache.playRepeat;
+    _playbackSpeed.value = GlobalDataCache.playbackSpeed;
+    enableAutoLongPressSpeed = GlobalDataCache.enableAutoLongPressSpeed;
+    _longPressSpeed.value = GlobalDataCache.longPressSpeed;
+    speedsList = GlobalDataCache.speedsList;
     // _playerEventSubs = onPlayerStatusChanged.listen((PlayerStatus status) {
     //   if (status == PlayerStatus.playing) {
     //     WakelockPlus.enable();
@@ -305,11 +305,11 @@ class PlPlayerController {
     String videoType = 'archive',
   }) {
     // 如果实例尚未创建，则创建一个新实例
-    _instance ??= PlPlayerController._internal(videoType);
+    _instance ??= PlPlayerController._internal();
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
-      _videoType.value = videoType;
     }
+    _videoType = videoType;
     return _instance!;
   }
 
@@ -471,6 +471,7 @@ class PlPlayerController {
           configuration: VideoControllerConfiguration(
             enableHardwareAcceleration: enableHA,
             androidAttachSurfaceAfterVideoParameters: false,
+            hwdec: enableHA ? GlobalDataCache.hardwareDecodeFormat : null,
           ),
         );
 
@@ -828,47 +829,53 @@ class PlPlayerController {
   }
 
   /// Toggle Change the videofit accordingly
-  void toggleVideoFit() {
-    showDialog(
-      context: Get.context!,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('画面比例'),
-          content: StatefulBuilder(builder: (context, StateSetter setState) {
-            return Wrap(
-              alignment: WrapAlignment.start,
+  void toggleVideoFit(String toggleType) {
+    if (toggleType == 'press') {
+      final String videoFitDEsc = _videoFitDesc.value;
+      final int index = videoFitType.indexWhere(
+        (element) => element['desc'] == videoFitDEsc,
+      );
+      final int newIndex = index + 1 >= videoFitType.length ? 0 : index + 1;
+      _videoFit.value = videoFitType[newIndex]['attr'];
+      _videoFitDesc.value = videoFitType[newIndex]['desc'];
+      setVideoFit();
+      SmartDialog.showToast('画面比例：${videoFitType[newIndex]['desc']}');
+    } else {
+      void onPressed(item) {
+        _videoFit.value = item['attr'];
+        _videoFitDesc.value = item['desc'];
+        setVideoFit();
+        Navigator.of(Get.context!).pop();
+      }
+
+      showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('画面比例'),
+            content: Wrap(
               spacing: 8,
               runSpacing: 2,
               children: [
                 for (var i in videoFitType) ...[
                   if (_videoFit.value == i['attr']) ...[
                     FilledButton(
-                      onPressed: () async {
-                        _videoFit.value = i['attr'];
-                        _videoFitDesc.value = i['desc'];
-                        setVideoFit();
-                        Get.back();
-                      },
+                      onPressed: () => onPressed(i),
                       child: Text(i['desc']),
                     ),
                   ] else ...[
                     FilledButton.tonal(
-                      onPressed: () async {
-                        _videoFit.value = i['attr'];
-                        _videoFitDesc.value = i['desc'];
-                        setVideoFit();
-                        Get.back();
-                      },
+                      onPressed: () => onPressed(i),
                       child: Text(i['desc']),
                     ),
                   ]
                 ]
               ],
-            );
-          }),
-        );
-      },
-    );
+            ),
+          );
+        },
+      );
+    }
   }
 
   /// 缓存fit
@@ -909,7 +916,7 @@ class PlPlayerController {
     if (videoType == 'live') {
       return;
     }
-    if (controlsLock.value) {
+    if (_controlsLock.value) {
       return;
     }
     _doubleSpeedStatus.value = val;
@@ -927,6 +934,11 @@ class PlPlayerController {
     feedBack();
     _controlsLock.value = val;
     showControls.value = !val;
+  }
+
+  /// 设置/更新顶部控制栏
+  void setHeaderControl(PreferredSizeWidget? widget) {
+    headerControl = widget;
   }
 
   void toggleFullScreen(bool val) {
@@ -1047,13 +1059,12 @@ class PlPlayerController {
 
   /// 缓存本次弹幕选项
   cacheDanmakuOption() {
-    final cache = GlobalDataCache();
-    cache.blockTypes = blockTypes;
-    cache.showArea = showArea;
-    cache.opacityVal = opacityVal;
-    cache.fontSizeVal = fontSizeVal;
-    cache.danmakuDurationVal = danmakuDurationVal;
-    cache.strokeWidth = strokeWidth;
+    GlobalDataCache.blockTypes = blockTypes;
+    GlobalDataCache.showArea = showArea;
+    GlobalDataCache.opacityVal = opacityVal;
+    GlobalDataCache.fontSizeVal = fontSizeVal;
+    GlobalDataCache.danmakuDurationVal = danmakuDurationVal;
+    GlobalDataCache.strokeWidth = strokeWidth;
 
     localCache.put(LocalCacheKey.danmakuBlockType, blockTypes);
     localCache.put(LocalCacheKey.danmakuShowArea, showArea);
@@ -1081,6 +1092,7 @@ class PlPlayerController {
       videoFitChangedTimer?.cancel();
       // _position.close();
       _playerEventSubs?.cancel();
+      _controlsLock.value = false;
       // _sliderPosition.close();
       // _sliderTempPosition.close();
       // _isSliderMoving.close();

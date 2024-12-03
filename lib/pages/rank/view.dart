@@ -38,7 +38,6 @@ class _RankPageState extends State<RankPage>
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         toolbarHeight: 0,
-        elevation: 0,
         backgroundColor: Colors.transparent,
         systemOverlayStyle: Platform.isAndroid
             ? SystemUiOverlayStyle(

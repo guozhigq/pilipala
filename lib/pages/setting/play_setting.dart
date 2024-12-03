@@ -23,7 +23,7 @@ class PlaySetting extends StatefulWidget {
 }
 
 class _PlaySettingState extends State<PlaySetting> {
-  Box setting = GStrorage.setting;
+  Box setting = GStorage.setting;
   late dynamic defaultVideoQa;
   late dynamic defaultLiveQa;
   late dynamic defaultAudioQa;
@@ -31,6 +31,7 @@ class _PlaySettingState extends State<PlaySetting> {
   late int defaultFullScreenMode;
   late int defaultBtmProgressBehavior;
   late String defaultAoOutput;
+  late String hardwareDecodeFormat;
 
   @override
   void initState() {
@@ -49,6 +50,8 @@ class _PlaySettingState extends State<PlaySetting> {
         defaultValue: BtmProgresBehavior.values.first.code);
     defaultAoOutput =
         setting.get(SettingBoxKey.defaultAoOutput, defaultValue: '0');
+    hardwareDecodeFormat = setting.get(SettingBoxKey.hardwareDecodeFormat,
+        defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
   }
 
   @override
@@ -67,14 +70,7 @@ class _PlaySettingState extends State<PlaySetting> {
         .labelMedium!
         .copyWith(color: Theme.of(context).colorScheme.outline);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '播放设置',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
+      appBar: AppBar(title: const Text('播放设置')),
       body: ListView(
         children: [
           ListTile(
@@ -99,7 +95,7 @@ class _PlaySettingState extends State<PlaySetting> {
             title: 'CDN优化',
             subTitle: '使用优质CDN线路',
             setKey: SettingBoxKey.enableCDN,
-            defaultVal: true,
+            defaultVal: false,
           ),
           const SetSwitchItem(
             title: '自动播放',
@@ -162,7 +158,7 @@ class _PlaySettingState extends State<PlaySetting> {
               setKey: SettingBoxKey.enablePlayerControlAnimation,
               defaultVal: true,
               callFn: (bool val) {
-                GlobalDataCache().enablePlayerControlAnimation = val;
+                GlobalDataCache.enablePlayerControlAnimation = val;
               }),
           SetSwitchItem(
             title: '港澳台模式',
@@ -297,6 +293,34 @@ class _PlaySettingState extends State<PlaySetting> {
               if (result != null) {
                 defaultAoOutput = result;
                 setting.put(SettingBoxKey.defaultAoOutput, result);
+                setState(() {});
+              }
+            },
+          ),
+          ListTile(
+            dense: false,
+            title: Text('硬解方式', style: titleStyle),
+            subtitle: Text(
+              '当前硬解方式(--hwdec)：$hardwareDecodeFormat',
+              style: subTitleStyle,
+            ),
+            onTap: () async {
+              String? result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SelectDialog<String>(
+                      title: '硬解方式',
+                      value: hardwareDecodeFormat,
+                      values: ['no', 'auto-safe', 'auto', 'yes', 'auto-copy']
+                          .map((e) {
+                        return {'title': e, 'value': e};
+                      }).toList());
+                },
+              );
+              if (result != null) {
+                setting.put(SettingBoxKey.hardwareDecodeFormat, result);
+                hardwareDecodeFormat = result;
+                GlobalDataCache.hardwareDecodeFormat = result;
                 setState(() {});
               }
             },
