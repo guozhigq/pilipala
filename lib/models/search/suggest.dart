@@ -84,10 +84,7 @@ Widget highlightText(String str) {
     String remainingText = str.substring(currentIndex);
 
     // 将剩余的普通文本部分添加到 children 列表中
-    children.add(TextSpan(
-      text: remainingText,
-      style: DefaultTextStyle.of(Get.context!).style,
-    ));
+    children.add(TextSpan(text: remainingText));
   }
 
   // 使用 Text.rich 创建包含高亮显示的富文本小部件，并返回
