@@ -226,14 +226,8 @@ class BuildMainApp extends StatelessWidget {
       pureDarkColorScheme = darkColorScheme.copyWith(
         background: Colors.black,
         surface: Colors.black,
-        primary: Colors.white,
-        secondary: Colors.white,
-        error: Colors.red,
         onPrimary: Colors.black,
         onSecondary: Colors.black,
-        onSurface: Colors.white,
-        onBackground: Colors.white,
-        onError: Colors.white,
       );
     }
 
