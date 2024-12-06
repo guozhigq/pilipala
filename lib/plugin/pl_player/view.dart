@@ -732,6 +732,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     lastFullScreenToggleTime = DateTime.now();
                     // 下滑退出全屏
                     await widget.controller.triggerFullScreen(status: flag);
+                    widget.fullScreenCb?.call(flag);
                   }
                   _distance.value = 0.0;
                 } else if (dy < _distance.value &&
@@ -741,6 +742,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     lastFullScreenToggleTime = DateTime.now();
                     // 上滑进入全屏
                     await widget.controller.triggerFullScreen(status: !flag);
+                    widget.fullScreenCb?.call(!flag);
                   }
                   _distance.value = 0.0;
                 }
