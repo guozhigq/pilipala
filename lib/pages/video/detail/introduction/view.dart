@@ -18,6 +18,7 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/follow.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -458,14 +459,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     Obx(
                       () {
                         final int attr =
-                            videoIntroController.followStatus['attribute'] ?? 0;
-                        return videoIntroController.followStatus.isEmpty
+                            videoIntroController.followStatus.value;
+                        return attr == -1
                             ? const SizedBox()
                             : SizedBox(
                                 height: 32,
                                 child: TextButton(
-                                  onPressed:
-                                      videoIntroController.actionRelationMod,
+                                  onPressed: () => videoIntroController
+                                      .actionRelationMod(context),
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.only(
                                       left: 8,

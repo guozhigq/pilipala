@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/models/follow/result.dart';
 import 'package:pilipala/pages/follow/index.dart';
-import 'package:pilipala/pages/video/detail/introduction/widgets/group_panel.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/follow.dart';
 import 'package:pilipala/utils/utils.dart';
 
 class FollowItem extends StatelessWidget {
@@ -47,28 +47,11 @@ class FollowItem extends StatelessWidget {
               height: 34,
               child: TextButton(
                 onPressed: () async {
-                  await showModalBottomSheet(
+                  int followStatus = await FollowUtils(
                     context: context,
-                    useSafeArea: true,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return DraggableScrollableSheet(
-                        initialChildSize: 0.6,
-                        minChildSize: 0,
-                        maxChildSize: 1,
-                        snap: true,
-                        expand: false,
-                        snapSizes: const [0.6],
-                        builder: (BuildContext context,
-                            ScrollController scrollController) {
-                          return GroupPanel(
-                            mid: item.mid!,
-                            scrollController: scrollController,
-                          );
-                        },
-                      );
-                    },
-                  );
+                    followStatus: 2,
+                    mid: item.mid!,
+                  ).showFollowSheet();
                 },
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
