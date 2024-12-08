@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/member.dart';
 import 'package:pilipala/http/user.dart';
-import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/member/archive.dart';
 import 'package:pilipala/models/member/coin.dart';
 import 'package:pilipala/models/member/info.dart';
 import 'package:pilipala/models/member/like.dart';
 import 'package:pilipala/models/user/info.dart';
+import 'package:pilipala/utils/follow.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -29,6 +28,12 @@ class MemberController extends GetxController {
   RxList<MemberCoinsDataModel> recentCoinsList = <MemberCoinsDataModel>[].obs;
   RxList<MemberLikeDataModel> recentLikeList = <MemberLikeDataModel>[].obs;
   RxBool isOwner = false.obs;
+  final Map<int, String> attributeTextMap = {
+    1: '悄悄关注',
+    2: '已关注',
+    6: '已互粉',
+    128: '已拉黑',
+  };
 
   @override
   void onInit() {
@@ -85,11 +90,12 @@ class MemberController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    if (attribute.value == 128) {
-      modifyRelation('block');
-    } else {
-      modifyRelation('follow');
-    }
+    attribute.value = await FollowUtils(
+      context: Get.context!,
+      followStatus: attribute.value,
+      mid: mid,
+    ).showFollowSheet();
+    attributeText.value = attributeTextMap[attribute.value] ?? '关注';
   }
 
   // 关系查询
@@ -99,16 +105,10 @@ class MemberController extends GetxController {
     var res = await UserHttp.hasFollow(mid);
     if (res['status']) {
       attribute.value = res['data']['attribute'];
-      final Map<int, String> attributeTextMap = {
-        1: '悄悄关注',
-        2: '已关注',
-        6: '已互关',
-        128: '已拉黑',
-      };
-      attributeText.value = attributeTextMap[attribute.value] ?? '关注';
       if (res['data']['special'] == 1) {
         attributeText.value = '特别关注';
       }
+      attributeText.value = attributeTextMap[attribute.value] ?? '关注';
     }
   }
 
@@ -118,66 +118,15 @@ class MemberController extends GetxController {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    modifyRelation('block');
-  }
-
-// 合并关注/取关和拉黑逻辑
-  Future modifyRelation(String actionType) async {
-    String contentText;
-    int act;
-    if (actionType == 'follow') {
-      contentText = memberInfo.value.isFollowed! ? '确定取消关注UP主?' : '确定关注UP主?';
-      act = memberInfo.value.isFollowed! ? 2 : 1;
-    } else if (actionType == 'block') {
-      contentText = attribute.value != 128 ? '确定拉黑UP主?' : '确定从黑名单移除UP主?';
-      act = attribute.value != 128 ? 5 : 6;
-    } else {
-      return;
-    }
-
-    showDialog(
+    final String actionType = attribute.value == 128 ? 'remove' : 'block';
+    attribute.value = await FollowUtils(
       context: Get.context!,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: Text(contentText),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                '点错了',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                var res = await VideoHttp.relationMod(
-                  mid: mid,
-                  act: act,
-                  reSrc: 11,
-                );
-                SmartDialog.dismiss();
-                if (res['status']) {
-                  if (actionType == 'follow') {
-                    memberInfo.value.isFollowed = !memberInfo.value.isFollowed!;
-                  } else if (actionType == 'block') {
-                    attribute.value = attribute.value != 128 ? 128 : 0;
-                    attributeText.value = attribute.value == 128 ? '已拉黑' : '关注';
-                    memberInfo.value.isFollowed = false;
-                  }
-                  relationSearch();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                  memberInfo.update((val) {});
-                }
-              },
-              child: const Text('确定'),
-            )
-          ],
-        );
-      },
-    );
+      followStatus: attribute.value,
+      mid: mid,
+    ).modifyRelationFetch(actionType, isDirect: true);
+    if (attribute.value != -1) {
+      attributeText.value = attributeTextMap[attribute.value] ?? '关注';
+    }
   }
 
   void shareUser() {
