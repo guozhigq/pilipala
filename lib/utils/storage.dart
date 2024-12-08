@@ -117,6 +117,7 @@ class SettingBoxKey {
       defaultHomePage = 'defaultHomePage',
       enableRelatedVideo = 'enableRelatedVideo',
       enableDlna = 'enableDlna',
+      hardwareDecodeFormat = 'hardwareDecodeFormat',
       enableSponsorBlock = 'enableSponsorBlock',
       enableComment = 'enableComment';
 
@@ -136,7 +137,8 @@ class SettingBoxKey {
       enableGradientBg = 'enableGradientBg',
       enableDynamicSwitch = 'enableDynamicSwitch',
       navBarSort = 'navBarSort',
-      actionTypeSort = 'actionTypeSort';
+      actionTypeSort = 'actionTypeSort',
+      enablePureBlack = 'enablePureBlack';
 }
 
 class LocalCacheKey {

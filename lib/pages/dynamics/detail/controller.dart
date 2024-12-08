@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/http/html.dart';
+import 'package:pilipala/http/dynamics.dart';
 import 'package:pilipala/http/reply.dart';
 import 'package:pilipala/models/common/reply_sort_type.dart';
 import 'package:pilipala/models/video/reply/item.dart';
@@ -12,6 +12,7 @@ class DynamicDetailController extends GetxController {
   DynamicDetailController(this.oid, this.type);
   int? oid;
   int? type;
+  int? opusId;
   dynamic item;
   int? floor;
   String nextOffset = "";
@@ -56,6 +57,12 @@ class DynamicDetailController extends GetxController {
     if (reqType == 'init') {
       nextOffset = '';
       noMore.value = '';
+      if (opusId != null && oid == 0) {
+        var res = await DynamicsHttp.opusDetail(opusId: opusId!);
+        if (res['status']) {
+          oid = int.parse(res['data']['item']['basic']['comment_id_str']);
+        }
+      }
     }
     var res = await ReplyHttp.replyList(
       oid: oid!,
@@ -110,13 +117,10 @@ class DynamicDetailController extends GetxController {
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
     replyList.clear();
+    noMore.value = '';
+    isLoadingMore = false;
+    isEnd = false;
     queryReplyList(reqType: 'init');
-  }
-
-  // 根据jumpUrl获取动态html
-  reqHtmlByOpusId(int id) async {
-    var res = await HtmlHttp.reqHtml(id, 'opus');
-    oid = res['commentId'];
   }
 
   // 上拉加载

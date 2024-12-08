@@ -116,6 +116,7 @@ class VideoDetailController extends GetxController
     BottomControlType.time,
     BottomControlType.space,
     BottomControlType.fit,
+    BottomControlType.speed,
     BottomControlType.fullscreen,
   ].obs;
   RxDouble sheetHeight = 0.0.obs;
@@ -168,7 +169,7 @@ class VideoDetailController extends GetxController
     }
 
     // CDN优化
-    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: true);
+    enableCDN = setting.get(SettingBoxKey.enableCDN, defaultValue: false);
     // 预设的画质
     cacheVideoQa = setting.get(SettingBoxKey.defaultVideoQa);
     // 预设的解码格式
@@ -486,7 +487,7 @@ class VideoDetailController extends GetxController
     if (result['status']) {
       if (result['data'].subtitles.isNotEmpty) {
         subtitles = result['data'].subtitles;
-        getDanmaku(subtitles);
+        getSubtitleContent(subtitles);
       }
     }
     headerControl = HeaderControl(
@@ -500,8 +501,8 @@ class VideoDetailController extends GetxController
     plPlayerController.setHeaderControl(headerControl);
   }
 
-  // 获取弹幕
-  Future getDanmaku(List subtitles) async {
+  // 获取字幕
+  Future getSubtitleContent(List subtitles) async {
     if (subtitles.isNotEmpty) {
       for (var i in subtitles) {
         final Map<String, dynamic> res = await VideoHttp.getSubtitleContent(
@@ -623,10 +624,8 @@ class VideoDetailController extends GetxController
   }
 
   void toggeleWatchLaterVisible(bool val) {
-    if (sourceType.value == 'watchLater' ||
-        sourceType.value == 'fav' ||
-        sourceType.value == 'up_archive') {
-      isWatchLaterVisible.value = !isWatchLaterVisible.value;
+    if (['watchLater', 'fav', 'up_archive'].contains(sourceType.value)) {
+      isWatchLaterVisible.value = val;
     }
   }
 

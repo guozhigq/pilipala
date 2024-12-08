@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
@@ -55,6 +56,8 @@ class GlobalDataCache {
   static late bool enableDynamicSwitch;
   // 投屏开关
   static bool enableDlna = false;
+  // 硬件解码格式
+  static late String hardwareDecodeFormat;
   // sponsorBlock开关
   static bool enableSponsorBlock = false;
   // 视频评论开关
@@ -126,6 +129,10 @@ class GlobalDataCache {
         settingBox.get(SettingBoxKey.enableAutoExpand, defaultValue: false);
     enableDynamicSwitch =
         settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
+    enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
+    hardwareDecodeFormat = settingBox.get(SettingBoxKey.hardwareDecodeFormat,
+        defaultValue: Platform.isAndroid ? 'auto-safe' : 'auto');
+    settingBox.get(SettingBoxKey.enableDynamicSwitch, defaultValue: true);
     enableDlna = settingBox.get(SettingBoxKey.enableDlna, defaultValue: false);
     enableSponsorBlock =
         settingBox.get(SettingBoxKey.enableSponsorBlock, defaultValue: false);

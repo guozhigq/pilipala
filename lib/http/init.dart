@@ -1,13 +1,11 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:hive/hive.dart';
-import 'package:pilipala/models/user/info.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import '../utils/storage.dart';
 import '../utils/utils.dart';
@@ -39,18 +37,7 @@ class Request {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    final UserInfoData? userInfo = userInfoCache.get('userInfoCache');
-    if (userInfo != null && userInfo.mid != null) {
-      final List<Cookie> cookie2 = await cookieManager.cookieJar
-          .loadForRequest(Uri.parse(HttpString.tUrl));
-      if (cookie2.isEmpty) {
-        try {
-          await Request().get(HttpString.tUrl);
-        } catch (e) {
-          log("setCookie, ${e.toString()}");
-        }
-      }
-    }
+    final userInfo = userInfoCache.get('userInfoCache');
     setOptionsHeaders(userInfo, userInfo != null && userInfo.mid != null);
     String baseUrlType = 'default';
     if (setting.get(SettingBoxKey.enableGATMode, defaultValue: false)) {
@@ -69,10 +56,10 @@ class Request {
   static Future<String> getCsrf() async {
     List<Cookie> cookies = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(HttpString.baseUrl));
-    String token = '';
-    if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
-      token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
-    }
+    String token = cookies
+        .firstWhere((e) => e.name == 'bili_jct',
+            orElse: () => Cookie('bili_jct', ''))
+        .value;
     return token;
   }
 

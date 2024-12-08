@@ -3,7 +3,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:pilipala/utils/login.dart';
+// import 'package:pilipala/utils/login.dart';
 
 class ApiInterceptor extends Interceptor {
   @override
@@ -19,9 +19,9 @@ class ApiInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     try {
       // 在响应之后处理数据
-      if (response.data is Map && response.data['code'] == -101) {
-        LoginUtils.loginOut();
-      }
+      // if (response.data is Map && response.data['code'] == -101) {
+      //   LoginUtils.loginOut();
+      // }
     } catch (err) {
       print('ApiInterceptor: $err');
     }
@@ -39,6 +39,8 @@ class ApiInterceptor extends Interceptor {
       SmartDialog.showToast(
         await dioError(err),
         displayType: SmartToastType.onlyRefresh,
+        displayTime: const Duration(seconds: 1),
+        debounce: true,
       );
     }
     super.onError(err, handler);
@@ -62,7 +64,7 @@ class ApiInterceptor extends Interceptor {
         return '发送请求超时，请检查网络设置';
       case DioExceptionType.unknown:
         final String res = await checkConnect();
-        return '$res，网络异常！';
+        return '$res ${error.error}';
     }
   }
 
