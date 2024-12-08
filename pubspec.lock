@@ -129,6 +129,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.4"
+  brotli:
+    dependency: "direct main"
+    description:
+      name: brotli
+      sha256: "7f891558ed779aab2bed874f0a36b8123f9ff3f19cf6efbee89e18ed294945ae"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.6.0"
   build:
     dependency: transitive
     description:

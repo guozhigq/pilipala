@@ -235,21 +235,6 @@ class Utils {
           if (diff < minDiff) {
             minDiff = diff;
             closestNumber = number;
-            return closestNumber;
-          }
-        }
-      } catch (_) {}
-    }
-
-    // 向上查找
-    if (closestNumber == 0) {
-      try {
-        for (int number in numbers) {
-          int diff = (number - target).abs();
-
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestNumber = number;
           }
         }
       } catch (_) {}

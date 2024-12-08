@@ -132,4 +132,22 @@ class FavDetailController extends GetxController {
     title.value = res['title'];
     print(title);
   }
+
+  Future toViewPlayAll() async {
+    final FavDetailItemData firstItem = favList.first;
+    final String heroTag = Utils.makeHeroTag(firstItem.bvid);
+    Get.toNamed(
+      '/video?bvid=${firstItem.bvid}&cid=${firstItem.cid}',
+      arguments: {
+        'videoItem': firstItem,
+        'heroTag': heroTag,
+        'sourceType': 'fav',
+        'mediaId': favInfo['id'],
+        'oid': firstItem.id,
+        'favTitle': favInfo['title'],
+        'favInfo': favInfo,
+        'count': favInfo['media_count'],
+      },
+    );
+  }
 }

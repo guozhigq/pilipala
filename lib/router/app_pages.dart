@@ -193,6 +193,9 @@ class Routes {
     // 专栏
     CustomGetPage(name: '/opus', page: () => const OpusPage()),
     CustomGetPage(name: '/read', page: () => const ReadPage()),
+    // 用户专栏
+    CustomGetPage(
+        name: '/memberArticle', page: () => const MemberArticlePage()),
   ];
 }
 

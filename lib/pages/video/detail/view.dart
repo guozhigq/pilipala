@@ -668,11 +668,11 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                                   tag: heroTag,
                                   child: Stack(
                                     children: <Widget>[
-                                      if (isShowing)
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 0),
-                                          child: videoPlayerPanel,
-                                        ),
+                                      Obx(
+                                        () => isShowing.value
+                                            ? buildVideoPlayerPanel()
+                                            : const SizedBox(),
+                                      ),
 
                                       /// 关闭自动播放时 手动播放
                                       Obx(

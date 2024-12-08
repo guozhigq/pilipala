@@ -145,4 +145,18 @@ class LiveHttp {
       };
     }
   }
+
+  // 直播历史记录
+  static Future liveRoomEntry({required int roomId}) async {
+    await Request().post(
+      Api.liveRoomEntry,
+      data: {
+        'room_id': roomId,
+        'platform': 'pc',
+        'csrf_token': await Request.getCsrf(),
+        'csrf': await Request.getCsrf(),
+        'visit_id': '',
+      },
+    );
+  }
 }

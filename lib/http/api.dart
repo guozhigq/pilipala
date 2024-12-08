@@ -562,4 +562,37 @@ class Api {
   /// 系统通知标记已读
   static const String systemMarkRead =
       '${HttpString.messageBaseUrl}/x/sys-msg/update_cursor';
+
+  /// 编辑收藏夹
+  static const String editFavFolder = '/x/v3/fav/folder/edit';
+
+  /// 新建收藏夹
+  static const String addFavFolder = '/x/v3/fav/folder/add';
+
+  /// 直播间弹幕信息
+  static const String getDanmuInfo =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/getDanmuInfo';
+
+  /// 直播间发送弹幕
+  static const String sendLiveMsg = '${HttpString.liveBaseUrl}/msg/send';
+
+  /// 我的关注 - 正在直播
+  static const String getFollowingLive =
+      '${HttpString.liveBaseUrl}/xlive/web-ucenter/user/following';
+
+  /// 稍后再看&收藏夹视频列表
+  static const String mediaList = '/x/v2/medialist/resource/list';
+
+  /// 用户专栏
+  static const String opusList = '/x/polymer/web-dynamic/v1/opus/feed/space';
+
+  ///
+  static const String getViewInfo = '/x/article/viewinfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '${HttpString.liveBaseUrl}/xlive/web-room/v1/index/roomEntryAction';
+
+  /// 删除评论
+  static const String replyDel = '/x/v2/reply/del';
 }

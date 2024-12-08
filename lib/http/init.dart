@@ -226,15 +226,6 @@ class Request {
       if (extra['ua'] != null) {
         options.headers = {'user-agent': headerUa(type: extra['ua'])};
       }
-      if (extra['opus-goback'] != null) {
-        List<Cookie> cookies = await cookieManager.cookieJar
-            .loadForRequest(Uri.parse(HttpString.baseUrl));
-        String cookieHeader = cookies
-            .map((cookie) => '${cookie.name}=${cookie.value}')
-            .join('; ');
-        options.headers!['cookie'] =
-            '$cookieHeader; opus-goback = ${extra['opus-goback']}';
-      }
     }
     options.responseType = resType;
 

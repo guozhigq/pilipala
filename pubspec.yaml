@@ -147,6 +147,10 @@ dependencies:
   # 二维码
   qr_flutter: ^4.1.0
   bottom_sheet: ^4.0.4
+  web_socket_channel: ^2.4.5
+  brotli: ^0.6.0
+  # 文本语法高亮
+  re_highlight: ^0.0.3
 
 dev_dependencies:
   flutter_test:
@@ -178,20 +182,6 @@ dependency_overrides:
   media_kit_libs_video:
     git:
       url: https://github.com/media-kit/media-kit
-      path: libs/universal/media_kit_libs_video
-
-dependency_overrides:
-  media_kit:
-    git:
-      url: https://github.com/media-kit/media-kit.git
-      path: media_kit
-  media_kit_video:
-    git:
-      url: https://github.com/media-kit/media-kit.git
-      path: media_kit_video
-  media_kit_libs_video:
-    git:
-      url: https://github.com/media-kit/media-kit.git
       path: libs/universal/media_kit_libs_video
 
 flutter_launcher_icons:
