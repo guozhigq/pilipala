@@ -117,20 +117,23 @@ class DynamicsController extends GetxController {
     /// 点击评论action 直接查看评论
     if (action == 'comment') {
       Get.toNamed('/dynamicDetail',
-          arguments: {'item': item, 'floor': floor, 'action': action});
+          arguments: {'item': item, 'floor': floor, 'action': action},
+          preventDuplicates: false);
       return false;
     }
     switch (item!.type) {
       /// 转发的动态
       case 'DYNAMIC_TYPE_FORWARD':
         Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor});
+            arguments: {'item': item, 'floor': floor},
+            preventDuplicates: false);
         break;
 
       /// 图文动态查看
       case 'DYNAMIC_TYPE_DRAW':
         Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor});
+            arguments: {'item': item, 'floor': floor},
+            preventDuplicates: false);
         break;
       case 'DYNAMIC_TYPE_AV':
         String bvid = item.modules.moduleDynamic.major.archive.bvid;
@@ -188,7 +191,8 @@ class DynamicsController extends GetxController {
       case 'DYNAMIC_TYPE_WORD':
         print('纯文本');
         Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor});
+            arguments: {'item': item, 'floor': floor},
+            preventDuplicates: false);
         break;
       case 'DYNAMIC_TYPE_LIVE_RCMD':
         DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;

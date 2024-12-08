@@ -17,6 +17,7 @@ import 'package:pilipala/pages/video/detail/controller.dart';
 import 'package:pilipala/pages/video/detail/reply/index.dart';
 import 'package:pilipala/plugin/pl_player/models/play_repeat.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/follow.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/id_utils.dart';
 import 'package:pilipala/utils/storage.dart';
@@ -26,7 +27,6 @@ import '../../../../common/pages_bottom_sheet.dart';
 import '../../../../models/common/video_episode_type.dart';
 import '../../../../utils/drawer.dart';
 import '../related/index.dart';
-import 'widgets/group_panel.dart';
 
 class VideoIntroController extends GetxController {
   VideoIntroController({required this.bvid});
@@ -50,7 +50,7 @@ class VideoIntroController extends GetxController {
   List addMediaIdsNew = [];
   List delMediaIdsNew = [];
   // 关注状态 默认未关注
-  RxMap followStatus = {}.obs;
+  RxInt followStatus = (-1).obs;
   RxInt lastPlayCid = 0.obs;
   UserInfoData? userInfo;
   RxList<VideoTagItem> videoTags = <VideoTagItem>[].obs;
@@ -66,6 +66,8 @@ class VideoIntroController extends GetxController {
   late bool enableRelatedVideo;
   UgcSeason? ugcSeason;
   RxList<Part> pages = <Part>[].obs;
+  // 默认原创视频
+  int copyright = 1;
 
   @override
   void onInit() {
@@ -94,6 +96,7 @@ class VideoIntroController extends GetxController {
       videoDetail.value = result['data']!;
       ugcSeason = result['data']!.ugcSeason;
       pages.value = result['data']!.pages!;
+      copyright = result['data']!.copyright!;
       if (type == null) {
         lastPlayCid.value = cid ?? videoDetail.value.cid!;
       }
@@ -215,7 +218,7 @@ class VideoIntroController extends GetxController {
             contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [1, 2]
+              children: (copyright == 2 ? [1] : [1, 2])
                   .map(
                     (e) => ListTile(
                       title: Padding(
@@ -334,113 +337,23 @@ class VideoIntroController extends GetxController {
     }
     var result = await VideoHttp.hasFollow(mid: videoDetail.value.owner!.mid!);
     if (result['status']) {
-      followStatus.value = result['data'];
+      followStatus.value = result['data']['attribute'];
     }
     return result;
   }
 
   // 关注/取关up
-  Future actionRelationMod() async {
+  Future actionRelationMod(BuildContext context) async {
     feedBack();
     if (userInfo == null) {
       SmartDialog.showToast('账号未登录');
       return;
     }
-    final int currentStatus = followStatus['attribute'];
-    if (currentStatus == 128) {
-      modifyRelation('block', currentStatus);
-    } else {
-      modifyRelation('follow', currentStatus);
-    }
-  }
-
-  // 操作用户关系
-  Future modifyRelation(String actionType, int currentStatus) async {
-    final int mid = videoDetail.value.owner!.mid!;
-    String contentText;
-    int act;
-    if (actionType == 'follow') {
-      contentText = currentStatus != 0 ? '确定取消关注UP主?' : '确定关注UP主?';
-      act = currentStatus != 0 ? 2 : 1;
-    } else if (actionType == 'block') {
-      contentText = '确定从黑名单移除UP主?';
-      act = 6;
-    } else {
-      return;
-    }
-
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        final Color outline = Theme.of(Get.context!).colorScheme.outline;
-        return AlertDialog(
-          title: const Text('提示'),
-          content: Text(contentText),
-          actions: [
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: Text('点错了', style: TextStyle(color: outline)),
-            ),
-            TextButton(
-              onPressed: () => modifyRelationFetch(
-                context,
-                mid,
-                act,
-                currentStatus,
-                actionType,
-              ),
-              child: const Text('确定'),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  // 操作用户关系Future
-  Future modifyRelationFetch(
-    BuildContext context,
-    mid,
-    act,
-    currentStatus,
-    actionType,
-  ) async {
-    var res = await VideoHttp.relationMod(mid: mid, act: act, reSrc: 11);
-    if (context.mounted) {
-      Navigator.of(context).pop();
-    }
-    if (res['status']) {
-      if (actionType == 'follow') {
-        final Map<int, int> statusMap = {
-          0: 2,
-          2: 0,
-        };
-        late int actionStatus;
-        actionStatus = statusMap[currentStatus] ?? 0;
-        followStatus['attribute'] = actionStatus;
-        if (currentStatus == 0 && Get.context!.mounted) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(
-              content: const Text('关注成功'),
-              duration: const Duration(seconds: 2),
-              action: SnackBarAction(
-                label: '设置分组',
-                onPressed: setFollowGroup,
-              ),
-              showCloseIcon: true,
-            ),
-          );
-        } else {
-          SmartDialog.showToast('取消关注成功');
-        }
-      } else if (actionType == 'block') {
-        followStatus['attribute'] = 0;
-        SmartDialog.showToast('取消拉黑成功');
-      }
-      followStatus.refresh();
-    } else {
-      SmartDialog.showToast(res['msg']);
-    }
+    followStatus.value = await FollowUtils(
+      context: context,
+      followStatus: followStatus.value,
+      mid: videoDetail.value.owner!.mid!,
+    ).showFollowSheet();
   }
 
   // 修改分P或番剧分集
@@ -565,33 +478,33 @@ class VideoIntroController extends GetxController {
   }
 
   // 设置关注分组
-  void setFollowGroup() async {
-    final mediaQueryData = MediaQuery.of(Get.context!);
-    final contentHeight = mediaQueryData.size.height - kToolbarHeight;
-    final double initialChildSize =
-        (contentHeight - Get.width * 9 / 16) / contentHeight;
-    await showModalBottomSheet(
-      context: Get.context!,
-      useSafeArea: true,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: initialChildSize,
-          minChildSize: 0,
-          maxChildSize: 1,
-          snap: true,
-          expand: false,
-          snapSizes: [initialChildSize],
-          builder: (BuildContext context, ScrollController scrollController) {
-            return GroupPanel(
-              mid: videoDetail.value.owner!.mid!,
-              scrollController: scrollController,
-            );
-          },
-        );
-      },
-    );
-  }
+  // void setFollowGroup() async {
+  //   final mediaQueryData = MediaQuery.of(Get.context!);
+  //   final contentHeight = mediaQueryData.size.height - kToolbarHeight;
+  //   final double initialChildSize =
+  //       (contentHeight - Get.width * 9 / 16) / contentHeight;
+  //   await showModalBottomSheet(
+  //     context: Get.context!,
+  //     useSafeArea: true,
+  //     isScrollControlled: true,
+  //     builder: (BuildContext context) {
+  //       return DraggableScrollableSheet(
+  //         initialChildSize: initialChildSize,
+  //         minChildSize: 0,
+  //         maxChildSize: 1,
+  //         snap: true,
+  //         expand: false,
+  //         snapSizes: [initialChildSize],
+  //         builder: (BuildContext context, ScrollController scrollController) {
+  //           return GroupPanel(
+  //             mid: videoDetail.value.owner!.mid!,
+  //             scrollController: scrollController,
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   // ai总结
   Future aiConclusion() async {

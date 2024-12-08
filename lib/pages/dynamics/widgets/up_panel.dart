@@ -44,6 +44,7 @@ class _UpPanelState extends State<UpPanel> {
 
   void onClickUp(data, i) {
     currentMid.value = data.mid;
+    data.hasUpdate = false;
     Navigator.push(
       context,
       PlPopupRoute(

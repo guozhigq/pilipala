@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/http/constants.dart';
+import 'package:pilipala/http/index.dart';
 import 'package:pilipala/http/login.dart';
 import 'package:gt3_flutter_plugin/gt3_flutter_plugin.dart';
 import 'package:pilipala/models/login/index.dart';
 import 'package:pilipala/utils/login.dart';
+import 'package:pilipala/utils/utils.dart';
 
 class LoginPageController extends GetxController {
   final GlobalKey mobFormKey = GlobalKey<FormState>();
@@ -340,5 +345,33 @@ class LoginPageController extends GetxController {
       validTimer?.cancel();
       Get.back();
     }
+  }
+
+  // cookie登录
+  Future loginInByCookie({
+    required String cookiesStr,
+    String domain = HttpString.baseUrl,
+  }) async {
+    final List<String> cookiesStrList = cookiesStr.split('; ');
+    final List<Cookie> cookiesList = cookiesStrList.map((cookie) {
+      final cookieArr = cookie.split('=');
+      return Cookie(cookieArr[0], cookieArr[1]);
+    }).toList();
+
+    final String cookiePath = await Utils.getCookiePath();
+    final cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(cookiePath),
+    );
+    CookieManager cookieManager = CookieManager(cookieJar);
+    Request.cookieManager = cookieManager;
+    await Request.cookieManager.cookieJar
+        .saveFromResponse(Uri.parse(HttpString.baseUrl), cookiesList);
+    try {
+      Request.dio.options.headers['cookie'] = cookiesStr;
+    } catch (err) {
+      debugPrint(err.toString());
+    }
+    LoginUtils.confirmLogin('', null);
   }
 }

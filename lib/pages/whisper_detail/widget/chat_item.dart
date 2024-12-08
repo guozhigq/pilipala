@@ -521,6 +521,7 @@ class SystemNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map content = item.content ?? '';
+    Color primary = Theme.of(context).colorScheme.primary;
     return Row(
       children: [
         const SizedBox(width: 12),
@@ -557,12 +558,35 @@ class SystemNotice extends StatelessWidget {
                     .labelSmall!
                     .copyWith(color: Theme.of(context).colorScheme.outline),
               ),
-              Divider(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
-              ),
-              SelectableText(
-                content['text'],
-              )
+              Divider(color: primary.withOpacity(0.05)),
+              SelectableText(content['text']),
+              if (content['jump_text'] != null &&
+                  content['jump_uri'] != null) ...[
+                Divider(color: primary.withOpacity(0.05)),
+                Align(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    onPressed: () {
+                      Get.toNamed('/webview', parameters: {
+                        'url': content['jump_uri'],
+                        'type': 'url',
+                        'pageTitle': content['jump_text'] == ''
+                            ? '查看详情'
+                            : content['jump_text'],
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith((states) {
+                        return primary.withAlpha(20);
+                      }),
+                    ),
+                    child: Text(content['jump_text'] == ''
+                        ? '查看详情'
+                        : content['jump_text']),
+                  ),
+                ),
+              ]
             ],
           ),
         ),

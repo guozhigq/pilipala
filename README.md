@@ -26,15 +26,50 @@
 Xcode 13.4 不支持**auto_orientation**，请注释相关代码
 
 ```bash
-[✓] Flutter (Channel stable, 3.16.5, on macOS 14.1.2 23B92 darwin-arm64, locale
-    zh-Hans-CN)
+[!] Flutter (Channel [user-branch], 3.19.6, on macOS 14.6.1 23G93 darwin-arm64,
+    locale zh-Hans-CN)
+    ! Flutter version 3.19.6 on channel [user-branch] at
+      /Users/rr/Documents/sdk/flutter
+      Currently on an unknown channel. Run `flutter channel` to switch to an
+      official channel.
+      If that doesn't fix the issue, reinstall Flutter by following instructions
+      at https://flutter.dev/docs/get-started/install.
+    ! Upstream repository unknown source is not a standard remote.
+      Set environment variable "FLUTTER_GIT_URL" to unknown source to dismiss
+      this error.
+    • Framework revision 54e66469a9 (8 months ago), 2024-04-17 13:08:03 -0700
+    • Engine revision c4cd48e186
+    • Dart version 3.3.4
+    • DevTools version 2.31.1
+    • Pub download mirror https://pub.flutter-io.cn
+    • Flutter download mirror https://storage.flutter-io.cn
+    • If those were intentional, you can disregard the above warnings; however
+      it is recommended to use "git" directly to perform update checks and
+      upgrades.
+
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+    • Android SDK at /Users/rr/Library/Android/sdk
+    • Platform android-34, build-tools 34.0.0
+    • Java binary at: /Applications/Android
+      Studio.app/Contents/jbr/Contents/Home/bin/java
+    • Java version OpenJDK Runtime Environment (build 21.0.3+-79915917-b509.11)
+    • All Android licenses accepted.
+
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Build 15C65
+    • CocoaPods version 1.14.3
+
 [✓] Chrome - develop for the web
-[✓] Android Studio (version 2022.3)
-[✓] VS Code (version 1.87.2)
-[✓] Connected device (3 available)
-[✓] Network resources
+    • Chrome at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+
+[✓] Android Studio (version 2024.2)
+    • Android Studio at /Applications/Android Studio.app/Contents
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 21.0.3+-79915917-b509.11)
 
 ```
 

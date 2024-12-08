@@ -778,10 +778,15 @@ class UgcSeasonBuild extends StatelessWidget {
                   ],
                 ),
                 if (ugcSeason.intro != null && ugcSeason.intro != '') ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    ugcSeason.intro!,
-                    style: TextStyle(color: outline, fontSize: 12),
+                  const SizedBox(height: 6),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 100),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        ugcSeason.intro!,
+                        style: TextStyle(color: outline, fontSize: 12),
+                      ),
+                    ),
                   ),
                 ],
                 const SizedBox(height: 4),
