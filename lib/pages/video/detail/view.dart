@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
@@ -76,7 +77,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     getStatusHeight();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
-    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
+    vdCtr.sheetHeight.value = GlobalDataCache.sheetHeight;
     videoIntroController = Get.put(
         VideoIntroController(bvid: Get.parameters['bvid']!),
         tag: heroTag);
@@ -223,8 +224,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void _extendNestCtrListener() {
     final double offset = _extendNestCtr.position.pixels;
     if (vdCtr.videoDirection.value == 'horizontal') {
-      vdCtr.sheetHeight.value =
-          Get.size.height - videoHeight - statusBarHeight + offset;
+      vdCtr.sheetHeight.value = max(GlobalDataCache.sheetHeight,
+          Get.size.height - videoHeight - statusBarHeight + offset);
       appbarStream.add(offset);
     } else {
       if (offset > (Get.size.width * 22 / 16 - videoHeight)) {
@@ -502,7 +503,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   @override
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
-    final _context = MediaQuery.of(context);
+    final orientation = MediaQuery.orientationOf(context);
     late final double verticalHeight = sizeContext.width * 22 / 16;
     late double defaultVideoHeight = vdCtr.videoDirection.value == 'vertical'
         ? verticalHeight
@@ -517,12 +518,12 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     });
 
     // 竖屏
-    final bool isPortrait = _context.orientation == Orientation.portrait;
+    final bool isPortrait = orientation == Orientation.portrait;
     // 横屏
-    final bool isLandscape = _context.orientation == Orientation.landscape;
+    final bool isLandscape = orientation == Orientation.landscape;
     final Rx<bool> isFullScreen = plPlayerController?.isFullScreen ?? false.obs;
     // 全屏时高度撑满
-    if (isLandscape || isFullScreen.value == true) {
+    if (isLandscape || isFullScreen.value) {
       videoHeight.value = Get.size.height;
       enterFullScreen();
     } else {
@@ -634,10 +635,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     }
 
     Widget childWhenDisabled = SafeArea(
-      top: MediaQuery.of(context).orientation == Orientation.portrait &&
-          plPlayerController?.isFullScreen.value == true,
-      bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
-          plPlayerController?.isFullScreen.value == true,
+      top: isPortrait && isFullScreen.value,
+      bottom: isPortrait && isFullScreen.value,
       left: false,
       right: false,
       child: Stack(
@@ -660,22 +659,25 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                 return <Widget>[
                   Obx(
                     () {
-                      final Orientation orientation =
-                          MediaQuery.of(context).orientation;
+                      final bool isLandscape =
+                          MediaQuery.orientationOf(context) ==
+                              Orientation.landscape;
                       final bool isFullScreen =
-                          plPlayerController?.isFullScreen.value == true;
-                      final double expandedHeight =
-                          orientation == Orientation.landscape || isFullScreen
-                              ? (MediaQuery.sizeOf(context).height -
-                                  (orientation == Orientation.landscape
-                                      ? 0
-                                      : MediaQuery.of(context).padding.top))
-                              : videoHeight.value;
-                      if (orientation == Orientation.landscape ||
-                          isFullScreen) {
+                          plPlayerController?.isFullScreen.value ?? false;
+
+                      late double expandedHeight;
+                      if (isLandscape || isFullScreen) {
                         enterFullScreen();
+                        expandedHeight = (MediaQuery.sizeOf(context).height -
+                            (isLandscape
+                                ? 0
+                                : MediaQuery.paddingOf(context).top));
                       } else {
                         exitFullScreen();
+                        if (vdCtr.videoDirection.value == 'vertical') {
+                          videoHeight.value = verticalHeight;
+                        }
+                        expandedHeight = videoHeight.value;
                       }
                       return SliverAppBar(
                         automaticallyImplyLeading: false,
@@ -687,21 +689,24 @@ class _VideoDetailPageState extends State<VideoDetailPage>
                         backgroundColor: Colors.black,
                         flexibleSpace: SizedBox.expand(
                           child: PopScope(
-                            canPop:
-                                plPlayerController?.isFullScreen.value != true,
+                            canPop: !isFullScreen,
                             onPopInvoked: (bool didPop) {
-                              if (plPlayerController?.controlsLock.value ==
-                                  true) {
-                                plPlayerController?.onLockControl(false);
-                                return;
+                              if (plPlayerController != null) {
+                                if (plPlayerController!.controlsLock.value) {
+                                  plPlayerController!.onLockControl(false);
+                                  return;
+                                }
+                                if (isFullScreen) {
+                                  plPlayerController!
+                                      .triggerFullScreen(status: false);
+                                  if (vdCtr.videoDirection.value ==
+                                      'vertical') {
+                                    videoHeight.value = verticalHeight;
+                                  }
+                                }
                               }
-                              if (plPlayerController?.isFullScreen.value ==
-                                  true) {
-                                plPlayerController!
-                                    .triggerFullScreen(status: false);
-                              }
-                              if (MediaQuery.of(context).orientation ==
-                                  Orientation.landscape) {
+
+                              if (isLandscape) {
                                 verticalScreen();
                               }
                             },
@@ -746,9 +751,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
 
               /// 不收回
               pinnedHeaderSliverHeightBuilder: () {
-                return MediaQuery.of(context).orientation ==
-                            Orientation.landscape ||
-                        plPlayerController?.isFullScreen.value == true
+                return isLandscape || isFullScreen.value
                     ? MediaQuery.sizeOf(context).height
                     : playerStatus.value != PlayerStatus.playing
                         ? kToolbarHeight

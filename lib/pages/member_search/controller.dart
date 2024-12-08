@@ -37,6 +37,7 @@ class MemberSearchController extends GetxController {
     } else {
       Get.back();
     }
+    loadingStatus.value = 'init';
   }
 
   void onChange(value) {
@@ -76,7 +77,7 @@ class MemberSearchController extends GetxController {
       archivePn += 1;
       hasRequest = true;
     }
-    // loadingStatus.value = 'finish';
+    loadingStatus.value = 'finish';
     return res;
   }
 

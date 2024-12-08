@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,7 @@ class _OverlayPanelState extends State<OverlayPanel>
 
   void onClickUp(data, i, {type = 'click'}) {
     if (type == 'click') {
+      data.hasUpdate = false;
       pageController.jumpToPage(i);
     }
   }
@@ -81,11 +84,11 @@ class _OverlayPanelState extends State<OverlayPanel>
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 50,
-            child: TabBar(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+        child: Column(
+          children: [
+            TabBar(
               controller: _tabController,
               dividerColor: Colors.transparent,
               automaticIndicatorColorAdjustment: false,
@@ -106,25 +109,26 @@ class _OverlayPanelState extends State<OverlayPanel>
                 });
               },
             ),
-          ),
-          Expanded(
-            child: PageView.builder(
-              itemCount: upList.length,
-              controller: pageController,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  clipBehavior: Clip.antiAlias,
-                  margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: UpDyanmicsPage(upInfo: upList[index], ctr: widget.ctr),
-                );
-              },
+            Expanded(
+              child: PageView.builder(
+                itemCount: upList.length,
+                controller: pageController,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    clipBehavior: Clip.antiAlias,
+                    margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child:
+                        UpDyanmicsPage(upInfo: upList[index], ctr: widget.ctr),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -139,8 +143,8 @@ class _OverlayPanelState extends State<OverlayPanel>
           duration: const Duration(milliseconds: 200),
           scale: currentMid == data.mid ? 1 : 0.9,
           child: NetworkImgLayer(
-            width: contentWidth,
-            height: contentWidth,
+            width: 46,
+            height: 46,
             src: data.face,
             type: 'avatar',
           ),

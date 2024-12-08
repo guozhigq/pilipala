@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/common/constants.dart';
 import 'package:pilipala/common/skeleton/video_intro.dart';
+import 'package:pilipala/common/widgets/badge.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/pages/video/detail/index.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
@@ -17,6 +18,7 @@ import 'package:pilipala/models/video_detail_res.dart';
 import 'package:pilipala/pages/video/detail/introduction/controller.dart';
 import 'package:pilipala/pages/video/detail/widgets/ai_detail.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/follow.dart';
 import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/storage.dart';
 import 'package:pilipala/utils/utils.dart';
@@ -264,6 +266,26 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color outline = t.colorScheme.outline;
+    const TextStyle titleStyle = TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    );
+
+    TextSpan titltWidget = TextSpan(
+      children: [
+        WidgetSpan(
+          child: Visibility(
+            visible: widget.videoDetail!.copyright == 2,
+            child: const PBadge(text: '转载', type: 'color'),
+          ),
+        ),
+        const TextSpan(text: ' '),
+        TextSpan(
+          text: widget.videoDetail!.title!,
+          style: titleStyle,
+        ),
+      ],
+    );
     return SliverPadding(
       padding: const EdgeInsets.only(
         left: StyleString.safeSpace,
@@ -285,25 +307,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             },
             child: ExpandablePanel(
               controller: _expandableCtr,
-              collapsed: Text(
-                widget.videoDetail!.title!,
-                softWrap: true,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              expanded: Text(
-                widget.videoDetail!.title!,
-                softWrap: true,
-                maxLines: 10,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              collapsed: Text.rich(softWrap: true, maxLines: 2, titltWidget),
+              expanded: Text.rich(softWrap: true, maxLines: 10, titltWidget),
               theme: const ExpandableThemeData(
                 animationDuration: Duration(milliseconds: 300),
                 scrollAnimationDuration: Duration(milliseconds: 300),
@@ -454,14 +459,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     Obx(
                       () {
                         final int attr =
-                            videoIntroController.followStatus['attribute'] ?? 0;
-                        return videoIntroController.followStatus.isEmpty
+                            videoIntroController.followStatus.value;
+                        return attr == -1
                             ? const SizedBox()
                             : SizedBox(
                                 height: 32,
                                 child: TextButton(
-                                  onPressed:
-                                      videoIntroController.actionRelationMod,
+                                  onPressed: () => videoIntroController
+                                      .actionRelationMod(context),
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.only(
                                       left: 8,
