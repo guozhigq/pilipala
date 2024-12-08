@@ -215,4 +215,25 @@ class DynamicsHttp {
       };
     }
   }
+
+  static Future opusDetail({
+    required int opusId,
+  }) async {
+    var res = await Request().get(
+      Api.opusDetail,
+      data: {'id': opusId},
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

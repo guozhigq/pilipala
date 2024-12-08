@@ -89,9 +89,8 @@ class _DynamicDetailPageState extends State<DynamicDetailPage>
             _dynamicDetailController = Get.put(
                 DynamicDetailController(oid, replyType),
                 tag: opusId.toString());
+            _dynamicDetailController.opusId = opusId;
             _futureBuilderFuture = _dynamicDetailController.queryReplyList();
-            await _dynamicDetailController.reqHtmlByOpusId(opusId!);
-            setState(() {});
           }
         } else {
           oid = moduleDynamic.major!.draw!.id!;
