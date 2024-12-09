@@ -110,7 +110,8 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final isPortrait = mediaQuery.orientation == Orientation.portrait;
-    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+    final RxBool isLandscape =
+        (mediaQuery.orientation == Orientation.landscape).obs;
 
     final padding = mediaQuery.padding;
 
@@ -194,7 +195,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
               Obx(
                 () => SizedBox(
                   height: padding.top +
-                      (_liveRoomController.isPortrait.value || isLandscape
+                      (_liveRoomController.isPortrait.value || isLandscape.value
                           ? 0
                           : kToolbarHeight),
                 ),
@@ -205,14 +206,14 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                   if (plPlayerController.isFullScreen.value == true) {
                     plPlayerController.triggerFullScreen(status: false);
                   }
-                  if (isLandscape) {
+                  if (isLandscape.value) {
                     verticalScreen();
                   }
                 },
                 child: Obx(
                   () => Container(
                     width: Get.size.width,
-                    height: isLandscape
+                    height: isLandscape.value
                         ? Get.size.height
                         : !_liveRoomController.isPortrait.value
                             ? Get.size.width * 9 / 16
@@ -313,7 +314,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           ),
           // 消息列表
           Visibility(
-            visible: !isLandscape,
+            visible: !isLandscape.value,
             child: Obx(
               () => Align(
                 alignment: Alignment.bottomCenter,
