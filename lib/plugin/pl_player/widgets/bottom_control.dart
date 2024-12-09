@@ -18,19 +18,18 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      height: 90,
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(7, 0, 7, 6),
+            padding: const EdgeInsets.fromLTRB(7, 0, 7, 4),
             child: ProgressBarWidget(controller: controller!),
           ),
           Row(children: buildBottomControl!),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
         ],
       ),
     );

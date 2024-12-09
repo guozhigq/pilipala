@@ -626,4 +626,7 @@ class Api {
   /// 修复标题和海报
   // /api/view?id=${aid}  /all/video/av${aid}  /video/av${aid}/
   static const String fixTitleAndPic = '${HttpString.biliplusBaseUrl}/api/view';
+
+  /// 专栏详情
+  static const String opusDetail = '/x/polymer/web-dynamic/v1/opus/detail';
 }
