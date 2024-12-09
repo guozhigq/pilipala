@@ -292,10 +292,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           style: ButtonStyle(
             padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
-          child: const Text(
-            '选集',
-            style: TextStyle(color: Colors.white, fontSize: 13),
-          ),
+          child: const Text('选集', style: textStyle),
         ),
       ),
 
@@ -310,14 +307,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             padding: MaterialStateProperty.all(EdgeInsets.zero),
           ),
           child: Obx(
-            () => Text(
-              _.videoFitDEsc.value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            () => Text(_.videoFitDEsc.value, style: textStyle),
           ),
         ),
       ),
@@ -339,10 +329,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 height: 40,
                 padding: const EdgeInsets.only(left: 20),
                 value: speed,
-                child: Text(
-                  '${speed}x',
-                  style: textStyle.copyWith(fontWeight: FontWeight.bold),
-                ),
+                child: Text('${speed}x', style: textStyle),
               );
             }).toList();
           },
@@ -352,10 +339,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             alignment: Alignment.center,
             margin: const EdgeInsets.only(right: 4),
             child: Obx(
-              () => Text(
-                '${_.playbackSpeed.toString()}x',
-                style: textStyle.copyWith(fontWeight: FontWeight.bold),
-              ),
+              () => Text('${_.playbackSpeed.toString()}x', style: textStyle),
             ),
           ),
         ),
