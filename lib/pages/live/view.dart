@@ -194,26 +194,31 @@ class _LivePageState extends State<LivePage>
                     ),
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    Get.toNamed('/liveFollowing');
-                  },
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  child: Row(
-                    children: [
-                      Text(
-                        '查看更多',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
+                Obx(
+                  () => Visibility(
+                    visible: _liveController.liveFollowingCount.value > 0,
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed('/liveFollowing');
+                      },
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      child: Row(
+                        children: [
+                          Text(
+                            '查看更多',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -222,19 +227,18 @@ class _LivePageState extends State<LivePage>
               future: _futureBuilderFuture2,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data == null) {
-                    return const SizedBox();
-                  }
                   Map? data = snapshot.data;
-                  if (data?['status']) {
+                  if (data != null && data['status']) {
                     RxList list = _liveController.liveFollowingList;
-                    return LiveFollowingListView(list: list);
+                    return list.isNotEmpty
+                        ? LiveFollowingListView(list: list)
+                        : const Center(child: Text('没有人在直播'));
                   } else {
                     return SizedBox(
                       height: 80,
                       child: Center(
                         child: Text(
-                          data?['msg'] ?? '',
+                          data?['msg'] ?? '请求异常',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.outline,
                             fontSize: 12,
@@ -280,6 +284,15 @@ class LiveFollowingListView extends StatelessWidget {
                         arguments: {
                           'liveItem': item,
                           'heroTag': item.roomId.toString()
+                        },
+                      );
+                    },
+                    onLongPress: () {
+                      Get.toNamed(
+                        '/member?mid=${list[index].uid}',
+                        arguments: {
+                          'face': list[index].face,
+                          'heroTag': list[index].uid.toString(),
                         },
                       );
                     },
