@@ -1080,10 +1080,7 @@ class _HeaderControlState extends State<HeaderControl> {
                 if (videoIntroController.isShowOnlineTotal)
                   Text(
                     '${videoIntroController.total.value}人正在看',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
+                    style: textStyle,
                   ),
                 const Spacer(),
                 Expanded(
@@ -1094,18 +1091,12 @@ class _HeaderControlState extends State<HeaderControl> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           String currentTime = _formatTime(snapshot.data!);
-                          return Text(
-                            currentTime,
-                            style: const TextStyle(fontSize: 12),
-                          );
+                          return Text(currentTime, style: textStyle);
                         } else if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           // 如果Stream还未发出数据，先显示初始获取的时间
                           String currentTime = _formatTime(initialTime);
-                          return Text(
-                            currentTime,
-                            style: const TextStyle(fontSize: 12),
-                          );
+                          return Text(currentTime, style: textStyle);
                         } else {
                           return const SizedBox();
                         }
@@ -1156,7 +1147,8 @@ class _HeaderControlState extends State<HeaderControl> {
                         () => Marquee(
                           text: videoIntroController.videoDetail.value.title ??
                               '',
-                          style: const TextStyle(fontSize: 16),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.white),
                           scrollAxis: Axis.horizontal,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           blankSpace: constraints.maxWidth,
