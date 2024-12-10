@@ -3,7 +3,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:pilipala/common/widgets/drag_handle.dart';
 import 'package:pilipala/common/widgets/group_panel.dart';
 import 'package:pilipala/http/video.dart';
-import 'package:pilipala/utils/global_data_cache.dart';
 
 class FollowUtils {
   final BuildContext context;
@@ -196,7 +195,7 @@ class FollowUtils {
           snapSizes: [initialChildSize],
           builder: (BuildContext context, ScrollController scrollController) {
             return GroupPanel(
-              mid: GlobalDataCache.userInfo!.mid!,
+              mid: mid,
               scrollController: scrollController,
             );
           },
