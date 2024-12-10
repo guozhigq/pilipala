@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/models/msg/system.dart';
 import 'package:pilipala/pages/message/utils/index.dart';
 import 'package:pilipala/utils/app_scheme.dart';
@@ -41,31 +42,35 @@ class _MessageSystemPageState extends State<MessageSystemPage> {
               if (snapshot.data == null) {
                 return const SizedBox();
               }
-              if (snapshot.data['status']) {
-                final systemItems = _messageSystemCtr.systemItems;
+              Map? data = snapshot.data;
+              if (data != null && data['status']) {
+                RxList<MessageSystemModel> systemItems =
+                    _messageSystemCtr.systemItems;
                 return Obx(
-                  () => ListView.separated(
-                    controller: scrollController,
-                    itemBuilder: (context, index) => SystemItem(
-                      item: systemItems[index],
-                      index: index,
-                      messageSystemCtr: _messageSystemCtr,
-                    ),
-                    itemCount: systemItems.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
-                        indent: 14,
-                        endIndent: 14,
-                        height: 1,
-                        color: Colors.grey.withOpacity(0.1),
-                      );
-                    },
-                  ),
+                  () => systemItems.isNotEmpty
+                      ? ListView.separated(
+                          controller: scrollController,
+                          itemBuilder: (context, index) => SystemItem(
+                            item: systemItems[index],
+                            index: index,
+                            messageSystemCtr: _messageSystemCtr,
+                          ),
+                          itemCount: systemItems.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return Divider(
+                              indent: 14,
+                              endIndent: 14,
+                              height: 1,
+                              color: Colors.grey.withOpacity(0.1),
+                            );
+                          },
+                        )
+                      : const CustomScrollView(slivers: [NoData()]),
                 );
               } else {
                 // 请求错误
                 return HttpError(
-                  errMsg: snapshot.data['msg'],
+                  errMsg: data?['msg'] ?? '请求异常',
                   fn: () {
                     setState(() {
                       _futureBuilderFuture =

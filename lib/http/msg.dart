@@ -299,8 +299,10 @@ class MsgHttp {
         return {
           'status': true,
           'data': res.data['data']['system_notify_list']
-              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
-              .toList(),
+                  ?.map<MessageSystemModel>(
+                      (e) => MessageSystemModel.fromJson(e))
+                  .toList() ??
+              [],
         };
       } catch (err) {
         return {'status': false, 'date': [], 'msg': err.toString()};
@@ -341,8 +343,10 @@ class MsgHttp {
         return {
           'status': true,
           'data': res.data['data']['system_notify_list']
-              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
-              .toList(),
+                  ?.map<MessageSystemModel>(
+                      (e) => MessageSystemModel.fromJson(e))
+                  .toList() ??
+              [],
         };
       } catch (err) {
         return {'status': false, 'date': [], 'msg': err.toString()};
