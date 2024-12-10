@@ -9,7 +9,7 @@ class LiveFollowController extends GetxController {
   RxInt crossAxisCount = 2.obs;
   Box setting = GStorage.setting;
   int _currentPage = 1;
-  RxInt liveFollowingCount = 0.obs;
+  RxString liveFollowingCount = '- '.obs;
   RxList<LiveFollowingItemModel> liveFollowingList =
       <LiveFollowingItemModel>[].obs;
 
@@ -28,10 +28,11 @@ class LiveFollowController extends GetxController {
     if (res['status']) {
       if (type == 'init') {
         liveFollowingList.value = res['data'].list;
-        liveFollowingCount.value = res['data'].liveCount;
+        liveFollowingCount.value = res['data'].liveCount.toString();
       } else if (type == 'onLoad') {
         liveFollowingList.addAll(res['data'].list);
       }
+      liveFollowingList.removeWhere((e) => e.liveStatus != 1);
       _currentPage += 1;
     } else {
       SmartDialog.showToast(res['msg']);

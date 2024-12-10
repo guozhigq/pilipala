@@ -137,7 +137,8 @@ class SettingBoxKey {
       enableGradientBg = 'enableGradientBg',
       enableDynamicSwitch = 'enableDynamicSwitch',
       navBarSort = 'navBarSort',
-      actionTypeSort = 'actionTypeSort';
+      actionTypeSort = 'actionTypeSort',
+      enablePureBlack = 'enablePureBlack';
 }
 
 class LocalCacheKey {

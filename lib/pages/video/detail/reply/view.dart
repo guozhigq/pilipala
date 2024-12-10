@@ -196,7 +196,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                 future: _futureBuilderFuture,
                 builder: (BuildContext context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    var data = snapshot.data;
+                    Map? data = snapshot.data;
                     if (_videoReplyController.replyList.isNotEmpty ||
                         (data != null && data['status'])) {
                       // 请求成功
@@ -258,7 +258,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                     } else {
                       // 请求错误
                       return HttpError(
-                        errMsg: data['msg'],
+                        errMsg: data?['msg'] ?? '请求异常',
                         fn: () {
                           setState(() {
                             _futureBuilderFuture =

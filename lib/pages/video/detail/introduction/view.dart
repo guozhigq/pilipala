@@ -276,7 +276,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         WidgetSpan(
           child: Visibility(
             visible: widget.videoDetail!.copyright == 2,
-            child: const PBadge(text: '转载', type: 'color'),
+            child: const PBadge(text: '转载', type: 'color', stack: 'relative'),
           ),
         ),
         const TextSpan(text: ' '),

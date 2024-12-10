@@ -73,7 +73,7 @@ class VideoReplyController extends GetxController {
         /// 临时修复
         final bool flag = replyList
             .any((ReplyItemModel reply) => reply.rpid == replies.first.rpid);
-        if (replies.length == 1 && flag) {
+        if (replies.length == 1 && flag && type == 'onLoad') {
           replies.clear();
           isEnd = true;
         }

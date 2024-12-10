@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
@@ -76,7 +77,7 @@ class _VideoDetailPageState extends State<VideoDetailPage>
     getStatusHeight();
     heroTag = Get.arguments['heroTag'];
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
-    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
+    vdCtr.sheetHeight.value = GlobalDataCache.sheetHeight;
     videoIntroController = Get.put(
         VideoIntroController(bvid: Get.parameters['bvid']!),
         tag: heroTag);
@@ -223,8 +224,8 @@ class _VideoDetailPageState extends State<VideoDetailPage>
   void _extendNestCtrListener() {
     final double offset = _extendNestCtr.position.pixels;
     if (vdCtr.videoDirection.value == 'horizontal') {
-      vdCtr.sheetHeight.value =
-          Get.size.height - videoHeight - statusBarHeight + offset;
+      vdCtr.sheetHeight.value = max(GlobalDataCache.sheetHeight,
+          Get.size.height - videoHeight - statusBarHeight + offset);
       appbarStream.add(offset);
     } else {
       if (offset > (Get.size.width * 22 / 16 - videoHeight)) {
