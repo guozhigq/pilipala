@@ -78,8 +78,8 @@ class _RcmdPageState extends State<RcmdPage>
                 future: _futureBuilderFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
+                    Map? data = snapshot.data;
+                    if (data != null && data['status']) {
                       return Obx(
                         () {
                           if (_rcmdController.isLoadingMore &&
@@ -94,7 +94,7 @@ class _RcmdPageState extends State<RcmdPage>
                       );
                     } else {
                       return HttpError(
-                        errMsg: data['msg'],
+                        errMsg: data?['msg'] ?? '请求异常',
                         fn: () {
                           setState(() {
                             _rcmdController.isLoadingMore = true;
