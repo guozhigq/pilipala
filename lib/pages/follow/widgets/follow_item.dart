@@ -47,7 +47,7 @@ class FollowItem extends StatelessWidget {
               height: 34,
               child: TextButton(
                 onPressed: () async {
-                  int followStatus = await FollowUtils(
+                  await FollowUtils(
                     context: context,
                     followStatus: 2,
                     mid: item.mid!,

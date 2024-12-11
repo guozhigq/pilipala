@@ -197,13 +197,13 @@ class LikeItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 25),
-                if (type == 'reply' || type == 'danmu')
+                if (type == 'reply' || type == 'danmu' || type == 'dynamic')
                   Container(
                     width: 60,
                     height: 60,
                     padding: const EdgeInsets.all(4),
                     child: Text(
-                      item.item!.title!,
+                      item.item?.title ?? '',
                       maxLines: 4,
                       style: const TextStyle(fontSize: 12, letterSpacing: 0.3),
                       overflow: TextOverflow.ellipsis,
