@@ -32,7 +32,6 @@ import 'package:status_bar_control/status_bar_control.dart';
 import '../../../plugin/pl_player/models/bottom_control_type.dart';
 import '../../../services/shutdown_timer_service.dart';
 import 'widgets/app_bar.dart';
-import 'widgets/header_control.dart';
 
 class VideoDetailPage extends StatefulWidget {
   const VideoDetailPage({Key? key}) : super(key: key);

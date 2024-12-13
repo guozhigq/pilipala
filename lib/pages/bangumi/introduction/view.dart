@@ -22,10 +22,10 @@ import 'controller.dart';
 import 'widgets/intro_detail.dart';
 
 class BangumiIntroPanel extends StatefulWidget {
-  final int? cid;
+  final int cid;
   const BangumiIntroPanel({
     Key? key,
-    this.cid,
+    required this.cid,
   }) : super(key: key);
 
   @override
@@ -49,7 +49,7 @@ class _BangumiIntroPanelState extends State<BangumiIntroPanel>
   void initState() {
     super.initState();
     heroTag = Get.arguments['heroTag'];
-    cid = widget.cid!;
+    cid = widget.cid;
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     _futureBuilderFuture = bangumiIntroController.queryBangumiIntro();
@@ -103,11 +103,11 @@ class BangumiInfo extends StatefulWidget {
   const BangumiInfo({
     super.key,
     this.bangumiDetail,
-    this.cid,
+    required this.cid,
   });
 
   final BangumiInfoModel? bangumiDetail;
-  final int? cid;
+  final int cid;
 
   @override
   State<BangumiInfo> createState() => _BangumiInfoState();
@@ -119,7 +119,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
   late final VideoDetailController videoDetailCtr;
   Box localCache = GStorage.localCache;
   late double sheetHeight;
-  int? cid;
+  late int cid;
   bool isProcessing = false;
   void Function()? handleState(Future Function() action) {
     return isProcessing
@@ -137,7 +137,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
     bangumiIntroController = Get.put(BangumiIntroController(), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     sheetHeight = localCache.get('sheetHeight');
-    cid = widget.cid!;
+    cid = widget.cid;
     videoDetailCtr.cid.listen((p0) {
       cid = p0;
       if (!mounted) {
@@ -313,7 +313,7 @@ class _BangumiInfoState extends State<BangumiInfo> {
           if (widget.bangumiDetail!.episodes!.isNotEmpty) ...[
             BangumiPanel(
               pages: widget.bangumiDetail!.episodes!,
-              cid: cid! ?? widget.bangumiDetail!.episodes!.first.cid!,
+              cid: cid,
               sheetHeight: sheetHeight,
               changeFuc: (bvid, cid, aid, cover) => bangumiIntroController
                   .changeSeasonOrbangu(bvid, cid, aid, cover),

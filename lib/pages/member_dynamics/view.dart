@@ -1,6 +1,7 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pilipala/common/widgets/no_data.dart';
 import 'package:pilipala/pages/member_dynamics/index.dart';
 import 'package:pilipala/utils/utils.dart';
 
@@ -82,7 +83,7 @@ class _MemberDynamicsPageState extends State<MemberDynamicsPage> {
                                 childCount: list.length,
                               ),
                             )
-                          : const SliverToBoxAdapter(),
+                          : const NoData(),
                     );
                   } else {
                     return HttpError(

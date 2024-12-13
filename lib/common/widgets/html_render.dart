@@ -59,7 +59,7 @@ class HtmlRender extends StatelessWidget {
                 imgUrl = imgUrl.replaceAll('http://', 'https://');
               }
               imgUrl = imgUrl.contains('@') ? imgUrl.split('@').first : imgUrl;
-              final bool isEmote = imgUrl.contains('/emote/');
+              // final bool isEmote = imgUrl.contains('/emote/');
               final bool isMall = imgUrl.contains('/mall/');
               if (isMall) {
                 return const SizedBox();
