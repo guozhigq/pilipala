@@ -6,6 +6,7 @@ import 'package:pilipala/common/skeleton/skeleton.dart';
 import 'package:pilipala/common/widgets/http_error.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/common/widgets/no_data.dart';
+import 'package:pilipala/utils/global_data_cache.dart';
 import 'package:pilipala/utils/utils.dart';
 
 import 'controller.dart';
@@ -236,6 +237,7 @@ class SessionItem extends StatelessWidget {
     final content = sessionItem.lastMsg.content;
     final msgStatus = sessionItem.lastMsg.msgStatus;
     final int msgType = sessionItem.lastMsg.msgType;
+    final int senderUid = sessionItem.lastMsg.senderUid;
 
     return ListTile(
       onTap: () {
@@ -269,7 +271,7 @@ class SessionItem extends StatelessWidget {
       title: Text(sessionItem.accountInfo?.name ?? ''),
       subtitle: Text(
           msgStatus == 1
-              ? '你撤回了一条消息'
+              ? '${senderUid == GlobalDataCache.userInfo?.mid ? '你' : '对方'}撤回了一条消息'
               : msgType == 2
                   ? '[图片]'
                   : content != null && content != ''
