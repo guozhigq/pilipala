@@ -124,16 +124,12 @@ class DynamicsController extends GetxController {
     switch (item!.type) {
       /// 转发的动态
       case 'DYNAMIC_TYPE_FORWARD':
-        Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor},
-            preventDuplicates: false);
+        goPush(item, floor);
         break;
 
       /// 图文动态查看
       case 'DYNAMIC_TYPE_DRAW':
-        Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor},
-            preventDuplicates: false);
+        goPush(item, floor);
         break;
       case 'DYNAMIC_TYPE_AV':
         String bvid = item.modules.moduleDynamic.major.archive.bvid;
@@ -189,10 +185,7 @@ class DynamicsController extends GetxController {
 
       /// 纯文字动态查看
       case 'DYNAMIC_TYPE_WORD':
-        print('纯文本');
-        Get.toNamed('/dynamicDetail',
-            arguments: {'item': item, 'floor': floor},
-            preventDuplicates: false);
+        goPush(item, floor);
         break;
       case 'DYNAMIC_TYPE_LIVE_RCMD':
         DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;
@@ -233,6 +226,17 @@ class DynamicsController extends GetxController {
         }
         break;
     }
+  }
+
+  void goPush(item, floor) {
+    if (Get.currentRoute == '/dynamicDetail') {
+      return;
+    }
+    Get.toNamed(
+      '/dynamicDetail',
+      arguments: {'item': item, 'floor': floor},
+      preventDuplicates: false,
+    );
   }
 
   Future queryFollowUp({type = 'init'}) async {
