@@ -5,10 +5,12 @@ class DynamicsDataModel {
     this.hasMore,
     this.items,
     this.offset,
+    this.total,
   });
   bool? hasMore;
   List<DynamicItemModel>? items;
   String? offset;
+  int? total;
 
   DynamicsDataModel.fromJson(Map<String, dynamic> json) {
     hasMore = json['has_more'];
@@ -16,6 +18,7 @@ class DynamicsDataModel {
         .map<DynamicItemModel>((e) => DynamicItemModel.fromJson(e))
         .toList();
     offset = json['offset'];
+    total = json['total'];
   }
 }
 
