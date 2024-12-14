@@ -91,6 +91,11 @@ class MemberHttp {
     String order = 'pubdate',
     bool orderAvoided = true,
   }) async {
+    String? wWebid;
+    if ((await getWWebid(mid: mid!))['status']) {
+      wWebid = GlobalDataCache.wWebid;
+    }
+
     String dmImgStr = Utils.base64EncodeRandomString(16, 64);
     String dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
     Map params = await WbiSign().makSign({
@@ -112,7 +117,8 @@ class MemberHttp {
               'order': 'pubdate',
               'special_type': 'charging',
             }
-          : {}
+          : {},
+      ...wWebid != null ? {'w_webid': wWebid} : {},
     });
 
     var res = await Request().get(
@@ -120,6 +126,7 @@ class MemberHttp {
       data: params,
       extra: {'ua': 'pc'},
     );
+
     if (res.data['code'] == 0) {
       return {
         'status': true,
@@ -163,13 +170,17 @@ class MemberHttp {
   }
 
   // 搜索用户动态
-  static Future memberDynamicSearch({int? pn, int? ps, int? mid}) async {
-    var res = await Request().get(Api.memberDynamic, data: {
-      'keyword': '海拔',
-      'mid': mid,
-      'pn': pn,
-      'ps': ps,
-      'platform': 'web'
+  static Future memberDynamicSearch({
+    int? pn,
+    int? mid,
+    String? offset,
+    required String keyword,
+  }) async {
+    var res = await Request().get(Api.memberDynamicSearch, data: {
+      'host_mid': mid,
+      'page': pn,
+      'offset': offset,
+      'keyword': keyword,
     });
     if (res.data['code'] == 0) {
       return {
