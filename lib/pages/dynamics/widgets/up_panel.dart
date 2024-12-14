@@ -59,7 +59,7 @@ class _UpPanelState extends State<UpPanel> {
   void onClickUpAni(data, i) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final itemWidth = contentWidth + itemPadding.horizontal;
-    final liveLen = liveList.length;
+    final liveLen = showLiveUser.value ? liveList.length : 0;
     final upLen = upList.length;
 
     currentMid.value = data.mid;
