@@ -26,7 +26,7 @@
 Xcode 13.4 不支持 ```auto_orientation```，请注释相关代码
 
 ```bash
-[✓] Flutter (Channel stable, 3.16.5, on macOS 14.1.2 23B92 darwin-arm64, locale
+[✓] Flutter (Channel stable, 3.19.6, on macOS 14.1.2 23B92 darwin-arm64, locale
     zh-Hans-CN)
 [✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
 [✓] Xcode - develop for iOS and macOS (Xcode 15.1)
