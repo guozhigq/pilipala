@@ -111,7 +111,7 @@ class SessionList {
 
 class LastMsg {
   LastMsg({
-    this.senderIid,
+    this.senderUid,
     this.receiverType,
     this.receiverId,
     this.msgType,
@@ -125,7 +125,7 @@ class LastMsg {
     // this.newFaceVersion,
   });
 
-  int? senderIid;
+  int? senderUid;
   int? receiverType;
   int? receiverId;
   int? msgType;
@@ -139,7 +139,7 @@ class LastMsg {
   // int? newFaceVersion;
 
   LastMsg.fromJson(Map<String, dynamic> json) {
-    senderIid = json['sender_uid'];
+    senderUid = json['sender_uid'];
     receiverType = json['receiver_type'];
     receiverId = json['receiver_id'];
     msgType = json['msg_type'];
