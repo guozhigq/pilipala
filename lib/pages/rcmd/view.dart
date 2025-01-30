@@ -23,32 +23,42 @@ class _RcmdPageState extends State<RcmdPage>
   final RcmdController _rcmdController = Get.put(RcmdController());
   late Future _futureBuilderFuture;
 
+  ScrollController? _scrollController;
+
   @override
   bool get wantKeepAlive => true;
+
+  void handleScroll() {
+    if (_scrollController == null) return;
+
+    if (_scrollController!.position.pixels >=
+        _scrollController!.position.maxScrollExtent - 200) {
+      EasyThrottle.throttle('my-throttler', const Duration(milliseconds: 200),
+          () {
+        _rcmdController.isLoadingMore = true;
+        _rcmdController.onLoad();
+      });
+    }
+    handleScrollEvent(_scrollController!);
+  }
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
-    ScrollController scrollController = _rcmdController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle(
-              'my-throttler', const Duration(milliseconds: 200), () {
-            _rcmdController.isLoadingMore = true;
-            _rcmdController.onLoad();
-          });
-        }
-        handleScrollEvent(scrollController);
-      },
-    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollController?.removeListener(handleScroll);
+    _scrollController = PrimaryScrollController.of(context)
+      ..addListener(handleScroll);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    _rcmdController.scrollController.removeListener(() {});
+    _scrollController?.removeListener(handleScroll);
     super.dispose();
   }
 
@@ -68,7 +78,6 @@ class _RcmdPageState extends State<RcmdPage>
           await Future.delayed(const Duration(milliseconds: 300));
         },
         child: CustomScrollView(
-          controller: _rcmdController.scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverPadding(

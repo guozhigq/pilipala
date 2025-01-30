@@ -1,12 +1,16 @@
-import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:pilipala/common/widgets/network_img_layer.dart';
 import 'package:pilipala/pages/mine/index.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/scrolling.dart';
+import 'package:pilipala/utils/subordinate_scroll_controller_scope.dart';
 import './controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,20 +20,45 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+class PreferredSizePersistentDelegate extends SliverPersistentHeaderDelegate {
+  @override
+  final TickerProvider vsync;
+  final PreferredSizeWidget widget;
+
+  const PreferredSizePersistentDelegate({
+    required this.widget,
+    required this.vsync,
+  });
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return widget;
+  }
+
+  @override
+  double get maxExtent => widget.preferredSize.height;
+
+  @override
+  double get minExtent => widget.preferredSize.height;
+
+  @override
+  bool shouldRebuild(covariant PreferredSizePersistentDelegate oldDelegate) =>
+      true;
+
+  // @override
+  // FloatingHeaderSnapConfiguration? get snapConfiguration =>
+  //     FloatingHeaderSnapConfiguration(
+  //         curve: Curves.easeOut, duration: const Duration(milliseconds: 200));
+}
+
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final HomeController _homeController = Get.put(HomeController());
   List videoList = [];
-  late Stream<bool> stream;
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    stream = _homeController.searchBarStream.stream;
-  }
 
   showUserBottomSheet() {
     feedBack();
@@ -44,9 +73,49 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  PreferredSizeWidget _buildTabs() {
+    if (_homeController.tabs.length > 1) {
+      if (_homeController.enableGradientBg) {
+        return const CustomTabs();
+      }
+      return PreferredSize(
+        preferredSize: const Size.fromHeight(42),
+        child: Container(
+          width: double.infinity,
+          color: Theme.of(context).colorScheme.surface,
+          height: 42,
+          padding: const EdgeInsets.only(top: 4),
+          child: Align(
+            alignment: Alignment.center,
+            child: TabBar(
+              controller: _homeController.tabController,
+              tabs: [for (var i in _homeController.tabs) Tab(text: i['label'])],
+              isScrollable: true,
+              enableFeedback: true,
+              splashBorderRadius: BorderRadius.circular(10),
+              tabAlignment: TabAlignment.center,
+              onTap: (value) {
+                feedBack();
+                if (_homeController.initialIndex.value == value) {
+                  ScrollingUtils.navigateToTop(
+                      PrimaryScrollController.of(context),
+                      MediaQuery.of(context).size.height);
+                }
+                _homeController.initialIndex.value = value;
+              },
+            ),
+          ),
+        ),
+      );
+    }
+    return const PreferredSize(
+        preferredSize: Size.fromHeight(6), child: SizedBox(height: 6));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -66,56 +135,51 @@ class _HomePageState extends State<HomePage>
                 ? SystemUiOverlayStyle.light
                 : SystemUiOverlayStyle.dark,
       ),
-      body: Column(
-        children: [
-          CustomAppBar(
-            stream: _homeController.hideSearchBar
-                ? stream
-                : StreamController<bool>.broadcast().stream,
-            ctr: _homeController,
-            callback: showUserBottomSheet,
-          ),
-          if (_homeController.tabs.length > 1) ...[
-            if (_homeController.enableGradientBg) ...[
-              const CustomTabs(),
-            ] else ...[
-              Container(
-                width: double.infinity,
-                height: 42,
-                padding: const EdgeInsets.only(top: 4),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: TabBar(
-                    controller: _homeController.tabController,
-                    tabs: [
-                      for (var i in _homeController.tabs) Tab(text: i['label'])
-                    ],
-                    isScrollable: true,
-                    dividerColor: Colors.transparent,
-                    enableFeedback: true,
-                    splashBorderRadius: BorderRadius.circular(10),
-                    tabAlignment: TabAlignment.center,
-                    onTap: (value) {
-                      feedBack();
-                      if (_homeController.initialIndex.value == value) {
-                        _homeController.tabsCtrList[value]().animateToTop();
-                      }
-                      _homeController.initialIndex.value = value;
-                    },
-                  ),
-                ),
+      body: SafeArea(
+        child: NestedScrollView(
+          floatHeaderSlivers: true,
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverPersistentHeader(
+                delegate: PreferredSizePersistentDelegate(
+                    vsync: this,
+                    widget: CustomAppBar(
+                        ctr: _homeController, callback: showUserBottomSheet)),
+                floating: true,
               ),
+              SliverOverlapAbsorber(
+                handle:
+                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                sliver: SliverPersistentHeader(
+                    delegate: PreferredSizePersistentDelegate(
+                        vsync: this, widget: _buildTabs()),
+                    pinned: true),
+              ),
+            ];
+          },
+          body: TabBarView(
+            controller: _homeController.tabController,
+            children: [
+              for (final (index, page) in _homeController.tabsPageList.indexed)
+                ListenableBuilder(
+                  listenable: _homeController.tabController,
+                  builder: (context, child) {
+                    return SubordinateScrollControllerScope(
+                      isActive: _homeController.tabController.index == index,
+                      child: Padding(
+                          padding: EdgeInsets.only(
+                              top: NestedScrollView
+                                          .sliverOverlapAbsorberHandleFor(
+                                              context)
+                                      .layoutExtent ??
+                                  0),
+                          child: page),
+                    );
+                  },
+                )
             ],
-          ] else ...[
-            const SizedBox(height: 6),
-          ],
-          Expanded(
-            child: TabBarView(
-              controller: _homeController.tabController,
-              children: _homeController.tabsPageList,
-            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -123,14 +187,12 @@ class _HomePageState extends State<HomePage>
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
-  final Stream<bool>? stream;
   final HomeController? ctr;
   final Function? callback;
 
   const CustomAppBar({
     super.key,
     this.height = kToolbarHeight,
-    this.stream,
     this.ctr,
     this.callback,
   });
@@ -140,30 +202,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: stream!.distinct(),
-      initialData: true,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        final RxBool isUserLoggedIn = ctr!.userLogin;
-        final double top = MediaQuery.of(context).padding.top;
-        return AnimatedOpacity(
-          opacity: snapshot.data ? 1 : 0,
-          duration: const Duration(milliseconds: 300),
-          child: AnimatedContainer(
-            curve: Curves.easeInOutCubicEmphasized,
-            duration: const Duration(milliseconds: 500),
-            height: snapshot.data ? top + 52 : top,
-            padding: EdgeInsets.fromLTRB(14, top + 6, 14, 0),
-            child: UserInfoWidget(
-              top: top,
-              ctr: ctr,
-              userLogin: isUserLoggedIn,
-              userFace: ctr?.userFace.value,
-              callback: () => callback!(),
-            ),
-          ),
-        );
-      },
+    final RxBool isUserLoggedIn = ctr!.userLogin;
+    final double top = MediaQuery.of(context).padding.top;
+
+    return UserInfoWidget(
+      top: top,
+      ctr: ctr,
+      userLogin: isUserLoggedIn,
+      userFace: ctr?.userFace.value,
+      callback: () => callback!(),
     );
   }
 }
@@ -214,25 +261,28 @@ class UserInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SearchBar(ctr: ctr),
-        if (userLogin.value) ...[
-          const SizedBox(width: 4),
-          ClipRect(
-            child: IconButton(
-              onPressed: () => Get.toNamed('/whisper'),
-              icon: const Icon(Icons.notifications_none),
-            ),
-          )
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Row(
+        children: [
+          SearchBar(ctr: ctr),
+          if (userLogin.value) ...[
+            const SizedBox(width: 4),
+            ClipRect(
+              child: IconButton(
+                onPressed: () => Get.toNamed('/whisper'),
+                icon: const Icon(Icons.notifications_none),
+              ),
+            )
+          ],
+          const SizedBox(width: 8),
+          Obx(
+            () => userLogin.value
+                ? buildLoggedInWidget(context)
+                : DefaultUser(callback: () => callback!()),
+          ),
         ],
-        const SizedBox(width: 8),
-        Obx(
-          () => userLogin.value
-              ? buildLoggedInWidget(context)
-              : DefaultUser(callback: () => callback!()),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -267,11 +317,14 @@ class DefaultUser extends StatelessWidget {
   }
 }
 
-class CustomTabs extends StatefulWidget {
+class CustomTabs extends StatefulWidget implements PreferredSizeWidget {
   const CustomTabs({super.key});
 
   @override
   State<CustomTabs> createState() => _CustomTabsState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(44);
 }
 
 class _CustomTabsState extends State<CustomTabs> {
@@ -280,7 +333,8 @@ class _CustomTabsState extends State<CustomTabs> {
   void onTap(int index) {
     feedBack();
     if (_homeController.initialIndex.value == index) {
-      _homeController.tabsCtrList[index]().animateToTop();
+      ScrollingUtils.navigateToTop(PrimaryScrollController.of(context),
+          MediaQuery.of(context).size.height);
     }
     _homeController.initialIndex.value = index;
     _homeController.tabController.index = index;

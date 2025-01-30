@@ -25,34 +25,42 @@ class _LivePageState extends State<LivePage>
   final LiveController _liveController = Get.put(LiveController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFuture2;
-  late ScrollController scrollController;
+
+  ScrollController? _scrollController;
 
   @override
   bool get wantKeepAlive => true;
+
+  void handleScroll() {
+    if (_scrollController == null) return;
+
+    if (_scrollController!.position.pixels >=
+        _scrollController!.position.maxScrollExtent - 200) {
+      EasyThrottle.throttle('liveList', const Duration(milliseconds: 200), () {
+        _liveController.onLoad();
+      });
+    }
+    handleScrollEvent(_scrollController!);
+  }
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _liveController.queryLiveList('init');
     _futureBuilderFuture2 = _liveController.fetchLiveFollowing();
-    scrollController = _liveController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('liveList', const Duration(milliseconds: 200),
-              () {
-            _liveController.onLoad();
-          });
-        }
-        handleScrollEvent(scrollController);
-      },
-    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollController?.removeListener(handleScroll);
+    _scrollController = PrimaryScrollController.of(context)
+      ..addListener(handleScroll);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(() {});
+    _scrollController?.removeListener(handleScroll);
     super.dispose();
   }
 
@@ -71,7 +79,6 @@ class _LivePageState extends State<LivePage>
           return await _liveController.onRefresh();
         },
         child: CustomScrollView(
-          controller: _liveController.scrollController,
           slivers: [
             buildFollowingList(),
             SliverPadding(

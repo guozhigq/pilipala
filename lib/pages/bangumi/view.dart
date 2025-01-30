@@ -22,34 +22,42 @@ class _BangumiPageState extends State<BangumiPage>
   final BangumiController _bangumidController = Get.put(BangumiController());
   late Future? _futureBuilderFuture;
   late Future? _futureBuilderFutureFollow;
-  late ScrollController scrollController;
+  ScrollController? _scrollController;
 
   @override
   bool get wantKeepAlive => true;
 
+  void handleScroll() {
+    if (_scrollController == null) return;
+
+    if (_scrollController!.position.pixels >=
+        _scrollController!.position.maxScrollExtent - 200) {
+      EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
+        _bangumidController.isLoadingMore = true;
+        _bangumidController.onLoad();
+      });
+      handleScrollEvent(_scrollController!);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    scrollController = _bangumidController.scrollController;
     _futureBuilderFuture = _bangumidController.queryBangumiListFeed();
     _futureBuilderFutureFollow = _bangumidController.queryBangumiFollow();
-    scrollController.addListener(
-      () async {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          EasyThrottle.throttle('my-throttler', const Duration(seconds: 1), () {
-            _bangumidController.isLoadingMore = true;
-            _bangumidController.onLoad();
-          });
-        }
-        handleScrollEvent(scrollController);
-      },
-    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollController?.removeListener(handleScroll);
+    _scrollController = PrimaryScrollController.of(context)
+      ..addListener(handleScroll);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(() {});
+    _scrollController?.removeListener(handleScroll);
     super.dispose();
   }
 
@@ -62,7 +70,6 @@ class _BangumiPageState extends State<BangumiPage>
         return _bangumidController.queryBangumiFollow();
       },
       child: CustomScrollView(
-        controller: _bangumidController.scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: Obx(
