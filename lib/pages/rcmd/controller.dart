@@ -8,7 +8,6 @@ import 'package:pilipala/models/model_rec_video_item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class RcmdController extends GetxController {
-  final ScrollController scrollController = ScrollController();
   int _currentPage = 0;
   // RxList<RecVideoItemAppModel> appVideoList = <RecVideoItemAppModel>[].obs;
   // RxList<RecVideoItemModel> webVideoList = <RecVideoItemModel>[].obs;
@@ -95,17 +94,6 @@ class RcmdController extends GetxController {
   // 上拉加载
   Future onLoad() async {
     queryRcmdFeed('onLoad');
-  }
-
-  // 返回顶部
-  void animateToTop() async {
-    if (scrollController.offset >=
-        MediaQuery.of(Get.context!).size.height * 5) {
-      scrollController.jumpTo(0);
-    } else {
-      await scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    }
   }
 
   void blockUserCb(mid) {

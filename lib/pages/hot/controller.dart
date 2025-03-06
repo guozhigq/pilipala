@@ -4,7 +4,6 @@ import 'package:pilipala/http/video.dart';
 import 'package:pilipala/models/model_hot_video_item.dart';
 
 class HotController extends GetxController {
-  final ScrollController scrollController = ScrollController();
   final int _count = 20;
   int _currentPage = 1;
   RxList<HotVideoItemModel> videoList = <HotVideoItemModel>[].obs;
@@ -40,16 +39,5 @@ class HotController extends GetxController {
   // 上拉加载
   Future onLoad() async {
     queryHotFeed('onLoad');
-  }
-
-  // 返回顶部并刷新
-  void animateToTop() async {
-    if (scrollController.offset >=
-        MediaQuery.of(Get.context!).size.height * 5) {
-      scrollController.jumpTo(0);
-    } else {
-      await scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    }
   }
 }

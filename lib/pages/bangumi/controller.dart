@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:pilipala/http/bangumi.dart';
@@ -6,7 +5,6 @@ import 'package:pilipala/models/bangumi/list.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class BangumiController extends GetxController {
-  final ScrollController scrollController = ScrollController();
   RxList<BangumiListItemModel> bangumiList = <BangumiListItemModel>[].obs;
   RxList<BangumiListItemModel> bangumiFollowList = <BangumiListItemModel>[].obs;
   int _currentPage = 1;
@@ -59,16 +57,5 @@ class BangumiController extends GetxController {
       bangumiFollowList.value = result['data'].list;
     } else {}
     return result;
-  }
-
-  // 返回顶部并刷新
-  void animateToTop() async {
-    if (scrollController.offset >=
-        MediaQuery.of(Get.context!).size.height * 5) {
-      scrollController.jumpTo(0);
-    } else {
-      await scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    }
   }
 }

@@ -10,6 +10,7 @@ import 'package:pilipala/pages/media/index.dart';
 import 'package:pilipala/pages/rank/index.dart';
 import 'package:pilipala/utils/event_bus.dart';
 import 'package:pilipala/utils/feed_back.dart';
+import 'package:pilipala/utils/scrolling.dart';
 import 'package:pilipala/utils/storage.dart';
 import './controller.dart';
 
@@ -51,7 +52,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         if (DateTime.now().millisecondsSinceEpoch - _lastSelectTime! < 500) {
           _homeController.onRefresh();
         } else {
-          _homeController.animateToTop();
+          ScrollingUtils.navigateToTop(PrimaryScrollController.of(context),
+              MediaQuery.of(context).size.height);
         }
         _lastSelectTime = DateTime.now().millisecondsSinceEpoch;
       }
