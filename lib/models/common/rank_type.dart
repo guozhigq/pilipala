@@ -16,9 +16,7 @@ enum RandType {
   madness,
   fashion,
   entertainment,
-  film,
-  origin,
-  rookie
+  film
 }
 
 extension RankTypeDesc on RandType {
@@ -50,7 +48,6 @@ extension RankTypeDesc on RandType {
         'technology',
         'sport',
         'car',
-        'life',
         'food',
         'animal',
         'madness',
