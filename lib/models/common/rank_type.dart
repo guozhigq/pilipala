@@ -3,7 +3,6 @@ import 'package:pilipala/pages/rank/zone/index.dart';
 
 enum RandType {
   all,
-  creation,
   animation,
   music,
   dance,
@@ -12,21 +11,17 @@ enum RandType {
   technology,
   sport,
   car,
-  life,
   food,
   animal,
   madness,
   fashion,
   entertainment,
-  film,
-  origin,
-  rookie
+  film
 }
 
 extension RankTypeDesc on RandType {
   String get description => [
         '全站',
-        '国创相关',
         '动画',
         '音乐',
         '舞蹈',
@@ -35,7 +30,6 @@ extension RankTypeDesc on RandType {
         '科技',
         '运动',
         '汽车',
-        '生活',
         '美食',
         '动物圈',
         '鬼畜',
@@ -46,7 +40,6 @@ extension RankTypeDesc on RandType {
 
   String get id => [
         'all',
-        'creation',
         'animation',
         'music',
         'dance',
@@ -55,7 +48,6 @@ extension RankTypeDesc on RandType {
         'technology',
         'sport',
         'car',
-        'life',
         'food',
         'animal',
         'madness',
@@ -80,18 +72,9 @@ List tabsConfig = [
       Icons.live_tv_outlined,
       size: 15,
     ),
-    'label': '国创相关',
-    'type': RandType.creation,
-    'page': const ZonePage(rid: 168),
-  },
-  {
-    'icon': const Icon(
-      Icons.live_tv_outlined,
-      size: 15,
-    ),
     'label': '动画',
     'type': RandType.animation,
-    'page': const ZonePage(rid: 1),
+    'page': const ZonePage(rid: 1005),
   },
   {
     'icon': const Icon(
@@ -100,7 +83,7 @@ List tabsConfig = [
     ),
     'label': '音乐',
     'type': RandType.music,
-    'page': const ZonePage(rid: 3),
+    'page': const ZonePage(rid: 1003),
   },
   {
     'icon': const Icon(
@@ -109,7 +92,7 @@ List tabsConfig = [
     ),
     'label': '舞蹈',
     'type': RandType.dance,
-    'page': const ZonePage(rid: 129),
+    'page': const ZonePage(rid: 1004),
   },
   {
     'icon': const Icon(
@@ -118,7 +101,7 @@ List tabsConfig = [
     ),
     'label': '游戏',
     'type': RandType.game,
-    'page': const ZonePage(rid: 4),
+    'page': const ZonePage(rid: 1008),
   },
   {
     'icon': const Icon(
@@ -127,7 +110,7 @@ List tabsConfig = [
     ),
     'label': '知识',
     'type': RandType.knowledge,
-    'page': const ZonePage(rid: 36),
+    'page': const ZonePage(rid: 1010),
   },
   {
     'icon': const Icon(
@@ -136,7 +119,7 @@ List tabsConfig = [
     ),
     'label': '科技',
     'type': RandType.technology,
-    'page': const ZonePage(rid: 188),
+    'page': const ZonePage(rid: 1012),
   },
   {
     'icon': const Icon(
@@ -145,7 +128,7 @@ List tabsConfig = [
     ),
     'label': '运动',
     'type': RandType.sport,
-    'page': const ZonePage(rid: 234),
+    'page': const ZonePage(rid: 1018),
   },
   {
     'icon': const Icon(
@@ -154,16 +137,7 @@ List tabsConfig = [
     ),
     'label': '汽车',
     'type': RandType.car,
-    'page': const ZonePage(rid: 223),
-  },
-  {
-    'icon': const Icon(
-      Icons.live_tv_outlined,
-      size: 15,
-    ),
-    'label': '生活',
-    'type': RandType.life,
-    'page': const ZonePage(rid: 160),
+    'page': const ZonePage(rid: 1013),
   },
   {
     'icon': const Icon(
@@ -172,7 +146,7 @@ List tabsConfig = [
     ),
     'label': '美食',
     'type': RandType.food,
-    'page': const ZonePage(rid: 211),
+    'page': const ZonePage(rid: 1020),
   },
   {
     'icon': const Icon(
@@ -181,7 +155,7 @@ List tabsConfig = [
     ),
     'label': '动物圈',
     'type': RandType.animal,
-    'page': const ZonePage(rid: 217),
+    'page': const ZonePage(rid: 1024),
   },
   {
     'icon': const Icon(
@@ -190,7 +164,7 @@ List tabsConfig = [
     ),
     'label': '鬼畜',
     'type': RandType.madness,
-    'page': const ZonePage(rid: 119),
+    'page': const ZonePage(rid: 1007),
   },
   {
     'icon': const Icon(
@@ -199,7 +173,7 @@ List tabsConfig = [
     ),
     'label': '时尚',
     'type': RandType.fashion,
-    'page': const ZonePage(rid: 155),
+    'page': const ZonePage(rid: 1014),
   },
   {
     'icon': const Icon(
@@ -208,7 +182,7 @@ List tabsConfig = [
     ),
     'label': '娱乐',
     'type': RandType.entertainment,
-    'page': const ZonePage(rid: 5),
+    'page': const ZonePage(rid: 1002),
   },
   {
     'icon': const Icon(
@@ -217,6 +191,6 @@ List tabsConfig = [
     ),
     'label': '影视',
     'type': RandType.film,
-    'page': const ZonePage(rid: 181),
+    'page': const ZonePage(rid: 1001),
   }
 ];
