@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -20,9 +18,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   RxString userFace = ''.obs;
   var userInfo;
   Box setting = GStrorage.setting;
-  late final StreamController<bool> searchBarStream =
-      StreamController<bool>.broadcast();
-  late bool hideSearchBar;
   late List defaultTabs;
   late List<String> tabbarSort;
   RxString defaultSearch = ''.obs;
@@ -34,8 +29,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
     userFace.value = userInfo != null ? userInfo.face : '';
-    hideSearchBar =
-        setting.get(SettingBoxKey.hideSearchBar, defaultValue: false);
     if (setting.get(SettingBoxKey.enableSearchWord, defaultValue: true)) {
       searchDefault();
     }
@@ -49,12 +42,6 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     int index = tabController.index;
     var ctr = tabsCtrList[index];
     ctr().onRefresh();
-  }
-
-  void animateToTop() {
-    int index = tabController.index;
-    var ctr = tabsCtrList[index];
-    ctr().animateToTop();
   }
 
   // 更新登录状态
@@ -113,11 +100,5 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     if (res.data['code'] == 0) {
       defaultSearch.value = res.data['data']['name'];
     }
-  }
-
-  @override
-  void onClose() {
-    searchBarStream.close();
-    super.onClose();
   }
 }

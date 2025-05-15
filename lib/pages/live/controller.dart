@@ -7,7 +7,6 @@ import 'package:pilipala/models/live/item.dart';
 import 'package:pilipala/utils/storage.dart';
 
 class LiveController extends GetxController {
-  final ScrollController scrollController = ScrollController();
   int count = 12;
   int _currentPage = 1;
   RxInt crossAxisCount = 2.obs;
@@ -53,17 +52,6 @@ class LiveController extends GetxController {
   // 上拉加载
   Future onLoad() async {
     queryLiveList('onLoad');
-  }
-
-  // 返回顶部并刷新
-  void animateToTop() async {
-    if (scrollController.offset >=
-        MediaQuery.of(Get.context!).size.height * 5) {
-      scrollController.jumpTo(0);
-    } else {
-      await scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    }
   }
 
   //

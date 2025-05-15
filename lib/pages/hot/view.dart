@@ -20,33 +20,41 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   final HotController _hotController = Get.put(HotController());
   List videoList = [];
   Future? _futureBuilderFuture;
-  late ScrollController scrollController;
+  ScrollController? _scrollController;
 
   @override
   bool get wantKeepAlive => true;
+
+  void handleScroll() {
+    if (_scrollController == null) return;
+
+    if (_scrollController!.position.pixels >=
+        _scrollController!.position.maxScrollExtent - 200) {
+      if (!_hotController.isLoadingMore) {
+        _hotController.isLoadingMore = true;
+        _hotController.onLoad();
+      }
+    }
+    handleScrollEvent(_scrollController!);
+  }
 
   @override
   void initState() {
     super.initState();
     _futureBuilderFuture = _hotController.queryHotFeed('init');
-    scrollController = _hotController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          if (!_hotController.isLoadingMore) {
-            _hotController.isLoadingMore = true;
-            _hotController.onLoad();
-          }
-        }
-        handleScrollEvent(scrollController);
-      },
-    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollController?.removeListener(handleScroll);
+    _scrollController = PrimaryScrollController.of(context)
+      ..addListener(handleScroll);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(() {});
+    _scrollController?.removeListener(handleScroll);
     super.dispose();
   }
 
@@ -58,7 +66,6 @@ class _HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
         return await _hotController.onRefresh();
       },
       child: CustomScrollView(
-        controller: _hotController.scrollController,
         slivers: [
           SliverPadding(
             // 单列布局 EdgeInsets.zero
