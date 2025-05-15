@@ -18,6 +18,7 @@ class SSearchController extends GetxController {
   RxList<SearchSuggestItem> searchSuggestList = <SearchSuggestItem>[].obs;
   final _debouncer =
       Debouncer(delay: const Duration(milliseconds: 200)); // 设置延迟时间
+  bool customSearchHint = false;
   String hintText = '搜索';
   RxString defaultSearch = ''.obs;
   Box setting = GStrorage.setting;
@@ -32,8 +33,11 @@ class SSearchController extends GetxController {
         onClickKeyword(Get.parameters['keyword']!);
       }
       if (Get.parameters['hintText'] != null) {
+        customSearchHint = true;
         hintText = Get.parameters['hintText']!;
         searchKeyWord.value = hintText;
+      } else {
+        customSearchHint = false;
       }
     }
     historyCacheList = histiryWord.get('cacheList') ?? [];
@@ -44,6 +48,9 @@ class SSearchController extends GetxController {
   void onChange(value) {
     searchKeyWord.value = value;
     if (value == '') {
+      if (customSearchHint) {
+        searchKeyWord.value = hintText;
+      }
       searchSuggestList.value = [];
       return;
     }
@@ -53,7 +60,11 @@ class SSearchController extends GetxController {
   void onClear() {
     if (searchKeyWord.value.isNotEmpty && controller.value.text != '') {
       controller.value.clear();
-      searchKeyWord.value = '';
+      if (customSearchHint) {
+        searchKeyWord.value = hintText;
+      } else {
+        searchKeyWord.value = '';
+      }
       searchSuggestList.value = [];
     } else {
       Get.back();
